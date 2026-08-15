@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ═══════════════════════════════════════════════════════
+    // قاعدة عامة لكل المستندات:
+    // قراءة عامة + كتابة عامة (حسب الإعداد الحالي للموقع)
+    // ═══════════════════════════════════════════════════════
+    match /{document=**} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // كل مجموعة على حدة (للتوثيق — السلوك الفعلي من القاعدة العامة)
+    // ═══════════════════════════════════════════════════════
+
+    // الطلاب: بيانات الطلاب المسجلين + الصورة الشخصية (Base64)
+    match /students/{studentId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // المعلمون: حسابات المعلمين
+    match /teachers/{teacherId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // الإعدادات: التحكم في التسجيل، الأسعار، الإعلانات، الملاحظات، واتساب...
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // طلبات الالتحاق بالعام الجديد
+    match /enrollments/{enrollmentId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // الإعلانات والنصائح
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // سجلات الحضور والمدفوعات (إن وجدت كمستندات منفصلة)
+    match /attendance/{attendanceId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // المجموعات الدراسية
+    match /groups/{groupId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // طلبات السداد/التحقق
+    match /payments/{paymentId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // الدروس والمحتوى التعليمي
+    match /lessons/{lessonId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}

@@ -1,0 +1,2527 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المستر</title>
+    <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap"
+        crossorigin>
+    <link rel="stylesheet" media="print" onload="this.media='all'"
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap"
+        crossorigin>
+    <link rel="stylesheet" href="admin.css">
+    <!-- Boxicons for Icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <!-- Set loading class before paint -->
+    <script>
+        document.documentElement.classList.add('loading');
+        // Firebase data readiness tracker
+        window.__fbTracker = (function() {
+            var pending = 0;
+            var resolvers = [];
+            function check() {
+                if (pending === 0) {
+                    resolvers.forEach(function(r) { r(); });
+                    resolvers = [];
+                }
+            }
+            return {
+                add: function() { pending++; },
+                done: function() { pending--; check(); },
+                wait: function() {
+                    if (pending === 0) return Promise.resolve();
+                    return new Promise(function(r) { resolvers.push(r); });
+                }
+            };
+        })();
+    </script>
+
+    <!-- Anti-FOUC: apply theme before paint -->
+    <script>
+        (function() {
+            var theme = localStorage.getItem('elmistar-theme');
+            if (!theme) {
+                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                localStorage.setItem('elmistar-theme', theme);
+            }
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+    <!-- ===== PRELOADER ===== -->
+    <div id="preloader" role="status" aria-label="Loading">
+        <div class="preloader-particles" aria-hidden="true">
+            <div class="prtcl" style="top:10%;left:5%;width:6px;height:6px;animation-delay:0s;background:#3b82f6;"></div>
+            <div class="prtcl" style="top:20%;right:12%;width:4px;height:4px;animation-delay:0.8s;background:#60a5fa;"></div>
+            <div class="prtcl" style="top:50%;left:8%;width:5px;height:5px;animation-delay:1.6s;background:#3b82f6;"></div>
+            <div class="prtcl" style="bottom:30%;right:8%;width:7px;height:7px;animation-delay:2.4s;background:#60a5fa;"></div>
+            <div class="prtcl" style="bottom:15%;left:15%;width:3px;height:3px;animation-delay:0.4s;background:#3b82f6;"></div>
+            <div class="prtcl" style="top:35%;right:5%;width:5px;height:5px;animation-delay:1.2s;background:#60a5fa;"></div>
+            <div class="prtcl" style="bottom:40%;left:3%;width:4px;height:4px;animation-delay:2s;background:#3b82f6;"></div>
+            <div class="prtcl" style="top:70%;right:15%;width:6px;height:6px;animation-delay:0.6s;background:#60a5fa;"></div>
+        </div>
+        <div class="preloader-box">
+            <div class="pl-mascot-wrap">
+                <svg class="pl-mascot" viewBox="0 0 120 140" fill="none" width="120" height="140" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="18" y="40" width="84" height="70" rx="8" fill="url(#bookGradA)" stroke="#1e40af" stroke-width="2.5"/>
+                    <rect x="18" y="40" width="42" height="70" rx="8" fill="#dbeafe" stroke="#1e40af" stroke-width="2.5"/>
+                    <line x1="60" y1="40" x2="60" y2="110" stroke="#93c5fd" stroke-width="1.5"/>
+                    <path d="M60 40 Q62 43 60 46" stroke="#1e40af" stroke-width="1.5" fill="none"/>
+                    <path d="M60 104 Q62 107 60 110" stroke="#1e40af" stroke-width="1.5" fill="none"/>
+                    <rect x="24" y="46" width="30" height="4" rx="2" fill="#bfdbfe"/>
+                    <rect x="24" y="54" width="25" height="4" rx="2" fill="#bfdbfe"/>
+                    <rect x="24" y="62" width="28" height="4" rx="2" fill="#bfdbfe"/>
+                    <rect x="66" y="46" width="30" height="4" rx="2" fill="#fde68a"/>
+                    <rect x="66" y="54" width="25" height="4" rx="2" fill="#fde68a"/>
+                    <rect x="66" y="62" width="28" height="4" rx="2" fill="#fde68a"/>
+                    <ellipse class="pl-eye pl-eye-l" cx="44" cy="80" rx="5" ry="5.5" fill="#1e3a8a"/>
+                    <ellipse class="pl-eye-pl" cx="44" cy="78.5" rx="2" ry="2.2" fill="#fff"/>
+                    <ellipse class="pl-eye pl-eye-r" cx="76" cy="80" rx="5" ry="5.5" fill="#1e3a8a"/>
+                    <ellipse class="pl-eye-pr" cx="76" cy="78.5" rx="2" ry="2.2" fill="#fff"/>
+                    <path class="pl-smile" d="M48 93 Q60 102 72 93" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                    <ellipse cx="36" cy="91" rx="5" ry="3" fill="#fda4af" opacity="0.5"/>
+                    <ellipse cx="84" cy="91" rx="5" ry="3" fill="#fda4af" opacity="0.5"/>
+                    <polygon points="60,18 18,32 60,28 102,32" fill="#1e3a8a" stroke="#1e3a8a" stroke-width="1"/>
+                    <rect x="44" y="18" width="32" height="6" rx="2" fill="#1e3a8a"/>
+                    <polygon points="60,14 44,20 60,18 76,20" fill="#1e3a8a"/>
+                    <line x1="82" y1="28" x2="94" y2="48" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="94" cy="50" r="3" fill="#60a5fa"/>
+                    <line x1="94" y1="50" x2="90" y2="60" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="94" y1="50" x2="98" y2="60" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="bookGradA" x1="18" y1="40" x2="102" y2="110">
+                            <stop offset="0%" stop-color="#dbeafe"/>
+                            <stop offset="100%" stop-color="#fde68a"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="pl-mascot-glow"></div>
+            </div>
+            <div class="pl-brand">
+                <div class="pl-title-ar">المستّر</div>
+                <div class="pl-title-en">ElMistar</div>
+            </div>
+            <div class="pl-loader-group">
+                <div class="pl-ring-wrap">
+                    <div class="pl-ring">
+                        <div class="pl-ring-spin"></div>
+                    </div>
+                </div>
+                <div class="pl-bar-wrap">
+                    <div class="pl-bar"></div>
+                </div>
+            </div>
+            <div class="pl-label">جاري التحميل<span class="pl-dots"><span>.</span><span>.</span><span>.</span></span></div>
+        </div>
+    </div>
+
+    <!-- ======================= -->
+    <!-- PASSWORD GATE -->
+    <!-- ======================= -->
+    <div id="password-gate" class="password-gate">
+        <div class="password-gate-box">
+            <div class="password-gate-icon">🔒</div>
+            <h2>دخول لوحة التحكم</h2>
+            <p>يرجى إدخال رقم السر للوصول إلى لوحة التحكم</p>
+            <input type="password" id="admin-password-input" class="password-gate-input" placeholder="أدخل الرقم السري" maxlength="20" autocomplete="off">
+            <button id="admin-password-submit" class="password-gate-btn">دخول</button>
+            <p id="password-gate-error" class="password-gate-error" style="display:none;">❌ الرقم السري غير صحيح</p>
+        </div>
+    </div>
+
+    <!-- ======================= -->
+    <!-- DATABASE LINKING SCREEN (تظهر عند عدم ربط قاعدة بيانات) -->
+    <!-- ======================= -->
+    <div id="db-setup-screen" class="db-setup-screen hidden">
+        <div class="db-setup-box">
+            <div class="db-setup-icon"><i class='bx bxs-data'></i></div>
+            <h2>ربط قاعدة البيانات بالموقع</h2>
+            <p class="db-setup-desc">
+                لا توجد قاعدة بيانات افتراضية. ربط الموقع بقاعدة بيانات <strong>Firestore</strong> الخاصة بك.
+                من Firebase Console: أنشئ مشروعاً ثم من <strong>Project settings → Your apps</strong> انسخ بيانات التطبيق.
+            </p>
+
+            <div class="db-setup-field">
+                <label>API Key</label>
+                <input type="text" id="setup-fb-apiKey" class="wa-template-input" placeholder="AIzaSy..." style="min-height:auto;direction:ltr;text-align:left;" autocomplete="off">
+            </div>
+            <div class="db-setup-field">
+                <label>Auth Domain</label>
+                <input type="text" id="setup-fb-authDomain" class="wa-template-input" placeholder="your-project.firebaseapp.com" style="min-height:auto;direction:ltr;text-align:left;" autocomplete="off">
+            </div>
+            <div class="db-setup-field">
+                <label>Project ID</label>
+                <input type="text" id="setup-fb-projectId" class="wa-template-input" placeholder="your-project-id" style="min-height:auto;direction:ltr;text-align:left;" autocomplete="off">
+            </div>
+            <div class="db-setup-field">
+                <label>Storage Bucket</label>
+                <input type="text" id="setup-fb-storageBucket" class="wa-template-input" placeholder="your-project.appspot.com" style="min-height:auto;direction:ltr;text-align:left;" autocomplete="off">
+            </div>
+            <div class="db-setup-field">
+                <label>Messaging Sender ID</label>
+                <input type="text" id="setup-fb-messagingSenderId" class="wa-template-input" placeholder="1234567890" style="min-height:auto;direction:ltr;text-align:left;" autocomplete="off">
+            </div>
+            <div class="db-setup-field">
+                <label>App ID</label>
+                <input type="text" id="setup-fb-appId" class="wa-template-input" placeholder="1:123:web:abc" style="min-height:auto;direction:ltr;text-align:left;" autocomplete="off">
+            </div>
+
+            <div class="db-setup-actions">
+                <button class="btn btn-outline" id="setup-fb-test-btn">
+                    <i class='bx bx-plug'></i> اختبار الاتصال
+                </button>
+                <button class="btn btn-primary" id="setup-fb-save-btn">
+                    <i class='bx bx-link'></i> ربط قاعدة البيانات
+                </button>
+            </div>
+            <p class="db-setup-hint">بعد الربط سيُعاد تحميل الصفحة وتظهر بياناتك في لوحة التحكم.</p>
+        </div>
+    </div>
+
+    <!-- ======================= -->
+    <!-- ADMIN DASHBOARD -->
+    <!-- ======================= -->
+    <div id="dashboard-screen" class="dashboard-wrapper">
+
+        <div id="mobile-scrim" class="mobile-scrim hidden"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h2>منصة المستر</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-target="home-view" data-color="blue"><i class='bx bx-home'></i> الرئيسية</li>
+                <li data-target="students-view" data-color="green"><i class='bx bx-user'></i> إدارة الطلاب</li>
+                <li data-target="groups-view" data-color="purple"><i class='bx bx-layer'></i> المجموعات</li>
+                <li data-target="combined-requests-view" data-color="orange"><i class='bx bx-time-five'></i> الطلبات والمدفوعات <span id="combined-requests-badge" class="badge">0</span></li>
+                <li data-target="summer-courses-view" data-color="red"><i class='bx bxs-sun'></i> الكورسات الصيفية <span id="summer-badge" class="badge">0</span></li>
+                <li data-target="educational-works-view" data-color="cyan"><i class='bx bxs-book'></i> أعمالي التعليمية</li>
+                <li data-target="settings-view" data-color="slate"><i class='bx bx-cog'></i> الإعدادات</li>
+            </ul>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <button id="mobile-menu-btn" class="btn btn-outline" style="display:none;"><i class='bx bx-menu'></i></button>
+                    <div class="header-title"></div>
+                </div>
+                <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع الليلي/النهاري">
+                    <span class="theme-toggle-icon">☀️</span>
+                    <span class="theme-toggle-icon" style="display:none">🌙</span>
+                </button>
+            </header>
+
+            <div class="content-body">
+
+                <!-- VIEW: HOME (الرئيسية) -->
+                <section id="home-view" class="view-section active">
+                    <!-- Welcome Banner -->
+                    <div class="home-welcome-banner">
+                        <div class="home-welcome-text">
+                            <div class="home-avatar">
+                                <i class='bx bxs-graduation'></i>
+                            </div>
+                            <div>
+                                <h2 class="home-greeting">مرحباً بك أستاذني</h2>
+                                <p class="home-subtitle">تطبيق إدارة الدروس والطلاب المتقدم</p>
+                            </div>
+                        </div>
+                        <div class="home-date">
+                            <i class='bx bx-calendar'></i>
+                            <span id="home-current-date">—</span>
+                        </div>
+                    </div>
+
+                    <!-- Stats Row -->
+                    <div class="home-stats-row">
+                        <div class="home-stat-card home-stat-blue">
+                            <div class="home-stat-top">
+                                <div class="home-stat-dot dot-blue"></div>
+                                <i class='bx bx-group'></i>
+                            </div>
+                            <div class="home-stat-value" id="home-stat-advanced">0</div>
+                            <div class="home-stat-label">الطلاب المتقدمين</div>
+                            <div class="home-stat-sub">طالب اليوم</div>
+                        </div>
+                        <div class="home-stat-card home-stat-green">
+                            <div class="home-stat-top">
+                                <div class="home-stat-dot dot-green"></div>
+                                <i class='bx bx-time-five'></i>
+                            </div>
+                            <div class="home-stat-value" id="home-stat-today-sessions">0</div>
+                            <div class="home-stat-label">حصص اليوم</div>
+                            <div class="home-stat-sub" id="home-day-name">—</div>
+                        </div>
+                        <div class="home-stat-card home-stat-purple">
+                            <div class="home-stat-top">
+                                <div class="home-stat-dot dot-purple"></div>
+                                <i class='bx bx-folder-open'></i>
+                            </div>
+                            <div class="home-stat-value" id="home-stat-groups">0</div>
+                            <div class="home-stat-label">المجموعات</div>
+                            <div class="home-stat-sub">مجموعة نشطة</div>
+                        </div>
+                    </div>
+
+                    <!-- All Groups -->
+                    <div class="home-sessions-section">
+                        <div class="home-sessions-header">
+                            <h2><i class='bx bx-calendar-check' style="color:var(--accent);"></i> جميع المجموعات (<span id="home-day-label">السبت</span>)</h2>
+                            <span class="home-sessions-count" id="home-sessions-count">0 مجموعات</span>
+                        </div>
+                        <div class="home-sessions-list" id="home-sessions-list">
+                            <!-- Empty state -->
+                            <div class="home-empty-state" id="home-empty-sessions">
+                                <div class="home-empty-icon">
+                                    <i class='bx bx-calendar-x'></i>
+                                </div>
+                                <h3>لا توجد مجموعات بعد 🎉</h3>
+                                <p>يمكنكك إضافة مجموعات من قسم المجموعات.</p>
+                            </div>
+                            <!-- Session cards injected by JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: STUDENTS MANAGEMENT -->
+                <section id="students-view" class="view-section">
+                    <!-- Page Hero Header -->
+                    <div class="students-page-hero">
+                        <div class="students-hero-info">
+                            <h2>🎓 إدارة الطلاب</h2>
+                            <p>تسجيل غياب، مدفوعات، تقارير أداء، ورسائل وتواصل بأولياء الأمور</p>
+                        </div>
+                        <div class="students-hero-actions">
+                            <button class="btn btn-primary btn-sm" id="open-attendance-btn">
+                                <i class='bx bx-calendar-check'></i> الحضور
+                            </button>
+                            <button class="btn btn-primary btn-sm" id="open-add-modal-btn">
+                                <i class='bx bx-user-plus'></i> إضافة
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Students Year Tabs -->
+                    <div class="students-year-tabs">
+                        <button class="year-tab active" data-year="current">العام الحالي</button>
+                        <button class="year-tab" data-year="previous">العام الماضي</button>
+                        <button class="year-tab" data-year="summer">الكورس الصيفي</button>
+                    </div>
+
+                    <!-- Filters Row -->
+                    <div class="filters-row doodle-card">
+                        <div class="filter-group">
+                            <label>البحث بالاسم أو ولي الأمر</label>
+                            <div class="search-box" style="width:100%">
+                                <i class='bx bx-search'></i>
+                                <input type="text" id="search-student" placeholder="" style="width:100%">
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label>تصفية حسب الصف</label>
+                            <select id="grade-filter">
+                                <option value="">كل الصفوف</option>
+                                <option value="مرحلة الكي جي والتأسيس">مرحلة الكي جي والتأسيس</option>
+                                <option value="الصف الأول الابتدائي">الصف الأول الابتدائي</option>
+                                <option value="الصف الثاني الابتدائي">الصف الثاني الابتدائي</option>
+                                <option value="الصف الثالث الابتدائي">الصف الثالث الابتدائي</option>
+                                <option value="الصف الرابع الابتدائي">الصف الرابع الابتدائي</option>
+                                <option value="الصف الخامس الابتدائي">الصف الخامس الابتدائي</option>
+                                <option value="الصف السادس الابتدائي">الصف السادس الابتدائي</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>المجموعة</label>
+                            <select id="group-filter">
+                                <option value="">كل المجموعات</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Student List -->
+                    <div class="table-container doodle-card">
+                        <div class="table-header">
+                            <h2>
+                                <i class='bx bx-group' style="color:var(--accent)"></i>
+                                قائمة الطلاب
+                                <span class="student-count-chip" id="students-count-chip">0 طالب</span>
+                            </h2>
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <label class="select-all-label" style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text-secondary);">
+                                    <input type="checkbox" id="select-all-checkbox" title="تحديد الكل" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;">
+                                    تحديد الكل
+                                </label>
+                                <button class="btn btn-outline btn-sm" id="open-group-modal-btn">
+                                    <i class='bx bx-layer'></i> إدارة المجموعات
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Bulk Actions Toolbar -->
+                        <div id="bulk-actions-toolbar" class="bulk-actions-toolbar" style="display:none;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <i class='bx bx-select-multiple' style="color:var(--accent);font-size:20px;"></i>
+                                <span id="bulk-selected-count" style="font-weight:800;color:var(--text-primary);">0</span>
+                                <span style="color:var(--text-secondary);">طالب محدد</span>
+                            </div>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <button class="btn btn-primary btn-sm" id="bulk-transfer-btn">
+                                    <i class='bx bx-transfer'></i> نقل إلى عام دراسي
+                                </button>
+                                <button class="btn btn-outline btn-sm" id="bulk-clear-btn">
+                                    <i class='bx bx-x'></i> إلغاء التحديد
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive desktop-table-view">
+                            <table class="data-table" id="students-table">
+                                <thead>
+                                    <tr>
+                                        <th class="student-photo-cell" style="display:none;">صورة</th>
+                                        <th>اسم الطالب</th>
+                                        <th>الصف</th>
+                                        <th>المجموعة</th>
+                                        <th>الحالة المالية</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="students-tbody">
+                                    <!-- Rows generated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="horizontal-cards-view" id="students-horizontal-view">
+                            <!-- Horizontal cards generated by JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: GROUPS MANAGEMENT -->
+                <section id="groups-view" class="view-section">
+                    <div class="students-page-hero">
+                        <div class="students-hero-info">
+                            <h2><i class='bx bx-layer' style="color:var(--accent);"></i> إدارة المجموعات</h2>
+                            <p>إضافة وتعديل وحذف المجموعات الدراسية وإدارة قوالب الرسائل</p>
+                        </div>
+                        <div class="students-hero-actions">
+                            <button class="btn btn-primary btn-sm" id="open-group-modal-btn-2">
+                                <i class='bx bx-plus-circle'></i> مجموعة جديدة
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Groups Year Tabs -->
+                    <div class="students-year-tabs">
+                        <button class="group-tab active" data-cat="current">العام الحالي</button>
+                        <button class="group-tab" data-cat="previous">العام الماضي</button>
+                        <button class="group-tab" data-cat="foundation">التأسيس</button>
+                    </div>
+
+                    <!-- Groups List -->
+                    <div class="table-container doodle-card">
+                        <div class="table-header">
+                            <h2>
+                                <i class='bx bx-layer' style="color:var(--accent)"></i>
+                                المجموعات الدراسية
+                                <span class="student-count-chip" id="groups-count-chip">0 مجموعة</span>
+                            </h2>
+                        </div>
+                        <div id="groups-view-list" style="display:flex;flex-direction:column;gap:12px;padding:16px;">
+                            <!-- Groups rendered by JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: COMBINED REQUESTS (التسجيل + الدفع + الالتحاق) -->
+                <section id="combined-requests-view" class="view-section">
+                    <div class="students-page-hero">
+                        <div class="students-hero-info">
+                            <h2><i class='bx bx-time-five'></i> الطلبات والمدفوعات</h2>
+                            <p>إدارة طلبات التسجيل وطلبات الدفع وطلبات الالتحاق من مكان واحد</p>
+                        </div>
+                    </div>
+
+                    <!-- Combined Tabs -->
+                    <div class="view-tabs-row" style="margin-bottom:12px;">
+                        <button class="view-tab active" data-combined-tab="requests"><i class='bx bx-user-check'></i> طلبات التسجيل <span id="combined-requests-count" class="badge">0</span></button>
+                        <button class="view-tab" data-combined-tab="payments"><i class='bx bxs-wallet'></i> طلبات الدفع <span id="combined-payments-count" class="badge">0</span></button>
+                        <button class="view-tab" data-combined-tab="enrollments"><i class='bx bxs-calendar-plus'></i> طلبات الالتحاق <span id="combined-enrollments-count" class="badge">0</span></button>
+                    </div>
+
+                    <!-- Tab Content: Registration Requests -->
+                    <div id="combined-requests-tab" class="combined-tab-content">
+                        <div class="view-tabs-row" style="margin-bottom:12px;">
+                            <button class="view-tab active" data-request-filter="all">الكل</button>
+                            <button class="view-tab" data-request-filter="pending">قيد الانتظار</button>
+                            <button class="view-tab" data-request-filter="activated">مفعل</button>
+                            <button class="view-tab" data-request-filter="rejected">مرفوض</button>
+                        </div>
+
+                        <div class="filters-row doodle-card" style="margin-bottom:20px;">
+                            <div class="filter-group" style="flex:2;">
+                                <label>البحث بالاسم أو رقم الهاتف</label>
+                                <div class="search-box" style="width:100%">
+                                    <i class='bx bx-search'></i>
+                                    <input type="text" id="search-requests" placeholder="ابحث عن طالب..." style="width:100%">
+                                </div>
+                            </div>
+                            <div class="filter-group" style="flex:1;">
+                                <label>تصفية حسب الصف</label>
+                                <select id="requests-grade-filter">
+                                    <option value="">كل الصفوف</option>
+                                    <option value="مرحلة الكي جي والتأسيس">مرحلة الكي جي والتأسيس</option>
+                                    <option value="الصف الأول الابتدائي">الصف الأول الابتدائي</option>
+                                    <option value="الصف الثاني الابتدائي">الصف الثاني الابتدائي</option>
+                                    <option value="الصف الثالث الابتدائي">الصف الثالث الابتدائي</option>
+                                    <option value="الصف الرابع الابتدائي">الصف الرابع الابتدائي</option>
+                                    <option value="الصف الخامس الابتدائي">الصف الخامس الابتدائي</option>
+                                    <option value="الصف السادس الابتدائي">الصف السادس الابتدائي</option>
+                                </select>
+                            </div>
+                            <div class="filter-group" style="flex:0;text-align:center;">
+                                <label>العدد</label>
+                                <div id="requests-count" style="font-size:22px;font-weight:900;color:var(--accent);">0</div>
+                            </div>
+                        </div>
+
+                        <!-- Bulk Actions Toolbar for Requests -->
+                        <div id="requests-bulk-toolbar" class="bulk-actions-toolbar" style="display:none;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <i class='bx bx-select-multiple' style="color:var(--accent);font-size:20px;"></i>
+                                <span id="requests-bulk-count" style="font-weight:800;color:var(--text-primary);">0</span>
+                                <span style="color:var(--text-secondary);">طالب محدد</span>
+                            </div>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <button class="btn btn-primary btn-sm" id="requests-bulk-activate-btn">
+                                    <i class='bx bx-user-check'></i> تفعيل
+                                </button>
+                                <button class="btn btn-primary btn-sm" id="requests-bulk-transfer-btn">
+                                    <i class='bx bx-transfer'></i> نقل إلى عام دراسي
+                                </button>
+                                <button class="btn btn-outline btn-sm" id="requests-bulk-clear-btn">
+                                    <i class='bx bx-x'></i> إلغاء التحديد
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="requests-grid" class="requests-grid">
+                            <!-- Cards generated by JS -->
+                        </div>
+
+                        <div id="requests-empty-state" class="empty-state hidden">
+                            <i class='bx bx-user-check'></i>
+                            <p>لا يوجد طلاب في هذا القسم</p>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content: Payment Requests -->
+                    <div id="combined-payments-tab" class="combined-tab-content" style="display:none;">
+                        <div class="payments-header">
+                            <div class="payments-title">
+                                <h2>📋 طلبات الدفع الإلكتروني</h2>
+                            </div>
+                            <div class="search-box">
+                                <i class='bx bx-search'></i>
+                                <input type="text" id="search-payments" placeholder="ابحث باسم الطالب...">
+                            </div>
+                        </div>
+
+                        <!-- Payment Tabs -->
+                        <div class="payments-tabs">
+                            <button class="payments-tab active" data-pay-tab="pending">
+                                <span class="badge">1</span>
+                                طلبات بانتظار المراجعة
+                            </button>
+                            <button class="payments-tab" data-pay-tab="history">
+                                سجل المدفوعات المؤكدة
+                            </button>
+                        </div>
+
+                        <!-- Payment Cards Grid -->
+                        <div id="payments-cards-container" class="payments-grid">
+                            <!-- Dynamic Cards -->
+                        </div>
+                    </div>
+
+                    <!-- Tab Content: Enrollment Requests -->
+                    <div id="combined-enrollments-tab" class="combined-tab-content" style="display:none;">
+                        <div class="table-container doodle-card">
+                            <div class="table-header">
+                                <h2><i class='bx bx-list-check' style="color:var(--accent)"></i> قائمة طلبات الالتحاق</h2>
+                                <label class="enroll-toggle-label">
+                                    <span>إظهار القسم للطلاب</span>
+                                    <input type="checkbox" id="enrollment-toggle" checked>
+                                    <span class="enroll-toggle-slider"></span>
+                                </label>
+                                <label class="enroll-toggle-label" style="margin-right:12px;">
+                                    <span>رسالة تهنئة بعد الالتحاق</span>
+                                    <input type="checkbox" id="congrats-toggle" checked>
+                                    <span class="enroll-toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="enrollments-table">
+                                    <thead>
+                                        <tr>
+                                            <th>الطالب</th>
+                                            <th>رقم الهاتف</th>
+                                            <th>الصف</th>
+                                            <th>الحالة</th>
+                                            <th>تاريخ الطلب</th>
+                                            <th>الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Rows injected by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: EDUCATIONAL WORKS MANAGEMENT (مدمج مع مبيعات الملازم) -->
+                <section id="educational-works-view" class="view-section">
+                    <div class="students-page-hero">
+                        <div class="students-hero-info">
+                            <h2>📚 إدارة أعمالي التعليمية</h2>
+                            <p>إضافة، تعديل، حذف، وإدارة الأعمال والملازم والمناهج التعليمية</p>
+                        </div>
+                        <div class="students-hero-actions">
+                            <button class="btn btn-primary btn-sm" id="ew-add-btn">
+                                <i class='bx bx-plus-circle'></i> إضافة عمل
+                            </button>
+                            <button class="btn btn-outline btn-sm" id="ew-manage-categories-btn">
+                                <i class='bx bx-tag'></i> إدارة التصنيفات
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Educational Works Tabs -->
+                    <div class="view-tabs-row" style="margin-bottom:12px;">
+                        <button class="view-tab active" data-ew-tab="works"><i class='bx bxs-book'></i> إدارة المحتوى</button>
+                        <button class="view-tab" data-ew-tab="purchases"><i class='bx bxs-cart'></i> مبيعات الملازم <span id="ew-purchases-count" class="badge">0</span></button>
+                    </div>
+
+                    <!-- Tab: Works Management -->
+                    <div id="ew-works-tab" class="combined-tab-content">
+                        <!-- Stats Grid -->
+                        <div class="sc-stats-grid">
+                            <div class="stat-card doodle-card">
+                                <div class="stat-header">
+                                    <div class="stat-icon-wrapper blue-gradient"><i class='bx bxs-book'></i></div>
+                                    <div class="stat-title"><h3>إجمالي الأعمال</h3></div>
+                                </div>
+                                <div class="stat-value-area"><h2 id="ew-stat-total">0</h2></div>
+                            </div>
+                            <div class="stat-card doodle-card">
+                                <div class="stat-header">
+                                    <div class="stat-icon-wrapper green-gradient"><i class='bx bxs-check-circle'></i></div>
+                                    <div class="stat-title"><h3>المنشورة</h3></div>
+                                </div>
+                                <div class="stat-value-area"><h2 id="ew-stat-active">0</h2></div>
+                            </div>
+                            <div class="stat-card doodle-card">
+                                <div class="stat-header">
+                                    <div class="stat-icon-wrapper red-gradient"><i class='bx bxs-x-circle'></i></div>
+                                    <div class="stat-title"><h3>المسودات</h3></div>
+                                </div>
+                                <div class="stat-value-area"><h2 id="ew-stat-drafts">0</h2></div>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="filters-row doodle-card" style="margin-bottom:20px;">
+                            <div class="filter-group" style="flex:2;">
+                                <label>بحث</label>
+                                <div class="search-box" style="width:100%">
+                                    <i class='bx bx-search'></i>
+                                    <input type="text" id="ew-admin-search" placeholder="ابحث في الأعمال..." style="width:100%">
+                                </div>
+                            </div>
+                            <div class="filter-group">
+                                <label>التصنيف</label>
+                                <select id="ew-admin-filter">
+                                    <option value="all">الكل</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>ترتيب</label>
+                                <select id="ew-admin-sort">
+                                    <option value="order">الترتيب المخصص</option>
+                                    <option value="order-desc">الترتيب: عكسي</option>
+                                    <option value="title">الترتيب الأبجدي</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>العدد</label>
+                                <div id="ew-count" style="font-size:22px;font-weight:900;color:var(--accent);">0</div>
+                            </div>
+                        </div>
+
+                        <!-- Works Table -->
+                        <div class="table-container doodle-card">
+                            <div class="table-header">
+                                <h2><i class='bx bxs-book' style="color:var(--accent)"></i> قائمة الأعمال</h2>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="ew-table">
+                                    <thead>
+                                        <tr>
+                                            <th>العمل</th>
+                                            <th>التصنيف</th>
+                                            <th>السعر</th>
+                                            <th>الفئة المستهدفة</th>
+                                            <th>الترتيب</th>
+                                            <th>الرابط</th>
+                                            <th>الحالة</th>
+                                            <th>الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Rows injected by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Purchases Management -->
+                    <div id="ew-purchases-tab" class="combined-tab-content" style="display:none;">
+                        <div class="students-page-hero" style="padding:0;margin-bottom:16px;">
+                            <div class="students-hero-info">
+                                <h2>🛒 مبيعات الملازم</h2>
+                                <p>إدارة طلبات شراء الملازم والمناهج التعليمية - تأكيد الدفع وتمكين المعاينة</p>
+                            </div>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="sc-stats-grid">
+                            <div class="stat-card doodle-card">
+                                <div class="stat-header">
+                                    <div class="stat-icon-wrapper blue-gradient"><i class='bx bxs-cart'></i></div>
+                                    <div class="stat-title"><h3>إجمالي المشتريات</h3></div>
+                                </div>
+                                <div class="stat-value-area"><h2 id="ew-purchases-total">0</h2></div>
+                            </div>
+                            <div class="stat-card doodle-card">
+                                <div class="stat-header">
+                                    <div class="stat-icon-wrapper" style="background:#fef3c7;"><i class='bx bxs-time' style="color:#d97706;"></i></div>
+                                    <div class="stat-title"><h3>قيد الانتظار</h3></div>
+                                </div>
+                                <div class="stat-value-area"><h2 id="ew-purchases-pending" style="color:#d97706;">0</h2></div>
+                            </div>
+                            <div class="stat-card doodle-card">
+                                <div class="stat-header">
+                                    <div class="stat-icon-wrapper green-gradient"><i class='bx bxs-check-circle'></i></div>
+                                    <div class="stat-title"><h3>مؤكدة</h3></div>
+                                </div>
+                                <div class="stat-value-area"><h2 id="ew-purchases-confirmed" style="color:var(--green);">0</h2></div>
+                            </div>
+                        </div>
+
+                        <!-- Purchases List -->
+                        <div class="table-container doodle-card">
+                            <div class="table-header">
+                                <h2><i class='bx bxs-receipt' style="color:var(--accent)"></i> طلبات شراء الملازم</h2>
+                            </div>
+                            <div id="ew-purchases-list" class="sc-subs-list">
+                                <!-- Injected by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: SUMMER COURSES MANAGEMENT -->
+                <section id="summer-courses-view" class="view-section">
+                    <!-- Page Hero -->
+                    <div class="students-page-hero">
+                        <div class="students-hero-info">
+                            <h2>🏖️ إدارة الكورسات الصيفية</h2>
+                            <p>إضافة، تعديل، حذف، وإدارة الكورسات الصيفية والاشتراكات</p>
+                        </div>
+                        <div class="students-hero-actions">
+                            <button class="btn btn-primary btn-sm" id="sc-add-btn">
+                                <i class='bx bx-plus-circle'></i> إضافة كورس
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="sc-stats-grid">
+                        <div class="stat-card doodle-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-wrapper blue-gradient"><i class='bx bxs-book'></i></div>
+                                <div class="stat-title"><h3>إجمالي الكورسات</h3></div>
+                            </div>
+                            <div class="stat-value-area"><h2 id="sc-stat-total">0</h2></div>
+                        </div>
+                        <div class="stat-card doodle-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-wrapper green-gradient"><i class='bx bxs-check-circle'></i></div>
+                                <div class="stat-title"><h3>الكورسات النشطة</h3></div>
+                            </div>
+                            <div class="stat-value-area"><h2 id="sc-stat-active">0</h2></div>
+                        </div>
+                        <div class="stat-card doodle-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-wrapper red-gradient"><i class='bx bxs-x-circle'></i></div>
+                                <div class="stat-title"><h3>غير النشطة</h3></div>
+                            </div>
+                            <div class="stat-value-area"><h2 id="sc-stat-inactive">0</h2></div>
+                        </div>
+                        <div class="stat-card doodle-card">
+                            <div class="stat-header">
+                                <div class="stat-icon-wrapper" style="background:var(--amber-dim);"><i class='bx bxs-user-check' style="color:var(--amber);"></i></div>
+                                <div class="stat-title"><h3>إجمالي الاشتراكات</h3></div>
+                            </div>
+                            <div class="stat-value-area"><h2 id="sc-stat-subs">0</h2></div>
+                        </div>
+                        <div class="stat-card doodle-card" style="grid-column:1/-1;">
+                            <div class="stat-header">
+                                <div class="stat-icon-wrapper" style="background:var(--accent-dim);"><i class='bx bxs-trophy' style="color:var(--accent);"></i></div>
+                                <div class="stat-title"><h3>الأكثر اشتراكاً</h3></div>
+                            </div>
+                            <div class="stat-value-area"><h4 id="sc-stat-top" style="color:var(--text-secondary);font-size:1.1rem;">لا توجد بيانات</h4></div>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="filters-row doodle-card" style="margin-bottom:20px;">
+                        <div class="filter-group" style="flex:2;">
+                            <label>بحث</label>
+                            <div class="search-box" style="width:100%">
+                                <i class='bx bx-search'></i>
+                                <input type="text" id="sc-search" placeholder="ابحث بكورس..." style="width:100%">
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label>الحالة</label>
+                            <select id="sc-filter">
+                                <option value="all">الكل</option>
+                                <option value="active">النشطة</option>
+                                <option value="inactive">غير النشطة</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>ترتيب</label>
+                            <select id="sc-sort">
+                                <option value="createdAt">تاريخ الإضافة</option>
+                                <option value="price-asc">السعر: الأقل</option>
+                                <option value="price-desc">السعر: الأعلى</option>
+                                <option value="title">الترتيب الأبجدي</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>العدد</label>
+                            <div id="sc-count" style="font-size:22px;font-weight:900;color:var(--accent);">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Courses Table -->
+                    <div class="table-container doodle-card">
+                        <div class="table-header">
+                            <h2><i class='bx bxs-book' style="color:var(--accent)"></i> قائمة الكورسات</h2>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="summer-courses-table">
+                                <thead>
+                                    <tr>
+                                        <th>الكورس</th>
+                                        <th>السعر</th>
+                                        <th>المدة</th>
+                                        <th>الحصص</th>
+                                        <th>الفئة المستهدفة</th>
+                                        <th>طريقة الدفع</th>
+                                        <th>الحالة</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Rows injected by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Subscriptions -->
+                    <div class="table-container doodle-card" style="margin-top:20px;">
+                        <div class="table-header">
+                            <h2><i class='bx bxs-user-check' style="color:var(--accent)"></i> الاشتراكات الحديثة</h2>
+                        </div>
+                        <div class="view-tabs-row" style="margin-bottom:12px;">
+                            <button class="view-tab active" data-sub-filter="all">الكل</button>
+                            <button class="view-tab" data-sub-filter="pending">قيد الانتظار</button>
+                            <button class="view-tab" data-sub-filter="confirmed">مؤكد</button>
+                        </div>
+                        <div id="sc-subscriptions-list" class="sc-subs-list">
+                            <!-- Subs injected by JS -->
+                        </div>
+                    </div>
+                </section>
+                <!-- MODAL: ENROLLMENT REJECTION REASON -->
+                <div id="enroll-reject-modal" class="modal-overlay hidden">
+                    <div class="modal-sheet doodle-card" style="max-width:450px;">
+                        <div class="modal-head">
+                            <h2><i class='bx bx-message-square-x' style="color:var(--red);"></i> رفض طلب الالتحاق</h2>
+                            <button class="modal-close-btn" id="close-enroll-reject-modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="color:var(--text-secondary);margin-bottom:12px;font-weight:700;" id="enroll-reject-student-name"></p>
+                            <div class="input-group">
+                                <label>سبب الرفض <span class="required" style="color:var(--red);">*</span></label>
+                                <textarea id="enroll-reject-reason" rows="3" placeholder="أدخل سبب رفض الطلب..." style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);resize:vertical;font-family:inherit;"></textarea>
+                            </div>
+                            <div style="display:flex;gap:10px;margin-top:16px;">
+                                <button class="btn btn-danger" id="confirm-enroll-reject-btn" style="flex:1;">تأكيد الرفض</button>
+                                <button class="btn btn-outline" id="cancel-enroll-reject-btn">إلغاء</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: SETTINGS (الإعدادات العامة + قوالب الواتساب + الإعلانات) -->
+                <section id="settings-view" class="view-section">
+                    <div class="students-page-hero">
+                        <div class="students-hero-info">
+                            <h2><i class='bx bx-cog' style="color:var(--accent)"></i> الإعدادات</h2>
+                            <p>التحكم في إعدادات الجلسات ورسائل الواتساب والإعلانات</p>
+                        </div>
+                    </div>
+
+                    <!-- Section: General Settings -->
+                    <div id="settings-general-tab" class="settings-panel">
+
+                                <!-- ═══════════════════════════════════════ -->
+                                <!-- 1. Teacher Profile (Blue)              -->
+                                <!-- ═══════════════════════════════════════ -->
+                                <div class="collapsible-settings settings-color-blue" data-default-open="false">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-icon" style="background:var(--accent-dim);">
+                                            <i class='bx bxs-user-badge' style="color:var(--accent);"></i>
+                                        </div>
+                                        <div>
+                                            <h4>بيانات المعلم الشخصية</h4>
+                                            <p>الاسم والصورة والمسمى والتعريف الذي يظهر في الصفحة الرئيسية</p>
+                                        </div>
+                                    </div>
+                                    <div id="profile-settings-body">
+                                        <!-- Image Upload -->
+                                        <div style="margin-bottom:16px;">
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px;">صورة المعلم (تظهر في الهيرو)</label>
+                                            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                                                <div id="profile-img-upload-zone" style="border:2px dashed var(--border,#2a3040);border-radius:12px;padding:16px 24px;text-align:center;cursor:pointer;transition:all .25s;background:var(--bg-card,#181d28);flex:1;min-width:180px;">
+                                                    <input type="file" id="profile-img-file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">
+                                                    <i class="bx bx-cloud-upload" style="font-size:28px;color:var(--accent);display:block;margin-bottom:4px;"></i>
+                                                    <span style="font-size:13px;color:var(--text-muted);">اسحب صورة أو اضغط للاختيار</span>
+                                                </div>
+                                                <div style="position:relative;">
+                                                    <img id="profile-img-preview" src="img/logo.png" alt="معاينة" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--accent);">
+                                                    <button type="button" id="profile-img-remove" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:1;">✕</button>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" id="profile-img-url" value="img/logo.png">
+                                        </div>
+                                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                                            <div>
+                                                <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">الاسم بالعربي</label>
+                                                <input type="text" id="profile-name-ar" class="wa-template-input" placeholder="مثال: محمد سعيد" style="min-height:auto;">
+                                            </div>
+                                            <div>
+                                                <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">اللقب بالعربي</label>
+                                                <input type="text" id="profile-title-ar" class="wa-template-input" placeholder="مثال: الحاكم" style="min-height:auto;">
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom:12px;">
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">الاسم بالإنجليزي</label>
+                                            <input type="text" id="profile-name-en" class="wa-template-input" placeholder="مثال: Muhamad Said El-Hakem" style="min-height:auto;">
+                                        </div>
+                                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                                            <div>
+                                                <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">المسمى الوظيفي</label>
+                                                <input type="text" id="profile-job-title" class="wa-template-input" placeholder="مثال: معلم اللغة الإنجليزية" style="min-height:auto;">
+                                            </div>
+                                            <div>
+                                                <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">سنوات الخبرة</label>
+                                                <input type="text" id="profile-experience" class="wa-template-input" placeholder="مثال: 10+" style="min-height:auto;">
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom:12px;">
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">التعريف / التخصص</label>
+                                            <input type="text" id="profile-specialization" class="wa-template-input" placeholder="مثال: متخصص في تأسيس اللغة الإنجليزية للأطفال بمناهج تربوية حديثة." style="min-height:auto;">
+                                        </div>
+                                        <div style="margin-bottom:12px;">
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">اقتباس / مقولة مميزة</label>
+                                            <textarea id="profile-quote" class="wa-template-input" rows="3" placeholder="اقتباس يظهر في الصفحة الرئيسية..."></textarea>
+                                        </div>
+                                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                                            <div>
+                                                <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">رقم الواتساب (لزر التواصل)</label>
+                                                <input type="tel" id="profile-wa-phone" class="wa-template-input" placeholder="مثال: 01125908425" style="min-height:auto;">
+                                            </div>
+                                            <div>
+                                                <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">رابط فيسبوك (اختياري)</label>
+                                                <input type="url" id="profile-fb-url" class="wa-template-input" placeholder="https://facebook.com/..." style="min-height:auto;">
+                                            </div>
+                                        </div>
+                                        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+                                            <button class="btn btn-primary" id="save-profile-btn">
+                                                <i class='bx bx-save'></i> حفظ بيانات المعلم
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ═══════════════════════════════════════ -->
+                                <!-- 2. Social Links (Green)                -->
+                                <!-- ═══════════════════════════════════════ -->
+                                <div class="collapsible-settings settings-color-green" data-default-open="false">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-icon" style="background:rgba(37,211,102,.1);">
+                                            <i class='bx bxl-whatsapp' style="color:#25D366;"></i>
+                                        </div>
+                                        <div>
+                                            <h4>روابط التواصل الاجتماعي</h4>
+                                            <p>روابط الصفحات التي تظهر في أسفل الصفحة الرئيسية</p>
+                                        </div>
+                                    </div>
+                                    <div id="social-links-body">
+                                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                                            <div>
+                                                <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">فيسبوك</label>
+                                                <input type="url" id="social-facebook" class="wa-template-input" placeholder="https://facebook.com/..." style="min-height:auto;">
+                                            </div>
+                                            <div>
+                                                <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">يوتيوب</label>
+                                                <input type="url" id="social-youtube" class="wa-template-input" placeholder="https://youtube.com/..." style="min-height:auto;">
+                                            </div>
+                                        </div>
+                                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                                            <div>
+                                                <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">تيليجرام</label>
+                                                <input type="url" id="social-telegram" class="wa-template-input" placeholder="https://t.me/..." style="min-height:auto;">
+                                            </div>
+                                            <div>
+                                                <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">واتساب (رقم)</label>
+                                                <input type="tel" id="social-whatsapp" class="wa-template-input" placeholder="رقم الواتساب without + | مثال: 201125908425" style="min-height:auto;">
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom:12px;">
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">رابط الموقع على الخريطة</label>
+                                            <input type="url" id="social-location" class="wa-template-input" placeholder="https://maps.app.goo.gl/..." style="min-height:auto;">
+                                        </div>
+                                        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+                                            <button class="btn btn-primary" id="save-social-btn">
+                                                <i class='bx bx-save'></i> حفظ روابط التواصل
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ═══════════════════════════════════════ -->
+                                <!-- 3. Registration Control (Purple)       -->
+                                <!-- ═══════════════════════════════════════ -->
+                                <div class="collapsible-settings settings-color-purple" data-default-open="false">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-icon" style="background:rgba(139,92,246,.1);">
+                                            <i class='bx bx-check-shield' style="color:#8b5cf6;"></i>
+                                        </div>
+                                        <div>
+                                            <h4>التحكم في التسجيل</h4>
+                                            <p>التحكم في إمكانية تسجيل حسابات جديدة في الموقع</p>
+                                        </div>
+                                    </div>
+                                    <div style="padding:14px 18px 0;">
+                                        <label class="enroll-toggle-label">
+                                            <span id="registration-toggle-label">التسجيل متاح</span>
+                                            <input type="checkbox" id="registration-toggle" checked>
+                                            <span class="enroll-toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div id="per-grade-section" class="per-grade-grid">
+                                        <div class="per-grade-grid-header">
+                                            <i class='bx bx-layer'></i>
+                                            <span>التحكم لكل صف دراسي</span>
+                                        </div>
+                                        <div id="per-grade-cards" class="per-grade-cards"></div>
+                                        <div class="per-grade-note">
+                                            <i class='bx bx-info-circle'></i>
+                                            <span>الحد الأقصى 0 = غير محدود • يتم تعطيل الصف تلقائياً عند اكتمال المقاعد</span>
+                                        </div>
+                                        <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+                                            <button class="btn btn-primary" id="save-per-grade-btn">
+                                                <i class='bx bx-save'></i> حفظ إعدادات الصفوف
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ═══════════════════════════════════════ -->
+                                <!-- 4. Session Settings (Orange)           -->
+                                <!-- ═══════════════════════════════════════ -->
+                                <div class="collapsible-settings settings-color-orange" data-default-open="false">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-icon" style="background:rgba(249,115,22,.1);">
+                                            <i class='bx bx-dollar-circle' style="color:#f97316;"></i>
+                                        </div>
+                                        <div>
+                                            <h4>إعدادات الجلسات</h4>
+                                            <p>تحديد سعر الحصة وعدد الحصص لكل قسم على حدة</p>
+                                        </div>
+                                    </div>
+                                    <p style="color:var(--text-secondary);margin-bottom:12px;">يمكنك تحديد سعر الحصة وعدد الحصص لكل قسم على حدة.</p>
+
+                                <!-- Current Year -->
+                                <div class="collapsible-settings settings-color-blue" data-default-open="true">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-icon" style="background:var(--accent-dim);">
+                                            <i class='bx bx-user' style="color:var(--accent);"></i>
+                                        </div>
+                                        <div>
+                                            <h4>العام الحالي</h4>
+                                            <p>سعر الحصة للطلاب المسجلين في العام الدراسي الحالي</p>
+                                        </div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">سعر الحصة (ج.م)</label>
+                                            <input type="number" id="settings-price-current" class="wa-template-input" value="15" min="1" step="1" style="height:38px;font-size:15px;font-weight:700;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">عدد الحصص شهرياً</label>
+                                            <input type="number" id="settings-sessions-current" class="wa-template-input" value="8" min="1" max="31" step="1" style="height:38px;font-size:15px;font-weight:700;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">الخصم الشهري (ج.م)</label>
+                                            <input type="number" id="settings-discount-current" class="wa-template-input" value="0" min="0" step="1" style="height:38px;font-size:15px;font-weight:700;">
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 10px; padding: 12px; background: var(--bg-elevated); border-radius: 12px; font-size: 14px; color: var(--text-secondary);">
+                                        الإجمالي الشهري: <strong id="settings-monthly-current" style="color: var(--green);">120</strong> ج.م <span style="color:var(--text-muted);">(بعد الخصم: <strong id="settings-monthly-after-current" style="color: var(--green);">120</strong> ج.م)</span>
+                                    </div>
+                                </div>
+
+                                <!-- Previous Year -->
+                                <div class="collapsible-settings settings-color-orange" data-default-open="true">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-icon" style="background:rgba(249,115,22,.1);">
+                                            <i class='bx bx-user-x' style="color:var(--orange);"></i>
+                                        </div>
+                                        <div>
+                                            <h4>العام الماضي</h4>
+                                            <p>سعر الحصة للطلاب من العام الماضي (الملتحقين حالياً)</p>
+                                        </div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">سعر الحصة (ج.م)</label>
+                                            <input type="number" id="settings-price-previous" class="wa-template-input" value="10" min="1" step="1" style="height:38px;font-size:15px;font-weight:700;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">عدد الحصص شهرياً</label>
+                                            <input type="number" id="settings-sessions-previous" class="wa-template-input" value="4" min="1" max="31" step="1" style="height:38px;font-size:15px;font-weight:700;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">الخصم الشهري (ج.م)</label>
+                                            <input type="number" id="settings-discount-previous" class="wa-template-input" value="0" min="0" step="1" style="height:38px;font-size:15px;font-weight:700;">
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 10px; padding: 12px; background: var(--bg-elevated); border-radius: 12px; font-size: 14px; color: var(--text-secondary);">
+                                        الإجمالي الشهري: <strong id="settings-monthly-previous" style="color: var(--green);">40</strong> ج.م <span style="color:var(--text-muted);">(بعد الخصم: <strong id="settings-monthly-after-previous" style="color: var(--green);">40</strong> ج.م)</span>
+                                    </div>
+                                </div>
+
+                                <!-- Summer -->
+                                <div class="collapsible-settings settings-color-red" data-default-open="true">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-icon" style="background:rgba(255,152,0,.1);">
+                                            <i class='bx bx-sun' style="color:var(--red);"></i>
+                                        </div>
+                                        <div>
+                                            <h4>الكورس الصيفي</h4>
+                                            <p>سعر الحصة للطلاب المسجلين في الكورس الصيفي</p>
+                                        </div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">سعر الحصة (ج.م)</label>
+                                            <input type="number" id="settings-price-summer" class="wa-template-input" value="20" min="1" step="1" style="height:38px;font-size:15px;font-weight:700;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">عدد الحصص شهرياً</label>
+                                            <input type="number" id="settings-sessions-summer" class="wa-template-input" value="12" min="1" max="31" step="1" style="height:38px;font-size:15px;font-weight:700;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">الخصم الشهري (ج.م)</label>
+                                            <input type="number" id="settings-discount-summer" class="wa-template-input" value="0" min="0" step="1" style="height:38px;font-size:15px;font-weight:700;">
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 10px; padding: 12px; background: var(--bg-elevated); border-radius: 12px; font-size: 14px; color: var(--text-secondary);">
+                                        الإجمالي الشهري: <strong id="settings-monthly-summer" style="color: var(--green);">240</strong> ج.م <span style="color:var(--text-muted);">(بعد الخصم: <strong id="settings-monthly-after-summer" style="color: var(--green);">240</strong> ج.م)</span>
+                                    </div>
+                                </div>
+                                <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+                                    <button class="btn btn-primary" id="save-settings-btn">
+                                        <i class='bx bx-save'></i> حفظ الإعدادات
+                                    </button>
+                                </div>
+                                </div>
+
+                                <!-- ═══════════════════════════════════════ -->
+                                <!-- 5. Curriculum (Orange)                -->
+                                <!-- ═══════════════════════════════════════ -->
+                                <div class="collapsible-settings settings-color-orange" data-default-open="false">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-icon" style="background:rgba(249,115,22,.1);">
+                                            <i class='bx bx-book-open' style="color:#f97316;"></i>
+                                        </div>
+                                        <div>
+                                            <h4>عرض المنهج التعليمي</h4>
+                                            <p>إظهار أو إخفاء زر "عرض المنهج التعليمي" في الصفحة الرئيسية</p>
+                                        </div>
+                                    </div>
+                                    <div style="padding:14px 18px;">
+                                        <label class="enroll-toggle-label">
+                                            <span id="curriculum-toggle-label">مرئي</span>
+                                            <input type="checkbox" id="curriculum-toggle" checked>
+                                            <span class="enroll-toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- ═══════════════════════════════════════ -->
+                                <!-- 7. Firebase Config (Red)              -->
+                                <!-- ═══════════════════════════════════════ -->
+                                <div class="collapsible-settings settings-color-red" data-default-open="false">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-icon" style="background:rgba(255,152,0,.1);">
+                                            <i class='bx bxs-data' style="color:#ff9800;"></i>
+                                        </div>
+                                        <div>
+                                            <h4>إعدادات Firebase</h4>
+                                            <p>تغيير معرفات Firebase (يُفعّل بعد إعادة التحميل)</p>
+                                        </div>
+                                    </div>
+                                    <div style="display:flex;flex-direction:column;gap:12px;">
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">API Key</label>
+                                            <input type="text" id="fb-apiKey" class="wa-template-input" placeholder="AIza..." style="min-height:auto;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">Auth Domain</label>
+                                            <input type="text" id="fb-authDomain" class="wa-template-input" placeholder="project.firebaseapp.com" style="min-height:auto;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">Project ID</label>
+                                            <input type="text" id="fb-projectId" class="wa-template-input" placeholder="project-id" style="min-height:auto;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">Storage Bucket</label>
+                                            <input type="text" id="fb-storageBucket" class="wa-template-input" placeholder="project.appspot.com" style="min-height:auto;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">Messaging Sender ID</label>
+                                            <input type="text" id="fb-messagingSenderId" class="wa-template-input" placeholder="123456789" style="min-height:auto;">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">App ID</label>
+                                            <input type="text" id="fb-appId" class="wa-template-input" placeholder="1:123:web:abc" style="min-height:auto;">
+                                        </div>
+                                        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;flex-wrap:wrap;">
+                                            <button class="btn btn-outline" id="test-firebase-config-btn">
+                                                <i class='bx bx-plug'></i> اختبار الاتصال
+                                            </button>
+                                            <button class="btn btn-danger" id="disconnect-firebase-btn">
+                                                <i class='bx bx-unlink'></i> فك ربط قاعدة البيانات
+                                            </button>
+                                            <button class="btn btn-primary" id="save-firebase-config-btn">
+                                                <i class='bx bx-save'></i> حفظ إعدادات Firebase
+                                            </button>
+                                        </div>
+                                        <p style="color:var(--text-muted);font-size:11px;margin:0;">يُفعّل التغيير بعد إعادة تحميل الصفحة. يُحفظ الإعداد للمتصفح الحالي ويُزامَن مع الموقع.</p>
+                                    </div>
+                                </div>
+
+                                <!-- ═══════════════════════════════════════ -->
+                                <!-- 7b. Google Sheets Sync (Green)        -->
+                                <!-- ═══════════════════════════════════════ -->
+                                <div class="collapsible-settings settings-color-green" data-default-open="false">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-icon" style="background:rgba(37,211,102,.1);">
+                                            <i class='bx bxl-google' style="color:#25D366;"></i>
+                                        </div>
+                                        <div>
+                                            <h4>المزامنة مع جوجل شيت</h4>
+                                            <p>ربط بيانات الطلاب بجدول جوجل شيت للتعديل المباشر</p>
+                                        </div>
+                                    </div>
+
+                                    <div style="display:flex;flex-direction:column;gap:14px;padding-top:14px;">
+                                        <span id="sheets-sync-status" class="sheets-status-pill"></span>
+
+                                        <div id="sheets-sync-notlinked" style="display:none;padding:12px 14px;border-radius:12px;background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.25);color:var(--text-secondary);font-size:13px;line-height:1.8;">
+                                            <i class='bx bx-info-circle' style="color:#ff9800;"></i>
+                                            <strong style="color:#ff9800;">القاعدة غير مربوطة بعد.</strong>
+                                            اربط قاعدة بيانات Firebase أولاً من قسم «إعدادات Firebase» ثم عد لإضافة رابط الجدول.
+                                        </div>
+
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px;">رابط جوجل شيت</label>
+                                            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                                                <input type="url" id="sheets-link" class="wa-template-input" placeholder="https://docs.google.com/spreadsheets/d/..." style="min-height:auto;flex:1;min-width:220px;direction:ltr;text-align:left;">
+                                                <button class="btn btn-primary" id="save-sheets-link-btn">
+                                                    <i class='bx bx-save'></i> حفظ الرابط
+                                                </button>
+                                                <button class="btn btn-outline" id="open-sheets-btn">
+                                                    <i class='bx bx-link-external'></i> فتح الجدول
+                                                </button>
+                                            </div>
+                                            <p style="color:var(--text-muted);font-size:11px;margin:6px 0 0;">يُحفظ الرابط مع إعدادات قاعدة البيانات ليظهر في جميع المتصفحات.</p>
+                                        </div>
+
+                                        <!-- خطوات الإعداد -->
+                                        <div class="collapsible-settings settings-color-green" data-default-open="false">
+                                            <div class="settings-section-header">
+                                                <div class="settings-section-icon" style="background:rgba(37,211,102,.1);">
+                                                    <i class='bx bx-list-ol' style="color:#25D366;"></i>
+                                                </div>
+                                                <div>
+                                                    <h4>خطوات ربط الجدول</h4>
+                                                    <p>دليل خطوة بخطوة لإعداد المزامنة مع فايرستور</p>
+                                                </div>
+                                            </div>
+                                            <div style="display:flex;flex-direction:column;gap:10px;">
+                                                <ol class="sheets-guide-steps" style="margin:0;padding-right:20px;display:flex;flex-direction:column;gap:10px;color:var(--text-secondary);font-size:13px;line-height:1.9;">
+                                                    <li>
+                                                        من <strong>Firebase Console → إعدادات المشروع → حساب الخدمة</strong> اضغط <strong>«إنشاء مفتاح خاص جديد»</strong> وسيُنزّل ملف JSON.
+                                                        <span style="color:var(--text-muted);font-size:11px;">(لا تشارك هذا الملف مع أي شخص — يُحفظ مشفّراً داخل السكريبت فقط)</span>
+                                                    </li>
+                                                    <li>
+                                                        أنشئ جدول جوجل شيت فارغاً، ثم من القائمة <strong>Extensions → Apps Script</strong> والصق محتوى الملف <code style="background:var(--bg-elevated);padding:1px 6px;border-radius:6px;direction:ltr;display:inline-block;">google-sheets-sync.gs</code> كاملاً واحفظه.
+                                                    </li>
+                                                    <li>
+                                                        أعد فتح الجدول وستظهر قائمة <strong>«🔥 مزامنة فايرستور»</strong> — اختر <strong>«1️⃣ ربط الإعدادات»</strong>، ثم أدخل
+                                                        <strong>Project ID</strong> (أدناه) والصق محتوى ملف JSON كاملاً.
+                                                    </li>
+                                                    <li>اختر <strong>«2️⃣ إنشاء صفحات الشيت»</strong> ثم <strong>«3️⃣ سحب البيانات من فايرستور»</strong>.</li>
+                                                    <li>اختر <strong>«تفعيل التعديل الفوري + سحب تلقائي كل 10 دقائق»</strong>.</li>
+                                                    <li>الصق <strong>رابط الجدول</strong> في الحقل أعلاه واضغط «حفظ الرابط».</li>
+                                                </ol>
+                                                <div style="padding:12px 14px;border-radius:12px;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2);font-size:12px;color:var(--text-secondary);line-height:1.9;">
+                                                    <i class='bx bx-error-circle' style="color:#f97316;"></i>
+                                                    <strong style="color:#f97316;">تنبيه:</strong>
+                                                    التعديل من الشيت يُحفظ في فايرستور فوراً (آخر كاتب يفوز). تجنّب تعديل نفس البيانات من الشيت واللوحة في آن واحد. عمودا «المعرف» و«المستحق» للقراءة فقط.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                    </div>
+
+                    <!-- Section: WhatsApp Templates -->
+                    <div id="settings-whatsapp-tab" class="settings-panel" style="margin-top:20px;">
+                        <div class="collapsible-settings settings-color-green" data-default-open="false">
+                            <div class="settings-section-header">
+                                <div class="settings-section-icon" style="background:rgba(37,211,102,.1);">
+                                    <i class='bx bx-message-detail' style="color:#25D366;"></i>
+                                </div>
+                                <div>
+                                    <h4>قوالب رسائل الواتساب</h4>
+                                    <p>إدارة القوالب الجاهزة المستخدمة في التواصل مع أولياء الأمور</p>
+                                </div>
+                            </div>
+                            <div style="padding: 20px; display: flex; flex-direction: column; gap: 20px;">
+                            <!-- Teacher Info for Registration WhatsApp -->
+                            <div class="whatsapp-template-card">
+                                <div class="template-header">
+                                    <i class='bx bxs-user-badge' style="color: var(--green); font-size: 22px;"></i>
+                                    <div>
+                                        <h4>بيانات المعلم لرسالة التسجيل</h4>
+                                        <p>اسم المعلم ورقم الواتساب الذي يتم تحويل الطالب إليه بعد التسجيل</p>
+                                    </div>
+                                </div>
+                                <div class="template-body">
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">اسم المعلم</label>
+                                            <input type="text" id="wa-template-teacher-name" class="wa-template-input" placeholder="مثال: مستر أحمد">
+                                        </div>
+                                        <div>
+                                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">رقم واتساب المعلم</label>
+                                            <input type="tel" id="wa-template-teacher-phone" class="wa-template-input" placeholder="مثال: 01125908425">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Automatic Message After Registration -->
+                            <div class="whatsapp-template-card">
+                                <div class="template-header">
+                                    <i class='bx bx-check-circle' style="color: #34d399; font-size: 22px;"></i>
+                                    <div>
+                                        <h4>الرسالة التلقائية بعد التسجيل</h4>
+                                        <p>تُرسل لولي الأمر تلقائياً مباشرة بعد تسجيل الطالب من الموقع</p>
+                                    </div>
+                                </div>
+                                <div class="template-body">
+                                    <textarea id="wa-template-registration-auto" class="wa-template-input" rows="5" placeholder="مرحباً {اسم_المعلم}، تم تسجيل الطالب/ة {اسم_الطالب} في {الصف}. رقم الهاتف: {رقم_الطالب}. يرجى تأكيد البيانات. شكراً لكم."></textarea>
+                                    <div class="template-variables">
+                                        <span class="var-tag" data-var="{اسم_الطالب}">{اسم_الطالب}</span>
+                                        <span class="var-tag" data-var="{رقم_الطالب}">{رقم_الطالب}</span>
+                                        <span class="var-tag" data-var="{الصف}">{الصف}</span>
+                                        <span class="var-tag" data-var="{اسم_المعلم}">{اسم_المعلم}</span>
+                                        <span class="var-tag" data-var="{رقم_المعلم}">{رقم_المعلم}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- New Registration Request Message -->
+                            <div class="whatsapp-template-card">
+                                <div class="template-header">
+                                    <i class='bx bx-user-plus' style="color: var(--accent); font-size: 22px;"></i>
+                                    <div>
+                                        <h4>رسالة طلب التسجيل الجديد</h4>
+                                        <p>تُستخدم عند التواصل مع ولي أمر طالب جديد قيد الانتظار</p>
+                                    </div>
+                                </div>
+                                <div class="template-body">
+                                    <textarea id="wa-template-new-request" class="wa-template-input" rows="4" placeholder="مرحباً، تم استلام طلب تسجيل الطالب/ة {اسم_الطالب} في {الصف}. يرجى مراجعة الطلب. شكراً لكم."></textarea>
+                                    <div class="template-variables">
+                                        <span class="var-tag" data-var="{اسم_الطالب}">{اسم_الطالب}</span>
+                                        <span class="var-tag" data-var="{الصف}">{الصف}</span>
+                                        <span class="var-tag" data-var="{رقم_الطالب}">{رقم_الطالب}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Message -->
+                            <div class="whatsapp-template-card">
+                                <div class="template-header">
+                                    <i class='bx bx-message-rounded' style="color: var(--accent); font-size: 22px;"></i>
+                                    <div>
+                                        <h4>رسالة سريعة</h4>
+                                        <p>رسالة عامة جاهزة للإرسال السريع لأي طالب</p>
+                                    </div>
+                                </div>
+                                <div class="template-body">
+                                    <textarea id="wa-template-quick" class="wa-template-input" rows="4" placeholder="اكتب الرسالة السريعة هنا..."></textarea>
+                                    <div class="template-variables">
+                                        <span class="var-tag" data-var="{اسم_الطالب}">{اسم_الطالب}</span>
+                                        <span class="var-tag" data-var="{الصف}">{الصف}</span>
+                                        <span class="var-tag" data-var="{رقم_ولي_الأمر}">{رقم_ولي_الأمر}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Session Reminder -->
+                            <div class="whatsapp-template-card">
+                                <div class="template-header">
+                                    <i class='bx bx-bell' style="color: var(--amber); font-size: 22px;"></i>
+                                    <div>
+                                        <h4>تذكير بالحصة</h4>
+                                        <p>رسالة تذكير قبل موعد الحصة</p>
+                                    </div>
+                                </div>
+                                <div class="template-body">
+                                    <textarea id="wa-template-reminder" class="wa-template-input" rows="4" placeholder="اكتب رسالة التذكير هنا..."></textarea>
+                                    <div class="template-variables">
+                                        <span class="var-tag" data-var="{اسم_الطالب}">{اسم_الطالب}</span>
+                                        <span class="var-tag" data-var="{اليوم}">{اليوم}</span>
+                                        <span class="var-tag" data-var="{الوقت}">{الوقت}</span>
+                                        <span class="var-tag" data-var="{الصف}">{الصف}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Absence Reminder -->
+                            <div class="whatsapp-template-card">
+                                <div class="template-header">
+                                    <i class='bx bx-user-x' style="color: #e879f9; font-size: 22px;"></i>
+                                    <div>
+                                        <h4>تذكير بالغياب</h4>
+                                        <p>تُرسل عند غياب الطالب عن الحصة</p>
+                                    </div>
+                                </div>
+                                <div class="template-body">
+                                    <textarea id="wa-template-absence" class="wa-template-input" rows="4" placeholder="اكتب رسالة تذكير الغياب هنا..."></textarea>
+                                    <div class="template-variables">
+                                        <span class="var-tag" data-var="{اسم_الطالب}">{اسم_الطالب}</span>
+                                        <span class="var-tag" data-var="{اليوم}">{اليوم}</span>
+                                        <span class="var-tag" data-var="{الوقت}">{الوقت}</span>
+                                        <span class="var-tag" data-var="{الصف}">{الصف}</span>
+                                        <span class="var-tag" data-var="{المجموعة}">{المجموعة}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Late Payment Message -->
+                            <div class="whatsapp-template-card">
+                                <div class="template-header">
+                                    <i class='bx bx-error-alt' style="color: var(--red); font-size: 22px;"></i>
+                                    <div>
+                                        <h4>رسالة تأخر المدفوعات</h4>
+                                        <p>تُرسل عند وجود مبلغ متأخر على الطالب</p>
+                                    </div>
+                                </div>
+                                <div class="template-body">
+                                    <textarea id="wa-template-late-payment" class="wa-template-input" rows="4" placeholder="اكتب رسالة تأخر المدفوعات هنا..."></textarea>
+                                    <div class="template-variables">
+                                        <span class="var-tag" data-var="{اسم_الطالب}">{اسم_الطالب}</span>
+                                        <span class="var-tag" data-var="{المبلغ_المتبقي}">{المبلغ_المتبقي}</span>
+                                        <span class="var-tag" data-var="{عدد_الحصص}">{عدد_الحصص}</span>
+                                        <span class="var-tag" data-var="{الصف}">{الصف}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+                                <button class="btn btn-primary" id="save-wa-templates-btn">
+                                    <i class='bx bx-save'></i> حفظ القوالب
+                                </button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Registration Notes -->
+                    <div id="settings-notes-tab" class="settings-panel" style="margin-top:20px;">
+                        <div class="collapsible-settings settings-color-purple" data-default-open="false">
+                            <div class="settings-section-header">
+                                <div class="settings-section-icon" style="background:rgba(139,92,246,.1);">
+                                    <i class='bx bx-notepad' style="color:#8b5cf6;"></i>
+                                </div>
+                                <div>
+                                    <h4>ملاحظات التسجيل <span id="notes-line-count" class="badge" style="background:rgba(139,92,246,.1);color:#8b5cf6;display:none;">0</span></h4>
+                                    <p>تعديل الملاحظات التي تظهر لولي الأمر قبل إتمام التسجيل</p>
+                                </div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:14px;padding-top:14px;">
+                                <!-- Quick Templates -->
+                                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                    <span style="font-size:12px;color:var(--text-muted);line-height:2;">قوالب سريعة:</span>
+                                    <button class="btn btn-outline" style="font-size:11px;padding:4px 10px;border-radius:20px;" onclick="insertNoteTemplate('attendance')">📅 الحضور والغياب</button>
+                                    <button class="btn btn-outline" style="font-size:11px;padding:4px 10px;border-radius:20px;" onclick="insertNoteTemplate('pricing')">💰 الأسعار</button>
+                                    <button class="btn btn-outline" style="font-size:11px;padding:4px 10px;border-radius:20px;" onclick="insertNoteTemplate('communication')">📱 التواصل</button>
+                                    <button class="btn btn-outline" style="font-size:11px;padding:4px 10px;border-radius:20px;" onclick="insertNoteTemplate('books')">📚 الكراسات</button>
+                                </div>
+
+                                <div>
+                                    <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px;">عنوان الملاحظات</label>
+                                    <input type="text" id="settings-notes-title" class="wa-template-input" placeholder="إضغط هنا لقراءة ملاحظات هامة جداً ⚠️">
+                                </div>
+
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                    <!-- Editor -->
+                                    <div>
+                                        <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px;">المحرر</label>
+                                        <textarea id="settings-notes-message" class="wa-template-input" rows="8" placeholder="اكتب كل ملاحظة في سطر منفصل..."></textarea>
+                                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+                                            <div class="template-variables" style="margin:0;">
+                                                <span class="var-tag">{price}</span>
+                                                <span class="var-tag">{monthly}</span>
+                                            </div>
+                                            <span id="notes-chars-count" style="font-size:11px;color:var(--text-muted);">0 حرف</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Live Preview -->
+                                    <div>
+                                        <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px;">معاينة مباشرة</label>
+                                        <div id="notes-live-preview" class="auth-notes-box" style="min-height:140px;max-height:250px;overflow-y:auto;">
+                                            <div class="auth-notes-content" style="border:none;padding:0;margin:0;">
+                                                <p style="color:var(--text-muted);font-size:12px;font-style:italic;">ستظهر الملاحظات هنا...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="display:flex;justify-content:flex-end;gap:10px;">
+                                    <button class="btn btn-outline" id="reset-notes-btn">
+                                        <i class='bx bx-refresh'></i> استعادة الافتراضي
+                                    </button>
+                                    <button class="btn btn-primary" id="save-notes-btn">
+                                        <i class='bx bx-save'></i> حفظ الملاحظات
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Announcements -->
+                    <div id="settings-announcements-tab" class="settings-panel" style="margin-top:20px;">
+                        <div class="collapsible-settings settings-color-blue" data-default-open="false">
+                            <div class="settings-section-header">
+                                <div class="settings-section-icon" style="background:var(--accent-dim);">
+                                    <i class='bx bxs-bell-ring' style="color:var(--accent);"></i>
+                                </div>
+                                <div>
+                                    <h4>إدارة الإعلانات <span id="settings-announcements-badge" class="badge">0</span></h4>
+                                    <p>إضافة وتعديل الإعلانات والنصائح والتنبيهات التي تظهر للطلاب عند فتح الموقع</p>
+                                </div>
+                            </div>
+                            <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+                                <button class="btn btn-primary btn-sm" id="ann-add-btn">
+                                    <i class='bx bx-plus-circle'></i> إضافة إعلان
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="announcements-table">
+                                    <thead>
+                                        <tr>
+                                            <th>الصورة</th>
+                                            <th>العنوان</th>
+                                            <th>الحالة</th>
+                                            <th>الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Rows injected by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Export & Reports -->
+                    <div class="settings-panel" style="margin-top:20px;">
+                        <div class="collapsible-settings settings-color-sky" data-default-open="false">
+                            <div class="settings-section-header">
+                                <div class="settings-section-icon" style="background:rgba(56,189,248,.1);">
+                                    <i class='bx bx-export' style="color:var(--sky-deep);"></i>
+                                </div>
+                                <div>
+                                    <h4>التصدير والتقارير</h4>
+                                    <p>تصدير أسماء الطلاب وأرقام الهواتف كملف CSV</p>
+                                </div>
+                            </div>
+                            <p style="color:var(--text-secondary);font-size:13px;margin:0 0 12px;">تصدير أسماء الطلاب المترجمة وأرقام الهواتف كملف CSV لاستيراده في Google Contacts</p>
+                            <button class="btn btn-outline" id="export-contacts-btn" style="align-self:flex-start;">
+                                <i class='bx bx-export'></i> تصدير CSV لجهات الاتصال
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- MODAL: ADD STUDENT -->
+                <div id="add-student-modal" class="modal-overlay hidden">
+                    <div class="modal-sheet doodle-card" style="max-width: 500px;">
+                        <div class="modal-head">
+                            <h2><i class='bx bx-user-plus' style="color:var(--accent);"></i> إضافة طالب جديد</h2>
+                            <button class="modal-close-btn" id="close-add-modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="add-student-form">
+                                <div class="input-group">
+                                    <label>اسم الطالب الرباعي</label>
+                                    <input type="text" id="student-name" required style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-family:inherit;">
+                                </div>
+                                <div class="input-group" style="margin-top:12px;">
+                                    <label>الصف الدراسي</label>
+                                    <select id="student-grade" required style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-family:inherit;">
+                                        <option value="" disabled selected>يرجى اختيار الصف الصحيح</option>
+                                        <option value="مرحلة الكي جي والتأسيس">مرحلة الكي جي والتأسيس</option>
+                                        <option value="الصف الأول الابتدائي">الصف الأول الابتدائي</option>
+                                        <option value="الصف الثاني الابتدائي">الصف الثاني الابتدائي</option>
+                                        <option value="الصف الثالث الابتدائي">الصف الثالث الابتدائي</option>
+                                        <option value="الصف الرابع الابتدائي">الصف الرابع الابتدائي</option>
+                                        <option value="الصف الخامس الابتدائي">الصف الخامس الابتدائي</option>
+                                        <option value="الصف السادس الابتدائي">الصف السادس الابتدائي</option>
+                                    </select>
+                                </div>
+                                <div class="input-group" style="margin-top:12px;">
+                                    <label>رقم هاتف ولي الأمر</label>
+                                    <input type="tel" id="student-phone" required style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-family:inherit;">
+                                </div>
+                                <div style="display:flex;gap:10px;margin-top:20px;">
+                                    <button type="submit" id="save-student-btn" class="btn btn-primary" style="flex:1;">حفظ الطالب</button>
+                                    <button type="button" class="btn btn-outline" id="cancel-add-btn">إلغاء</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        <nav class="mobile-nav">
+            <div class="mobile-nav-item active" data-target="home-view" data-color="blue">
+                <i class='bx bx-home'></i>
+                <span>الرئيسية</span>
+            </div>
+            <div class="mobile-nav-item" data-target="students-view" data-color="green">
+                <i class='bx bx-user'></i>
+                <span>الطلاب</span>
+            </div>
+            <div class="mobile-nav-item" data-target="combined-requests-view" data-color="orange">
+                <i class='bx bx-time-five'></i>
+                <span>الطلبات</span>
+                <span id="combined-requests-badge-mobile" class="badge hidden">0</span>
+            </div>
+            <div class="mobile-nav-item" data-target="summer-courses-view" data-color="red">
+                <i class='bx bxs-sun'></i>
+                <span>الصيفية</span>
+                <span id="summer-badge-mobile" class="badge hidden">0</span>
+            </div>
+            <div class="mobile-nav-item" data-target="educational-works-view" data-color="cyan">
+                <i class='bx bxs-book'></i>
+                <span>أعمالي</span>
+            </div>
+            <div class="mobile-nav-item" data-target="settings-view" data-color="slate">
+                <i class='bx bx-cog'></i>
+                <span>الإعدادات</span>
+            </div>
+        </nav>
+    </div>
+
+    <!-- MODAL: EDIT STUDENT GRADES -->
+    <div id="edit-modal" class="modal-overlay hidden">
+        <div class="modal-sheet doodle-card" style="max-width: 550px;">
+            <div class="modal-head">
+                <h2>تعديل بيانات الطالب</h2>
+                <button class="modal-close-btn" id="close-edit-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-student-form">
+                    <input type="hidden" id="edit-student-id">
+                    <div id="edit-student-photo-wrap" style="text-align:center;margin-bottom:16px;">
+                        <div id="edit-student-avatar" style="width:80px;height:80px;border-radius:50%;margin:0 auto;background:linear-gradient(135deg,var(--accent,#3b82f6),var(--accent-dark,#1d4ed8));display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:900;box-shadow:0 4px 12px rgba(59,130,246,0.3);overflow:hidden;border:3px solid var(--accent,#3b82f6);"></div>
+                    </div>
+                    <div class="input-group">
+                        <label>الاسم</label>
+                        <input type="text" id="edit-student-name">
+                    </div>
+                    <div class="input-group">
+                        <label>رقم هاتف ولي الأمر</label>
+                        <input type="text" id="edit-student-phone">
+                    </div>
+                    <div class="input-group">
+                        <label>الصف الدراسي</label>
+                        <select id="edit-student-grade" required>
+                            <option value="" disabled selected>يرجى اختيار الصف الصحيح</option>
+                            <option value="مرحلة الكي جي والتأسيس">مرحلة الكي جي والتأسيس</option>
+                            <option value="الصف الأول الابتدائي">الصف الأول الابتدائي</option>
+                            <option value="الصف الثاني الابتدائي">الصف الثاني الابتدائي</option>
+                            <option value="الصف الثالث الابتدائي">الصف الثالث الابتدائي</option>
+                            <option value="الصف الرابع الابتدائي">الصف الرابع الابتدائي</option>
+                            <option value="الصف الخامس الابتدائي">الصف الخامس الابتدائي</option>
+                            <option value="الصف السادس الابتدائي">الصف السادس الابتدائي</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <label style="margin: 0;">الحصص والمتابعة (كل شهر <span id="label-sessions-per-month">8</span> حصص)</label>
+                            <div style="display: flex; gap: 5px;">
+                                <button type="button" class="btn btn-outline btn-sm add-month-btn"
+                                    style="padding: 2px 8px; font-size: 11px;">
+                                    <i class='bx bx-plus-circle'></i> إضافة شهر
+                                </button>
+                                <button type="button" class="btn btn-outline btn-sm del-month-btn"
+                                    style="padding: 2px 8px; font-size: 11px; border-color: var(--red); color: var(--red);">
+                                    <i class='bx bx-minus-circle'></i> حذف شهر
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Legend for Dots -->
+                        <div class="attendance-legend" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; font-size: 11px; font-weight: 700; color: var(--text-muted); justify-content: center;">
+                            <div style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: var(--green); display: inline-block;"></span> حضر ودفع</div>
+                            <div style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: var(--red); display: inline-block;"></span> حضر ولم يدفع</div>
+                            <div style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent); display: inline-block;"></span> دفع مقدماً</div>
+                            <div style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: var(--bg-elevated); border: 1px solid var(--border); display: inline-block;"></span> لم يحضر</div>
+                        </div>
+                        <div id="attendance-months-container" class="attendance-months-container">
+                            <!-- Rows of months will be injected here -->
+                        </div>
+                        <div id="booklet-info-box" style="display: none; margin-top: 10px; background: var(--amber-dim); border: 1px solid var(--amber); padding: 12px; border-radius: var(--r-lg); align-items: center; gap: 10px; color: var(--amber); font-weight: 700;">
+                            <i class='bx bxs-book-bookmark' style="font-size: 20px;"></i>
+                            <span id="booklet-info-text"></span>
+                        </div>
+                        <input type="hidden" id="edit-student-attendance" value="0">
+                        <input type="hidden" id="edit-student-total-sessions" value="8"><!-- updated dynamically by JS -->
+                    </div>
+                    <div class="input-group">
+                        <label>نظام المدفوعات الذكي 💸</label>
+                        <div class="input-group booklet-pricing-container" style="margin-top: 10px; margin-bottom: 15px; background: var(--bg-input); padding: 15px; border-radius: var(--r-lg); border: 1px solid var(--border); transition: all 0.3s ease;">
+                            <label style="color: var(--text-secondary); font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                                <i class='bx bx-book-open' style="color: var(--accent); font-size: 18px;"></i>
+                                سعر الملزمات الإضافية (يُضاف للمستحق)
+                            </label>
+                            <div class="booklet-presets">
+                                <button type="button" class="preset-btn" data-val="10">10 ج</button>
+                                <button type="button" class="preset-btn" data-val="20">20 ج</button>
+                                <button type="button" class="preset-btn" data-val="30">30 ج</button>
+                                <button type="button" class="preset-btn" data-val="custom">أخرى ✏️</button>
+                            </div>
+                            <div id="booklet-details-wrapper" style="display: none; margin-top: 10px;">
+                                <input type="text" id="edit-student-booklet-name" placeholder="اسم/رقم الملزمة (اختياري)" style="width: 100%; padding: 8px 12px; border-radius: var(--r-sm); border: 1px solid var(--border); font-size: 13px; margin-bottom: 8px; background: var(--bg-input); color: var(--text-primary);">
+                            </div>
+                            <div id="custom-expense-wrapper" style="display: none; margin-top: 12px; transform: translateY(-5px); transition: all 0.3s ease;">
+                                <input type="number" id="edit-student-other-expenses" value="0" min="0" step="5" placeholder="أدخل القيمة المخصصة بالجنيه" style="width: 100%; padding: 8px 12px; border-radius: var(--r-sm); border: 1.5px solid var(--accent); font-weight: 700; color: var(--text-primary); background: var(--bg-input);">
+                            </div>
+                        </div>
+                        <div class="input-group" style="margin-bottom: 15px;">
+                            <label class="checkbox-container" style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--text-secondary);">
+                                <input type="checkbox" id="auto-attendance-check" style="width: 18px; height: 18px; cursor: pointer;">
+                                تأكيد حضور الحصص تلقائيًا عند دفع كامل الشهر
+                            </label>
+                        </div>
+                        <div class="payment-controls">
+                            <button type="button" class="btn btn-success pay-due-btn">المستحق</button>
+                            <button type="button" class="btn btn-outline pay-btn" data-amount="20"> الحصه (20 ج)</button>
+                            <button type="button" class="btn btn-outline pay-btn" data-amount="160"> الشهر (160 ج)</button>
+                            <button type="button" class="btn btn-danger btn-sm reset-pay-btn"
+                                title="تصفير الحساب"><i class='bx bx-reset'></i> تصفير الحساب</button>
+                        </div>
+                        <div class="payment-status-preview">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <span>المبلغ المدفوع: <strong id="display-paid-amount">0</strong> ج</span>
+                                <span id="smart-calc-info"
+                                    style="font-size: 13px; color: var(--text-muted); background: var(--bg-elevated); padding: 2px 8px; border-radius: var(--r-sm);"></span>
+                            </div>
+                            <div id="payment-calc-alert"
+                                style="display: none; padding: 8px; border-radius: 8px; font-size: 13px; font-weight: 700; margin-top: 5px;">
+                            </div>
+                        </div>
+                        <input type="hidden" id="edit-student-paid" value="0">
+                    </div>
+                    <div class="input-row" style="display: flex; gap: 10px;">
+                        <div class="input-group" style="flex: 1;">
+                            <label>يوم الحصة</label>
+                            <input type="text" id="edit-student-day" placeholder="مثلاً: الأحد">
+                        </div>
+                        <div class="input-group" style="flex: 1;">
+                            <label>ساعة الحصة</label>
+                            <input type="text" id="edit-student-hour" placeholder="مثلاً: 4 عصراً">
+                        </div>
+                    </div>
+
+                    <div class="input-row" style="display:flex;gap:10px;">
+                        <div class="input-group" style="flex:1;">
+                            <label>المجموعة</label>
+                            <select id="edit-student-group">
+                                <option value="">بدون مجموعة</option>
+                            </select>
+                        </div>
+                        <div class="input-group" style="flex:1;">
+                            <label>العام الدراسي</label>
+                            <select id="edit-student-year">
+                                <option value="current">العام الحالي</option>
+                                <option value="previous">العام الماضي</option>
+                                <option value="summer">الكورس الصيفي</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>مستوى الطالب</label>
+                        <select id="edit-student-level">
+                            <option value="لم يتم تحديد المستوى">لم يتم تحديد المستوى 🌟</option>
+                            <option value="ممتاز">ممتاز 🌟</option>
+                            <option value="جيد جداً">جيد جداً ✨</option>
+                            <option value="جيد">جيد 👍</option>
+                            <option value="مقبول">مقبول ⚠️</option>
+                            <option value="ضعيف">ضعيف 🛑</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>تقرير مختصر لولي الأمر</label>
+                        <textarea id="edit-student-report" rows="2"
+                            placeholder="اكتب ملخصاً سريعاً للأداء..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>ملاحظات المعلم (داخلية)</label>
+                        <textarea id="edit-student-notes" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" style="margin-top:15px;">تحديث
+                        البيانات</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: STUDENT FILE -->
+    <div id="student-file-modal" class="modal-overlay hidden">
+        <div class="modal-sheet doodle-card student-file-modal" style="max-width: 800px;">
+            <div class="modal-head">
+                <h2><i class='bx bx-folder-open' style="color: var(--sky-deep);"></i> ملف الطالب</h2>
+                <button class="modal-close-btn" id="close-student-file-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="student-file-content">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TAKE ATTENDANCE -->
+    <div id="attendance-modal" class="modal-overlay hidden">
+        <div class="modal-sheet doodle-card" style="max-width: 900px;">
+            <div class="modal-head">
+                <h2><i class='bx bx-calendar-check' style="color: var(--green);"></i> تسجيل حضور وغياب الحصة اليومية</h2>
+                <button class="modal-close-btn" id="close-attendance-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Date and Grade Filters -->
+                <div class="input-row" style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div class="input-group" style="flex: 1;">
+                        <label>تاريخ الحصة</label>
+                        <input type="date" id="attendance-date">
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <label>اختر المجموعة الدراسية</label>
+                        <select id="attendance-grade-filter">
+                            <option value="">كل الطلاب</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Students List -->
+                <div class="doodle-card" style="padding: 20px; margin-bottom: 20px;">
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <i class='bx bx-user-check' style="color: var(--accent);"></i>
+                        قائمة الطلاب
+                        <span id="attendance-count-badge" class="badge" style="background: var(--accent-dim); color: var(--accent); margin-right: auto;">0 طالب</span>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;font-weight:700;color:var(--accent);margin-right:10px;">
+                            <input type="checkbox" id="attendance-select-all" style="width:18px;height:18px;cursor:pointer;"> تحديد الكل للحصة رقم
+                            <select id="attendance-select-all-session" style="padding:4px 8px;border-radius:6px;border:1.5px solid var(--border);font-weight:800;font-size:14px;cursor:pointer;background:var(--bg-input);color:var(--text-primary);">
+                                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                                <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                            </select>
+                        </label>
+                        <span style="font-size:11px;color:var(--text-muted);margin-right:10px;">
+                            <span style="color:var(--green);">● مسجل</span> &nbsp;
+                            <span style="color:var(--accent);">● جديد</span>
+                        </span>
+                    </h3>
+                    <div id="attendance-students-list" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Students will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button class="btn btn-outline" id="cancel-attendance-btn">إغلاق</button>
+                    <button class="btn btn-danger btn-sm" id="bulk-reset-attendance-btn" style="margin-right:auto;"><i class='bx bx-reset'></i> تصفير حصص الكل</button>
+                    <button class="btn btn-primary" id="save-attendance-btn"><i class='bx bx-save'></i> حفظ كشف الحضور والغياب</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: GROUP MANAGEMENT -->
+    <div id="group-modal" class="modal-overlay hidden">
+        <div class="modal-sheet doodle-card" style="max-width: 750px;">
+            <div class="modal-head">
+                <h2><i class='bx bx-layer' style="color:var(--accent);"></i> إدارة المجموعات</h2>
+                <button class="modal-close-btn" id="close-group-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                    <h3 style="font-size:15px;color:var(--text-secondary);font-weight:700;">المجموعات الدراسية</h3>
+                    <button class="btn btn-primary btn-sm" id="add-group-btn">
+                        <i class='bx bx-plus-circle'></i> مجموعة جديدة
+                    </button>
+                </div>
+                <div id="groups-list" class="groups-modal-list">
+                    <!-- Groups rendered by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD/EDIT GROUP -->
+    <div id="group-form-modal" class="modal-overlay hidden">
+        <div class="modal-sheet doodle-card" style="max-width: 480px;">
+            <div class="modal-head">
+                <h2 id="group-form-title"><i class='bx bx-plus-circle' style="color:var(--accent);"></i> مجموعة جديدة</h2>
+                <button class="modal-close-btn" id="close-group-form-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="group-form">
+                    <input type="hidden" id="group-form-id">
+                    <div class="input-group">
+                        <label>اسم المجموعة</label>
+                        <input type="text" id="group-name" required placeholder="أدخل اسم المجموعة">
+                    </div>
+                    <div class="input-group">
+                        <label>القسم</label>
+                        <select id="group-category" required style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-family:inherit;">
+                            <option value="current">العام الحالي</option>
+                            <option value="previous">العام الماضي</option>
+                            <option value="foundation">التأسيس</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>لون المجموعة</label>
+                        <div class="group-color-picker" id="group-color-picker">
+                            <button type="button" class="color-option" data-color="#3b82f6" style="background:#3b82f6"></button>
+                            <button type="button" class="color-option" data-color="#22c55e" style="background:#22c55e"></button>
+                            <button type="button" class="color-option" data-color="#ef4444" style="background:#ef4444"></button>
+                            <button type="button" class="color-option" data-color="#f59e0b" style="background:#f59e0b"></button>
+                            <button type="button" class="color-option" data-color="#8b5cf6" style="background:#8b5cf6"></button>
+                            <button type="button" class="color-option" data-color="#ec4899" style="background:#ec4899"></button>
+                            <button type="button" class="color-option" data-color="#14b8a6" style="background:#14b8a6"></button>
+                            <button type="button" class="color-option active" data-color="#f97316" style="background:#f97316"></button>
+                        </div>
+                        <input type="hidden" id="group-color" value="#f97316">
+                    </div>
+                    <div class="input-row" style="display:flex;gap:10px;">
+                        <div class="input-group" style="flex:1;">
+                            <label>يوم الحصة</label>
+                            <input type="text" id="group-day" placeholder="مثلاً: الأحد، الثلاثاء">
+                        </div>
+                        <div class="input-group" style="flex:1;">
+                            <label>موعد الحصة</label>
+                            <input type="text" id="group-time" placeholder="مثلاً: 4 عصراً">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>تقرير مختصر لولي الأمر</label>
+                        <textarea id="group-report" rows="3"
+                            placeholder="تقرير مختصر يُطبَّق على جميع الطلاب في المجموعة..."></textarea>
+                        <small style="color:var(--text-secondary);font-size:11px;margin-top:4px;display:block;">سيتم تطبيق هذا التقرير على جميع الطلاب في المجموعة تلقائياً</small>
+                    </div>
+                    <div class="input-group">
+                        <label><i class='bx bxl-whatsapp' style="color:#25D366;"></i> لينك جروب الواتساب</label>
+                        <input type="url" id="group-whatsapp" placeholder="https://chat.whatsapp.com/...">
+                        <small style="color:var(--text-secondary);font-size:11px;margin-top:4px;display:block;">رابط مجموعة الواتساب لهذه المجموعة</small>
+                    </div>
+                    <div id="group-templates-section" style="display:none;">
+                        <label style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;display:block;">قوالب رسائل سريعة</label>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button type="button" class="group-tpl-btn quick" data-type="quick"><i class="bx bx-message-rounded"></i> رسالة سريعة</button>
+                            <button type="button" class="group-tpl-btn late" data-type="late"><i class="bx bxl-whatsapp"></i> رسالة تأخر المدفوعات</button>
+                            <button type="button" class="group-tpl-btn reminder" data-type="reminder"><i class="bx bx-bell"></i> تذكير بالحصة</button>
+                            <button type="button" class="group-tpl-btn absence" data-type="absence"><i class="bx bx-user-x"></i> تذكير بالغياب</button>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:10px;margin-top:16px;">
+                        <button type="submit" class="btn btn-primary" style="flex:1;" id="save-group-btn">
+                            <i class='bx bx-save'></i> حفظ المجموعة
+                        </button>
+                        <button type="button" class="btn btn-outline" id="cancel-group-form-btn">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD/EDIT ANNOUNCEMENT -->
+    <div id="announcement-form-modal" class="modal-overlay hidden">
+        <div class="modal-sheet doodle-card" style="max-width: 550px;">
+            <div class="modal-head">
+                <h2 id="ann-form-title"><i class='bx bx-plus-circle' style="color:var(--accent);"></i> إضافة إعلان جديد</h2>
+                <button class="modal-close-btn" id="close-ann-form-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="announcement-form">
+                    <input type="hidden" id="ann-form-id">
+                    <div class="input-group">
+                        <label>عنوان الإعلان</label>
+                        <input type="text" id="ann-title" required placeholder="أدخل عنوان الإعلان">
+                    </div>
+
+                    <div class="input-group">
+                        <label>صورة الإعلان</label>
+                        <div id="ann-upload-zone" style="border:2px dashed var(--border,#2a3040);border-radius:14px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:var(--bg-card,#181d28);">
+                            <input type="file" id="ann-image-file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+                            <i class="bx bx-cloud-upload" style="font-size:44px;color:var(--accent,#6c63ff);display:block;margin-bottom:8px;"></i>
+                            <p style="font-size:14px;font-weight:700;color:var(--text-primary,#e2e8f0);margin:0 0 4px;">اضغط أو اسحب صورة هنا</p>
+                            <p style="font-size:12px;color:var(--text-secondary,#94a3b8);margin:0;">JPG, PNG, WEBP — حتى 5 ميجا</p>
+                        </div>
+                        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                            <img id="ann-image-preview" src="" alt="معاينة" style="max-width:180px;max-height:110px;border-radius:10px;border:1px solid var(--border,#2a3040);display:none;object-fit:cover;">
+                            <button type="button" id="ann-remove-image" class="btn-sm" style="display:none;background:#ef4444;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">إزالة الصورة</button>
+                        </div>
+                        <input type="hidden" id="ann-image-url">
+                    </div>
+                    <div class="input-group">
+                        <label class="checkbox-container" style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;">
+                            <input type="checkbox" id="ann-is-active" checked style="width:18px;height:18px;cursor:pointer;">
+                            مفعل (ظاهر للزوار)
+                        </label>
+                    </div>
+                    <div style="display:flex;gap:10px;margin-top:16px;">
+                        <button type="submit" class="btn btn-primary" style="flex:1;"><i class='bx bx-save'></i> حفظ الإعلان</button>
+                        <button type="button" class="btn btn-outline" id="cancel-ann-form-btn">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD/EDIT WORK -->
+    <div id="work-modal" class="modal-overlay hidden">
+        <div class="modal-sheet doodle-card" style="max-width: 600px;">
+            <div class="modal-head">
+                <h3 id="work-modal-title">💼 إضافة عمل جديد</h3>
+                <button class="modal-close-btn" id="close-work-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="work-form">
+                    <input type="hidden" id="work-id">
+                    <div class="input-grid" style="display: grid; gap: 15px; grid-template-columns: 1fr;">
+                        <div class="input-group">
+                            <label style="font-weight:700; margin-bottom:5px; display:block;">عنوان العمل *</label>
+                            <input type="text" id="work-title" required placeholder="أدخل عنوان العمل أو المشروع..." style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+                        </div>
+                        <div class="input-group">
+                            <label style="font-weight:700; margin-bottom:5px; display:block;">رابط الصورة (اختياري)</label>
+                            <input type="url" id="work-image-url" placeholder="https://example.com/image.jpg" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+                        </div>
+                        <div class="input-group">
+                            <label style="font-weight:700; margin-bottom:5px; display:block;">رابط العمل الخارجي *</label>
+                            <input type="url" id="work-link-url" required placeholder="https://example.com/my-work" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+                        </div>
+                        <div class="input-group">
+                            <label style="font-weight:700; margin-bottom:5px; display:block;">وصف العمل</label>
+                            <textarea id="work-desc" rows="4" placeholder="اكتب وصفاً تفصيلياً للعمل..." style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit;"></textarea>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                        <button type="button" class="btn btn-outline" id="cancel-work-btn">إلغاء</button>
+                        <button type="submit" class="btn btn-primary"><i class='bx bx-save'></i> حفظ العمل</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- MODAL: COURSE FORM (ADD/EDIT) -->
+    <div id="course-form-modal" class="modal-overlay hidden">
+        <div class="modal-sheet doodle-card" style="max-width:700px;">
+            <div class="modal-head">
+                <h2 id="cf-modal-title"><i class='bx bx-plus-circle' style="color:var(--accent);"></i> إضافة كورس جديد</h2>
+                <button class="modal-close-btn" id="cf-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="course-form">
+                    <input type="hidden" id="cf-id">
+
+                    <div class="cf-form-grid">
+                        <div class="input-group" style="grid-column:1/-1;">
+                            <label>عنوان الكورس <span class="required">*</span></label>
+                            <input type="text" id="cf-title" required placeholder="أدخل عنوان الكورس">
+                        </div>
+
+                        <div class="input-group" style="grid-column:1/-1;">
+                            <label>الوصف المختصر</label>
+                            <textarea id="cf-short-desc" rows="2" placeholder="وصف قصير يظهر في البطاقة"></textarea>
+                        </div>
+
+                        <div class="input-group" style="grid-column:1/-1;">
+                            <label>صورة الكورس <small>(اختياري)</small></label>
+                            <div id="cf-upload-zone" style="border:2px dashed var(--border,#2a3040);border-radius:14px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:var(--bg-card,#181d28);">
+                                <input type="file" id="cf-image-file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+                                <i class="bx bx-cloud-upload" style="font-size:44px;color:var(--accent,#6c63ff);display:block;margin-bottom:8px;"></i>
+                                <p style="font-size:14px;font-weight:700;color:var(--text-primary,#e2e8f0);margin:0 0 4px;">اضغط أو اسحب صورة هنا</p>
+                                <p style="font-size:12px;color:var(--text-secondary,#94a3b8);margin:0;">JPG, PNG, WEBP — حتى 5 ميجا</p>
+                            </div>
+                            <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                                <img id="cf-image-preview" src="" alt="معاينة" style="max-width:180px;max-height:110px;border-radius:10px;border:1px solid var(--border,#2a3040);display:none;object-fit:cover;">
+                                <button type="button" id="cf-remove-image" class="btn-sm" style="display:none;background:#ef4444;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">إزالة الصورة</button>
+                            </div>
+                            <input type="hidden" id="cf-image-url">
+                        </div>
+
+                        <div class="input-group">
+                            <label>السعر (ج.م)</label>
+                            <input type="number" id="cf-price" min="0" step="1" placeholder="0">
+                        </div>
+
+                        <div class="input-group">
+                            <label>طريقة الدفع</label>
+                            <select id="cf-payment-method">
+                                <option value="cash">نقداً</option>
+                                <option value="online">أونلاين</option>
+                                <option value="both">نقداً / أونلاين</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>المدة</label>
+                            <input type="text" id="cf-duration" placeholder="مثلاً: 8 أسابيع">
+                        </div>
+
+                        <div class="input-group">
+                            <label>عدد الحصص</label>
+                            <input type="number" id="cf-lessons" min="0" placeholder="0">
+                        </div>
+
+                        <div class="input-group" style="grid-column:1/-1;">
+                            <label>الفئة المستهدفة</label>
+                            <input type="text" id="cf-target-audience" placeholder="مثال: الصف الأول الابتدائي">
+                        </div>
+
+                        <div class="input-group">
+                            <label>تاريخ البداية</label>
+                            <input type="date" id="cf-start-date">
+                        </div>
+
+                        <div class="input-group">
+                            <label>تاريخ النهاية</label>
+                            <input type="date" id="cf-end-date">
+                        </div>
+
+                        <div class="input-group" style="grid-column:1/-1;">
+                            <label class="checkbox-container" style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;">
+                                <input type="checkbox" id="cf-is-active" checked style="width:18px;height:18px;cursor:pointer;">
+                                مفعل (متاح للعرض)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:10px;margin-top:20px;">
+                        <button type="submit" class="btn btn-primary" style="flex:1;"><i class='bx bx-save'></i> إضافة الكورس</button>
+                        <button type="button" class="btn btn-outline" id="cf-cancel">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE NAVIGATION -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item active" data-target="home-view" data-color="blue">
+            <i class='bx bx-home'></i>
+            <span>الرئيسية</span>
+        </div>
+        <div class="mobile-nav-item" data-target="students-view" data-color="green">
+            <i class='bx bx-user'></i>
+            <span>الطلاب</span>
+        </div>
+        <div class="mobile-nav-item" data-target="groups-view" data-color="purple">
+            <i class='bx bx-layer'></i>
+            <span>المجموعات</span>
+        </div>
+        <div class="mobile-nav-item" data-target="combined-requests-view" data-color="orange">
+            <i class='bx bx-time-five'></i>
+            <span>الطلبات</span>
+            <span id="combined-requests-badge-mobile2" class="badge hidden">0</span>
+        </div>
+        <div class="mobile-nav-item" data-target="summer-courses-view" data-color="red">
+            <i class='bx bxs-sun'></i>
+            <span>الصيفية</span>
+            <span id="summer-badge-mobile2" class="badge hidden">0</span>
+        </div>
+        <div class="mobile-nav-item" data-target="educational-works-view" data-color="cyan">
+            <i class='bx bxs-book'></i>
+            <span>أعمالي</span>
+        </div>
+        <div class="mobile-nav-item" data-target="settings-view" data-color="slate">
+            <i class='bx bx-cog'></i>
+            <span>الإعدادات</span>
+        </div>
+    </nav>
+
+    <!-- MODAL: EDUCATIONAL WORKS FORM (ADD/EDIT) -->
+    <div id="ew-form-modal" class="modal-overlay hidden">
+        <div class="modal-sheet doodle-card" style="max-width:600px;">
+            <div class="modal-head">
+                <h2 id="ew-modal-title"><i class='bx bx-plus-circle' style="color:var(--accent);"></i> إضافة عمل جديد</h2>
+                <button class="modal-close-btn" id="ew-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="ew-form">
+                    <input type="hidden" id="ew-id">
+
+                    <div style="display:grid;gap:15px;">
+                        <div class="input-group">
+                            <label>عنوان العمل <span class="required">*</span></label>
+                            <input type="text" id="ew-title" required placeholder="أدخل عنوان العمل">
+                        </div>
+
+                        <div class="input-group">
+                            <label>وصف العمل</label>
+                            <textarea id="ew-desc" rows="3" placeholder="وصف مختصر للعمل"></textarea>
+                        </div>
+
+                        <div class="input-group">
+                            <label>صورة العمل <small>(اختياري)</small></label>
+                            <div id="ew-upload-zone" style="border:2px dashed var(--border,#2a3040);border-radius:14px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:var(--bg-card,#181d28);">
+                                <input type="file" id="ew-image-file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+                                <i class="bx bx-cloud-upload" style="font-size:44px;color:var(--accent,#6c63ff);display:block;margin-bottom:8px;"></i>
+                                <p style="font-size:14px;font-weight:700;color:var(--text-primary,#e2e8f0);margin:0 0 4px;">اضغط أو اسحب صورة هنا</p>
+                                <p style="font-size:12px;color:var(--text-secondary,#94a3b8);margin:0;">JPG, PNG, WEBP — حتى 5 ميجا</p>
+                            </div>
+                            <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                                <img id="ew-image-preview" src="" alt="معاينة" style="max-width:120px;max-height:90px;border-radius:10px;border:1px solid var(--border,#2a3040);display:none;object-fit:cover;">
+                                <button type="button" id="ew-remove-image" class="btn-sm" style="display:none;background:#ef4444;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">إزالة الصورة</button>
+                            </div>
+                            <input type="hidden" id="ew-image-url">
+                        </div>
+
+                        <div class="input-group">
+                            <label>رابط العمل</label>
+                            <input type="url" id="ew-link-url" placeholder="https://example.com/my-work">
+                        </div>
+
+                        <div class="input-group">
+                            <label>رابط المعاينة <small>(رابط PDF خارجي)</small></label>
+                            <input type="url" id="ew-preview-url" placeholder="https://example.com/preview">
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                            <div class="input-group">
+                                <label>الفئة المستهدفة</label>
+                                <input type="text" id="ew-target-audience" placeholder="مثال: الصف الأول الابتدائي">
+                            </div>
+                            <div class="input-group">
+                                <label>السعر <small>(ج.م - 0 = مجاني)</small></label>
+                                <input type="number" id="ew-price" min="0" value="0" step="1" placeholder="السعر بالجنيه">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>تفاصيل الملزمة</label>
+                            <textarea id="ew-details" rows="3" placeholder="تفاصيل إضافية عن الملزمة (عدد الصفحات، المحتوى، إلخ)"></textarea>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                            <div class="input-group">
+                                <label>التصنيف</label>
+                                <select id="ew-category">
+                                    <option value="">جاري التحميل...</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>ترتيب العرض</label>
+                                <input type="number" id="ew-order" min="0" value="0" placeholder="0">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="checkbox-container" style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;">
+                                <input type="checkbox" id="ew-is-active" checked style="width:18px;height:18px;cursor:pointer;">
+                                منشور (ظاهر للجمهور)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:10px;margin-top:20px;">
+                        <button type="submit" class="btn btn-primary" style="flex:1;"><i class='bx bx-save'></i> إضافة العمل</button>
+                        <button type="button" class="btn btn-outline" id="ew-cancel">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CATEGORIES MANAGER -->
+    <div id="ew-categories-modal" class="modal-overlay hidden">
+        <div class="modal-sheet doodle-card" style="max-width:500px;">
+            <div class="modal-head">
+                <h2><i class='bx bx-tag' style="color:var(--accent);"></i> إدارة التصنيفات</h2>
+                <button class="modal-close-btn" id="ew-cat-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Add/edit category form -->
+                <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+                    <input type="hidden" id="ew-cat-id">
+                    <input type="text" id="ew-cat-label" placeholder="اسم التصنيف (مثال: 📖 كتاب)" style="flex:1;min-width:140px;padding:10px 12px;border:2px solid var(--border,#2a3040);border-radius:10px;background:var(--bg-input,#1e2533);color:var(--text-primary,#e2e8f0);font-family:inherit;font-size:14px;">
+                    <input type="number" id="ew-cat-order" placeholder="ترتيب" style="width:80px;padding:10px 12px;border:2px solid var(--border,#2a3040);border-radius:10px;background:var(--bg-input,#1e2533);color:var(--text-primary,#e2e8f0);font-family:inherit;font-size:14px;">
+                    <button type="button" class="btn btn-primary btn-sm" id="ew-cat-save-btn"><i class='bx bx-plus'></i> إضافة</button>
+                </div>
+
+                <!-- Categories list -->
+                <div id="ew-cat-list" style="max-height:300px;overflow-y:auto;"></div>
+                <div style="margin-top:12px;font-size:13px;color:var(--text-muted,#94a3b8);">
+                    <i class='bx bx-info-circle'></i> التصنيفات تظهر تلقائياً في قوائم الإضافة والتصفية. يمكنك سحب وترتيب التصنيفات بواسطة زر تغيير الترتيب.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Compat Libraries (For local file:// support) -->
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-storage-compat.js"></script>
+    <!-- ربط قاعدة البيانات (Firestore) — لا توجد قاعدة افتراضية، يُحدَّد الإعداد من هذه اللوحة -->
+    <script src="firebase-config-data.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        console.log('✅ Firebase scripts loaded! Configured:', window.__fbConfigured);
+    </script>
+
+    <!-- Image Lightbox (عرض وتكبير وحفظ صور الطلاب) -->
+    <div id="student-photo-lightbox" class="photo-lightbox-overlay">
+        <div class="photo-lightbox-container">
+            <button class="photo-lightbox-close" id="lightbox-close-btn">&times;</button>
+            <div class="photo-lightbox-image-wrap">
+                <img id="lightbox-image" src="" alt="صورة الطالب" class="photo-lightbox-img">
+            </div>
+            <div class="photo-lightbox-info">
+                <span id="lightbox-student-name" class="photo-lightbox-name"></span>
+            </div>
+            <div class="photo-lightbox-actions">
+                <button class="photo-lightbox-btn download" id="lightbox-download-btn">
+                    <i class='bx bx-download'></i> تحميل الصورة
+                </button>
+                <button class="photo-lightbox-btn close" id="lightbox-close-btn-bottom">
+                    <i class='bx bx-x'></i> إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejection Modal -->
+    <div id="rejection-modal" class="modal-overlay hidden">
+        <div class="modal-sheet doodle-card" style="max-width: 450px;">
+            <div class="modal-head">
+                <h2>رفض طلب التسجيل</h2>
+                <button class="modal-close-btn" id="close-rejection-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label>سبب الرفض <span class="required" style="color:var(--rose-deep);">*</span></label>
+                    <textarea id="rejection-reason" rows="3" placeholder="أدخل سبب رفض الطلب..." style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);resize:vertical;font-family:inherit;"></textarea>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:16px;">
+                    <button class="btn btn-danger" id="confirm-rejection-btn" style="flex:1;">تأكيد الرفض</button>
+                    <button class="btn btn-outline" id="cancel-rejection-btn" style="flex:1;">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Group WhatsApp Message Modal -->
+    <div id="group-wa-modal" class="modal-overlay hidden">
+        <div class="modal-sheet doodle-card" style="max-width: 560px;">
+            <div class="modal-head">
+                <h2><i class='bx bxl-whatsapp' style="color:#25D366;"></i> إرسال رسالة للمجموعة</h2>
+                <button class="modal-close-btn" id="close-group-wa-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom:14px;">
+                    <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">المجموعة</label>
+                    <div id="group-wa-name" style="font-weight:800;color:var(--text-primary);font-size:15px;"></div>
+                    <div id="group-wa-count" style="font-size:13px;color:var(--text-muted);margin-top:2px;"></div>
+                </div>
+                <!-- Composition Section -->
+                <div id="group-wa-compose">
+                    <div class="input-group">
+                        <label>نوع الرسالة</label>
+                        <select id="group-wa-template-type" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-family:inherit;">
+                            <option value="quick">رسالة سريعة</option>
+                            <option value="late">تأخر المدفوعات</option>
+                            <option value="reminder">تذكير بالحصة</option>
+                            <option value="absence">تذكير بالغياب</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>نص الرسالة</label>
+                        <textarea id="group-wa-message" rows="5" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-family:inherit;resize:vertical;" placeholder="سيتم استبدال {اسم_الطالب} و{الصف} تلقائياً لكل طالب"></textarea>
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">المتغيرات: <code>{اسم_الطالب}</code> <code>{الصف}</code> <code>{اليوم}</code> <code>{الوقت}</code></div>
+                    </div>
+                    <div id="group-wa-progress" style="display:none;margin-top:12px;padding:12px;background:var(--bg-elevated);border-radius:8px;text-align:center;">
+                        <div id="group-wa-progress-text" style="font-weight:700;color:var(--text-primary);margin-bottom:6px;"></div>
+                        <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+                            <div id="group-wa-progress-bar" style="height:100%;width:0;background:#25D366;border-radius:3px;transition:width .3s;"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:10px;margin-top:16px;">
+                        <button class="btn btn-success" id="group-wa-generate-btn" style="flex:1;">
+                            <i class='bx bx-refresh'></i> تجهيز الرسائل
+                        </button>
+                        <button class="btn btn-outline" id="cancel-group-wa-btn">إلغاء</button>
+                    </div>
+                </div>
+                <!-- Student List Section -->
+                <div id="group-wa-student-list" style="display:none;margin-top:12px;">
+                    <div style="font-weight:700;color:var(--text-primary);margin-bottom:8px;font-size:14px;">
+                        <i class='bx bxs-user-detail'></i> قائمة الطلاب — اضغط على إرسال بجانب كل طالب
+                    </div>
+                    <div id="group-wa-student-rows" style="max-height:350px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
+                    <button class="btn btn-outline" id="group-wa-back-btn" style="margin-top:10px;width:100%;">
+                        <i class='bx bx-arrow-back'></i> العودة لتعديل الرسالة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <!-- Offline Management -->
+    <script src="services-bundle.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('services-bundle.js')
+                    .then(registration => console.log('ServiceWorker registered:', registration.scope))
+                    .catch(err => console.log('ServiceWorker registration failed:', err));
+            });
+        }
+    </script>
+    <script src="summer-courses.js"></script>
+    <script src="educational-works.js"></script>
+    <script src="admin.js"></script>
+
+    <!-- Loading Manager: reveal page only when ready -->
+    <script>
+    (function() {
+        var preloader = document.getElementById('preloader');
+        if (!preloader) return;
+        var html = document.documentElement;
+        var allLoaded = false;
+        var fbReady = false;
+
+        function revealPage() {
+            if (preloader.dataset.revealed) return;
+            preloader.dataset.revealed = '1';
+            preloader.classList.add('fade-out');
+            setTimeout(function() {
+                html.classList.remove('loading');
+            }, 50);
+            setTimeout(function() {
+                preloader.style.display = 'none';
+            }, 500);
+        }
+
+        function checkReady() {
+            if (allLoaded && fbReady) {
+                revealPage();
+            }
+        }
+
+        // Wait for Firebase data AFTER DOMContentLoaded (when admin.js has registered with tracker)
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.__fbTracker) {
+                window.__fbTracker.wait().then(function() {
+                    fbReady = true;
+                    checkReady();
+                });
+            } else {
+                fbReady = true;
+            }
+        });
+
+        window.addEventListener('load', function() {
+            allLoaded = true;
+            checkReady();
+        });
+
+        // Fallback: reveal after 30s even if something failed
+        setTimeout(function() {
+            if (preloader.dataset.revealed) return;
+            allLoaded = true;
+            fbReady = true;
+            checkReady();
+        }, 30000);
+    })();
+    </script>
+</body>
+
+</html>
