@@ -2300,6 +2300,7 @@ function showForceProfilePhotoModal(user) {
             '</div>' +
             '<div id="forcePhotoError" style="display:none;color:#f87171;font-size:13px;font-weight:700;margin-top:10px;"></div>' +
             '<button id="forcePhotoSubmitBtn" disabled style="width:100%;margin-top:22px;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1e1b16;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;opacity:.55;transition:all .2s;box-shadow:0 4px 0 #b45309;">حفظ الصورة</button>' +
+            '<button id="forcePhotoLogoutBtn" style="width:100%;margin-top:10px;padding:12px;border:2px solid rgba(239,68,68,0.4);border-radius:12px;background:transparent;color:#f87171;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;">تسجيل الخروج</button>' +
         '</div>';
 
     document.body.appendChild(overlay);
@@ -2365,6 +2366,11 @@ function showForceProfilePhotoModal(user) {
             submitBtn.textContent = 'حفظ الصورة';
             showError('حدث خطأ أثناء الحفظ، حاول مرة أخرى');
         });
+    });
+
+    var logoutBtn = overlay.querySelector('#forcePhotoLogoutBtn');
+    logoutBtn.addEventListener('click', function () {
+        logoutAndRefresh();
     });
 }
 
