@@ -3977,6 +3977,12 @@ function submitEnrollmentRequest(student, studentId) {
         return;
     }
 
+    if (!student.profileImage) {
+        showToast('⚠️ يجب إضافة صورة شخصية توضح ملامح الطالب لاكتمال التسجيل', 'error');
+        showForceProfilePhotoModal(student);
+        return;
+    }
+
     var data = {
         studentId: studentId,
         studentName: student.name || 'غير معروف',
