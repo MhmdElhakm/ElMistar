@@ -3971,15 +3971,83 @@ function getNextGrade(currentGrade) {
     return gradeMap[g] || currentGrade;
 }
 
+function showIncompleteRegistrationModal(student, missingItems) {
+    if (document.getElementById('incomplete-reg-modal')) return;
+
+    var itemsHtml = missingItems.map(function (item) {
+        return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(239,68,68,0.08);border-radius:10px;margin-bottom:8px;border:1px solid rgba(239,68,68,0.15);">' +
+            '<span style="font-size:20px;">' + item.icon + '</span>' +
+            '<div style="flex:1;text-align:right;">' +
+                '<div style="font-weight:700;color:#f1f5f9;font-size:14px;">' + item.label + '</div>' +
+                '<div style="font-size:12.5px;color:#94a3b8;margin-top:2px;">' + item.desc + '</div>' +
+            '</div>' +
+            '<span style="color:#ef4444;font-size:18px;">❌</span>' +
+        '</div>';
+    }).join('');
+
+    var overlay = document.createElement('div');
+    overlay.id = 'incomplete-reg-modal';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:999998;background:rgba(2,6,23,0.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);animation:fadeIn 0.3s ease;';
+
+    overlay.innerHTML =
+        '<div style="background:#0f172a;border:2px solid rgba(239,68,68,0.3);border-radius:24px;padding:36px 28px;max-width:440px;width:92%;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,0.6);animation:modalPop 0.3s cubic-bezier(0.34,1.56,0.64,1);max-height:90vh;overflow-y:auto;">' +
+            '<div style="font-size:52px;margin-bottom:10px;">⚠️</div>' +
+            '<h2 style="font-size:20px;font-weight:900;color:#f8fafc;margin:0 0 8px;">بيانات التسجيل غير مكتملة</h2>' +
+            '<p style="font-size:14px;color:#94a3b8;margin:0 0 18px;line-height:1.7;">لا يمكن إتمام طلب الالتحاق بالعام الدراسي الجديد لعدم توافر بعض البيانات المطلوبة</p>' +
+            '<div style="text-align:right;margin-bottom:20px;">' + itemsHtml + '</div>' +
+            '<button id="incompleteRegFixBtn" style="width:100%;margin-top:6px;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1e1b16;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 4px 0 #b45309;">' +
+                '📝 إكمال البيانات المطلوبة' +
+            '</button>' +
+            '<button id="incompleteRegLogoutBtn" style="width:100%;margin-top:10px;padding:12px;border:2px solid rgba(239,68,68,0.4);border-radius:12px;background:transparent;color:#f87171;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;">تسجيل الخروج</button>' +
+        '</div>';
+
+    document.body.appendChild(overlay);
+
+    var fixBtn = overlay.querySelector('#incompleteRegFixBtn');
+    var logoutBtn = overlay.querySelector('#incompleteRegLogoutBtn');
+
+    fixBtn.addEventListener('click', function () {
+        overlay.remove();
+        if (missingItems.some(function (i) { return i.key === 'profileImage'; })) {
+            showForceProfilePhotoModal(student);
+        }
+    });
+
+    logoutBtn.addEventListener('click', function () {
+        logoutAndRefresh();
+    });
+
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) overlay.remove();
+    });
+}
+
 function submitEnrollmentRequest(student, studentId) {
     if (!window.db) {
         showToast('خطأ في الاتصال بقاعدة البيانات', 'error');
         return;
     }
 
+    var missingItems = [];
+
+    if (!student.name || !student.name.trim()) {
+        missingItems.push({ key: 'name', icon: '👤', label: 'اسم الطالب', desc: 'لم يتم تسجيل اسم الطالب في الحساب' });
+    }
+
+    if (!student.phone || !student.phone.trim()) {
+        missingItems.push({ key: 'phone', icon: '📱', label: 'رقم التليفون', desc: 'لم يتم إدخال رقم التليفون الخاص بالطالب' });
+    }
+
+    if (!student.grade || !student.grade.trim()) {
+        missingItems.push({ key: 'grade', icon: '📚', label: 'المجموعة الدراسية', desc: 'لم يتم تحديد الصف الدراسي للطالب' });
+    }
+
     if (!student.profileImage) {
-        showToast('⚠️ يجب إضافة صورة شخصية توضح ملامح الطالب لاكتمال التسجيل', 'error');
-        showForceProfilePhotoModal(student);
+        missingItems.push({ key: 'profileImage', icon: '🖼️', label: 'الصورة الشخصية', desc: 'يجب إضافة صورة شخصية واضحة توضح ملامح الطالب' });
+    }
+
+    if (missingItems.length > 0) {
+        showIncompleteRegistrationModal(student, missingItems);
         return;
     }
 
