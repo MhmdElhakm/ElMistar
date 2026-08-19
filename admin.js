@@ -5060,9 +5060,6 @@ function loadSessionSettings() {
             };
         }
         settingsLoaded = true;
-        // Load session timeout
-        var timeoutInput = document.getElementById('settings-session-timeout');
-        if (timeoutInput) timeoutInput.value = data.sessionTimeout || 1;
         // Update settings form fields
         var ids = ['current', 'previous', 'summer'];
         ids.forEach(function (k) {
@@ -5110,8 +5107,6 @@ function saveSessionSettings() {
         sessionSettings[k] = { sessionPrice: price, sessionsPerMonth: sessions, discount: discount };
         dataToSave[k] = { sessionPrice: price, sessionsPerMonth: sessions, discount: discount };
     }
-    var timeoutInput = document.getElementById('settings-session-timeout');
-    dataToSave.sessionTimeout = timeoutInput ? (parseInt(timeoutInput.value) || 1) : 1;
     dataToSave.updatedAt = new Date().toISOString();
     window.db.collection("settings").doc("sessionConfig").set(dataToSave, { merge: true }).then(function () {
         updatePaymentButtons();

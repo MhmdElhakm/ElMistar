@@ -1294,54 +1294,6 @@ function setLoggedIn(user) {
 
     // Force students who registered before the photo requirement to upload a profile photo
     maybeForceProfilePhoto(user);
-
-    // Start auto-logout timer
-    _startAutoLogoutTimer();
-}
-
-// ============================================
-// AUTO-LOGOUT TIMER
-// ============================================
-var _autoLogoutTimer = null;
-var _autoLogoutTimeout = 1; // default 1 minute
-
-function _startAutoLogoutTimer() {
-    _resetAutoLogoutTimer();
-    _setupAutoLogoutListeners();
-}
-
-function _resetAutoLogoutTimer() {
-    if (_autoLogoutTimer) clearTimeout(_autoLogoutTimer);
-    if (!window.db) return;
-    window.db.collection("settings").doc("sessionConfig").get().then(function (doc) {
-        if (doc.exists) {
-            var data = doc.data();
-            _autoLogoutTimeout = data.sessionTimeout || 1;
-        }
-        var ms = _autoLogoutTimeout * 60 * 1000;
-        _autoLogoutTimer = setTimeout(function () {
-            showToast('⏰ انتهت مدة الجلسة، جارٍ تسجيل الخروج...', 'info');
-            setTimeout(function () { logoutAndRefresh(); }, 1500);
-        }, ms);
-    }).catch(function () {
-        var ms = _autoLogoutTimeout * 60 * 1000;
-        _autoLogoutTimer = setTimeout(function () {
-            showToast('⏰ انتهت مدة الجلسة، جارٍ تسجيل الخروج...', 'info');
-            setTimeout(function () { logoutAndRefresh(); }, 1500);
-        }, ms);
-    });
-}
-
-var _autoLogoutListenersSetup = false;
-function _setupAutoLogoutListeners() {
-    if (_autoLogoutListenersSetup) return;
-    _autoLogoutListenersSetup = true;
-    var events = ['click', 'keypress', 'scroll', 'touchstart', 'mousemove'];
-    events.forEach(function (evt) {
-        document.addEventListener(evt, function () {
-            _resetAutoLogoutTimer();
-        }, { passive: true });
-    });
 }
 
 function monitorStudentAccount(user) {
