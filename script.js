@@ -517,9 +517,6 @@ async function fetchAndShowLoginStudents(phone) {
                             <p style="margin:0 0 4px;font-size:1rem;font-weight:800;color:#991B1B;">لا توجد بيانات مسجلة</p>
                             <p style="margin:0;font-size:0.82rem;color:#B91C1C;font-weight:600;">لا نجد حساباً مرتبطاً بهذا الرقم</p>
                         </div>
-                        <button onclick="document.querySelector('.auth-tab-btn[data-tab=signup]')?.click()" style="margin-top:4px;padding:8px 20px;border-radius:10px;border:2px solid #EF4444;background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all .2s;box-shadow:0 3px 0 #B91C1C;">
-                            <i class='bx bx-user-plus' style="margin-left:4px;"></i> إنشاء حساب جديد
-                        </button>
                     </div>
                 `;
                 loginError.classList.remove('hidden');
@@ -742,6 +739,7 @@ function _applyRegistrationState(enabled, grades) {
     _registrationEnabled = enabled !== false;
     var btn = document.getElementById('signup-submit-btn');
     var heroBtn = document.getElementById('signupBtnHero');
+    var inquiryHeroBtn = document.getElementById('inquiryBtnHero');
     var inputs = actualSignupForm ? actualSignupForm.querySelectorAll('input, select, button') : [];
     var newYear = _registrationEnrollOpen;
     if (enabled) {
@@ -757,6 +755,7 @@ function _applyRegistrationState(enabled, grades) {
             heroBtn.classList.toggle('btn-signup-newyear', newYear);
             heroBtn.classList.remove('btn-signup-closed');
         }
+        if (inquiryHeroBtn) inquiryHeroBtn.style.display = 'none';
         inputs.forEach(function (el) { if (el !== btn) el.disabled = false; });
         _applyGradeFilter(grades);
     } else {
@@ -771,6 +770,10 @@ function _applyRegistrationState(enabled, grades) {
             heroBtn.textContent = 'التسجيل للعام الجديد مغلق';
             heroBtn.classList.remove('btn-signup-newyear');
             heroBtn.classList.add('btn-signup-closed');
+        }
+        if (inquiryHeroBtn) {
+            inquiryHeroBtn.style.display = '';
+            inquiryHeroBtn.onclick = function () { openModal('authOverlay'); };
         }
         inputs.forEach(function (el) { if (el !== btn) el.disabled = true; });
     }
