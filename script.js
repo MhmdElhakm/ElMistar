@@ -1856,7 +1856,6 @@ async function populateDashboard(user) {
     const dPhone = document.getElementById('dash-phone');
     const dGradeText = document.getElementById('dash-grade-text');
     const dTime = document.getElementById('dash-time');
-    const dWaContainer = document.getElementById('dash-wa-container');
     const dPhoto = document.getElementById('dashboard-photo');
 
     // Static Data
@@ -1895,6 +1894,7 @@ async function populateDashboard(user) {
             if (dTopCardsEl) dTopCardsEl.style.display = 'none';
             document.getElementById('enrollment-section')?.style.setProperty('display', 'none');
             document.getElementById('summer-enrollment-section')?.style.setProperty('display', 'none');
+            document.getElementById('dash-wa-group-section')?.style.setProperty('display', 'none');
             const dTeacherNotes = document.getElementById('dash-teacher-notes');
             if (dTeacherNotes) {
                 dTeacherNotes.innerHTML = `
@@ -1930,6 +1930,7 @@ async function populateDashboard(user) {
             if (dTopCards) dTopCards.style.display = 'none';
             document.getElementById('enrollment-section')?.style.setProperty('display', 'none');
             document.getElementById('summer-enrollment-section')?.style.setProperty('display', 'none');
+            document.getElementById('dash-wa-group-section')?.style.setProperty('display', 'none');
             const dTeacherNotes = document.getElementById('dash-teacher-notes');
             if (dTeacherNotes) {
                 dTeacherNotes.innerHTML = `
@@ -1972,6 +1973,7 @@ async function populateDashboard(user) {
             if (dTopCards) dTopCards.style.display = 'none';
             document.getElementById('enrollment-section')?.style.setProperty('display', 'none');
             document.getElementById('summer-enrollment-section')?.style.setProperty('display', 'none');
+            document.getElementById('dash-wa-group-section')?.style.setProperty('display', 'none');
             updatePaymentProgressDisplay(0, 0, 0, 0, false, "");
 
             // Show registration success / pending approval message
@@ -2053,6 +2055,24 @@ async function populateDashboard(user) {
                 if (dLevelBadge) dLevelBadge.style.display = 'none';
             }
 
+            // WhatsApp Group Button
+            const waGroupSection = document.getElementById('dash-wa-group-section');
+            const waGroupBtn = document.getElementById('dash-wa-group-btn');
+            if (student.groupId && window.db) {
+                try {
+                    const groupDoc = await window.db.collection("groups").doc(student.groupId).get();
+                    if (groupDoc.exists) {
+                        const groupData = groupDoc.data();
+                        if (groupData.whatsapp) {
+                            waGroupBtn.href = groupData.whatsapp;
+                            if (waGroupSection) waGroupSection.style.display = 'block';
+                        }
+                    }
+                } catch (e) {
+                    console.log('WhatsApp group load error:', e);
+                }
+            }
+
             // Check for pending payment requests
             try {
                 const paySnap = await getSnapshotByPhoneField("payment_requests", "studentPhone", user.phone);
@@ -2093,8 +2113,6 @@ async function populateDashboard(user) {
                     fSubtext.textContent = `تم سداد تكلفة جميع الحصص السابقة`;
                 }
             }
-
-            if (dWaContainer) dWaContainer.style.display = 'none';
 
             // Re-initialize payment listeners (safely handled inside the function)
             initPaymentSystem();

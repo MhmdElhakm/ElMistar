@@ -2269,6 +2269,15 @@ function openStudentFileModal(student) {
         </div>
 
         <div class="student-file-actions">
+            ${(() => {
+                const studentGroup = student.groupId ? groupsData.find(g => g.id === student.groupId) : null;
+                if (studentGroup && studentGroup.whatsapp) {
+                    return `<a href="${studentGroup.whatsapp}" target="_blank" class="wa-action-btn" style="background:#25D366;color:#fff;display:inline-flex;align-items:center;gap:6px;margin-bottom:12px;text-decoration:none;border-radius:12px;padding:10px 16px;font-weight:700;">
+                        <i class='bx bxl-whatsapp' style="font-size:20px;"></i> انضم لجروب ${studentGroup.name}
+                    </a>`;
+                }
+                return '';
+            })()}
             <div class="wa-actions-row">
                 ${student.phone ? `
                 <a href="${buildWhatsAppUrl(student.phone, getReminderMessage(student))}" target="_blank" class="wa-action-btn reminder">
@@ -6407,7 +6416,62 @@ document.addEventListener('DOMContentLoaded', function() {
     if (exportBtn) {
         exportBtn.addEventListener('click', exportGoogleContactsCSV);
     }
+
+    // Export Student Photos ZIP
+    const exportPhotosBtn = document.getElementById('export-photos-btn');
+    if (exportPhotosBtn) {
+        exportPhotosBtn.addEventListener('click', exportStudentPhotosZIP);
+    }
 });
+
+const ARABIC_NAMES_MAP = {
+    'محمد':'mohamed','محمود':'mahmoud','مها':'maha','منى':'mona','منال':'manal',
+    'مريم':'maryam','ملاك':'malak','مأمون':'mamoun','ماجد':'majed','ماهر':'maher',
+    'ليلى':'layla','لينا':'lina','ليث':'laith','لبنى':'lobna','لطيفة':'latifa',
+    'كريم':'karim','كوثر':'kawthar',
+    'يوسف':'yousef','يونس':'younis','ياسر':'yasser','ياسمين':'yasmin',
+    'وائل':'wael','وليد':'walid','وفاء':'wafa','ريم':'reem','رنا':'rana',
+    'رائد':'raed','رشا':'rasha','رقيه':'raqeeya','رجب':'ragab','ريم':'reem',
+    'سارة':'sara','سلمى':'salma','سمية':'samiha','سمير':'sameer','سلطان':'sultan',
+    'سنوسي':'sanoussi','سعيد':'said','سليم':'salem','سمر':'samar',
+    'شيماء':'shaimaa','شيرين':'shereen','شادي':'shadi','شعبان':'shaaban',
+    'طارق':'tarek','طلال':'talal','توفيق':'tawfik','تميم':'tamim',
+    'عمر':'omar','علي':'ali','عبير':'abeer','عفاف':'afaf','عبدالله':'abdullah',
+    'غادة':'gada','غازي':'ghazi',
+    'فاطمة':'fatma','فهد':'fahd','فيصل':'faisal','فريد':'farid','فوزية':'fawzia',
+    'قمر':'qamar',
+    'نور':'nour','نادية':'nadia','ناصر':'nasser','نبيل':'nabil','نجلاء':'nagla',
+    'هبة':'heba','هاني':'hani','هالة':'hala','هشام':'hisham','هدى':'huda',
+    'ولاء':'wala','وليد':'walid',
+    'ياسمين':'yasmin','يحيى':'yahya',
+    'أحمد':'ahmed','أسامة':'osama','إيمان':'eman','إبراهيم':'ibrahim',
+    'أمين':'amine','أنس':'anas','إسلام':'islam','إلهام':'elham',
+    'آدم':'adam','آمنة':'amina',
+    'إبراهيم':'ibrahim','أحمد':'ahmed','إبراهيم':'ibrahim',
+    'أميرة':'amira','إسلام':'islam','إسلام':'islam',
+    'بدر':'badr','باسم':'bassem','بشرى':'bashira','بسمة':'basma',
+    'طارق':'tarek','تغريد':'taghrid',
+    'حسن':'hassan','حسين':'hussien','حمدان':'hamdan','حمزة':'hamza',
+    'خالد':'khaled','خليل':'khalil','خديجة':'khadija',
+    'دانا':'dana','دينا':'dina',
+    'ذكى':'thakia',
+    'زياد':'ziad','زينب':'zeinab','زكي':'zaki',
+    'جواهر':'jawaher','جمال':'gamal','جميلة':'jamila',
+    'حاتم':'hatem','حليمة':'halima',
+    'دانا':'dana','داليا':'dalia','دينا':'dina',
+    'رائد':'raed','رشا':'rasha','رنا':'rana','رنيم':'ranim',
+    'سلطان':'sultan','سمية':'samiha','سناء':'sanaa',
+    'شمس':'shams','شذا':'shadha',
+    'غادة':'gada','غازي':'ghazi',
+    'فؤاد':'fouad','فدوى':'fedwa',
+    'قحطان':'qahtan',
+    'ندى':'nada','نورهان':'norhan',
+    'هبة':'heba','هدى':'huda',
+    'وليد':'walid','ولاء':'wala',
+    'ياسمين':'yasmin','يزن':'yazen',
+    'أحمد':'ahmed','إسلام':'islam','إسماعيل':'ismail',
+    ' bp':'bp'
+};
 
 const ARABIC_TO_EN = {
     'ا':'a','أ':'a','إ':'e','آ':'a','ب':'b','ت':'t','ث':'th','ج':'g','ح':'h',
@@ -6419,15 +6483,26 @@ const ARABIC_TO_EN = {
 
 function transliterateArabic(text) {
     if (!text) return '';
-    return text.split('').map(ch => ARABIC_TO_EN[ch] || ch).join('').replace(/\s+/g, ' ').trim();
+    let result = text;
+    const words = result.split(/\s+/).filter(Boolean);
+    const translated = words.map(word => {
+        if (ARABIC_NAMES_MAP[word]) return ARABIC_NAMES_MAP[word];
+        return word.split('').map(ch => ARABIC_TO_EN[ch] || ch).join('');
+    });
+    return translated.join(' ').replace(/\s+/g, ' ').trim();
 }
 
 function formatPhoneInternational(phone) {
     if (!phone) return '';
     const digits = phone.toString().replace(/\D/g, '');
     if (digits.length === 0) return '';
-    const national = digits.startsWith('0') ? digits.slice(1) : digits;
-    return national;
+    let num = digits;
+    if (num.startsWith('0')) {
+        num = '01' + num.slice(1);
+    } else if (!num.startsWith('01')) {
+        num = '01' + num;
+    }
+    return num;
 }
 
 function capitalizeFirst(word) {
@@ -6476,6 +6551,74 @@ function exportGoogleContactsCSV() {
     }
 
     showToast(`✅ تم تصدير ${activeStudents.length} جهة اتصال بنجاح`);
+}
+
+async function exportStudentPhotosZIP() {
+    if (!studentsData || studentsData.length === 0) {
+        showToast('لا يوجد طلاب مدرجين للتصدير', 'error');
+        return;
+    }
+
+    const activeStudents = studentsData.filter(s => s.phone && s.phone.toString().replace(/\D/g, '').length >= 10 && s.profileImage);
+
+    if (activeStudents.length === 0) {
+        showToast('لا يوجد طلاب بصور صالحة للتصدير', 'error');
+        return;
+    }
+
+    showToast('جاري تجهيز الصور...', 'info');
+
+    try {
+        if (typeof JSZip === 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+            document.head.appendChild(script);
+            await new Promise((resolve, reject) => {
+                script.onload = resolve;
+                script.onerror = reject;
+            });
+        }
+
+        const zip = new JSZip();
+        let count = 0;
+
+        for (const s of activeStudents) {
+            const parts = (s.name || '').split(/\s+/).filter(Boolean);
+            const firstTwo = parts.slice(0, 3);
+            const enName = transliterateArabic(firstTwo.join(' '));
+            const capitalized = enName.split(' ').map(capitalizeFirst).join(' ');
+            const phone = formatPhoneInternational(s.phone);
+            const fileName = `${phone}_${capitalized || 'student'}.jpg`;
+
+            try {
+                const base64Data = s.profileImage.includes(',') ? s.profileImage.split(',')[1] : s.profileImage;
+                zip.file(fileName, base64Data, { base64: true });
+                count++;
+            } catch (err) {
+                console.error('Error adding photo for', s.name, err);
+            }
+        }
+
+        if (count === 0) {
+            showToast('لم يتم العثور على صور للتصدير', 'error');
+            return;
+        }
+
+        const content = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(content);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'elmistar-student-photos.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast(`✅ تم تصدير ${count} صورة طالب بنجاح`);
+    } catch (err) {
+        console.error('Export photos error:', err);
+        showToast('حدث خطأ أثناء تصدير الصور', 'error');
+    }
 }
 
 // ============================================
