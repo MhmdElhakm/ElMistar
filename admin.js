@@ -6497,10 +6497,8 @@ function formatPhoneInternational(phone) {
     const digits = phone.toString().replace(/\D/g, '');
     if (digits.length === 0) return '';
     let num = digits;
-    if (num.startsWith('0')) {
-        num = '01' + num.slice(1);
-    } else if (!num.startsWith('01')) {
-        num = '01' + num;
+    if (!num.startsWith('0')) {
+        num = '0' + num;
     }
     return num;
 }
