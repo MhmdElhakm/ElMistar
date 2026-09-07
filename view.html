@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جاري فتح التطبيق...</title>
+    <link rel="icon" href="img/logo.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+            background: #0b0c10;
+            color: #e2e8f0;
+        }
+        #loader-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            z-index: 20;
+        }
+        .app-loader-box {
+            background: #181d28;
+            border: 1px solid #2a3040;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 460px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .app-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(108, 99, 255, 0.2);
+            border-top-color: #6c63ff;
+            border-radius: 50%;
+            animation: appSpin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes appSpin { to { transform: rotate(360deg); } }
+        h2 { font-size: 1.25rem; margin-bottom: 8px; color: #f8fafc; }
+        p { font-size: 0.9rem; color: #94a3b8; line-height: 1.7; }
+        #loader-status { font-size: 0.8rem; color: #64748b; margin-top: 14px; direction: ltr; word-break: break-all; }
+        .app-btn-home {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 24px;
+            background: #6c63ff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        #app-frame { display: none; border: none; width: 100%; height: 100vh; position: fixed; top: 0; left: 0; background: #fff; z-index: 10; }
+        #install-banner {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 99999;
+            background: linear-gradient(135deg, #181d28 0%, #1e2533 100%);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 0;
+            box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
+            font-family: 'Cairo', sans-serif;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        #install-banner.show { display: block; }
+        #install-banner .install-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; gap: 12px; }
+        #install-banner .install-info { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+        #install-banner .install-info img { width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0; border: 2px solid rgba(108,99,255,0.3); object-fit: cover; }
+        #install-banner .install-info h4 { color: #f8fafc; font-size: 13px; margin: 0 0 1px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #install-banner .install-info p { color: #94a3b8; font-size: 11px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #install-banner .install-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+        #install-banner .install-btn {
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 12px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        #install-banner .install-btn-primary { background: linear-gradient(135deg, #6c63ff, #5a52e0); color: #fff; box-shadow: 0 2px 12px rgba(108,99,255,0.4); }
+        #install-banner .install-btn-ghost { width: 32px; height: 32px; border-radius: 8px; padding: 0; font-size: 16px; background: rgba(255,255,255,0.06); color: #94a3b8; display: flex; align-items: center; justify-content: center; }
+        #install-banner .ios-box { display: none; padding: 0 20px 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+        #install-banner .ios-box.show { display: block; }
+        #install-banner .ios-box-inner { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(37,99,235,0.08); border-radius: 10px; border: 1px solid rgba(37,99,235,0.15); }
+        #install-banner .ios-box-inner p { color: #94a3b8; font-size: 11px; margin: 0; line-height: 1.6; }
+        #install-banner .ios-box-inner strong { color: #6c63ff; }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config-data.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+    (function() {
+        var params = new URLSearchParams(window.location.search);
+        var slug = (params.get('slug') || '').trim();
+        var appId = (params.get('id') || '').trim();
+        if (!slug && !appId) {
+            try {
+                var pathSegs = window.location.pathname.split('/').filter(function(s){return s;});
+                var last = pathSegs.length ? decodeURIComponent(pathSegs[pathSegs.length - 1]) : '';
+                if (last && last !== 'view.html' && last !== 'index.html' && /^[A-Za-z0-9\-_]+$/.test(last) && !/\./.test(last)) {
+                    slug = last;
+                }
+            } catch (e) {}
+        }
+
+        function setStatus(t) {
+            var el = document.getElementById('loader-status');
+            if (el) el.textContent = t;
+        }
+
+        function buildCompleteAppDocument(app) {
+            if (!app) return '';
+            var html = (app.htmlCode || '').trim();
+            var css = (app.cssCode || '').trim();
+            var js = (app.jsCode || '').trim();
+            css = css.replace(/<\/style/gi, '<\\/style');
+            js = js.replace(/<\/script/gi, '<\\/script');
+            if (!html && !css && !js) return '';
+            var isFullDoc = /<!DOCTYPE\s+html|<html[\s>]/i.test(html);
+            if (isFullDoc) {
+                var doc = html;
+                if (css) {
+                    var styleTag = '\n<style id="elmistar-app-custom-css">\n' + css + '\n</style>\n';
+                    if (/<\/head>/i.test(doc)) { doc = doc.replace(/<\/head>/i, styleTag + '</head>'); }
+                    else if (/<body/i.test(doc)) { doc = doc.replace(/<body/i, styleTag + '<body'); }
+                    else { doc += styleTag; }
+                }
+                if (js) {
+                    var scriptTag = '\n<script id="elmistar-app-custom-js">\n' + js + '\n<\/script>\n';
+                    if (/<\/body>/i.test(doc)) { doc = doc.replace(/<\/body>/i, scriptTag + '</body>'); }
+                    else { doc += scriptTag; }
+                }
+                return doc;
+            }
+            var hasArabic = /[\u0600-\u06FF]/.test(html + ' ' + (app.title || ''));
+            var dir = hasArabic ? 'rtl' : 'ltr';
+            var lang = hasArabic ? 'ar' : 'en';
+            return '<!DOCTYPE html>\n' +
+                '<html lang="' + lang + '" dir="' + dir + '">\n' +
+                '<head>\n' +
+                '  <meta charset="UTF-8">\n' +
+                '  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+                '  <title>' + (app.title ? String(app.title).replace(/</g, '&lt;') : 'تطبيق') + '</title>\n' +
+                (app.favicon ? '  <link rel="icon" href="' + app.favicon + '">\n' : '') +
+                '  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">\n' +
+                '  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">\n' +
+                (css ? '  <style>\n' + css + '\n  </style>\n' : '') +
+                '</head>\n' +
+                '<body>\n' + html + '\n' +
+                (js ? '  <script>\n' + js + '\n  <\/script>\n' : '') +
+                '</body>\n</html>';
+        }
+
+        function hasContent(a) {
+            if (!a) return false;
+            return !!((a.htmlCode || '').trim() || (a.cssCode || '').trim() || (a.jsCode || '').trim());
+        }
+
+        function injectPWA(appData) {
+            try {
+                var manifest = {
+                    name: appData.title || 'تطبيق',
+                    short_name: (appData.title || 'تطبيق').substring(0, 12),
+                    description: appData.description || '',
+                    start_url: window.location.href.split('?')[0] + '?id=' + encodeURIComponent(appData.slug || appData.id || ''),
+                    scope: './',
+                    display: 'standalone',
+                    background_color: '#0b0c10',
+                    theme_color: '#6c63ff',
+                    orientation: 'any',
+                    icons: []
+                };
+                if (appData.thumbnail && (appData.thumbnail.startsWith('http') || appData.thumbnail.startsWith('data:'))) {
+                    manifest.icons.push({ src: appData.thumbnail, sizes: '192x192', type: 'image/png', purpose: 'any' });
+                    manifest.icons.push({ src: appData.thumbnail, sizes: '512x512', type: 'image/png', purpose: 'any maskable' });
+                } else {
+                    manifest.icons.push({ src: 'img/logo.png', sizes: '192x192', type: 'image/png', purpose: 'any' });
+                    manifest.icons.push({ src: 'img/logo.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' });
+                }
+                var blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+                var url = URL.createObjectURL(blob);
+                var link = document.createElement('link');
+                link.rel = 'manifest';
+                link.href = url;
+                document.head.appendChild(link);
+            } catch (e) {}
+        }
+
+        function registerServiceWorker() {
+            if (!('serviceWorker' in navigator)) return;
+            navigator.serviceWorker.register('service-worker.js').catch(function() {});
+        }
+
+        function setupInstallPrompt(appData) {
+            var deferredPrompt = null;
+            var banner = document.getElementById('install-banner');
+            var installBtn = document.getElementById('install-accept');
+            var dismissBtn = document.getElementById('install-dismiss');
+            var titleEl = document.getElementById('install-app-title');
+            var subtitleEl = document.getElementById('install-app-subtitle');
+            var iconEl = document.getElementById('install-app-icon');
+            var iosBox = document.getElementById('ios-instructions');
+            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+            if (isStandalone) return;
+
+            if (titleEl) titleEl.textContent = 'ثبّت ' + (appData.title || 'التطبيق');
+            if (iconEl && appData.thumbnail && (appData.thumbnail.startsWith('http') || appData.thumbnail.startsWith('data:'))) {
+                iconEl.src = appData.thumbnail;
+            }
+
+            function showBanner() {
+                if (banner) banner.classList.add('show');
+            }
+            function hideBanner() {
+                if (banner) banner.classList.remove('show');
+            }
+
+            if (isIOS) {
+                setTimeout(function() {
+                    if (subtitleEl) subtitleEl.textContent = 'iPhone / iPad — شارك وأضف للشاشة';
+                    if (installBtn) installBtn.textContent = 'كيف؟';
+                    if (iosBox) iosBox.classList.add('show');
+                    if (installBtn) {
+                        installBtn.addEventListener('click', function() {
+                            if (iosBox) iosBox.classList.toggle('show');
+                        });
+                    }
+                    showBanner();
+                }, 2000);
+            } else {
+                var bannerShown = false;
+
+                window.addEventListener('beforeinstallprompt', function(e) {
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    if (!bannerShown) {
+                        bannerShown = true;
+                        showBanner();
+                    }
+                });
+
+                setTimeout(function() {
+                    if (!bannerShown && !isStandalone) {
+                        bannerShown = true;
+                        showBanner();
+                    }
+                }, 4000);
+            }
+
+            if (installBtn && !isIOS) {
+                installBtn.addEventListener('click', function() {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then(function() {
+                            deferredPrompt = null;
+                            hideBanner();
+                        });
+                    } else {
+                        hideBanner();
+                    }
+                });
+            }
+
+            if (dismissBtn) {
+                dismissBtn.addEventListener('click', function() {
+                    hideBanner();
+                });
+            }
+
+            window.addEventListener('appinstalled', function() {
+                deferredPrompt = null;
+                hideBanner();
+            });
+        }
+
+        var _installPromptSetup = false;
+        function renderApp(appData) {
+            if (!hasContent(appData)) { showNotFound('بيانات التطبيق فارغة أو غير مكتملة.'); return; }
+            var fullDoc = buildCompleteAppDocument(appData);
+            if (!fullDoc) { showNotFound('تعذر بناء صفحة التطبيق.'); return; }
+            try {
+                document.title = appData.title || 'تطبيق';
+                if (appData.favicon) {
+                    var link = document.querySelector("link[rel~='icon']");
+                    if (link) link.href = appData.favicon;
+                    else { link = document.createElement('link'); link.rel = 'icon'; link.href = appData.favicon; document.head.appendChild(link); }
+                }
+                var frame = document.getElementById('app-frame');
+                var loader = document.getElementById('loader-wrap');
+                if (loader) loader.style.display = 'none';
+                if (frame) {
+                    frame.style.display = 'block';
+                    frame.srcdoc = fullDoc;
+                }
+                injectPWA(appData);
+                registerServiceWorker();
+                if (!_installPromptSetup) {
+                    _installPromptSetup = true;
+                    setupInstallPrompt(appData);
+                }
+            } catch (err) {
+                showNotFound('خطأ في عرض التطبيق: ' + err.message);
+            }
+        }
+
+        function showNotFound(msg) {
+            document.title = 'تطبيق غير موجود';
+            var box = document.getElementById('loader-box');
+            if (box) {
+                box.innerHTML = '<div style="font-size:3rem;margin-bottom:12px;">🔍</div>' +
+                    '<h2>تطبيق غير موجود</h2><p>' + (msg || '') + '</p>' +
+                    '<p id="loader-status"></p>' +
+                    '<a href="index.html" class="app-btn-home">العودة للصفحة الرئيسية</a>';
+                setStatus('slug=' + slug + ' id=' + appId + ' path=' + window.location.pathname);
+            }
+        }
+
+        function tryFromCache(identifier) {
+            if (!identifier) return null;
+            try {
+                var cached = localStorage.getItem('elmistar_web_apps_cache');
+                if (cached) {
+                    var list = JSON.parse(cached);
+                    if (Array.isArray(list)) {
+                        var found = list.find(function(a) {
+                            if (!a) return false;
+                            if (a.slug && a.slug.toLowerCase() === identifier.toLowerCase()) return true;
+                            if (a.id && a.id === identifier) return true;
+                            if (a.appId && a.appId.toLowerCase() === identifier.toLowerCase()) return true;
+                            return false;
+                        });
+                        if (found) return found;
+                    }
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        function matchesPreview(previewData, slugVal, idVal) {
+            if (!previewData) return false;
+            if (slugVal) return !!(previewData.slug && previewData.slug.toLowerCase() === slugVal.toLowerCase());
+            if (idVal) return previewData.id === idVal;
+            return true;
+        }
+
+        function appFingerprint(a) {
+            if (!a) return '';
+            return [(a.htmlCode || '').length, (a.cssCode || '').length, (a.jsCode || '').length].join('|');
+        }
+
+        function loadFirstAppDirect() {
+            setStatus('عرض مباشر — جاري تحميل أول تطبيق...');
+            function pickFirst(list) {
+                if (!list || !list.length) return null;
+                var visible = list.filter(function(a){ return a && a.isActive !== false && a.isActive !== 'false' && hasContent(a); });
+                visible.sort(function(a,b){ return (Number(a.order)||0) - (Number(b.order)||0); });
+                return visible[0] || null;
+            }
+            try {
+                var raw = localStorage.getItem('elmistar_web_apps_cache');
+                if (raw) {
+                    var first = pickFirst(JSON.parse(raw));
+                    if (first) { renderApp(first); fetchFirstFresh(first); return; }
+                }
+            } catch (e) {}
+            var retries = 0;
+            (function waitDb() {
+                if (!window.db) {
+                    retries++;
+                    if (retries < 40) { setTimeout(waitDb, 250); return; }
+                    showNotFound('تعذر الاتصال بقاعدة البيانات.');
+                    return;
+                }
+                window.db.collection('webApps').get().then(function(snap) {
+                    var list = [];
+                    snap.forEach(function(d){ var a = d.data(); a.id = d.id; list.push(a); });
+                    try { localStorage.setItem('elmistar_web_apps_cache', JSON.stringify(list)); } catch (e) {}
+                    var f = pickFirst(list);
+                    if (f) renderApp(f);
+                    else showNotFound('لا توجد تطبيقات منشورة بعد.');
+                }).catch(function(){ showNotFound('تعذر تحميل التطبيق.'); });
+            })();
+            function fetchFirstFresh(current) {
+                if (!window.db) { setTimeout(function(){ fetchFirstFresh(current); }, 500); return; }
+                window.db.collection('webApps').get().then(function(snap) {
+                    var list = [];
+                    snap.forEach(function(d){ var a = d.data(); a.id = d.id; list.push(a); });
+                    var f = pickFirst(list);
+                    if (f && appFingerprint(f) !== appFingerprint(current)) renderApp(f);
+                }).catch(function(){});
+            }
+        }
+
+        function loadApp() {
+            var identifier = appId || slug;
+            if (!identifier) { loadFirstAppDirect(); return; }
+            setStatus('identifier=' + identifier + ' — جاري البحث...');
+            var renderedFp = '';
+            var didRender = false;
+            function renderOnce(appData, src) {
+                if (!hasContent(appData)) return;
+                renderedFp = appFingerprint(appData);
+                didRender = true;
+                setStatus('عرض من: ' + src);
+                renderApp(appData);
+            }
+            try {
+                var rawPreview = sessionStorage.getItem('elmistar_app_preview');
+                if (rawPreview) {
+                    var previewData = JSON.parse(rawPreview);
+                    if (hasContent(previewData) && matchesPreview(previewData, slug, appId)) renderOnce(previewData, 'preview');
+                }
+            } catch (e) {}
+            if (!didRender) {
+                var cachedApp = tryFromCache(identifier);
+                if (hasContent(cachedApp)) renderOnce(cachedApp, 'cache');
+            }
+            var gaveUp = false;
+            setTimeout(function() {
+                if (!didRender && !gaveUp) {
+                    gaveUp = true;
+                    showNotFound('تعذر تحميل التطبيق. تحقق من الرابط وقاعدة البيانات.');
+                    setStatus('identifier=' + identifier + ' path=' + window.location.pathname + ' db=' + (!!window.db));
+                }
+            }, 9000);
+            var retries = 0;
+            function fetchFromFirestore() {
+                if (gaveUp) return;
+                if (!window.db) {
+                    retries++;
+                    setStatus('بانتظار قاعدة البيانات... (' + retries + ')');
+                    if (retries < 40) { setTimeout(fetchFromFirestore, 250); }
+                    return;
+                }
+                setStatus('متصل — جاري جلب أحدث نسخة...');
+                var col = window.db.collection('webApps');
+                function renderFresh(data, src) {
+                    if (!hasContent(data)) return;
+                    if (!didRender || appFingerprint(data) !== renderedFp) renderOnce(data, src || 'firestore');
+                }
+                function fetchByDocId(id) {
+                    col.doc(id).get().then(function(docSnap) {
+                        if (docSnap.exists) { var d = docSnap.data(); d.id = docSnap.id; renderFresh(d, 'firestore:id'); }
+                        else if (!didRender) { showNotFound('لم يتم العثور على التطبيق: ' + identifier); }
+                    }).catch(function(err) { if (!didRender) showNotFound('خطأ في جلب بيانات التطبيق.'); });
+                }
+                if (slug) {
+                    col.where('slug', '==', slug.toLowerCase()).get().then(function(snapshot) {
+                        if (!snapshot.empty) { var doc = snapshot.docs[0]; var data = doc.data(); data.id = doc.id; renderFresh(data, 'firestore:slug'); return; }
+                        col.where('slug', '==', identifier).get().then(function(snap2) {
+                            if (!snap2.empty) { var doc2 = snap2.docs[0]; var data2 = doc2.data(); data2.id = doc2.id; renderFresh(data2, 'firestore:slug2'); }
+                            else { fetchByDocId(identifier); }
+                        }).catch(function() { fetchByDocId(identifier); });
+                    }).catch(function() { fetchByDocId(identifier); });
+                } else { fetchByDocId(appId); }
+            }
+            fetchFromFirestore();
+        }
+
+        window.addEventListener('error', function(e) {
+            var frame = document.getElementById('app-frame');
+            if (!frame || frame.style.display !== 'block') {
+                setStatus('خطأ: ' + (e.message || 'unknown'));
+            }
+        });
+
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', loadApp); }
+        else { loadApp(); }
+    })();
+    </script>
+</head>
+<body>
+    <iframe id="app-frame" title="التطبيق" allow="autoplay; camera; microphone; clipboard-read; clipboard-write; fullscreen"></iframe>
+    <div id="install-banner">
+        <div class="install-row">
+            <div class="install-info">
+                <img id="install-app-icon" src="img/logo.png" alt="">
+                <div>
+                    <h4 id="install-app-title">تثبيت التطبيق</h4>
+                    <p id="install-app-subtitle">ادخل بسرعة من شاشة هاتفك</p>
+                </div>
+            </div>
+            <div class="install-actions">
+                <button id="install-accept" class="install-btn install-btn-primary">تثبيت</button>
+                <button id="install-dismiss" class="install-btn install-btn-ghost" title="إغلاق">&times;</button>
+            </div>
+        </div>
+        <div id="ios-instructions" class="ios-box">
+            <div class="ios-box-inner">
+                <span style="font-size:18px;">📤</span>
+                <p>اضغط على زر <strong>المشاركة</strong> في سفاري ثم اختر <strong>"إضافة إلى الشاشة الرئيسية"</strong></p>
+            </div>
+        </div>
+    </div>
+    <div id="loader-wrap">
+        <div class="app-loader-box" id="loader-box">
+            <div class="app-spinner"></div>
+            <h2>جاري تشغيل التطبيق...</h2>
+            <p>يرجى الانتظار لحظات ريثما يتم تجهيز بيئة العمل.</p>
+            <p id="loader-status"></p>
+        </div>
+    </div>
+</body>
+</html>

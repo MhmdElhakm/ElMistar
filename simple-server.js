@@ -57,6 +57,27 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  let urlPath = req.url.split('?')[0];
+  try { urlPath = decodeURIComponent(urlPath); } catch (e) {}
+  // رابط نظيف: /slug يعرض التطبيق عبر view.html
+  if (urlPath !== '/' && !urlPath.includes('.') && !urlPath.startsWith('/save-config')) {
+    const slug = urlPath.replace(/^\/+|\/+$/g, '').split('/').pop();
+    if (slug && /^[A-Za-z0-9\-_]+$/.test(slug)) {
+      const maybeFile = path.join(__dirname, slug);
+      if (!fs.existsSync(maybeFile)) {
+        try {
+          const content = fs.readFileSync(path.join(__dirname, 'view.html'), 'utf8');
+          res.writeHead(200, { 'Content-Type': 'text/html' });
+          res.end(content, 'utf-8');
+        } catch (e) {
+          res.writeHead(404, { 'Content-Type': 'text/html' });
+          res.end('<h1>404 Not Found</h1>', 'utf-8');
+        }
+        return;
+      }
+    }
+  }
+
   let filePath = '.' + req.url.split('?')[0];
   if (filePath === './') {
     filePath = './index.html';
@@ -77,7 +98,11 @@ const server = http.createServer((req, res) => {
       }
     }
     else {
-      res.writeHead(200, { 'Content-Type': contentType });
+      const headers = { 'Content-Type': contentType, 'Access-Control-Allow-Origin': '*' };
+      if (extname === '.html' || extname === '.js' || extname === '.css') {
+        headers['Cache-Control'] = 'no-store, no-cache, must-revalidate';
+      }
+      res.writeHead(200, headers);
       res.end(content, 'utf-8');
     }
   });
