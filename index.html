@@ -304,8 +304,8 @@
         <button class="page-dot" data-target="educational-works-section" data-label="أعمالي التعليمية"
             aria-label="أعمالي التعليمية"></button>
         <div class="dot-line"></div>
-        <button class="page-dot" data-target="apps-section" data-label="تطبيقاتي"
-                        aria-label="تطبيقاتي"></button>
+        <button class="page-dot" data-target="apps-section" data-label="تطبيقاتنا"
+            aria-label="تطبيقاتنا"></button>
         <div class="dot-line"></div>
     </nav>
 
@@ -313,7 +313,7 @@
     <div class="page-counter" id="pageCounter">
         <span class="current-page" id="currentPageNum">1</span>
         <span>/</span>
-        <span>3</span>
+        <span>4</span>
     </div>
 
     <!-- NAVBAR -->
@@ -334,7 +334,7 @@
                         class="nav-btn-link">الكورسات الصيفية</button></li>
                 <li><button
                         onclick="document.getElementById('apps-section').scrollIntoView({behavior: 'smooth'})"
-                        class="nav-btn-link">تطبيقاتي</button></li>
+                        class="nav-btn-link">تطبيقاتنا 🚀</button></li>
                 <li><button onclick="document.getElementById('contact').scrollIntoView({behavior: 'smooth'})"
                         class="nav-btn-link">تواصل معنا</button></li>
                 <li><button type="button" id="openLookupModalNav" class="nav-btn-link logged-in-only"
@@ -824,46 +824,38 @@
     </section>
 
     <!-- ============================================ -->
-    <!--        WEB APPS SECTION (تطبيقاتي)           -->
+    <!--        APPS SECTION (تطبيقاتنا)              -->
     <!-- ============================================ -->
     <section class="apps-section reveal" id="apps-section">
         <div class="container">
             <div class="section-header">
-                <span class="section-tag glow">💻 تطبيقاتي</span>
-                <h2 class="main-title">تطبيقات <span class="accent-text">الويب</span></h2>
-                <p class="section-desc">تصفح تطبيقاتي التي قمت ببرمجتها وتصميمها بنفسي</p>
+                <span class="section-tag glow">🚀 تطبيقاتنا</span>
+                <h2 class="main-title">تطبيقات <span class="accent-text">تعليمية</span> تفاعلية</h2>
+                <p class="section-desc">أدوات تعليمية مجانية مصممة خصيصاً لطلاب المستر</p>
             </div>
 
             <!-- Skeleton Loading -->
-            <div class="apps-skeleton">
+            <div class="apps-skeleton" id="appsSkeleton">
                 <div class="skeleton-card"></div>
                 <div class="skeleton-card"></div>
                 <div class="skeleton-card"></div>
             </div>
 
             <!-- Empty State -->
-            <div class="apps-empty-state" id="apps-empty-state" style="display:none;">
-                <div style="text-align:center;padding:60px 20px;color:var(--text-muted, #64748b);">
-                    <div style="font-size:4rem;margin-bottom:16px;">💻</div>
-                    <h3 style="font-size:1.5rem;margin-bottom:8px;color:var(--ink, #1e3a8a);">لا توجد تطبيقات متاحة حالياً</h3>
+            <div class="apps-empty-state" id="appsEmptyState" style="display:none;">
+                <div style="text-align:center;padding:60px 20px;color:var(--text-muted,#64748b);">
+                    <div style="font-size:4rem;margin-bottom:16px;">🚀</div>
+                    <h3 style="font-size:1.5rem;margin-bottom:8px;color:var(--ink,#1e3a8a);">لا توجد تطبيقات متاحة حالياً</h3>
                     <p>سيتم إضافة التطبيقات قريباً، تابعونا!</p>
                 </div>
             </div>
 
-            <!-- Apps Cards Grid -->
-            <div class="apps-cards-grid" id="apps-cards-grid">
+            <!-- Apps Grid -->
+            <div class="apps-grid" id="appsGrid">
                 <!-- Cards injected by JS -->
             </div>
         </div>
     </section>
-
-    <!-- APP FULL-PAGE RUNNER -->
-    <div id="apps-preview-overlay" class="modal-overlay hidden" style="z-index:9999;padding:0;">
-        <button id="apps-preview-back" style="position:fixed;top:16px;right:16px;z-index:10000;background:rgba(24,29,40,0.92);border:2px solid #2a3040;color:#e2e8f0;padding:10px 20px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;backdrop-filter:blur(12px);box-shadow:0 4px 24px rgba(0,0,0,0.6);font-family:'Cairo',sans-serif;transition:all 0.25s ease;" onmouseover="this.style.background='rgba(108,99,255,0.35)';this.style.borderColor='#6c63ff'" onmouseout="this.style.background='rgba(24,29,40,0.92)';this.style.borderColor='#2a3040'">
-            <i class="bx bx-arrow-back" style="font-size:18px;"></i> العودة للموقع
-        </button>
-        <iframe id="apps-preview-frame" style="position:fixed;top:0;left:0;width:100vw;height:100vh;border:none;background:#0b0c10;" allow="autoplay; camera; microphone; clipboard-read; clipboard-write; fullscreen"></iframe>
-    </div>
 
     <!-- ============================================ -->
     <!--        COURSE DETAIL MODAL                   -->
@@ -2615,8 +2607,86 @@
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
     <!-- ربط قاعدة البيانات (Firestore) — لا توجد قاعدة افتراضية، يُحدَّد الإعداد من لوحة التحكم -->
-    <script src="firebase-config-data.js"></script>
-    <script src="firebase-config.js"></script>
+    <script>
+    // ═══════════════════════════════════════════════════════════
+    // firebase-config-data.js — مُدمج مباشرةً
+    // ═══════════════════════════════════════════════════════════
+    window.__ELMISTAR_EMBEDDED_CONFIG = {
+        apiKey: "AIzaSyD1OK39VnjBelGo2rtitimoBQw6phETaFw",
+        authDomain: "el-mistar.firebaseapp.com",
+        projectId: "el-mistar",
+        storageBucket: "el-mistar.firebasestorage.app",
+        messagingSenderId: "158605479233",
+        appId: "1:158605479233:web:91e4610a85a623b478a5c0",
+        measurementId: "G-Q89J2C5E50"
+    };
+    </script>
+    <script>
+    // ═══════════════════════════════════════════════════════════
+    // firebase-config.js — مُدمج مباشرةً
+    // ═══════════════════════════════════════════════════════════
+    (function () {
+        var STORAGE_KEY = 'elmistar_firebase_config';
+        var saved = null;
+        try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                var parsed = JSON.parse(raw);
+                if (parsed && typeof parsed === 'object') saved = parsed;
+            }
+        } catch (e) {}
+        var embedded = window.__ELMISTAR_EMBEDDED_CONFIG || null;
+        var config = null;
+        if (saved && saved.apiKey && saved.projectId) {
+            config = saved;
+        } else if (embedded && embedded.apiKey && embedded.projectId) {
+            config = embedded;
+        }
+        window.__fbConfigured = false;
+        window.ElmistarConfig = {
+            STORAGE_KEY: STORAGE_KEY,
+            get: function () {
+                return config ? JSON.parse(JSON.stringify(config)) : null;
+            },
+            save: function (cfg) {
+                if (!cfg || typeof cfg !== 'object') return;
+                config = cfg;
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg)); } catch (e) {}
+            },
+            clear: function () {
+                config = null;
+                try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+            },
+            isConfigured: function () { return !!config; },
+            test: function (cfg) {
+                return new Promise(function (resolve, reject) {
+                    var name = 'connection-test-' + Date.now();
+                    try {
+                        var app = firebase.initializeApp(cfg, name);
+                        app.firestore().collection('settings').doc('_connection_test').get()
+                            .then(function () { app.delete().catch(function () {}); resolve(true); })
+                            .catch(function (err) { app.delete().catch(function () {}); reject(err); });
+                    } catch (err) { reject(err); }
+                });
+            }
+        };
+        if (config) {
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(config);
+                }
+                window.db = firebase.firestore();
+                window.__fbConfigured = true;
+                console.log('✅ تم ربط قاعدة البيانات (Firestore): ' + config.projectId);
+            } catch (err) {
+                console.error('❌ فشل ربط قاعدة البيانات:', err);
+                window.__fbConfigured = false;
+            }
+        } else {
+            console.warn('⚠️ لم يتم ربط قاعدة بيانات Firebase بعد — رجاءً ربطها من لوحة التحكم.');
+        }
+    })();
+    </script>
     <script>
         // Show a notice if no database is linked yet
         if (!window.db) {
@@ -2710,13 +2780,7 @@
         <img src="" alt="Full view" class="lightbox-content" id="lightbox-img-full">
     </div>
 
-    <script src="summer-courses.js" defer></script>
-    <script src="educational-works.js" defer></script>
-    <script src="apps-section.js" defer></script>
     <script src="script.js" defer></script>
-
-    <!-- Prism.js Syntax Highlighting -->
-
 
     <!-- PAGE LOADING MANAGER (must run last) -->
     <script>
@@ -2789,123 +2853,6 @@
             fbReady = true;
             checkReady();
         }, 3000);
-    })();
-    </script>
-    <!-- PWA INSTALL BANNER -->
-    <div id="pwa-install-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#181d28 0%,#1e2533 100%);border-top:1px solid rgba(255,255,255,0.08);padding:0;box-shadow:0 -8px 32px rgba(0,0,0,0.4);font-family:'Cairo',sans-serif;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;gap:12px;">
-            <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
-                <img src="img/logo.png" alt="ElMistar" style="width:42px;height:42px;border-radius:12px;flex-shrink:0;border:2px solid rgba(108,99,255,0.3);">
-                <div style="min-width:0;">
-                    <h4 style="color:#f8fafc;font-size:13px;margin:0 0 1px;font-weight:800;font-family:'Cairo',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">ثبّت تطبيق المستر</h4>
-                    <p id="pwa-install-subtitle" style="color:#94a3b8;font-size:11px;margin:0;font-family:'Cairo',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">ادخل بسرعة من شاشة هاتفك</p>
-                </div>
-            </div>
-            <div style="display:flex;gap:6px;flex-shrink:0;align-items:center;">
-                <button id="pwa-install-accept" style="padding:8px 16px;border-radius:10px;font-weight:800;font-size:12px;border:none;cursor:pointer;font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#6c63ff,#5a52e0);color:#fff;box-shadow:0 2px 12px rgba(108,99,255,0.4);transition:all 0.2s;white-space:nowrap;">تثبيت</button>
-                <button id="pwa-install-dismiss" style="width:32px;height:32px;border-radius:8px;font-weight:700;font-size:16px;border:none;cursor:pointer;font-family:'Cairo',sans-serif;background:rgba(255,255,255,0.06);color:#94a3b8;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;" title="إغلاق">&times;</button>
-            </div>
-        </div>
-        <!-- iOS Instructions (hidden by default) -->
-        <div id="pwa-ios-instructions" style="display:none;padding:0 20px 12px;border-top:1px solid rgba(255,255,255,0.06);margin-top:0;">
-            <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(37,99,235,0.08);border-radius:10px;border:1px solid rgba(37,99,235,0.15);">
-                <span style="font-size:18px;">📤</span>
-                <p style="color:#94a3b8;font-size:11px;margin:0;font-family:'Cairo',sans-serif;line-height:1.6;">
-                    اضغط على زر <strong style="color:#6c63ff;">المشاركة</strong> في سفاري ثم اختر <strong style="color:#6c63ff;">"إضافة إلى الشاشة الرئيسية"</strong>
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-    (function() {
-        if (!('serviceWorker' in navigator)) return;
-
-        navigator.serviceWorker.register('main-sw.js').catch(function() {});
-
-        var deferredPrompt = null;
-        var banner = document.getElementById('pwa-install-banner');
-        var installBtn = document.getElementById('pwa-install-accept');
-        var dismissBtn = document.getElementById('pwa-install-dismiss');
-        var subtitle = document.getElementById('pwa-install-subtitle');
-        var iosInstructions = document.getElementById('pwa-ios-instructions');
-        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-        var dismissed = localStorage.getItem('pwa-install-dismissed');
-        var DISMISS_COOLDOWN = 24 * 60 * 60 * 1000;
-
-        if (isStandalone) {
-            if (banner) banner.style.display = 'none';
-            return;
-        }
-
-        var isDismissed = false;
-
-        function showBanner() {
-            if (banner) banner.style.display = 'block';
-        }
-
-        function hideBanner() {
-            if (banner) banner.style.display = 'none';
-            isDismissed = true;
-            localStorage.setItem('pwa-install-dismissed', Date.now());
-        }
-
-        if (isIOS) {
-            setTimeout(function() {
-                if (isDismissed) return;
-                if (subtitle) subtitle.textContent = 'iPhone / iPad — شارك وأضف للشاشة';
-                if (iosInstructions) iosInstructions.style.display = 'block';
-                if (installBtn) {
-                    installBtn.textContent = 'كيف؟';
-                    installBtn.addEventListener('click', function() {
-                        if (iosInstructions) {
-                            iosInstructions.style.display = iosInstructions.style.display === 'none' ? 'block' : 'none';
-                        }
-                    });
-                }
-                showBanner();
-            }, 3000);
-        }
-
-        window.addEventListener('beforeinstallprompt', function(e) {
-            e.preventDefault();
-            deferredPrompt = e;
-            if (!isIOS && !isDismissed) {
-                showBanner();
-            }
-        });
-
-        if (installBtn && !isIOS) {
-            installBtn.addEventListener('click', function() {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then(function(outcome) {
-                        deferredPrompt = null;
-                        hideBanner();
-                    });
-                } else {
-                    hideBanner();
-                }
-            });
-        }
-
-        setTimeout(function() {
-            if (banner && banner.style.display === 'none' && !isStandalone && !isIOS && !isDismissed) {
-                showBanner();
-            }
-        }, 5000);
-
-        if (dismissBtn) {
-            dismissBtn.addEventListener('click', function() {
-                hideBanner();
-            });
-        }
-
-        window.addEventListener('appinstalled', function() {
-            deferredPrompt = null;
-            hideBanner();
-        });
     })();
     </script>
 </body>

@@ -202,7 +202,7 @@
                 <li data-target="combined-requests-view" data-color="orange"><i class='bx bx-time-five'></i> الطلبات والمدفوعات <span id="combined-requests-badge" class="badge">0</span></li>
                 <li data-target="summer-courses-view" data-color="red"><i class='bx bxs-sun'></i> الكورسات الصيفية <span id="summer-badge" class="badge">0</span></li>
                 <li data-target="educational-works-view" data-color="cyan"><i class='bx bxs-book'></i> أعمالي التعليمية</li>
-                <li data-target="apps-view" data-color="pink"><i class='bx bx-code-alt'></i> تطبيقاتي</li>
+                <li data-target="apps-view" data-color="violet"><i class='bx bx-rocket'></i> التطبيقات</li>
                 <li data-target="settings-view" data-color="slate"><i class='bx bx-cog'></i> الإعدادات</li>
             </ul>
         </aside>
@@ -887,79 +887,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- VIEW: WEB APPS MANAGEMENT (تطبيقاتي) -->
-                <section id="apps-view" class="view-section">
-                    <div class="students-page-hero">
-                        <div class="students-hero-info">
-                            <h2>💻 إدارة تطبيقاتي</h2>
-                            <p>إضافة، تعديل، حذف، وإدارة تطبيقات الويب المعروضة على الموقع</p>
-                        </div>
-                        <div class="students-hero-actions">
-                            <button class="btn btn-primary btn-sm" id="apps-add-btn">
-                                <i class='bx bx-plus-circle'></i> إضافة تطبيق
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Stats Grid -->
-                    <div class="sc-stats-grid">
-                        <div class="stat-card doodle-card">
-                            <div class="stat-header">
-                                <div class="stat-icon-wrapper blue-gradient"><i class='bx bx-code-alt'></i></div>
-                                <div class="stat-title"><h3>إجمالي التطبيقات</h3></div>
-                            </div>
-                            <div class="stat-value-area"><h2 id="apps-stat-total">0</h2></div>
-                        </div>
-                        <div class="stat-card doodle-card">
-                            <div class="stat-header">
-                                <div class="stat-icon-wrapper green-gradient"><i class='bx bxs-check-circle'></i></div>
-                                <div class="stat-title"><h3>المنشورة</h3></div>
-                            </div>
-                            <div class="stat-value-area"><h2 id="apps-stat-active">0</h2></div>
-                        </div>
-                        <div class="stat-card doodle-card">
-                            <div class="stat-header">
-                                <div class="stat-icon-wrapper red-gradient"><i class='bx bxs-x-circle'></i></div>
-                                <div class="stat-title"><h3>المسودات</h3></div>
-                            </div>
-                            <div class="stat-value-area"><h2 id="apps-stat-drafts">0</h2></div>
-                        </div>
-                    </div>
-
-                    <!-- Filters -->
-                    <div class="filters-row doodle-card" style="margin-bottom:20px;">
-                        <div class="filter-group" style="flex:2;">
-                            <label>بحث</label>
-                            <div class="search-box" style="width:100%">
-                                <i class='bx bx-search'></i>
-                                <input type="text" id="apps-admin-search" placeholder="ابحث في التطبيقات..." style="width:100%">
-                            </div>
-                        </div>
-                        <div class="filter-group">
-                            <label>ترتيب</label>
-                            <select id="apps-admin-sort">
-                                <option value="order">الترتيب المخصص</option>
-                                <option value="order-desc">الترتيب: عكسي</option>
-                                <option value="title">الترتيب الأبجدي</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>العدد</label>
-                            <div id="apps-count" style="font-size:22px;font-weight:900;color:var(--accent);">0</div>
-                        </div>
-                    </div>
-
-                    <!-- Apps Grid -->
-                    <div class="admin-apps-grid" id="admin-apps-grid">
-                        <!-- Cards injected by JS -->
-                    </div>
-                    <div id="admin-apps-empty" style="display:none;text-align:center;padding:60px 20px;">
-                        <div style="font-size:4rem;margin-bottom:16px;">💻</div>
-                        <h3 style="font-size:1.3rem;color:var(--text-primary,#e2e8f0);margin-bottom:8px;">لا توجد تطبيقات بعد</h3>
-                        <p style="color:var(--text-muted,#94a3b8);">اضغط "إضافة تطبيق" للبدء</p>
-                    </div>
-                </section>
 
                 <!-- VIEW: SETTINGS (الإعدادات العامة + قوالب الواتساب + الإعلانات) -->
                 <section id="settings-view" class="view-section">
@@ -1726,6 +1653,163 @@
                     </div>
                 </div>
 
+                <!-- ============================== -->
+                <!-- VIEW: APPS MANAGEMENT — التطبيقات -->
+                <!-- ============================== -->
+                <section id="apps-view" class="view-section">
+                    <div class="students-page-hero" style="background:linear-gradient(135deg,rgba(109,40,217,0.12),rgba(139,92,246,0.08));">
+                        <div class="students-hero-info">
+                            <h2>🚀 إدارة التطبيقات</h2>
+                            <p>تحكم في التطبيقات التي تظهر في الموقع — الإظهار، الإخفاء، الترتيب والمعلومات</p>
+                        </div>
+                        <div class="students-hero-actions">
+                            <a href="../index.html#apps-section" target="_blank" class="btn btn-outline btn-sm">
+                                <i class='bx bx-link-external'></i> عرض في الموقع
+                            </a>
+                        </div>
+                    </div>
+
+                    <div style="background:rgba(139,92,246,0.08);border:1.5px solid rgba(139,92,246,0.25);border-radius:14px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;">
+                        <i class='bx bx-info-circle' style="color:#8b5cf6;font-size:1.3rem;flex-shrink:0;margin-top:2px;"></i>
+                        <div>
+                            <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">كيف يعمل قسم التطبيقات؟</strong>
+                            <p style="color:var(--text-secondary);font-size:0.85rem;line-height:1.7;margin:0;">
+                                كل تطبيق موجود في مجلد <code style="background:var(--bg-input);padding:2px 6px;border-radius:4px;">apps/</code> وله ملفاته المستقلة.
+                                التعديلات هنا تتحكم في ما يظهر للزوار — ويتم حفظها محلياً وتُطبَّق فوراً على الموقع.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Section Header Settings (Accordion) -->
+                    <details class="accordion-card" style="margin-bottom:20px;">
+                        <summary class="accordion-header" style="font-size:1.1rem;font-weight:800;color:var(--text-primary);display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none;padding:16px 20px;background:var(--bg-card,#fff);border:1.5px solid var(--border,#e2e8f0);border-radius:14px;transition:all 0.3s;">
+                            <i class='bx bx-text' style="color:#8b5cf6;font-size:1.3rem;"></i>
+                            <span>إعدادات عنوان القسم</span>
+                            <i class='bx bx-chevron-down' style="margin-right:auto;transition:transform 0.3s;font-size:1.2rem;"></i>
+                        </summary>
+                        <div class="accordion-body" style="padding:20px;background:var(--bg-card,#fff);border:1.5px solid var(--border,#e2e8f0);border-top:none;border-radius:0 0 14px 14px;display:grid;gap:14px;">
+                            <div class="input-group">
+                                <label>عنوان القسم الرئيسي</label>
+                                <input type="text" id="apps-section-title" placeholder="تطبيقات تعليمية تفاعلية">
+                            </div>
+                            <div class="input-group">
+                                <label>وصف القسم</label>
+                                <textarea id="apps-section-desc" rows="2" placeholder="أدوات تعليمية مجانية مصممة خصيصاً لطلاب المستر"></textarea>
+                            </div>
+                            <div class="input-group">
+                                <label>نص الشارة (Tag)</label>
+                                <input type="text" id="apps-section-tag" placeholder="🚀 تطبيقاتنا" maxlength="30">
+                            </div>
+                            <button class="btn btn-outline btn-sm" id="apps-section-save-btn" style="align-self:flex-start;">
+                                <i class='bx bx-save'></i> حفظ إعدادات العنوان
+                            </button>
+                            <span id="apps-section-save-msg" style="font-size:0.85rem;color:var(--text-secondary);display:none;"></span>
+                        </div>
+                    </details>
+                    <style>
+                        .accordion-card[open] .accordion-header {
+                            border-radius: 14px 14px 0 0;
+                            border-bottom-color: transparent;
+                        }
+                        .accordion-card[open] .accordion-header i.bx-chevron-down {
+                            transform: rotate(180deg);
+                        }
+                        .accordion-header::-webkit-details-marker { display: none; }
+                        .accordion-header::marker { content: ''; }
+                    </style>
+
+                    <div id="admin-apps-list" style="display:flex;flex-direction:column;gap:16px;">
+                        <!-- Injected by admin.js -->
+                    </div>
+
+                    <div style="margin-top:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <button class="btn btn-primary" id="admin-apps-add-btn">
+                            <i class='bx bx-plus'></i> إضافة تطبيق جديد
+                        </button>
+                        <button class="btn btn-primary" id="admin-apps-save-btn">
+                            <i class='bx bx-save'></i> حفظ التغييرات
+                        </button>
+                        <button class="btn btn-outline" id="admin-apps-reset-btn">
+                            <i class='bx bx-trash'></i> حذف الكل
+                        </button>
+                        <span id="admin-apps-save-msg" style="font-size:0.85rem;color:var(--text-secondary);display:none;"></span>
+                    </div>
+
+                    <!-- App Edit Modal -->
+                    <div id="app-edit-modal" class="modal-overlay hidden">
+                        <div class="modal-sheet doodle-card" style="max-width:520px;">
+                            <div class="modal-head">
+                                <h2 id="app-edit-modal-title"><i class='bx bx-edit' style="color:var(--accent);"></i> تعديل التطبيق</h2>
+                                <button class="modal-close-btn" id="app-edit-close">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" id="app-edit-id">
+                                <div style="display:grid;gap:14px;">
+                                    <div class="input-group">
+                                        <label>اسم التطبيق <span class="required">*</span></label>
+                                        <input type="text" id="app-edit-name" placeholder="مثال: آلة حاسبة تعليمية">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>الوصف</label>
+                                        <textarea id="app-edit-desc" rows="3" placeholder="وصف مختصر يظهر للزوار"></textarea>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>التصنيف</label>
+                                        <input type="text" id="app-edit-tag" placeholder="مثال: رياضيات">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>الصورة المصغرة للتطبيق</label>
+                                        <div id="app-edit-img-preview" style="width:100%;height:140px;border:2px dashed var(--border,#d1d5db);border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--bg-secondary,#f9fafb);margin-bottom:10px;cursor:pointer;transition:all 0.3s;" onclick="document.getElementById('app-edit-img-file').click();">
+                                            <div id="app-edit-img-placeholder" style="text-align:center;color:var(--text-muted,#9ca3af);">
+                                                <i class='bx bx-cloud-upload' style="font-size:2.5rem;display:block;margin-bottom:6px;"></i>
+                                                <span style="font-size:0.85rem;">اضغط لرفع الصورة</span>
+                                                <span style="display:block;font-size:0.75rem;margin-top:4px;">PNG, JPG, SVG (حد أقصى 2MB)</span>
+                                            </div>
+                                            <img id="app-edit-img-thumb" src="" alt="معاينة" style="display:none;width:100%;height:100%;object-fit:cover;">
+                                        </div>
+                                        <input type="file" id="app-edit-img-file" accept="image/*" style="display:none;">
+                                        <input type="hidden" id="app-edit-iconUrl">
+                                        <div style="display:flex;gap:8px;align-items:center;">
+                                            <button type="button" class="btn btn-outline btn-sm" id="app-edit-img-remove" style="display:none;color:#ef4444;border-color:#fca5a5;font-size:0.75rem;">
+                                                <i class='bx bx-trash'></i> حذف الصورة
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                        <div class="input-group">
+                                            <label>لون البطاقة</label>
+                                            <select id="app-edit-color">
+                                                <option value="theme-blue">🔵 أزرق</option>
+                                                <option value="theme-purple">🟣 بنفسجي</option>
+                                                <option value="theme-green">🟢 أخضر</option>
+                                                <option value="theme-orange">🟠 برتقالي</option>
+                                                <option value="theme-red">🔴 أحمر</option>
+                                                <option value="theme-teal">🩵 فيروزي</option>
+                                            </select>
+                                        </div>
+                                        <div class="input-group">
+                                            <label>الترتيب</label>
+                                            <input type="number" id="app-edit-order" min="1" max="99" placeholder="1">
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>رابط التطبيق</label>
+                                        <input type="text" id="app-edit-url" placeholder="apps/calculator/index.html" style="direction:ltr;text-align:left;">
+                                    </div>
+                                    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;background:var(--bg-card);padding:12px;border-radius:10px;border:1.5px solid var(--border);">
+                                        <input type="checkbox" id="app-edit-visible" style="width:18px;height:18px;cursor:pointer;accent-color:var(--accent);">
+                                        ظاهر للزوار في الموقع
+                                    </label>
+                                </div>
+                                <div style="display:flex;gap:10px;margin-top:20px;">
+                                    <button class="btn btn-primary" id="app-edit-save" style="flex:1;"><i class='bx bx-save'></i> حفظ</button>
+                                    <button class="btn btn-outline" id="app-edit-cancel">إلغاء</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
             </div>
         <nav class="mobile-nav">
             <div class="mobile-nav-item active" data-target="home-view" data-color="blue">
@@ -1749,10 +1833,6 @@
             <div class="mobile-nav-item" data-target="educational-works-view" data-color="cyan">
                 <i class='bx bxs-book'></i>
                 <span>أعمالي</span>
-            </div>
-            <div class="mobile-nav-item" data-target="apps-view" data-color="pink">
-                <i class='bx bx-code-alt'></i>
-                <span>تطبيقاتي</span>
             </div>
             <div class="mobile-nav-item" data-target="settings-view" data-color="slate">
                 <i class='bx bx-cog'></i>
@@ -2302,9 +2382,9 @@
             <i class='bx bxs-book'></i>
             <span>أعمالي</span>
         </div>
-        <div class="mobile-nav-item" data-target="apps-view" data-color="pink">
-            <i class='bx bx-code-alt'></i>
-            <span>تطبيقاتي</span>
+        <div class="mobile-nav-item" data-target="apps-view" data-color="violet">
+            <i class='bx bx-rocket'></i>
+            <span>تطبيقات</span>
         </div>
         <div class="mobile-nav-item" data-target="settings-view" data-color="slate">
             <i class='bx bx-cog'></i>
@@ -2430,176 +2510,90 @@
         </div>
     </div>
 
-    <!-- MODAL: WEB APPS FORM (ADD/EDIT) -->
-    <div id="apps-form-modal" class="modal-overlay hidden">
-        <div class="modal-sheet doodle-card" style="max-width:700px;">
-            <div class="modal-head">
-                <h2 id="apps-modal-title"><i class='bx bx-plus-circle' style="color:var(--accent);"></i> إضافة تطبيق جديد</h2>
-                <button class="modal-close-btn" id="apps-close">&times;</button>
-            </div>
-            <div class="modal-body" style="max-height:80vh;overflow-y:auto;">
-                <form id="apps-form">
-                    <input type="hidden" id="apps-id">
-
-                    <div style="display:grid;gap:15px;">
-                        <div class="input-group">
-                            <label>اسم التطبيق <span class="required">*</span></label>
-                            <input type="text" id="apps-title" required placeholder="أدخل اسم التطبيق">
-                        </div>
-
-                        <div class="input-group">
-                            <label>وصف التطبيق</label>
-                            <textarea id="apps-desc" rows="2" placeholder="وصف مختصر للتطبيق"></textarea>
-                        </div>
-
-                        <div class="input-group">
-                            <label>رابط التطبيق <small>(الرابط: view.html?slug=<strong>هنا</strong>)</small></label>
-                            <div style="display:flex;align-items:center;gap:0;border:2px solid var(--border,#2a3040);border-radius:10px;background:var(--bg-input,#1e2533);overflow:hidden;">
-                                <span style="padding:0 12px;color:var(--text-muted,#94a3b8);font-size:13px;font-weight:700;white-space:nowrap;background:rgba(255,255,255,0.03);height:42px;display:flex;align-items:center;border-left:2px solid var(--border,#2a3040);">/</span>
-                                <input type="text" id="apps-slug" placeholder="my-app" style="flex:1;border:none;background:transparent;padding:10px 12px;font-size:13px;font-family:monospace;color:var(--text-primary,#e2e8f0);direction:ltr;text-align:left;height:42px;outline:none;">
-                            </div>
-                            <p style="font-size:11px;color:var(--text-muted,#94a3b8);margin:4px 0 0;">انكليزي فقط، بدون مسافات أو رموز خاصة (مثال: timer-app, calculator)</p>
-                        </div>
-
-                        <div class="input-group">
-                            <label>صورة مصغرة <small>(اختياري)</small></label>
-                            <div id="apps-upload-zone" style="border:2px dashed var(--border,#2a3040);border-radius:14px;padding:20px 16px;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:var(--bg-card,#181d28);">
-                                <input type="file" id="apps-thumb-file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
-                                <i class="bx bx-cloud-upload" style="font-size:36px;color:var(--accent,#6c63ff);display:block;margin-bottom:6px;"></i>
-                                <p style="font-size:13px;font-weight:700;color:var(--text-primary,#e2e8f0);margin:0 0 4px;">اضغط أو اسحب صورة هنا</p>
-                                <p style="font-size:11px;color:var(--text-secondary,#94a3b8);margin:0;">JPG, PNG, WEBP — حتى 5 ميجا</p>
-                            </div>
-                            <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                                <img id="apps-thumb-preview" src="" alt="معاينة" style="max-width:100px;max-height:70px;border-radius:10px;border:1px solid var(--border,#2a3040);display:none;object-fit:cover;">
-                                <button type="button" id="apps-remove-thumb" class="btn-sm" style="display:none;background:#ef4444;color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">إزالة الصورة</button>
-                            </div>
-                            <input type="hidden" id="apps-thumb-url">
-                        </div>
-
-                        <div class="input-group">
-                            <label>أيقونة التطبيق (.ico) <small>(اختياري — تظهر في تبويب المتصفح)</small></label>
-                            <div id="apps-favicon-upload-zone" style="border:2px dashed var(--border,#2a3040);border-radius:14px;padding:20px 16px;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:var(--bg-card,#181d28);">
-                                <input type="file" id="apps-favicon-file" accept=".ico,image/x-icon,image/vnd.microsoft.icon" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
-                                <i class="bx bx-image" style="font-size:36px;color:#f59e0b;display:block;margin-bottom:6px;"></i>
-                                <p style="font-size:13px;font-weight:700;color:var(--text-primary,#e2e8f0);margin:0 0 4px;">اضغط أو اسحب ملف أيقونة هنا</p>
-                                <p style="font-size:11px;color:var(--text-secondary,#94a3b8);margin:0;">.ico — حتى 1 ميجا</p>
-                            </div>
-                            <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                                <img id="apps-favicon-preview" src="" alt="معاينة" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--border,#2a3040);display:none;object-fit:cover;">
-                                <button type="button" id="apps-remove-favicon" class="btn-sm" style="display:none;background:#ef4444;color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">إزالة</button>
-                            </div>
-                            <input type="hidden" id="apps-favicon-url">
-                        </div>
-
-                        <div class="input-group">
-                            <label><i class="bx bxl-html5" style="color:#e34f26;"></i> ملف HTML</label>
-                            <div class="apps-code-upload-zone" id="apps-html-upload-zone" style="border:2px dashed var(--border,#2a3040);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:var(--bg-card,#181d28);">
-                                <input type="file" id="apps-html-file" accept=".html,.htm" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
-                                <i class="bx bx-file" style="font-size:28px;color:#e34f26;display:block;margin-bottom:4px;"></i>
-                                <p style="font-size:12px;font-weight:700;color:var(--text-primary,#e2e8f0);margin:0;">ارفع ملف HTML</p>
-                                <p style="font-size:11px;color:var(--text-secondary,#94a3b8);margin:2px 0 0;">.html أو .htm</p>
-                            </div>
-                            <div class="apps-code-file-info" id="apps-html-file-info" style="display:none;margin-top:8px;padding:8px 12px;background:rgba(227,79,38,.1);border-radius:8px;font-size:12px;color:#e34f26;font-weight:700;direction:ltr;text-align:left;">
-                                <i class="bx bx-check-circle"></i> <span class="apps-file-name"></span>
-                                <button type="button" class="apps-remove-file-btn" data-target="html" style="float:left;background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px;">×</button>
-                            </div>
-                            <textarea id="apps-html-code" rows="4" placeholder="أو الصق كود HTML هنا..." style="font-family:monospace;font-size:12px;direction:ltr;text-align:left;background:var(--bg-input,#1e2533);color:var(--text-primary,#e2e8f0);border:2px solid var(--border,#2a3040);border-radius:10px;padding:10px;resize:vertical;width:100%;margin-top:8px;"></textarea>
-                        </div>
-
-                        <div class="input-group">
-                            <label><i class="bx bxl-css3" style="color:#1572b6;"></i> ملف CSS</label>
-                            <div class="apps-code-upload-zone" id="apps-css-upload-zone" style="border:2px dashed var(--border,#2a3040);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:var(--bg-card,#181d28);">
-                                <input type="file" id="apps-css-file" accept=".css" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
-                                <i class="bx bx-file" style="font-size:28px;color:#1572b6;display:block;margin-bottom:4px;"></i>
-                                <p style="font-size:12px;font-weight:700;color:var(--text-primary,#e2e8f0);margin:0;">ارفع ملف CSS</p>
-                                <p style="font-size:11px;color:var(--text-secondary,#94a3b8);margin:2px 0 0;">.css</p>
-                            </div>
-                            <div class="apps-code-file-info" id="apps-css-file-info" style="display:none;margin-top:8px;padding:8px 12px;background:rgba(21,114,182,.1);border-radius:8px;font-size:12px;color:#1572b6;font-weight:700;direction:ltr;text-align:left;">
-                                <i class="bx bx-check-circle"></i> <span class="apps-file-name"></span>
-                                <button type="button" class="apps-remove-file-btn" data-target="css" style="float:left;background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px;">×</button>
-                            </div>
-                            <textarea id="apps-css-code" rows="4" placeholder="أو الصق كود CSS هنا..." style="font-family:monospace;font-size:12px;direction:ltr;text-align:left;background:var(--bg-input,#1e2533);color:var(--text-primary,#e2e8f0);border:2px solid var(--border,#2a3040);border-radius:10px;padding:10px;resize:vertical;width:100%;margin-top:8px;"></textarea>
-                        </div>
-
-                        <div class="input-group">
-                            <label><i class="bx bxl-javascript" style="color:#f7df1e;"></i> ملف JavaScript</label>
-                            <div class="apps-code-upload-zone" id="apps-js-upload-zone" style="border:2px dashed var(--border,#2a3040);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:var(--bg-card,#181d28);">
-                                <input type="file" id="apps-js-file" accept=".js" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
-                                <i class="bx bx-file" style="font-size:28px;color:#f7df1e;display:block;margin-bottom:4px;"></i>
-                                <p style="font-size:12px;font-weight:700;color:var(--text-primary,#e2e8f0);margin:0;">ارفع ملف JavaScript</p>
-                                <p style="font-size:11px;color:var(--text-secondary,#94a3b8);margin:2px 0 0;">.js</p>
-                            </div>
-                            <div class="apps-code-file-info" id="apps-js-file-info" style="display:none;margin-top:8px;padding:8px 12px;background:rgba(247,223,30,.1);border-radius:8px;font-size:12px;color:#b8960a;font-weight:700;direction:ltr;text-align:left;">
-                                <i class="bx bx-check-circle"></i> <span class="apps-file-name"></span>
-                                <button type="button" class="apps-remove-file-btn" data-target="js" style="float:left;background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px;">×</button>
-                            </div>
-                            <textarea id="apps-js-code" rows="4" placeholder="أو الصق كود JavaScript هنا..." style="font-family:monospace;font-size:12px;direction:ltr;text-align:left;background:var(--bg-input,#1e2533);color:var(--text-primary,#e2e8f0);border:2px solid var(--border,#2a3040);border-radius:10px;padding:10px;resize:vertical;width:100%;margin-top:8px;"></textarea>
-                        </div>
-
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
-                            <div class="input-group">
-                                <label>ترتيب العرض</label>
-                                <input type="number" id="apps-order" min="0" value="0" placeholder="0">
-                            </div>
-                            <div class="input-group">
-                                <label class="checkbox-container" style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;margin-top:24px;">
-                                    <input type="checkbox" id="apps-is-active" checked style="width:18px;height:18px;cursor:pointer;">
-                                    منشور (ظاهر للجمهور)
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display:flex;gap:10px;margin-top:20px;">
-                        <button type="submit" class="btn btn-primary" style="flex:1;"><i class='bx bx-save'></i> إضافة التطبيق</button>
-                        <button type="button" class="btn btn-outline" id="apps-cancel">إلغاء</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- APP DETAIL MODAL -->
-    <div id="admin-app-detail-modal" class="modal-overlay hidden" style="z-index:10000;">
-        <div class="modal-sheet doodle-card" style="max-width:750px;max-height:90vh;overflow-y:auto;">
-            <div class="modal-head" style="position:sticky;top:0;z-index:2;background:var(--bg-card,#181d28);border-bottom:1px solid var(--border,#2a3040);">
-                <h2 id="detail-modal-title" style="font-size:18px;"><i class='bx bx-code-alt' style="color:var(--accent);"></i> تفاصيل التطبيق</h2>
-                <div style="display:flex;gap:6px;align-items:center;">
-                    <button id="detail-prev-btn" class="btn btn-outline btn-sm" title="السابق"><i class='bx bx-chevron-right'></i></button>
-                    <span id="detail-counter" style="font-size:12px;color:var(--text-muted,#94a3b8);min-width:50px;text-align:center;">1/1</span>
-                    <button id="detail-next-btn" class="btn btn-outline btn-sm" title="التالي"><i class='bx bx-chevron-left'></i></button>
-                    <button id="detail-close-btn" class="btn btn-danger btn-sm" style="margin-right:8px;" title="إغلاق"><i class="bx bx-x"></i></button>
-                </div>
-            </div>
-            <div class="modal-body" id="detail-modal-body">
-                <!-- Content injected by JS -->
-            </div>
-        </div>
-    </div>
-
-    <!-- APP PREVIEW OVERLAY -->
-    <div id="apps-preview-overlay" class="modal-overlay hidden" style="z-index:9999;">
-        <div style="width:100%;height:100%;display:flex;flex-direction:column;background:var(--bg-body,#0f1219);">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--bg-card,#181d28);border-bottom:2px solid var(--border,#2a3040);flex-shrink:0;">
-                <h3 id="apps-preview-title" style="margin:0;font-size:16px;color:var(--text-primary,#e2e8f0);">معاينة التطبيق</h3>
-                <div style="display:flex;gap:8px;">
-                    <button id="apps-preview-fullscreen" class="btn btn-outline btn-sm" title="فتح في نافذة جديدة"><i class="bx bx-fullscreen"></i></button>
-                    <button id="apps-preview-close" class="btn btn-danger btn-sm" title="إغلاق"><i class="bx bx-x"></i></button>
-                </div>
-            </div>
-            <iframe id="apps-preview-frame" style="flex:1;border:none;width:100%;height:100%;background:#0b0c10;" allow="autoplay; camera; microphone; clipboard-read; clipboard-write; fullscreen"></iframe>
-        </div>
-    </div>
-
     <!-- Firebase Compat Libraries (For local file:// support) -->
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-storage-compat.js"></script>
-    <!-- ربط قاعدة البيانات (Firestore) — لا توجد قاعدة افتراضية، يُحدَّد الإعداد من هذه اللوحة -->
-    <script src="firebase-config-data.js"></script>
-    <script src="firebase-config.js"></script>
+    <!-- ربط قاعدة البيانات (Firestore) — مُدمج مباشرةً -->
     <script>
-        console.log('✅ Firebase scripts loaded! Configured:', window.__fbConfigured);
+    // ═══════════════════════════════════════════════════════════
+    // firebase-config-data.js — مُدمج مباشرةً
+    // ═══════════════════════════════════════════════════════════
+    window.__ELMISTAR_EMBEDDED_CONFIG = {
+        apiKey: "AIzaSyD1OK39VnjBelGo2rtitimoBQw6phETaFw",
+        authDomain: "el-mistar.firebaseapp.com",
+        projectId: "el-mistar",
+        storageBucket: "el-mistar.firebasestorage.app",
+        messagingSenderId: "158605479233",
+        appId: "1:158605479233:web:91e4610a85a623b478a5c0",
+        measurementId: "G-Q89J2C5E50"
+    };
+    </script>
+    <script>
+    // ═══════════════════════════════════════════════════════════
+    // firebase-config.js — مُدمج مباشرةً
+    // ═══════════════════════════════════════════════════════════
+    (function () {
+        var STORAGE_KEY = 'elmistar_firebase_config';
+        var saved = null;
+        try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                var parsed = JSON.parse(raw);
+                if (parsed && typeof parsed === 'object') saved = parsed;
+            }
+        } catch (e) {}
+        var embedded = window.__ELMISTAR_EMBEDDED_CONFIG || null;
+        var config = null;
+        if (saved && saved.apiKey && saved.projectId) {
+            config = saved;
+        } else if (embedded && embedded.apiKey && embedded.projectId) {
+            config = embedded;
+        }
+        window.__fbConfigured = false;
+        window.ElmistarConfig = {
+            STORAGE_KEY: STORAGE_KEY,
+            get: function () {
+                return config ? JSON.parse(JSON.stringify(config)) : null;
+            },
+            save: function (cfg) {
+                if (!cfg || typeof cfg !== 'object') return;
+                config = cfg;
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg)); } catch (e) {}
+            },
+            clear: function () {
+                config = null;
+                try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+            },
+            isConfigured: function () { return !!config; },
+            test: function (cfg) {
+                return new Promise(function (resolve, reject) {
+                    var name = 'connection-test-' + Date.now();
+                    try {
+                        var app = firebase.initializeApp(cfg, name);
+                        app.firestore().collection('settings').doc('_connection_test').get()
+                            .then(function () { app.delete().catch(function () {}); resolve(true); })
+                            .catch(function (err) { app.delete().catch(function () {}); reject(err); });
+                    } catch (err) { reject(err); }
+                });
+            }
+        };
+        if (config) {
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(config);
+                }
+                window.db = firebase.firestore();
+                window.__fbConfigured = true;
+                console.log('✅ Firebase scripts loaded! Configured:', window.__fbConfigured);
+            } catch (err) {
+                console.error('❌ فشل ربط قاعدة البيانات:', err);
+                window.__fbConfigured = false;
+            }
+        } else {
+            console.warn('⚠️ لم يتم ربط قاعدة بيانات Firebase بعد — رجاءً ربطها من هذه اللوحة.');
+        }
+    })();
     </script>
 
     <!-- Image Lightbox (عرض وتكبير وحفظ صور الطلاب) -->
@@ -2701,20 +2695,7 @@
 
     <div id="toast-container"></div>
 
-    <!-- Offline Management -->
-    <script src="services-bundle.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('services-bundle.js')
-                    .then(registration => console.log('ServiceWorker registered:', registration.scope))
-                    .catch(err => console.log('ServiceWorker registration failed:', err));
-            });
-        }
-    </script>
-    <script src="summer-courses.js"></script>
-    <script src="educational-works.js"></script>
-    <script src="apps-section.js"></script>
+    <!-- OfflineManager + SyncService + educational-works + summer-courses are merged into admin.js -->
     <script src="admin.js"></script>
 
     <!-- Loading Manager: reveal page only when ready -->

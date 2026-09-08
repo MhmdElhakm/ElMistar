@@ -1,3 +1,2905 @@
+﻿// ============================================
+// MERGED: OfflineManager + SyncService (from services-bundle.js)
+// ============================================
+if (typeof window !== 'undefined') {
+  // --- firebaseService.js ---
+  (function() {
+// Firebase is initialized by firebase-config.js (loaded before this bundle).
+// لا توجد قاعدة بيانات افتراضية — يُحدَّد الإعداد من لوحة التحكم.
+if (firebase.apps.length) {
+    window.db = firebase.firestore();
+}
+window.__fbConfigured = !!window.db;
+
+console.log("Firebase Service Initialized (configured: " + window.__fbConfigured + ")");
+
+  })();
+
+  // --- offlineSync.js (includes OfflineManager and SyncService) ---
+  if (!window.OfflineManager && !window.SyncService) {
+window.OfflineManager = (function () {
+    const DB_NAME = 'ElMistarOfflineDB';
+    const STORE_NAME = 'operations';
+    const DB_VERSION = 1;
+    let dbInstance = null;
+
+    // Initialize IndexedDB
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            if (dbInstance) {
+                resolve(dbInstance);
+                return;
+            }
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                }
+            };
+
+            request.onsuccess = (event) => {
+                dbInstance = event.target.result;
+                resolve(dbInstance);
+            };
+
+            request.onerror = (event) => {
+                console.error("OfflineManager: Error initializing IndexedDB", event.target.error);
+                reject(event.target.error);
+            };
+        });
+    }
+
+    // Save an operation locally
+    async function saveOperation(operation) {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            
+            // Ensure operation has a timestamp
+            operation.timestamp = operation.timestamp || Date.now();
+            
+            // Add pendingSync flag as requested
+            operation.pendingSync = true;
+            
+            const request = store.add(operation);
+
+            request.onsuccess = () => {
+                console.log("Offline Save Success", request.result);
+                resolve(request.result);
+            };
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    // Get all pending operations sorted by timestamp
+    async function getOperations() {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const results = request.result || [];
+                // Sort by timestamp to ensure order of execution
+                results.sort((a, b) => a.timestamp - b.timestamp);
+                resolve(results);
+            };
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    // Delete an operation after successful sync
+    async function deleteOperation(id) {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.delete(id);
+
+            request.onsuccess = () => resolve();
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    // Clear all operations
+    async function clearAll() {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.clear();
+
+            request.onsuccess = () => resolve();
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    return {
+        init: initDB,
+        saveOperation,
+        getOperations,
+        deleteOperation,
+        clearAll
+    };
+})();
+
+window.SyncService = (function () {
+    let isSyncing = false;
+
+    // Detect initial state
+    let isOnline = navigator.onLine;
+
+    // Initialize UI and Events
+    function init() {
+        createStatusIndicator();
+        updateStatusUI();
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        // Initialize offline DB
+        OfflineManager.init();
+
+        // If currently online, try to sync any left-over data
+        if (navigator.onLine) {
+            syncData();
+        }
+    }
+
+    function createStatusIndicator() {
+        // Create an indicator if it doesn't exist
+        if (!document.getElementById('connection-status')) {
+            const indicator = document.createElement('div');
+            indicator.id = 'connection-status';
+            indicator.style.position = 'fixed';
+            indicator.style.bottom = '20px';
+            indicator.style.left = '20px';
+            indicator.style.padding = '8px 16px';
+            indicator.style.borderRadius = '20px';
+            indicator.style.fontSize = '14px';
+            indicator.style.fontWeight = 'bold';
+            indicator.style.zIndex = '9999';
+            indicator.style.transition = 'all 0.3s ease';
+            indicator.style.display = 'flex';
+            indicator.style.alignItems = 'center';
+            indicator.style.gap = '8px';
+            document.body.appendChild(indicator);
+        }
+    }
+
+    function updateStatusUI() {
+        const indicator = document.getElementById('connection-status');
+        if (!indicator) return;
+
+        if (isOnline) {
+            indicator.style.backgroundColor = '#dcfce7';
+            indicator.style.color = '#15803d';
+            indicator.style.border = '1px solid #16a34a';
+            indicator.innerHTML = "<i class='bx bx-wifi'></i> متصل";
+            // Hide after a few seconds if online
+            setTimeout(() => {
+                if (navigator.onLine) indicator.style.opacity = '0';
+            }, 3000);
+        } else {
+            indicator.style.opacity = '1';
+            indicator.style.backgroundColor = '#fee2e2';
+            indicator.style.color = '#b91c1c';
+            indicator.style.border = '1px solid #ef4444';
+            indicator.innerHTML = "<i class='bx bx-wifi-off'></i> بدون إنترنت";
+        }
+    }
+
+    function handleOnline() {
+        isOnline = true;
+        updateStatusUI();
+        console.log("Network status changed: Online");
+        syncData();
+    }
+
+    function handleOffline() {
+        isOnline = false;
+        updateStatusUI();
+        console.log("Network status changed: Offline");
+        if (typeof showToast === 'function') {
+            showToast("لا يوجد اتصال بالإنترنت، تم حفظ البيانات محلياً وسيتم رفعها تلقائياً عند عودة الاتصال", "error");
+        }
+    }
+
+    // Process stored operations
+    async function syncData() {
+        if (isSyncing || !navigator.onLine) return;
+        isSyncing = true;
+
+        console.log("Sync Started");
+
+        try {
+            const operations = await OfflineManager.getOperations();
+            if (operations.length === 0) {
+                isSyncing = false;
+                return; // Nothing to sync
+            }
+
+            for (const op of operations) {
+                try {
+                    await pushToFirebase(op);
+                    // On success, delete from local DB
+                    await OfflineManager.deleteOperation(op.id);
+                } catch (err) {
+                    console.error("Sync failed for operation:", op, err);
+                    // If it's a network error, stop syncing and retry later
+                    throw err; 
+                }
+            }
+
+            console.log("Sync Success");
+        } catch (error) {
+            console.error("Sync Failed:", error);
+        } finally {
+            isSyncing = false;
+        }
+    }
+
+    // Push a single operation to Firebase
+    async function pushToFirebase(op) {
+        // Wait for db to be available
+        if (!window.db) {
+            throw new Error("Firestore DB not initialized yet");
+        }
+
+        // Clean up serverTimestamp issues if any
+        if (op.data && op.data.createdAt === 'SERVER_TIMESTAMP') {
+            op.data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        }
+        if (op.data && op.data.confirmedAt === 'SERVER_TIMESTAMP') {
+            op.data.confirmedAt = firebase.firestore.FieldValue.serverTimestamp();
+        }
+
+        const colRef = window.db.collection(op.collection);
+
+        if (op.action === 'add') {
+            await colRef.add(op.data);
+        } else if (op.action === 'update') {
+            await colRef.doc(op.docId).update(op.data);
+        } else if (op.action === 'delete') {
+            await colRef.doc(op.docId).delete();
+        } else if (op.action === 'set') {
+            await colRef.doc(op.docId).set(op.data);
+        }
+    }
+
+    // Public wrapper to use instead of direct db calls
+    async function executeDbOperation(collection, action, docId, data) {
+        // Format data to handle timestamps nicely when offline
+        if (data) {
+            for (let key in data) {
+                if (data[key] && typeof data[key] === 'object' && data[key].constructor && data[key].constructor.name === 'FieldValueImpl') {
+                    data[key] = 'SERVER_TIMESTAMP';
+                }
+            }
+        }
+
+        if (navigator.onLine) {
+            try {
+                // Execute directly
+                const op = { collection, action, docId, data };
+                await pushToFirebase(op);
+                return { success: true, offline: false };
+            } catch (err) {
+                console.error("Direct execution failed", err);
+                
+                // Check if it's a network/connection error
+                const isNetworkError = 
+                    err.code === 'unavailable' || 
+                    err.code === 'deadline-exceeded' ||
+                    (err.message && err.message.toLowerCase().includes('network')) ||
+                    (err.message && err.message.toLowerCase().includes('failed to fetch'));
+                
+                if (!isNetworkError) {
+                    throw err; 
+                }
+                console.warn("Network error, falling back to offline storage.");
+            }
+        }
+        
+        // Save locally
+        await OfflineManager.saveOperation({
+            collection,
+            action,
+            docId,
+            data,
+            timestamp: Date.now()
+        });
+        
+        return { success: true, offline: true };
+    }
+
+    return {
+        init,
+        executeDbOperation
+    };
+})();
+
+// Initialize on load
+window.addEventListener('DOMContentLoaded', () => {
+    SyncService.init();
+});
+
+  }
+
+  // --- offline-manager.js ---
+  if (!window.OfflineManager) {
+window.OfflineManager = (function () {
+    const DB_NAME = 'ElMistarOfflineDB';
+    const STORE_NAME = 'operations';
+    const DB_VERSION = 1;
+    let dbInstance = null;
+
+    // Initialize IndexedDB
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            if (dbInstance) {
+                resolve(dbInstance);
+                return;
+            }
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                }
+            };
+
+            request.onsuccess = (event) => {
+                dbInstance = event.target.result;
+                resolve(dbInstance);
+            };
+
+            request.onerror = (event) => {
+                console.error("OfflineManager: Error initializing IndexedDB", event.target.error);
+                reject(event.target.error);
+            };
+        });
+    }
+
+    // Save an operation locally
+    async function saveOperation(operation) {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            
+            // Ensure operation has a timestamp
+            operation.timestamp = operation.timestamp || Date.now();
+            
+            const request = store.add(operation);
+
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    // Get all pending operations sorted by timestamp
+    async function getOperations() {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const results = request.result || [];
+                // Sort by timestamp to ensure order of execution
+                results.sort((a, b) => a.timestamp - b.timestamp);
+                resolve(results);
+            };
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    // Delete an operation after successful sync
+    async function deleteOperation(id) {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.delete(id);
+
+            request.onsuccess = () => resolve();
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    // Clear all operations
+    async function clearAll() {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.clear();
+
+            request.onsuccess = () => resolve();
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    return {
+        init: initDB,
+        saveOperation,
+        getOperations,
+        deleteOperation,
+        clearAll
+    };
+})();
+
+  }
+
+  // --- sync-service.js ---
+  if (!window.SyncService) {
+window.SyncService = (function () {
+    let isSyncing = false;
+
+    // Detect initial state
+    let isOnline = navigator.onLine;
+
+    // Initialize UI and Events
+    function init() {
+        createStatusIndicator();
+        updateStatusUI();
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        // Initialize offline DB
+        OfflineManager.init();
+
+        // If currently online, try to sync any left-over data
+        if (navigator.onLine) {
+            syncData();
+        }
+    }
+
+    function createStatusIndicator() {
+        // Create an indicator if it doesn't exist
+        if (!document.getElementById('connection-status')) {
+            const indicator = document.createElement('div');
+            indicator.id = 'connection-status';
+            indicator.style.position = 'fixed';
+            indicator.style.bottom = '20px';
+            indicator.style.left = '20px';
+            indicator.style.padding = '8px 16px';
+            indicator.style.borderRadius = '20px';
+            indicator.style.fontSize = '14px';
+            indicator.style.fontWeight = 'bold';
+            indicator.style.zIndex = '9999';
+            indicator.style.transition = 'all 0.3s ease';
+            indicator.style.display = 'flex';
+            indicator.style.alignItems = 'center';
+            indicator.style.gap = '8px';
+            document.body.appendChild(indicator);
+        }
+    }
+
+    function updateStatusUI() {
+        const indicator = document.getElementById('connection-status');
+        if (!indicator) return;
+
+        if (isOnline) {
+            indicator.style.backgroundColor = '#dcfce7';
+            indicator.style.color = '#15803d';
+            indicator.style.border = '1px solid #16a34a';
+            indicator.innerHTML = "<i class='bx bx-wifi'></i> متصل";
+            // Hide after a few seconds if online
+            setTimeout(() => {
+                if (navigator.onLine) indicator.style.opacity = '0';
+            }, 3000);
+        } else {
+            indicator.style.opacity = '1';
+            indicator.style.backgroundColor = '#fee2e2';
+            indicator.style.color = '#b91c1c';
+            indicator.style.border = '1px solid #ef4444';
+            indicator.innerHTML = "<i class='bx bx-wifi-off'></i> بدون إنترنت";
+        }
+    }
+
+    function handleOnline() {
+        isOnline = true;
+        updateStatusUI();
+        syncData();
+    }
+
+    function handleOffline() {
+        isOnline = false;
+        updateStatusUI();
+        if (typeof showToast === 'function') {
+            showToast("أنت تعمل حالياً بدون إنترنت، سيتم مزامنة البيانات تلقائياً عند عودة الاتصال.", "error");
+        }
+    }
+
+    // Process stored operations
+    async function syncData() {
+        if (isSyncing || !navigator.onLine) return;
+        isSyncing = true;
+
+        try {
+            const operations = await OfflineManager.getOperations();
+            if (operations.length === 0) {
+                isSyncing = false;
+                return; // Nothing to sync
+            }
+
+            if (typeof showToast === 'function') {
+                showToast("جاري مزامنة البيانات مع الخادم... ⏳");
+            }
+
+            for (const op of operations) {
+                try {
+                    await pushToFirebase(op);
+                    // On success, delete from local DB
+                    await OfflineManager.deleteOperation(op.id);
+                } catch (err) {
+                    console.error("Sync failed for operation:", op, err);
+                    // If it's a network error, stop syncing and retry later
+                    // We don't delete the operation so it will retry
+                    throw err; 
+                }
+            }
+
+            if (typeof showToast === 'function') {
+                showToast("✅ تمت مزامنة جميع البيانات بنجاح!");
+            }
+        } catch (error) {
+            console.error("Sync process encountered an error:", error);
+            if (typeof showToast === 'function') {
+                showToast("تعذر استكمال المزامنة، سيتم إعادة المحاولة لاحقاً.", "error");
+            }
+        } finally {
+            isSyncing = false;
+        }
+    }
+
+    // Push a single operation to Firebase
+    async function pushToFirebase(op) {
+        // Remove the local id and timestamp to not mess up Firebase if they are not needed
+        // but we need to keep data clean
+        
+        // Wait for db to be available (assuming 'db' is global from admin.js)
+        if (!window.db) {
+            throw new Error("Firestore DB not initialized yet");
+        }
+
+        // Clean up serverTimestamp issues if any
+        if (op.data && op.data.createdAt === 'SERVER_TIMESTAMP') {
+            op.data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        }
+        if (op.data && op.data.confirmedAt === 'SERVER_TIMESTAMP') {
+            op.data.confirmedAt = firebase.firestore.FieldValue.serverTimestamp();
+        }
+
+        const colRef = window.db.collection(op.collection);
+
+        if (op.action === 'add') {
+            await colRef.add(op.data);
+        } else if (op.action === 'update') {
+            await colRef.doc(op.docId).update(op.data);
+        } else if (op.action === 'delete') {
+            await colRef.doc(op.docId).delete();
+        } else if (op.action === 'set') {
+            await colRef.doc(op.docId).set(op.data);
+        }
+    }
+
+    // Public wrapper to use instead of direct db calls
+    async function executeDbOperation(collection, action, docId, data) {
+        // Format data to handle timestamps nicely when offline
+        if (data) {
+            // Find FieldValue.serverTimestamp() and replace with string for local storage
+            for (let key in data) {
+                if (data[key] && typeof data[key] === 'object' && data[key].constructor && data[key].constructor.name === 'FieldValueImpl') {
+                    data[key] = 'SERVER_TIMESTAMP';
+                }
+            }
+        }
+
+        if (navigator.onLine) {
+            try {
+                // Execute directly
+                const op = { collection, action, docId, data };
+                await pushToFirebase(op);
+                return { success: true, offline: false };
+            } catch (err) {
+                console.error("Direct execution failed", err);
+                
+                // Check if it's a network/connection error
+                const isNetworkError = 
+                    err.code === 'unavailable' || 
+                    err.code === 'deadline-exceeded' ||
+                    (err.message && err.message.toLowerCase().includes('network')) ||
+                    (err.message && err.message.toLowerCase().includes('failed to fetch'));
+                
+                if (!isNetworkError) {
+                    // It's a real error (permission, validation, etc.)
+                    throw err; // Re-throw to be handled by caller or global handler
+                }
+                // If it is a network error, we fall through to save locally
+                console.warn("Network error, falling back to offline storage.");
+            }
+        }
+        
+        // Save locally (either because navigator.onLine was false or pushToFirebase failed with network error)
+        await OfflineManager.saveOperation({
+            collection,
+            action,
+            docId,
+            data,
+            timestamp: Date.now()
+        });
+        
+        if (typeof showToast === 'function') {
+            showToast("تم الحفظ محلياً (وضع عدم الاتصال)", "error");
+        }
+        return { success: true, offline: true };
+    }
+
+    return {
+        init,
+        executeDbOperation
+    };
+})();
+
+// Initialize on load
+window.addEventListener('DOMContentLoaded', () => {
+    SyncService.init();
+});
+
+  }
+
+
+
+
+}
+
+// ============================================
+// MERGED: educational-works.js
+// ============================================
+// ============================================
+// EDUCATIONAL WORKS SYSTEM - ElMistar
+// Firestore is the ONLY source of truth.
+// Collections:
+//   - educationalWorks            (works/memos/curricula)
+//   - settings/educationalWorksConfig (categories array)
+//   - workbookPurchases           (purchase requests with receipts)
+// ============================================
+
+const EducationalWorks = (function () {
+  // ─── State ─────────────────────────────────────
+  let allWorks = [];
+  let categories = [];
+  let purchases = [];
+  let userPurchases = {}; // workId -> { status, id }
+  let currentFilter = 'all';
+  let currentSearch = '';
+
+  // ─── Helpers ───────────────────────────────────
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function validateUrl(url) {
+    return url && typeof url === 'string' &&
+      (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image/'));
+  }
+
+  function getDefaultImage() {
+    return 'img/logo.png';
+  }
+
+  function formatDate(d) {
+    if (!d) return '—';
+    const date = d.toDate ? d.toDate() : new Date(d);
+    return date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function timeAgo(date) {
+    if (!date) return '';
+    const now = new Date();
+    const d = date.toDate ? date.toDate() : new Date(date);
+    const diff = Math.floor((now - d) / 1000);
+    if (diff < 60) return 'الآن';
+    if (diff < 3600) return 'منذ ' + Math.floor(diff / 60) + ' دقيقة';
+    if (diff < 86400) return 'منذ ' + Math.floor(diff / 3600) + ' ساعة';
+    if (diff < 2592000) return 'منذ ' + Math.floor(diff / 86400) + ' يوم';
+    return 'منذ ' + Math.floor(diff / 2592000) + ' شهر';
+  }
+
+  function getPhoneVariants(phone) {
+    const cleaned = (phone || '').toString().replace(/\D/g, '');
+    if (!cleaned) return [];
+    const noZero = cleaned.replace(/^0+/, '');
+    const withZero = '0' + noZero;
+    return withZero === noZero ? [withZero] : [withZero, noZero];
+  }
+
+  function getCurrentUser() {
+    try {
+      const stored = localStorage.getItem('el_mistar_current_user');
+      if (stored && stored !== 'undefined') return JSON.parse(stored);
+    } catch (e) { }
+    return null;
+  }
+
+  function getCategoryLabel(id) {
+    if (!id) return '';
+    const c = categories.find(function (x) { return x.id === id; });
+    return c ? c.label : '';
+  }
+
+  // Database wrapper with offline support (SyncService) + direct fallback
+  function dbOp(collection, action, docId, data) {
+    if (window.SyncService && typeof window.SyncService.executeDbOperation === 'function') {
+      return window.SyncService.executeDbOperation(collection, action, docId, data);
+    }
+    if (!window.db) return Promise.reject('Firestore not initialized');
+    const col = window.db.collection(collection);
+    if (action === 'add') return col.add(data);
+    if (action === 'update') return col.doc(docId).update(data);
+    if (action === 'delete') return col.doc(docId).delete();
+    if (action === 'set') return col.doc(docId).set(data);
+    return Promise.reject('Unknown action');
+  }
+
+  function compressImage(file, maxDim, quality) {
+    return new Promise(function (resolve, reject) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = function () { reject(new Error('Failed to load image')); };
+        img.src = e.target.result;
+      };
+      reader.onerror = function () { reject(new Error('Failed to read file')); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ─── Categories (shared) ───────────────────────
+  function fetchCategories() {
+    return window.db.collection('settings').doc('educationalWorksConfig').get()
+      .then(function (doc) {
+        categories = (doc.exists && Array.isArray(doc.data().categories)) ? doc.data().categories.slice() : [];
+        categories.sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+        return categories;
+      })
+      .catch(function (err) {
+        console.error('[EW] categories fetch error:', err);
+        categories = [];
+        return categories;
+      });
+  }
+
+  // ═══════════════════════════════════════════════
+  // PUBLIC SECTION (index.html)
+  // ═══════════════════════════════════════════════
+  function loadPublicWorks() {
+    window.__fbTracker && window.__fbTracker.add();
+    if (!window.db) {
+      console.error('[EW] window.db is not available!');
+      window.__fbTracker && window.__fbTracker.done();
+      hideSkeleton();
+      showEmptyState();
+      return;
+    }
+    Promise.all([
+      window.db.collection('educationalWorks').get(),
+      fetchCategories()
+    ]).then(function (results) {
+      window.__fbTracker && window.__fbTracker.done();
+      const snapshot = results[0];
+      allWorks = [];
+      snapshot.forEach(function (doc) {
+        const w = doc.data();
+        w.id = doc.id;
+        allWorks.push(w);
+      });
+      renderPublic();
+      const user = getCurrentUser();
+      if (user && user.phone) {
+        loadUserPurchases(user.phone);
+      } else {
+        userPurchases = {};
+      }
+    }).catch(function (err) {
+      window.__fbTracker && window.__fbTracker.done();
+      console.error('[EW] load public works error:', err);
+      hideSkeleton();
+      showEmptyState();
+      if (typeof showToast === 'function') {
+        showToast('خطأ في تحميل الأعمال التعليمية', 'error');
+      }
+    });
+  }
+
+  function loadUserPurchases(phone) {
+    const variants = getPhoneVariants(phone);
+    if (variants.length === 0) return;
+    const q = variants.length === 1
+      ? window.db.collection('workbookPurchases').where('studentPhone', '==', variants[0])
+      : window.db.collection('workbookPurchases').where('studentPhone', 'in', variants);
+    q.onSnapshot(function (snap) {
+      userPurchases = {};
+      snap.forEach(function (doc) {
+        const p = doc.data();
+        userPurchases[p.workId] = { status: p.status || 'pending', id: doc.id };
+      });
+      renderCards();
+    }, function (err) {
+      console.error('[EW] purchases snapshot error:', err);
+    });
+  }
+
+  function hideSkeleton() {
+    const sk = document.querySelector('.ew-skeleton');
+    if (sk) sk.style.display = 'none';
+  }
+
+  function showEmptyState() {
+    const es = document.querySelector('.ew-empty-state');
+    if (es) es.style.display = 'block';
+    const container = document.querySelector('.ew-cards-grid');
+    if (container) container.innerHTML = '';
+  }
+
+  function ensureFilterBar() {
+    if (document.querySelector('.ew-filter-bar')) return;
+    const section = document.querySelector('#educational-works-section');
+    if (!section) return;
+    const bar = document.createElement('div');
+    bar.className = 'ew-filter-bar';
+    let catOptions = '<option value="all">كل التصنيفات</option>';
+    categories.forEach(function (c) {
+      catOptions += '<option value="' + c.id + '">' + escapeHtml(c.label) + '</option>';
+    });
+    bar.innerHTML =
+      '<div class="ew-search-wrap">' +
+        '<i class="bx bx-search"></i>' +
+        '<input type="text" class="ew-search-input" id="ew-search-input" placeholder="ابحث عن ملزمة أو منهج...">' +
+      '</div>' +
+      '<div class="ew-category-select-wrap">' +
+        '<select class="ew-category-select" id="ew-category-select">' + catOptions + '</select>' +
+      '</div>';
+    const refNode = section.querySelector('.ew-skeleton') || section.querySelector('.ew-cards-grid');
+    if (refNode && refNode.parentNode === section) {
+      section.insertBefore(bar, refNode);
+    } else {
+      section.appendChild(bar);
+    }
+    const searchInput = document.getElementById('ew-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', function () {
+        currentSearch = this.value.trim();
+        renderCards();
+      });
+    }
+    const catSelect = document.getElementById('ew-category-select');
+    if (catSelect) {
+      catSelect.addEventListener('change', function () {
+        currentFilter = this.value;
+        renderCards();
+      });
+    }
+  }
+
+  function renderPublic() {
+    hideSkeleton();
+    renderCards();
+  }
+
+  function renderCards() {
+    const container = document.querySelector('.ew-cards-grid');
+    const emptyState = document.querySelector('.ew-empty-state');
+    if (!container) return;
+
+    let visible = allWorks.filter(function (w) { return w.isActive === true; });
+
+    if (currentFilter !== 'all') {
+      visible = visible.filter(function (w) { return (w.category || '') === currentFilter; });
+    }
+    const q = currentSearch.toLowerCase();
+    if (q) {
+      visible = visible.filter(function (w) {
+        return (w.title || '').toLowerCase().indexOf(q) !== -1 ||
+               (w.description || '').toLowerCase().indexOf(q) !== -1 ||
+               (w.targetAudience || '').toLowerCase().indexOf(q) !== -1;
+      });
+    }
+    visible.sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+
+    if (visible.length === 0) {
+      container.innerHTML = '';
+      if (emptyState) emptyState.style.display = 'block';
+      return;
+    }
+    if (emptyState) emptyState.style.display = 'none';
+
+    container.innerHTML = '';
+    visible.forEach(function (work) {
+      container.appendChild(buildWorkCard(work));
+    });
+    bindCardEvents(container);
+  }
+
+  function buildWorkCard(work) {
+    const card = document.createElement('div');
+    card.className = 'ew-card ew-card-visible';
+
+    const imgUrl = validateUrl(work.imageUrl) ? work.imageUrl : getDefaultImage();
+    const priceBadge = work.price > 0 ? escapeHtml(work.price) + '<small> ج.م</small>' : 'مجاني';
+    const priceClass = work.price > 0 ? '' : ' ew-price-free';
+    const catLabel = getCategoryLabel(work.category);
+    const audience = work.targetAudience || '';
+
+    const state = userPurchases[work.id] || null;
+    const confirmed = state && state.status === 'confirmed';
+    const pending = state && state.status === 'pending';
+
+    let actions = '';
+    if (work.price > 0) {
+      if (confirmed) {
+        let cols = '';
+        if (work.previewUrl) {
+          cols += '<a class="ew-card-btn ew-card-btn-preview ew-card-btn-preview-sm" href="' + work.previewUrl + '" target="_blank" rel="noopener"><i class="bx bx-book-open"></i> معاينة</a>';
+        }
+        if (work.linkUrl) {
+          cols += '<a class="ew-card-btn ew-card-btn-download" href="' + work.linkUrl + '" target="_blank" rel="noopener"><i class="bx bx-download"></i> تحميل</a>';
+        }
+        if (!cols) cols = '<span class="ew-card-btn" style="background:#cbd5e1!important;cursor:default;box-shadow:none;">تم الشراء ✓</span>';
+        actions = '<div class="ew-btn-group-2col">' + cols + '</div>' +
+          '<span class="ew-purchase-confirmed-badge">✅ تم شراؤه وتفعيله</span>';
+      } else if (pending) {
+        actions = '<button type="button" class="ew-card-btn ew-card-btn-buy" style="opacity:.8;"><i class="bx bx-time-five"></i> قيد المراجعة</button>' +
+          '<span class="ew-purchase-confirmed-badge" style="color:#d97706;">⏳ بانتظار تأكيد الدفع</span>';
+      } else {
+        actions = '<button type="button" class="ew-card-btn ew-card-btn-buy" data-id="' + work.id + '"><i class="bx bx-cart-add"></i> شراء الملزمة</button>';
+      }
+    } else {
+      let cols = '';
+      if (work.previewUrl) {
+        cols += '<a class="ew-card-btn ew-card-btn-preview ew-card-btn-preview-sm" href="' + work.previewUrl + '" target="_blank" rel="noopener"><i class="bx bx-book-open"></i> معاينة</a>';
+      }
+      if (work.linkUrl) {
+        cols += '<a class="ew-card-btn ew-card-btn-download" href="' + work.linkUrl + '" target="_blank" rel="noopener"><i class="bx bx-download"></i> تحميل مجاني</a>';
+      }
+      if (!cols) cols = '<span class="ew-card-btn" style="background:#cbd5e1!important;cursor:default;box-shadow:none;">تواصل معنا للتفاصيل</span>';
+      actions = '<div class="ew-btn-group-2col">' + cols + '</div>';
+    }
+
+    card.innerHTML =
+      '<div class="ew-card-img-wrap">' +
+        '<img class="ew-card-img" src="' + imgUrl + '" alt="' + escapeHtml(work.title || '') + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + getDefaultImage() + '\';">' +
+        (catLabel ? '<span class="ew-card-badge">' + escapeHtml(catLabel) + '</span>' : '') +
+        '<span class="ew-price-badge' + priceClass + '">' + priceBadge + '</span>' +
+      '</div>' +
+      '<div class="ew-card-body">' +
+        (audience ? '<span class="ew-audience-badge">🎯 ' + escapeHtml(audience) + '</span>' : '') +
+        '<h3 class="ew-card-title">' + escapeHtml(work.title || 'بدون عنوان') + '</h3>' +
+        (work.description ? '<p class="ew-card-desc">' + escapeHtml(work.description) + '</p>' : '') +
+        (work.details ? '<div class="ew-details-toggle"><button type="button" class="ew-details-btn">التفاصيل ▾</button><div class="ew-details-content" style="display:none;">' + escapeHtml(work.details) + '</div></div>' : '') +
+        '<div class="ew-card-actions"><div class="ew-btn-group">' + actions + '</div></div>' +
+      '</div>';
+    return card;
+  }
+
+  function bindCardEvents(container) {
+    container.querySelectorAll('.ew-card-btn-buy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const id = btn.getAttribute('data-id');
+        if (!id) return;
+        const work = allWorks.find(function (w) { return w.id === id; });
+        if (work) startPurchase(work);
+      });
+    });
+    container.querySelectorAll('.ew-details-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const content = btn.nextElementSibling;
+        if (!content) return;
+        const isOpen = content.style.display !== 'none';
+        content.style.display = isOpen ? 'none' : 'block';
+        btn.textContent = isOpen ? 'التفاصيل ▾' : 'التفاصيل ▴';
+      });
+    });
+  }
+
+  function startPurchase(work) {
+    const user = getCurrentUser();
+    if (!user) {
+      if (typeof showToast === 'function') {
+        showToast('يرجى تسجيل الدخول أولاً لشراء الملزمة', 'error');
+      }
+      if (typeof openModal === 'function') {
+        openModal('authOverlay');
+      } else {
+        const ao = document.getElementById('authOverlay');
+        if (ao) ao.classList.add('active');
+      }
+      return;
+    }
+    const payModal = document.getElementById('payment-modal');
+    if (!payModal) {
+      if (typeof showToast === 'function') showToast('نظام الدفع غير متاح حالياً', 'error');
+      return;
+    }
+    payModal.setAttribute('data-workbook-pending-work-id', work.id);
+    payModal.setAttribute('data-workbook-pending-title', work.title || '');
+    payModal.setAttribute('data-workbook-pending-price', work.price || 0);
+    const amount = document.getElementById('payment-amount');
+    if (amount) amount.value = work.price || 0;
+    const submitBtn = document.getElementById('submit-payment-btn');
+    if (submitBtn) submitBtn.disabled = true;
+    if (typeof openModal === 'function') {
+      openModal('payment-modal');
+    } else {
+      payModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    if (typeof showToast === 'function') {
+      showToast('أرفق صورة إيصال الدفع لتأكيد شراء "' + (work.title || '') + '"', 'info');
+    }
+  }
+
+  // ═══════════════════════════════════════════════
+  // ADMIN SECTION (admin.html)
+  // ═══════════════════════════════════════════════
+  function loadCategories() {
+    if (!window.db) return;
+    fetchCategories().then(function () {
+      populateCategorySelects();
+    });
+  }
+
+  function populateCategorySelects() {
+    const catSelect = document.getElementById('ew-category');
+    const filterSelect = document.getElementById('ew-admin-filter');
+    let options = '<option value="">بدون تصنيف</option>';
+    categories.forEach(function (c) {
+      options += '<option value="' + c.id + '">' + escapeHtml(c.label) + '</option>';
+    });
+    if (catSelect) catSelect.innerHTML = options;
+    if (filterSelect) {
+      filterSelect.innerHTML = '<option value="all">الكل</option>' + options;
+    }
+    renderAdminTable();
+    renderCategoriesModalList();
+  }
+
+  function loadAdminWorks() {
+    window.__fbTracker && window.__fbTracker.add();
+    if (!window.db) { window.__fbTracker && window.__fbTracker.done(); return; }
+    let _ewDone = false;
+    window.db.collection('educationalWorks')
+      .onSnapshot(function (snapshot) {
+        if (!_ewDone) { _ewDone = true; window.__fbTracker && window.__fbTracker.done(); }
+        allWorks = [];
+        snapshot.forEach(function (doc) {
+          const w = doc.data();
+          w.id = doc.id;
+          allWorks.push(w);
+        });
+        renderAdminTable();
+        renderAdminStats();
+      }, function (err) {
+        if (!_ewDone) { _ewDone = true; window.__fbTracker && window.__fbTracker.done(); }
+        console.error('[EW] works snapshot error:', err);
+      });
+  }
+
+  function renderAdminTable() {
+    const tbody = document.querySelector('#ew-table tbody');
+    if (!tbody) return;
+
+    let filtered = allWorks.slice();
+    const searchEl = document.getElementById('ew-admin-search');
+    const filterEl = document.getElementById('ew-admin-filter');
+    const sortEl = document.getElementById('ew-admin-sort');
+    const searchVal = searchEl ? searchEl.value.toLowerCase().trim() : '';
+    const catFilter = filterEl ? filterEl.value : 'all';
+    const sortVal = sortEl ? sortEl.value : 'order';
+
+    if (searchVal) {
+      filtered = filtered.filter(function (w) {
+        return (w.title || '').toLowerCase().indexOf(searchVal) !== -1 ||
+               (w.description || '').toLowerCase().indexOf(searchVal) !== -1 ||
+               (w.targetAudience || '').toLowerCase().indexOf(searchVal) !== -1;
+      });
+    }
+    if (catFilter !== 'all') {
+      filtered = filtered.filter(function (w) { return (w.category || '') === catFilter; });
+    }
+    if (sortVal === 'title') {
+      filtered.sort(function (a, b) { return (a.title || '').localeCompare(b.title || '', 'ar'); });
+    } else if (sortVal === 'order-desc') {
+      filtered.sort(function (a, b) { return (b.order || 0) - (a.order || 0); });
+    } else {
+      filtered.sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+    }
+
+    const countEl = document.getElementById('ew-count');
+    if (countEl) countEl.textContent = filtered.length;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);"><i class="bx bx-search-alt" style="font-size:40px;display:block;margin-bottom:10px;"></i>لا توجد أعمال</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    filtered.forEach(function (w) {
+      const tr = document.createElement('tr');
+      const imgUrl = validateUrl(w.imageUrl) ? w.imageUrl : getDefaultImage();
+      const price = w.price > 0 ? escapeHtml(w.price) + ' ج.م' : '<span style="color:var(--green);font-weight:800;">مجاني</span>';
+      const catLabel = getCategoryLabel(w.category) || '—';
+      const statusColor = w.isActive ? 'var(--green)' : 'var(--text-muted)';
+      const statusLabel = w.isActive ? 'منشور' : 'مسودة';
+      let links = '';
+      if (w.previewUrl) {
+        links += '<a href="' + w.previewUrl + '" target="_blank" rel="noopener" class="btn-icon" title="معاينة" style="color:#10b981;"><i class="bx bx-book-open"></i></a> ';
+      }
+      if (w.linkUrl) {
+        links += '<a href="' + w.linkUrl + '" target="_blank" rel="noopener" class="btn-icon" title="رابط العمل" style="color:#3b82f6;"><i class="bx bx-link-external"></i></a> ';
+      }
+      if (!links) links = '—';
+
+      tr.innerHTML =
+        '<td><div style="display:flex;align-items:center;gap:10px;">' +
+          '<img src="' + imgUrl + '" style="width:44px;height:44px;border-radius:10px;object-fit:cover;border:1px solid var(--border);" onerror="this.src=\'' + getDefaultImage() + '\';this.onerror=null;">' +
+          '<div><strong>' + escapeHtml(w.title || 'بدون عنوان') + '</strong><div style="font-size:12px;color:var(--text-muted);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(w.description || '') + '</div></div>' +
+        '</div></td>' +
+        '<td>' + catLabel + '</td>' +
+        '<td>' + price + '</td>' +
+        '<td>' + escapeHtml(w.targetAudience || '—') + '</td>' +
+        '<td>' + (w.order || 0) + '</td>' +
+        '<td>' + links + '</td>' +
+        '<td>' +
+          '<button type="button" class="btn-icon toggle-ew-btn" data-id="' + w.id + '" data-active="' + !!w.isActive + '" style="color:' + statusColor + ';" title="' + (w.isActive ? 'إخفاء' : 'نشر') + '"><i class="bx ' + (w.isActive ? 'bx-toggle-right' : 'bx-toggle-left') + '"></i></button> ' +
+          '<span style="font-size:12px;font-weight:700;color:' + statusColor + '">' + statusLabel + '</span>' +
+        '</td>' +
+        '<td><div style="display:flex;gap:6px;">' +
+          '<button type="button" class="btn-icon edit-ew-btn" data-id="' + w.id + '" title="تعديل"><i class="bx bx-edit"></i></button>' +
+          '<button type="button" class="btn-icon danger delete-ew-btn" data-id="' + w.id + '" title="حذف"><i class="bx bx-trash"></i></button>' +
+        '</div></td>';
+      tbody.appendChild(tr);
+    });
+    bindAdminRowEvents(tbody);
+  }
+
+  function bindAdminRowEvents(tbody) {
+    tbody.querySelectorAll('.toggle-ew-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const id = btn.getAttribute('data-id');
+        const isActive = btn.getAttribute('data-active') === 'true';
+        dbOp('educationalWorks', 'update', id, { isActive: !isActive })
+          .then(function () {
+            if (typeof showToast === 'function') showToast(isActive ? 'تم الإخفاء' : '✅ تم النشر');
+          })
+          .catch(function (err) {
+            console.error('[EW] toggle error:', err);
+            if (typeof showToast === 'function') showToast('خطأ في التحديث', 'error');
+          });
+      });
+    });
+    tbody.querySelectorAll('.edit-ew-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const w = allWorks.find(function (x) { return x.id === btn.getAttribute('data-id'); });
+        if (w) openEWForm(w);
+      });
+    });
+    tbody.querySelectorAll('.delete-ew-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const w = allWorks.find(function (x) { return x.id === btn.getAttribute('data-id'); });
+        if (w && confirm('هل أنت متأكد من حذف "' + (w.title || '') + '"؟')) {
+          dbOp('educationalWorks', 'delete', w.id, null)
+            .then(function () {
+              if (typeof showToast === 'function') showToast('✅ تم الحذف');
+            })
+            .catch(function (err) {
+              console.error('[EW] delete error:', err);
+              if (typeof showToast === 'function') showToast('خطأ في الحذف', 'error');
+            });
+        }
+      });
+    });
+  }
+
+  function renderAdminStats() {
+    const totalEl = document.getElementById('ew-stat-total');
+    const activeEl = document.getElementById('ew-stat-active');
+    const draftsEl = document.getElementById('ew-stat-drafts');
+    const total = allWorks.length;
+    const active = allWorks.filter(function (w) { return w.isActive; }).length;
+    if (totalEl) totalEl.textContent = total;
+    if (activeEl) activeEl.textContent = active;
+    if (draftsEl) draftsEl.textContent = total - active;
+  }
+
+  function openEWForm(work) {
+    const modal = document.getElementById('ew-form-modal');
+    if (!modal) return;
+
+    document.getElementById('ew-id').value = work ? work.id : '';
+    document.getElementById('ew-title').value = work ? (work.title || '') : '';
+    document.getElementById('ew-desc').value = work ? (work.description || '') : '';
+    document.getElementById('ew-link-url').value = work ? (work.linkUrl || '') : '';
+    document.getElementById('ew-preview-url').value = work ? (work.previewUrl || '') : '';
+    document.getElementById('ew-target-audience').value = work ? (work.targetAudience || '') : '';
+    document.getElementById('ew-price').value = work ? (work.price || 0) : 0;
+    document.getElementById('ew-details').value = work ? (work.details || '') : '';
+    document.getElementById('ew-order').value = work ? (work.order || 0) : 0;
+    document.getElementById('ew-is-active').checked = work ? !!work.isActive : true;
+
+    const catSelect = document.getElementById('ew-category');
+    if (catSelect) catSelect.value = work ? (work.category || '') : '';
+
+    const imgUrlInput = document.getElementById('ew-image-url');
+    const preview = document.getElementById('ew-image-preview');
+    const removeBtn = document.getElementById('ew-remove-image');
+    if (work && work.imageUrl) {
+      imgUrlInput.value = work.imageUrl;
+      preview.src = work.imageUrl;
+      preview.style.display = 'block';
+      removeBtn.style.display = 'inline-block';
+    } else {
+      imgUrlInput.value = '';
+      preview.src = '';
+      preview.style.display = 'none';
+      removeBtn.style.display = 'none';
+    }
+
+    const titleEl = document.getElementById('ew-modal-title');
+    if (titleEl) titleEl.innerHTML = work
+      ? '<i class="bx bx-edit"></i> تعديل العمل'
+      : '<i class="bx bx-plus-circle" style="color:var(--accent);"></i> إضافة عمل جديد';
+
+    const submitBtn = modal.querySelector('#ew-form button[type="submit"]');
+    if (submitBtn) submitBtn.innerHTML = work
+      ? '<i class="bx bx-save"></i> حفظ التعديلات'
+      : '<i class="bx bx-save"></i> إضافة العمل';
+
+    modal.classList.remove('hidden');
+  }
+
+  function handleEWFormSubmit(e) {
+    e.preventDefault();
+    const id = document.getElementById('ew-id').value;
+    const title = (document.getElementById('ew-title').value || '').trim();
+    if (!title) {
+      if (typeof showToast === 'function') showToast('يرجى إدخال عنوان العمل', 'error');
+      return;
+    }
+    const data = {
+      title: title,
+      description: (document.getElementById('ew-desc').value || '').trim(),
+      imageUrl: (document.getElementById('ew-image-url').value || '').trim(),
+      linkUrl: (document.getElementById('ew-link-url').value || '').trim(),
+      previewUrl: (document.getElementById('ew-preview-url').value || '').trim(),
+      targetAudience: (document.getElementById('ew-target-audience').value || '').trim(),
+      price: parseFloat(document.getElementById('ew-price').value) || 0,
+      details: (document.getElementById('ew-details').value || '').trim(),
+      category: document.getElementById('ew-category').value,
+      order: parseInt(document.getElementById('ew-order').value) || 0,
+      isActive: document.getElementById('ew-is-active').checked,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (!id) data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+
+    dbOp('educationalWorks', id ? 'update' : 'add', id || null, data)
+      .then(function () {
+        if (typeof showToast === 'function') showToast(id ? '✅ تم تعديل العمل' : '✅ تم إضافة العمل');
+        const modal = document.getElementById('ew-form-modal');
+        if (modal) modal.classList.add('hidden');
+      })
+      .catch(function (err) {
+        console.error('[EW] save error:', err);
+        if (typeof showToast === 'function') showToast('خطأ في الحفظ', 'error');
+      });
+  }
+
+  // ─── Categories Manager ────────────────────────
+  function renderCategoriesModalList() {
+    const list = document.getElementById('ew-cat-list');
+    if (!list) return;
+    if (categories.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);">لا توجد تصنيفات بعد</div>';
+      return;
+    }
+    list.innerHTML = '';
+    categories.forEach(function (c, i) {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:var(--bg-card);';
+      row.innerHTML =
+        '<span style="font-weight:700;flex:1;">' + escapeHtml(c.label) + '</span>' +
+        '<button type="button" class="btn-icon ew-cat-up" data-id="' + c.id + '" title="أعلى" ' + (i === 0 ? 'disabled style="opacity:.4;cursor:default;"' : '') + '><i class="bx bx-chevron-up"></i></button>' +
+        '<button type="button" class="btn-icon ew-cat-down" data-id="' + c.id + '" title="أسفل" ' + (i === categories.length - 1 ? 'disabled style="opacity:.4;cursor:default;"' : '') + '><i class="bx bx-chevron-down"></i></button>' +
+        '<button type="button" class="btn-icon ew-cat-edit" data-id="' + c.id + '" title="تعديل"><i class="bx bx-edit"></i></button>' +
+        '<button type="button" class="btn-icon danger ew-cat-del" data-id="' + c.id + '" title="حذف"><i class="bx bx-trash"></i></button>';
+      list.appendChild(row);
+    });
+
+    list.querySelectorAll('.ew-cat-up').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.disabled) return;
+        const idx = categories.findIndex(function (c) { return c.id === btn.getAttribute('data-id'); });
+        if (idx <= 0) return;
+        const tmp = categories[idx - 1];
+        categories[idx - 1] = categories[idx];
+        categories[idx] = tmp;
+        saveCategories();
+      });
+    });
+    list.querySelectorAll('.ew-cat-down').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.disabled) return;
+        const idx = categories.findIndex(function (c) { return c.id === btn.getAttribute('data-id'); });
+        if (idx === -1 || idx >= categories.length - 1) return;
+        const tmp = categories[idx + 1];
+        categories[idx + 1] = categories[idx];
+        categories[idx] = tmp;
+        saveCategories();
+      });
+    });
+    list.querySelectorAll('.ew-cat-edit').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const c = categories.find(function (x) { return x.id === btn.getAttribute('data-id'); });
+        if (!c) return;
+        document.getElementById('ew-cat-id').value = c.id;
+        document.getElementById('ew-cat-label').value = c.label || '';
+        document.getElementById('ew-cat-order').value = c.order || 0;
+        document.getElementById('ew-cat-save-btn').innerHTML = '<i class="bx bx-check"></i> حفظ';
+        document.getElementById('ew-cat-label').focus();
+      });
+    });
+    list.querySelectorAll('.ew-cat-del').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const id = btn.getAttribute('data-id');
+        if (!confirm('حذف هذا التصنيف؟ (الأعمال المرتبطة به لن تُحذف)')) return;
+        categories = categories.filter(function (c) { return c.id !== id; });
+        saveCategories();
+      });
+    });
+  }
+
+  function handleCategorySave() {
+    const id = document.getElementById('ew-cat-id').value;
+    const label = (document.getElementById('ew-cat-label').value || '').trim();
+    if (!label) {
+      if (typeof showToast === 'function') showToast('أدخل اسم التصنيف', 'error');
+      return;
+    }
+    const order = parseInt(document.getElementById('ew-cat-order').value) || 0;
+    if (id) {
+      const c = categories.find(function (x) { return x.id === id; });
+      if (c) { c.label = label; c.order = order; }
+    } else {
+      categories.push({ id: 'cat_' + Date.now(), label: label, order: order });
+    }
+    document.getElementById('ew-cat-id').value = '';
+    document.getElementById('ew-cat-label').value = '';
+    document.getElementById('ew-cat-order').value = '';
+    document.getElementById('ew-cat-save-btn').innerHTML = '<i class="bx bx-plus"></i> إضافة';
+    saveCategories();
+  }
+
+  function saveCategories() {
+    categories.forEach(function (c, i) { c.order = i; });
+    dbOp('settings', 'set', 'educationalWorksConfig', {
+      categories: categories,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    })
+      .then(function () {
+        if (typeof showToast === 'function') showToast('✅ تم حفظ التصنيفات');
+        populateCategorySelects();
+      })
+      .catch(function (err) {
+        console.error('[EW] categories save error:', err);
+        if (typeof showToast === 'function') showToast('خطأ في حفظ التصنيفات', 'error');
+      });
+  }
+
+  // ─── Purchases (admin) ────────────────────────
+  function loadPurchases() {
+    if (!window.db) return;
+    window.db.collection('workbookPurchases')
+      .onSnapshot(function (snapshot) {
+        purchases = [];
+        snapshot.forEach(function (doc) {
+          const p = doc.data();
+          p.id = doc.id;
+          purchases.push(p);
+        });
+        renderPurchases();
+        updatePurchasesBadge();
+      }, function (err) {
+        console.error('[EW] purchases error:', err);
+      });
+  }
+
+  function renderPurchases() {
+    const container = document.getElementById('ew-purchases-list');
+    if (!container) return;
+
+    if (purchases.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);"><i class="bx bx-cart" style="font-size:36px;display:block;margin-bottom:8px;"></i>لا توجد طلبات شراء بعد</div>';
+      updatePurchasesStats();
+      return;
+    }
+
+    purchases.sort(function (a, b) {
+      return ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0);
+    });
+
+    container.innerHTML = '';
+    purchases.slice(0, 50).forEach(function (p) {
+      const card = document.createElement('div');
+      card.className = 'sub-card';
+      const isConfirmed = p.status === 'confirmed';
+      const statusLabel = isConfirmed ? 'مؤكد' : 'قيد الانتظار';
+      const statusClass = isConfirmed ? 'confirmed' : 'pending';
+
+      let actions = '';
+      if (!isConfirmed) {
+        actions += '<button type="button" class="btn btn-success btn-sm confirm-purchase-btn" data-id="' + p.id + '" style="padding:4px 12px;font-size:12px;">تأكيد الدفع</button>';
+      }
+      actions += '<button type="button" class="btn btn-danger btn-sm delete-purchase-btn" data-id="' + p.id + '" style="padding:4px 12px;font-size:12px;">حذف</button>';
+
+      const receiptHtml = p.receiptImage
+        ? '<span class="sub-receipt-row">🧾 الإيصال: <img src="' + p.receiptImage + '" class="sub-receipt-thumb ew-purchase-receipt" data-id="' + p.id + '" style="width:60px;height:60px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid var(--border);" title="عرض الإيصال"></span>'
+        : '<span style="color:var(--text-muted);font-size:12px;">بدون إيصال</span>';
+
+      let waLink = '';
+      const phoneDigits = (p.studentPhone || '').toString().replace(/\D/g, '').replace(/^0/, '');
+      if (phoneDigits) waLink = 'https://wa.me/20' + phoneDigits;
+
+      card.innerHTML =
+        '<div class="sub-card-header">' +
+          '<strong>' + escapeHtml(p.studentName || p.studentPhone || '—') + '</strong>' +
+          '<span class="sub-status ' + statusClass + '">' + statusLabel + '</span>' +
+        '</div>' +
+        '<div class="sub-card-body">' +
+          '<span><i class="bx bxs-book"></i> ' + escapeHtml(p.workTitle || '—') + '</span>' +
+          '<span><i class="bx bxs-phone"></i> ' + escapeHtml(p.studentPhone || '—') + '</span>' +
+          '<span>💰 ' + (p.price ? escapeHtml(p.price) + ' ج.م' : 'مجاني') + '</span>' +
+          '<span>💳 ' + escapeHtml(p.paymentMethod || '—') + '</span>' +
+          receiptHtml +
+        '</div>' +
+        '<div class="sub-card-footer">' +
+          '<small>' + timeAgo(p.createdAt) + '</small>' +
+          (waLink ? '<a href="' + waLink + '" target="_blank" rel="noopener" style="color:#25D366;font-weight:700;font-size:12px;display:inline-flex;align-items:center;gap:4px;"><i class="bx bxl-whatsapp"></i> واتساب</a>' : '') +
+          '<div style="display:flex;gap:6px;">' + actions + '</div>' +
+        '</div>';
+      container.appendChild(card);
+    });
+    bindPurchaseEvents(container);
+    updatePurchasesStats();
+  }
+
+  function bindPurchaseEvents(container) {
+    container.querySelectorAll('.confirm-purchase-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const id = btn.getAttribute('data-id');
+        dbOp('workbookPurchases', 'update', id, { status: 'confirmed' })
+          .then(function () {
+            if (typeof showToast === 'function') showToast('✅ تم تأكيد الدفع وتمكين المعاينة');
+          })
+          .catch(function (err) {
+            console.error('[EW] confirm purchase error:', err);
+            if (typeof showToast === 'function') showToast('خطأ في التحديث', 'error');
+          });
+      });
+    });
+    container.querySelectorAll('.delete-purchase-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const id = btn.getAttribute('data-id');
+        if (confirm('حذف طلب الشراء هذا؟')) {
+          dbOp('workbookPurchases', 'delete', id, null)
+            .then(function () {
+              if (typeof showToast === 'function') showToast('تم الحذف');
+            })
+            .catch(function (err) {
+              console.error('[EW] delete purchase error:', err);
+              if (typeof showToast === 'function') showToast('خطأ في الحذف', 'error');
+            });
+        }
+      });
+    });
+    container.querySelectorAll('.ew-purchase-receipt').forEach(function (img) {
+      img.addEventListener('click', function () {
+        const p = purchases.find(function (x) { return x.id === img.getAttribute('data-id'); });
+        if (!p || !p.receiptImage) return;
+        const existing = document.getElementById('receipt-viewer-overlay');
+        if (existing) existing.remove();
+        const overlay = document.createElement('div');
+        overlay.id = 'receipt-viewer-overlay';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+        overlay.innerHTML =
+          '<div style="position:relative;max-width:90vw;max-height:90vh;">' +
+            '<button type="button" style="position:absolute;top:-40px;right:0;background:none;border:none;color:#fff;font-size:30px;cursor:pointer;">✕</button>' +
+            '<img src="' + p.receiptImage + '" style="max-width:100%;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.5);">' +
+          '</div>';
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', function (e) {
+          if (e.target === overlay || e.target.tagName === 'BUTTON') overlay.remove();
+        });
+      });
+    });
+  }
+
+  function updatePurchasesStats() {
+    const totalEl = document.getElementById('ew-purchases-total');
+    const pendingEl = document.getElementById('ew-purchases-pending');
+    const confirmedEl = document.getElementById('ew-purchases-confirmed');
+    const total = purchases.length;
+    const pending = purchases.filter(function (p) { return p.status !== 'confirmed'; }).length;
+    if (totalEl) totalEl.textContent = total;
+    if (pendingEl) pendingEl.textContent = pending;
+    if (confirmedEl) confirmedEl.textContent = total - pending;
+  }
+
+  function updatePurchasesBadge() {
+    const pending = purchases.filter(function (p) { return p.status !== 'confirmed'; }).length;
+    const el = document.getElementById('ew-purchases-count');
+    if (el) {
+      el.textContent = pending;
+      el.style.display = pending > 0 ? 'inline-block' : 'none';
+    }
+  }
+
+  // ─── Admin modal events & image upload ────────
+  function setupAdminModalEvents() {
+    const addBtn = document.getElementById('ew-add-btn');
+    if (addBtn) addBtn.addEventListener('click', function () { openEWForm(null); });
+
+    const catBtn = document.getElementById('ew-manage-categories-btn');
+    if (catBtn) {
+      catBtn.addEventListener('click', function () {
+        const modal = document.getElementById('ew-categories-modal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          renderCategoriesModalList();
+        }
+      });
+    }
+
+    const ewModal = document.getElementById('ew-form-modal');
+    const ewClose = document.getElementById('ew-close');
+    const ewCancel = document.getElementById('ew-cancel');
+    if (ewClose) ewClose.addEventListener('click', function () { ewModal.classList.add('hidden'); });
+    if (ewCancel) ewCancel.addEventListener('click', function () { ewModal.classList.add('hidden'); });
+    if (ewModal) ewModal.addEventListener('click', function (e) { if (e.target === ewModal) ewModal.classList.add('hidden'); });
+
+    const ewForm = document.getElementById('ew-form');
+    if (ewForm) ewForm.addEventListener('submit', handleEWFormSubmit);
+
+    const catModal = document.getElementById('ew-categories-modal');
+    const catClose = document.getElementById('ew-cat-close');
+    if (catClose) catClose.addEventListener('click', function () { catModal.classList.add('hidden'); });
+    if (catModal) catModal.addEventListener('click', function (e) { if (e.target === catModal) catModal.classList.add('hidden'); });
+
+    const catSave = document.getElementById('ew-cat-save-btn');
+    if (catSave) catSave.addEventListener('click', handleCategorySave);
+    const catLabelInput = document.getElementById('ew-cat-label');
+    if (catLabelInput) {
+      catLabelInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); handleCategorySave(); }
+      });
+    }
+
+    const searchEl = document.getElementById('ew-admin-search');
+    const filterEl = document.getElementById('ew-admin-filter');
+    const sortEl = document.getElementById('ew-admin-sort');
+    if (searchEl) searchEl.addEventListener('input', renderAdminTable);
+    if (filterEl) filterEl.addEventListener('change', renderAdminTable);
+    if (sortEl) sortEl.addEventListener('change', renderAdminTable);
+  }
+
+  function setupEWImageUpload() {
+    const fileInput = document.getElementById('ew-image-file');
+    const preview = document.getElementById('ew-image-preview');
+    const removeBtn = document.getElementById('ew-remove-image');
+    const hiddenInput = document.getElementById('ew-image-url');
+    const uploadZone = document.getElementById('ew-upload-zone');
+    if (!fileInput || !hiddenInput) return;
+
+    fileInput.addEventListener('change', function (e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        if (typeof showToast === 'function') showToast('حجم الصورة يتجاوز 5 ميجا', 'error');
+        fileInput.value = '';
+        return;
+      }
+      compressImage(file, 800, 0.7).then(function (dataUrl) {
+        hiddenInput.value = dataUrl;
+        if (preview) { preview.src = dataUrl; preview.style.display = 'block'; }
+        if (removeBtn) removeBtn.style.display = 'inline-block';
+        if (uploadZone) uploadZone.style.borderColor = '#6c63ff';
+      }).catch(function () {
+        if (typeof showToast === 'function') showToast('فشل في معالجة الصورة', 'error');
+      });
+    });
+
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function () {
+        hiddenInput.value = '';
+        if (preview) { preview.src = ''; preview.style.display = 'none'; }
+        removeBtn.style.display = 'none';
+        fileInput.value = '';
+        if (uploadZone) uploadZone.style.borderColor = '';
+      });
+    }
+
+    if (uploadZone) {
+      uploadZone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        uploadZone.style.borderColor = '#6c63ff';
+      });
+      uploadZone.addEventListener('dragleave', function () {
+        uploadZone.style.borderColor = '';
+      });
+      uploadZone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        uploadZone.style.borderColor = '';
+        const file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+          fileInput.files = e.dataTransfer.files;
+          fileInput.dispatchEvent(new Event('change'));
+        }
+      });
+    }
+  }
+
+  // ─── Init ──────────────────────────────────────
+  function init() {
+    const isAdmin = !!document.getElementById('educational-works-view');
+    if (isAdmin) {
+      loadCategories();
+      loadAdminWorks();
+      loadPurchases();
+      setupAdminModalEvents();
+      setupEWImageUpload();
+    } else if (document.querySelector('#educational-works-section')) {
+      loadPublicWorks();
+    }
+  }
+
+  // ─── Public API ────────────────────────────────
+  return {
+    init: init,
+    renderAdminTable: renderAdminTable,
+    openEWForm: openEWForm,
+    refreshUserPurchases: function () {
+      const user = getCurrentUser();
+      if (user && user.phone) {
+        loadUserPurchases(user.phone);
+      } else {
+        userPurchases = {};
+        renderCards();
+      }
+    }
+  };
+})();
+
+// ─── Auto-init on DOMContentLoaded ─────────────
+document.addEventListener('DOMContentLoaded', function () {
+  EducationalWorks.init();
+});
+
+
+// ============================================
+// MERGED: summer-courses.js
+// ============================================
+// ============================================
+// SUMMER COURSES SYSTEM - ElMistar
+// Firestore is the ONLY source of truth.
+// ============================================
+
+const SummerCourses = (function () {
+  // ─── State ─────────────────────────────────────
+  let allCourses = [];
+  let publicCourses = [];
+  let subscriptions = [];
+  let userSubscribedIds = {}; // phone+courseId -> true for quick lookup
+  let currentSubFilter = 'all';
+
+  // ─── Init ──────────────────────────────────────
+  function init() {
+    console.log('[SC] SummerCourses.init() called');
+    console.log('[SC] window.db available:', !!window.db);
+    if (document.querySelector('.summer-section')) {
+      loadPublicCourses();
+    }
+    if (document.getElementById('summer-courses-view')) {
+      loadAdminCourses();
+      loadSubscriptions();
+      // Subscription filter tabs
+      document.querySelectorAll('[data-sub-filter]').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          document.querySelectorAll('[data-sub-filter]').forEach(function (t) { t.classList.remove('active'); });
+          tab.classList.add('active');
+          currentSubFilter = tab.getAttribute('data-sub-filter');
+          renderSubscriptions();
+        });
+      });
+    }
+  }
+
+  // ─── Helpers ───────────────────────────────────
+  // Match phones stored with or without a leading zero (legacy data)
+  function getPhoneVariants(phone) {
+    var cleaned = (phone || '').toString().replace(/\D/g, '');
+    if (!cleaned) return [];
+    var noZero = cleaned.replace(/^0+/, '');
+    var withZero = '0' + noZero;
+    return withZero === noZero ? [withZero] : [withZero, noZero];
+  }
+
+  function queryByPhone(collectionName, field, phone) {
+    var variants = getPhoneVariants(phone);
+    if (variants.length === 0) return Promise.resolve(null);
+    if (variants.length === 1) {
+      return window.db.collection(collectionName).where(field, '==', variants[0]).get();
+    }
+    return window.db.collection(collectionName).where(field, 'in', variants).get();
+  }
+
+  function formatDate(d) {
+    if (!d) return '—';
+    const date = d.toDate ? d.toDate() : new Date(d);
+    return date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function timeAgo(date) {
+    if (!date) return '';
+    const now = new Date();
+    const d = date.toDate ? date.toDate() : new Date(date);
+    const diff = Math.floor((now - d) / 1000);
+    if (diff < 60) return 'الآن';
+    if (diff < 3600) return 'منذ ' + Math.floor(diff / 60) + ' دقيقة';
+    if (diff < 86400) return 'منذ ' + Math.floor(diff / 3600) + ' ساعة';
+    if (diff < 2592000) return 'منذ ' + Math.floor(diff / 86400) + ' يوم';
+    return 'منذ ' + Math.floor(diff / 2592000) + ' شهر';
+  }
+
+  function validateUrl(url) {
+    return url && typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image/'));
+  }
+
+  function getDefaultImage() {
+    return 'img/logo.png';
+  }
+
+  function getPaymentMethodLabel(method) {
+    var labels = { cash: 'نقداً', online: 'أونلاين', both: 'نقداً / أونلاين' };
+    return labels[method] || method;
+  }
+
+  function getGradeName(g) {
+    if (!g) return '';
+    var str = g.toString().trim();
+    var names = {
+      "0": "مرحلة الكي جي والتأسيس", "تأسيس": "مرحلة الكي جي والتأسيس", "مرحلة التأسيس": "مرحلة الكي جي والتأسيس", "تأسيس / KG": "مرحلة الكي جي والتأسيس", "kg": "مرحلة الكي جي والتأسيس", "مرحلة الكي جي والتأسيس": "مرحلة الكي جي والتأسيس",
+      "1": "الصف الأول الابتدائي", "g1": "الصف الأول الابتدائي", "الصف الأول": "الصف الأول الابتدائي", "أول ابتدائي": "الصف الأول الابتدائي", "الأول الابتدائي": "الصف الأول الابتدائي", "الصف الأول الابتدائي": "الصف الأول الابتدائي",
+      "2": "الصف الثاني الابتدائي", "g2": "الصف الثاني الابتدائي", "الصف الثاني": "الصف الثاني الابتدائي", "ثاني ابتدائي": "الصف الثاني الابتدائي", "الثاني الابتدائي": "الصف الثاني الابتدائي", "الصف الثاني الابتدائي": "الصف الثاني الابتدائي",
+      "3": "الصف الثالث الابتدائي", "g3": "الصف الثالث الابتدائي", "الصف الثالث": "الصف الثالث الابتدائي", "ثالث ابتدائي": "الصف الثالث الابتدائي", "الثالث الابتدائي": "الصف الثالث الابتدائي", "الصف الثالث الابتدائي": "الصف الثالث الابتدائي",
+      "4": "الصف الرابع الابتدائي", "g4": "الصف الرابع الابتدائي", "الصف الرابع": "الصف الرابع الابتدائي", "رابع ابتدائي": "الصف الرابع الابتدائي", "الرابع الابتدائي": "الصف الرابع الابتدائي", "الصف الرابع الابتدائي": "الصف الرابع الابتدائي",
+      "5": "الصف الخامس الابتدائي", "g5": "الصف الخامس الابتدائي", "الصف الخامس": "الصف الخامس الابتدائي", "خامس ابتدائي": "الصف الخامس الابتدائي", "الخامس الابتدائي": "الصف الخامس الابتدائي", "الصف الخامس الابتدائي": "الصف الخامس الابتدائي",
+      "6": "الصف السادس الابتدائي", "g6": "الصف السادس الابتدائي", "الصف السادس": "الصف السادس الابتدائي", "سادس ابتدائي": "الصف السادس الابتدائي", "السادس الابتدائي": "الصف السادس الابتدائي", "الصف السادس الابتدائي": "الصف السادس الابتدائي"
+    };
+    return names[str] || g;
+  }
+
+  function loadUserSubscriptions(user) {
+    userSubscribedIds = {};
+    if (!window.db || !user || !user.phone) { renderPublicCourses(); return; }
+    var phone = user.phone.toString().trim();
+    var name = (user.name || '').trim();
+    var grade = getGradeName((user.grade || '').trim());
+    queryByPhone('courseSubscriptions', 'phone', phone)
+      .then(function (snapshot) {
+        if (!snapshot) return;
+        snapshot.forEach(function (doc) {
+          var data = doc.data();
+          if (data.courseId &&
+              (data.name || '').trim() === name &&
+              getGradeName((data.grade || '').trim()) === grade) {
+            userSubscribedIds[data.courseId] = data.status || 'pending';
+          }
+        });
+        renderPublicCourses();
+      })
+      .catch(function (err) {
+        console.error('[SC] loadUserSubscriptions error:', err);
+        renderPublicCourses();
+      });
+  }
+
+  function getPaymentMethodBadge(method) {
+    var colors = {
+      cash: { bg: '#fef3c7', text: '#92400e' },
+      online: { bg: '#dbeafe', text: '#1e40af' },
+      both: { bg: '#d1fae5', text: '#065f46' }
+    };
+    var c = colors[method] || { bg: '#f1f5f9', text: '#475569' };
+    return '<span style="background:' + c.bg + ';color:' + c.text + ';padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">' + getPaymentMethodLabel(method) + '</span>';
+  }
+
+  // ─── Image Upload & Compression ──────────────
+  function compressImage(file, maxWidth, quality) {
+    return new Promise(function (resolve, reject) {
+      if (!file || !file.type.startsWith('image/')) {
+        reject(new Error('Invalid file type'));
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var img = new Image();
+        img.onload = function () {
+          var w = img.width;
+          var h = img.height;
+          if (w > maxWidth) {
+            h = Math.round((h * maxWidth) / w);
+            w = maxWidth;
+          }
+          var canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          var dataUrl = canvas.toDataURL('image/jpeg', quality || 0.7);
+          resolve(dataUrl);
+        };
+        img.onerror = function () { reject(new Error('Failed to load image')); };
+        img.src = e.target.result;
+      };
+      reader.onerror = function () { reject(new Error('Failed to read file')); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function setupImageUpload() {
+    var fileInput = document.getElementById('cf-image-file');
+    var preview = document.getElementById('cf-image-preview');
+    var removeBtn = document.getElementById('cf-remove-image');
+    var hiddenInput = document.getElementById('cf-image-url');
+    var uploadZone = document.getElementById('cf-upload-zone');
+    if (!fileInput || !preview || !hiddenInput) return;
+
+    fileInput.addEventListener('change', function (e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        if (typeof showToast === 'function') showToast('حجم الصورة يتجاوز 5 ميجا', 'error');
+        fileInput.value = '';
+        return;
+      }
+      compressImage(file, 800, 0.7).then(function (dataUrl) {
+        hiddenInput.value = dataUrl;
+        preview.src = dataUrl;
+        preview.style.display = 'block';
+        if (removeBtn) removeBtn.style.display = 'inline-block';
+        if (uploadZone) uploadZone.style.borderColor = '#6c63ff';
+      }).catch(function (err) {
+        console.error('[SC] Image compress error:', err);
+        if (typeof showToast === 'function') showToast('فشل في معالجة الصورة', 'error');
+      });
+    });
+
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function () {
+        hiddenInput.value = '';
+        preview.src = '';
+        preview.style.display = 'none';
+        removeBtn.style.display = 'none';
+        fileInput.value = '';
+        if (uploadZone) uploadZone.style.borderColor = '';
+      });
+    }
+
+    if (uploadZone) {
+      uploadZone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        this.style.borderColor = '#6c63ff';
+        this.style.background = 'rgba(108,99,255,0.06)';
+      });
+      uploadZone.addEventListener('dragleave', function () {
+        this.style.borderColor = '';
+        this.style.background = '';
+      });
+      uploadZone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        this.style.borderColor = '';
+        this.style.background = '';
+        var file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+          fileInput.files = e.dataTransfer.files;
+          fileInput.dispatchEvent(new Event('change'));
+        }
+      });
+    }
+  }
+
+  // ───────────────────────────────────────────────
+  // PUBLIC SECTION (index.html)
+  // ───────────────────────────────────────────────
+  function loadPublicCourses() {
+    console.log('[SC] loadPublicCourses() — checking window.db:', !!window.db);
+    window.__fbTracker && window.__fbTracker.add();
+    if (!window.db) {
+      console.error('[SC] window.db is not available! Firebase not initialized.');
+      window.__fbTracker && window.__fbTracker.done();
+      hideSkeleton();
+      showEmptyState();
+      return;
+    }
+
+    console.log('[SC] Fetching from Firestore collection: summerCourses');
+    window.db.collection('summerCourses')
+      .orderBy('createdAt', 'desc')
+      .get()
+      .then(function (snapshot) {
+        console.log('[SC] Snapshot received! Size:', snapshot.size);
+        allCourses = [];
+        snapshot.forEach(function (doc) {
+          var courseData = doc.data();
+          courseData.id = doc.id;
+          allCourses.push(courseData);
+        });
+        console.log('[SC] All courses loaded:', allCourses.length);
+        publicCourses = allCourses.filter(function (c) {
+          return c.isActive === true;
+        });
+        console.log('[SC] Active courses for public:', publicCourses.length);
+        var stored = null;
+        try { stored = JSON.parse(localStorage.getItem('el_mistar_current_user')); } catch (e) {}
+        if (stored && stored.phone && stored.name) {
+          loadUserSubscriptions(stored);
+        } else {
+          userSubscribedIds = {};
+          renderPublicCourses();
+        }
+        window.__fbTracker && window.__fbTracker.done();
+        // Now set up real-time listener for subsequent updates
+        _setupPublicCoursesListener();
+      })
+      .catch(function (err) {
+        window.__fbTracker && window.__fbTracker.done();
+        console.error('[SC] Firestore snapshot error:', err);
+        console.error('[SC] Error code:', err.code);
+        console.error('[SC] Error message:', err.message);
+        hideSkeleton();
+        showEmptyState();
+        if (typeof showToast === 'function') {
+          showToast('خطأ في تحميل الكورسات: ' + (err.message || err.code), 'error');
+        }
+      });
+  }
+
+  var _publicCoursesListenerSetup = false;
+  function _setupPublicCoursesListener() {
+    if (_publicCoursesListenerSetup) return;
+    _publicCoursesListenerSetup = true;
+    window.db.collection('summerCourses')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(function (snapshot) {
+        allCourses = [];
+        snapshot.forEach(function (doc) {
+          var courseData = doc.data();
+          courseData.id = doc.id;
+          allCourses.push(courseData);
+        });
+        publicCourses = allCourses.filter(function (c) {
+          return c.isActive === true;
+        });
+        var stored = null;
+        try { stored = JSON.parse(localStorage.getItem('el_mistar_current_user')); } catch (e) {}
+        if (stored && stored.phone && stored.name) {
+          loadUserSubscriptions(stored);
+        } else {
+          userSubscribedIds = {};
+          renderPublicCourses();
+        }
+      }, function (err) {
+        console.error('[SC] Realtime listener error:', err);
+      });
+  }
+
+  function hideSkeleton() {
+    var skeleton = document.querySelector('.summer-skeleton');
+    if (skeleton) skeleton.style.display = 'none';
+  }
+
+  function showEmptyState() {
+    var emptyState = document.querySelector('.summer-empty-state');
+    if (emptyState) emptyState.style.display = 'block';
+  }
+
+  function renderPublicCourses() {
+    var container = document.querySelector('.summer-courses-grid');
+    var skeleton = document.querySelector('.summer-skeleton');
+    var emptyState = document.querySelector('.summer-empty-state');
+
+    // Always hide skeleton when rendering
+    if (skeleton) skeleton.style.display = 'none';
+
+    if (!container) {
+      console.warn('[SC] .summer-courses-grid container not found');
+      return;
+    }
+
+    if (publicCourses.length === 0) {
+      container.innerHTML = '';
+      showEmptyState();
+      console.log('[SC] No active courses to display');
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = 'none';
+
+    console.log('[SC] Rendering', publicCourses.length, 'courses');
+    container.innerHTML = '';
+
+    publicCourses.forEach(function (course, index) {
+      var card = document.createElement('div');
+      card.className = 'summer-card';
+      card.style.animationDelay = (index * 0.1) + 's';
+
+      var imgUrl = validateUrl(course.imageUrl) ? course.imageUrl : getDefaultImage();
+      var priceText = course.price ? course.price + ' ج.م' : 'مجاناً';
+      var badgeClass = course.isActive ? 'active' : 'inactive';
+      var badgeText = course.isActive ? '🚀 متاح' : '🔴 غير متاح';
+      var audienceHtml = course.targetAudience
+        ? '<div class="summer-audience-badge"><i class="bx bx-user"></i> ' + course.targetAudience + '</div>'
+        : '';
+
+      card.innerHTML =
+        '<div class="summer-card-img-wrap">' +
+          '<img src="' + imgUrl + '" alt="' + (course.title || '') + '" class="summer-card-img" loading="lazy" onerror="this.src=\'' + getDefaultImage() + '\';this.onerror=null;">' +
+          '<div class="summer-card-badge ' + badgeClass + '">' + badgeText + '</div>' +
+        '</div>' +
+        '<div class="summer-card-body">' +
+          '<h3 class="summer-card-title">' + (course.title || 'بدون عنوان') + '</h3>' +
+          audienceHtml +
+          '<p class="summer-card-desc">' + (course.shortDescription || '') + '</p>' +
+          '<div class="summer-card-meta">' +
+            '<span class="summer-price">' + priceText + '</span>' +
+            getPaymentMethodBadge(course.paymentMethod) +
+          '</div>' +
+          '<div class="summer-card-footer">' +
+            '<span class="summer-duration"><i class="bx bx-time"></i> ' + (course.duration || '—') + '</span>' +
+            '<span class="summer-lessons"><i class="bx bx-book-open"></i> ' + (course.lessonsCount || 0) + ' حصة</span>' +
+          '</div>' +
+          (function () {
+            var subStatus = userSubscribedIds[course.id];
+            if (subStatus === 'confirmed') {
+              return '<button class="summer-subscribe-btn subscribed" disabled>' +
+                '<i class="bx bx-check-circle"></i> تم الاشتراك ✓' +
+                '</button>';
+            } else if (subStatus === 'pending') {
+              return '<button class="summer-subscribe-btn pending" disabled>' +
+                '<i class="bx bx-time"></i> تم تقديم طلب الاشتراك بنجاح' +
+                '</button>';
+            }
+            return '<button class="summer-subscribe-btn" data-id="' + course.id + '">' +
+              '<i class="bx bx-plus-circle"></i> اشترك الان' +
+              '</button>';
+          })() +
+        '</div>';
+
+      container.appendChild(card);
+
+      // Animate on scroll
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('summer-card-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      observer.observe(card);
+    });
+
+    // Subscribe buttons
+    document.querySelectorAll('.summer-subscribe-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = this.getAttribute('data-id');
+        var course = publicCourses.find(function (c) { return c.id === id; });
+        if (course) openSubscribeModal(course);
+      });
+    });
+
+    console.log('[SC] Public courses rendered successfully');
+  }
+
+  // ─── Subscribe Modal ───────────────────────────
+  function openSubscribeModal(course) {
+    var stored = null;
+    try { stored = JSON.parse(localStorage.getItem('el_mistar_current_user')); } catch (e) { stored = null; }
+
+    if (stored && stored.name) {
+      directSubscribe(course, stored);
+    } else {
+      localStorage.setItem('pendingSummerCourseId', course.id);
+      var authOverlay = document.getElementById('authOverlay');
+      if (authOverlay) authOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function directSubscribe(course, user) {
+    if (!window.db || !user.phone) {
+      if (typeof showToast === 'function') showToast('بيانات المستخدم غير مكتملة', 'error');
+      return;
+    }
+
+    var phone = user.phone.toString().trim();
+    var name = (user.name || '').trim();
+    var grade = getGradeName((user.grade || '').trim());
+
+    if (course.paymentMethod === 'cash') {
+      // Save subscription directly without payment
+      window.db.collection('courseSubscriptions').add({
+        courseId: course.id,
+        courseTitle: course.title,
+        name: name,
+        phone: phone,
+        grade: grade,
+        email: user.email || '',
+        paymentMethod: 'cash',
+        status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function () {
+        userSubscribedIds[course.id] = 'pending';
+        renderPublicCourses();
+        if (typeof showToast === 'function') showToast('✅ تم التسجيل بنجاح! سيتم التواصل معك قريباً.', 'success');
+      }).catch(function (err) {
+        console.error('[SC] Subscribe error:', err);
+        if (typeof showToast === 'function') showToast('حدث خطأ أثناء التسجيل', 'error');
+      });
+      return;
+    }
+
+    if (course.paymentMethod === 'both') {
+      // Show subscribe modal with pre-filled data so user can choose cash or online
+      var subModal = document.getElementById('subscribe-modal');
+      if (subModal) {
+        document.getElementById('sub-course-name').textContent = course.title || '';
+        document.getElementById('sub-course-price').textContent = (course.price ? course.price + ' ج.م' : 'مجاناً');
+        document.getElementById('sub-name').value = name;
+        document.getElementById('sub-phone').value = phone;
+        document.getElementById('sub-grade').value = grade;
+        document.getElementById('sub-email').value = user.email || '';
+        subModal.setAttribute('data-course-id', course.id);
+        // Reset and show payment info based on default method
+        var info = document.getElementById('sub-payment-info');
+        if (info) {
+          info.innerHTML = '📌 سيتم الدفع داخل السنتر. سنتواصل معك قريباً.';
+          info.style.background = '#fef3c7';
+          info.style.color = '#92400e';
+          info.style.display = 'block';
+        }
+        document.getElementById('sub-payment-method').value = 'cash';
+        subModal.classList.add('active');
+      }
+      return;
+    }
+
+    // paymentMethod === 'online' or default: show payment modal
+    var payModal = document.getElementById('payment-modal');
+    var amountInput = document.getElementById('payment-amount');
+    if (amountInput) amountInput.value = course.price || 0;
+    if (payModal) {
+      payModal.setAttribute('data-summer-pending-course-id', course.id);
+      payModal.setAttribute('data-summer-pending-title', course.title || '');
+      payModal.setAttribute('data-summer-pending-phone', phone);
+      payModal.setAttribute('data-summer-pending-name', name);
+      payModal.setAttribute('data-summer-pending-grade', grade);
+      payModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function handleSubscribeSubmit(e) {
+    e.preventDefault();
+    var modal = document.getElementById('subscribe-modal');
+    var courseId = modal ? modal.getAttribute('data-course-id') : '';
+    var course = publicCourses.find(function (c) { return c.id === courseId; });
+    if (!course) return;
+
+    var name = (document.getElementById('sub-name') || {}).value || '';
+    var phone = (document.getElementById('sub-phone') || {}).value || '';
+    var grade = (document.getElementById('sub-grade') || {}).value || '';
+    var email = (document.getElementById('sub-email') || {}).value || '';
+    var method = course.paymentMethod === 'both'
+      ? ((document.getElementById('sub-payment-method') || {}).value || 'cash')
+      : course.paymentMethod;
+
+    name = name.trim();
+    phone = phone.trim();
+    email = email.trim();
+    grade = getGradeName(grade).trim();
+
+    if (!name || !phone || !grade) {
+      if (typeof showToast === 'function') showToast('يرجى ملء الحقول المطلوبة', 'error');
+      return;
+    }
+
+    // Check duplicate (query by phone, filter name+grade+courseId client-side)
+    queryByPhone('courseSubscriptions', 'phone', phone)
+      .then(function (snapshot) {
+        var alreadySubscribed = false;
+        if (snapshot) {
+          snapshot.forEach(function (doc) {
+          var d = doc.data();
+          if (d.courseId === courseId &&
+              (d.name || '').trim() === name &&
+              (d.grade || '').trim() === grade) {
+            alreadySubscribed = true;
+          }
+        });
+        }
+        if (alreadySubscribed) {
+          if (typeof showToast === 'function') showToast('هذا الطالب مشترك بالفعل في هذا الكورس ✅', 'error');
+          return;
+        }
+
+        var subData = {
+          courseId: courseId,
+          courseTitle: course.title,
+          name: name,
+          phone: phone,
+          grade: grade,
+          email: email,
+          paymentMethod: method,
+          status: 'pending',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        if (method === 'online') {
+          // Don't create subscription yet - show payment modal and let script.js handle creation with receipt
+          if (modal) modal.classList.remove('active');
+          var payModal = document.getElementById('payment-modal');
+          var amountInput = document.getElementById('payment-amount');
+          if (amountInput) amountInput.value = course.price || 0;
+          if (payModal) {
+            payModal.setAttribute('data-summer-pending-course-id', courseId);
+            payModal.setAttribute('data-summer-pending-title', course.title || '');
+            payModal.setAttribute('data-summer-pending-phone', phone);
+            payModal.setAttribute('data-summer-pending-name', name);
+            payModal.setAttribute('data-summer-pending-grade', grade);
+            payModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+          }
+          return;
+        }
+
+        // Cash: save subscription directly
+        window.db.collection('courseSubscriptions').add(subData).then(function () {
+          if (modal) modal.classList.remove('active');
+          var info = document.getElementById('sub-payment-info');
+          if (info) {
+            info.innerHTML = '📌 سيتم الدفع داخل السنتر. سنتواصل معك قريباً.';
+            info.style.display = 'block';
+          }
+          userSubscribedIds[courseId] = 'pending';
+          renderPublicCourses();
+          if (typeof showToast === 'function') showToast('✅ تم التسجيل بنجاح! سنتواصل معك قريباً.', 'success');
+        }).catch(function (err) {
+          console.error('[SC] Subscribe error:', err);
+          if (typeof showToast === 'function') showToast('حدث خطأ أثناء التسجيل', 'error');
+        });
+      })
+      .catch(function (err) {
+        console.error('[SC] Duplicate check error:', err);
+        if (typeof showToast === 'function') showToast('حدث خطأ في التحقق', 'error');
+      });
+  }
+
+  // ───────────────────────────────────────────────
+  // ADMIN SECTION (admin.html)
+  // ───────────────────────────────────────────────
+  function loadAdminCourses() {
+    window.__fbTracker && window.__fbTracker.add();
+    if (!window.db) { window.__fbTracker && window.__fbTracker.done(); return; }
+    var _acDone = false;
+    window.db.collection('summerCourses')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(function (snapshot) {
+        if (!_acDone) { _acDone = true; window.__fbTracker && window.__fbTracker.done(); }
+        console.log('[SC Admin] Snapshot received, size:', snapshot.size);
+        allCourses = [];
+        snapshot.forEach(function (doc) {
+          var courseData = doc.data();
+          courseData.id = doc.id;
+          allCourses.push(courseData);
+        });
+        renderAdminCourses();
+        loadAdminStats();
+      }, function (err) {
+        if (!_acDone) { _acDone = true; window.__fbTracker && window.__fbTracker.done(); }
+        console.error('[SC Admin] Error:', err);
+      });
+  }
+
+  function renderAdminCourses() {
+    var tbody = document.querySelector('#summer-courses-table tbody');
+    if (!tbody) return;
+
+    var filtered = allCourses.slice();
+
+    var searchEl = document.getElementById('sc-search');
+    var filterEl = document.getElementById('sc-filter');
+    var sortEl = document.getElementById('sc-sort');
+
+    var searchVal = searchEl ? searchEl.value.toLowerCase().trim() : '';
+    var statusFilter = filterEl ? filterEl.value : 'all';
+    var sortVal = sortEl ? sortEl.value : 'createdAt';
+
+    if (searchVal) {
+      filtered = filtered.filter(function (c) {
+        return (c.title || '').toLowerCase().indexOf(searchVal) !== -1 ||
+               (c.shortDescription || '').toLowerCase().indexOf(searchVal) !== -1;
+      });
+    }
+    if (statusFilter === 'active') filtered = filtered.filter(function (c) { return c.isActive; });
+    else if (statusFilter === 'inactive') filtered = filtered.filter(function (c) { return !c.isActive; });
+
+    if (sortVal === 'price-asc') filtered.sort(function (a, b) { return (a.price || 0) - (b.price || 0); });
+    else if (sortVal === 'price-desc') filtered.sort(function (a, b) { return (b.price || 0) - (a.price || 0); });
+    else if (sortVal === 'title') filtered.sort(function (a, b) { return (a.title || '').localeCompare(b.title || '', 'ar'); });
+    else filtered.sort(function (a, b) {
+      return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+    });
+
+    var chip = document.getElementById('sc-count');
+    if (chip) chip.textContent = filtered.length + ' كورس';
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);"><i class="bx bx-search-alt" style="font-size:40px;display:block;margin-bottom:10px;"></i>لا توجد كورسات</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    filtered.forEach(function (course) {
+      var tr = document.createElement('tr');
+      var imgUrl = validateUrl(course.imageUrl) ? course.imageUrl : getDefaultImage();
+      var activeStyle = course.isActive ? 'var(--green)' : 'var(--text-muted)';
+      var activeLabel = course.isActive ? 'نشط' : 'غير نشط';
+      var activeIcon = course.isActive ? 'bx-toggle-right' : 'bx-toggle-left';
+
+      tr.innerHTML =
+        '<td><div style="display:flex;align-items:center;gap:10px;">' +
+          '<img src="' + imgUrl + '" style="width:44px;height:44px;border-radius:10px;object-fit:cover;border:1px solid var(--border);" onerror="this.src=\'' + getDefaultImage() + '\';this.onerror=null;">' +
+          '<strong>' + (course.title || 'بدون عنوان') + '</strong>' +
+        '</div></td>' +
+        '<td>' + (course.price ? course.price + ' ج.م' : 'مجاناً') + '</td>' +
+        '<td>' + (course.duration || '—') + '</td>' +
+        '<td>' + (course.lessonsCount || 0) + '</td>' +
+        '<td style="font-size:13px;">' + (course.targetAudience || '—') + '</td>' +
+        '<td>' + getPaymentMethodBadge(course.paymentMethod) + '</td>' +
+        '<td>' +
+          '<button class="btn-icon toggle-course-btn" data-id="' + course.id + '" data-active="' + course.isActive + '" style="color:' + activeStyle + ';" title="' + (course.isActive ? 'إلغاء التفعيل' : 'تفعيل') + '">' +
+            '<i class="bx ' + activeIcon + '"></i>' +
+          '</button> ' +
+          '<span style="font-size:12px;font-weight:700;color:' + activeStyle + '">' + activeLabel + '</span>' +
+        '</td>' +
+        '<td><div style="display:flex;gap:6px;">' +
+          '<button class="btn-icon edit-course-btn" data-id="' + course.id + '" title="تعديل"><i class="bx bx-edit"></i></button>' +
+          '<button class="btn-icon duplicate-course-btn" data-id="' + course.id + '" title="نسخ"><i class="bx bx-copy"></i></button>' +
+          '<button class="btn-icon danger delete-course-btn" data-id="' + course.id + '" title="حذف"><i class="bx bx-trash"></i></button>' +
+        '</div></td>';
+      tbody.appendChild(tr);
+    });
+
+    attachAdminCourseEvents();
+  }
+
+  function attachAdminCourseEvents() {
+    document.querySelectorAll('.edit-course-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = this.getAttribute('data-id');
+        var course = allCourses.find(function (c) { return c.id === id; });
+        if (course) openCourseForm(course);
+      });
+    });
+
+    document.querySelectorAll('.delete-course-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = this.getAttribute('data-id');
+        var course = allCourses.find(function (c) { return c.id === id; });
+        if (course && confirm('هل أنت متأكد من حذف "' + course.title + '"؟')) {
+          SyncService.executeDbOperation('summerCourses', 'delete', id, null)
+            .then(function () { if (typeof showToast === 'function') showToast('✅ تم حذف الكورس'); })
+            .catch(function (err) { console.error('[SC] Delete error:', err); if (typeof showToast === 'function') showToast('خطأ في الحذف', 'error'); });
+        }
+      });
+    });
+
+    document.querySelectorAll('.toggle-course-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = this.getAttribute('data-id');
+        var isActive = this.getAttribute('data-active') === 'true';
+        SyncService.executeDbOperation('summerCourses', 'update', id, { isActive: !isActive })
+          .then(function () { if (typeof showToast === 'function') showToast(isActive ? 'تم إلغاء التفعيل' : 'تم التفعيل'); })
+          .catch(function (err) { console.error('[SC] Toggle error:', err); if (typeof showToast === 'function') showToast('خطأ في التحديث', 'error'); });
+      });
+    });
+
+    document.querySelectorAll('.duplicate-course-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = this.getAttribute('data-id');
+        var course = allCourses.find(function (c) { return c.id === id; });
+        if (!course) return;
+        var data = {};
+        for (var key in course) {
+          if (key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
+            data[key] = course[key];
+          }
+        }
+        data.title = data.title + ' (نسخة)';
+        data.isActive = false;
+        data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        SyncService.executeDbOperation('summerCourses', 'add', null, data)
+          .then(function () { if (typeof showToast === 'function') showToast('✅ تم نسخ الكورس'); })
+          .catch(function (err) { console.error('[SC] Duplicate error:', err); if (typeof showToast === 'function') showToast('خطأ في النسخ', 'error'); });
+      });
+    });
+  }
+
+  // ─── Course Form (Add/Edit) ────────────────────
+  function openCourseForm(course) {
+    var modal = document.getElementById('course-form-modal');
+    if (!modal) return;
+    var form = document.getElementById('course-form');
+    if (form) form.reset();
+
+    document.getElementById('cf-id').value = course ? course.id : '';
+    document.getElementById('cf-title').value = course ? (course.title || '') : '';
+    document.getElementById('cf-short-desc').value = course ? (course.shortDescription || '') : '';
+    document.getElementById('cf-image-url').value = course ? (course.imageUrl || '') : '';
+    document.getElementById('cf-price').value = course ? (course.price || '') : '';
+    document.getElementById('cf-payment-method').value = course ? (course.paymentMethod || 'cash') : 'cash';
+    document.getElementById('cf-duration').value = course ? (course.duration || '') : '';
+    document.getElementById('cf-lessons').value = course ? (course.lessonsCount || '') : '';
+    document.getElementById('cf-target-audience').value = course ? (course.targetAudience || '') : '';
+    document.getElementById('cf-is-active').checked = course ? !!course.isActive : true;
+
+    if (course && course.startDate) {
+      var sd = course.startDate.toDate ? course.startDate.toDate() : new Date(course.startDate);
+      document.getElementById('cf-start-date').value = sd.toISOString().split('T')[0];
+    } else {
+      document.getElementById('cf-start-date').value = '';
+    }
+    if (course && course.endDate) {
+      var ed = course.endDate.toDate ? course.endDate.toDate() : new Date(course.endDate);
+      document.getElementById('cf-end-date').value = ed.toISOString().split('T')[0];
+    } else {
+      document.getElementById('cf-end-date').value = '';
+    }
+
+    var preview = document.getElementById('cf-image-preview');
+    var removeBtn = document.getElementById('cf-remove-image');
+    if (course && course.imageUrl) {
+      preview.src = course.imageUrl;
+      preview.style.display = 'block';
+      removeBtn.style.display = 'inline-block';
+    } else {
+      preview.src = '';
+      preview.style.display = 'none';
+      removeBtn.style.display = 'none';
+    }
+
+    document.getElementById('cf-modal-title').textContent = course ? 'تعديل الكورس' : 'إضافة كورس جديد';
+    modal.classList.remove('hidden');
+  }
+
+  function handleCourseFormSubmit(e) {
+    e.preventDefault();
+    var form = e.target;
+    var id = document.getElementById('cf-id').value;
+    var title = (document.getElementById('cf-title').value || '').trim();
+    var shortDescription = (document.getElementById('cf-short-desc').value || '').trim();
+    var imageUrl = (document.getElementById('cf-image-url').value || '').trim();
+    var price = parseFloat(document.getElementById('cf-price').value) || 0;
+    var paymentMethod = document.getElementById('cf-payment-method').value;
+    var duration = (document.getElementById('cf-duration').value || '').trim();
+    var lessonsCount = parseInt(document.getElementById('cf-lessons').value) || 0;
+    var targetAudience = (document.getElementById('cf-target-audience').value || '').trim();
+    var startDate = document.getElementById('cf-start-date').value;
+    var endDate = document.getElementById('cf-end-date').value;
+    var isActive = document.getElementById('cf-is-active').checked;
+
+    if (!title) {
+      if (typeof showToast === 'function') showToast('يرجى إدخال عنوان الكورس', 'error');
+      return;
+    }
+
+    var submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'جاري الحفظ... <i class="bx bx-loader-alt bx-spin"></i>';
+    }
+
+    var data = {
+      title: title,
+      shortDescription: shortDescription,
+      imageUrl: imageUrl,
+      price: price,
+      paymentMethod: paymentMethod,
+      duration: duration,
+      lessonsCount: lessonsCount,
+      targetAudience: targetAudience,
+      startDate: startDate ? firebase.firestore.Timestamp.fromDate(new Date(startDate)) : null,
+      endDate: endDate ? firebase.firestore.Timestamp.fromDate(new Date(endDate)) : null,
+      isActive: isActive,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    var action = id ? 'update' : 'add';
+    var docId = id || null;
+    if (!id) data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+
+    SyncService.executeDbOperation('summerCourses', action, docId, data)
+      .then(function () {
+        console.log('[SC] Course saved successfully:', action, title);
+        if (typeof showToast === 'function') showToast(id ? '✅ تم تعديل الكورس' : '✅ تم إضافة الكورس');
+        document.getElementById('course-form-modal').classList.add('hidden');
+      })
+      .catch(function (err) {
+        console.error('[SC] Save course error:', err);
+        if (typeof showToast === 'function') showToast('حدث خطأ في الحفظ', 'error');
+      })
+      .finally(function () {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = id ? 'تعديل الكورس' : 'إضافة الكورس';
+        }
+      });
+  }
+
+  // ─── Admin Stats ──────────────────────────────
+  function loadAdminStats() {
+    var total = allCourses.length;
+    var active = allCourses.filter(function (c) { return c.isActive; }).length;
+    var inactive = total - active;
+
+    var totalEl = document.getElementById('sc-stat-total');
+    var activeEl = document.getElementById('sc-stat-active');
+    var inactiveEl = document.getElementById('sc-stat-inactive');
+    var subsEl = document.getElementById('sc-stat-subs');
+
+    if (totalEl) animateCount(totalEl, total);
+    if (activeEl) animateCount(activeEl, active);
+    if (inactiveEl) animateCount(inactiveEl, inactive);
+    if (subsEl) animateCount(subsEl, subscriptions.length);
+
+    var topCourseEl = document.getElementById('sc-stat-top');
+    if (topCourseEl && subscriptions.length > 0) {
+      var counts = {};
+      subscriptions.forEach(function (s) {
+        counts[s.courseId] = (counts[s.courseId] || 0) + 1;
+      });
+      var entries = Object.entries(counts).sort(function (a, b) { return b[1] - a[1]; });
+      var topId = entries[0][0];
+      var topCourse = allCourses.find(function (c) { return c.id === topId; });
+      topCourseEl.textContent = topCourse ? topCourse.title + ' (' + entries[0][1] + ' مشترك)' : 'لا توجد بيانات';
+    } else if (topCourseEl) {
+      topCourseEl.textContent = 'لا توجد اشتراكات';
+    }
+  }
+
+  function loadSubscriptions() {
+    window.__fbTracker && window.__fbTracker.add();
+    if (!window.db) { window.__fbTracker && window.__fbTracker.done(); return; }
+    var _subDone = false;
+    window.db.collection('courseSubscriptions')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(function (snapshot) {
+        if (!_subDone) { _subDone = true; window.__fbTracker && window.__fbTracker.done(); }
+        subscriptions = [];
+        snapshot.forEach(function (doc) {
+          var subData = doc.data();
+          subData.id = doc.id;
+          subscriptions.push(subData);
+        });
+        loadAdminStats();
+        renderSubscriptions();
+        updateSummerBadge();
+      }, function (err) {
+        if (!_subDone) { _subDone = true; window.__fbTracker && window.__fbTracker.done(); }
+        console.error('[SC] Subscriptions error:', err);
+      });
+  }
+
+  function renderSubscriptions() {
+    var container = document.getElementById('sc-subscriptions-list');
+    if (!container) return;
+
+    // Filter by selected tab
+    var filtered = subscriptions;
+    if (currentSubFilter === 'pending') {
+      filtered = subscriptions.filter(function (s) { return s.status === 'pending'; });
+    } else if (currentSubFilter === 'confirmed') {
+      filtered = subscriptions.filter(function (s) { return s.status === 'confirmed'; });
+    }
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);">لا توجد اشتراكات في هذا القسم</div>';
+      return;
+    }
+
+    container.innerHTML = '';
+    filtered.slice(0, 50).forEach(function (sub) {
+      var card = document.createElement('div');
+      card.className = 'sub-card';
+      var statusLabel = sub.status === 'pending' ? 'قيد الانتظار' : 'مؤكد';
+      var actionsHtml = '';
+      actionsHtml =
+        '<button class="btn-icon edit-sub-btn" data-phone="' + (sub.phone || '') + '" title="تعديل بيانات الطالب" style="background:var(--accent-dim);color:var(--accent);border:1px solid var(--border-active);font-size:12px;padding:4px 8px;border-radius:6px;cursor:pointer;"><i class="bx bx-edit"></i></button>';
+      if (sub.status === 'pending') {
+        actionsHtml +=
+          '<button class="btn btn-success btn-sm confirm-sub-btn" data-id="' + sub.id + '" style="padding:4px 12px;font-size:12px;">تأكيد</button>' +
+          '<button class="btn btn-danger btn-sm delete-sub-btn" data-id="' + sub.id + '" style="padding:4px 12px;font-size:12px;">حذف</button>';
+      } else {
+        actionsHtml +=
+          '<button class="btn btn-danger btn-sm delete-sub-btn" data-id="' + sub.id + '" style="padding:4px 12px;font-size:12px;">حذف</button>';
+      }
+
+      var receiptHtml = '';
+      if (sub.receiptImage) {
+        receiptHtml = '<div class="sub-receipt"><img src="' + sub.receiptImage + '" class="sub-receipt-thumb" data-sub-id="' + sub.id + '" style="width:60px;height:60px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid var(--border);" title="عرض الإيصال"></div>';
+      }
+
+      card.innerHTML =
+        '<div class="sub-card-header">' +
+          '<strong>' + (sub.name || '—') + '</strong>' +
+          '<span class="sub-status ' + (sub.status || 'pending') + '">' + statusLabel + '</span>' +
+        '</div>' +
+        '<div class="sub-card-body">' +
+          '<span><i class="bx bxs-phone"></i> ' + (sub.phone || '—') + '</span>' +
+          '<span><i class="bx bxs-graduation"></i> ' + (getGradeName(sub.grade) || '—') + '</span>' +
+          '<span>📚 ' + (sub.courseTitle || '—') + '</span>' +
+          '<span>💰 ' + getPaymentMethodLabel(sub.paymentMethod) + '</span>' +
+          (sub.receiptImage ? '<span class="sub-receipt-row">🧾 الإيصال: ' + receiptHtml + '</span>' : '') +
+        '</div>' +
+        '<div class="sub-card-footer">' +
+          '<small>' + timeAgo(sub.createdAt) + '</small>' +
+          actionsHtml +
+        '</div>';
+      container.appendChild(card);
+    });
+
+    document.querySelectorAll('.confirm-sub-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = this.getAttribute('data-id');
+        SyncService.executeDbOperation('courseSubscriptions', 'update', id, { status: 'confirmed' })
+          .then(function () { if (typeof showToast === 'function') showToast('✅ تم تأكيد الاشتراك'); })
+          .catch(function (err) { if (typeof showToast === 'function') showToast('خطأ', 'error'); });
+      });
+    });
+
+    document.querySelectorAll('.delete-sub-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = this.getAttribute('data-id');
+        if (confirm('حذف هذا الاشتراك؟')) {
+          SyncService.executeDbOperation('courseSubscriptions', 'delete', id, null)
+            .then(function () { if (typeof showToast === 'function') showToast('تم الحذف'); })
+            .catch(function (err) { if (typeof showToast === 'function') showToast('خطأ', 'error'); });
+        }
+      });
+    });
+
+    document.querySelectorAll('.edit-sub-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var phone = this.getAttribute('data-phone');
+        if (!phone) return;
+        var cleanPhone = phone.toString().replace(/\D/g, '');
+        var student = null;
+        if (typeof studentsData !== 'undefined') {
+          student = studentsData.find(function (s) {
+            return (s.phone || '').toString().replace(/\D/g, '') === cleanPhone;
+          });
+        }
+        if (student && typeof openEditModal === 'function') {
+          openEditModal(student);
+        } else {
+          if (typeof showToast === 'function') showToast('لم يتم العثور على الطالب في قاعدة البيانات', 'error');
+        }
+      });
+    });
+
+    // Receipt thumbnail click handler
+    container.querySelectorAll('.sub-receipt-thumb').forEach(function (img) {
+      img.addEventListener('click', function () {
+        var subId = this.getAttribute('data-sub-id');
+        var sub = subscriptions.find(function (s) { return s.id === subId; });
+        if (!sub || !sub.receiptImage) return;
+        var existing = document.getElementById('receipt-viewer-overlay');
+        if (existing) existing.remove();
+        var overlay = document.createElement('div');
+        overlay.id = 'receipt-viewer-overlay';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+        overlay.innerHTML =
+          '<div style="position:relative;max-width:90vw;max-height:90vh;">' +
+            '<button id="rv-close" style="position:absolute;top:-40px;right:0;background:none;border:none;color:#fff;font-size:30px;cursor:pointer;">✕</button>' +
+            '<img src="' + sub.receiptImage + '" style="max-width:100%;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.5);">' +
+          '</div>';
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', function (e) {
+          if (e.target === overlay || e.target.id === 'rv-close') overlay.remove();
+        });
+      });
+    });
+  }
+
+  // ─── Badge: Update pending subscription count ─
+  function updateSummerBadge() {
+    var pendingCount = subscriptions.filter(function (s) { return s.status === 'pending'; }).length;
+    var badges = ['summer-badge', 'summer-badge-mobile', 'summer-badge-mobile2'];
+    badges.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.textContent = pendingCount;
+        el.style.display = pendingCount > 0 ? 'inline-block' : 'none';
+      }
+    });
+  }
+
+  // ─── Utility: Animate Count ──────────────────
+  function animateCount(el, target, duration) {
+    duration = duration || 800;
+    if (!el) return;
+    var start = performance.now();
+    function step(now) {
+      var progress = Math.min((now - start) / duration, 1);
+      var ease = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(ease * target);
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ─── Refresh user subscriptions (one-time fetch, no new listener) ──
+  function refreshUserSubscriptions() {
+    try {
+      var stored = JSON.parse(localStorage.getItem('el_mistar_current_user'));
+      if (stored && stored.phone && stored.name) {
+        loadUserSubscriptions(stored);
+      } else {
+        userSubscribedIds = {};
+        renderPublicCourses();
+      }
+    } catch (e) {
+      userSubscribedIds = {};
+      renderPublicCourses();
+    }
+  }
+
+  // ─── Public API ────────────────────────────────
+  return {
+    init: init,
+    loadPublicCourses: loadPublicCourses,
+    renderAdminCourses: renderAdminCourses,
+    openSubscribeModal: openSubscribeModal,
+    directSubscribe: directSubscribe,
+    handleSubscribeSubmit: handleSubscribeSubmit,
+    openCourseForm: openCourseForm,
+    handleCourseFormSubmit: handleCourseFormSubmit,
+    setupImageUpload: setupImageUpload,
+    refreshUserSubscriptions: refreshUserSubscriptions,
+    setUserSubscribed: function (courseId) {
+      userSubscribedIds[courseId] = 'pending';
+      renderPublicCourses();
+    }
+  };
+})();
+
+// ─── Auto-init on DOMContentLoaded ─────────────
+document.addEventListener('DOMContentLoaded', function () {
+  SummerCourses.init();
+
+  // Subscribe modal
+  var subModal = document.getElementById('subscribe-modal');
+  if (subModal) {
+    var subClose = document.getElementById('sub-close');
+    if (subClose) subClose.addEventListener('click', function () {
+      subModal.classList.remove('active');
+      var info = document.getElementById('sub-payment-info');
+      if (info) info.style.display = 'none';
+    });
+    subModal.addEventListener('click', function (e) {
+      if (e.target === this) {
+        this.classList.remove('active');
+        var info = document.getElementById('sub-payment-info');
+        if (info) info.style.display = 'none';
+      }
+    });
+    var subForm = document.getElementById('sub-form');
+    if (subForm) subForm.addEventListener('submit', SummerCourses.handleSubscribeSubmit);
+    // Show/hide payment info when payment method changes
+    var subPayMethod = document.getElementById('sub-payment-method');
+    if (subPayMethod) {
+      subPayMethod.addEventListener('change', function () {
+        var info = document.getElementById('sub-payment-info');
+        if (info) {
+          if (this.value === 'cash') {
+            info.innerHTML = '📌 سيتم الدفع داخل السنتر. سنتواصل معك قريباً.';
+            info.style.background = '#fef3c7';
+            info.style.color = '#92400e';
+          } else {
+            info.innerHTML = '📌 بعد إتمام الحجز، سيطلب منك رفع إيصال الدفع أونلاين.';
+            info.style.background = '#eff6ff';
+            info.style.color = '#1e40af';
+          }
+          info.style.display = 'block';
+        }
+      });
+    }
+  }
+
+  // Course form modal (admin)
+  var cfModal = document.getElementById('course-form-modal');
+  if (cfModal) {
+    var cfClose = document.getElementById('cf-close');
+    if (cfClose) cfClose.addEventListener('click', function () { cfModal.classList.add('hidden'); });
+    var cfCancel = document.getElementById('cf-cancel');
+    if (cfCancel) cfCancel.addEventListener('click', function () { cfModal.classList.add('hidden'); });
+    cfModal.addEventListener('click', function (e) { if (e.target === this) this.classList.add('hidden'); });
+    var cfForm = document.getElementById('course-form');
+    if (cfForm) cfForm.addEventListener('submit', SummerCourses.handleCourseFormSubmit);
+    SummerCourses.setupImageUpload();
+  }
+
+  // Admin search/filter/sort — re-render on change
+  var scSearch = document.getElementById('sc-search');
+  var scFilter = document.getElementById('sc-filter');
+  var scSort = document.getElementById('sc-sort');
+  if (scSearch) scSearch.addEventListener('input', function () { renderAdminCoursesGlobal(); });
+  if (scFilter) scFilter.addEventListener('change', function () { renderAdminCoursesGlobal(); });
+  if (scSort) scSort.addEventListener('change', function () { renderAdminCoursesGlobal(); });
+
+  // Admin add course button
+  var scAddBtn = document.getElementById('sc-add-btn');
+  if (scAddBtn) scAddBtn.addEventListener('click', function () { SummerCourses.openCourseForm(null); });
+
+});
+
+function renderAdminCoursesGlobal() {
+  if (typeof SummerCourses.renderAdminCourses === 'function') {
+    SummerCourses.renderAdminCourses();
+  }
+}
+
+// ─── Expose to global scope ────────────────────
+window.SummerCourses = SummerCourses;
+
+
+// ============================================
+// MAIN: admin.js
+// ============================================
 // Firebase is initialized in admin.html inline script
 console.log('✅ admin.js loaded!');
 
@@ -6497,8 +9399,10 @@ function formatPhoneInternational(phone) {
     const digits = phone.toString().replace(/\D/g, '');
     if (digits.length === 0) return '';
     let num = digits;
-    if (!num.startsWith('0')) {
-        num = '0' + num;
+    if (num.startsWith('0')) {
+        num = '01' + num.slice(1);
+    } else if (!num.startsWith('01')) {
+        num = '01' + num;
     }
     return num;
 }
@@ -6714,3 +9618,441 @@ document.addEventListener('DOMContentLoaded', function() {
     StudentPhotoLightbox.init();
 });
 
+
+
+// ============================================
+// APPS MANAGEMENT MODULE — إدارة التطبيقات
+// ElMistar Admin Dashboard
+// ============================================
+
+(function () {
+    'use strict';
+
+    var STORAGE_KEY = 'elmistar_apps_config';
+
+    var DEFAULT_APPS = [];
+
+    // State
+    var appsData = [];
+    var editingId = null;
+
+    var LEGACY_DEFAULT_IDS = { calculator:1, quiz:1, converter:1 };
+
+    function isLegacyDefault(a) {
+        if (!a || !LEGACY_DEFAULT_IDS[a.id]) return false;
+        var u = a.iconUrl || '';
+        return (u === '' || u.indexOf('img/apps/') === 0);
+    }
+
+    function loadApps() {
+        try {
+            var stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                var parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) {
+                    appsData = parsed.filter(function(a){ return !isLegacyDefault(a); }).map(function(a){
+                        if ('icon' in a) delete a.icon;
+                        return a;
+                    });
+                    return;
+                }
+            }
+        } catch(e){}
+        appsData = JSON.parse(JSON.stringify(DEFAULT_APPS));
+    }
+
+    function saveApps() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appsData));
+        // Notify other tabs
+        window.dispatchEvent(new StorageEvent('storage', { key: STORAGE_KEY }));
+    }
+
+    function esc(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    // Fix common mistakes in saved URLs (e.g. "appsGadwalindex.html" -> "apps/Gadwal/index.html")
+    function normalizeAppUrl(u) {
+        if (!u) return '';
+        var t = String(u).trim().replace(/\\/g, '/');
+        if (/^https?:\/\//i.test(t) || t.charAt(0) === '#') return t;
+        t = t.replace(/^apps(?=[^\/])/i, 'apps/');
+        t = t.replace(/([^\/])index\.html$/i, '$1/index.html');
+        t = t.replace(/\/{2,}/g, '/');
+        return t;
+    }
+
+    var colorMap = {
+        'theme-blue':'🔵 أزرق','theme-purple':'🟣 بنفسجي','theme-green':'🟢 أخضر',
+        'theme-orange':'🟠 برتقالي','theme-red':'🔴 أحمر','theme-teal':'🩵 فيروزي'
+    };
+    var colorBgMap = {
+        'theme-blue':'linear-gradient(135deg,#1e40af,#3b82f6)',
+        'theme-purple':'linear-gradient(135deg,#6d28d9,#8b5cf6)',
+        'theme-green':'linear-gradient(135deg,#065f46,#10b981)',
+        'theme-orange':'linear-gradient(135deg,#c2410c,#f97316)',
+        'theme-red':'linear-gradient(135deg,#991b1b,#ef4444)',
+        'theme-teal':'linear-gradient(135deg,#0f766e,#14b8a6)'
+    };
+
+    function renderAdminApps() {
+        var list = document.getElementById('admin-apps-list');
+        if (!list) return;
+
+        var sorted = appsData.slice().sort(function(a,b){ return (a.order||99)-(b.order||99); });
+
+        list.innerHTML = sorted.map(function(app) {
+            var bg = colorBgMap[app.color] || colorBgMap['theme-blue'];
+            var visClass = app.visible ? '' : 'style="opacity:0.55"';
+            var thumbUrl = app.iconUrl || '';
+            if (!thumbUrl) {
+                for (var di=0;di<DEFAULT_APPS.length;di++){ if (DEFAULT_APPS[di].id===app.id && DEFAULT_APPS[di].iconUrl){ thumbUrl = DEFAULT_APPS[di].iconUrl; break; } }
+            }
+            var iconHtml = thumbUrl
+                ? '<div class="admin-app-row-banner" style="background:#f1f5f9;width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;"><img src="'+esc(thumbUrl)+'" alt="'+esc(app.name)+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.remove();"></div>'
+                : '<div class="admin-app-row-banner" style="background:'+bg+';width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;flex-shrink:0;"><i class="bx bx-image"></i></div>';
+            return (
+                '<div class="admin-app-row doodle-card" id="admin-app-row-'+esc(app.id)+'" '+visClass+'>' +
+                  iconHtml +
+                  '<div style="flex:1;min-width:0;">' +
+                    '<div style="font-weight:800;font-size:1rem;color:var(--text-primary);">'+esc(app.name)+'</div>' +
+                    '<div style="font-size:0.8rem;color:var(--text-secondary);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(app.description)+'</div>' +
+                    '<div style="display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap;">' +
+                      '<span style="font-size:0.7rem;background:rgba(37,99,235,0.1);color:#2563eb;padding:2px 8px;border-radius:10px;font-weight:700;">'+esc(app.tag||'')+'</span>' +
+                      '<span style="font-size:0.7rem;color:var(--text-muted);">ترتيب: '+esc(String(app.order||1))+'</span>' +
+                      '<span style="font-size:0.7rem;direction:ltr;color:var(--text-muted);">'+esc(app.url)+'</span>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">' +
+                    '<button class="btn btn-sm '+(app.visible ? 'btn-primary' : 'btn-outline')+' app-toggle-btn" data-id="'+esc(app.id)+'" title="'+(app.visible?'إخفاء':'إظهار')+'">' +
+                      (app.visible ? '<i class="bx bx-show"></i>' : '<i class="bx bx-hide"></i>') +
+                    '</button>' +
+                    '<button class="btn btn-outline btn-sm app-edit-btn" data-id="'+esc(app.id)+'">' +
+                      '<i class="bx bx-edit"></i>' +
+                    '</button>' +
+                    '<a href="'+esc(normalizeAppUrl(app.url))+'" target="_blank" class="btn btn-outline btn-sm" title="فتح التطبيق">' +
+                      '<i class="bx bx-link-external"></i>' +
+                    '</a>' +
+                    '<button class="btn btn-sm btn-outline app-delete-btn" data-id="'+esc(app.id)+'" title="حذف التطبيق" style="color:#ef4444;border-color:#fca5a5;">' +
+                      '<i class="bx bx-trash"></i>' +
+                    '</button>' +
+                  '</div>' +
+                '</div>'
+            );
+        }).join('');
+
+        // Bind events
+        list.querySelectorAll('.app-toggle-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = btn.dataset.id;
+                var app = appsData.find(function(a){ return a.id===id; });
+                if (app) { app.visible = !app.visible; renderAdminApps(); }
+            });
+        });
+        list.querySelectorAll('.app-edit-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                openEditModal(btn.dataset.id);
+            });
+        });
+        list.querySelectorAll('.app-delete-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                deleteApp(btn.dataset.id);
+            });
+        });
+    }
+
+    function openEditModal(id) {
+        var app = appsData.find(function(a){ return a.id===id; });
+        if (!app) return;
+        editingId = id;
+        document.getElementById('app-edit-id').value = id;
+        document.getElementById('app-edit-name').value = app.name || '';
+        document.getElementById('app-edit-desc').value = app.description || '';
+        document.getElementById('app-edit-iconUrl').value = app.iconUrl || '';
+        document.getElementById('app-edit-tag').value = app.tag || '';
+        document.getElementById('app-edit-color').value = app.color || 'theme-blue';
+        document.getElementById('app-edit-order').value = app.order || 1;
+        document.getElementById('app-edit-url').value = app.url || '';
+        document.getElementById('app-edit-visible').checked = app.visible !== false;
+        // Show image preview if exists
+        updateImagePreview(app.iconUrl || '');
+        var titleEl = document.getElementById('app-edit-modal-title');
+        if (titleEl) titleEl.innerHTML = "<i class='bx bx-edit' style='color:var(--accent);'></i> تعديل التطبيق";
+        var modal = document.getElementById('app-edit-modal');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function openAddModal() {
+        editingId = null;
+        document.getElementById('app-edit-id').value = '';
+        document.getElementById('app-edit-name').value = '';
+        document.getElementById('app-edit-desc').value = '';
+        document.getElementById('app-edit-iconUrl').value = '';
+        document.getElementById('app-edit-tag').value = '';
+        document.getElementById('app-edit-color').value = 'theme-blue';
+        document.getElementById('app-edit-order').value = appsData.length + 1;
+        document.getElementById('app-edit-url').value = '';
+        document.getElementById('app-edit-visible').checked = true;
+        updateImagePreview('');
+        var titleEl = document.getElementById('app-edit-modal-title');
+        if (titleEl) titleEl.innerHTML = "<i class='bx bx-plus-circle' style='color:var(--accent);'></i> إضافة تطبيق جديد";
+        var modal = document.getElementById('app-edit-modal');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function updateImagePreview(url) {
+        var thumb = document.getElementById('app-edit-img-thumb');
+        var placeholder = document.getElementById('app-edit-img-placeholder');
+        var removeBtn = document.getElementById('app-edit-img-remove');
+        if (url) {
+            if (thumb) { thumb.src = url; thumb.style.display = 'block'; }
+            if (placeholder) placeholder.style.display = 'none';
+            if (removeBtn) removeBtn.style.display = 'inline-flex';
+        } else {
+            if (thumb) { thumb.src = ''; thumb.style.display = 'none'; }
+            if (placeholder) placeholder.style.display = 'block';
+            if (removeBtn) removeBtn.style.display = 'none';
+        }
+    }
+
+    function deleteApp(id) {
+        var app = appsData.find(function(a){ return a.id===id; });
+        if (!app) return;
+        if (!confirm('هل أنت متأكد من حذف التطبيق "'+app.name+'"؟\nلا يمكن التراجع عن هذا الإجراء.')) return;
+        appsData = appsData.filter(function(a){ return a.id!==id; });
+        saveApps();
+        renderAdminApps();
+        showSaveMsg('تم حذف التطبيق "'+app.name+'"', false);
+    }
+
+    function closeEditModal() {
+        var modal = document.getElementById('app-edit-modal');
+        if (modal) modal.classList.add('hidden');
+        editingId = null;
+    }
+
+    function showSaveMsg(msg, isError) {
+        var el = document.getElementById('admin-apps-save-msg');
+        if (!el) return;
+        el.textContent = msg;
+        el.style.color = isError ? '#ef4444' : '#10b981';
+        el.style.display = 'inline';
+        setTimeout(function(){ el.style.display='none'; }, 3000);
+    }
+
+    function init() {
+        loadApps();
+        renderAdminApps();
+
+        // Add button
+        var addBtn = document.getElementById('admin-apps-add-btn');
+        if (addBtn) {
+            addBtn.addEventListener('click', function() {
+                openAddModal();
+            });
+        }
+
+        // Save button
+        var saveBtn = document.getElementById('admin-apps-save-btn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', function() {
+                saveApps();
+                showSaveMsg('✅ تم حفظ التغييرات بنجاح!', false);
+            });
+        }
+
+        // Reset button
+        var resetBtn = document.getElementById('admin-apps-reset-btn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+                if (confirm('هل تريد حذف جميع التطبيقات؟')) {
+                    appsData = [];
+                    saveApps();
+                    renderAdminApps();
+                    showSaveMsg('تم حذف جميع التطبيقات', false);
+                }
+            });
+        }
+
+        // Image file upload
+        var fileInput = document.getElementById('app-edit-img-file');
+        var imgPreview = document.getElementById('app-edit-img-preview');
+        var removeImgBtn = document.getElementById('app-edit-img-remove');
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('حجم الصورة يجب أن لا يتجاوز 2MB');
+                    fileInput.value = '';
+                    return;
+                }
+                if (!file.type.startsWith('image/')) {
+                    alert('يرجى اختيار ملف صورة صالح');
+                    fileInput.value = '';
+                    return;
+                }
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    var base64 = ev.target.result;
+                    document.getElementById('app-edit-iconUrl').value = base64;
+                    updateImagePreview(base64);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        if (imgPreview) {
+            imgPreview.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                imgPreview.style.borderColor = 'var(--accent,#f97316)';
+                imgPreview.style.background = 'rgba(249,115,22,0.05)';
+            });
+            imgPreview.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                imgPreview.style.borderColor = '';
+                imgPreview.style.background = '';
+            });
+            imgPreview.addEventListener('drop', function(e) {
+                e.preventDefault();
+                imgPreview.style.borderColor = '';
+                imgPreview.style.background = '';
+                var file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    fileInput.files = e.dataTransfer.files;
+                    fileInput.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+        
+        if (removeImgBtn) {
+            removeImgBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('app-edit-iconUrl').value = '';
+                if (fileInput) fileInput.value = '';
+                updateImagePreview('');
+            });
+        }
+
+        // Modal close
+        var closeBtn = document.getElementById('app-edit-close');
+        if (closeBtn) closeBtn.addEventListener('click', closeEditModal);
+        var cancelBtn = document.getElementById('app-edit-cancel');
+        if (cancelBtn) cancelBtn.addEventListener('click', closeEditModal);
+
+        // Modal save
+        var editSaveBtn = document.getElementById('app-edit-save');
+        if (editSaveBtn) {
+            editSaveBtn.addEventListener('click', function() {
+                var name = document.getElementById('app-edit-name').value.trim();
+                if (!name) { alert('الاسم مطلوب'); return; }
+                
+                var appData = {
+                    name: name,
+                    description: document.getElementById('app-edit-desc').value.trim(),
+                    iconUrl: document.getElementById('app-edit-iconUrl').value.trim(),
+                    tag: document.getElementById('app-edit-tag').value.trim(),
+                    color: document.getElementById('app-edit-color').value,
+                    order: parseInt(document.getElementById('app-edit-order').value) || 1,
+                    url: normalizeAppUrl(document.getElementById('app-edit-url').value),
+                    visible: document.getElementById('app-edit-visible').checked
+                };
+
+                if (editingId) {
+                    // Edit existing app
+                    var app = appsData.find(function(a){ return a.id===editingId; });
+                    if (app) {
+                        Object.assign(app, appData);
+                    }
+                } else {
+                    // Add new app
+                    var newId = 'app_' + Date.now();
+                    appData.id = newId;
+                    appsData.push(appData);
+                }
+                
+                closeEditModal();
+                renderAdminApps();
+                showSaveMsg(editingId ? 'تم تعديل التطبيق بنجاح' : 'تم إضافة التطبيق الجديد بنجاح', false);
+            });
+        }
+
+        // Close modal on overlay click
+        var modal = document.getElementById('app-edit-modal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeEditModal();
+            });
+        }
+
+        // Section header settings
+        var SECTION_STORAGE_KEY = 'elmistar_apps_section_config';
+        var defaultSectionConfig = {
+            title: 'تطبيقات تعليمية تفاعلية',
+            description: 'أدوات تعليمية مجانية مصممة خصيصاً لطلاب المستر',
+            tag: '🚀 تطبيقاتنا'
+        };
+
+        function loadSectionConfig() {
+            try {
+                var stored = localStorage.getItem(SECTION_STORAGE_KEY);
+                if (stored) return JSON.parse(stored);
+            } catch(e){}
+            return defaultSectionConfig;
+        }
+
+        function saveSectionConfig(config) {
+            localStorage.setItem(SECTION_STORAGE_KEY, JSON.stringify(config));
+            window.dispatchEvent(new StorageEvent('storage', { key: SECTION_STORAGE_KEY }));
+        }
+
+        // Load section settings into form
+        var sectionConfig = loadSectionConfig();
+        var titleInput = document.getElementById('apps-section-title');
+        var descInput = document.getElementById('apps-section-desc');
+        var tagInput = document.getElementById('apps-section-tag');
+        if (titleInput) titleInput.value = sectionConfig.title || '';
+        if (descInput) descInput.value = sectionConfig.description || '';
+        if (tagInput) tagInput.value = sectionConfig.tag || '';
+
+        // Save section settings
+        var sectionSaveBtn = document.getElementById('apps-section-save-btn');
+        if (sectionSaveBtn) {
+            sectionSaveBtn.addEventListener('click', function() {
+                var config = {
+                    title: (titleInput ? titleInput.value.trim() : '') || defaultSectionConfig.title,
+                    description: (descInput ? descInput.value.trim() : '') || defaultSectionConfig.description,
+                    tag: (tagInput ? tagInput.value.trim() : '') || defaultSectionConfig.tag
+                };
+                saveSectionConfig(config);
+                var msgEl = document.getElementById('apps-section-save-msg');
+                if (msgEl) {
+                    msgEl.textContent = '✅ تم حفظ إعدادات العنوان بنجاح!';
+                    msgEl.style.color = '#10b981';
+                    msgEl.style.display = 'inline';
+                    setTimeout(function(){ msgEl.style.display='none'; }, 3000);
+                }
+            });
+        }
+    }
+
+    // Wait for DOM
+    document.addEventListener('DOMContentLoaded', function() {
+        // Run when apps-view is activated
+        var appsNavItems = document.querySelectorAll('[data-target="apps-view"]');
+        appsNavItems.forEach(function(item) {
+            item.addEventListener('click', function() {
+                renderAdminApps();
+            });
+        });
+        init();
+    });
+
+    window.AdminAppsManager = {
+        reload: function() { loadApps(); renderAdminApps(); },
+        save: saveApps
+    };
+})();
