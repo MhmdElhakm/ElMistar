@@ -1,0 +1,108 @@
+/* Custom CSS Stylesheet for جدولي App */
+
+/* Global Scrollbar Hiding for Carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Base resets & iOS elastic scroll overrides */
+html, body {
+  overscroll-behavior-y: contain;
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'Cairo', sans-serif !important;
+}
+
+/* Modal Overlay Animation */
+.modal-overlay {
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Slide Up Transition for Modals (Mobile First) */
+.modal-container {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.modal-overlay.hidden .modal-container {
+  transform: translateY(100%);
+}
+
+@media (min-width: 640px) {
+  .modal-overlay.hidden .modal-container {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+/* Active bottom nav items visual transitions */
+.nav-tab-btn {
+  position: relative;
+}
+
+.nav-tab-btn.active .nav-tab-icon-wrapper {
+  background-color: #ecfdf5; /* emerald-50 */
+  color: #059669; /* emerald-600 */
+  transform: scale(1.1) translateY(-2px);
+}
+
+.nav-tab-btn.active span {
+  color: #059669;
+  font-weight: 800;
+}
+
+/* Daily Selector Item active styles */
+.day-btn {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.day-btn.active {
+  background-color: #059669;
+  color: #ffffff;
+  box-shadow: 0 4px 12px -3px rgba(5, 150, 105, 0.4);
+  transform: scale(1.05);
+}
+
+/* Smooth check animation for checklist items */
+.checkbox-animate:checked + div {
+  background-color: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.checkbox-animate:checked + div span {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+
+/* Custom premium hover/press scales */
+.active-press:active {
+  transform: scale(0.97);
+}
+
+/* Pulsing micro-animations */
+@keyframes pulse-emerald {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 20px -6px rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 10px 24px -4px rgba(16, 185, 129, 0.6);
+  }
+}
+
+#fab-add {
+  animation: pulse-emerald 4s infinite ease-in-out;
+}
+#fab-add:active {
+  transform: scale(0.9) !important;
+  animation: none;
+}
