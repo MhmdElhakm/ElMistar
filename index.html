@@ -91,7 +91,7 @@
     <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/raphtalia">
 
     <!-- Core Style -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260908">
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -267,7 +267,11 @@
                     <div class="pl-bar"></div>
                 </div>
             </div>
-            <div class="pl-label">جاري تجهيز المحتوى<span class="pl-dots"><span>.</span><span>.</span><span>.</span></span></div>
+            <div class="pl-label">جاري تحميل أحدث البيانات<span class="pl-dots"><span>.</span><span>.</span><span>.</span></span></div>
+            <div class="pl-error" id="boot-error" hidden>
+                <div class="pl-error-msg">تعذّر تحميل أحدث البيانات. تحقق من الاتصال بالإنترنت ثم أعد المحاولة.</div>
+                <button class="pl-retry-btn" id="boot-retry-btn" type="button">إعادة المحاولة</button>
+            </div>
         </div>
     </div>
 
@@ -2780,7 +2784,8 @@
         <img src="" alt="Full view" class="lightbox-content" id="lightbox-img-full">
     </div>
 
-    <script src="script.js" defer></script>
+    <script src="boot.js?v=20260908" defer></script>
+    <script src="script.js?v=20260908" defer></script>
 
     <!-- PAGE LOADING MANAGER (must run last) -->
     <script>
@@ -2789,12 +2794,17 @@
         if (!preloader) return;
 
         var heroImg = document.querySelector('.hero-img');
+        var bootErrorBox = document.getElementById('boot-error');
+        var bootRetryBtn = document.getElementById('boot-retry-btn');
         var allLoaded = false;
         var heroReady = false;
         var fbReady = false;
+        var bootReady = false;
+        var bootFailed = false;
 
         var pageStartTime = Date.now();
         var MIN_DISPLAY_TIME = 3000;
+        var BOOT_WATCHDOG_MS = 30000;
 
         function revealPage() {
             if (preloader.dataset.revealed) return;
@@ -2812,8 +2822,39 @@
             }, remaining);
         }
 
+        function showBootError() {
+            bootFailed = true;
+            preloader.classList.add('boot-error');
+            if (bootErrorBox) bootErrorBox.hidden = false;
+        }
+
+        function hideBootError() {
+            bootFailed = false;
+            preloader.classList.remove('boot-error');
+            if (bootErrorBox) bootErrorBox.hidden = true;
+        }
+
+        function handleBootResult(ok) {
+            if (ok) {
+                bootReady = true;
+                bootFailed = false;
+                hideBootError();
+                checkReady();
+                return;
+            }
+            var st = (window.ElmistarBoot && window.ElmistarBoot.state) ? window.ElmistarBoot.state() : { reason: '' };
+            if (st.reason === 'no-db') {
+                bootReady = true;
+                var fbBar = document.getElementById('db-not-configured-bar');
+                if (fbBar) fbBar.style.display = 'block';
+                checkReady();
+                return;
+            }
+            showBootError();
+        }
+
         function checkReady() {
-            if (allLoaded && heroReady && fbReady) {
+            if (allLoaded && heroReady && fbReady && bootReady) {
                 revealPage();
             }
         }
@@ -2828,7 +2869,37 @@
             } else {
                 fbReady = true;
             }
+            if (window.ElmistarBoot && window.ElmistarBoot.ready) {
+                window.ElmistarBoot.ready.then(handleBootResult);
+            } else {
+                bootReady = true;
+            }
         });
+
+        document.addEventListener('elmistar:boot-ready', function() {
+            bootReady = true;
+            bootFailed = false;
+            hideBootError();
+            checkReady();
+        });
+
+        document.addEventListener('elmistar:boot-status', function() {
+            var st = (window.ElmistarBoot && window.ElmistarBoot.state) ? window.ElmistarBoot.state() : null;
+            if (st && st.status === 'pending') {
+                bootReady = false;
+                hideBootError();
+            }
+        });
+
+        if (bootRetryBtn) {
+            bootRetryBtn.addEventListener('click', function() {
+                hideBootError();
+                bootReady = false;
+                if (window.ElmistarBoot && window.ElmistarBoot.retry) {
+                    window.ElmistarBoot.retry().then(handleBootResult);
+                }
+            });
+        }
 
         window.addEventListener('load', function() {
             allLoaded = true;
@@ -2848,11 +2919,9 @@
 
         setTimeout(function() {
             if (!document.documentElement.classList.contains('loading')) return;
-            allLoaded = true;
-            heroReady = true;
-            fbReady = true;
-            checkReady();
-        }, 3000);
+            if (preloader.dataset.revealed) return;
+            if (!bootReady && !bootFailed) showBootError();
+        }, BOOT_WATCHDOG_MS);
     })();
     </script>
 </body>

@@ -1,71 +1,121 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ═══════════════════════════════════════════════════════
-    // قاعدة عامة لكل المستندات:
-    // قراءة عامة + كتابة عامة (حسب الإعداد الحالي للموقع)
-    // ═══════════════════════════════════════════════════════
-    match /{document=**} {
-      allow read: if true;
-      allow write: if true;
+
+    // ═══════════════════════════════════════════
+    // دوال مساعدة للتحقق من البيانات
+    // ═══════════════════════════════════════════
+    function txt(v, max) {
+      return v is string && v.size() <= max;
+    }
+    // صورة Base64 مضغوطة (إيصال/صورة شخصية) — حد آمن تحت سقف 1MB للمستند
+    function imgOk(v) {
+      return !(v is string) || v.size() <= 900000;
     }
 
-    // ═══════════════════════════════════════════════════════
-    // كل مجموعة على حدة (للتوثيق — السلوك الفعلي من القاعدة العامة)
-    // ═══════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════
+    // 1) محتوى عام يُعرض في الموقع (قراءة للجميع)
+    // الكتابة مفتوحة لأن لوحة الأدمن بلا تسجيل دخول
+    // ═══════════════════════════════════════════
+    match /settings/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if true;
+    }
+    match /summerCourses/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if true;
+    }
+    match /educationalWorks/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if true;
+    }
+    match /announcements/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if true;
+    }
+    match /groups/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if true;
+    }
+    match /portfolio/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if true;
+    }
+    match /lessons/{docId} {
+      allow get, list: if true;
+      allow create, update, delete: if true;
+    }
 
-    // الطلاب: بيانات الطلاب المسجلين + الصورة الشخصية (Base64)
+    // ═══════════════════════════════════════════
+    // 2) طلبات الزوار من الموقع — إنشاء متحقق منه
+    // لمنع البيانات العشوائية مع إبقاء كل النماذج شغالة
+    // ═══════════════════════════════════════════
+    match /enrollmentRequests/{docId} {
+      allow get, list: if true;
+      allow create: if txt(request.resource.data.studentPhone, 30)
+        && txt(request.resource.data.studentName, 150)
+        && request.resource.data.status == 'pending';
+      allow update, delete: if true;
+    }
+    match /courseSubscriptions/{docId} {
+      allow get, list: if true;
+      allow create: if txt(request.resource.data.phone, 30)
+        && txt(request.resource.data.name, 150)
+        && request.resource.data.status == 'pending'
+        && imgOk(request.resource.data.get('receiptImage', ''));
+      allow update, delete: if true;
+    }
+    match /workbookPurchases/{docId} {
+      allow get, list: if true;
+      allow create: if txt(request.resource.data.studentPhone, 30)
+        && request.resource.data.status == 'pending'
+        && imgOk(request.resource.data.get('receiptImage', ''));
+      allow update, delete: if true;
+    }
+    match /payment_requests/{docId} {
+      allow get, list: if true;
+      allow create: if txt(request.resource.data.studentPhone, 30)
+        && request.resource.data.amountPaid is number
+        && request.resource.data.status == 'pending'
+        && imgOk(request.resource.data.get('receiptImage', ''));
+      allow update, delete: if true;
+    }
+
+    // ═══════════════════════════════════════════
+    // 3) الطلاب — يقرأ الطالب بياناته ويحدّثها من الموقع
+    // والأدمن يديرها كاملة (بلا تسجيل دخول حالياً)
+    // ═══════════════════════════════════════════
     match /students/{studentId} {
+      allow get, list: if true;
+      allow create, update, delete: if true;
+    }
+
+    // ═══════════════════════════════════════════
+    // 4) مجموعات قديمة/احتياطية مستخدمة في أجزاء من الكود
+    // ═══════════════════════════════════════════
+    match /enrollments/{docId} {
       allow read: if true;
       allow write: if true;
     }
-
-    // المعلمون: حسابات المعلمين
-    match /teachers/{teacherId} {
+    match /teachers/{docId} {
       allow read: if true;
       allow write: if true;
     }
-
-    // الإعدادات: التحكم في التسجيل، الأسعار، الإعلانات، الملاحظات، واتساب...
-    match /settings/{settingId} {
+    match /attendance/{docId} {
       allow read: if true;
       allow write: if true;
     }
-
-    // طلبات الالتحاق بالعام الجديد
-    match /enrollments/{enrollmentId} {
-      allow read: if true;
-      allow write: if true;
-    }
-
-    // الإعلانات والنصائح
-    match /announcements/{announcementId} {
-      allow read: if true;
-      allow write: if true;
-    }
-
-    // سجلات الحضور والمدفوعات (إن وجدت كمستندات منفصلة)
-    match /attendance/{attendanceId} {
-      allow read: if true;
-      allow write: if true;
-    }
-
-    // المجموعات الدراسية
-    match /groups/{groupId} {
-      allow read: if true;
-      allow write: if true;
-    }
-
-    // طلبات السداد/التحقق
-    match /payments/{paymentId} {
-      allow read: if true;
-      allow write: if true;
-    }
-
-    // الدروس والمحتوى التعليمي
-    match /lessons/{lessonId} {
+    match /payments/{docId} {
       allow read: if true;
       allow write: if true;
     }
   }
 }
+
+// ─── ملاحظات النشر ───
+// 1) للنشر: firebase deploy --only firestore:rules
+// 2) الكتابة مفتوحة عمداً لأن لوحة الأدمن تعمل بلا Firebase Authentication.
+//    للتشديد لاحقاً: فعّل تسجيل دخول للأدمن ثم استبدل
+//    allow create, update, delete: if true;
+//    بـ  allow create, update, delete: if request.auth != null;
+//    في كل المجموعات ما عدا طلبات الزوار (تبقى قراءة/إنشاء للجميع).

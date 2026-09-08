@@ -1,4 +1,4 @@
-const CACHE_NAME = 'elmistar-admin-v11';
+const CACHE_NAME = 'elmistar-admin-v12';
 const ASSETS_TO_CACHE = [
     './admin.html',
     './admin.css',
