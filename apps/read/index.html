@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قارئ الكلمات الإنجليزية 🔊</title>
+    
+    <!-- Google Fonts for Arabic & English text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #6C5CE7;
+            --primary-hover: #5A4BD1;
+            --primary-light: #F0EDFF;
+            --accent-color: #00CEC9;
+            --accent-hover: #00B5B2;
+            --clear-color: #FF7675;
+            --clear-hover: #D63031;
+            --clear-light: #FFEAEA;
+            --bg-gradient: linear-gradient(135deg, #A8C0FF 0%, #3F2B96 100%);
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --text-dark: #2D3436;
+            --text-muted: #636E72;
+            --border-radius: 24px;
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 10px 20px rgba(108, 92, 231, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #74EBD5 0%, #9ACE6A 100%);
+            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                              radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                              radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 35px 30px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        /* Top decorative bar */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #FF7675, #FDCB6E, #00CEC9, #6C5CE7);
+        }
+
+        .title-wrapper {
+            margin-bottom: 25px;
+        }
+
+        .app-title {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .speaker-icon {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .speaker-icon.speaking {
+            animation: pulse-speaker 0.6s infinite alternate;
+        }
+
+        @keyframes pulse-speaker {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.3) rotate(5deg); }
+        }
+
+        .app-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Alert / Message Notification Box */
+        .message-box {
+            display: none;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .message-box.warning {
+            background-color: #FFF3CD;
+            color: #856404;
+            border: 2px solid #FFEEBA;
+        }
+
+        .message-box.error {
+            background-color: #F8D7DA;
+            color: #721C24;
+            border: 2px solid #F5C6CB;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Input field area */
+        .input-group {
+            margin-bottom: 22px;
+            position: relative;
+        }
+
+        .word-input {
+            width: 100%;
+            padding: 18px 20px;
+            font-size: 2rem;
+            font-family: 'Fredoka', cursive, sans-serif;
+            font-weight: 600;
+            color: var(--text-dark);
+            background: #F8F9FA;
+            border: 3px solid #E2E8F0;
+            border-radius: 18px;
+            text-align: center;
+            direction: ltr; /* English word direction */
+            outline: none;
+            transition: all 0.25s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        .word-input:focus {
+            border-color: var(--primary-color);
+            background: #FFFFFF;
+            box-shadow: 0 0 0 5px rgba(108, 92, 231, 0.2), inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .word-input::placeholder {
+            color: #A0AEC0;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        /* Speed controls */
+        .speed-container {
+            background: var(--primary-light);
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .speed-label {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        .speed-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .speed-btn {
+            background: white;
+            border: 2px solid transparent;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .speed-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        .speed-btn:hover:not(.active) {
+            background: #EBE6FF;
+        }
+
+        /* Action Buttons */
+        .buttons-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-main {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            border: none;
+            border-radius: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-read {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-read:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(108, 92, 231, 0.35);
+        }
+
+        .btn-read:active {
+            transform: translateY(1px);
+        }
+
+        .secondary-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-repeat {
+            background: var(--accent-color);
+            color: white;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 15px rgba(0, 206, 201, 0.25);
+        }
+
+        .btn-repeat:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-clear {
+            background: var(--clear-light);
+            color: var(--clear-color);
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: 2px solid rgba(255, 118, 117, 0.3);
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-clear:hover {
+            background: var(--clear-hover);
+            color: white;
+            border-color: var(--clear-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Sound wave indicator animation */
+        .sound-wave {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            height: 24px;
+            margin-top: 15px;
+        }
+
+        .sound-wave.active {
+            display: flex;
+        }
+
+        .bar {
+            width: 4px;
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 4px;
+            animation: wave 1s ease-in-out infinite;
+        }
+
+        .bar:nth-child(1) { animation-delay: 0.0s; }
+        .bar:nth-child(2) { animation-delay: 0.1s; }
+        .bar:nth-child(3) { animation-delay: 0.2s; }
+        .bar:nth-child(4) { animation-delay: 0.3s; }
+        .bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes wave {
+            0%, 100% { height: 6px; }
+            50% { height: 22px; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .card {
+                padding: 25px 20px;
+            }
+            .app-title {
+                font-size: 1.7rem;
+            }
+            .word-input {
+                font-size: 1.7rem;
+                padding: 14px 15px;
+            }
+            .speed-container {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            
+            <!-- Header -->
+            <div class="title-wrapper">
+                <h1 class="app-title">
+                    <span class="speaker-icon" id="speakerIcon">🔊</span>
+                    <span>قارئ الكلمات الإنجليزية</span>
+                </h1>
+                <p class="app-subtitle">اكتب الكلمة الإنجليزية</p>
+            </div>
+
+            <!-- Warning / Notification Message -->
+            <div id="messageBox" class="message-box"></div>
+
+            <!-- Input area -->
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="wordInput" 
+                    class="word-input" 
+                    placeholder="elephant" 
+                    autocomplete="off"
+                    autofocus
+                    spellcheck="false"
+                >
+            </div>
+
+            <!-- Speed selector -->
+            <div class="speed-container">
+                <span class="speed-label">سرعة القراءة:</span>
+                <div class="speed-options">
+                    <button type="button" class="speed-btn" id="speedSlowBtn" data-rate="0.65">
+                        <span>🐢</span> بطيء
+                    </button>
+                    <button type="button" class="speed-btn active" id="speedNormalBtn" data-rate="1.0">
+                        <span>🙂</span> عادي
+                    </button>
+                </div>
+            </div>
+
+            <!-- Buttons Grid -->
+            <div class="buttons-grid">
+                <!-- Main Read Button -->
+                <button type="button" class="btn-main btn-read" id="readBtn">
+                    <span>🔊</span> اقرأ الكلمة
+                </button>
+
+                <!-- Secondary Buttons: Repeat & Clear -->
+                <div class="secondary-buttons">
+                    <button type="button" class="btn-repeat" id="repeatBtn">
+                        <span>🔁</span> إعادة القراءة
+                    </button>
+                    <button type="button" class="btn-clear" id="clearBtn">
+                        <span>🗑️</span> مسح
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sound Wave Visualizer when speaking -->
+            <div class="sound-wave" id="soundWave">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const wordInput = document.getElementById('wordInput');
+        const readBtn = document.getElementById('readBtn');
+        const repeatBtn = document.getElementById('repeatBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const speedSlowBtn = document.getElementById('speedSlowBtn');
+        const speedNormalBtn = document.getElementById('speedNormalBtn');
+        const messageBox = document.getElementById('messageBox');
+        const speakerIcon = document.getElementById('speakerIcon');
+        const soundWave = document.getElementById('soundWave');
+
+        // State variables
+        let currentRate = 1.0;
+        let selectedVoice = null;
+        let isSpeechSupported = 'speechSynthesis' in window;
+
+        // Initialize Speech Synthesis & Find Best English Voice
+        function initVoice() {
+            if (!isSpeechSupported) {
+                showMessage('عذرًا، متصفحك لا يدعم قراءة الكلمات صوتيًا. جرّب متصفحًا آخر.', 'error');
+                return;
+            }
+
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                // Priority list for English voices
+                const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+                
+                // Prefer Google, Samantha, Natural, US/UK voices
+                selectedVoice = englishVoices.find(v => v.lang === 'en-US' && (v.name.includes('Natural') || v.name.includes('Google'))) ||
+                                englishVoices.find(v => v.lang === 'en-US') ||
+                                englishVoices.find(v => v.lang === 'en-GB') ||
+                                englishVoices[0] ||
+                                null;
+            }
+        }
+
+        // Voice list changed event (needed for Chrome/Android)
+        if (isSpeechSupported) {
+            window.speechSynthesis.onvoiceschanged = initVoice;
+            initVoice();
+        }
+
+        // Display Alert Message
+        function showMessage(text, type = 'warning') {
+            messageBox.textContent = text;
+            messageBox.className = `message-box ${type}`;
+            messageBox.style.display = 'block';
+        }
+
+        // Hide Alert Message
+        function hideMessage() {
+            messageBox.style.display = 'none';
+        }
+
+        // Speech Function
+        function speakWord() {
+            hideMessage();
+
+            if (!isSpeechSupported) {
+                showMessage('عذرًا، متصفحك لا يدعم قراءة الكلمات صوتيًا. جرّب متصفحًا آخر.', 'error');
+                return;
+            }
+
+            const word = wordInput.value.trim();
+
+            // Error Check 1: Empty Input
+            if (!word) {
+                showMessage('من فضلك اكتب كلمة أولًا 😊', 'warning');
+                wordInput.focus();
+                return;
+            }
+
+            // Error Check 2: Non-English characters check (Must contain English letters)
+            // Allows basic English letters, spaces, hyphens, and apostrophes (e.g., ice-cream, don't)
+            const englishRegex = /^[a-zA-Z\s\-']+$/;
+            if (!englishRegex.test(word)) {
+                showMessage('من فضلك اكتب كلمة إنجليزية صحيحة', 'warning');
+                return;
+            }
+
+            // Stop any ongoing speech before starting a new one
+            window.speechSynthesis.cancel();
+
+            // Create Speech Utterance
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = 'en-US';
+            utterance.rate = currentRate;
+
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            }
+
+            // Visual feedback handlers
+            utterance.onstart = () => {
+                speakerIcon.classList.add('speaking');
+                soundWave.classList.add('active');
+            };
+
+            utterance.onend = () => {
+                speakerIcon.classList.remove('speaking');
+                soundWave.classList.remove('active');
+            };
+
+            utterance.onerror = (e) => {
+                speakerIcon.classList.remove('speaking');
+                soundWave.classList.remove('active');
+                console.error('Speech synthesis error:', e);
+            };
+
+            // Speak!
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Clear Function
+        function clearInput() {
+            wordInput.value = '';
+            hideMessage();
+            if (isSpeechSupported) {
+                window.speechSynthesis.cancel();
+            }
+            speakerIcon.classList.remove('speaking');
+            soundWave.classList.remove('active');
+            wordInput.focus();
+        }
+
+        // Speed Selection Logic
+        function setSpeed(rate, selectedBtn, otherBtn) {
+            currentRate = rate;
+            selectedBtn.classList.add('active');
+            otherBtn.classList.remove('active');
+        }
+
+        // Event Listeners
+        readBtn.addEventListener('click', speakWord);
+        repeatBtn.addEventListener('click', speakWord);
+        clearBtn.addEventListener('click', clearInput);
+
+        speedSlowBtn.addEventListener('click', () => {
+            setSpeed(parseFloat(speedSlowBtn.dataset.rate), speedSlowBtn, speedNormalBtn);
+        });
+
+        speedNormalBtn.addEventListener('click', () => {
+            setSpeed(parseFloat(speedNormalBtn.dataset.rate), speedNormalBtn, speedSlowBtn);
+        });
+
+        // Trigger speak on Enter key press
+        wordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                speakWord();
+            }
+        });
+
+        // Hide message when user starts typing again
+        wordInput.addEventListener('input', () => {
+            if (messageBox.style.display === 'block') {
+                hideMessage();
+            }
+        });
+    </script>
+</body>
+</html>
