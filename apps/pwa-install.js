@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   'use strict';
   try {
     if (window.__elmistarPwaInit) return;
@@ -39,6 +39,9 @@
       if (window.__elmistarInstalled === true) return;
     } catch (e) {}
     var installedViaEvent = false;
+    try {
+      if (window.__elmistarInstalled === true) installedViaEvent = true;
+    } catch (e) {}
     var overlay = null, bar = null;
     var installBtn = null, closeBtn = null, subEl = null, titleEl = null, iconEl = null;
     var autoShown = false;
@@ -46,10 +49,16 @@
     var prompting = false;
 
     var TXT = {
-      ready: 'اضغط «تثبيت» لإضافة التطبيق إلى شاشتك الرئيسية',
-      ios: 'اضغط مشاركة ↗ ثم «إضافة إلى الشاشة الرئيسية»',
-      manual: 'من قائمة المتصفح ⋮ اختر «تثبيت التطبيق»',
-      success: 'أصبح التطبيق الآن على شاشتك الرئيسية 🎉'
+      readyTitle: 'تثبيت التطبيق على جهازك',
+      ready: 'اضغط «تثبيت التطبيق» وستظهر واجهة التثبيت الأصلية للنظام',
+      waiting: 'بانتظار تأكيد التثبيت من واجهة النظام…',
+      iosTitle: 'تثبيت التطبيق من Safari',
+      ios: 'مشاركة ↗ ثم «إضافة إلى الشاشة الرئيسية» ثم «إضافة»',
+      manualTitle: 'تثبيت التطبيق',
+      manual: 'من قائمة المتصفح ⋮ اختر «تثبيت التطبيق» ثم أكّد من واجهة النظام',
+      success: 'تم تثبيت التطبيق بنجاح 🎉',
+      installNow: 'تثبيت التطبيق',
+      howTo: 'التثبيت'
     };
 
     function refreshMode() {
@@ -61,12 +70,19 @@
       }
       installBtn.classList.remove('hidden');
       try { installBtn.removeAttribute('disabled'); } catch (e) {}
+      installBtn.textContent = TXT.installNow;
       if (isIOSDevice()) {
+        titleEl.textContent = TXT.iosTitle;
         subEl.textContent = TXT.ios;
+        installBtn.textContent = TXT.howTo;
       } else if (deferredPrompt) {
+        titleEl.textContent = TXT.readyTitle;
         subEl.textContent = TXT.ready;
+        installBtn.textContent = TXT.installNow;
       } else {
+        titleEl.textContent = TXT.manualTitle;
         subEl.textContent = TXT.manual;
+        installBtn.textContent = TXT.howTo;
       }
     }
 
@@ -74,6 +90,8 @@
       if (!overlay) return;
       overlay.classList.remove('show');
       dismissedThisLoad = true;
+      try { installBtn.removeAttribute('disabled'); } catch (e) {}
+      prompting = false;
     }
     function show(force) {
       if (!overlay || !document.body.contains(overlay)) return;
@@ -95,7 +113,7 @@
       titleEl.textContent = 'تم تثبيت التطبيق!';
       subEl.textContent = TXT.success;
       installBtn.classList.add('hidden');
-      setTimeout(function () { hide(); }, 2600);
+      setTimeout(function () { remove(); }, 3000);
     }
     function markInstalled(withSuccess) {
       installedViaEvent = true;
@@ -151,10 +169,10 @@
         '<div class="elmistar-pwa-sheet">' +
           '<div class="elmistar-pwa-icon">📱</div>' +
           '<div class="elmistar-pwa-txt">' +
-            '<div class="elmistar-pwa-title">ثبّت التطبيق على هاتفك</div>' +
+            '<div class="elmistar-pwa-title"></div>' +
             '<div class="elmistar-pwa-sub"></div>' +
           '</div>' +
-          '<button type="button" class="elmistar-pwa-install">تثبيت</button>' +
+          '<button type="button" class="elmistar-pwa-install"></button>' +
           '<button type="button" class="elmistar-pwa-close" aria-label="إغلاق">×</button>' +
           '<div class="elmistar-pwa-more"></div>' +
         '</div>';
@@ -166,7 +184,6 @@
       titleEl = overlay.querySelector('.elmistar-pwa-title');
       iconEl = overlay.querySelector('.elmistar-pwa-icon');
       var moreEl = overlay.querySelector('.elmistar-pwa-more');
-      window.__elmistarPwaMore = moreEl;
       function toggleMore() {
         if (!moreEl) return;
         var open = moreEl.classList.contains('show');
@@ -178,12 +195,12 @@
           if (isIOSDevice()) {
             moreEl.innerHTML =
               '<ol class="elmistar-pwa-steps">' +
-                '<li><span class="elmistar-pwa-step-n">1</span><span>اضغط زر المشاركة <b>↗</b></span></li>' +
+                '<li><span class="elmistar-pwa-step-n">1</span><span>اضغط زر المشاركة <b>↗</b> في Safari</span></li>' +
                 '<li><span class="elmistar-pwa-step-n">2</span><span>اختر <b>«إضافة إلى الشاشة الرئيسية»</b></span></li>' +
-                '<li><span class="elmistar-pwa-step-n">3</span><span>اضغط <b>«إضافة»</b></span></li>' +
+                '<li><span class="elmistar-pwa-step-n">3</span><span>اضغط <b>«إضافة»</b> للتأكيد</span></li>' +
               '</ol>';
           } else {
-            moreEl.innerHTML = 'من قائمة المتصفح <b>⋮</b> اختر <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b>';
+            moreEl.innerHTML = 'من قائمة المتصفح <b>⋮</b> اختر <b>«تثبيت التطبيق»</b> ثم أكّد من واجهة التثبيت الأصلية للنظام';
           }
           moreEl.classList.add('show');
           bar.classList.add('expanded');
@@ -202,32 +219,35 @@
           var dp = deferredPrompt;
           prompting = true;
           try { installBtn.setAttribute('disabled', 'disabled'); } catch (e) {}
+          subEl.textContent = TXT.waiting;
           try {
             var p = dp.prompt();
             if (p && p.catch) p.catch(function () {});
             if (dp.userChoice) {
               dp.userChoice.then(function (choice) {
-                prompting = false;
-                try { installBtn.removeAttribute('disabled'); } catch (e) {}
                 deferredPrompt = null;
                 try { window.__elmistarDeferredPrompt = null; } catch (e) {}
                 if (choice && choice.outcome === 'accepted') {
-                  markInstalled(true);
-                } else { hide(); }
+                  prompting = false;
+                  subEl.textContent = TXT.waiting;
+                  try { installBtn.removeAttribute('disabled'); } catch (e) {}
+                } else {
+                  hide();
+                  refreshMode();
+                }
               }).catch(function () {
-                prompting = false;
-                try { installBtn.removeAttribute('disabled'); } catch (e) {}
                 hide();
+                refreshMode();
               });
             } else {
               prompting = false;
               try { installBtn.removeAttribute('disabled'); } catch (e) {}
-              hide();
+              refreshMode();
             }
           } catch (e) {
             prompting = false;
             try { installBtn.removeAttribute('disabled'); } catch (e) {}
-            hide();
+            refreshMode();
           }
         } else {
           try {
@@ -244,7 +264,7 @@
       if (!document.body) return;
       if (isAppInstalled()) return;
       build();
-      var delay = 1500;
+      var delay = 5000;
       try {
         if (typeof window.ELMISTAR_PWA_DELAY === 'number') delay = window.ELMISTAR_PWA_DELAY;
       } catch (e) {}

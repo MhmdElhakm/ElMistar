@@ -7,33 +7,19 @@ const DB_KEYS = {
   SETTINGS: 'jadwali_settings'
 };
 
-const MOCK_KIDS = [
-  { id: 'k1', name: 'أحمد', age: 8, grade: 'الصف الثالث الابتدائي', color: '#10b981' },
-  { id: 'k2', name: 'سارة', age: 6, grade: 'الصف الأول الابتدائي', color: '#8b5cf6' }
-];
+const MOCK_KIDS = [];
 
-const MOCK_LESSONS = [
-  { id: 'l1', childId: 'k1', name: 'الرياضيات', day: 'الأحد', time: '09:00', duration: 60 },
-  { id: 'l2', childId: 'k1', name: 'اللغة العربية', day: 'الأحد', time: '10:30', duration: 45 },
-  { id: 'l3', childId: 'k2', name: 'التربية الفنية', day: 'الاثنين', time: '11:00', duration: 60 },
-  { id: 'l4', childId: 'k2', name: 'اللغة الإنجليزية', day: 'الأربعاء', time: '09:30', duration: 45 },
-  { id: 'l5', childId: 'k1', name: 'العلوم الطبيعية', day: 'الخميس', time: '08:30', duration: 60 }
-];
+const MOCK_LESSONS = [];
 
-const MOCK_TASKS = [
-  { id: 't1', childId: 'k1', name: 'حل واجب كتاب الرياضيات ص ٢٤', day: 'الأحد', type: 'daily', completed: false },
-  { id: 't2', childId: 'k1', name: 'حفظ جزء عم (سورة النبأ)', day: 'الجمعة', type: 'weekly', completed: false },
-  { id: 't3', childId: 'k2', name: 'ترتيب سرير النوم والألعاب', day: 'الاثنين', type: 'daily', completed: true },
-  { id: 't4', childId: 'k2', name: 'قراءة قصة الأرنب والسلحفاة', day: '', type: 'available', completed: false },
-  { id: 't5', childId: 'k1', name: 'مساعدة أمي في سقي النباتات', day: '', type: 'available', completed: false },
-  { id: 't6', childId: 'k2', name: 'رسم لوحة للربيع بالألوان المائية', day: '', type: 'available', completed: true }
-];
+const MOCK_TASKS = [];
 
 const MOCK_SETTINGS = {
   notifications: true,
   twoFactor: false,
   autoLogin: true
 };
+
+const SEED_IDS = ['k1', 'k2', 'l1', 'l2', 'l3', 'l4', 'l5', 't1', 't2', 't3', 't4', 't5', 't6'];
 
 const Database = {
   init() {
@@ -49,6 +35,23 @@ const Database = {
     if (!localStorage.getItem(DB_KEYS.SETTINGS)) {
       localStorage.setItem(DB_KEYS.SETTINGS, JSON.stringify(MOCK_SETTINGS));
     }
+    this.purgeSeedData();
+  },
+
+  purgeSeedData() {
+    try {
+      let changed = false;
+      ['jadwali_kids', 'jadwali_lessons', 'jadwali_tasks'].forEach(key => {
+        let items = [];
+        try { items = JSON.parse(localStorage.getItem(key)) || []; } catch (e) { items = []; }
+        const filtered = items.filter(item => item && SEED_IDS.indexOf(item.id) === -1);
+        if (filtered.length !== items.length) {
+          localStorage.setItem(key, JSON.stringify(filtered));
+          changed = true;
+        }
+      });
+      return changed;
+    } catch (e) { return false; }
   },
 
   getChildren() {
@@ -260,7 +263,6 @@ window.addEventListener('DOMContentLoaded', () => {
   registerServiceWorker();
   setupHeaderDate();
   setupNavigation();
-  setupDayCarousel();
   setupKidFilters();
   setupFormHandlers();
   setupModalControls();
@@ -318,29 +320,6 @@ function switchView(viewId) {
     }
   });
   renderView(viewId);
-}
-
-// Days Horizontal Scroll Carousel
-function setupDayCarousel() {
-  const carousel = document.getElementById('home-days-carousel');
-  if (!carousel) return;
-  carousel.innerHTML = '';
-  DAYS_AR.forEach((day, index) => {
-    const isToday = day === DAYS_AR[new Date().getDay()];
-    const dayCard = document.createElement('button');
-    dayCard.className = `day-btn shrink-0 flex flex-col items-center justify-center w-14 h-16 rounded-2xl bg-white border border-slate-100 hover:border-emerald-300 shadow-sm transition-all ${day === appState.selectedDay ? 'active' : ''}`;
-    dayCard.innerHTML = `
-      <span class="text-[10px] font-bold ${day === appState.selectedDay ? 'text-emerald-100' : 'text-slate-400'}">${day === DAYS_AR[new Date().getDay()] ? 'اليوم' : ''}</span>
-      <span class="text-xs font-black mt-1">${day.substring(0, 7)}</span>
-    `;
-    dayCard.addEventListener('click', () => {
-      document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('active'));
-      dayCard.classList.add('active');
-      appState.selectedDay = day;
-      renderHomeView();
-    });
-    carousel.appendChild(dayCard);
-  });
 }
 
 // Kids filters on the header bar
@@ -496,7 +475,6 @@ function setupModalControls() {
     appState.selectedChildId = 'all';
     appState.selectedDay = DAYS_AR[new Date().getDay()];
     setupKidFilters();
-    setupDayCarousel();
     switchView('view-home');
     renderAll();
   });

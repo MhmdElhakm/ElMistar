@@ -6192,7 +6192,7 @@ function submitEnrollmentRequest(student, studentId) {
                 ? '<div class="app-card-img-wrap"><img src="'+escAttr(imgUrl)+'" alt="'+escHtml(app.name)+'" class="app-card-img" loading="lazy" onerror="this.remove();"></div>'
                 : '<div class="app-card-img-wrap app-card-img-empty"></div>';
             var appUrl = normalizeAppUrl(app.url);
-            return '<a href="'+escAttr(appUrl)+'" target="_blank" rel="noopener" class="app-card '+escAttr(app.color||'theme-blue')+'" id="app-card-'+escAttr(app.id)+'">' +
+            return '<div class="app-card '+escAttr(app.color||'theme-blue')+'" id="app-card-'+escAttr(app.id)+'">' +
                 bannerHtml +
                 '<div class="app-card-body">' +
                   (app.tag ? '<span class="app-card-tag"><i class="bx bx-user"></i> '+escHtml(app.tag)+'</span>' : '') +
@@ -6200,10 +6200,10 @@ function submitEnrollmentRequest(student, studentId) {
                   '<p class="app-card-desc">'+escHtml(app.description)+'</p>' +
                   '<span class="app-card-details-link"><i class="bx bx-chevron-down"></i> التفاصيل</span>' +
                   '<div class="app-card-footer">' +
-                    '<button class="app-card-launch-btn" onclick="event.preventDefault();event.stopPropagation();window.open(\''+escAttr(appUrl)+'\',\'_blank\')"><i class="bx bx-link-external"></i> افتح التطبيق</button>' +
+                    '<button class="app-card-launch-btn" onclick="window.open(\''+escAttr(appUrl)+'\',\'_blank\')"><i class="bx bx-link-external"></i> افتح التطبيق</button>' +
                   '</div>' +
                 '</div>' +
-              '</a>';
+              '</div>';
         }).join('');
     }
 
