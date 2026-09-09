@@ -9,10 +9,10 @@
 
     var SETTINGS_DOCS = [
         'registration', 'enrollment', 'sessionConfig', 'notes',
-        'congrats', 'curriculum', 'socialLinks', 'profile',
-        'educationalWorksConfig', 'whatsapp_templates'
+        'congrats', 'socialLinks', 'profile',
+        'educationalWorksConfig', 'whatsapp_templates', 'appsSection'
     ];
-    var BOOT_COLLECTIONS = ['summerCourses', 'educationalWorks', 'announcements', 'groups'];
+    var BOOT_COLLECTIONS = ['summerCourses', 'educationalWorks', 'announcements', 'groups', 'apps'];
 
     var status = 'pending';
     var reason = '';

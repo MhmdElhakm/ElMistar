@@ -45,6 +45,12 @@ service cloud.firestore {
       allow get, list: if true;
       allow create, update, delete: if true;
     }
+    match /apps/{appId} {
+      allow get, list: if true;
+      allow create: if txt(request.resource.data.name, 150)
+        && imgOk(request.resource.data.get('iconUrl', ''));
+      allow update, delete: if true;
+    }
 
     // ═══════════════════════════════════════════
     // 2) طلبات الزوار من الموقع — إنشاء متحقق منه

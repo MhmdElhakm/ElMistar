@@ -214,7 +214,7 @@ const EducationalWorks = (function () {
     bar.innerHTML =
       '<div class="ew-search-wrap">' +
         '<i class="bx bx-search"></i>' +
-        '<input type="text" class="ew-search-input" id="ew-search-input" placeholder="ابحث عن ملزمة أو منهج...">' +
+        '<input type="text" class="ew-search-input" id="ew-search-input" placeholder="ابحث عن ملزمة...">' +
       '</div>' +
       '<div class="ew-category-select-wrap">' +
         '<select class="ew-category-select" id="ew-category-select">' + catOptions + '</select>' +
@@ -342,14 +342,17 @@ const EducationalWorks = (function () {
   }
 
   function bindCardEvents(container) {
-    container.querySelectorAll('.ew-card-btn-buy').forEach(function (btn) {
-      btn.addEventListener('click', function () {
+    if (!container.__ewBound) {
+      container.__ewBound = true;
+      container.addEventListener('click', function (e) {
+        var btn = e.target && e.target.closest ? e.target.closest('.ew-card-btn-buy') : null;
+        if (!btn || !container.contains(btn)) return;
         const id = btn.getAttribute('data-id');
         if (!id) return;
         const work = allWorks.find(function (w) { return w.id === id; });
         if (work) startPurchase(work);
       });
-    });
+    }
     container.querySelectorAll('.ew-details-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
         const content = btn.nextElementSibling;
@@ -1457,14 +1460,18 @@ const SummerCourses = (function () {
       observer.observe(card);
     });
 
-    // Subscribe buttons
-    document.querySelectorAll('.summer-subscribe-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var id = this.getAttribute('data-id');
+    // Subscribe buttons (delegated once so carousel clones work too)
+    var scGrid = document.querySelector('.summer-courses-grid');
+    if (scGrid && !scGrid.__scBound) {
+      scGrid.__scBound = true;
+      scGrid.addEventListener('click', function (e) {
+        var btn = e.target && e.target.closest ? e.target.closest('.summer-subscribe-btn') : null;
+        if (!btn || !scGrid.contains(btn) || btn.disabled) return;
+        var id = btn.getAttribute('data-id');
         var course = publicCourses.find(function (c) { return c.id === id; });
         if (course) openSubscribeModal(course);
       });
-    });
+    }
 
     console.log('[SC] Public courses rendered successfully');
   }
@@ -2317,14 +2324,12 @@ function getMonthlyAfterDiscountForYear(year) {
 const MODAL_SEO_TITLES = {
     'authOverlay': "بوابة الطلاب والاشتراك | ElMistar",
     'pronouncer-modal': "الناطق الفوري وتقييم النطق بالذكاء الاصطناعي | ElMistar",
-    'qr-modal': "قارئ الـ QR كود للمناهج التفاعلية | ElMistar",
+    'qr-modal': "قارئ الـ QR كود التفاعلي | ElMistar",
     'payment-modal': "نظام الدفع والتحقق الذكي | ElMistar",
     'about-us-modal': "من هو المستر محمد سعيد الحاكم؟ | ElMistar",
     'contact-us-modal': "تواصل مع المستر محمد سعيد الحاكم | ElMistar",
     'privacy-policy-modal': "سياسة الخصوصية وحماية بيانات الطلاب | ElMistar",
-    'terms-modal': "الشروط والأحكام والالتزام بالحصص | ElMistar",
-    'short-vowels-modal': "كورس دمج الحروف والكلمات Short Vowels | ElMistar",
-    'curriculum-modal': "المنهج التعليمي - تأسيس اللغة الإنجليزية | ElMistar"
+    'terms-modal': "الشروط والأحكام والالتزام بالحصص | ElMistar"
 };
 
 function openModal(modalId) {
@@ -2391,7 +2396,7 @@ function _playClickTone() {
 }
 
 document.addEventListener('click', (e) => {
-    const el = e.target.closest('button, .btn, .nav-btn-link, .page-dot, .audio-guide-btn, .play-sound-btn');
+    const el = e.target.closest('button, .btn, .nav-btn-link, .page-dot, .play-sound-btn');
     if (el && !el.classList.contains('no-click-sound')) {
         _playClickTone();
     }
@@ -2435,7 +2440,7 @@ if (sections.length > 0 && typeof IntersectionObserver !== 'undefined') {
 function updateSideNav(id) {
     const dots = document.querySelectorAll('.page-dot');
     const pageCounter = document.getElementById('currentPageNum');
-    const sectionIds = ['home', 'my-portfolio']; // Fixed order for counter
+    const sectionIds = ['home']; // Fixed order for counter
 
     const index = sectionIds.indexOf(id);
     if (index !== -1) {
@@ -2988,6 +2993,7 @@ function _applyRegistrationState(enabled, grades) {
         }
         if (heroBtn) {
             heroBtn.disabled = false;
+            heroBtn.style.display = '';
             heroBtn.textContent = newYear ? 'سجّل الآن للعام الدراسي الجديد' : 'سجّل الآن';
             heroBtn.classList.toggle('btn-signup-newyear', newYear);
             heroBtn.classList.remove('btn-signup-closed');
@@ -3004,13 +3010,22 @@ function _applyRegistrationState(enabled, grades) {
         }
         if (heroBtn) {
             heroBtn.disabled = true;
-            heroBtn.textContent = 'التسجيل للعام الجديد مغلق';
+            heroBtn.style.display = 'none';
             heroBtn.classList.remove('btn-signup-newyear');
             heroBtn.classList.add('btn-signup-closed');
         }
+        var loggedInNow = false;
+        try {
+            var _u = JSON.parse(localStorage.getItem('el_mistar_current_user') || 'null');
+            loggedInNow = !!(_u && (_u.name || _u.phone));
+        } catch (e) {}
         if (inquiryHeroBtn) {
-            inquiryHeroBtn.style.display = '';
-            inquiryHeroBtn.onclick = function () { openModal('authOverlay'); };
+            if (loggedInNow) {
+                inquiryHeroBtn.style.display = 'none';
+            } else {
+                inquiryHeroBtn.style.display = '';
+                inquiryHeroBtn.onclick = function () { openModal('authOverlay'); };
+            }
         }
         inputs.forEach(function (el) { if (el !== btn) el.disabled = true; });
     }
@@ -3491,6 +3506,8 @@ function setLoggedIn(user) {
 
     // UI Adjustments
     if (loginBtnNav) loginBtnNav.style.display = 'none';
+    var inqHero = document.getElementById('inquiryBtnHero');
+    if (inqHero) inqHero.style.display = 'none';
     if (userProfileNav) userProfileNav.classList.add('active');
 
     const displayEl = document.getElementById('userDisplay');
@@ -4964,130 +4981,6 @@ setTimeout(initPaymentSystem, 1000);
 
 
 // ============================================
-// CURRICULUM NAVIGATION (OPEN MODAL)
-// ============================================
-const sparkCurriculumSection = document.getElementById('my-portfolio');
-const openCurriculumButtons = [
-    document.getElementById('openCurriculumNav'),
-    document.getElementById('openCurriculumModal')
-];
-
-openCurriculumButtons.forEach(btn => {
-    if (btn) {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            openModal('curriculum-modal');
-
-            // Close mobile menu if open
-            if (window.innerWidth <= 992) {
-                if (typeof navLinks !== 'undefined' && navLinks.classList.contains('open')) {
-                    navLinks.classList.remove('open');
-                    hamburger.classList.remove('open');
-                }
-            }
-        });
-    }
-});
-
-
-
-// ============================================
-// LETTERS MODAL MANAGEMENT
-// ============================================
-const lettersModal = document.getElementById('letters-modal');
-const openLettersBtns = [
-    document.getElementById('openLettersLevelCard'),
-    document.getElementById('openLettersLevelCardModal')
-];
-const closeLettersBtn = document.querySelector('[data-close="letters-modal"]');
-
-openLettersBtns.forEach(btn => {
-    if (btn) {
-        btn.addEventListener('click', () => {
-            openModal('letters-modal');
-        });
-    }
-});
-
-if (closeLettersBtn) {
-    closeLettersBtn.addEventListener('click', () => {
-        closeModal('letters-modal');
-    });
-}
-
-if (lettersModal) {
-    lettersModal.addEventListener('click', (e) => {
-        if (e.target === lettersModal) {
-            closeModal('letters-modal');
-        }
-    });
-}
-
-// ============================================
-// SHORT VOWELS MODAL MANAGEMENT
-// ============================================
-const shortVowelsModal = document.getElementById('short-vowels-modal');
-const openShortVowelsBtns = [
-    document.getElementById('openShortVowelsLevelCard'),
-    document.getElementById('openShortVowelsLevelCardModal')
-];
-const closeShortVowelsBtn = document.querySelector('[data-close="short-vowels-modal"]');
-
-openShortVowelsBtns.forEach(btn => {
-    if (btn) {
-        btn.addEventListener('click', () => {
-            openModal('short-vowels-modal');
-        });
-    }
-});
-
-if (closeShortVowelsBtn) {
-    closeShortVowelsBtn.addEventListener('click', () => {
-        closeModal('short-vowels-modal');
-    });
-}
-
-if (shortVowelsModal) {
-    shortVowelsModal.addEventListener('click', (e) => {
-        if (e.target === shortVowelsModal) {
-            closeModal('short-vowels-modal');
-        }
-    });
-}
-
-// ============================================
-// LONG VOWELS MODAL MANAGEMENT
-// ============================================
-const longVowelsModal = document.getElementById('long-vowels-modal');
-const openLongVowelsBtns = [
-    document.getElementById('openLongVowelsLevelCard'),
-    document.getElementById('openLongVowelsLevelCardModal')
-];
-const closeLongVowelsBtn = document.querySelector('[data-close="long-vowels-modal"]');
-
-openLongVowelsBtns.forEach(btn => {
-    if (btn) {
-        btn.addEventListener('click', () => {
-            openModal('long-vowels-modal');
-        });
-    }
-});
-
-if (closeLongVowelsBtn) {
-    closeLongVowelsBtn.addEventListener('click', () => {
-        closeModal('long-vowels-modal');
-    });
-}
-
-if (longVowelsModal) {
-    longVowelsModal.addEventListener('click', (e) => {
-        if (e.target === longVowelsModal) {
-            closeModal('long-vowels-modal');
-        }
-    });
-}
-
-// ============================================
 // PRONOUNCER MODAL MANAGEMENT
 // ============================================
 const pronouncerModal = document.getElementById('pronouncer-modal');
@@ -5234,82 +5127,6 @@ if (stopQRBtn) {
 
 
 
-// Play Sound Logic — Event delegation (1 listener instead of 26)
-let currentAudio = null;
-let currentPlayingBtn = null;
-
-function stopCurrentSound() {
-    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-    if (currentPlayingBtn) {
-        currentPlayingBtn.innerText = "استمع 🔊";
-        currentPlayingBtn.classList.remove('playing');
-        currentPlayingBtn = null;
-    }
-    window.speechSynthesis.cancel();
-}
-
-// Single delegated listener on the letters modal body
-const lettersModalBody = document.querySelector('#letters-modal .modal-body');
-if (lettersModalBody) {
-    lettersModalBody.addEventListener('click', (e) => {
-        const btn = e.target.closest('.play-sound-btn');
-        if (!btn) return;
-        e.stopPropagation();
-
-        // Toggle off if same button
-        if (currentPlayingBtn === btn) {
-            stopCurrentSound();
-            return;
-        }
-
-        stopCurrentSound();
-
-        const card = btn.closest('.letter-card-item');
-        if (!card) return;
-        const img = card.querySelector('.letter-card-img');
-        const nameEl = card.querySelector('.letter-name');
-        const name = nameEl ? nameEl.innerText : '';
-
-        let letter = '';
-        if (img && img.getAttribute('src')) {
-            letter = img.getAttribute('src').split('/').pop().split('.')[0].toLowerCase();
-        }
-
-        const audioFileName = (letter === 'a') ? 'A' : letter;
-        const audioPath = `audio/Jolly/${audioFileName}.mp3`;
-
-        btn.innerText = "جاري التشغيل...";
-        btn.classList.add('playing');
-        currentPlayingBtn = btn;
-
-        const audio = new Audio(audioPath);
-        currentAudio = audio;
-
-        audio.onended = () => {
-            if (currentPlayingBtn === btn) {
-                btn.innerText = "استمع 🔊";
-                btn.classList.remove('playing');
-                currentAudio = null;
-                currentPlayingBtn = null;
-            }
-        };
-
-        audio.onerror = () => {
-            // Fallback to TTS
-            const utterance = new SpeechSynthesisUtterance(name.split(' — ')[0]);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.8;
-            utterance.onend = () => {
-                btn.innerText = "استمع 🔊";
-                btn.classList.remove('playing');
-                currentPlayingBtn = null;
-            };
-            window.speechSynthesis.speak(utterance);
-        };
-
-        audio.play().catch(() => audio.onerror());
-    });
-}
 
 
 // ============================================
@@ -5449,6 +5266,12 @@ function openImageLightbox(img) {
 const lessonView = document.getElementById('lesson-view');
 const lessonClose = document.getElementById('lesson-view-close');
 
+function stopCurrentSound() {
+    try {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+    } catch (e) {}
+}
+
 function showLesson(lessonId) {
     const lesson = lessonsData.find(l => l.id === lessonId);
     if (!lesson) return;
@@ -5474,7 +5297,7 @@ if (lessonClose) {
     });
 }
 
-const clickableImages = document.querySelectorAll('.letter-card-img-wrap img, .hero-img, .student-img-container img, .gallery-item img');
+const clickableImages = document.querySelectorAll('.hero-img, .student-img-container img');
 
 clickableImages.forEach(img => {
     if (imagePopupsEnabled) img.style.cursor = 'zoom-in';
@@ -5484,36 +5307,7 @@ clickableImages.forEach(img => {
         e.stopPropagation();
         if (openImageLightbox(img)) return;
 
-        const card = img.closest('.letter-card-item');
-
-        if (card) {
-            // It's a lesson card - populate full infographic
-            const name = card.querySelector('.letter-name').innerText;
-            const story = card.querySelector('.detail-item:nth-child(1)').innerText.replace('القصة:', '').trim();
-            const movement = card.querySelector('.detail-item:nth-child(2)').innerText.replace('الحركة:', '').trim();
-            const playBtn = card.querySelector('.play-sound-btn');
-
-            if (lessonModalTitle) lessonModalTitle.innerText = name;
-            if (lessonModalStory) lessonModalStory.innerText = story;
-            if (lessonModalMovement) lessonModalMovement.innerText = movement;
-            // Also update lightbox modal duplicate elements if they exist
-            const lbMovement = document.getElementById('lb-modal-movement');
-            const lbTitle = document.getElementById('lb-modal-title');
-            const lbStory = document.getElementById('lb-modal-story');
-            if (lbMovement) lbMovement.innerText = movement;
-            if (lbTitle) lbTitle.innerText = name;
-            if (lbStory) lbStory.innerText = story;
-
-            // Sync play button
-            const lbPlayBtn = document.getElementById('lb-modal-play');
-            if (lbPlayBtn && playBtn) {
-                lbPlayBtn.onclick = () => playBtn.click();
-            }
-
-            lightboxOverlay.classList.add('lesson-mode');
-        } else {
-            lightboxOverlay.classList.remove('lesson-mode');
-        }
+        lightboxOverlay.classList.remove('lesson-mode');
 
         lightboxImg.src = img.src;
         lightboxImg.alt = img.alt || 'Extended view';
@@ -5538,86 +5332,13 @@ if (lightboxOverlay) {
     });
 }
 
-// ============================================
-// CURRICULUM PODCAST AUDIO (ELMISTAR)
-// ============================================
-const elmistarAudioTriggers = document.querySelectorAll('.Elmistar-audio-trigger');
-const elmistarAudioEl = document.querySelector('.Elmistar-audio-el');
-
-elmistarAudioTriggers.forEach(trigger => {
-    trigger.addEventListener('click', () => {
-        if (!elmistarAudioEl) return;
-
-        if (elmistarAudioEl.paused) {
-            elmistarAudioEl.play();
-            trigger.classList.add('playing');
-        } else {
-            elmistarAudioEl.pause();
-            trigger.classList.remove('playing');
-        }
-    });
-});
-
-if (elmistarAudioEl) {
-    elmistarAudioEl.addEventListener('ended', () => {
-        elmistarAudioTriggers.forEach(t => t.classList.remove('playing'));
-    });
-}
-
-// Keep the old spark audio triggers if they still exist elsewhere
-const audioTriggers = document.querySelectorAll('.spark-audio-trigger');
-const sparkAudio = document.querySelector('.spark-audio-el');
-
-audioTriggers.forEach(trigger => {
-    trigger.addEventListener('click', () => {
-        if (!sparkAudio) return;
-
-        if (sparkAudio.paused) {
-            sparkAudio.play();
-            trigger.classList.add('playing');
-        } else {
-            sparkAudio.pause();
-            trigger.classList.remove('playing');
-        }
-    });
-});
-
-if (sparkAudio) {
-    sparkAudio.addEventListener('ended', () => {
-        audioTriggers.forEach(t => t.classList.remove('playing'));
-    });
-}
-
-// ============================================
-// CURRICULUM LEVELS TABS LOGIC
-// ============================================
-const selectorBtns = document.querySelectorAll('.selector-btn');
-const levelsGrid = document.getElementById('curriculum-levels-grid');
-const levelCards = levelsGrid ? levelsGrid.querySelectorAll('.level-card') : [];
-
-selectorBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const levelNum = btn.getAttribute('data-level');
-
-        // Update buttons active state
-        selectorBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        // Update cards visibility
-        levelCards.forEach(card => card.classList.remove('active-card'));
-        const targetCard = levelCards[levelNum - 1];
-        if (targetCard) {
-            targetCard.classList.add('active-card');
-        }
-    });
-});
 
 
 // ============================================
 // FULL-PAGE NAVIGATION SYSTEM
 // ============================================
 (function () {
-        const pageSections = ['home', 'my-portfolio', 'contact'];
+        const pageSections = ['home', 'contact'];
     const dots = document.querySelectorAll('.page-dot');
     const progressBar = document.getElementById('scrollProgressBar');
     const currentPageNum = document.getElementById('currentPageNum');
@@ -5671,7 +5392,7 @@ selectorBtns.forEach(btn => {
         const activeModal = document.querySelector('.modal-overlay.active, .auth-overlay.active');
         if (activeModal) return;
 
-    const pageSections = ['home', 'my-portfolio', 'contact'];
+    const pageSections = ['home', 'contact'];
         const idx = pageSections.indexOf(currentSectionId);
 
         if (e.key === 'ArrowDown' || e.key === 'PageDown') {
@@ -5811,26 +5532,6 @@ document.addEventListener('click', (e) => {
         closeSeoModal(seoModal.id);
     }
 });
-
-// ============================================
-// CURRICULUM MODAL MANAGEMENT
-// ============================================
-const curriculumModal = document.getElementById('curriculum-modal');
-const closeCurriculumBtn = document.querySelector('[data-close="curriculum-modal"]');
-
-if (closeCurriculumBtn) {
-    closeCurriculumBtn.addEventListener('click', () => {
-        closeModal('curriculum-modal');
-    });
-}
-
-if (curriculumModal) {
-    curriculumModal.addEventListener('click', (e) => {
-        if (e.target === curriculumModal) {
-            closeModal('curriculum-modal');
-        }
-    });
-}
 
 // ============================================
 // AUTO-REFRESH: Sync data when tab becomes visible
@@ -6375,9 +6076,21 @@ function submitEnrollmentRequest(student, studentId) {
 (function () {
     'use strict';
 
-    var DEFAULT_APPS = [];
+    var FIRESTORE_COLLECTION = 'apps';
+    var SECTION_DOC_ID = 'appsSection';
 
     var STORAGE_KEY = 'elmistar_apps_config';
+
+    var DEFAULT_SECTION = {
+        title: 'تطبيقات تعليمية تفاعلية',
+        description: 'أدوات تعليمية مجانية مصممة خصيصاً لطلاب المستر',
+        tag: '🚀 تطبيقاتنا'
+    };
+
+    var appsCache = null;
+    var sectionCache = null;
+    var appsUnsub = null;
+    var sectionUnsub = null;
 
     var LEGACY_DEFAULT_IDS = { calculator:1, quiz:1, converter:1 };
 
@@ -6387,7 +6100,7 @@ function submitEnrollmentRequest(student, studentId) {
         return (u === '' || u.indexOf('img/apps/') === 0);
     }
 
-    function getAppsConfig() {
+    function readLocalApps() {
         try {
             var stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
@@ -6395,10 +6108,43 @@ function submitEnrollmentRequest(student, studentId) {
                 if (Array.isArray(parsed)) {
                     return parsed.filter(function(a){ return !isLegacyDefault(a); });
                 }
-                return parsed;
             }
         } catch (e) {}
-        return DEFAULT_APPS;
+        return [];
+    }
+
+    function writeLocalApps(list) {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list || [])); } catch (e) {}
+    }
+
+    function getAppsConfig() {
+        if (appsCache) return appsCache;
+        appsCache = readLocalApps();
+        return appsCache;
+    }
+
+    function serverAppsGet() {
+        if (window.ElmistarBoot && window.ElmistarBoot.getDocsServer) {
+            return window.ElmistarBoot.getDocsServer(FIRESTORE_COLLECTION);
+        }
+        return window.db.collection(FIRESTORE_COLLECTION).get({ source: 'server' });
+    }
+
+    function fetchAppsFromServer() {
+        if (!window.db) return Promise.reject(new Error('no-db'));
+        return serverAppsGet().then(function (snap) {
+            var list = [];
+            snap.forEach(function (doc) {
+                var d = doc.data() || {};
+                d.id = doc.id;
+                if ('icon' in d) delete d.icon;
+                list.push(d);
+            });
+            list = list.filter(function (a) { return !isLegacyDefault(a); });
+            appsCache = list;
+            writeLocalApps(list);
+            return list;
+        });
     }
 
     function escHtml(str) {
@@ -6421,14 +6167,13 @@ function submitEnrollmentRequest(student, studentId) {
         return t;
     }
 
-    function renderApps() {
+    function paintApps(apps) {
         var grid = document.getElementById('appsGrid');
         var skeleton = document.getElementById('appsSkeleton');
         var emptyState = document.getElementById('appsEmptyState');
         if (!grid) return;
 
-        var apps = getAppsConfig();
-        var visible = apps
+        var visible = (apps || [])
             .filter(function(a){ return a.visible !== false; })
             .sort(function(a,b){ return (a.order||99)-(b.order||99); });
 
@@ -6443,9 +6188,6 @@ function submitEnrollmentRequest(student, studentId) {
 
         grid.innerHTML = visible.map(function(app){
             var imgUrl = app.iconUrl || '';
-            if (!imgUrl) {
-                for (var i=0;i<DEFAULT_APPS.length;i++){ if (DEFAULT_APPS[i].id===app.id && DEFAULT_APPS[i].iconUrl){ imgUrl = DEFAULT_APPS[i].iconUrl; break; } }
-            }
             var bannerHtml = imgUrl
                 ? '<div class="app-card-img-wrap"><img src="'+escAttr(imgUrl)+'" alt="'+escHtml(app.name)+'" class="app-card-img" loading="lazy" onerror="this.remove();"></div>'
                 : '<div class="app-card-img-wrap app-card-img-empty"></div>';
@@ -6465,18 +6207,70 @@ function submitEnrollmentRequest(student, studentId) {
         }).join('');
     }
 
-    // Section header settings
+    function renderApps() {
+        paintApps(getAppsConfig());
+    }
+
+    function refreshAppsFromServer() {
+        if (!window.db) {
+            appsCache = readLocalApps();
+            paintApps(appsCache);
+            return Promise.resolve(appsCache);
+        }
+        return fetchAppsFromServer().then(function (list) {
+            paintApps(list);
+            return list;
+        }, function () {
+            appsCache = readLocalApps();
+            paintApps(appsCache);
+            return appsCache;
+        });
+    }
+
+    function subscribeAppsLive() {
+        if (!window.db || appsUnsub) return;
+        var q = window.db.collection(FIRESTORE_COLLECTION);
+        var handler = function (snap) {
+            var list = [];
+            snap.forEach(function (doc) {
+                var d = doc.data() || {};
+                d.id = doc.id;
+                if ('icon' in d) delete d.icon;
+                list.push(d);
+            });
+            list = list.filter(function (a) { return !isLegacyDefault(a); });
+            appsCache = list;
+            writeLocalApps(list);
+            paintApps(list);
+        };
+        var onErr = function () {};
+        if (window.ElmistarBoot && window.ElmistarBoot.onServerSnapshot) {
+            appsUnsub = window.ElmistarBoot.onServerSnapshot(q, handler, onErr);
+        } else {
+            appsUnsub = q.onSnapshot(handler, onErr);
+        }
+    }
+
     var SECTION_STORAGE_KEY = 'elmistar_apps_section_config';
 
-    function updateSectionHeader() {
-        var config = { title: 'تطبيقات تعليمية تفاعلية', description: 'أدوات تعليمية مجانية مصممة خصيصاً لطلاب المستر', tag: '🚀 تطبيقاتنا' };
+    function readLocalSection() {
         try {
             var stored = localStorage.getItem(SECTION_STORAGE_KEY);
-            if (stored) config = JSON.parse(stored);
+            if (stored) {
+                var parsed = JSON.parse(stored);
+                if (parsed && typeof parsed === 'object') return parsed;
+            }
         } catch(e){}
+        return JSON.parse(JSON.stringify(DEFAULT_SECTION));
+    }
 
+    function writeLocalSection(config) {
+        try { localStorage.setItem(SECTION_STORAGE_KEY, JSON.stringify(config)); } catch (e) {}
+    }
+
+    function paintSectionHeader(config) {
         var section = document.getElementById('apps-section');
-        if (!section) return;
+        if (!section || !config) return;
 
         var tagEl = section.querySelector('.section-tag');
         var titleEl = section.querySelector('.main-title');
@@ -6484,8 +6278,7 @@ function submitEnrollmentRequest(student, studentId) {
 
         if (tagEl && config.tag) tagEl.textContent = config.tag;
         if (titleEl && config.title) {
-            // Preserve the accent span
-            var parts = config.title.split(' ');
+            var parts = String(config.title).split(' ');
             if (parts.length > 1) {
                 var last = parts.pop();
                 titleEl.innerHTML = escHtml(parts.join(' ')) + ' <span class="accent-text">' + escHtml(last) + '</span>';
@@ -6496,9 +6289,81 @@ function submitEnrollmentRequest(student, studentId) {
         if (descEl && config.description) descEl.textContent = config.description;
     }
 
+    function updateSectionHeader() {
+        paintSectionHeader(sectionCache || readLocalSection());
+    }
+
+    function serverSectionGet() {
+        if (window.ElmistarBoot && window.ElmistarBoot.getDocServer) {
+            return window.ElmistarBoot.getDocServer('settings', SECTION_DOC_ID);
+        }
+        return window.db.collection('settings').doc(SECTION_DOC_ID).get({ source: 'server' });
+    }
+
+    function fetchSectionFromServer() {
+        if (!window.db) return Promise.reject(new Error('no-db'));
+        return serverSectionGet().then(function (doc) {
+            var config = JSON.parse(JSON.stringify(DEFAULT_SECTION));
+            if (doc && doc.exists) {
+                var d = doc.data() || {};
+                if (d.title) config.title = d.title;
+                if (d.description) config.description = d.description;
+                if (d.tag) config.tag = d.tag;
+            }
+            sectionCache = config;
+            writeLocalSection(config);
+            return config;
+        });
+    }
+
+    function refreshSectionFromServer() {
+        if (!window.db) {
+            sectionCache = readLocalSection();
+            paintSectionHeader(sectionCache);
+            return Promise.resolve(sectionCache);
+        }
+        return fetchSectionFromServer().then(function (config) {
+            paintSectionHeader(config);
+            return config;
+        }, function () {
+            sectionCache = readLocalSection();
+            paintSectionHeader(sectionCache);
+            return sectionCache;
+        });
+    }
+
+    function subscribeSectionLive() {
+        if (!window.db || sectionUnsub) return;
+        var ref = window.db.collection('settings').doc(SECTION_DOC_ID);
+        var handler = function (doc) {
+            if (!doc || !doc.exists) return;
+            var d = doc.data() || {};
+            var config = JSON.parse(JSON.stringify(DEFAULT_SECTION));
+            if (d.title) config.title = d.title;
+            if (d.description) config.description = d.description;
+            if (d.tag) config.tag = d.tag;
+            sectionCache = config;
+            writeLocalSection(config);
+            paintSectionHeader(config);
+        };
+        var onErr = function () {};
+        if (window.ElmistarBoot && window.ElmistarBoot.onServerSnapshot) {
+            sectionUnsub = window.ElmistarBoot.onServerSnapshot(ref, handler, onErr);
+        } else {
+            sectionUnsub = ref.onSnapshot(handler, onErr);
+        }
+    }
+
     function initAppsSection() {
-        renderApps();
-        updateSectionHeader();
+        if (!window.db) {
+            appsCache = readLocalApps();
+            sectionCache = readLocalSection();
+            paintApps(appsCache);
+            paintSectionHeader(sectionCache);
+            return;
+        }
+        refreshAppsFromServer().then(function () { subscribeAppsLive(); });
+        refreshSectionFromServer().then(function () { subscribeSectionLive(); });
     }
 
     if (document.readyState === 'loading') {
@@ -6507,6 +6372,11 @@ function submitEnrollmentRequest(student, studentId) {
         initAppsSection();
     }
 
+    document.addEventListener('elmistar:data-refreshed', function () {
+        refreshAppsFromServer();
+        refreshSectionFromServer();
+    });
+
     window.addEventListener('storage', function(e){
         if (e.key === STORAGE_KEY) renderApps();
         if (e.key === SECTION_STORAGE_KEY) updateSectionHeader();
@@ -6514,8 +6384,11 @@ function submitEnrollmentRequest(student, studentId) {
 
     window.ElMistarApps = {
         render: renderApps,
+        refresh: function () {
+            refreshAppsFromServer();
+            refreshSectionFromServer();
+        },
         getConfig: getAppsConfig,
-        STORAGE_KEY: STORAGE_KEY,
-        DEFAULT_APPS: DEFAULT_APPS
+        STORAGE_KEY: STORAGE_KEY
     };
 })();
