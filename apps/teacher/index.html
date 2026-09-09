@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مساعد المعلم</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2F6FED">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="مساعد المعلم">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<script>
+window.__elmistarDeferredPrompt=null;window.__elmistarInstalled=false;
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__elmistarDeferredPrompt=e;if(window.__elmistarPwaOnPrompt)window.__elmistarPwaOnPrompt(e);});
+window.addEventListener('appinstalled',function(){window.__elmistarInstalled=true;window.__elmistarDeferredPrompt=null;if(window.__elmistarPwaOnInstalled)window.__elmistarPwaOnInstalled();});
+</script>
+<link rel="stylesheet" href="../pwa-install.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --primary:#2F6FED;
+  --primary-dark:#16305C;
+  --primary-mid:#1B3E7A;
+  --primary-light:#EAF2FF;
+  --primary-light2:#F4F8FF;
+  --surface:#FFFFFF;
+  --bg:#F4F8FF;
+  --success:#1FAA6D;
+  --success-bg:#E7F8F0;
+  --danger:#E5484D;
+  --danger-bg:#FDECEC;
+  --warning:#F5A623;
+  --warning-bg:#FEF3E0;
+  --purple:#7C5CFC;
+  --purple-bg:#F0ECFF;
+  --text:#16305C;
+  --text-muted:#5B7396;
+  --border:#DCE7F7;
+  --radius:16px;
+  --radius-sm:10px;
+  --shadow:0 4px 20px rgba(22,48,92,0.08);
+  --shadow-lg:0 12px 32px rgba(22,48,92,0.16);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Cairo', 'Tahoma', sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+#app{
+  max-width:520px;
+  margin:0 auto;
+  min-height:100vh;
+  background:var(--bg);
+  position:relative;
+  padding-bottom:88px;
+}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+input,select,textarea{font-family:inherit;}
+
+/* ---------- HEADER ---------- */
+.top-header{
+  background:linear-gradient(135deg, var(--primary-dark), var(--primary-mid));
+  color:#fff;
+  padding:20px 18px 26px;
+  border-radius:0 0 28px 28px;
+  position:relative;
+}
+.top-header .row{
+  display:flex; align-items:center; justify-content:space-between;
+}
+.top-header h1{font-size:20px; font-weight:800;}
+.top-header .sub{font-size:13px; opacity:.85; margin-top:4px;}
+.header-icons{display:flex; gap:10px;}
+.icon-btn{
+  width:38px; height:38px; border-radius:50%;
+  background:rgba(255,255,255,0.15);
+  display:flex; align-items:center; justify-content:center;
+  font-size:17px;
+  position:relative;
+}
+.icon-btn .dot{
+  position:absolute; top:6px; left:8px; width:8px; height:8px;
+  background:var(--warning); border-radius:50%; border:2px solid var(--primary-mid);
+}
+
+/* ---------- CONTENT ---------- */
+.content{padding:16px 16px 8px;}
+.section-title{font-size:16px; font-weight:800; margin:18px 0 10px; color:var(--primary-dark);}
+
+/* Welcome card (home) */
+.welcome-card{
+  background:linear-gradient(135deg, var(--primary), #4C8CFF);
+  border-radius:var(--radius);
+  padding:20px;
+  color:#fff;
+  display:flex; align-items:center; gap:14px;
+  box-shadow:var(--shadow);
+  margin-top:-8px;
+}
+.welcome-card .emoji-badge{
+  width:52px; height:52px; border-radius:14px;
+  background:rgba(255,255,255,0.2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; flex-shrink:0;
+}
+.welcome-card h2{font-size:17px; font-weight:800; margin-bottom:4px;}
+.welcome-card p{font-size:13px; opacity:.9;}
+.welcome-card .count-pill{
+  margin-top:8px; display:inline-block;
+  background:rgba(255,255,255,0.22);
+  padding:4px 10px; border-radius:20px; font-size:12px; font-weight:700;
+}
+
+/* Quick stats */
+.stats-row{display:flex; gap:10px; margin-top:16px;}
+.stat-card{
+  flex:1; background:var(--surface); border-radius:var(--radius-sm);
+  padding:14px 8px; text-align:center; box-shadow:var(--shadow);
+  border:1px solid var(--border);
+}
+.stat-card .num{font-size:20px; font-weight:800; color:var(--primary);}
+.stat-card .lbl{font-size:11.5px; color:var(--text-muted); margin-top:4px;}
+
+/* Lesson list item */
+.lesson-card{
+  background:var(--surface); border-radius:var(--radius-sm);
+  padding:14px; display:flex; align-items:center; gap:12px;
+  box-shadow:var(--shadow); margin-bottom:10px; border:1px solid var(--border);
+  border-right:4px solid var(--primary);
+}
+.lesson-card:active{transform:scale(0.98);}
+.lesson-time{
+  background:var(--primary-light); color:var(--primary);
+  font-weight:800; font-size:13px; padding:8px 10px; border-radius:10px;
+  text-align:center; min-width:64px;
+}
+.lesson-info h4{font-size:14.5px; font-weight:700;}
+.lesson-info p{font-size:12px; color:var(--text-muted); margin-top:2px;}
+.lesson-arrow{margin-right:auto; color:var(--text-muted); font-size:18px;}
+
+.empty-state{
+  text-align:center; padding:36px 16px; color:var(--text-muted);
+}
+.empty-state .big-emoji{font-size:44px; margin-bottom:10px;}
+.empty-state p{font-size:14px; font-weight:600;}
+
+/* ---------- SEARCH ---------- */
+.search-bar{
+  display:flex; align-items:center; gap:8px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:10px 14px; margin-bottom:12px;
+  box-shadow:var(--shadow);
+}
+.search-bar input{border:none; outline:none; flex:1; font-size:14px; background:transparent; color:var(--text);}
+.search-bar .icon{color:var(--text-muted);}
+
+.filter-chips{display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin-bottom:14px;}
+.filter-chips::-webkit-scrollbar{display:none;}
+.chip{
+  white-space:nowrap; padding:7px 14px; border-radius:20px;
+  background:var(--surface); border:1px solid var(--border);
+  font-size:12.5px; font-weight:600; color:var(--text-muted);
+}
+.chip.active{background:var(--primary); color:#fff; border-color:var(--primary);}
+
+/* ---------- GROUP CARD ---------- */
+.group-card{
+  background:var(--surface); border-radius:var(--radius);
+  padding:16px; box-shadow:var(--shadow); margin-bottom:14px;
+  border:1px solid var(--border);
+}
+.group-card-top{display:flex; justify-content:space-between; align-items:flex-start;}
+.group-card-top h3{font-size:16px; font-weight:800; color:var(--primary-dark);}
+.group-card-top .subject{font-size:12.5px; color:var(--primary); font-weight:600; margin-top:2px;}
+.group-actions{display:flex; gap:6px;}
+.mini-btn{
+  width:32px; height:32px; border-radius:9px; background:var(--primary-light2);
+  display:flex; align-items:center; justify-content:center; font-size:15px;
+  border:1px solid var(--border);
+}
+.mini-btn.danger{color:var(--danger);}
+.mini-btn.edit{color:var(--primary);}
+.group-meta{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+.meta-pill{
+  font-size:12px; background:var(--primary-light2); color:var(--text-muted);
+  padding:6px 10px; border-radius:9px; font-weight:600; border:1px solid var(--border);
+}
+.group-card-footer{
+  display:flex; justify-content:space-between; align-items:center; margin-top:14px;
+}
+.fee-tag{font-size:14px; font-weight:800; color:var(--success);}
+.stats-btn{
+  background:var(--purple-bg); color:var(--purple); font-weight:700; font-size:12.5px;
+  padding:8px 14px; border-radius:10px;
+}
+
+/* Floating add button */
+.fab{
+  position:fixed; bottom:96px; left:50%; transform:translateX(calc(-50% + 224px));
+  background:var(--primary); color:#fff; padding:13px 20px; border-radius:30px;
+  font-weight:700; font-size:14px; box-shadow:var(--shadow-lg);
+  display:flex; align-items:center; gap:6px; z-index:40;
+}
+@media (max-width:560px){
+  .fab{transform:none; left:auto; right:16px;}
+}
+
+/* ---------- STUDENT CARD ---------- */
+.student-card{
+  background:var(--surface); border-radius:var(--radius-sm); padding:14px;
+  box-shadow:var(--shadow); margin-bottom:10px; border:1px solid var(--border);
+  display:flex; align-items:center; gap:12px;
+}
+.avatar{
+  width:42px; height:42px; border-radius:50%; background:var(--primary-light);
+  color:var(--primary); display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:15px; flex-shrink:0;
+}
+.student-info{flex:1; min-width:0;}
+.student-info h4{font-size:14.5px; font-weight:700;}
+.student-info p{font-size:12px; color:var(--text-muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.student-actions{display:flex; gap:6px;}
+
+/* ---------- MODALS ---------- */
+.overlay{
+  position:fixed; inset:0; background:rgba(16,32,60,0.5);
+  display:none; align-items:flex-end; justify-content:center; z-index:100;
+  backdrop-filter:blur(2px);
+}
+.overlay.open{display:flex;}
+.sheet{
+  background:var(--bg); width:100%; max-width:520px; max-height:90vh;
+  border-radius:24px 24px 0 0; overflow-y:auto; box-shadow:var(--shadow-lg);
+  animation:slideUp .25s ease;
+}
+@keyframes slideUp{from{transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+.sheet-header{
+  position:sticky; top:0; background:var(--surface); padding:16px 18px;
+  display:flex; justify-content:space-between; align-items:center;
+  border-bottom:1px solid var(--border); z-index:5;
+  border-radius:24px 24px 0 0;
+}
+.sheet-header h3{font-size:16px; font-weight:800; color:var(--primary-dark);}
+.close-btn{
+  width:32px; height:32px; border-radius:50%; background:var(--primary-light2);
+  display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--text-muted);
+}
+.sheet-body{padding:18px;}
+
+.field{margin-bottom:14px;}
+.field label{display:block; font-size:12.5px; font-weight:700; color:var(--text-muted); margin-bottom:6px;}
+.field input, .field select{
+  width:100%; padding:12px 14px; border-radius:11px; border:1px solid var(--border);
+  background:var(--surface); font-size:14px; color:var(--text); outline:none;
+}
+.field input:focus, .field select:focus{border-color:var(--primary);}
+.field-row{display:flex; gap:10px;}
+.field-row .field{flex:1;}
+.schedule-row{display:flex; gap:8px; margin-bottom:8px; align-items:center;}
+.schedule-row select, .schedule-row input{flex:1;}
+.add-time-btn{
+  font-size:12.5px; font-weight:700; color:var(--primary); padding:8px 0;
+}
+.remove-slot{color:var(--danger); font-size:16px; padding:4px 8px;}
+
+.btn-primary{
+  width:100%; background:var(--primary); color:#fff; padding:14px; border-radius:13px;
+  font-weight:800; font-size:14.5px; margin-top:8px;
+}
+.btn-secondary{
+  width:100%; background:var(--surface); color:var(--danger); padding:14px; border-radius:13px;
+  font-weight:700; font-size:14px; margin-top:8px; border:1px solid var(--border);
+}
+.btn-whatsapp{
+  width:100%; background:var(--success); color:#fff; padding:15px; border-radius:14px;
+  font-weight:800; font-size:14.5px; display:flex; align-items:center; justify-content:center; gap:8px;
+  box-shadow:0 6px 18px rgba(31,170,109,0.35);
+}
+
+/* Attendance modal specific */
+.att-header-card{
+  background:var(--primary-light); border-radius:var(--radius-sm); padding:14px; margin-bottom:14px;
+}
+.att-header-card h3{color:var(--primary-dark); font-size:15px; font-weight:800;}
+.att-header-card p{font-size:12px; color:var(--text-muted); margin-top:4px;}
+.att-student-card{
+  background:var(--surface); border-radius:var(--radius-sm); padding:12px; margin-bottom:10px;
+  border:1px solid var(--border);
+}
+.att-student-top{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.att-student-top h4{font-size:14px; font-weight:700; flex:1;}
+.call-icon{width:32px; height:32px; border-radius:9px; background:var(--primary-light2); display:flex; align-items:center; justify-content:center; font-size:14px;}
+.toggle-row{display:flex; gap:6px; margin-bottom:8px;}
+.toggle-btn{
+  flex:1; padding:8px 4px; border-radius:9px; border:1px solid var(--border);
+  font-size:11.5px; font-weight:700; color:var(--text-muted); background:var(--surface);
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+}
+.toggle-btn.active-present{background:var(--success-bg); color:var(--success); border-color:var(--success);}
+.toggle-btn.active-absent{background:var(--danger-bg); color:var(--danger); border-color:var(--danger);}
+.toggle-btn.active-late{background:var(--warning-bg); color:#B4780C; border-color:var(--warning);}
+.toggle-btn.active-hw-done{background:var(--success-bg); color:var(--success); border-color:var(--success);}
+.toggle-btn.active-hw-missing{background:var(--danger-bg); color:var(--danger); border-color:var(--danger);}
+.toggle-btn.active-hw-late{background:var(--warning-bg); color:#B4780C; border-color:var(--warning);}
+.send-one-btn{
+  margin-top:4px; width:100%; padding:8px; border-radius:9px; background:var(--primary-light2);
+  color:var(--primary); font-size:12px; font-weight:700; border:1px solid var(--border);
+}
+
+/* ---------- PAYMENTS ---------- */
+.overview-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;}
+.overview-card{
+  background:var(--surface); border-radius:var(--radius-sm); padding:14px;
+  box-shadow:var(--shadow); border:1px solid var(--border);
+}
+.overview-card.full{grid-column:1 / -1;}
+.overview-card .lbl{font-size:12px; color:var(--text-muted); font-weight:600;}
+.overview-card .val{font-size:19px; font-weight:800; margin-top:6px;}
+.val.green{color:var(--success);} .val.red{color:var(--danger);} .val.blue{color:var(--primary);} .val.purple{color:var(--purple);}
+
+.pay-group{
+  background:var(--surface); border-radius:var(--radius-sm); margin-bottom:10px;
+  box-shadow:var(--shadow); border:1px solid var(--border); overflow:hidden;
+}
+.pay-group-head{padding:14px; display:flex; justify-content:space-between; align-items:center;}
+.pay-group-head h4{font-size:14.5px; font-weight:700;}
+.pay-group-head .sub{font-size:11.5px; color:var(--text-muted); margin-top:3px;}
+.pay-group-body{
+  display:none; padding:0 14px 14px; border-top:1px solid var(--border);
+}
+.pay-group-body.open{display:block;}
+.pay-mini-stats{display:flex; gap:8px; margin:12px 0;}
+.pay-mini-stats div{flex:1; text-align:center; background:var(--primary-light2); border-radius:8px; padding:8px 4px;}
+.pay-mini-stats .n{font-size:13px; font-weight:800;}
+.pay-mini-stats .l{font-size:10px; color:var(--text-muted); margin-top:2px;}
+.pay-student-row{display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px solid var(--border);}
+.pay-student-row span{font-size:13px; flex:1;}
+.pay-student-row input{width:90px; padding:6px 8px; border-radius:8px; border:1px solid var(--border); text-align:center; font-size:12.5px;}
+.paid-badge{font-size:10.5px; padding:3px 8px; border-radius:8px; font-weight:700;}
+.paid-badge.full{background:var(--success-bg); color:var(--success);}
+.paid-badge.partial{background:var(--warning-bg); color:#B4780C;}
+.paid-badge.none{background:var(--danger-bg); color:var(--danger);}
+
+/* ---------- SCHEDULE ---------- */
+.week-grid-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+.week-grid{display:grid; grid-template-columns:56px repeat(7, 108px); min-width:800px;}
+.day-head{
+  background:var(--primary-dark); color:#fff; text-align:center; padding:10px 4px;
+  font-size:12.5px; font-weight:700; position:sticky; top:0;
+}
+.day-head.today{background:var(--primary);}
+.time-head{background:var(--primary-dark);}
+.time-cell{
+  background:var(--surface); font-size:10.5px; color:var(--text-muted);
+  text-align:center; padding:14px 2px; border-bottom:1px solid var(--border); font-weight:700;
+}
+.day-cell{
+  background:var(--primary-light2); border:1px solid var(--border); min-height:56px;
+  padding:4px; position:relative;
+}
+.slot-card{
+  background:var(--primary); color:#fff; border-radius:8px; padding:6px 7px;
+  font-size:10.5px; font-weight:700; line-height:1.4;
+}
+.slot-card .sub{font-weight:500; opacity:.85; font-size:9.5px;}
+
+/* ---------- BOTTOM NAV ---------- */
+.bottom-nav{
+  position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+  width:100%; max-width:520px; background:#fff;
+  border-top:1px solid var(--border); display:flex; z-index:50;
+  box-shadow:0 -4px 20px rgba(22,48,92,0.08);
+  padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+}
+.nav-item{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:6px 2px; color:var(--text-muted); font-size:10.5px; font-weight:700;
+}
+.nav-item .nav-ic{font-size:19px;}
+.nav-item.active{color:var(--primary);}
+.nav-item.active .nav-ic{transform:translateY(-1px);}
+
+.view{display:none;}
+.view.active{display:block;}
+
+.toast{
+  position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
+  background:var(--primary-dark); color:#fff; padding:11px 20px; border-radius:12px;
+  font-size:13px; font-weight:600; z-index:200; opacity:0; transition:opacity .25s;
+  pointer-events:none; white-space:nowrap;
+}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HOME VIEW -->
+  <div class="view active" id="view-home">
+    <div class="top-header">
+      <div class="row">
+        <div>
+          <h1>الرئيسية - مساعد المعلم</h1>
+          <div class="sub" id="homeDateLine">-</div>
+        </div>
+        <div class="header-icons">
+          <button class="icon-btn" onclick="showToast('لا توجد إشعارات جديدة')">🔔<span class="dot"></span></button>
+          <button class="icon-btn" onclick="openSettings()">☁️</button>
+        </div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="welcome-card">
+        <div class="emoji-badge">⏰</div>
+        <div>
+          <h2>أهلاً بك يا أستاذ</h2>
+          <p id="welcomeSub">جاهز ليوم دراسي جديد؟</p>
+          <div class="count-pill" id="lessonsTodayPill">0 حصة اليوم</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card"><div class="num" id="statTotalStudents">0</div><div class="lbl">إجمالي الطلاب</div></div>
+        <div class="stat-card"><div class="num" id="statTotalGroups">0</div><div class="lbl">عدد المجموعات</div></div>
+        <div class="stat-card"><div class="num" id="statLessonsToday">0</div><div class="lbl">دروس اليوم</div></div>
+      </div>
+
+      <div class="section-title">جدول دروس اليوم</div>
+      <div id="todayLessonsList"></div>
+    </div>
+  </div>
+
+  <!-- STUDENTS VIEW -->
+  <div class="view" id="view-students">
+    <div class="top-header">
+      <div class="row">
+        <div><h1 id="studentsCountTitle">الطلاب المسجلين (0)</h1></div>
+        <div class="header-icons"><button class="icon-btn" onclick="openSettings()">☁️</button></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="search-bar">
+        <span class="icon">🔎</span>
+        <input type="text" id="studentSearch" placeholder="بحث بالاسم أو الرقم..." oninput="renderStudents()">
+      </div>
+      <div class="filter-chips" id="studentFilterChips"></div>
+      <div id="studentsList"></div>
+    </div>
+    <button class="fab" onclick="openStudentModal()">+ إضافة طالب</button>
+  </div>
+
+  <!-- GROUPS VIEW -->
+  <div class="view" id="view-groups">
+    <div class="top-header">
+      <div class="row">
+        <div><h1>المجموعات الدراسية</h1></div>
+        <div class="header-icons"><button class="icon-btn" onclick="openSettings()">☁️</button></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="search-bar">
+        <span class="icon">🔎</span>
+        <input type="text" id="groupSearch" placeholder="بحث بالاسم أو المادة..." oninput="renderGroups()">
+      </div>
+      <div id="groupsList"></div>
+    </div>
+    <button class="fab" onclick="openGroupModal()">+ إضافة مجموعة</button>
+  </div>
+
+  <!-- PAYMENTS VIEW -->
+  <div class="view" id="view-payments">
+    <div class="top-header">
+      <div class="row">
+        <div>
+          <h1>المدفوعات والإحصائيات</h1>
+          <div class="sub" id="paymentsMonthLine">-</div>
+        </div>
+        <div class="header-icons"><button class="icon-btn" onclick="openSettings()">☁️</button></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="overview-grid">
+        <div class="overview-card"><div class="lbl">إجمالي المجموعات</div><div class="val blue" id="ovGroups">0</div></div>
+        <div class="overview-card"><div class="lbl">إجمالي الطلاب</div><div class="val purple" id="ovStudents">0</div></div>
+        <div class="overview-card"><div class="lbl">المبلغ المتوقع</div><div class="val" id="ovExpected">0</div></div>
+        <div class="overview-card"><div class="lbl">المحصّل فعلياً</div><div class="val green" id="ovCollected">0</div></div>
+        <div class="overview-card full"><div class="lbl">المبلغ المتبقي</div><div class="val red" id="ovRemaining">0</div></div>
+      </div>
+      <div class="section-title">متابعة مدفوعات المجموعات</div>
+      <div id="paymentsGroupList"></div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE VIEW -->
+  <div class="view" id="view-schedule">
+    <div class="top-header">
+      <div class="row">
+        <div><h1>جدول المواعيد الأسبوعي</h1></div>
+        <div class="header-icons"><button class="icon-btn" onclick="openSettings()">☁️</button></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="week-grid-wrap">
+        <div class="week-grid" id="weekGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-item active" data-view="home" onclick="switchView('home')"><span class="nav-ic">🏠</span>الرئيسية</button>
+    <button class="nav-item" data-view="students" onclick="switchView('students')"><span class="nav-ic">🧑‍🎓</span>الطلاب</button>
+    <button class="nav-item" data-view="groups" onclick="switchView('groups')"><span class="nav-ic">👥</span>المجموعات</button>
+    <button class="nav-item" data-view="payments" onclick="switchView('payments')"><span class="nav-ic">💰</span>المدفوعات</button>
+    <button class="nav-item" data-view="schedule" onclick="switchView('schedule')"><span class="nav-ic">🗓️</span>الجدول</button>
+  </div>
+
+  <!-- GROUP MODAL -->
+  <div class="overlay" id="groupModal">
+    <div class="sheet">
+      <div class="sheet-header">
+        <h3 id="groupModalTitle">إضافة مجموعة</h3>
+        <button class="close-btn" onclick="closeModal('groupModal')">✕</button>
+      </div>
+      <div class="sheet-body">
+        <div class="field"><label>اسم المجموعة</label><input id="gName" placeholder="مثال: الصف الخامس الابتدائي"></div>
+        <div class="field"><label>المادة</label><input id="gSubject" placeholder="مثال: لغة عربية"></div>
+        <div class="field"><label>قيمة الاشتراك الشهري (ج.م)</label><input id="gFee" type="number" placeholder="مثال: 300"></div>
+        <div class="field">
+          <label>مواعيد الحصص</label>
+          <div id="gScheduleRows"></div>
+          <button class="add-time-btn" onclick="addScheduleRow()">+ إضافة موعد</button>
+        </div>
+        <button class="btn-primary" onclick="saveGroup()">حفظ المجموعة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT MODAL -->
+  <div class="overlay" id="studentModal">
+    <div class="sheet">
+      <div class="sheet-header">
+        <h3 id="studentModalTitle">إضافة طالب</h3>
+        <button class="close-btn" onclick="closeModal('studentModal')">✕</button>
+      </div>
+      <div class="sheet-body">
+        <div class="field"><label>اسم الطالب</label><input id="sName" placeholder="اسم الطالب"></div>
+        <div class="field"><label>المجموعة</label><select id="sGroup"></select></div>
+        <div class="field"><label>اسم ولي الأمر</label><input id="sParentName" placeholder="اسم ولي الأمر"></div>
+        <div class="field"><label>رقم هاتف ولي الأمر</label><input id="sParentPhone" placeholder="01xxxxxxxxx" type="tel"></div>
+        <button class="btn-primary" onclick="saveStudent()">حفظ الطالب</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTENDANCE / HOMEWORK MODAL -->
+  <div class="overlay" id="attModal">
+    <div class="sheet">
+      <div class="sheet-header">
+        <h3>سجل الحضور والواجب</h3>
+        <button class="close-btn" onclick="closeModal('attModal')">✕</button>
+      </div>
+      <div class="sheet-body">
+        <div class="att-header-card">
+          <h3 id="attGroupName">-</h3>
+          <p id="attGroupMeta">-</p>
+        </div>
+        <div class="search-bar">
+          <span class="icon">🔎</span>
+          <input type="text" id="attSearch" placeholder="بحث عن طالب..." oninput="renderAttendanceList()">
+        </div>
+        <div id="attStudentsList"></div>
+        <button class="btn-whatsapp" onclick="sendGroupWhatsappReport()">📲 إرسال تقرير يومي عبر الواتساب</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GROUP STATS MODAL -->
+  <div class="overlay" id="statsModal">
+    <div class="sheet">
+      <div class="sheet-header">
+        <h3 id="statsGroupTitle">إحصائيات المجموعة</h3>
+        <button class="close-btn" onclick="closeModal('statsModal')">✕</button>
+      </div>
+      <div class="sheet-body" id="statsBody"></div>
+    </div>
+  </div>
+
+  <!-- STUDENT HISTORY MODAL -->
+  <div class="overlay" id="historyModal">
+    <div class="sheet">
+      <div class="sheet-header">
+        <h3 id="historyStudentTitle">سجل الطالب</h3>
+        <button class="close-btn" onclick="closeModal('historyModal')">✕</button>
+      </div>
+      <div class="sheet-body" id="historyBody"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="overlay" id="settingsModal">
+    <div class="sheet">
+      <div class="sheet-header">
+        <h3>الإعدادات</h3>
+        <button class="close-btn" onclick="closeModal('settingsModal')">✕</button>
+      </div>
+      <div class="sheet-body">
+        <div class="field">
+          <label>رابط شيت البيانات (Google Sheets)</label>
+          <input id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/...">
+        </div>
+        <button class="btn-primary" onclick="saveSettings()">حفظ الإعدادات</button>
+        <button class="btn-secondary" onclick="resetAllData()">إعادة تعيين كل البيانات</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ==================== STATE ==================== */
+const DAYS_ORDER = ['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة'];
+const JS_DAY_TO_AR = {0:'الأحد',1:'الاثنين',2:'الثلاثاء',3:'الأربعاء',4:'الخميس',5:'الجمعة',6:'السبت'};
+const TIME_SLOTS = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00'];
+
+let state = {
+  groups: [],
+  students: [],
+  attendance: {},   // key: groupId__date -> { studentId: {att:'present'|'absent'|'late', hw:'done'|'missing'|'late'} }
+  payments: {},      // key: studentId__YYYY-MM -> amount paid
+  settings: { sheetUrl: '' }
+};
+
+let editingGroupId = null;
+let editingStudentId = null;
+let currentAttGroupId = null;
+let currentAttDate = null;
+let studentFilterGroup = 'all';
+
+/* ==================== STORAGE ==================== */
+async function loadState(){
+  try{
+    const res = await window.storage.get('teacher-app-state');
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      state = Object.assign(state, parsed);
+    } else {
+      seedDemoData();
+      await persist();
+    }
+  }catch(e){
+    seedDemoData();
+    try{ await persist(); }catch(e2){}
+  }
+}
+let saveTimer=null;
+function persist(){
+  return new Promise((resolve)=>{
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async ()=>{
+      try{ await window.storage.set('teacher-app-state', JSON.stringify(state)); }catch(e){}
+      resolve();
+    }, 150);
+  });
+}
+
+function seedDemoData(){
+  const g1 = uid();
+  const g2 = uid();
+  state.groups = [
+    {id:g1, name:'الصف الخامس الابتدائي', subject:'لغة عربية', fee:300, schedule:[{day:'الاثنين',time:'13:00'},{day:'الخميس',time:'13:00'}]},
+    {id:g2, name:'الصف الثالث الإعدادي', subject:'رياضيات', fee:400, schedule:[{day:'الأحد',time:'17:00'},{day:'الثلاثاء',time:'17:00'}]}
+  ];
+  state.students = [
+    {id:uid(), name:'أحمد محمود', groupId:g1, parentName:'محمود سيد', parentPhone:'01001234567'},
+    {id:uid(), name:'سارة علي', groupId:g1, parentName:'علي حسن', parentPhone:'01112345678'},
+    {id:uid(), name:'يوسف كريم', groupId:g2, parentName:'كريم عبدالله', parentPhone:'01223456789'}
+  ];
+}
+
+function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
+
+/* ==================== UTIL ==================== */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function todayISO(d){ const dt = d||new Date(); return dt.toISOString().slice(0,10); }
+function monthKey(d){ const dt = d||new Date(); return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0'); }
+function arabicDayName(d){ return JS_DAY_TO_AR[d.getDay()]; }
+function formatArTime(t){
+  const [h,m] = t.split(':').map(Number);
+  const period = h < 12 ? 'ص' : 'م';
+  let h12 = h % 12; if(h12===0) h12=12;
+  return `${h12}:${String(m).padStart(2,'0')} ${period}`;
+}
+function initials(name){ return (name||'').trim().split(' ').slice(0,2).map(w=>w[0]).join(''); }
+function normalizePhone(phone){
+  let p = (phone||'').replace(/\D/g,'');
+  if(p.startsWith('0')) p = '2'+p; // Egypt country code default
+  return p;
+}
+function groupById(id){ return state.groups.find(g=>g.id===id); }
+function studentById(id){ return state.students.find(s=>s.id===id); }
+function studentsInGroup(gid){ return state.students.filter(s=>s.groupId===gid); }
+
+/* ==================== NAV ==================== */
+function switchView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.view===name));
+  if(name==='home') renderHome();
+  if(name==='students') renderStudents();
+  if(name==='groups') renderGroups();
+  if(name==='payments') renderPayments();
+  if(name==='schedule') renderSchedule();
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+
+/* ==================== HOME ==================== */
+function renderHome(){
+  const now = new Date();
+  const dayName = arabicDayName(now);
+  const dateStr = now.toLocaleDateString('ar-EG', {day:'numeric', month:'long', year:'numeric'});
+  document.getElementById('homeDateLine').textContent = `${dayName} - ${dateStr}`;
+
+  const todayLessons = getLessonsForDate(now);
+  document.getElementById('statTotalStudents').textContent = state.students.length;
+  document.getElementById('statTotalGroups').textContent = state.groups.length;
+  document.getElementById('statLessonsToday').textContent = todayLessons.length;
+  document.getElementById('lessonsTodayPill').textContent = `${todayLessons.length} حصة اليوم`;
+  document.getElementById('welcomeSub').textContent = todayLessons.length ? 'جاهز ليوم دراسي جديد؟' : 'يوم هادئ اليوم، استرح قليلاً';
+
+  const list = document.getElementById('todayLessonsList');
+  list.innerHTML = '';
+  if(todayLessons.length===0){
+    list.innerHTML = `<div class="empty-state"><div class="big-emoji">☕</div><p>لا توجد حصص مجدولة اليوم${dayName==='الجمعة' ? ' (يوم الجمعة)' : ''}</p></div>`;
+    return;
+  }
+  todayLessons.sort((a,b)=>a.time.localeCompare(b.time));
+  todayLessons.forEach(l=>{
+    const g = groupById(l.groupId);
+    const count = studentsInGroup(g.id).length;
+    const card = document.createElement('div');
+    card.className = 'lesson-card';
+    card.onclick = ()=>openAttendance(g.id, todayISO(now));
+    card.innerHTML = `
+      <div class="lesson-time">${formatArTime(l.time)}</div>
+      <div class="lesson-info">
+        <h4>${g.name}</h4>
+        <p>${g.subject} • ${count} طالب</p>
+      </div>
+      <div class="lesson-arrow">›</div>`;
+    list.appendChild(card);
+  });
+}
+
+function getLessonsForDate(dateObj){
+  const dayName = arabicDayName(dateObj);
+  const out = [];
+  state.groups.forEach(g=>{
+    (g.schedule||[]).forEach(s=>{
+      if(s.day===dayName) out.push({groupId:g.id, time:s.time, day:s.day});
+    });
+  });
+  return out;
+}
+
+/* ==================== GROUPS ==================== */
+function renderGroups(){
+  const q = (document.getElementById('groupSearch').value||'').trim();
+  const list = document.getElementById('groupsList');
+  list.innerHTML = '';
+  let groups = state.groups;
+  if(q) groups = groups.filter(g=> g.name.includes(q) || g.subject.includes(q));
+  if(groups.length===0){
+    list.innerHTML = `<div class="empty-state"><div class="big-emoji">👥</div><p>لا توجد مجموعات بعد</p></div>`;
+    return;
+  }
+  groups.forEach(g=>{
+    const count = studentsInGroup(g.id).length;
+    const scheduleTxt = (g.schedule||[]).map(s=>`${s.day} ${formatArTime(s.time)}`).join(' / ') || 'لم يحدد موعد';
+    const card = document.createElement('div');
+    card.className = 'group-card';
+    card.innerHTML = `
+      <div class="group-card-top">
+        <div>
+          <h3>${g.name}</h3>
+          <div class="subject">${g.subject}</div>
+        </div>
+        <div class="group-actions">
+          <button class="mini-btn edit" onclick="openGroupModal('${g.id}')">✏️</button>
+          <button class="mini-btn danger" onclick="deleteGroup('${g.id}')">🗑️</button>
+        </div>
+      </div>
+      <div class="group-meta">
+        <span class="meta-pill">👤 ${count} طالب</span>
+        <span class="meta-pill">🕒 ${scheduleTxt}</span>
+      </div>
+      <div class="group-card-footer">
+        <span class="fee-tag">${g.fee} ج.م / شهرياً</span>
+        <button class="stats-btn" onclick="openGroupStats('${g.id}')">📊 الإحصائيات والدرجات</button>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function openGroupModal(id){
+  editingGroupId = id || null;
+  document.getElementById('groupModalTitle').textContent = id ? 'تعديل المجموعة' : 'إضافة مجموعة';
+  const rowsWrap = document.getElementById('gScheduleRows');
+  rowsWrap.innerHTML = '';
+  if(id){
+    const g = groupById(id);
+    document.getElementById('gName').value = g.name;
+    document.getElementById('gSubject').value = g.subject;
+    document.getElementById('gFee').value = g.fee;
+    (g.schedule||[]).forEach(s=>addScheduleRow(s.day, s.time));
+  }else{
+    document.getElementById('gName').value='';
+    document.getElementById('gSubject').value='';
+    document.getElementById('gFee').value='';
+    addScheduleRow();
+  }
+  openModal('groupModal');
+}
+function addScheduleRow(day, time){
+  const wrap = document.getElementById('gScheduleRows');
+  const row = document.createElement('div');
+  row.className = 'schedule-row';
+  const dayOpts = DAYS_ORDER.map(d=>`<option value="${d}" ${d===day?'selected':''}>${d}</option>`).join('');
+  row.innerHTML = `
+    <select class="sch-day">${dayOpts}</select>
+    <input type="time" class="sch-time" value="${time||'13:00'}">
+    <button class="remove-slot" onclick="this.parentElement.remove()">✕</button>`;
+  wrap.appendChild(row);
+}
+async function saveGroup(){
+  const name = document.getElementById('gName').value.trim();
+  const subject = document.getElementById('gSubject').value.trim();
+  const fee = parseFloat(document.getElementById('gFee').value) || 0;
+  if(!name || !subject){ showToast('من فضلك أدخل اسم المجموعة والمادة'); return; }
+  const rows = document.querySelectorAll('#gScheduleRows .schedule-row');
+  const schedule = Array.from(rows).map(r=>({
+    day: r.querySelector('.sch-day').value,
+    time: r.querySelector('.sch-time').value
+  }));
+  if(editingGroupId){
+    const g = groupById(editingGroupId);
+    g.name=name; g.subject=subject; g.fee=fee; g.schedule=schedule;
+  }else{
+    state.groups.push({id:uid(), name, subject, fee, schedule});
+  }
+  await persist();
+  closeModal('groupModal');
+  renderGroups();
+  showToast('تم حفظ المجموعة بنجاح');
+}
+async function deleteGroup(id){
+  if(!confirm('هل تريد حذف هذه المجموعة؟ سيتم إلغاء ربط الطلاب بها.')) return;
+  state.groups = state.groups.filter(g=>g.id!==id);
+  state.students.forEach(s=>{ if(s.groupId===id) s.groupId=''; });
+  await persist();
+  renderGroups();
+  showToast('تم حذف المجموعة');
+}
+
+function openGroupStats(id){
+  const g = groupById(id);
+  const students = studentsInGroup(id);
+  document.getElementById('statsGroupTitle').textContent = `إحصائيات ${g.name}`;
+  let totalSessions=0, presentCount=0, hwDoneCount=0, records=0;
+  Object.keys(state.attendance).forEach(key=>{
+    if(key.startsWith(id+'__')){
+      totalSessions++;
+      const dayRec = state.attendance[key];
+      Object.values(dayRec).forEach(r=>{
+        records++;
+        if(r.att==='present') presentCount++;
+        if(r.hw==='done') hwDoneCount++;
+      });
+    }
+  });
+  const attRate = records ? Math.round((presentCount/records)*100) : 0;
+  const hwRate = records ? Math.round((hwDoneCount/records)*100) : 0;
+  const body = document.getElementById('statsBody');
+  body.innerHTML = `
+    <div class="stats-row" style="margin-top:0">
+      <div class="stat-card"><div class="num">${students.length}</div><div class="lbl">عدد الطلاب</div></div>
+      <div class="stat-card"><div class="num">${totalSessions}</div><div class="lbl">حصص مسجلة</div></div>
+      <div class="stat-card"><div class="num">${attRate}%</div><div class="lbl">نسبة الحضور</div></div>
+    </div>
+    <div class="section-title">نسبة إنجاز الواجبات: ${hwRate}%</div>
+    <div class="section-title">الطلاب</div>
+    ${students.map(s=>`<div class="student-card"><div class="avatar">${initials(s.name)}</div><div class="student-info"><h4>${s.name}</h4><p>${s.parentName||''}</p></div></div>`).join('') || '<div class="empty-state"><p>لا يوجد طلاب في هذه المجموعة</p></div>'}
+  `;
+  openModal('statsModal');
+}
+
+/* ==================== STUDENTS ==================== */
+function renderStudentFilterChips(){
+  const wrap = document.getElementById('studentFilterChips');
+  wrap.innerHTML = '';
+  const allChip = document.createElement('button');
+  allChip.className = 'chip' + (studentFilterGroup==='all' ? ' active':'');
+  allChip.textContent = 'جميع المجموعات';
+  allChip.onclick = ()=>{ studentFilterGroup='all'; renderStudents(); };
+  wrap.appendChild(allChip);
+  state.groups.forEach(g=>{
+    const c = document.createElement('button');
+    c.className = 'chip' + (studentFilterGroup===g.id ? ' active':'');
+    c.textContent = g.name;
+    c.onclick = ()=>{ studentFilterGroup=g.id; renderStudents(); };
+    wrap.appendChild(c);
+  });
+}
+function renderStudents(){
+  renderStudentFilterChips();
+  document.getElementById('studentsCountTitle').textContent = `الطلاب المسجلين (${state.students.length})`;
+  const q = (document.getElementById('studentSearch').value||'').trim();
+  let list = state.students;
+  if(studentFilterGroup!=='all') list = list.filter(s=>s.groupId===studentFilterGroup);
+  if(q) list = list.filter(s=> s.name.includes(q) || (s.parentPhone||'').includes(q));
+  const wrap = document.getElementById('studentsList');
+  wrap.innerHTML = '';
+  if(list.length===0){
+    wrap.innerHTML = `<div class="empty-state"><div class="big-emoji">🧑‍🎓</div><p>لا يوجد طلاب مطابقين</p></div>`;
+    return;
+  }
+  list.forEach(s=>{
+    const g = groupById(s.groupId);
+    const card = document.createElement('div');
+    card.className = 'student-card';
+    card.innerHTML = `
+      <div class="avatar">${initials(s.name)}</div>
+      <div class="student-info">
+        <h4>${s.name}</h4>
+        <p>${g ? g.name : 'بدون مجموعة'} • ولي الأمر: ${s.parentName||'-'}</p>
+      </div>
+      <div class="student-actions">
+        <button class="mini-btn" onclick="callPhone('${s.parentPhone}')">📞</button>
+        <button class="mini-btn" style="color:var(--success)" onclick="openWhatsappChat('${s.parentPhone}','${escapeQ(s.name)}')">💬</button>
+        <button class="mini-btn" onclick="openStudentHistory('${s.id}')">🕒</button>
+        <button class="mini-btn edit" onclick="openStudentModal('${s.id}')">✏️</button>
+        <button class="mini-btn danger" onclick="deleteStudent('${s.id}')">🗑️</button>
+      </div>`;
+    wrap.appendChild(card);
+  });
+}
+function escapeQ(s){ return (s||'').replace(/'/g,"\\'"); }
+
+function openStudentModal(id){
+  editingStudentId = id || null;
+  document.getElementById('studentModalTitle').textContent = id ? 'تعديل بيانات الطالب' : 'إضافة طالب';
+  const sel = document.getElementById('sGroup');
+  sel.innerHTML = state.groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join('') || '<option value="">لا توجد مجموعات</option>';
+  if(id){
+    const s = studentById(id);
+    document.getElementById('sName').value = s.name;
+    sel.value = s.groupId;
+    document.getElementById('sParentName').value = s.parentName;
+    document.getElementById('sParentPhone').value = s.parentPhone;
+  }else{
+    document.getElementById('sName').value='';
+    document.getElementById('sParentName').value='';
+    document.getElementById('sParentPhone').value='';
+  }
+  openModal('studentModal');
+}
+async function saveStudent(){
+  const name = document.getElementById('sName').value.trim();
+  const groupId = document.getElementById('sGroup').value;
+  const parentName = document.getElementById('sParentName').value.trim();
+  const parentPhone = document.getElementById('sParentPhone').value.trim();
+  if(!name){ showToast('من فضلك أدخل اسم الطالب'); return; }
+  if(editingStudentId){
+    const s = studentById(editingStudentId);
+    s.name=name; s.groupId=groupId; s.parentName=parentName; s.parentPhone=parentPhone;
+  }else{
+    state.students.push({id:uid(), name, groupId, parentName, parentPhone});
+  }
+  await persist();
+  closeModal('studentModal');
+  renderStudents();
+  showToast('تم حفظ بيانات الطالب');
+}
+async function deleteStudent(id){
+  if(!confirm('هل تريد حذف هذا الطالب؟')) return;
+  state.students = state.students.filter(s=>s.id!==id);
+  await persist();
+  renderStudents();
+  showToast('تم حذف الطالب');
+}
+function callPhone(phone){
+  if(!phone){ showToast('لا يوجد رقم هاتف'); return; }
+  window.open('tel:'+phone, '_blank');
+}
+function openWhatsappChat(phone, name){
+  if(!phone){ showToast('لا يوجد رقم هاتف'); return; }
+  const text = encodeURIComponent(`مرحباً، معك أستاذ ${name ? '' : ''}بخصوص الطالب/ة ${name}`);
+  window.open(`https://wa.me/${normalizePhone(phone)}?text=${text}`, '_blank');
+}
+
+function openStudentHistory(id){
+  const s = studentById(id);
+  document.getElementById('historyStudentTitle').textContent = `سجل ${s.name}`;
+  const rows = [];
+  Object.keys(state.attendance).forEach(key=>{
+    const [gid, date] = key.split('__');
+    const rec = state.attendance[key][id];
+    if(rec) rows.push({date, gid, ...rec});
+  });
+  rows.sort((a,b)=> b.date.localeCompare(a.date));
+  const body = document.getElementById('historyBody');
+  if(rows.length===0){
+    body.innerHTML = `<div class="empty-state"><div class="big-emoji">🕒</div><p>لا يوجد سجل حضور لهذا الطالب بعد</p></div>`;
+  }else{
+    const attLabel = {present:'حضر ✅', absent:'غائب ❌', late:'متأخر ⏰'};
+    const hwLabel = {done:'كتب الواجب 📚', missing:'لم يكتب ⚠️', late:'تسليم متأخر ⏳'};
+    body.innerHTML = rows.map(r=>{
+      const g = groupById(r.gid);
+      return `<div class="student-card" style="align-items:flex-start">
+        <div class="avatar">📅</div>
+        <div class="student-info">
+          <h4>${r.date} ${g?('- '+g.name):''}</h4>
+          <p>${attLabel[r.att]||''} • ${hwLabel[r.hw]||''}</p>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  openModal('historyModal');
+}
+
+/* ==================== ATTENDANCE MODAL ==================== */
+function openAttendance(groupId, dateISO){
+  currentAttGroupId = groupId;
+  currentAttDate = dateISO || todayISO();
+  const g = groupById(groupId);
+  const count = studentsInGroup(groupId).length;
+  document.getElementById('attGroupName').textContent = g.name;
+  document.getElementById('attGroupMeta').textContent = `${g.subject} • ${currentAttDate} • ${count} طالب`;
+  document.getElementById('attSearch').value = '';
+  const key = groupId+'__'+currentAttDate;
+  if(!state.attendance[key]) state.attendance[key] = {};
+  renderAttendanceList();
+  openModal('attModal');
+}
+function renderAttendanceList(){
+  const q = (document.getElementById('attSearch').value||'').trim();
+  let students = studentsInGroup(currentAttGroupId);
+  if(q) students = students.filter(s=>s.name.includes(q));
+  const key = currentAttGroupId+'__'+currentAttDate;
+  const dayRec = state.attendance[key] || {};
+  const wrap = document.getElementById('attStudentsList');
+  wrap.innerHTML = '';
+  if(students.length===0){
+    wrap.innerHTML = `<div class="empty-state"><p>لا يوجد طلاب</p></div>`;
+    return;
+  }
+  students.forEach(s=>{
+    const rec = dayRec[s.id] || {att:null, hw:null};
+    const card = document.createElement('div');
+    card.className = 'att-student-card';
+    card.innerHTML = `
+      <div class="att-student-top">
+        <h4>${s.name}</h4>
+        <button class="call-icon" onclick="callPhone('${s.parentPhone}')">📞</button>
+      </div>
+      <div class="toggle-row">
+        <button class="toggle-btn ${rec.att==='present'?'active-present':''}" onclick="setAtt('${s.id}','att','present')">✅<span>حضر</span></button>
+        <button class="toggle-btn ${rec.att==='absent'?'active-absent':''}" onclick="setAtt('${s.id}','att','absent')">❌<span>لم يحضر</span></button>
+        <button class="toggle-btn ${rec.att==='late'?'active-late':''}" onclick="setAtt('${s.id}','att','late')">⏰<span>متأخر</span></button>
+      </div>
+      <div class="toggle-row">
+        <button class="toggle-btn ${rec.hw==='done'?'active-hw-done':''}" onclick="setAtt('${s.id}','hw','done')">📚<span>كتب الواجب</span></button>
+        <button class="toggle-btn ${rec.hw==='missing'?'active-hw-missing':''}" onclick="setAtt('${s.id}','hw','missing')">⚠️<span>لم يكتب</span></button>
+        <button class="toggle-btn ${rec.hw==='late'?'active-hw-late':''}" onclick="setAtt('${s.id}','hw','late')">⏳<span>تسليم متأخر</span></button>
+      </div>
+      <button class="send-one-btn" onclick="sendStudentWhatsappReport('${s.id}')">📲 إرسال تقرير هذا الطالب</button>
+    `;
+    wrap.appendChild(card);
+  });
+}
+async function setAtt(studentId, field, value){
+  const key = currentAttGroupId+'__'+currentAttDate;
+  if(!state.attendance[key]) state.attendance[key] = {};
+  if(!state.attendance[key][studentId]) state.attendance[key][studentId] = {att:null, hw:null};
+  const rec = state.attendance[key][studentId];
+  rec[field] = rec[field]===value ? null : value;
+  await persist();
+  renderAttendanceList();
+}
+const ATT_LABEL = {present:'حضر ✅', absent:'لم يحضر ❌', late:'حضر متأخراً ⏰', null:'لم يسجل بعد'};
+const HW_LABEL = {done:'كتب الواجب 📚', missing:'لم يكتب الواجب ⚠️', late:'سلّم الواجب متأخراً ⏳', null:'لم يسجل بعد'};
+
+function buildReportMessage(studentName, rec, groupName, date){
+  return `تقرير اليوم (${date}) - ${groupName}\nالطالب/ة: ${studentName}\nالحضور: ${ATT_LABEL[rec.att]}\nالواجب: ${HW_LABEL[rec.hw]}\n\nمع تحيات المعلم.`;
+}
+function sendStudentWhatsappReport(studentId){
+  const s = studentById(studentId);
+  if(!s.parentPhone){ showToast('لا يوجد رقم هاتف لولي الأمر'); return; }
+  const key = currentAttGroupId+'__'+currentAttDate;
+  const rec = (state.attendance[key] && state.attendance[key][studentId]) || {att:null, hw:null};
+  const g = groupById(currentAttGroupId);
+  const msg = buildReportMessage(s.name, rec, g.name, currentAttDate);
+  window.open(`https://wa.me/${normalizePhone(s.parentPhone)}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+function sendGroupWhatsappReport(){
+  const students = studentsInGroup(currentAttGroupId);
+  const withPhone = students.filter(s=>s.parentPhone);
+  if(withPhone.length===0){ showToast('لا يوجد أرقام هواتف مسجلة'); return; }
+  showToast(`سيتم فتح واتساب لكل طالب على حدة (${withPhone.length})`);
+  withPhone.forEach((s, idx)=>{
+    setTimeout(()=> sendStudentWhatsappReport(s.id), idx*350);
+  });
+}
+
+/* ==================== PAYMENTS ==================== */
+function renderPayments(){
+  const now = new Date();
+  const mKey = monthKey(now);
+  document.getElementById('paymentsMonthLine').textContent = `شهر ${String(now.getMonth()+1).padStart(2,'0')}-${now.getFullYear()}`;
+
+  let expected=0, collected=0;
+  state.students.forEach(s=>{
+    const g = groupById(s.groupId);
+    if(!g) return;
+    expected += g.fee;
+    const paid = state.payments[s.id+'__'+mKey] || 0;
+    collected += Math.min(paid, g.fee);
+  });
+  const remaining = Math.max(expected - collected, 0);
+  document.getElementById('ovGroups').textContent = state.groups.length;
+  document.getElementById('ovStudents').textContent = state.students.length;
+  document.getElementById('ovExpected').textContent = expected + ' ج.م';
+  document.getElementById('ovCollected').textContent = collected + ' ج.م';
+  document.getElementById('ovRemaining').textContent = remaining + ' ج.م';
+
+  const wrap = document.getElementById('paymentsGroupList');
+  wrap.innerHTML = '';
+  if(state.groups.length===0){
+    wrap.innerHTML = `<div class="empty-state"><p>لا توجد مجموعات بعد</p></div>`;
+    return;
+  }
+  state.groups.forEach(g=>{
+    const students = studentsInGroup(g.id);
+    let gExpected=0, gCollected=0;
+    students.forEach(s=>{
+      gExpected += g.fee;
+      gCollected += Math.min(state.payments[s.id+'__'+mKey]||0, g.fee);
+    });
+    const gRemaining = Math.max(gExpected-gCollected,0);
+    const card = document.createElement('div');
+    card.className = 'pay-group';
+    const bodyId = 'paybody_'+g.id;
+    card.innerHTML = `
+      <div class="pay-group-head" onclick="togglePayGroup('${bodyId}')">
+        <div>
+          <h4>${g.name}</h4>
+          <div class="sub">${students.length} طالب • ${g.fee} ج.م/طالب</div>
+        </div>
+        <div style="font-weight:800; color:${gRemaining>0?'var(--danger)':'var(--success)'}">${gCollected}/${gExpected}</div>
+      </div>
+      <div class="pay-group-body" id="${bodyId}">
+        <div class="pay-mini-stats">
+          <div><div class="n">${gExpected}</div><div class="l">متوقع</div></div>
+          <div><div class="n" style="color:var(--success)">${gCollected}</div><div class="l">محصّل</div></div>
+          <div><div class="n" style="color:var(--danger)">${gRemaining}</div><div class="l">متبقي</div></div>
+        </div>
+        ${students.map(s=>{
+          const paid = state.payments[s.id+'__'+mKey]||0;
+          const status = paid>=g.fee ? 'full' : (paid>0 ? 'partial':'none');
+          const statusLabel = status==='full'?'مدفوع بالكامل':(status==='partial'?'مدفوع جزئياً':'لم يدفع');
+          return `<div class="pay-student-row">
+            <span>${s.name} <span class="paid-badge ${status}">${statusLabel}</span></span>
+            <input type="number" value="${paid}" onchange="updatePayment('${s.id}','${mKey}',this.value)">
+          </div>`;
+        }).join('')}
+      </div>`;
+    wrap.appendChild(card);
+  });
+}
+function togglePayGroup(id){
+  document.getElementById(id).classList.toggle('open');
+}
+async function updatePayment(studentId, mKey, value){
+  const amount = parseFloat(value)||0;
+  state.payments[studentId+'__'+mKey] = amount;
+  await persist();
+  renderPayments();
+  showToast('تم تحديث المبلغ المدفوع');
+}
+
+/* ==================== SCHEDULE ==================== */
+function renderSchedule(){
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '';
+  const todayName = arabicDayName(new Date());
+
+  grid.appendChild(makeCell('time-head day-head', ''));
+  DAYS_ORDER.forEach(d=>{
+    grid.appendChild(makeCell('day-head'+(d===todayName?' today':''), d));
+  });
+
+  TIME_SLOTS.forEach(slot=>{
+    grid.appendChild(makeCell('time-cell', formatArTime(slot)));
+    DAYS_ORDER.forEach(day=>{
+      const cell = document.createElement('div');
+      cell.className = 'day-cell';
+      state.groups.forEach(g=>{
+        (g.schedule||[]).forEach(s=>{
+          if(s.day===day && s.time===slot){
+            const sc = document.createElement('div');
+            sc.className='slot-card';
+            sc.innerHTML = `${g.name}<div class="sub">${g.subject}</div>`;
+            sc.onclick = ()=> openAttendance(g.id, todayISO());
+            cell.appendChild(sc);
+          }
+        });
+      });
+      grid.appendChild(cell);
+    });
+  });
+}
+function makeCell(cls, text){
+  const d = document.createElement('div');
+  d.className = cls;
+  d.textContent = text;
+  return d;
+}
+
+/* ==================== SETTINGS ==================== */
+function openSettings(){
+  document.getElementById('sheetUrlInput').value = state.settings.sheetUrl || '';
+  openModal('settingsModal');
+}
+async function saveSettings(){
+  state.settings.sheetUrl = document.getElementById('sheetUrlInput').value.trim();
+  await persist();
+  closeModal('settingsModal');
+  showToast('تم حفظ الإعدادات');
+}
+async function resetAllData(){
+  if(!confirm('سيتم حذف كل البيانات نهائياً. هل أنت متأكد؟')) return;
+  state = { groups:[], students:[], attendance:{}, payments:{}, settings:{sheetUrl:''} };
+  await persist();
+  renderHome(); renderStudents(); renderGroups(); renderPayments(); renderSchedule();
+  closeModal('settingsModal');
+  showToast('تم إعادة تعيين البيانات');
+}
+
+/* ==================== INIT ==================== */
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click', (e)=>{ if(e.target===ov) ov.classList.remove('open'); });
+});
+
+(async function init(){
+  await loadState();
+  renderHome();
+})();
+if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('./sw.js').catch(function(){}); } catch(e){} }
+</script>
+<script src="../pwa-install.js"></script>
+</body>
+</html>

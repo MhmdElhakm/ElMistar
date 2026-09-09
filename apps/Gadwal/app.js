@@ -264,22 +264,16 @@ window.addEventListener('DOMContentLoaded', () => {
   setupKidFilters();
   setupFormHandlers();
   setupModalControls();
+  setupInstallButton();
   renderAll();
 });
 
-// PWA Service Worker Registration
+// PWA Service Worker Registration (file URL required for real installability)
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    const blob = new Blob([SW_CODE], { type: 'application/javascript' });
-    const swUrl = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl, { scope: './' })
-      .then((reg) => {
-        console.log('[PWA] Service Worker registered successfully:', reg.scope);
-      })
-      .catch((err) => {
-        console.warn('[PWA] Service Worker registration via blob failed, trying inline:', err);
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      });
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .then(function () {})
+      .catch(function () {});
   }
 }
 
@@ -1184,6 +1178,29 @@ function showDetailsModal(item, type, kid) {
 
   lucide.createIcons();
   openModal('modal-details');
+}
+
+function setupInstallButton() {
+  const btn = document.getElementById('btn-install-app');
+  if (!btn) return;
+  const refresh = () => {
+    try {
+      if (window.ElMistarPWA && window.ElMistarPWA.isAppInstalled && window.ElMistarPWA.isAppInstalled()) {
+        btn.innerText = 'مثبت ✓';
+        btn.setAttribute('disabled', 'disabled');
+        btn.classList.add('opacity-70');
+      }
+    } catch (e) {}
+  };
+  btn.addEventListener('click', () => {
+    try {
+      if (window.ElMistarPWA && window.ElMistarPWA.showInstall) window.ElMistarPWA.showInstall();
+      else if (window.__elmistarDeferredPrompt) window.__elmistarDeferredPrompt.prompt();
+      else showToast('من قائمة المتصفح ⋮ اختر تثبيت التطبيق');
+    } catch (e) { showToast('من قائمة المتصفح ⋮ اختر تثبيت التطبيق'); }
+  });
+  setTimeout(refresh, 2000);
+  window.addEventListener('appinstalled', refresh);
 }
 
 // Toast System

@@ -2,17 +2,24 @@
 <html lang="ar" dir="rtl" class="h-full">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>جدولي - إدارة جدول الأطفال والمهام</title>
-  
-  <!-- Web App Manifest (Inlined) -->
-  <link rel="manifest" href='data:application/json,{"name":"جدولي - إدارة جدول الأطفال والمهام","short_name":"جدولي","description":"تطبيق ويب تقدمي متجاوب باللغة العربية لإدارة الأطفال والجدول الدراسي والمهام اليومية.","start_url":"./index.html","display":"standalone","background_color":"#ffffff","theme_color":"#059669","orientation":"portrait-primary","dir":"rtl","lang":"ar-EG","icons":[{"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
+  <meta name="description" content="تطبيق جدولي لإدارة جدول الأطفال والمهام اليومية - يعمل بدون إنترنت وقابل للتثبيت على الهاتف">
+  <!-- Web App Manifest -->
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#059669">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="جدولي">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="./icons/favicon.png">
+  <script>
+  window.__elmistarDeferredPrompt=null;window.__elmistarInstalled=false;
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__elmistarDeferredPrompt=e;if(window.__elmistarPwaOnPrompt)window.__elmistarPwaOnPrompt(e);});
+  window.addEventListener('appinstalled',function(){window.__elmistarInstalled=true;window.__elmistarDeferredPrompt=null;if(window.__elmistarPwaOnInstalled)window.__elmistarPwaOnInstalled();});
+  </script>
 
   <!-- Google Fonts - Cairo -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,7 +60,8 @@
   </script>
 
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./pwa-install.css">
 </head>
 <body class="font-cairo bg-slate-50 text-slate-800 h-full flex flex-col antialiased selection:bg-emerald-100 selection:text-emerald-950 overflow-hidden">
 
@@ -238,6 +246,17 @@
       <!-- ================= 5. VIEW SETTINGS ================= -->
       <section id="view-settings" class="view-panel hidden space-y-6">
         <h2 class="text-xl font-bold text-slate-800">الإعدادات والبيانات</h2>
+
+        <div class="bg-gradient-to-l from-emerald-600 to-emerald-500 rounded-2xl p-4 shadow-emerald-glow flex items-center gap-3 text-white">
+          <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <i data-lucide="smartphone" class="w-5 h-5"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-bold">تثبيت التطبيق على الهاتف</p>
+            <p class="text-xs text-emerald-100">يعمل بدون إنترنت ويفتح بملء الشاشة</p>
+          </div>
+          <button id="btn-install-app" class="bg-white text-emerald-700 text-xs font-black px-4 py-2.5 rounded-xl shadow-sm active:scale-95 transition shrink-0">تثبيت</button>
+        </div>
 
         <!-- Toggles Card -->
         <div class="bg-white rounded-2xl border border-slate-100 p-4 space-y-4 shadow-premium">
@@ -648,54 +667,6 @@
   <!-- JavaScript -->
   <script src="app.js"></script>
 
-  <!-- PWA Install Bar -->
-  <style>
-  #elmistar-install-bar{position:fixed;bottom:12px;right:12px;left:12px;z-index:9999;background:#111827;color:#fff;border-radius:16px;padding:12px 14px;display:none;align-items:center;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,.35);font-family:'Cairo',Tahoma,sans-serif;direction:rtl;max-width:480px;margin:0 auto}
-  #elmistar-install-bar.show{display:flex;animation:elmistar-bar-up .35s ease}
-  @keyframes elmistar-bar-up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
-  #elmistar-install-bar .eib-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#f97316,#fb923c);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
-  #elmistar-install-bar .eib-txt{flex:1;min-width:0}
-  #elmistar-install-bar .eib-title{font-weight:800;font-size:.9rem}
-  #elmistar-install-bar .eib-sub{font-size:.75rem;color:#d1d5db;line-height:1.6}
-  #elmistar-install-bar .eib-install{background:#f97316;border:none;color:#fff;font-weight:800;font-family:inherit;font-size:.85rem;border-radius:10px;padding:9px 18px;cursor:pointer;white-space:nowrap}
-  #elmistar-install-bar .eib-close{background:transparent;border:none;color:#9ca3af;font-size:1.2rem;cursor:pointer;padding:4px}
-  </style>
-  <div id="elmistar-install-bar" role="dialog" aria-label="تثبيت التطبيق">
-    <div class="eib-icon">📲</div>
-    <div class="eib-txt">
-      <div class="eib-title">ثبّت التطبيق على هاتفك</div>
-      <div class="eib-sub" id="elmistar-install-sub">وصول سريع من الشاشة الرئيسية</div>
-    </div>
-    <button class="eib-install" id="elmistar-install-btn">تثبيت</button>
-    <button class="eib-close" id="elmistar-install-close" aria-label="إغلاق">✕</button>
-  </div>
-  <script>
-  (function(){
-    var bar=document.getElementById('elmistar-install-bar');
-    function isStandalone(){ return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }
-    if (isStandalone()) { if(bar) bar.remove(); return; }
-    var sub=document.getElementById('elmistar-install-sub');
-    var btn=document.getElementById('elmistar-install-btn');
-    var close=document.getElementById('elmistar-install-close');
-    if(!bar||!btn||!close) return;
-    var deferred=null;
-    var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-    function show(msg){ if(isStandalone()) return; if(msg) sub.textContent=msg; bar.classList.add('show'); }
-    function hide(){ bar.classList.remove('show'); }
-    window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; show('اضغط «تثبيت» لإضافة التطبيق إلى شاشة هاتفك'); });
-    window.addEventListener('appinstalled',function(){ if(bar) bar.remove(); });
-    btn.addEventListener('click',function(){
-      if (deferred){ deferred.prompt(); deferred.userChoice.then(function(){ hide(); deferred=null; }); }
-      else if (isIOS){ show('اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية»'); }
-      else { show('من قائمة المتصفح اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية»'); }
-    });
-    close.addEventListener('click',function(){ hide(); });
-    setTimeout(function(){
-      if (isStandalone() || !document.body.contains(bar) || bar.classList.contains('show')) return;
-      if (isIOS) show('اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية» لتثبيت التطبيق');
-      else show('ثبّته على شاشتك: من قائمة المتصفح اختر «تثبيت التطبيق»');
-    }, 5000);
-  })();
-  </script>
+  <script src="./pwa-install.js"></script>
 </body>
 </html>
