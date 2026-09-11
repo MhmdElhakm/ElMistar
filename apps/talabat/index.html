@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#FFB800" />
+<title>ناقصنا ايه | مشتريات البيت</title>
+<link rel="icon" type="image/png" href="icon.png" />
+<link rel="apple-touch-icon" href="icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF8FF;
+    --bg-paper: #FFFFFF;
+    --card: #FFFFFF;
+    --text: #1E1B2E;
+    --text-sec: #6B6580;
+    --text-muted: #A8A3C0;
+    --border: #EDE9FE;
+    --primary: #7C3AED;
+    --primary-dark: #6D28D9;
+    --primary-light: #F1EAFE;
+    --primary-soft: #E9DFFF;
+    --grad: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 55%, #6D28D9 100%);
+    --grad-soft: linear-gradient(135deg, #EDE9FE 0%, #FDF4FF 60%, #EFF6FF 100%);
+    --grad-sun: linear-gradient(135deg, #FBBF24 0%, #FB7185 100%);
+    --success: #10B981;
+    --success-light: #DCFCE7;
+    --danger: #F43F5E;
+    --danger-light: #FFE4E6;
+    --pending: #F59E0B;
+    --pending-light: #FEF3C7;
+    --accent: #06B6D4;
+    --accent-light: #CFFAFE;
+    --pink: #EC4899;
+    --pink-light: #FCE7F3;
+    --mint: #14B8A6;
+    --mint-light: #CCFBF1;
+    --nav-h: 76px;
+    --radius: 22px;
+    --radius-sm: 16px;
+    --radius-xs: 12px;
+    --shadow-sm: 0 2px 8px rgba(124,58,237,.07);
+    --shadow: 0 8px 28px rgba(124,58,237,.10);
+    --shadow-lg: 0 16px 48px rgba(124,58,237,.16);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Cairo", "Nunito", sans-serif;
+    background: var(--bg);
+    background-image: radial-gradient(600px 320px at 85% -60px, #EDE9FE 0%, transparent 60%), radial-gradient(500px 300px at 0% 0%, #FCE7F3 0%, transparent 55%), radial-gradient(700px 420px at 50% 110%, #E0F2FE 0%, transparent 60%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; font-weight: 700; }
+  input, select, textarea { font-family: inherit; font-size: 15px; font-weight: 600; }
+  .hidden { display: none !important; }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: calc(var(--nav-h) + 28px);
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 15px 20px;
+    border-radius: 18px;
+    font-size: 15px; font-weight: 800;
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    min-height: 54px;
+    border: none;
+    background: #fff;
+    color: var(--text);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn:active { transform: scale(.97); }
+  .btn svg { width: 19px; height: 19px; }
+  .btn-primary { background: var(--grad); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 12px 26px rgba(124,58,237,.38); letter-spacing: .1px; }
+  .btn-primary:active { box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 5px 12px rgba(124,58,237,.3); }
+  .btn-success { background: linear-gradient(135deg,#34D399,#10B981); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 12px 26px rgba(16,185,129,.32); }
+  .btn-danger { background: linear-gradient(135deg,#FB7185,#F43F5E); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 12px 26px rgba(244,63,94,.3); }
+  .btn-group .btn:not(.btn-primary):not(.btn-success):not(.btn-danger), .btn-secondary { background: #fff; color: var(--primary-dark); border: 1.5px solid rgba(124,58,237,.28); box-shadow: 0 4px 12px rgba(124,58,237,.08); }
+  .btn-group .btn:not(.btn-primary):not(.btn-success):not(.btn-danger):active { background: var(--primary-light); }
+  .btn-ghost { background: transparent; border: none; box-shadow: none; width: auto; padding: 8px 14px; min-height: auto; font-weight: 800; color: var(--primary); }
+  .btn-group { display: flex; flex-direction: column; gap: 12px; }
+  .btn-sm { padding: 9px 15px; min-height: 38px; font-size: 13px; width: auto; border-radius: 14px; }
+
+  .form-card {
+    width: 100%; background: var(--card); border-radius: 24px;
+    padding: 28px 22px 24px; border: 1px solid rgba(124,58,237,.08);
+    box-shadow: var(--shadow);
+    animation: pop .35s ease-out;
+  }
+  @keyframes pop { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .form-title { font-size: 22px; font-weight: 900; margin-bottom: 6px; text-align: center; }
+  .form-subtitle { color: var(--text-sec); margin-bottom: 20px; text-align: center; font-size: 14px; font-weight: 600; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-weight: 800; margin-bottom: 6px; font-size: 14px; }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 13px 14px;
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--bg); transition: all .2s; color: var(--text);
+    box-shadow: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+  }
+  .field input.error { border-color: var(--danger); background: var(--danger-light); }
+  .help-text { color: var(--text-muted); font-size: 12px; margin-top: 4px; font-weight: 600; }
+  .error-text { color: var(--danger); background: var(--danger-light); padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 14px; font-size: 14px; font-weight: 600; border: 1px solid var(--danger); }
+
+  .onboarding { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 28px 20px; }
+  .welcome-card { width: 100%; text-align: center; max-width: 420px; }
+  .brand-icon {
+    width: 100px; height: 100px; margin: 0 auto 20px;
+    background: var(--primary-light); border: none;
+    border-radius: 24px; display: flex; align-items: center; justify-content: center;
+    font-size: 48px; animation: pop .5s ease-out;
+    box-shadow: 0 8px 24px rgba(59,130,246,.2);
+  }
+  .brand-title { font-size: 34px; font-weight: 900; color: var(--primary-dark); margin-bottom: 8px; }
+  .brand-desc { font-size: 15px; color: var(--text-sec); margin-bottom: 36px; font-weight: 600; line-height: 1.8; }
+  /* ===== Welcome hero ===== */
+  .onboarding.wb { position: relative; overflow: hidden; }
+  .wb-blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; pointer-events: none; }
+  .wb-blob.b1 { width: 280px; height: 280px; background: #DDD0FE; top: -90px; right: -80px; animation: blobFloat 7s ease-in-out infinite; }
+  .wb-blob.b2 { width: 220px; height: 220px; background: #FBCFE8; bottom: -70px; left: -60px; animation: blobFloat 8s ease-in-out 1s infinite reverse; }
+  @keyframes blobFloat { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-18px,16px) scale(1.08); } }
+  .welcome-card { position: relative; z-index: 1; }
+  .welcome-card .noura-card { margin: 0 0 16px; }
+  .brand-icon.xl { width: 112px; height: 112px; border-radius: 32px; }
+  .brand-icon.xl svg { width: 52px; height: 52px; }
+  .app-logo { position: relative; overflow: hidden; padding: 0; }
+  .app-logo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .brand-title.grad { font-size: 40px; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 6px; }
+  .feat-row { display: flex; gap: 8px; justify-content: center; margin: -22px 0 14px; }
+  .feat-pill { display: flex; align-items: center; gap: 7px; background: #fff; border: 1.5px solid rgba(124,58,237,.14); border-radius: 999px; padding: 7px 13px 7px 8px; font-size: 12px; font-weight: 800; box-shadow: var(--shadow-sm); }
+  .feat-ico { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .btn-xl { min-height: 58px; font-size: 17px; border-radius: 20px; }
+  .trust-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; font-size: 11.5px; font-weight: 800; color: var(--text-muted); }
+  .trust-row i { width: 4px; height: 4px; border-radius: 50%; background: var(--text-muted); opacity: .6; }
+  @keyframes wUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+  .w-anim { animation: wUp .55s cubic-bezier(.22,1,.36,1) both; }
+  .w-anim.d1 { animation-delay: .08s; } .w-anim.d2 { animation-delay: .16s; }
+  .w-anim.d3 { animation-delay: .24s; } .w-anim.d4 { animation-delay: .32s; }
+  .w-anim.d5 { animation-delay: .4s; } .w-anim.d6 { animation-delay: .48s; }
+  .home-code-box {
+    background: var(--primary-light); border: 1.5px solid var(--primary);
+    border-radius: var(--radius); padding: 20px; text-align: center; margin: 16px 0 20px;
+  }
+  .home-code { font-size: 28px; font-weight: 900; color: var(--primary-dark); letter-spacing: 3px; font-family: monospace; }
+  .home-code-label { font-size: 12px; color: var(--text-sec); margin-bottom: 6px; font-weight: 700; }
+  .success-icon { width: 72px; height: 72px; margin: 0 auto 14px; background: var(--success-light); border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; animation: pop .5s ease-out; box-shadow: 0 6px 16px rgba(16,185,129,.2); }
+
+  .topbar { padding: 16px 18px 6px; position: sticky; top: 0; background: var(--bg); z-index: 10; border-bottom: 1px solid var(--border); }
+  .topbar .greeting { font-size: 20px; font-weight: 800; }
+  .page-title { font-size: 22px; font-weight: 900; margin: 10px 18px 12px; }
+  .section { padding: 0 18px; margin-bottom: 18px; }
+  .page { animation: fadePage .2s ease-out; }
+  @keyframes fadePage { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card {
+    background: var(--card); border-radius: var(--radius); padding: 14px;
+    border: none; box-shadow: var(--shadow-sm);
+  }
+  .stat-icon { font-size: 22px; margin-bottom: 6px; }
+  .stat-label { font-size: 12px; color: var(--text-sec); font-weight: 700; margin-bottom: 2px; }
+  .stat-value { font-size: 20px; font-weight: 900; }
+  .stat-value .currency { font-size: 13px; font-weight: 700; }
+
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .section-header h3 { font-size: 16px; font-weight: 800; }
+  .section-header a { color: var(--primary); font-size: 13px; font-weight: 700; text-decoration: none; }
+
+  .filters-wrap { padding: 0 18px 10px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+  .filters-wrap::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 8px 14px; border-radius: 999px;
+    background: var(--card); color: var(--text-sec); font-weight: 700; font-size: 13px;
+    margin-left: 6px; border: 1.5px solid var(--border); transition: all .15s;
+  }
+  .filter-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  .search-bar { padding: 0 18px 12px; }
+  .search-box { position: relative; }
+  .search-box input { width: 100%; padding: 12px 14px 12px 40px; background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); }
+  .search-box input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
+  .search-box .sicon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 16px; }
+
+  .category-group { margin-bottom: 14px; padding: 0 14px; }
+  .category-card { background: var(--card); border-radius: var(--radius); overflow: hidden; border: none; box-shadow: var(--shadow-sm); }
+  .category-card-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+  .category-card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .category-card-info { flex: 1; }
+  .category-card-name { font-size: 15px; font-weight: 800; }
+  .category-card-count { font-size: 12px; font-weight: 700; opacity: .7; }
+  .category-card-badge { padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+  .category-card-orders { padding: 4px 10px 10px; }
+
+  .order-card {
+    background: var(--bg); border-radius: var(--radius-sm);
+    padding: 12px; margin: 0 0 6px;
+    border: none;
+    display: flex; align-items: center; gap: 10px;
+    transition: transform .1s; cursor: pointer;
+    user-select: none; -webkit-user-select: none;
+  }
+  .order-card:active { transform: scale(.98); }
+  .order-card.purchased { opacity: .7; background: var(--success-light); }
+  .order-main { flex: 1; min-width: 0; }
+  .order-name { font-size: 15px; font-weight: 800; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .order-name.purchased-name { text-decoration: line-through; color: var(--text-muted); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 800; border: none; }
+  .badge-pending { background: var(--pending-light); color: #B7950B; }
+  .badge-done { background: var(--success-light); color: #1E8449; }
+  .order-meta { font-size: 12px; color: var(--text-sec); display: flex; flex-wrap: wrap; gap: 6px; }
+  .meta-item { display: inline-flex; align-items: center; gap: 3px; }
+  .purchase-info { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); font-size: 13px; }
+  .purchase-info .price { color: var(--success); font-weight: 800; font-size: 14px; }
+
+  .context-menu {
+    position: fixed; background: var(--card); border-radius: var(--radius);
+    border: none; box-shadow: var(--shadow-lg);
+    z-index: 9999; min-width: 170px; padding: 6px;
+    animation: pop .15s ease-out;
+  }
+  .context-menu-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700;
+    transition: background .1s; cursor: pointer; border: none; background: none;
+    width: 100%; color: var(--text); text-align: right;
+  }
+  .context-menu-item:active { background: var(--bg); }
+  .context-menu-item .ctx-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .context-menu-item.buy .ctx-icon { background: var(--success-light); }
+  .context-menu-item.edit .ctx-icon { background: var(--primary-light); }
+  .context-menu-item.delete .ctx-icon { background: var(--danger-light); }
+  .context-menu-item.delete { color: var(--danger); }
+  .context-menu-sep { height: 1px; background: var(--border); margin: 3px 10px; }
+
+  .empty { text-align: center; padding: 40px 24px; }
+  .empty-icon { font-size: 56px; margin-bottom: 12px; }
+  .empty-title { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+  .empty-desc { color: var(--text-sec); font-size: 14px; margin-bottom: 16px; }
+  .empty .btn { width: auto; display: inline-flex; min-width: 180px; }
+
+  .speech-bubble {
+    position: relative; background: var(--card); border: none;
+    border-radius: 14px; padding: 12px 16px; margin: 0 18px 12px;
+    box-shadow: var(--shadow-sm);
+    font-size: 14px; font-weight: 700; color: var(--text-sec); line-height: 1.7;
+  }
+  .speech-bubble::after {
+    content: ''; position: absolute; bottom: -8px; right: 24px;
+    width: 0; height: 0;
+    border-left: 8px solid transparent; border-right: 8px solid transparent;
+    border-top: 8px solid var(--card);
+  }
+  .speech-bubble.wife { background: #FFF0F8; }
+  .speech-bubble.wife::after { border-top-color: #FFF0F8; }
+  .speech-bubble.husband { background: #EBF5FB; }
+  .speech-bubble.husband::after { border-top-color: #EBF5FB; right: auto; left: 24px; }
+  .speech-bubble.app-msg { background: var(--primary-light); }
+  .speech-bubble.app-msg::after { border-top-color: var(--primary-light); }
+  .bubble-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; background: var(--bg); }
+  .parent-avatar { width: 44px; height: 44px; border-radius: 50%; overflow: hidden; padding: 0; background: #fff; border: 2px solid #fff; box-shadow: var(--shadow-sm); }
+  .parent-avatar svg { width: 100%; height: 100%; }
+  .family-duo { display: flex; align-items: flex-end; }
+  .family-duo svg { margin-left: -8px; border-radius: 50%; background: rgba(255,255,255,.2); }
+  .fam-photo { width: 46px; height: 46px; border-radius: 50%; overflow: hidden; background: rgba(255,255,255,.2); border: 2px solid rgba(255,255,255,.65); display: block; margin-left: -10px; }
+  .fam-photo:first-child { margin-left: 0; }
+  .fam-photo svg, .fam-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-row { display: flex; gap: 10px; padding: 4px 16px 14px; }
+  .photo-slot { flex: 1; background: var(--bg); border-radius: 18px; padding: 10px; text-align: center; }
+  .photo-slot .ph { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; margin: 0 auto 6px; background: #fff; box-shadow: var(--shadow-sm); }
+  .photo-slot .ph svg, .photo-slot .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-slot b { font-size: 12px; display: block; margin-bottom: 6px; }
+  /* ===== Collapsible pro sections ===== */
+  .collapsible-head { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; text-align: right; border-radius: 20px; transition: background .18s; }
+  .collapsible-head:active { background: var(--primary-light); }
+  .collapsible-head.sub { padding: 6px 0 10px; border-radius: 12px; }
+  .ch-icon { width: 44px; height: 44px; border-radius: 15px; background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 6px 14px rgba(124,58,237,.3); }
+  .ch-texts { flex: 1; min-width: 0; }
+  .ch-texts b { display: block; font-size: 15px; font-weight: 900; }
+  .ch-texts small { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-sec); margin-top: 1px; }
+  .collapsible-head .chev { width: 30px; height: 30px; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-size: 21px; font-weight: 900; display: flex; align-items: center; justify-content: center; transform: rotate(-90deg); transition: transform .25s, background .25s; line-height: 1; flex-shrink: 0; }
+  .collapsible-head .chev.open { transform: rotate(90deg); background: var(--primary); color: #fff; }
+  .collapsible-body { animation: fadePage .25s ease-out; }
+  .color-item-icon { cursor: pointer; border: none; transition: transform .15s; }
+  .color-item-icon:active { transform: scale(.9); }
+  .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+  .icon-opt { background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .icon-opt small { font-size: 11px; font-weight: 800; color: var(--text-sec); }
+  .icon-opt.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 4px 12px rgba(124,58,237,.2); }
+  .bubble-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; padding: 0 18px; }
+  .bubble-row.wife { flex-direction: row-reverse; }
+
+  .expense-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 18px 14px; }
+  .exp-mini { background: var(--card); padding: 12px 8px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow-sm); }
+  .exp-mini .l { font-size: 11px; color: var(--text-sec); font-weight: 700; margin-bottom: 2px; }
+  .exp-mini .v { font-size: 15px; font-weight: 800; }
+  .exp-mini .v span { font-size: 11px; }
+  .exp-list-item {
+    background: var(--card); border-radius: var(--radius); padding: 12px;
+    margin: 0 18px 8px; border: none;
+    box-shadow: var(--shadow-sm); display: flex; gap: 10px; align-items: center;
+  }
+  .exp-cat { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .exp-body { flex: 1; min-width: 0; }
+  .exp-name { font-weight: 800; font-size: 14px; margin-bottom: 2px; }
+  .exp-detail { font-size: 12px; color: var(--text-sec); }
+  .exp-price { font-weight: 800; font-size: 16px; flex-shrink: 0; }
+
+  .report-card { background: var(--card); border-radius: var(--radius); padding: 16px; margin: 0 18px 12px; border: none; box-shadow: var(--shadow-sm); }
+  .report-card h4 { font-size: 15px; font-weight: 800; margin-bottom: 10px; color: var(--primary-dark); }
+  .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  .rstat { background: var(--bg); padding: 10px; border-radius: var(--radius-sm); }
+  .rstat .rl { font-size: 11px; color: var(--text-sec); font-weight: 700; }
+  .rstat .rv { font-size: 16px; font-weight: 800; margin-top: 2px; }
+  .rstat .rv span { font-size: 11px; color: var(--text-sec); }
+  .barchart { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding: 8px 2px 0; border-bottom: 1.5px solid var(--border); margin-top: 6px; }
+  .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; gap: 3px; }
+  .bar-fill { width: 100%; background: var(--primary); border-radius: 4px 4px 0 0; min-height: 2px; }
+  .bar-label { font-size: 9px; color: var(--text-sec); font-weight: 700; }
+  .donut-wrap { display: flex; align-items: center; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .donut-legend { display: flex; flex-direction: column; gap: 5px; min-width: 120px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-pct { margin-right: auto; color: var(--text-muted); font-weight: 600; }
+
+  .settings-card { background: var(--card); border-radius: var(--radius); margin: 0 18px 12px; border: none; box-shadow: var(--shadow-sm); overflow: hidden; }
+  .settings-title { padding: 12px 16px 4px; font-size: 13px; color: var(--text-sec); font-weight: 800; }
+  .settings-item { display: flex; align-items: center; padding: 12px 16px; gap: 10px; border-top: 1px solid var(--border); }
+  .settings-item:first-of-type { border-top: none; }
+  .settings-item:active { background: var(--bg); }
+  .si-icon { width: 36px; height: 36px; background: var(--primary-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .si-body { flex: 1; min-width: 0; }
+  .si-label { font-weight: 800; font-size: 13px; margin-bottom: 1px; }
+  .si-value { font-size: 12px; color: var(--text-sec); word-break: break-word; }
+  .si-action { color: var(--text-muted); font-size: 16px; flex-shrink: 0; }
+  .code-display { background: var(--primary-light); color: var(--primary-dark); padding: 5px 10px; border-radius: 8px; font-family: monospace; font-weight: 800; letter-spacing: 1px; font-size: 13px; display: inline-block; margin-bottom: 4px; }
+  .code-display.inline { margin-bottom: 0; white-space: nowrap; }
+  .icon-copy-btn { width: 40px; height: 40px; border-radius: 13px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform .15s, background .15s; }
+  .icon-copy-btn:active { transform: scale(.9); background: var(--primary); color: #fff; }
+  .btn-row { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .color-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 16px 12px; }
+  .color-item { display: flex; align-items: center; gap: 8px; padding: 10px; background: var(--bg); border-radius: 10px; }
+  .color-item-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .color-item-info { flex: 1; min-width: 0; }
+  .color-item-name { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+  .color-item-preview { width: 100%; height: 6px; border-radius: 3px; }
+  .color-picker-wrap input[type="color"] { width: 32px; height: 32px; border: none; border-radius: 8px; cursor: pointer; padding: 0; background: none; }
+  .color-picker-wrap input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+  .color-picker-wrap input[type="color"]::-webkit-color-swatch { border-radius: 6px; border: none; }
+  .learned-list { padding: 0 16px 12px; display: flex; flex-wrap: wrap; gap: 5px; }
+  .learned-tag { background: var(--bg); padding: 5px 8px; border-radius: 8px; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; }
+  .learned-tag button { color: var(--danger); font-size: 13px; }
+  .about { text-align: center; padding: 16px; color: var(--text-muted); font-size: 12px; }
+  .about .version { color: var(--primary); font-weight: 800; margin-top: 2px; }
+  .dev-name { font-size: 13.5px; font-weight: 900; color: var(--text); margin-bottom: 8px; }
+  .social-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; }
+  .soc { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,.16); transition: transform .15s; text-decoration: none; }
+  .soc:active { transform: scale(.9); }
+  .soc.fb { background: #1877F2; }
+  .soc.tg { background: #229ED9; }
+  .soc.wa { background: #25D366; }
+
+  .fab {
+    position: fixed; bottom: calc(var(--nav-h) + 14px); left: 50%; transform: translateX(-50%);
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--primary); color: #fff; font-size: 26px; font-weight: 900;
+    border: none; box-shadow: 0 6px 20px rgba(59,130,246,.35);
+    display: flex; align-items: center; justify-content: center; z-index: 30;
+    transition: transform .15s;
+  }
+  .fab:active { transform: translateX(-50%) scale(.9); box-shadow: 0 3px 10px rgba(59,130,246,.25); }
+  @media (min-width: 481px) { .fab { left: calc(50% + 170px); } }
+
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px; height: var(--nav-h);
+    background: var(--card); display: flex; align-items: stretch; justify-content: space-around;
+    padding: 4px 6px calc(4px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border); z-index: 25;
+    box-shadow: 0 -2px 8px rgba(0,0,0,.04);
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1px; color: var(--text-muted); font-size: 10px; font-weight: 700;
+    transition: color .15s; border-radius: 10px;
+  }
+  .nav-item:active { transform: scale(.95); }
+  .nav-item svg { width: 22px; height: 22px; }
+  .nav-item.active { color: var(--primary); font-weight: 800; }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(30,27,46,.52);
+    -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px);
+    z-index: 100; display: flex; align-items: flex-end; justify-content: center;
+    animation: fadeIn .22s ease-out;
+  }
+  @media (min-width: 481px) { .modal-backdrop { align-items: center; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    width: 100%; max-width: 480px; background: var(--bg);
+    border-radius: 28px 28px 0 0; max-height: 90vh; overflow-y: auto;
+    animation: modalSpring .5s cubic-bezier(.3,1.25,.45,1) both; padding: 6px 18px 24px;
+    border: 1px solid rgba(124,58,237,.2); border-bottom: none;
+    box-shadow: 0 -18px 60px rgba(30,27,46,.3);
+  }
+  @media (min-width: 481px) { .modal { border-radius: 28px; border-bottom: 1px solid rgba(124,58,237,.2); } }
+  @keyframes modalSpring { 0% { transform: translateY(90px) scale(.96); opacity: 0; } 60% { transform: translateY(-8px) scale(1.005); opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+  @keyframes fieldIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  .modal > * { animation: fieldIn .45s cubic-bezier(.22,1,.36,1) both; }
+  .modal > *:nth-child(2) { animation-delay: .04s; }
+  .modal > *:nth-child(3) { animation-delay: .08s; }
+  .modal > *:nth-child(4) { animation-delay: .12s; }
+  .modal > *:nth-child(5) { animation-delay: .16s; }
+  .modal > *:nth-child(6) { animation-delay: .2s; }
+  .modal > *:nth-child(7) { animation-delay: .24s; }
+  .modal > *:nth-child(n+8) { animation-delay: .28s; }
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 6px auto 14px; }
+  .modal h2 { font-size: 20px; font-weight: 900; margin-bottom: 4px; text-align: center; }
+  .modal .m-sub { text-align: center; color: var(--text-sec); font-size: 13px; margin-bottom: 14px; font-weight: 700; background: #fff; border: 1px solid rgba(124,58,237,.14); border-radius: 14px; padding: 9px 12px; box-shadow: var(--shadow-sm); }
+  .m-emblem { width: 58px; height: 58px; border-radius: 20px; background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center; margin: 2px auto 10px; box-shadow: 0 12px 26px rgba(124,58,237,.42), inset 0 1px 0 rgba(255,255,255,.4); animation: emblemFloat 3s ease-in-out infinite; }
+  @keyframes emblemFloat { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-5px) rotate(2deg); } }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .frequent-section { margin-bottom: 12px; }
+  .frequent-title { font-size: 13px; font-weight: 800; color: var(--text-sec); margin-bottom: 6px; }
+  .frequent-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .frequent-chip { background: var(--card); border: 1.5px solid var(--primary); color: var(--primary-dark); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+  .frequent-chip:active { background: var(--primary-light); }
+  .suggest-list { display: flex; flex-wrap: wrap; gap: 6px; margin: -8px 0 12px; animation: popIn .2s ease-out; }
+  .suggest-list.hidden { display: none; }
+  .suggest-chip { background: var(--primary-light); color: var(--primary-dark); border: 1.5px solid rgba(124,58,237,.32); padding: 7px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 800; }
+  .suggest-chip:active { background: var(--primary); color: #fff; }
+  .category-query { background: var(--pending-light); border: 1px solid var(--pending); color: #7D6608; padding: 10px 12px; border-radius: var(--radius-sm); margin-bottom: 12px; font-size: 13px; font-weight: 600; }
+  .cat-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 6px; }
+  .cat-opt { background: #fff; border: 1.5px solid var(--border); padding: 12px 6px; border-radius: 16px; text-align: center; font-size: 12px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; transition: all .15s; color: var(--text); }
+  .cat-opt:active { transform: scale(.95); }
+  .cat-opt-ico { width: 44px; height: 44px; border-radius: 15px; display: flex; align-items: center; justify-content: center; }
+  .cat-opt.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); box-shadow: 0 8px 18px rgba(124,58,237,.25); transform: translateY(-2px); }
+  .cat-pick-card { background: linear-gradient(180deg, #F5F0FF, #fff 70%); border: 1.5px solid rgba(124,58,237,.22); border-radius: 20px; padding: 14px; margin-bottom: 12px; box-shadow: 0 10px 24px rgba(124,58,237,.12); animation: popIn .25s ease-out; }
+  .cat-pick-head { display: flex; gap: 10px; align-items: center; margin-bottom: 11px; }
+  .cat-pick-ico { width: 44px; height: 44px; border-radius: 15px; background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 8px 16px rgba(124,58,237,.35); }
+  .cat-pick-head b { font-size: 14px; font-weight: 900; display: block; }
+  .cat-pick-head small { font-size: 11.5px; color: var(--text-sec); font-weight: 700; display: block; margin-top: 1px; }
+  .pharm-note { background: var(--danger-light); color: var(--danger); padding: 8px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; margin-bottom: 10px; border: 1px solid var(--danger); }
+
+  .confirm-dialog { max-width: 340px !important; width: calc(100% - 40px); align-self: center; margin: auto; border-radius: 20px !important; padding: 22px 20px; }
+  .confirm-dialog .confirm-icon { width: 54px; height: 54px; background: var(--danger-light); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 12px; }
+  .confirm-dialog h3 { text-align: center; font-size: 17px; margin-bottom: 4px; }
+  .confirm-dialog p { text-align: center; color: var(--text-sec); font-size: 13px; margin-bottom: 16px; }
+  .confirm-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .toast-container { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 6px; width: calc(100% - 36px); max-width: 420px; pointer-events: none; }
+  .toast { background: var(--card); padding: 12px 14px; border-radius: var(--radius); border: none; box-shadow: var(--shadow-lg); font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; animation: toastIn .25s ease-out, toastOut .25s ease-in 2.6s forwards; }
+  .toast.success { border-left: 4px solid var(--success); }
+  .toast.error { border-left: 4px solid var(--danger); }
+  .toast.warning { border-left: 4px solid var(--pending); }
+  .toast-icon { font-size: 16px; flex-shrink: 0; }
+  @keyframes toastIn { from { transform: translateY(-16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes toastOut { to { transform: translateY(-16px); opacity: 0; } }
+  /* ===== EdTech friendly override ===== */
+  .page { animation: pageUp .35s ease-out; }
+  @keyframes pageUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @keyframes popIn { from { opacity: 0; transform: scale(.94) translateY(8px); } to { opacity: 1; transform: none; } }
+  .topbar { background: transparent; border: none; padding: 18px 20px 4px; position: static; }
+  .topbar .greeting { font-size: 15px; font-weight: 800; color: var(--text-sec); }
+  .page-title { font-size: 26px; font-weight: 900; letter-spacing: -.3px; margin: 2px 20px 14px; }
+  .section { padding: 0 20px; }
+  .hero { margin: 0 20px 14px; background: var(--grad); border-radius: 24px; padding: 20px 18px; color: #fff; position: relative; overflow: hidden; box-shadow: 0 16px 36px rgba(124,58,237,.32); animation: popIn .4s ease-out; }
+  .hero::before, .hero::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.14); }
+  .hero::before { width: 180px; height: 180px; left: -50px; top: -70px; }
+  .hero::after { width: 120px; height: 120px; right: -30px; bottom: -50px; }
+  .hero-top { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+  .hero-mascot { width: 64px; height: 64px; flex-shrink: 0; border-radius: 20px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; animation: floaty 3.2s ease-in-out infinite; }
+  .hero h2 { font-size: 19px; font-weight: 900; line-height: 1.5; }
+  .hero p { font-size: 13px; opacity: .92; font-weight: 600; margin-top: 2px; }
+  .hero-progress { position: relative; z-index: 1; margin-top: 14px; background: rgba(255,255,255,.22); border-radius: 999px; height: 12px; overflow: hidden; }
+  .hero-progress > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg,#FDE68A,#FBBF24,#FB7185); transition: width .6s ease; }
+  .hero-meta { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 12px; font-weight: 800; }
+  .streak-row { display: flex; gap: 8px; margin: 0 20px 14px; }
+  .streak-pill { flex: 1; background: #fff; border-radius: 18px; padding: 10px 12px; display: flex; align-items: center; gap: 9px; box-shadow: var(--shadow-sm); border: 1px solid rgba(124,58,237,.07); animation: popIn .4s ease-out; }
+  .streak-ico { width: 38px; height: 38px; border-radius: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .streak-pill b { font-size: 15px; display: block; line-height: 1.2; }
+  .streak-pill small { font-size: 11px; color: var(--text-sec); font-weight: 700; }
+  .stat-card, .exp-mini, .rstat { border-radius: 20px !important; border: 1px solid rgba(124,58,237,.07) !important; }
+  .stat-card { position: relative; overflow: hidden; }
+  .stat-card::after { content: ''; position: absolute; inset: auto -30px -46px auto; width: 110px; height: 110px; border-radius: 50%; background: var(--primary-light); z-index: 0; }
+  .stat-card > * { position: relative; z-index: 1; }
+  .stat-icon { width: 42px; height: 42px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: var(--primary-light); }
+  .badge-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 4px; margin-bottom: 14px; scrollbar-width: none; }
+  .badge-row::-webkit-scrollbar { display: none; }
+  .achv { min-width: 132px; background: #fff; border-radius: 20px; padding: 12px; box-shadow: var(--shadow-sm); border: 1px solid rgba(124,58,237,.07); display: flex; gap: 9px; align-items: center; }
+  .achv.locked { opacity: .55; filter: grayscale(.4); }
+  .achv-ico { width: 42px; height: 42px; border-radius: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
+  .achv b { font-size: 12px; display: block; }
+  .achv small { font-size: 10.5px; color: var(--text-sec); font-weight: 700; }
+  .category-card, .order-card, .exp-list-item, .report-card, .settings-card, .empty { border-radius: 20px !important; }
+  .category-card-icon, .exp-cat, .si-icon, .ctx-icon { border-radius: 14px !important; }
+  .filter-chip.active { background: var(--grad); border-color: transparent; box-shadow: 0 6px 16px rgba(124,58,237,.3); }
+  .search-box input { border-radius: 18px !important; border: 1px solid rgba(124,58,237,.12) !important; padding: 13px 14px 13px 42px !important; }
+  .fab { background: var(--grad) !important; box-shadow: 0 12px 28px rgba(124,58,237,.42) !important; width: 60px; height: 60px; border-radius: 22px !important; }
+  .bottom-nav { border-radius: 24px 24px 0 0; border: none; box-shadow: 0 -10px 30px rgba(124,58,237,.10); height: var(--nav-h); }
+  .nav-item { position: relative; }
+  .nav-item.active { color: var(--primary); }
+  .nav-item.active::after { content: ''; width: 22px; height: 4px; border-radius: 99px; background: var(--grad); position: absolute; bottom: 6px; }
+  .nav-ico { width: 40px; height: 26px; display: flex; align-items: center; justify-content: center; }
+  .brand-icon { background: var(--grad) !important; border-radius: 28px !important; box-shadow: 0 16px 36px rgba(124,58,237,.35) !important; animation: floaty 3.4s ease-in-out infinite; }
+  .empty-icon { animation: floaty 3s ease-in-out infinite; }
+  .bar-fill { background: linear-gradient(180deg,#A78BFA,#7C3AED) !important; border-radius: 7px 7px 3px 3px !important; }
+  .modal { border-radius: 26px 26px 0 0 !important; }
+  .speech-bubble { border-radius: 18px !important; border: 1px solid rgba(124,58,237,.08) !important; }
+  /* ===== Salim AI companion - floating & alive ===== */
+  @keyframes nouraBob { 0%,100% { transform: translateY(0) rotate(-1.2deg); } 50% { transform: translateY(-9px) rotate(1.2deg); } }
+  @keyframes heroFloat { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-12px) rotate(2deg); } }
+  @keyframes slBlink { 0%,93%,100% { transform: scaleY(1); } 96% { transform: scaleY(.06); } }
+  @keyframes slTalk { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(.72); } }
+  @keyframes slWaveArm { 0%,100% { transform: rotate(-24deg); } 50% { transform: rotate(-12deg); } }
+  @keyframes glowPulse { 0%,100% { opacity: .5; transform: scale(1); } 50% { opacity: .9; transform: scale(1.08); } }
+  .sl-eyes { transform-box: fill-box; transform-origin: center; animation: slBlink 4.2s infinite; }
+  .sl-mouth { transform-box: fill-box; transform-origin: center top; animation: slTalk .9s ease-in-out infinite; }
+  .sl-arm { animation: slWaveArm 2.2s ease-in-out infinite; }
+  .noura-char { position: relative; }
+  .noura-char::before { content: ''; position: absolute; inset: -6px; border-radius: 28px; background: radial-gradient(circle, rgba(124,58,237,.22), transparent 70%); animation: glowPulse 2.6s ease-in-out infinite; z-index: 0; }
+  .noura-char svg { position: relative; z-index: 1; }
+  @keyframes waveGrow { 0%,100% { transform: scaleY(.4); opacity: .5; } 50% { transform: scaleY(1); opacity: 1; } }
+  @keyframes dotBlink { 0%,60%,100% { opacity: .25; transform: scale(.8); } 30% { opacity: 1; transform: scale(1.15); } }
+  .noura-card { display: flex; gap: 10px; align-items: flex-end; margin: 0 20px 14px; animation: popIn .4s ease-out; }
+  .noura-char { flex-shrink: 0; width: 76px; animation: nouraBob 2.8s ease-in-out infinite; filter: drop-shadow(0 10px 14px rgba(124,58,237,.25)); }
+  .noura-char svg { width: 100%; height: auto; display: block; }
+  .noura-bubble { flex: 1; background: #fff; border-radius: 20px 20px 20px 6px; padding: 12px 14px 10px; box-shadow: var(--shadow-sm); border: 1px solid rgba(124,58,237,.09); position: relative; }
+  .noura-name { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 900; color: var(--primary); margin-bottom: 3px; }
+  .noura-msg { font-size: 13.5px; font-weight: 700; color: var(--text); line-height: 1.7; }
+  .noura-live { display: flex; align-items: center; gap: 7px; margin-top: 7px; font-size: 10.5px; font-weight: 800; color: var(--text-muted); }
+  .waves { display: inline-flex; align-items: flex-end; gap: 2.5px; height: 14px; }
+  .waves i { width: 3px; border-radius: 3px; background: var(--primary); height: 100%; transform: scaleY(.4); animation: waveGrow 1s ease-in-out infinite; }
+  .waves i:nth-child(2) { animation-delay: .15s; background: var(--pink); }
+  .waves i:nth-child(3) { animation-delay: .3s; }
+  .waves i:nth-child(4) { animation-delay: .45s; background: var(--mint); }
+  .dots { display: inline-flex; gap: 3px; }
+  .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--primary); animation: dotBlink 1.2s infinite; }
+  .dots i:nth-child(2) { animation-delay: .2s; }
+  .dots i:nth-child(3) { animation-delay: .4s; }
+  .noura-hero-char { flex-shrink: 0; width: 104px; margin-bottom: -20px; animation: heroFloat 2.6s ease-in-out infinite; filter: drop-shadow(0 12px 16px rgba(0,0,0,.25)); }
+  .photo-char { width: 78px; height: 78px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; box-shadow: 0 10px 22px rgba(124,58,237,.3); animation: nouraBob 2.8s ease-in-out infinite; flex-shrink: 0; }
+  .photo-char img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .noura-hero-char.photo-char { width: 96px; height: 96px; margin-bottom: 0; animation: heroFloat 2.6s ease-in-out infinite; }
+  .noura-hero-char svg { width: 100%; height: auto; display: block; }
+  .hero-cta { position: relative; z-index: 1; margin-top: 12px; display: flex; gap: 8px; }
+  .hero-cta .btn { min-height: 48px; font-size: 14px; }
+  .hero-cta .cta-main { background: #fff; color: var(--primary-dark); box-shadow: 0 8px 20px rgba(0,0,0,.18); }
+  .hero-cta .cta-ghost { background: rgba(255,255,255,.18); color: #fff; box-shadow: none; }
+  /* ===== Bolder, clearer cards ===== */
+  .stat-card, .streak-pill, .achv { border: 1.5px solid rgba(124,58,237,.16) !important; box-shadow: 0 6px 18px rgba(124,58,237,.12) !important; }
+  .stat-card { border-top: 4px solid var(--primary) !important; }
+  .stat-card:nth-child(2) { border-top-color: #10B981 !important; }
+  .stat-card:nth-child(3) { border-top-color: #F59E0B !important; }
+  .stat-card:nth-child(4) { border-top-color: #06B6D4 !important; }
+  .stat-icon { width: 46px; height: 46px; }
+  .stat-label { font-size: 12.5px; font-weight: 800; color: var(--text); }
+  .stat-value { font-size: 23px; }
+  .streak-pill b { font-size: 16px; }
+  .achv { border-top: 3px solid var(--primary) !important; }
+  .achv b { font-size: 12.5px; }
+  .category-card, .order-card, .exp-list-item, .report-card, .settings-card { border: 1.5px solid rgba(124,58,237,.14) !important; box-shadow: 0 6px 18px rgba(124,58,237,.10) !important; }
+  .category-card { border-width: 2px !important; box-shadow: 0 10px 26px rgba(124,58,237,.14) !important; }
+  .category-card-header { border-bottom: 2px solid rgba(124,58,237,.12); padding: 14px 16px !important; }
+  .category-card-icon { width: 48px !important; height: 48px !important; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.7), 0 4px 10px rgba(0,0,0,.08); }
+  .category-card-icon svg { width: 24px !important; height: 24px !important; }
+  .category-card-name { font-size: 16.5px !important; font-weight: 900 !important; }
+  .category-card-count { font-size: 12.5px !important; font-weight: 800 !important; opacity: 1 !important; }
+  .category-card-badge { padding: 6px 14px !important; font-size: 12.5px !important; box-shadow: inset 0 0 0 1.5px currentColor; }
+  .category-card-orders { padding: 8px 12px 12px !important; display: flex; flex-direction: column; gap: 8px; }
+  .order-card { background: #fff !important; border: 1.5px solid var(--border) !important; border-radius: 16px !important; padding: 13px 14px !important; margin: 0 !important; box-shadow: 0 3px 10px rgba(30,27,46,.06) !important; }
+  .order-card .category-card-icon { width: 44px !important; height: 44px !important; }
+  .order-name { font-size: 15.5px !important; font-weight: 900 !important; }
+  .badge { padding: 4px 11px !important; font-size: 11.5px !important; box-shadow: inset 0 0 0 1.5px currentColor; }
+  .order-meta { font-size: 12.5px !important; font-weight: 700 !important; }
+  .purchase-info { border-top: 1.5px dashed var(--border) !important; margin-top: 8px !important; padding-top: 8px !important; }
+  .purchase-info .price { font-size: 16px !important; font-weight: 900 !important; }
+  /* ===== Very urgent orders ===== */
+  .urgent-toggle { display: flex; align-items: center; gap: 10px; background: var(--danger-light); border: 1.5px solid var(--danger); border-radius: 16px; padding: 11px 13px; margin-bottom: 14px; cursor: pointer; font-weight: 800; font-size: 13.5px; color: var(--danger); transition: all .18s; }
+  .urgent-toggle input { display: none; }
+  .ut-switch { width: 44px; height: 25px; border-radius: 999px; background: #E5C3C8; position: relative; flex-shrink: 0; transition: background .18s; }
+  .ut-switch::after { content: ''; position: absolute; top: 3px; right: 3px; width: 19px; height: 19px; border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.2); transition: transform .18s; }
+  .urgent-toggle.on { background: linear-gradient(135deg,#FFE4E6,#FECDD3); box-shadow: 0 6px 16px rgba(244,63,94,.22); }
+  .urgent-toggle.on .ut-switch { background: var(--danger); }
+  .urgent-toggle.on .ut-switch::after { transform: translateX(-19px); }
+  .badge-urgent { background: linear-gradient(135deg,#FB7185,#E11D48); color: #fff; animation: urgPulse 1.6s ease-in-out infinite; }
+  @keyframes urgPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+  .order-card.urgent { border: 2px solid var(--danger) !important; background: linear-gradient(180deg,#FFF1F2,#fff 70%) !important; }
+  .urgent-banner { margin: 0 20px 12px; background: linear-gradient(135deg,#FB7185,#E11D48); border-radius: 20px; padding: 13px 15px; color: #fff; box-shadow: 0 10px 24px rgba(225,29,72,.32); animation: popIn .4s ease-out; }
+  .urgent-banner h3 { font-size: 15px; font-weight: 900; margin-bottom: 8px; display: flex; align-items: center; gap: 7px; }
+  .urgent-banner .order-card { background: #fff !important; margin-bottom: 7px !important; }
+  .urgent-banner .order-card:last-child { margin-bottom: 0 !important; }
+  .urgent-banner .order-name { color: #1E1B2E !important; }
+  .urgent-banner .order-meta { color: #55506B !important; }
+  .urgent-banner .order-meta .meta-item:first-child { color: #1E1B2E !important; font-weight: 900 !important; }
+  .urgent-banner .badge-pending { background: #FEF3C7 !important; color: #92400E !important; }
+  .section-header h3 { font-size: 17px; font-weight: 900; }
+  .noura-bubble { border: 1.5px solid rgba(124,58,237,.16) !important; box-shadow: 0 8px 22px rgba(124,58,237,.14) !important; }
+  .noura-msg { font-size: 14px; color: var(--text); }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  /* =============================
+     MESSAGES SYSTEM
+     ============================= */
+  const MSG = {
+    wifeGreeting: [
+      "محتاجين إيه يا ست البنات؟ ❤️",
+      "قولي يا حبيبة القلب، إيه الطلبات؟ 😄",
+      "اتفضلي يا أم العيال... افتحي قائمة الطلبات 😂",
+      "يا ترى هنطلب إيه النهارده؟ ربنا يستر على جيب أبو العيال 😂",
+      "اكتبي يا ستي وأنا هبلّغ البطل 😄",
+      "قولي طلبات البيت يا مدام... وربنا يعينه علينا 😂",
+      "محتاجين حاجات ضروري ولا هنشتري ونقول ربنا يسهل؟ 😂",
+      "اكتبي براحتك يا روحي... بس بالراحة على الراجل شوية 😂❤️",
+      "ربنا يوسع عليه ويرزقه من واسع فضله ❤️",
+      "اكتبي اللي ناقصكم يا حبيبتي وربنا يبارك في رزقكم.",
+      "ادعي له يا حبيبتي... الراجل داخل على معركة السوبر ماركت 😂"
+    ],
+    addOrder: [
+      "واحدة واحدة يا مدام 😂",
+      "هو إحنا فاتحين فرع هايبر ماركت؟ 😂",
+      "تمام... واللي بعده يا ست الكل 😄",
+      "لسه في حاجات تانية؟ 😳",
+      "يا ساتر... كملي 😂",
+      "ربنا يعين أبو العيال ❤️",
+      "اكتبي يا حبيبتي، ربنا يوسع عليه.",
+      "ده طلب ضروري ولا من بتوع: طالما إحنا نازلين نجيبه؟ 😂",
+      "حاضر يا ستي... اتسجلت 😂",
+      "تمام، كده هو هيعرف ياخدリスト دي كلها 😂"
+    ],
+    finishList: [
+      "خلاص يا حبيبتي، القائمة جاهزة... ربنا يقوي قلبه 😂❤️",
+      "تمام يا ست الكل، كده الدور على البطل 🦸‍♂️",
+      "القائمة اتبعتت... ربنا يكون في عونه 😂",
+      "اللهم إني قد بلغت... 😂",
+      "ربنا يرزقه ويبارك له ويقدر يجيبهم كلهم ❤️",
+      "كده خلصنا؟ الحمد لله... ربنا يعينه على السوبر ماركت 😂"
+    ],
+    husbandView: [
+      "ربنا ما يحرمنيش منك يا بطلي ❤️",
+      "ربنا يرزقك من واسع فضله وكرمه يا حبيبي.",
+      "بص على الضروري الأول يا روحي، والباقي ربنا يسهل فيه.",
+      "متقلقش... إحنا مش طالبين القمر يعني 😂",
+      "ربنا يبارك لك في رزقك ويكفيك هم المصاريف ❤️",
+      "شد حيلك يا بطل... دي حاجات البيت 😂",
+      "ربنا يعينك علينا ويرزقك أضعاف اللي بتصرفه علينا ❤️",
+      "عارفة إن المصاريف كتير عليك، ربنا يوسع رزقك.",
+      "ربنا يبارك لك في كل جنيه بتصرفه على بيتك وأهلك.",
+      "خد نفس عميق... وبص على القائمة 😂",
+      "متبصش على الإجمالي مرة واحدة عشان قلبك 😂❤️"
+    ],
+    totalScreen: [
+      "بسم الله... خد نفس كده 😂",
+      "ماتقلقش، الرقم شكله كبير بس إحنا أسرة محترمة 😂",
+      "يا رب يكون معاك باقي المرتب 😂",
+      "اللهم بارك... ولا حول ولا قوة إلا بالله 😂",
+      "ربنا يعوض عليك يا بطل ❤️",
+      "ربنا يرزقك أكتر مما أنفقت.",
+      "الفلوس راحت... بس راحت في البيت يا حبيبي 😂❤️"
+    ],
+    purchaseDone: [
+      "تمت المهمة بنجاح يا بطل! 🦸‍♂️❤️",
+      "ربنا يبارك لك في رزقك ويخلف عليك خيرًا.",
+      "ربنا يجعل كل جنيه أنفقته على بيتك في ميزان حسناتك.",
+      "ربنا يوسع رزقك ويبارك لك في أهلك وبيتك.",
+      "ربنا يخليكم لبعض ويرزقكم من واسع فضله.",
+      "أهو كده الرجالة ولا بلاش 😂❤️",
+      "خلصت المهمة يا أبو العيال... تستاهل قهوة ☕😂",
+      "ربنا يعوض عليك ويبارك لك في اللي فاضل من المرتب 😂❤️",
+      "ربنا يجعل بيتكم مليان مودة ورحمة وبركة."
+    ],
+    skipPurchase: [
+      "ولا يهمك يا حبيبي ❤️",
+      "معلش، المهم الضروري وربنا يسهل في الباقي.",
+      "ولا يهمك يا بطلي، ربنا يوسع عليك.",
+      "الباقي نستناه لما ربنا يفرجها 😂❤️",
+      "عارفة إن الدنيا مش دايمًا سهلة، ربنا يرزقك من واسع فضله.",
+      "ولا يهمك يا روحي، ربنا يبارك لك في اللي قدرت تجيبه."
+    ],
+    religious: [
+      "ربنا يبارك لك في رزقك ويزيدك من فضله.",
+      "اللهم ارزقهم رزقًا واسعًا حلالًا طيبًا.",
+      "ربنا يجعل الإنفاق على أهل البيت بركة في الرزق.",
+      "اللهم بارك لهم في بيتهم وأهلهم ورزقهم.",
+      "ربنا يخلي بيوتكم عامرة بالمودة والرحمة.",
+      "اللهم اكفهم بحلالك عن حرامك وأغنهم بفضلك عمن سواك.",
+      "ربنا يوسع رزق كل أب بيجري على بيته.",
+      "اللهم ارزق كل بيت السكينة والبركة والرزق الحلال.",
+      "ربنا يجعل تعبك وشقاك من أجل أهلك في ميزان حسناتك.",
+      "ربنا يبارك في القليل ويزيده."
+    ],
+    empty: [
+      "مفيش طلبات لحد دلوقتي... هتسيبوا البيت كده؟ 😂",
+      "القائمة فاضية يا جماعة 😄",
+      "واضح إن الثلاجة لسه مليانة... الحمد لله 😂",
+      "مفيش حاجة ناقصة؟ طب الحمد لله ❤️",
+      "البيت متظبط... يعني كل حاجة موجودة 😂",
+      "إيه ده... مفيش طلبات النهارده؟ 😂"
+    ],
+    error: [
+      "استنى يا بطل... حصلت حاجة مش مفهومة 😂",
+      "معلش يا حبيبي، جرب تاني.",
+      "النت قرر ياخد أجازة 😂",
+      "واضح إن التطبيق محتاج قهوة ☕😂"
+    ],
+    toastSuccess: [
+      "تمام يا ستي ✓",
+      " handled ✓",
+      "上帝يا حبيبي، تمام ✓",
+      " يس equalTo ✓"
+    ],
+    wifeCharacter: "👩",
+    husbandCharacter: "🧔",
+    appCharacter: "🏠"
+  };
+
+  let _lastMsgIdx = {};
+  function pickMsg(arr) {
+    if (!arr || !arr.length) return '';
+    let idx;
+    do { idx = Math.floor(Math.random() * arr.length); } while (idx === _lastMsgIdx[arr.join(',')] && arr.length > 1);
+    _lastMsgIdx[arr.join(',')] = idx;
+    return arr[idx];
+  }
+
+  /* EdTech SVG icon system - rounded, friendly */
+  const ICONS = {
+    home: '<path d="M4 11l8-7 8 7v8a2 2 0 0 1-2 2h-4v-6h-4v6H6a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    cart: '<circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="17" cy="20" r="1.6" fill="currentColor"/><path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h7.6a1.5 1.5 0 0 0 1.5-1.2L20 8H6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    wallet: '<rect x="3" y="6" width="18" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 13h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    chart: '<path d="M4 20V10M10 20V4M16 20v-8M21 20H3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    gear: '<circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.8l1.2 2.4 2.6-.6 1 2.5 2.6.7-.4 2.6 1.8 2-1.8 2 .4 2.6-2.6.7-1 2.5-2.6-.6L12 21.2l-1.2-2.4-2.6.6-1-2.5-2.6-.7.4-2.6-1.8-2 1.8-2-.4-2.6 2.6-.7 1-2.5 2.6.6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
+    leaf: '<path d="M5 19C5 9 13 5 20 5c0 8-4 14-13 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 19c3-5 7-9 12-11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    basket: '<path d="M5 9h14l-1.5 10a2 2 0 0 1-2 1.8h-7A2 2 0 0 1 6.5 19z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 9l4-5 4 5M10 13v4M14 13v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    sparkle: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="currentColor"/>',
+    pill: '<rect x="3.5" y="9" width="17" height="7" rx="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v7" stroke="currentColor" stroke-width="2"/>',
+    bolt: '<path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+    box: '<path d="M4 8l8-4 8 4v8l-8 4-8-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 8l8 4 8-4M12 12v8" fill="none" stroke="currentColor" stroke-width="2"/>',
+    check: '<path d="M4.5 12.5l5 5 10-11" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>',
+    flame: '<path d="M12 22c4 0 7-2.8 7-6.8 0-3-2-5.3-3.5-7C14 6.5 13 5 13 2c-4 3-6 5.8-6.5 9.2C5.4 12 5 13.4 5 15.2 5 19.2 8 22 12 22z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+    star: '<path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6L3.2 9.4l6.1-.8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+    trophy: '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7 6H4a3 3 0 0 0 3 5M17 6h3a3 3 0 0 1-3 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    search: '<circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    fb: '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" fill="currentColor"/>',
+    tg: '<path d="M22 2L11 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2l-7 20-4-9-9-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    wa: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    copy: '<rect x="9" y="9" width="12" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    pencil: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    plus: '<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>'
+  };
+  function svgIcon(name, size) {
+    return '<svg viewBox="0 0 24 24" width="' + (size || 20) + '" height="' + (size || 20) + '" fill="none">' + (ICONS[name] || ICONS.box) + '</svg>';
+  }
+  function mascotSVG() {
+    return '<svg viewBox="0 0 96 96" width="56" height="56"><ellipse cx="48" cy="86" rx="22" ry="6" fill="rgba(0,0,0,.15)"/><rect x="22" y="30" width="52" height="48" rx="18" fill="#fff"/><circle cx="38" cy="52" r="4.5" fill="#1E1B2E"/><circle cx="58" cy="52" r="4.5" fill="#1E1B2E"/><circle cx="39.5" cy="50.5" r="1.4" fill="#fff"/><circle cx="59.5" cy="50.5" r="1.4" fill="#fff"/><path d="M40 64c2.5 3 5.5 4.5 8 4.5s5.5-1.5 8-4.5" stroke="#7C3AED" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M20 44c-4-1-6-5-4-9 3 1 5 3 6 6z" fill="#FBBF24"/><path d="M76 44c4-1 6-5 4-9-3 1-5 3-6 6z" fill="#FBBF24"/><rect x="30" y="14" width="36" height="12" rx="6" fill="#FDE68A"/><circle cx="48" cy="20" r="3" fill="#F59E0B"/></svg>';
+  }
+  /* Professional parent portraits - flat friendly style */
+  function momSVG(size) {
+    const s = size || 40;
+    return '<svg viewBox="0 0 96 96" width="' + s + '" height="' + s + '">'
+      + '<ellipse cx="48" cy="88" rx="20" ry="5" fill="rgba(0,0,0,.10)"/>'
+      + '<path d="M20 78c0-16 8-26 28-26s28 10 28 26v4H20z" fill="#7C3AED"/>'
+      + '<path d="M20 78c0-16 8-26 28-26s28 10 28 26" fill="none" stroke="#6D28D9" stroke-width="2"/>'
+      + '<path d="M24 50c0-16 10-28 24-28s24 12 24 28c0 10-3 17-7 22H31c-4-5-7-12-7-22z" fill="#8B5CF6"/>'
+      + '<ellipse cx="48" cy="52" rx="15" ry="17" fill="#F6C89F"/>'
+      + '<path d="M34 48c1-9 6-15 14-15s13 6 14 15c-3-6-8-9-14-9s-11 3-14 9z" fill="#5B21B6"/>'
+      + '<circle cx="42" cy="52" r="2.2" fill="#1E1B2E"/><circle cx="54" cy="52" r="2.2" fill="#1E1B2E"/>'
+      + '<circle cx="42.7" cy="51.3" r=".7" fill="#fff"/><circle cx="54.7" cy="51.3" r=".7" fill="#fff"/>'
+      + '<path d="M38.5 46.5c1.5-1.2 3.5-1.5 5-.8M52.5 45.7c1.5-.7 3.5-.4 5 .8" stroke="#5B21B6" stroke-width="1.6" stroke-linecap="round" fill="none"/>'
+      + '<path d="M43 60c1.8 2.2 3.5 3.2 5 3.2s3.2-1 5-3.2" stroke="#B45309" stroke-width="2" stroke-linecap="round" fill="none"/>'
+      + '<circle cx="37" cy="56.5" r="2.4" fill="#F9A8A8" opacity=".7"/><circle cx="59" cy="56.5" r="2.4" fill="#F9A8A8" opacity=".7"/>'
+      + '<circle cx="33.5" cy="60" r="1.8" fill="#FBBF24"/>'
+      + '</svg>';
+  }
+  function dadSVG(size) {
+    const s = size || 40;
+    return '<svg viewBox="0 0 96 96" width="' + s + '" height="' + s + '">'
+      + '<ellipse cx="48" cy="88" rx="20" ry="5" fill="rgba(0,0,0,.10)"/>'
+      + '<path d="M20 78c0-14 9-24 28-24s28 10 28 24v4H20z" fill="#0E7490"/>'
+      + '<path d="M42 78v-8h12v8" fill="#F6C89F"/>'
+      + '<ellipse cx="48" cy="50" rx="16" ry="18" fill="#F1B98A"/>'
+      + '<path d="M32 46c-1-10 6-20 16-20s17 10 16 20c-1-4-2-6-3-8-4 2-8 3-13 3s-9-1-13-3c-1 2-2 4-3 8z" fill="#1E1B2E"/>'
+      + '<path d="M34 54c0 9 6 15 14 15s14-6 14-15c0-1 0-2-.2-3-2 5-7 8-13.8 8S36.4 56 34.4 51c-.2 1-.4 2-.4 3z" fill="#2B2118"/>'
+      + '<circle cx="42" cy="50" r="2.2" fill="#1E1B2E"/><circle cx="54" cy="50" r="2.2" fill="#1E1B2E"/>'
+      + '<circle cx="42.7" cy="49.3" r=".7" fill="#fff"/><circle cx="54.7" cy="49.3" r=".7" fill="#fff"/>'
+      + '<path d="M38.5 44.5c1.5-1.2 3.5-1.5 5-.8M52.5 43.7c1.5-.7 3.5-.4 5 .8" stroke="#1E1B2E" stroke-width="1.6" stroke-linecap="round" fill="none"/>'
+      + '<path d="M44 61c1.5 1.4 2.8 2 4 2s2.5-.6 4-2" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>'
+      + '<circle cx="37" cy="54.5" r="2.2" fill="#F9A8A8" opacity=".6"/><circle cx="59" cy="54.5" r="2.2" fill="#F9A8A8" opacity=".6"/>'
+      + '</svg>';
+  }
+  function familySVG() {
+    return '<div style="display:flex;align-items:flex-end;gap:2px;">' + momSVG(52) + dadSVG(52) + '</div>';
+  }
+  /* Real family photos (uploaded) with SVG fallback */
+  function parentPhoto(type, size) {
+    const s = size || 44;
+    const url = (state.photos && state.photos[type]) || '';
+    if (url) return '<img src="' + url + '" width="' + s + '" height="' + s + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="' + (type === 'mom' ? 'الأم' : 'الأب') + '"/>';
+    return type === 'mom' ? momSVG(s) : dadSVG(s);
+  }
+  function parentAvatar(type, size) {
+    return parentPhoto(type === 'wife' ? 'mom' : type === 'husband' ? 'dad' : 'mom', size);
+  }
+  function familyPhotos(px) {
+    const s = px || 46;
+    return '<div class="family-duo"><span class="fam-photo">' + parentPhoto('mom', s) + '</span><span class="fam-photo">' + parentPhoto('dad', s) + '</span></div>';
+  }
+  /* Noura - friendly AI study companion, always mid-speech */
+  function salimSVG(mood) {
+    mood = mood || 'talk';
+    const skin = '#F7B98A', skinD = '#E09A63', hair = '#2B2119', hood = '#14B8A6', hoodD = '#0E7490', cap = '#7C3AED', capD = '#6D28D9';
+    let mouth, brows, arms, extras = '';
+    let eyes = '<g class="sl-eyes"><ellipse cx="59" cy="56" rx="6.6" ry="7.6" fill="#fff"/><ellipse cx="81" cy="56" rx="6.6" ry="7.6" fill="#fff"/>'
+      + '<circle cx="59.5" cy="57" r="3.5" fill="#241623"/><circle cx="81.5" cy="57" r="3.5" fill="#241623"/>'
+      + '<circle cx="60.8" cy="55.5" r="1.2" fill="#fff"/><circle cx="82.8" cy="55.5" r="1.2" fill="#fff"/></g>';
+    if (mood === 'celebrate') {
+      brows = '<path d="M50 42c3.5-3 8-3.5 11.5-2M78.5 40c3.5-1.5 8-1 11.5 2" stroke="#2B2119" stroke-width="2.6" stroke-linecap="round" fill="none"/>';
+      mouth = '<g class="sl-mouth"><path d="M58 70c0 9 5 15 12 15s12-6 12-15c-7 2.5-17 2.5-24 0z" fill="#7F1D1D"/><rect x="61" y="70.5" width="18" height="4.5" rx="2" fill="#fff"/><ellipse cx="70" cy="81" rx="5" ry="3.2" fill="#FB7185"/></g>';
+      arms = '<g transform="rotate(-38 102 120)"><rect x="94" y="94" width="15" height="42" rx="7.5" fill="' + hood + '"/><circle cx="101.5" cy="90" r="10" fill="' + skin + '"/><path d="M95 84l-4-7M101 82v-8M107 84l4-7" stroke="' + skin + '" stroke-width="4" stroke-linecap="round"/></g>'
+        + '<g transform="rotate(38 38 120)"><rect x="30.5" y="94" width="15" height="42" rx="7.5" fill="' + hood + '"/><circle cx="38" cy="90" r="10" fill="' + skin + '"/><path d="M32 84l-4-7M38 82v-8M44 84l4-7" stroke="' + skin + '" stroke-width="4" stroke-linecap="round"/></g>';
+      extras = '<circle cx="18" cy="32" r="3.5" fill="#FBBF24"/><circle cx="122" cy="28" r="3.5" fill="#EC4899"/><rect x="112" y="54" width="7" height="7" rx="2" fill="#14B8A6" transform="rotate(20 115 57)"/><rect x="20" y="60" width="7" height="7" rx="2" fill="#8B5CF6" transform="rotate(-15 23 63)"/><circle cx="128" cy="86" r="2.6" fill="#F59E0B"/><circle cx="12" cy="90" r="2.6" fill="#06B6D4"/>';
+    } else if (mood === 'soft') {
+      brows = '<path d="M50 45c3.5-2 8-2.3 11.5-1M78.5 44c3.5-.3 8 .5 11.5 2.5" stroke="#2B2119" stroke-width="2.6" stroke-linecap="round" fill="none"/>';
+      mouth = '<g class="sl-mouth"><path d="M63 73c2 3.4 4.5 5 7 5s5-1.6 7-5" stroke="#9A3412" stroke-width="2.6" stroke-linecap="round" fill="none"/></g>';
+      arms = '<g><rect x="92" y="108" width="15" height="36" rx="7.5" fill="' + hood + '"/><circle cx="99.5" cy="104" r="9.5" fill="' + skin + '"/><path d="M93 98l-3-6M99 96v-7M105 98l3-6" stroke="' + skin + '" stroke-width="3.6" stroke-linecap="round"/></g>';
+    } else if (mood === 'happy') {
+      brows = '<path d="M50 42c3.5-3 8-3.5 11.5-2M78.5 40c3.5-1.5 8-1 11.5 2" stroke="#2B2119" stroke-width="2.6" stroke-linecap="round" fill="none"/>';
+      mouth = '<g class="sl-mouth"><path d="M59 71c0 8.5 5 14 11 14s11-5.5 11-14c-7 2.5-15 2.5-22 0z" fill="#7F1D1D"/><ellipse cx="70" cy="81" rx="4.6" ry="3" fill="#FB7185"/></g>';
+      arms = '<g transform="rotate(-30 102 120)"><rect x="94" y="96" width="15" height="40" rx="7.5" fill="' + hood + '"/><circle cx="101.5" cy="92" r="10" fill="' + skin + '"/><path d="M95 86l-4-7M101 84v-8M107 86l4-7" stroke="' + skin + '" stroke-width="4" stroke-linecap="round"/></g>';
+    } else if (mood === 'wink') {
+      brows = '<path d="M50 42c3.5-3 8-3.5 11.5-2M78.5 40c3.5-1.5 8-1 11.5 2" stroke="#2B2119" stroke-width="2.6" stroke-linecap="round" fill="none"/>';
+      eyes = '<ellipse cx="59" cy="56" rx="6.6" ry="7.6" fill="#fff"/><circle cx="59.5" cy="57" r="3.5" fill="#241623"/><circle cx="60.8" cy="55.5" r="1.2" fill="#fff"/>'
+        + '<g class="sl-eyes"><path d="M74 57c2.5 2.5 5 3.5 7.5 3.5s5-1 7.5-3.5" stroke="#241623" stroke-width="2.8" stroke-linecap="round" fill="none"/></g>';
+      mouth = '<g class="sl-mouth"><path d="M61 72c3 4.5 8 6 13 4.5" stroke="#9A3412" stroke-width="2.8" stroke-linecap="round" fill="none"/><ellipse cx="72" cy="76" rx="2.6" ry="3" fill="#7F1D1D"/></g>';
+      arms = '<g transform="rotate(-14 102 122)"><rect x="94" y="98" width="15" height="38" rx="7.5" fill="' + hood + '"/><circle cx="101.5" cy="90" r="10" fill="' + skin + '"/><path d="M101 82v-9M101 73l-4 1M101 73l4 1" stroke="' + skin + '" stroke-width="4" stroke-linecap="round"/></g>';
+    } else if (mood === 'laugh') {
+      brows = '<path d="M50 40c3.5-3 8-3.5 11.5-2M78.5 38c3.5-1.5 8-1 11.5 2" stroke="#2B2119" stroke-width="2.6" stroke-linecap="round" fill="none"/>';
+      eyes = '<g class="sl-eyes"><path d="M51 58c2.5-4 5.5-6 8-6s5.5 2 8 6M73 58c2.5-4 5.5-6 8-6s5.5 2 8 6" stroke="#241623" stroke-width="2.8" stroke-linecap="round" fill="none"/></g>';
+      mouth = '<path d="M56 69c0 10 6 17 14 17s14-7 14-17c-8 3-20 3-28 0z" fill="#7F1D1D"/><path d="M59 70c4-1.5 8-2.2 11-2.2s7 .7 11 2.2" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/><ellipse cx="70" cy="82" rx="5.5" ry="3.4" fill="#FB7185"/>';
+      arms = '<g transform="rotate(-38 102 120)"><rect x="94" y="94" width="15" height="42" rx="7.5" fill="' + hood + '"/><circle cx="101.5" cy="90" r="10" fill="' + skin + '"/><path d="M95 84l-4-7M101 82v-8M107 84l4-7" stroke="' + skin + '" stroke-width="4" stroke-linecap="round"/></g>'
+        + '<g transform="rotate(38 38 120)"><rect x="30.5" y="94" width="15" height="42" rx="7.5" fill="' + hood + '"/><circle cx="38" cy="90" r="10" fill="' + skin + '"/><path d="M32 84l-4-7M38 82v-8M44 84l4-7" stroke="' + skin + '" stroke-width="4" stroke-linecap="round"/></g>';
+      extras = '<path d="M20 44l3-6M26 48l5-3M114 40l-3-6M108 44l-5-3" stroke="#FBBF24" stroke-width="3" stroke-linecap="round/><circle cx="122" cy="70" r="2.6" fill="#EC4899"/><circle cx="18" cy="72" r="2.6" fill="#06B6D4"/>';
+    } else if (mood === 'wow') {
+      brows = '<path d="M50 38c3.5-3.4 8-4 11.5-2.5M78.5 35.5c3.5-1.5 8-1 11.5 2.5" stroke="#2B2119" stroke-width="2.6" stroke-linecap="round" fill="none"/>';
+      eyes = '<g class="sl-eyes"><ellipse cx="59" cy="56" rx="7.6" ry="8.6" fill="#fff"/><ellipse cx="81" cy="56" rx="7.6" ry="8.6" fill="#fff"/>'
+        + '<circle cx="59.5" cy="57" r="4" fill="#241623"/><circle cx="81.5" cy="57" r="4" fill="#241623"/>'
+        + '<circle cx="61" cy="55.2" r="1.4" fill="#fff"/><circle cx="83" cy="55.2" r="1.4" fill="#fff"/></g>';
+      mouth = '<g class="sl-mouth"><ellipse cx="70" cy="76" rx="4.6" ry="5.6" fill="#7F1D1D"/><ellipse cx="70" cy="78" rx="2.4" ry="2.4" fill="#FB7185"/></g>';
+      arms = '<g transform="rotate(-20 102 122)"><rect x="94" y="100" width="15" height="36" rx="7.5" fill="' + hood + '"/><circle cx="101.5" cy="96" r="9.5" fill="' + skin + '"/></g>'
+        + '<g transform="rotate(20 38 122)"><rect x="30.5" y="100" width="15" height="36" rx="7.5" fill="' + hood + '"/><circle cx="38" cy="96" r="9.5" fill="' + skin + '"/></g>';
+      extras = '<path d="M30 30l-4-8M110 30l4-8M70 14v-8" stroke="#FBBF24" stroke-width="3.5" stroke-linecap="round/><circle cx="30" cy="20" r="2.4" fill="#FBBF24"/><circle cx="110" cy="20" r="2.4" fill="#FBBF24"/>';
+    } else if (mood === 'think') {
+      brows = '<path d="M50 40c3.5-3 8-3.5 11.5-2M78.5 44c3.5-.5 8 0 11.5 3" stroke="#2B2119" stroke-width="2.6" stroke-linecap="round" fill="none"/>';
+      eyes = '<g class="sl-eyes"><ellipse cx="59" cy="56" rx="6.6" ry="7.6" fill="#fff"/><ellipse cx="81" cy="56" rx="6.6" ry="7.6" fill="#fff"/>'
+        + '<circle cx="61.5" cy="57" r="3.5" fill="#241623"/><circle cx="83.5" cy="57" r="3.5" fill="#241623"/>'
+        + '<circle cx="62.8" cy="55.5" r="1.2" fill="#fff"/><circle cx="84.8" cy="55.5" r="1.2" fill="#fff"/></g>';
+      mouth = '<path d="M63 74c3 2 7 2.4 10 1" stroke="#9A3412" stroke-width="2.6" stroke-linecap="round" fill="none"/>';
+      arms = '<g><rect x="92" y="108" width="15" height="30" rx="7.5" fill="' + hood + '"/><circle cx="99.5" cy="98" r="9" fill="' + skin + '"/><path d="M99 90l-2-6" stroke="' + skin + '" stroke-width="3.6" stroke-linecap="round"/></g>';
+      extras = '<circle cx="116" cy="34" r="4" fill="#fff" stroke="#DDD6FE" stroke-width="2"/><circle cx="126" cy="22" r="6" fill="#fff" stroke="#DDD6FE" stroke-width="2"/>';
+    } else {
+      brows = '<path d="M50 43c3.5-2.6 8-3 11.5-1.6M78.5 41.4c3.5-1.4 8-.6 11.5 2.4" stroke="#2B2119" stroke-width="2.6" stroke-linecap="round" fill="none"/>';
+      mouth = '<g class="sl-mouth"><ellipse cx="70" cy="75" rx="6.6" ry="7.6" fill="#7F1D1D"/><ellipse cx="70" cy="78.4" rx="4" ry="3.4" fill="#FB7185"/></g>';
+      arms = '<g class="sl-arm" transform="rotate(-24 102 120)"><rect x="94" y="98" width="15" height="38" rx="7.5" fill="' + hood + '"/><circle cx="101.5" cy="94" r="10" fill="' + skin + '"/><path d="M95 88l-4-7M101 86v-8M107 88l4-7" stroke="' + skin + '" stroke-width="4" stroke-linecap="round"/></g>';
+    }
+    return '<svg viewBox="0 0 140 172" xmlns="http://www.w3.org/2000/svg">'
+      + extras
+      + '<path d="M18 140c6-3 12-3 18 0M104 148c6-3 12-3 18 0" stroke="#DDD6FE" stroke-width="4" stroke-linecap="round" fill="none" opacity=".9"/>'
+      + '<rect x="40" y="108" width="60" height="52" rx="22" fill="' + hood + '"/>'
+      + '<rect x="40" y="108" width="60" height="52" rx="22" fill="none" stroke="' + hoodD + '" stroke-width="2" opacity=".45"/>'
+      + '<path d="M62 110h16l-8 14z" fill="#fff"/>'
+      + '<rect x="57" y="134" width="26" height="15" rx="7.5" fill="' + hoodD + '"/>'
+      + '<path d="M70 138l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4-2.9-2.8 4-.6z" fill="#FDE68A"/>'
+      + '<rect x="63" y="94" width="14" height="18" rx="7" fill="' + skinD + '"/>'
+      + '<g><rect x="33" y="110" width="15" height="36" rx="7.5" fill="' + hood + '"/><circle cx="40.5" cy="144" r="8.5" fill="' + skin + '"/></g>'
+      + arms
+      + '<circle cx="45" cy="64" r="5.5" fill="' + skin + '"/><circle cx="95" cy="64" r="5.5" fill="' + skin + '"/>'
+      + '<ellipse cx="70" cy="62" rx="25" ry="28" fill="' + skin + '"/>'
+      + '<path d="M44 56c-2-14 1-24 6-30-1 5 0 9 2 12 1-8 6-15 12-18 0 5 1 8 3 11 3-5 8-9 14-10-1 4-1 7 0 10 4-2 8-2 12 1 2-8 1-16-2-22 8 6 12 16 10 30-2-6-5-9-8-11-6 5-14 8-24 8s-18-3-24-8c-1 3-1 5-1 7z" fill="' + hair + '"/>'
+      + '<path d="M44 34c8-10 32-12 52-2l3-12c-2-3-6-5-10-5H52c-5 0-9 3-10.5 7z" fill="' + cap + '"/>'
+      + '<path d="M44 34c8-10 32-12 52-2" fill="none" stroke="' + capD + '" stroke-width="2.5" stroke-linecap="round"/>'
+      + '<rect x="86" y="8" width="26" height="10" rx="5" fill="' + capD + '"/>'
+      + '<path d="M70 26l1.6 3.2 3.6.5-2.6 2.5.6 3.6-3.2-1.7-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" fill="#FDE68A"/>'
+      + brows
+      + eyes
+      + '<ellipse cx="51" cy="67" rx="4.4" ry="2.8" fill="#F9A8A8" opacity=".8"/><ellipse cx="89" cy="67" rx="4.4" ry="2.8" fill="#F9A8A8" opacity=".8"/>'
+      + '<path d="M68 64c.8 1 1.2 1.8 1 2.6-.2.9-1.2 1.2-2.2 1" stroke="#D97757" stroke-width="1.6" stroke-linecap="round" fill="none"/>'
+      + mouth
+      + '</svg>';
+  }
+  function speakWaves() {
+    return '<span class="waves"><i></i><i></i><i></i><i></i></span><span class="dots"><i></i><i></i><i></i></span>';
+  }
+  /* Family photo card - husband/wife photo + live speech bubble */
+  function photoCharHTML(type, cls) {
+    const url = state.photos && state.photos[type];
+    if (!url) return '';
+    return '<div class="' + (cls || 'noura-char photo-char') + '"><img src="' + url + '" alt="' + (type === 'mom' ? 'الزوجة' : 'الزوج') + '"/></div>';
+  }
+  function assistantSay(msg, mood, label, who) {
+    const url = (who && state.photos && state.photos[who]) || '';
+    const av = url ? '<div class="noura-char photo-char"><img src="' + url + '" alt=""/></div>' : '';
+    const whoName = who === 'dad' ? 'الزوج' : who === 'mom' ? 'الزوجة' : 'بيتنا';
+    return '<div class="noura-card">' + av
+      + '<div class="noura-bubble"><div class="noura-name">' + svgIcon('star', 13) + ' ' + whoName + ' • ' + (label || 'رسالة جديدة') + '</div>'
+      + '<div class="noura-msg">' + msg + '</div>'
+      + '<div class="noura-live">' + speakWaves() + '</div></div></div>';
+  }
+  function handlePhotoUpload(type, file) {
+    if (!file || !file.type.startsWith('image/')) { toast('اختر صورة صحيحة', 'error'); return; }
+    const img = new Image();
+    const rd = new FileReader();
+    rd.onload = () => {
+      img.onload = () => {
+        const max = 256;
+        const sc = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        if (!state.photos) state.photos = { mom: '', dad: '' };
+        state.photos[type] = c.toDataURL('image/jpeg', .82);
+        persist(); render();
+        toast(type === 'mom' ? 'تم حفظ صورة الأم' : 'تم حفظ صورة الأب', 'success');
+      };
+      img.src = rd.result;
+    };
+    rd.readAsDataURL(file);
+  }
+  function emptySVG() {
+    return '<svg viewBox="0 0 120 96" width="120" height="96"><ellipse cx="60" cy="88" rx="30" ry="5" fill="#EDE9FE"/><rect x="28" y="28" width="64" height="50" rx="16" fill="#fff" stroke="#EDE9FE" stroke-width="3"/><path d="M44 52h32M44 61h20" stroke="#DDD6FE" stroke-width="5" stroke-linecap="round"/><circle cx="86" cy="30" r="14" fill="#7C3AED"/><path d="M80 30l4 4 7-8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="22" r="5" fill="#FCE7F3"/><circle cx="98" cy="60" r="6" fill="#E0F2FE"/></svg>';
+  }
+  function calcStreak() {
+    try {
+      const days = new Set((state.expenses || []).map(e => (e.createdAt || '').slice(0, 10)));
+      let s = 0; const d = new Date();
+      while (true) { const k = d.toISOString().slice(0, 10); if (days.has(k)) { s++; d.setDate(d.getDate() - 1); } else break; }
+      return s;
+    } catch { return 0; }
+  }
+  function getLevel() {
+    const done = (state.orders || []).filter(o => o.status === 'purchased').length;
+    const lvl = Math.min(7, 1 + Math.floor(done / 4));
+    const pct = Math.min(100, Math.round(((done % 4) / 4) * 100));
+    const names = ['مستكشف', 'متعلم', 'نشيط', 'بطل البيت', 'خبير', 'أسطورة', 'بطل خارق'];
+    return { lvl, pct, title: names[lvl - 1] };
+  }
+
+  /* =============================
+     CATEGORIES
+     ============================= */
+  const CATEGORIES = {
+    produce: { id: 'produce', name: 'خضار وفاكهة', icon: 'leaf', color: '#16A34A' },
+    grocery: { id: 'grocery', name: 'بقالة ودكان', icon: 'basket', color: '#F59E0B' },
+    cleaning: { id: 'cleaning', name: 'نظافة ومنزل', icon: 'sparkle', color: '#06B6D4' },
+    pharmacy: { id: 'pharmacy', name: 'صيدلية', icon: 'pill', color: '#EC4899' },
+    emergency: { id: 'emergency', name: 'طوارئ', icon: 'bolt', color: '#F43F5E' },
+    other: { id: 'other', name: 'أخرى', icon: 'box', color: '#7C3AED' }
+  };
+  const CATEGORY_LIST = Object.values(CATEGORIES);
+
+  const CATEGORY_LOCATIONS = {
+    produce: 'محل الخضار',
+    grocery: 'البقالة أو السوبرماركت',
+    cleaning: 'السوبرماركت أو البقالة',
+    pharmacy: 'الصيدلية',
+    emergency: 'الحديدي أو محل الأدوات',
+    other: 'حسب المتوفر'
+  };
+
+  const CLASSIFIER_MAP = {
+    produce: [
+      'بطاطس','بطاطا','بطاطا حلوة','طماطم','طماطم شيري','بندورة','خيار','قثاء','جزر',
+      'كزبرة','بقدونس','نعناع','شبت','جرجير','فجل','بنجر','شمندر','كرفس','ريحان',
+      'بصل','بصل أخضر','بصل أحمر','ثوم','زنجبيل','فلفل','فلفل رومي','فلفل ألوان',
+      'فلفل حار','شطة خضرا','ملوخية','سبانخ','سلق','سلطة','خس','كابوتشي',
+      'كوسا','كوسة','قرنبيط','ملفوف','كرنب','باذنجان','بامية','قلقاس',
+      'برتقال','برتقال بلدي','برتقال بصرة','يوسفي','ليمون','ليمون أخضر',
+      'جريب فروت','موز','مانجو','مانجو عويسي','مانجو زبدية','مانجو سكري',
+      'فراولة','توت','عنب','عنب أحمر','عنب أخضر','تفاح','تفاح أحمر','تفاح أخضر',
+      'كمثرى','خوخ','مشمش','برقوق','كرز','جوافة','رمان','تين','تين شوكي',
+      'بلح','تمر','عجوة','شمام','بطيخ','أناناس','كيوي','أفوكادو','جوز هند',
+      'قصب','دوم','تين مجفف','مشمشية','قراصيا','زبيب','فواكه','خضار','خضروات','فاكهة'
+    ],
+    grocery: [
+      'رز','رز مصري','رز بسمتي','معكرونة','مكرونة','مكرونة أقلام','اسباجتي',
+      'لسان عصفور','شعرية','شوربة','شوربة عدس','عدس','عدس أصفر','عدس بجبة',
+      'فول','فول مدمس','فول مدشوش','حمص','حمص الشام','ترمس','فاصوليا',
+      'فاصوليا بيضا','فاصوليا حمرا','لوبيا','بسلة','ذرة','فشار','بقوليات','بقول',
+      'زيت','زيت ذرة','زيت عباد','زيت زيتون','زيت نباتي','زيت حار','زيت سمسم',
+      'سمنة','سمنة بلدي','سمنة نباتي','زبدة','سميد','دقيق','طحين','نشا','بقسماط',
+      'سكر','سكر بني','ملح','فلفل أسود','فلفل أبيض','كمون','كزبرة ناشفة',
+      'كركم','كاري','قرفة','قرنفل','حبهان','ورق لورا','ورق لوري','زعتر','روزماري',
+      'بابريكا','سماق','دقة','بهارات','خل','خل تفاح','صلصة','معجون طماطم',
+      'كاتشب','مايونيز','مستردة','طحينة','عسل','عسل أسود','عسل أبيض',
+      'مربى','مربى فراولة','مربى تين','حلاوة طحينية','جبنة','جبنة قريش',
+      'جبنة رومي','جبنة شيدر','جبنة موزاريلا','جبنة فيتا','جبنة نستو','جبنة كيري',
+      'لبنة','لبن','لبن رايب','لبن بودرة','زبادي','حليب','بيض','بيض بلدي',
+      'عصير','عصير مانجو','عصير جوافة','عصير برتقال','شاي','شاي أخضر',
+      'قهوة','قهوة تركي','قهوة عربي','نسكافيه','كاكاو','ينسون','تليو','بردقوش',
+      'كركديه','عرقسوس','تمر هندي','سوبيا','خروب','بيبسي','كوكاكولا','فانتا',
+      'سبرايت','ميرندا','شويبس','مياه غازية','مياه','ماء','بسكويت','كيك',
+      'كرواسون','باتيه','عيش','عيش بلدي','عيش فينو','عيش شامي','توست',
+      'شيبس','شيبسي','دوريتوس','لب','سوداني','مكسرات','لوز','عين جمل','بندق',
+      'كاجو','فستق','شوكولاتة','حلاوة','ملبس','لبان','مصاصة','خميرة','صودا',
+      'سمك','سمك بلطي','سمك بوري','جمبري','سبيط','تونة','سردين','ماكريل',
+      'رنجة','فسيخ','لحم','لحمة','لحمة مفرومة','بوفتيك','كباب حلة','كبدة',
+      'فراخ','دجاج','بط','وز','حمام','أرانب','سجق','لانشون','بسطرمة','كفتة',
+      'لحوم','نقانق','مرق','شوفان','بقالة','دكان','سوبرماركت','علبة','علب'
+    ],
+    cleaning: [
+      'شامبو','شامبو قشرة','بلسم','حمام كريم','صبغة شعر','صابون','صابون غار',
+      'صابون نابلسي','صابون سائل','شاور جل','استحمام','معجون أسنان',
+      'معجون أسنان حساسة','فرشاة أسنان','فرشاة أسنان كهربا','خيط أسنان',
+      'سواك','غسول فم','مزيل عرق','برفان','كولونيا','كريم مرطب','كريم شعر',
+      'زيت شعر','زيت خروع','زيت جرجير','فازلين','جلسرين','مكياج','ماسكرا',
+      'مناديل','مناديل مبللة','ورق مرحاض','ورق تواليت','قطن','فوط صحية',
+      'حفاضات','مسحوق غسيل','مسحوق أوتوماتيك','داوني','منعم غسيل','كلور',
+      'كلوركس','فلاش','ديتول','مطهر','معقم','معطر جو','معطر أرضيات',
+      'ملمع زجاج','ملمع خشب','سلك مواعين','ليفة','إسفنجة','مقشة','مساحة',
+      'جردل','شرشوبة','فرشاة بلاط','فرشاة حمام','مكنسة','مكنسة كهربا',
+      'قفازات','كيس زبالة','أكياس تلاجة','ورق فويل','ورق زبدة','استرتش',
+      'أطباق فويل','كبايات ورق','معالق بلاستيك','فوطة','وسادة','شرشف',
+      'ملاءة','تنظيف','نظافة','مطهر','أكياس','نفايات','بلاستيك','إلمنيوم',
+      'كيس','سجادة','منظفات','مزيل بقع','بيكابون','فاب','بخور','عطر'
+    ],
+    pharmacy: [
+      'مسكن','مسكن ألم','باراسيتامول','بنادول','بنادول كولد','أسبرين','ريفو',
+      'بروفين','كتافلام','فولتارين','دواء','أدوية','حبوب','قرص','برشام',
+      'مرهم','مرهم حروق','ميبو','هيموكلار','ريباريل جل','كريم طبي',
+      'كريم مضاد حيوي','قطرة','قطرة عين','قطرة أنف','قطرة أذن','بخاخ أنف',
+      'دواء كحة','استحلاب','مضاد حيوي','أوجمنتين','فلاجيل','أنتينال',
+      'ستربتوكين','مالوكس','جافيسكون','راني','فيتامين','فيتامين سي',
+      'فيتامين د','حديد','كالسيوم','مغنيسيوم','أوميجا 3','زيت كبد الحوت',
+      'اختبار حمل','ترمومتر','جهاز سكر','جهاز ضغط','شرايط سكر','سرنجات',
+      'قطن طبي','شاش','بلاستر','رباط ضاغط','ضمادة','لصقة','شراب',
+      'سعال','زكام','برد','مكمل غذائي','صيدلية','فازلين','مضاد حموضة',
+      'واقي شمس','مرطب شفايف','بودرة تلك','زيت أطفال','شامبو أطفال',
+      'كريم حفاض','لبن أطفال','ببرونة'
+    ],
+    emergency: [
+      'بطارية','بطارية قلم','حجارة','لمبة','لمبة ليد','لمبة موفرة','مصباح',
+      'كشاف','كابل','كابل شاحن','شاحن','شاحن سريع','شاحن موبايل','مشترك كهربا',
+      'وصلة','سلك','فيشة','بريزة','مفتاح كهربا','دواية','شريط لحام','قابس',
+      'مفك','مفك عادة','مفك صليبة','مفك تست','بنسة','زرادية','مفتاح إنجليزي',
+      'مفتاح فرنساوي','شاكوش','مطرقة','مسامير','مسمار','خابور','فيشر',
+      'صامولة','سلسلة','قفل','كالون','مفصلة','مقبض','مقبض باب','جرس','مفتاح',
+      'مواسير','محبس','خلاط','دش','حنفية','صنبور','سيفون','جلدة','تفلون',
+      'صمام','سيليكون','سيلكون','غراء','أمير','معجون حوائط','صنفرة',
+      'رولة دهان','فرشاة دهان','بوية','لاكيه','ورنيش','تنر','دهان',
+      'أسمنت','اسمنت','طوب','مضخة','أنابيب','حديد','إصلاح','لاصق','سلوتيب',
+      'كرتون','ولاعة','كبريت','شمع','فحم','مبيد حشري','صاعق ناموس',
+      'بخور ناموس','حبل غسيل','مشابك','شماعة','كرتون'
+    ]
+  };
+
+  /* =============================
+     STORAGE
+     ============================= */
+  const STORAGE_KEY = 'baytna_v2';
+  const Storage = {
+    load() { try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; } catch { return null; } },
+    save(s) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); return true; } catch { return false; } },
+    clear() { localStorage.removeItem(STORAGE_KEY); }
+  };
+
+  /* =============================
+     STATE
+     ============================= */
+  let state = {
+    initialized: false, home: null, user: null,
+    orders: [], expenses: [], learnedMap: {}, usageFreq: {},
+    categoryColors: {}, categoryNames: {}, categoryIcons: {},
+    photos: { mom: '', dad: '' },
+    currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: ''
+  };
+
+  function uid() { return Math.random().toString(36).slice(2, 10); }
+  function getCategoryName(catId) { return state.categoryNames?.[catId] || CATEGORIES[catId]?.name || catId; }
+  function getCategoryIcon(catId) { return state.categoryIcons?.[catId] || CATEGORIES[catId]?.icon || 'box'; }
+  const CAT_ICON_CHOICES = [
+    { id: 'leaf', label: 'ورقة' }, { id: 'basket', label: 'سلة' },
+    { id: 'cart', label: 'عربة' }, { id: 'sparkle', label: 'لمعان' },
+    { id: 'pill', label: 'دواء' }, { id: 'bolt', label: 'برق' },
+    { id: 'box', label: 'صندوق' }, { id: 'star', label: 'نجمة' },
+    { id: 'flame', label: 'شعلة' }, { id: 'trophy', label: 'كأس' },
+    { id: 'wallet', label: 'محفظة' }, { id: 'home', label: 'بيت' }
+  ];
+  function nowISO() { return new Date().toISOString(); }
+  function formatCurrency(v) { return Number(v || 0).toFixed(2).replace(/\.00$/, ''); }
+  function todayKey(d) { d = d || new Date(); return d.toISOString().slice(0, 10); }
+  function isSameDay(iso, d) { return iso.slice(0, 10) === todayKey(d || new Date()); }
+  function genHomeCode() { return `HOME-${Math.floor(1000 + Math.random() * 9000)}`; }
+
+  /* =============================
+     CLASSIFIER
+     ============================= */
+  function normalizeTerm(s) {
+    if (!s) return '';
+    return s.toLowerCase().trim().replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/[ؤئ]/g, 'ء').replace(/\s+/g, ' ');
+  }
+  function classifyOrder(name, opts) {
+    opts = opts || {};
+    if (opts.forceCategory && CATEGORIES[opts.forceCategory]) return { categoryId: opts.forceCategory, source: 'forced' };
+    const norm = normalizeTerm(name);
+    if (state.learnedMap[norm] && CATEGORIES[state.learnedMap[norm]]) return { categoryId: state.learnedMap[norm], source: 'learned' };
+    for (const cat of Object.keys(CLASSIFIER_MAP)) {
+      for (const kw of CLASSIFIER_MAP[cat]) {
+        if (norm === normalizeTerm(kw)) return { categoryId: cat, source: 'exact' };
+      }
+    }
+    for (const cat of Object.keys(CLASSIFIER_MAP)) {
+      for (const kw of CLASSIFIER_MAP[cat]) {
+        if (norm.includes(normalizeTerm(kw)) || normalizeTerm(kw).includes(norm)) return { categoryId: cat, source: 'partial' };
+      }
+    }
+    return { categoryId: 'other', source: 'unknown' };
+  }
+  function saveLearning(term, catId) { state.learnedMap[normalizeTerm(term)] = catId; persist(); }
+
+  /* =============================
+     PERSIST
+     ============================= */
+  function persist() { state.updatedAt = Date.now(); Storage.save(state); schedulePush(); }
+  function restore() { const s = Storage.load(); if (s) { state = Object.assign(state, s); return true; } return false; }
+
+  /* =============================
+     FIREBASE FIRESTORE SYNC
+     ============================= */
+  const firebaseConfig = {
+    apiKey: "AIzaSyC8Gj1hufwwXrdO4zzQjPMeMg_KD3XSKDQ",
+    authDomain: "project-84ae3235-3633-44c1-819.firebaseapp.com",
+    projectId: "project-84ae3235-3633-44c1-819",
+    storageBucket: "project-84ae3235-3633-44c1-819.firebasestorage.app",
+    messagingSenderId: "1009475192148",
+    appId: "1:1009475192148:web:5031fa8ddcbca4c860b4c1",
+    measurementId: "G-97QYMTBRKS"
+  };
+  let db = null, cloudUnsub = null, cloudCode = null, pushTimer = null;
+  try {
+    if (window.firebase) {
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+    }
+  } catch { db = null; }
+  const UI_ONLY_KEYS = ['currentTab', 'orderFilter', 'categoryFilter', 'searchQuery'];
+  function cloudPayload() {
+    const p = {};
+    for (const k of Object.keys(state)) {
+      if (k[0] === '_' || UI_ONLY_KEYS.includes(k)) continue;
+      p[k] = state[k];
+    }
+    p.updatedAt = state.updatedAt || Date.now();
+    return p;
+  }
+  function schedulePush() {
+    if (!db || !state.home?.code) return;
+    if (pushTimer) clearTimeout(pushTimer);
+    pushTimer = setTimeout(() => {
+      try { db.collection('homes').doc(state.home.code).set(cloudPayload(), { merge: true }); }
+      catch { /* offline - SDK queues automatically */ }
+    }, 800);
+  }
+  function attachCloud() {
+    if (!db || !state.home?.code) return;
+    if (cloudCode === state.home.code) return;
+    if (cloudUnsub) { try { cloudUnsub(); } catch {} cloudUnsub = null; }
+    cloudCode = state.home.code;
+    try {
+      cloudUnsub = db.collection('homes').doc(state.home.code).onSnapshot((snap) => {
+        if (!snap.exists) { schedulePush(); return; }
+        const remote = snap.data() || {};
+        if ((remote.updatedAt || 0) > (state.updatedAt || 0) && remote.home) {
+          const ui = {};
+          for (const k of UI_ONLY_KEYS) ui[k] = state[k];
+          Object.assign(state, remote, ui);
+          Storage.save(state);
+          render();
+          if (state.initialized) toast('وصل تحديث جديد من جهاز تاني', 'info');
+        }
+      });
+    } catch { /* offline */ }
+  }
+
+  /* =============================
+     ACTIONS
+     ============================= */
+  function addOrder({ name, notes, urgent }) {
+    const { categoryId } = classifyOrder(name);
+    const order = { id: uid(), name: name.trim(), notes: notes || '', urgent: !!urgent, categoryId, status: 'pending', createdAt: nowISO(), createdBy: state.user?.name || 'الزوجة', purchaseLocation: CATEGORY_LOCATIONS[categoryId] || '', purchase: null };
+    state.orders.unshift(order);
+    const key = normalizeTerm(order.name);
+    state.usageFreq[key] = (state.usageFreq[key] || 0) + 1;
+    persist();
+    return order;
+  }
+  function updateOrder(id, patch) {
+    const o = state.orders.find(x => x.id === id);
+    if (!o) return null;
+    if (patch.name !== undefined && patch.name.trim() !== o.name) {
+      const { categoryId } = classifyOrder(patch.name);
+      o.categoryId = categoryId;
+      o.purchaseLocation = CATEGORY_LOCATIONS[categoryId] || '';
+    }
+    Object.assign(o, patch);
+    if (patch.name) o.name = patch.name.trim();
+    persist();
+    return o;
+  }
+  function deleteOrder(id) {
+    const idx = state.orders.findIndex(x => x.id === id);
+    if (idx >= 0) state.orders.splice(idx, 1);
+    persist();
+  }
+  function markPurchased(orderId, { originalPrice, finalPrice }) {
+    const o = state.orders.find(x => x.id === orderId);
+    if (!o) return null;
+    o.status = 'purchased';
+    o.purchase = { originalPrice: Number(originalPrice) || 0, finalPrice: Number(finalPrice) || 0, purchasedAt: nowISO() };
+    const exp = { id: uid(), title: o.name, amount: o.purchase.finalPrice, savings: 0, categoryId: o.categoryId, sourceType: 'order', sourceId: o.id, notes: '', purchaseLocation: o.purchaseLocation || '', createdAt: o.purchase.purchasedAt };
+    state.expenses.unshift(exp);
+    persist();
+    return { order: o, expense: exp };
+  }
+  function addManualExpense({ title, amount, categoryId, notes, createdAt }) {
+    const exp = { id: uid(), title: title.trim(), amount: Number(amount) || 0, savings: 0, categoryId: categoryId || 'other', sourceType: 'manual', sourceId: null, notes: notes || '', purchaseLocation: CATEGORY_LOCATIONS[categoryId] || '', createdAt: createdAt || nowISO() };
+    state.expenses.unshift(exp);
+    persist();
+    return exp;
+  }
+  function deleteExpense(id) {
+    const idx = state.expenses.findIndex(x => x.id === id);
+    if (idx >= 0) {
+      const exp = state.expenses[idx];
+      if (exp.sourceType === 'order' && exp.sourceId) {
+        const o = state.orders.find(x => x.id === exp.sourceId);
+        if (o) { o.status = 'pending'; o.purchase = null; }
+      }
+      state.expenses.splice(idx, 1);
+      persist();
+    }
+  }
+
+  /* =============================
+     AGGREGATION
+     ============================= */
+  function statsCounts() {
+    const pending = state.orders.filter(o => o.status === 'pending').length;
+    const done = state.orders.filter(o => o.status === 'purchased' && o.purchase && isSameDay(o.purchase.purchasedAt)).length;
+    return { pending, done };
+  }
+  function sumExpensesInRange(range) {
+    const now = new Date(); let total = 0, savings = 0, count = 0;
+    for (const e of state.expenses) {
+      const d = new Date(e.createdAt); let pass = false;
+      if (range === 'day') pass = isSameDay(e.createdAt, now);
+      else if (range === 'week') pass = (now - d) / (864e5) < 7;
+      else if (range === 'month') pass = d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      else pass = true;
+      if (pass) { total += Number(e.amount) || 0; savings += Number(e.savings) || 0; count++; }
+    }
+    return { total, savings, count };
+  }
+  function topCategoryInRange(range) {
+    const now = new Date(); const perCat = {};
+    for (const e of state.expenses) {
+      const d = new Date(e.createdAt); let pass;
+      if (range === 'day') pass = isSameDay(e.createdAt, now);
+      else if (range === 'week') pass = (now - d) / 864e5 < 7;
+      else if (range === 'month') pass = d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      else pass = true;
+      if (pass) perCat[e.categoryId] = (perCat[e.categoryId] || 0) + (Number(e.amount) || 0);
+    }
+    let topId = null, topVal = 0;
+    for (const id of Object.keys(perCat)) { if (perCat[id] > topVal) { topVal = perCat[id]; topId = id; } }
+    return { id: topId, total: topVal };
+  }
+  function last7DaysBars() {
+    const days = []; const labels = ['أحد', 'إثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت']; const now = new Date();
+    for (let i = 6; i >= 0; i--) { const d = new Date(now); d.setDate(now.getDate() - i); const key = d.toISOString().slice(0, 10); days.push({ key, total: state.expenses.filter(e => e.createdAt.slice(0, 10) === key).reduce((s, e) => s + (Number(e.amount) || 0), 0), label: labels[d.getDay()] }); }
+    return days;
+  }
+  function monthDayBars() {
+    const now = new Date(); const y = now.getFullYear(), m = now.getMonth(); const daysInMonth = new Date(y, m + 1, 0).getDate(); const arr = [];
+    for (let day = 1; day <= daysInMonth; day++) { const key = `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; arr.push({ key, total: state.expenses.filter(e => e.createdAt.slice(0, 10) === key).reduce((s, e) => s + (Number(e.amount) || 0), 0), label: day }); }
+    return arr;
+  }
+  function categoryBreakdown(range) {
+    const breakdown = {}; for (const id of Object.keys(CATEGORIES)) breakdown[id] = 0; const now = new Date();
+    for (const e of state.expenses) { const d = new Date(e.createdAt); let pass; if (range === 'day') pass = isSameDay(e.createdAt, now); else if (range === 'week') pass = (now - d) / 864e5 < 7; else if (range === 'month') pass = d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); else pass = true; if (pass) breakdown[e.categoryId] = (breakdown[e.categoryId] || 0) + (Number(e.amount) || 0); }
+    return breakdown;
+  }
+  function mostExpensiveDayWeek() { const days = last7DaysBars(); let top = days[0]; for (const d of days) if (d.total > top.total) top = d; return top; }
+  function frequentOrders(n) { n = n || 6; return Object.entries(state.usageFreq).filter(([, v]) => v >= 2).sort((a, b) => b[1] - a[1]).slice(0, n).map(([k, v]) => ({ name: findOriginalName(k) || k, count: v })); }
+  function findOriginalName(key) { for (const o of state.orders) { if (normalizeTerm(o.name) === key) return o.name; } return null; }
+
+  /* =============================
+     ROUTER
+     ============================= */
+  function setTab(tab) { state.currentTab = tab; persist(); render(); }
+
+  /* =============================
+     UI HELPERS
+     ============================= */
+  function toast(message, type) {
+    type = type || 'info';
+    const container = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    const iconMap = { success: '✅', error: '❌', warning: '⚠️', info: '💬' };
+    t.innerHTML = `<div class="toast-icon">${iconMap[type] || '💬'}</div><div>${message}</div>`;
+    container.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+  function escapeHTML(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function formatDateShort(d) {
+    const today = new Date(); const y = todayKey(), k = d.toISOString().slice(0, 10);
+    if (y === k) return `النهارده ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    const yest = new Date(); yest.setDate(yest.getDate() - 1);
+    if (yest.toISOString().slice(0, 10) === k) return `امبارح ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    return `${d.getDate()}/${d.getMonth() + 1} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+  function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text).then(() => true).catch(() => fallbackCopy(text));
+    return Promise.resolve(fallbackCopy(text));
+  }
+  function fallbackCopy(text) { try { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); return true; } catch { return false; } }
+  function shareHomeCode(code, name) {
+    const text = `تعالى ا joining بيتنا 🏠\nكود הבית: ${code}`;
+    if (navigator.share) return navigator.share({ title: 'ناقصنا ايه', text }).then(() => true).catch(() => false);
+    return copyToClipboard(text).then(ok => { toast(ok ? 'تم نسخ الكود ✓' : 'مقدرش أنسخ', ok ? 'success' : 'error'); return ok; });
+  }
+  function openModal(html, opts) {
+    opts = opts || {};
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop';
+    backdrop.innerHTML = `<div class="modal ${opts.classes || ''}" role="dialog">${html}</div>`;
+    document.body.appendChild(backdrop);
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop && opts.dismissible !== false) closeModal(backdrop); });
+    setTimeout(() => { const f = backdrop.querySelector('input, select, textarea'); if (f) f.focus(); }, 50);
+    backdrop._close = () => closeModal(backdrop);
+    backdrop._node = backdrop.querySelector('.modal');
+    return backdrop;
+  }
+  function closeModal(b) { const n = b._node || b.querySelector('.modal'); if (n) { n.style.animation = 'toastOut .15s ease-in forwards'; setTimeout(() => b.remove(), 150); } else b.remove(); }
+  function confirmDialog({ title, message, confirmText, cancelText, danger }) {
+    return new Promise((resolve) => {
+      const html = `<div class="confirm-dialog">
+        <div class="confirm-icon">${danger ? '⚠️' : '❓'}</div>
+        <h3>${title}</h3><p>${message}</p>
+        <div class="confirm-buttons">
+          <button class="btn" id="cancelBtn">${cancelText || '↩️ لا'}</button>
+          <button class="btn ${danger ? 'btn-danger' : 'btn-primary'}" id="okBtn">${confirmText || 'تمام'}</button>
+        </div></div>`;
+      const m = openModal(html, { dismissible: false });
+      m.querySelector('#cancelBtn').onclick = () => { closeModal(m); resolve(false); };
+      m.querySelector('#okBtn').onclick = () => { closeModal(m); resolve(true); };
+    });
+  }
+
+  /* =============================
+     SPEECH BUBBLE HELPER
+     ============================= */
+  function speechBubble(msg, type) {
+    const url = type === 'wife' ? (state.photos && state.photos.mom) : type === 'husband' ? (state.photos && state.photos.dad) : '';
+    const av = url ? `<div class="bubble-avatar parent-avatar"><img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt=""/></div>` : '';
+    return `<div class="bubble-row ${type}">
+      ${av}
+      <div class="speech-bubble ${type}">${msg}</div>
+    </div>`;
+  }
+
+  /* =============================
+     RENDERING
+     ============================= */
+  const app = document.getElementById('app');
+
+  function render() {
+    if (!state.initialized || !state.home || !state.user) { app.innerHTML = renderOnboarding(); return; }
+    app.innerHTML = renderMain();
+    app.insertAdjacentHTML('beforeend', renderBottomNav());
+    if (['home', 'orders'].includes(state.currentTab)) {
+      app.insertAdjacentHTML('beforeend', `<button class="fab" id="fabBtn" aria-label="زوّد طلب">+</button>`);
+    }
+    bindMain();
+  }
+
+  function renderOnboarding() {
+    if (!state._onboardingStep) state._onboardingStep = 'welcome';
+    const s = state._onboardingStep;
+    if (s === 'welcome') return renderWelcome();
+    if (s === 'create') return renderCreateHome();
+    if (s === 'join') return renderJoinHome();
+    if (s === 'created-success') return renderCreatedSuccess();
+    if (s === 'username') return renderUsernameScreen();
+    return renderWelcome();
+  }
+
+  function renderWelcome() {
+    const feats = [
+      { ic: 'cart', t: 'مهام ذكية', bg: '#F1EAFE', c: '#7C3AED' },
+      { ic: 'bolt', t: 'أولويات', bg: '#FFE4E6', c: '#E11D48' },
+      { ic: 'chart', t: 'تقارير', bg: '#E0F2FE', c: '#0284C7' }
+    ];
+    return `<div class="onboarding wb"><div class="welcome-card">
+      <div class="wb-blob b1"></div><div class="wb-blob b2"></div>
+      <div class="brand-icon xl app-logo w-anim" style="color:#fff;">${svgIcon('home', 52)}<img src="icon.png" alt="ناقصنا ايه" onerror="this.remove()" /></div>
+      <div class="brand-title grad w-anim d1">ناقصنا ايه</div>
+      <div class="brand-desc w-anim d2">مشتريات البيت صارت لعبة ممتعة — مهام ونقاط وشارات لعيلتك كلها</div>
+      <div class="feat-row w-anim d3">${feats.map(f => `<div class="feat-pill"><span class="feat-ico" style="background:${f.bg};color:${f.c};">${svgIcon(f.ic, 19)}</span><span>${f.t}</span></div>`).join('')}</div>
+      <div class="w-anim d4">${assistantSay(pickMsg(MSG.wifeGreeting), null, 'أول مهمة', 'mom')}</div>
+      <div class="btn-group w-anim d5">
+        <button class="btn btn-primary btn-xl" id="goCreate">عمل بيت جديد</button>
+        <button class="btn" id="goJoin">انضم لبيت موجود</button>
+      </div>
+      <div class="trust-row w-anim d6"><span>مزامنة سحابية</span><i></i><span>بدون تسجيل</span><i></i><span>+300 صنف جاهز</span></div>
+    </div></div>`;
+  }
+
+  function renderCreateHome() {
+    return `<div class="onboarding"><div class="form-card">
+      <button class="btn-ghost" id="backWelcome" style="margin-bottom:6px;">رجوع</button>
+      <h2 class="form-title">عمل بيت جديد 🏡</h2>
+      <p class="form-subtitle">اختار اسم لبيتك وابدأ يا حبيبي</p>
+      <div class="field">
+        <label>اسم البيت (اختياري)</label>
+        <input type="text" id="homeNameInput" placeholder="مثال: بيت محمد" maxlength="30" />
+        <div class="help-text">هنطلّعلك كود خاص بالبيت</div>
+      </div>
+      <button class="btn btn-primary" id="submitCreate">عمل البيت</button>
+    </div></div>`;
+  }
+
+  function renderCreatedSuccess() {
+    const code = state._pendingCode || genHomeCode();
+    return `<div class="onboarding"><div class="form-card">
+      <div class="success-icon" style="color:#059669;">${svgIcon('check', 34)}</div>
+      <h2 class="form-title">البيت اتعمل يا حبيبي!</h2>
+      <p class="form-subtitle">ابعت الكود ده لأي حد في العيلة يjoin</p>
+      <div class="home-code-box">
+        <div class="home-code-label">كود البيت</div>
+        <div class="home-code" id="codeDisplay">${code}</div>
+      </div>
+      <div class="btn-group">
+        <button class="btn" id="copyCodeBtn">نسخ الكود</button>
+        <button class="btn btn-primary" id="gotoUsername">ادخل البيت</button>
+      </div>
+    </div></div>`;
+  }
+
+  function renderJoinHome() {
+    return `<div class="onboarding"><div class="form-card">
+      <button class="btn-ghost" id="backWelcome2" style="margin-bottom:6px;">رجوع</button>
+      <h2 class="form-title">ادخل بيت موجود 🔗</h2>
+      <p class="form-subtitle">اكتب كود البيت اللي عندك</p>
+      <div class="field">
+        <label>كود البيت</label>
+        <input type="text" id="joinCodeInput" placeholder="مثال: HOME-4827" style="text-transform:uppercase; letter-spacing:2px;" />
+        <div class="help-text">اكتب الكود زي ما هو بالظبط</div>
+      </div>
+      <div id="joinError" class="error-text hidden">الكود غلط أو البيت مش موجود 😅</div>
+      <button class="btn btn-primary" id="submitJoin">انضم للبيت</button>
+    </div></div>`;
+  }
+
+  function renderUsernameScreen() {
+    return `<div class="onboarding"><div class="form-card">
+      <h2 class="form-title">قولنا اسمك؟ 👋</h2>
+      <p class="form-subtitle">هنعرفك بالاسم ده في البيت</p>
+      <div class="field">
+        <label>اسمك</label>
+        <input type="text" id="userNameInput" placeholder="مثال: محمد، الزواجة، أحمد" maxlength="20" />
+      </div>
+      <button class="btn btn-primary" id="submitUsername">يلا ندخل</button>
+    </div></div>`;
+  }
+
+  function renderBottomNav() {
+    const t = state.currentTab;
+    const tabs = [
+      { id: 'home', label: 'الرئيسية', icon: 'home' },
+      { id: 'orders', label: 'الطلبات', icon: 'cart' },
+      { id: 'expenses', label: 'المصروفات', icon: 'wallet' },
+      { id: 'reports', label: 'التقارير', icon: 'chart' },
+      { id: 'settings', label: 'الإعدادات', icon: 'gear' }
+    ];
+    return `<nav class="bottom-nav">${tabs.map(tab => `<button class="nav-item ${t === tab.id ? 'active' : ''}" data-tab="${tab.id}"><span class="nav-ico">${svgIcon(tab.icon, 22)}</span><span>${tab.label}</span></button>`).join('')}</nav>`;
+  }
+
+  function renderMain() {
+    switch (state.currentTab) {
+      case 'home': return renderHome();
+      case 'orders': return renderOrders();
+      case 'expenses': return renderExpenses();
+      case 'reports': return renderReports();
+      case 'settings': return renderSettings();
+      default: return renderHome();
+    }
+  }
+
+  function renderHome() {
+    const { pending, done } = statsCounts();
+    const today = sumExpensesInRange('day');
+    const month = sumExpensesInRange('month');
+    const userName = state.user?.name || 'صديقي';
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'صباح الخير' : hour < 17 ? 'مساء النور' : 'مساء الخير';
+    const recent = state.orders.filter(o => !(o.status === 'purchased' && o.purchase && !isSameDay(o.purchase.purchasedAt))).sort((a, b) => ((b.urgent && b.status !== 'purchased') ? 1 : 0) - ((a.urgent && a.status !== 'purchased') ? 1 : 0)).slice(0, 5);
+    const urgentCount = state.orders.filter(o => o.urgent && o.status === 'pending').length;
+    const streak = calcStreak();
+    const level = getLevel();
+    const totalTasks = pending + done;
+    const progress = totalTasks ? Math.round((done / totalTasks) * 100) : 0;
+    const achv = [
+      { t: 'أول طلب', s: totalTasks > 0 ? 'تم الفتح' : 'أضف طلبك', ok: totalTasks > 0, bg: '#F1EAFE', c: '#7C3AED', ic: 'star' },
+      { t: 'سلسلة ' + streak + ' يوم', s: streak > 1 ? 'مستمرة' : 'ابدأ اليوم', ok: streak > 1, bg: '#FEF3C7', c: '#D97706', ic: 'flame' },
+      { t: 'بطل التسوق', s: done + ' مهمة', ok: done >= 4, bg: '#DCFCE7', c: '#059669', ic: 'trophy' }
+    ];
+
+    return `<div class="page">
+      <div class="topbar"><div class="greeting">${greeting} يا ${escapeHTML(userName)}</div></div>
+      <div class="page-title">رحلة بيتنا اليوم</div>
+
+      <div class="hero">
+        <div class="hero-top">
+          ${photoCharHTML('mom', 'noura-hero-char photo-char')}
+          <div style="flex:1;min-width:0;"><div class="noura-name" style="color:#fff;">الزوجة • رسالة البيت</div><h2 style="color:#fff;">${pickMsg(MSG.wifeGreeting)}</h2><p style="color:rgba(255,255,255,.9);">المستوى ${level.lvl} • ${level.title}</p></div>
+        </div>
+        <div class="hero-progress"><span style="width:${progress}%"></span></div>
+        <div class="hero-meta"><span>تقدم مهام اليوم ${progress}%</span><span>${done}/${totalTasks}</span></div>
+        <div class="hero-meta" style="margin-top:2px;">${speakWaves()}</div>
+        <div class="hero-cta"><button class="btn cta-main" id="heroAddOrder">يلا نبدأ مهمة جديدة</button><button class="btn cta-ghost" data-gotab2="orders">عرض القائمة</button></div>
+      </div>
+
+      <div class="streak-row">
+        <div class="streak-pill"><div class="streak-ico" style="background:#FEF3C7;color:#D97706;">${svgIcon('flame', 20)}</div><div><b>${streak} يوم</b><small>سلسلة الالتزام</small></div></div>
+        <div class="streak-pill"><div class="streak-ico" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('star', 20)}</div><div><b>${level.pct}%</b><small>للمستوى التالي</small></div></div>
+      </div>
+
+      ${urgentCount ? `<div class="urgent-banner"><h3>${svgIcon('bolt', 18)} عندك ${urgentCount} ${urgentCount === 1 ? 'طلب ضروري جداً' : 'طلبات ضرورية جداً'} مستنيينك</h3></div>` : ''}
+
+      <div class="badge-row">${achv.map(a => `<div class="achv ${a.ok ? '' : 'locked'}"><div class="achv-ico" style="background:${a.bg};color:${a.c};">${svgIcon(a.ic, 22)}</div><div><b>${a.t}</b><small>${a.s}</small></div></div>`).join('')}</div>
+
+      <div class="section"><div class="stats-row">
+        <div class="stat-card"><div class="stat-icon" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('cart', 20)}</div><div class="stat-label">مطلوب لسه</div><div class="stat-value">${pending}</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#DCFCE7;color:#059669;">${svgIcon('check', 20)}</div><div class="stat-label">اتشترى النهارده</div><div class="stat-value">${done}</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#FEF3C7;color:#D97706;">${svgIcon('wallet', 20)}</div><div class="stat-label">مصروف اليوم</div><div class="stat-value">${formatCurrency(today.total)}<span class="currency"> ج.م</span></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#E0F2FE;color:#0284C7;">${svgIcon('chart', 20)}</div><div class="stat-label">مصروف الشهر</div><div class="stat-value">${formatCurrency(month.total)}<span class="currency"> ج.م</span></div></div>
+      </div></div>
+
+      <div class="section"><div class="section-header"><h3>آخر الطلبات</h3><a href="#" data-gotab="orders">شوف كلهم ←</a></div></div>
+      ${recent.length === 0 ? renderEmptyOrders() : recent.map(o => renderOrderCard(o)).join('')}
+    </div>`;
+  }
+
+  function renderEmptyOrders() {
+    return `<div class="empty">
+      <div class="empty-icon">${emptySVG()}</div>
+      <div class="empty-title">${pickMsg(MSG.empty)}</div>
+      <div class="empty-desc">اضغط على الزر + عشان تزوّد أول طلب</div>
+      <button class="btn btn-primary" id="emptyAddOrder">زوّد طلب</button>
+    </div>`;
+  }
+
+  function renderOrderCard(o) {
+    const cat = CATEGORIES[o.categoryId] || CATEGORIES.other;
+    const purchased = o.status === 'purchased';
+    const loc = o.purchaseLocation ? `<span class="meta-item">${escapeHTML(o.purchaseLocation)}</span>` : '';
+    const notes = o.notes ? `<span class="meta-item">${escapeHTML(o.notes)}</span>` : '';
+    let pinfo = '';
+    if (purchased && o.purchase) pinfo = `<div class="purchase-info"><span class="price">${formatCurrency(o.purchase.finalPrice)} ج.م</span></div>`;
+    return `<div class="order-card ${purchased ? 'purchased' : ''} ${o.urgent && !purchased ? 'urgent' : ''}" data-id="${o.id}">
+      <div class="category-card-icon" style="background:${cat.color}18;color:${cat.color};">${svgIcon(getCategoryIcon(o.categoryId), 20)}</div>
+      <div class="order-main">
+        <div class="order-name ${purchased ? 'purchased-name' : ''}">${escapeHTML(o.name)} <span class="badge ${purchased ? 'badge-done' : 'badge-pending'}">${purchased ? 'اتشترى' : 'مطلوب'}</span>${o.urgent && !purchased ? '<span class="badge badge-urgent">ضروري جداً</span>' : ''}</div>
+        <div class="order-meta"><span class="meta-item">${getCategoryName(o.categoryId)}</span>${loc}${notes}</div>
+        ${pinfo}
+      </div>
+    </div>`;
+  }
+
+  function renderOrders() {
+    const { orderFilter, categoryFilter, searchQuery } = state;
+    let list = state.orders.filter(o => !(o.status === 'purchased' && o.purchase && !isSameDay(o.purchase.purchasedAt)));
+    if (orderFilter === 'pending') list = list.filter(o => o.status === 'pending');
+    else if (orderFilter === 'done') list = list.filter(o => o.status === 'purchased');
+    if (categoryFilter !== 'all') list = list.filter(o => o.categoryId === categoryFilter);
+    if (searchQuery) { const q = normalizeTerm(searchQuery); list = list.filter(o => normalizeTerm(o.name).includes(q)); }
+    const grouped = {}; for (const c of CATEGORY_LIST) grouped[c.id] = [];
+    for (const o of list) { if (!grouped[o.categoryId]) grouped[o.categoryId] = []; grouped[o.categoryId].push(o); }
+    for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => ((b.urgent && b.status !== 'purchased') ? 1 : 0) - ((a.urgent && a.status !== 'purchased') ? 1 : 0));
+    const urgentList = list.filter(o => o.urgent && o.status === 'pending');
+
+    return `<div class="page">
+      <div class="topbar"><div class="greeting">مهام التسوق</div></div>
+      <div class="page-title">${list.length === 0 ? 'مفيش طلبات' : list.length === 1 ? 'فيه طلب واحد' : `فيه ${list.length} طلبات`}</div>
+
+      ${assistantSay(pickMsg(list.length === 0 ? MSG.empty : MSG.husbandView), null, 'دليل القائمة', list.length === 0 ? 'mom' : 'dad')}
+
+      ${urgentList.length ? `<div class="urgent-banner"><h3>${svgIcon('bolt', 18)} ضروري جداً — ${urgentList.length} ${urgentList.length === 1 ? 'طلب' : 'طلبات'} لازم يتجابوا الأول</h3>${urgentList.map(o => renderOrderCard(o)).join('')}</div>` : ''}
+
+      ${list.length === 0 ? renderEmptyOrders() : CATEGORY_LIST.map(cat => {
+        const arr = grouped[cat.id] || []; if (!arr.length) return '';
+        const catColor = state.categoryColors?.[cat.id] || cat.color;
+        const pendingCount = arr.filter(o => o.status === 'pending').length;
+        return `<div class="category-group"><div class="category-card">
+          <div class="category-card-header" style="background:${catColor}12;">
+            <div class="category-card-icon" style="background:${catColor}20;color:${catColor};">${svgIcon(getCategoryIcon(cat.id), 20)}</div>
+            <div class="category-card-info"><div class="category-card-name">${getCategoryName(cat.id)}</div><div class="category-card-count" style="color:${catColor};">${arr.length} طلب${arr.length > 1 ? 'ات' : ''}</div></div>
+            <div class="category-card-badge" style="background:${catColor}20;color:${catColor};border-color:${catColor};">${pendingCount > 0 ? `${pendingCount} مطلوب` : 'خلاص'}</div>
+          </div>
+          <div class="category-card-orders">${arr.map(o => renderOrderCard(o)).join('')}</div>
+        </div></div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  function renderExpenses() {
+    const today = sumExpensesInRange('day'); const week = sumExpensesInRange('week'); const month = sumExpensesInRange('month');
+    return `<div class="page">
+      <div class="topbar"><div class="greeting">تتبع التقدم</div></div>
+      <div class="page-title">المصروفات</div>
+
+      ${assistantSay(pickMsg(MSG.totalScreen), null, 'شرح المصروفات', 'dad')}
+
+      <div class="expense-summary">
+        <div class="exp-mini"><div class="l">النهارده</div><div class="v">${formatCurrency(today.total)} <span>ج.م</span></div></div>
+        <div class="exp-mini"><div class="l">الأسبوع</div><div class="v">${formatCurrency(week.total)} <span>ج.م</span></div></div>
+        <div class="exp-mini"><div class="l">الشهر</div><div class="v">${formatCurrency(month.total)} <span>ج.م</span></div></div>
+      </div>
+
+      <div class="section"><div class="section-header"><h3>سجل المصروفات</h3><a href="#" id="addExpenseLink">+ مصروف جديد</a></div></div>
+
+      ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش مصروفات لسه</div><div class="empty-desc">لما هتشتري أو تزود مصروف هنسجله هنا</div><button class="btn btn-primary" id="emptyAddExpense">زوّد مصروف</button></div>` :
+        state.expenses.map(e => {
+          const cat = CATEGORIES[e.categoryId] || CATEGORIES.other;
+          return `<div class="exp-list-item" data-eid="${e.id}">
+            <div class="exp-cat" style="background:${cat.color}20;color:${cat.color}">${svgIcon(getCategoryIcon(e.categoryId), 20)}</div>
+            <div class="exp-body"><div class="exp-name">${escapeHTML(e.title)}</div><div class="exp-detail">${getCategoryName(e.categoryId)} • ${formatDateShort(new Date(e.createdAt))}</div>
+              ${e.sourceType === 'manual' ? `<button class="btn-ghost" data-delexp="${e.id}" style="padding:3px 6px;font-size:11px;color:var(--danger)">شيل</button>` : ''}
+            </div>
+            <div class="exp-price">${formatCurrency(e.amount)} ج.م</div>
+          </div>`;
+        }).join('')}
+    </div>`;
+  }
+
+  function renderReports() {
+    const day = sumExpensesInRange('day'); const week = sumExpensesInRange('week'); const month = sumExpensesInRange('month'); const all = sumExpensesInRange('all');
+    const dayCat = topCategoryInRange('day'); const weekCat = topCategoryInRange('week'); const monthCat = topCategoryInRange('month');
+    const weekDay = mostExpensiveDayWeek(); const monthDays = monthDayBars(); const weekDays = last7DaysBars();
+    const monthBreak = categoryBreakdown('month'); const totalMonth = Object.values(monthBreak).reduce((a, b) => a + b, 0);
+    return `<div class="page">
+      <div class="topbar"><div class="greeting">لوحة الإنجاز</div></div>
+      <div class="page-title">إحصائيات البيت</div>
+      ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش بيانات كفاية</div><div class="empty-desc">اشتري طلبات أو أضف مصروفات وهتظهر لك الإحصائيات</div></div>` : `
+      <div class="report-card"><h4>تقرير اليوم</h4><div class="report-grid">
+        <div class="rstat"><div class="rl">عدد المشتريات</div><div class="rv">${day.count}</div></div>
+        <div class="rstat"><div class="rl">إجمالي اليوم</div><div class="rv">${formatCurrency(day.total)}<span> ج.م</span></div></div>
+        <div class="rstat"><div class="rl">أعلى مصروف</div><div class="rv">${formatCurrency(day.total > 0 ? Math.max(...state.expenses.filter(e => isSameDay(e.createdAt)).map(e => e.amount)) : 0)}<span> ج.م</span></div></div>
+        <div class="rstat"><div class="rl">أكثر قسم</div><div class="rv">${dayCat.id ? getCategoryName(dayCat.id) : '—'}</div></div>
+      </div></div>
+      <div class="report-card"><h4>تقرير الأسبوع</h4><div class="report-grid">
+        <div class="rstat"><div class="rl">إجمالي الأسبوع</div><div class="rv">${formatCurrency(week.total)}<span> ج.م</span></div></div>
+        <div class="rstat"><div class="rl">المتوسط اليومي</div><div class="rv">${formatCurrency(week.count ? week.total / 7 : 0)}<span> ج.م</span></div></div>
+        <div class="rstat"><div class="rl">أكتر يوم صرف</div><div class="rv">${weekDay.total ? weekDay.label : '—'}<span>${weekDay.total ? ' (' + formatCurrency(weekDay.total) + ')' : ''}</span></div></div>
+        <div class="rstat"><div class="rl">أكثر قسم</div><div class="rv">${weekCat.id ? getCategoryName(weekCat.id) : '—'}</div></div>
+      </div><h4 style="margin-top:8px;">المصاريف (آخر 7 أيام)</h4>${renderBarChart(weekDays)}</div>
+      <div class="report-card"><h4>تقرير الشهر</h4><div class="report-grid">
+        <div class="rstat"><div class="rl">إجمالي الشهر</div><div class="rv">${formatCurrency(month.total)}<span> ج.م</span></div></div>
+        <div class="rstat"><div class="rl">متوسط اليوم</div><div class="rv">${formatCurrency(monthDays.filter(d => d.total > 0).length ? month.total / monthDays.filter(d => d.total > 0).length : 0)}<span> ج.م</span></div></div>
+        <div class="rstat"><div class="rl">أكثر قسم</div><div class="rv">${monthCat.id ? getCategoryName(monthCat.id) : '—'}</div></div>
+        <div class="rstat"><div class="rl">أيام الشراء</div><div class="rv">${monthDays.filter(d => d.total > 0).length}<span> يوم</span></div></div>
+      </div><h4 style="margin-top:10px;">التوزيع على الأقسام</h4>${renderDonut(monthBreak, totalMonth)}<h4 style="margin-top:14px;">المصاريف اليومية (الشهر)</h4>${renderBarChartSparse(monthDays)}</div>
+      <div class="report-card" style="background:var(--primary-light);">
+        <h4 style="color:var(--primary-dark);">ملخص كل شيء</h4>
+        <div style="font-size:26px;font-weight:900;color:var(--primary-dark);text-align:center;">${formatCurrency(all.total)} ج.م</div>
+        <div style="text-align:center;color:var(--primary);font-weight:700;font-size:12px;margin-top:2px;">الإجمالي الكلي • ${all.count} عملية شراء</div>
+        ${assistantSay(pickMsg(MSG.religious), null, 'احتفال بالإنجاز', 'mom')}
+      </div>`}
+    </div>`;
+  }
+
+  function renderDonut(breakdown, total) {
+    const entries = CATEGORY_LIST.map(c => ({ id: c.id, name: getCategoryName(c.id), icon: c.icon, color: state.categoryColors?.[c.id] || c.color, value: breakdown[c.id] || 0 })).filter(e => e.value > 0);
+    if (!entries.length) return `<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px;">مفيش بيانات الشهر ده</div>`;
+    let cumulative = 0;
+    const segments = entries.map(e => { const start = (cumulative / total) * 360; cumulative += e.value; const end = (cumulative / total) * 360; return { ...e, start, end, pct: total ? (e.value / total * 100) : 0 }; });
+    const R = 68, CX = 70, CY = 70;
+    const arcPath = (start, end) => { if (end - start >= 359.99) return `M ${CX} ${CY - R} A ${R} ${R} 0 1 1 ${CX - 0.001} ${CY - R} Z`; const s = polar(CX, CY, R, start - 90), e = polar(CX, CY, R, end - 90); return `M ${CX} ${CY} L ${s.x} ${s.y} A ${R} ${R} 0 ${(end - start) > 180 ? 1 : 0} 1 ${e.x} ${e.y} Z`; };
+    return `<div class="donut-wrap"><svg viewBox="0 0 140 140" width="140" height="140">${segments.map(s => `<path d="${arcPath(s.start, s.end)}" fill="${s.color}"/>`).join('')}</svg><div class="donut-legend">${segments.map(s => `<div class="legend-item"><span class="legend-dot" style="background:${s.color}"></span><span>${s.name}</span><span class="legend-pct">${s.pct.toFixed(0)}%</span></div>`).join('')}</div></div>`;
+  }
+  function polar(cx, cy, r, deg) { const rad = deg * Math.PI / 180; return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) }; }
+  function renderBarChart(days) {
+    const max = Math.max(1, ...days.map(d => d.total)); const maxIdx = days.reduce((iMax, d, i, arr) => d.total > arr[iMax].total ? i : iMax, 0);
+    return `<div class="barchart">${days.map((d, i) => { const h = (d.total / max) * 100; return `<div class="bar-item"><div class="bar-fill" style="height:${Math.max(h, 2)}%"></div><div class="bar-label">${d.label}</div></div>`; }).join('')}</div>`;
+  }
+  function renderBarChartSparse(days) {
+    const sampled = []; const step = days.length > 16 ? 3 : days.length > 10 ? 2 : 1;
+    for (let i = 0; i < days.length; i += step) sampled.push(days[i]);
+    const max = Math.max(1, ...sampled.map(d => d.total));
+    return `<div class="barchart" style="height:110px;">${sampled.map(d => { const h = (d.total / max) * 100; return `<div class="bar-item"><div class="bar-fill" style="height:${Math.max(h, 2)}%"></div><div class="bar-label">${d.label}</div></div>`; }).join('')}</div>`;
+  }
+
+  function renderSettings() {
+    const learnedEntries = Object.entries(state.learnedMap || {}); const totalSavings = sumExpensesInRange('all').savings;
+    return `<div class="page">
+      <div class="topbar"><div class="greeting">التحكم</div></div>
+      <div class="page-title">إدارة البيت</div>
+      <div class="settings-card"><div class="settings-title">الحساب والبيت</div>
+        <div class="settings-item"><div class="si-icon" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('home', 18)}</div><div class="si-body"><div class="si-label">اسمك</div><div class="si-value">${escapeHTML(state.user?.name || '')}</div></div><button class="si-action" id="editUserBtn">تعديل</button></div>
+        <div class="settings-item"><div class="si-icon" style="background:#FCE7F3;color:#EC4899;">${svgIcon('star', 18)}</div><div class="si-body"><div class="si-label">اسم البيت</div><div class="si-value">${escapeHTML(state.home?.name || 'بيتنا')}</div></div><button class="si-action" id="editHomeNameBtn">تعديل</button></div>
+        <div class="settings-item"><div class="si-icon" style="background:#FEF3C7;color:#D97706;">${svgIcon('check', 18)}</div><div class="si-body"><div class="si-label">كود البيت</div></div><span class="code-display inline">${escapeHTML(state.home?.code || '')}</span><button class="icon-copy-btn" id="copyHomeCode" aria-label="نسخ الكود">${svgIcon('copy', 18)}</button></div>
+      </div>
+      <div class="settings-card"><div class="settings-title">صور العائلة</div>
+        <div style="padding:6px 16px 2px;color:var(--text-sec);font-size:11px;font-weight:600;">ارفع صورة حقيقية للأم والأب من موبايلك</div>
+        <div class="photo-row">
+          <div class="photo-slot"><div class="ph">${parentPhoto('mom', 64)}</div><b>صورة الأم</b>
+            <div class="btn-row" style="justify-content:center;"><label class="btn btn-sm" style="cursor:pointer;">اختيار<input type="file" id="momPhotoInput" accept="image/*" class="hidden" /></label>${state.photos?.mom ? '<button class="btn btn-sm" data-rmphoto="mom">حذف</button>' : ''}</div>
+          </div>
+          <div class="photo-slot"><div class="ph">${parentPhoto('dad', 64)}</div><b>صورة الأب</b>
+            <div class="btn-row" style="justify-content:center;"><label class="btn btn-sm" style="cursor:pointer;">اختيار<input type="file" id="dadPhotoInput" accept="image/*" class="hidden" /></label>${state.photos?.dad ? '<button class="btn btn-sm" data-rmphoto="dad">حذف</button>' : ''}</div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-card"><button class="collapsible-head" id="catCustomHead"><span class="ch-icon">${svgIcon('sparkle', 22)}</span><span class="ch-texts"><b>تخصيص الأقسام</b><small>الأسماء والأيقونات والألوان • اضغط للعرض</small></span><span class="chev ${state._catOpen ? 'open' : ''}">‹</span></button>
+        <div class="collapsible-body ${state._catOpen ? '' : 'hidden'}">
+        <div style="padding:6px 16px 2px;color:var(--text-sec);font-size:11px;font-weight:600;">الأيقونة لتغييرها • اللون لتغييره • تعديل للاسم</div>
+        <div class="color-grid">${CATEGORY_LIST.map(cat => {
+          const currentColor = state.categoryColors?.[cat.id] || cat.color;
+          return `<div class="color-item" data-catcolor="${cat.id}"><button class="color-item-icon" data-iconcat="${cat.id}" style="background:${currentColor}20;color:${currentColor};" aria-label="تغيير الأيقونة">${svgIcon(getCategoryIcon(cat.id), 20)}</button><div class="color-item-info"><div class="color-item-name">${getCategoryName(cat.id)}</div><div class="color-item-preview" style="background:${currentColor};"></div></div><div style="display:flex;align-items:center;gap:6px;"><button class="btn btn-sm" data-editcat="${cat.id}">تعديل</button><div class="color-picker-wrap"><input type="color" value="${currentColor}" data-colorpick="${cat.id}" /></div></div></div>`;
+        }).join('')}</div>
+        </div>
+      </div>
+      <div class="settings-card"><div class="settings-title">البيانات</div>
+        <div class="settings-item"><div class="si-icon" style="background:#DCFCE7;color:#059669;">${svgIcon('trophy', 18)}</div><div class="si-body"><div class="si-label">التوفير الكلي</div><div class="si-value">${formatCurrency(totalSavings)} ج.م</div></div></div>
+        <div class="settings-item"><div class="si-icon" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('cart', 18)}</div><div class="si-body"><div class="si-label">الطلبات</div><div class="si-value">${state.orders.length} طلب (${state.orders.filter(o => o.status === 'purchased').length} اتشترى)</div></div></div>
+        <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">${svgIcon('wallet', 18)}</div><div class="si-body"><div class="si-label">المصروفات</div><div class="si-value">${state.expenses.length} عملية</div></div></div>
+        <div style="padding:8px 16px 0;"><button class="collapsible-head sub" id="learnedHead"><span class="ch-texts"><b>الكلمات اللي اتعلمناها (${learnedEntries.length})</b><small>اضغط للعرض</small></span><span class="chev ${state._learnedOpen ? 'open' : ''}">‹</span></button></div>
+        <div class="collapsible-body ${state._learnedOpen ? '' : 'hidden'}">
+        ${!learnedEntries.length ? `<div style="padding:2px 16px 12px;color:var(--text-muted);font-size:12px;">مفيش تصنيفات مخصوصة لسه.</div>` : `<div class="learned-list">${learnedEntries.map(([term, catId]) => `<span class="learned-tag">${escapeHTML(term)} → ${getCategoryName(catId)}<button data-unlearn="${escapeHTML(term)}">✕</button></span>`).join('')}</div><div style="padding:0 16px 12px;"><button class="btn btn-sm" id="clearLearned">مسح الكل</button></div>`}
+        </div>
+      </div>
+      <div class="settings-card"><div class="settings-title">خطر ⚠️</div>
+        <div class="settings-item" id="clearAllBtn"><div class="si-icon" style="background:var(--danger-light);color:var(--danger)">!</div><div class="si-body"><div class="si-label" style="color:var(--danger)">مسح كل حاجة</div><div class="si-value">هيمسح البيت والطلبات والمصروفات كلها</div></div><div class="si-action" style="color:var(--danger)">→</div></div>
+      </div>
+      <div class="about"><div class="dev-name">إعداد وتصميم محمد سعيد الحاكم</div><div class="social-row"><a class="soc fb" href="https://facebook.com/MhmdElhakm" target="_blank" rel="noopener" aria-label="فيسبوك">${svgIcon('fb', 16)}</a><a class="soc tg" href="https://t.me/MhmdElhakm" target="_blank" rel="noopener" aria-label="تليجرام">${svgIcon('tg', 16)}</a><a class="soc wa" href="https://wa.me/201125908425" target="_blank" rel="noopener" aria-label="واتس اب">${svgIcon('wa', 16)}</a></div></div>
+    </div>`;
+  }
+
+  /* =============================
+     EVENT BINDINGS
+     ============================= */
+  function bindOnboarding() {
+    const b = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
+    b('goCreate', () => { state._onboardingStep = 'create'; render(); });
+    b('goJoin', () => { state._onboardingStep = 'join'; render(); });
+    b('backWelcome', () => { state._onboardingStep = 'welcome'; render(); });
+    b('backWelcome2', () => { state._onboardingStep = 'welcome'; render(); });
+    b('submitCreate', () => {
+      const nameInput = document.getElementById('homeNameInput');
+      const name = (nameInput.value || '').trim() || 'بيتنا';
+      const code = genHomeCode();
+      state._pendingName = name; state._pendingCode = code;
+      state.home = { code, name, createdAt: nowISO() }; persist();
+      state._onboardingStep = 'created-success'; render();
+    });
+    b('copyCodeBtn', () => { const code = document.getElementById('codeDisplay').textContent; copyToClipboard(code).then(ok => toast(ok ? 'تم النسخ ✓' : 'مقدرش أنسخ', ok ? 'success' : 'error')); });
+    b('gotoUsername', () => { state._onboardingStep = 'username'; render(); });
+    b('submitJoin', () => {
+      const inp = document.getElementById('joinCodeInput'); const err = document.getElementById('joinError');
+      const showErr = () => { err.classList.remove('hidden'); inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'), 1500); };
+      let code = inp.value.trim().toUpperCase();
+      if (!/^HOME-\d{4,}$/.test(code)) code = 'HOME-' + (code.replace(/\D/g, ''));
+      if (state.home && state.home.code && code === state.home.code) { state._pendingCode = code; state._pendingName = state.home.name; state._onboardingStep = 'username'; render(); return; }
+      if (!db) { showErr(); return; }
+      const btn = document.getElementById('submitJoin');
+      if (btn) { btn.disabled = true; btn.textContent = 'جاري البحث...'; }
+      db.collection('homes').doc(code).get().then((snap) => {
+        if (snap.exists && snap.data().home) {
+          const remote = snap.data();
+          state.home = remote.home;
+          state._pendingCode = code; state._pendingName = remote.home.name;
+          state._pendingCloud = remote;
+          state._onboardingStep = 'username'; render();
+        } else showErr();
+      }).catch(showErr).finally(() => { const b2 = document.getElementById('submitJoin'); if (b2) { b2.disabled = false; b2.textContent = 'انضم للبيت'; } });
+    });
+    b('submitUsername', () => {
+      const inp = document.getElementById('userNameInput'); const name = (inp.value || '').trim();
+      if (!name) { inp.classList.add('error'); inp.focus(); return; }
+      inp.classList.remove('error');
+      state.user = { id: uid(), name, joinedAt: nowISO() };
+      if (state._pendingCloud && state._pendingCloud.home) {
+        const rc = state._pendingCloud;
+        for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'categoryColors', 'categoryNames', 'photos', 'updatedAt']) {
+          if (rc[k] !== undefined) state[k] = rc[k];
+        }
+        state._pendingCloud = null;
+      }
+      if (!state.home) state.home = { code: state._pendingCode || genHomeCode(), name: state._pendingName || 'بيتنا', createdAt: nowISO() };
+      state.initialized = true; state.currentTab = 'home'; state._onboardingStep = null; persist(); attachCloud();
+      toast(`أهلاً يا ${name}! 👋`, 'success'); render();
+    });
+  }
+
+  function bindMain() {
+    document.querySelectorAll('.nav-item[data-tab]').forEach(b => { b.onclick = () => setTab(b.dataset.tab); });
+    const gl = document.querySelector('[data-gotab="orders"]'); if (gl) gl.onclick = (e) => { e.preventDefault(); setTab('orders'); };
+    const fab = document.getElementById('fabBtn'); if (fab) fab.onclick = openAddOrderModal;
+    const ha = document.getElementById('heroAddOrder'); if (ha) ha.onclick = openAddOrderModal;
+    document.querySelectorAll('[data-gotab2]').forEach(b => { b.onclick = () => setTab(b.dataset.gotab2); });
+    const ea = document.getElementById('emptyAddOrder'); if (ea) ea.onclick = openAddOrderModal;
+    const ea2 = document.getElementById('emptyAddExpense'); if (ea2) ea2.onclick = openAddExpenseModal;
+    document.querySelectorAll('.order-card').forEach(card => {
+      let pressTimer = null, moved = false; const id = card.dataset.id;
+      const startPress = (e) => { moved = false; pressTimer = setTimeout(() => { if (!moved) showContextMenu(e, id); }, 500); };
+      const cancelPress = () => clearTimeout(pressTimer);
+      const movePress = () => { moved = true; clearTimeout(pressTimer); };
+      card.addEventListener('touchstart', startPress, { passive: true });
+      card.addEventListener('touchend', cancelPress);
+      card.addEventListener('touchmove', movePress, { passive: true });
+      card.addEventListener('mousedown', startPress);
+      card.addEventListener('mouseup', cancelPress);
+      card.addEventListener('mouseleave', cancelPress);
+      card.addEventListener('mousemove', movePress);
+    });
+    const al = document.getElementById('addExpenseLink'); if (al) al.onclick = (e) => { e.preventDefault(); openAddExpenseModal(); };
+    document.querySelectorAll('[data-delexp]').forEach(b => b.onclick = () => handleDeleteExpense(b.dataset.delexp));
+    document.querySelectorAll('[data-ofil]').forEach(b => b.onclick = () => { state.orderFilter = b.dataset.ofil; persist(); render(); });
+    document.querySelectorAll('[data-cfil]').forEach(b => b.onclick = () => { state.categoryFilter = b.dataset.cfil; persist(); render(); });
+    const si = document.getElementById('orderSearch');
+    if (si) { si.oninput = (e) => { state.searchQuery = e.target.value; if (si._to) clearTimeout(si._to); si._to = setTimeout(() => { persist(); render(); const i = document.getElementById('orderSearch'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 200); }; }
+    bindSettings();
+  }
+
+  function showContextMenu(e, orderId) {
+    closeContextMenu();
+    const o = state.orders.find(x => x.id === orderId); if (!o) return;
+    const purchased = o.status === 'purchased';
+    const menu = document.createElement('div'); menu.className = 'context-menu'; menu.id = 'activeContextMenu';
+    let items = '';
+    if (!purchased) items += `<button class="context-menu-item buy" data-ctx-buy="${orderId}"><span class="ctx-icon">✅</span><span>جبتها يا بطل</span></button>`;
+    items += `<button class="context-menu-item edit" data-ctx-edit="${orderId}"><span class="ctx-icon">✏️</span><span>تعديل</span></button>`;
+    if (!purchased) items += `<button class="context-menu-item" data-ctx-urg="${orderId}"><span class="ctx-icon" style="background:var(--danger-light);">!</span><span>${o.urgent ? 'شيلي علامة الضروري' : 'خليها ضروري جداً'}</span></button>`;
+    if (!purchased) { items += `<div class="context-menu-sep"></div><button class="context-menu-item delete" data-ctx-del="${orderId}"><span class="ctx-icon">🗑️</span><span>خلاص بلاش دي</span></button>`; }
+    menu.innerHTML = items;
+    let x, y;
+    if (e.touches?.length) { x = e.touches[0].clientX; y = e.touches[0].clientY; } else { x = e.clientX; y = e.clientY; }
+    document.body.appendChild(menu);
+    const rect = menu.getBoundingClientRect();
+    if (x + rect.width > window.innerWidth - 10) x = window.innerWidth - rect.width - 10;
+    if (y + rect.height > window.innerHeight - 10) y = window.innerHeight - rect.height - 10;
+    if (x < 10) x = 10; if (y < 10) y = 10;
+    menu.style.left = x + 'px'; menu.style.top = y + 'px';
+    menu.querySelector('[data-ctx-buy]')?.addEventListener('click', () => { closeContextMenu(); openPurchaseModal(orderId); });
+    menu.querySelector('[data-ctx-edit]')?.addEventListener('click', () => { closeContextMenu(); openEditOrderModal(orderId); });
+    menu.querySelector('[data-ctx-urg]')?.addEventListener('click', () => { closeContextMenu(); updateOrder(orderId, { urgent: !o.urgent }); toast(o.urgent ? 'اتشالت علامة الضروري' : 'بقى ضروري جداً', 'success'); render(); });
+    menu.querySelector('[data-ctx-del]')?.addEventListener('click', () => { closeContextMenu(); handleDeleteOrder(orderId); });
+    setTimeout(() => { document.addEventListener('click', closeContextMenu, { once: true }); document.addEventListener('touchstart', closeContextMenu, { once: true }); }, 10);
+  }
+  function closeContextMenu() { const m = document.getElementById('activeContextMenu'); if (m) m.remove(); }
+
+  function bindSettings() {
+    const b = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
+    b('editUserBtn', () => openEditTextModal({ title: 'تعديل اسمك', label: 'الاسم', value: state.user?.name || '', placeholder: 'اسمك', max: 20, onSave: (v) => { state.user.name = v.trim(); persist(); toast('تمام، الاسم اتحدث ✓', 'success'); render(); } }));
+    b('editHomeNameBtn', () => openEditTextModal({ title: 'تعديل اسم البيت', label: 'اسم البيت', value: state.home?.name || '', placeholder: 'اسم البيت', max: 30, onSave: (v) => { state.home.name = v.trim(); persist(); toast('اسم البيت اتحدث ✓', 'success'); render(); } }));
+    b('copyHomeCode', () => { copyToClipboard(state.home.code).then(ok => toast(ok ? 'تم نسخ الكود' : 'مقدرش أنسخ', ok ? 'success' : 'error')); });
+    document.querySelectorAll('[data-colorpick]').forEach(picker => {
+      picker.addEventListener('input', (e) => { const catId = e.target.dataset.colorpick; const color = e.target.value; if (!state.categoryColors) state.categoryColors = {}; state.categoryColors[catId] = color; persist(); const item = e.target.closest('.color-item'); if (item) { const icon = item.querySelector('.color-item-icon'); const preview = item.querySelector('.color-item-preview'); if (icon) { icon.style.background = color + '20'; icon.style.color = color; } if (preview) preview.style.background = color; } });
+      picker.addEventListener('change', () => render());
+    });
+    document.querySelectorAll('[data-editcat]').forEach(btn => {
+      btn.onclick = () => { const catId = btn.dataset.editcat; const cat = CATEGORIES[catId]; if (!cat) return;
+        openEditTextModal({ title: `تعديل اسم القسم`, label: 'اسم القسم', value: getCategoryName(catId), placeholder: cat.name, max: 25, onSave: (v) => { if (!state.categoryNames) state.categoryNames = {}; const t = v.trim(); if (t === cat.name) delete state.categoryNames[catId]; else state.categoryNames[catId] = t; persist(); toast('اسم القسم اتحدث', 'success'); render(); } });
+      };
+    });
+    const momIn = document.getElementById('momPhotoInput');
+    if (momIn) momIn.onchange = (e) => handlePhotoUpload('mom', e.target.files[0]);
+    const dadIn = document.getElementById('dadPhotoInput');
+    if (dadIn) dadIn.onchange = (e) => handlePhotoUpload('dad', e.target.files[0]);
+    document.querySelectorAll('[data-rmphoto]').forEach(btn => btn.onclick = () => { if (!state.photos) state.photos = { mom: '', dad: '' }; state.photos[btn.dataset.rmphoto] = ''; persist(); render(); });
+    const scrollToId = (id) => { requestAnimationFrame(() => { const h = document.getElementById(id); if (h) h.scrollIntoView({ block: 'start', behavior: 'smooth' }); }); };
+    const cch = document.getElementById('catCustomHead'); if (cch) cch.onclick = () => { state._catOpen = !state._catOpen; persist(); render(); scrollToId('catCustomHead'); };
+    const lnh = document.getElementById('learnedHead'); if (lnh) lnh.onclick = () => { state._learnedOpen = !state._learnedOpen; persist(); render(); scrollToId('learnedHead'); };
+    document.querySelectorAll('[data-iconcat]').forEach(btn => btn.onclick = () => openIconPickerModal(btn.dataset.iconcat));
+    document.querySelectorAll('[data-unlearn]').forEach(btn => btn.onclick = () => { delete state.learnedMap[btn.dataset.unlearn]; persist(); toast('تمام، الكلمة اتمسحت', 'success'); render(); });
+    b('clearLearned', () => { confirmDialog({ title: 'مسح الكلمات؟', message: 'هنمسح كل التصنيفات اللي اتعلمناها.', confirmText: 'مسح', cancelText: 'لا', danger: true }).then(ok => { if (ok) { state.learnedMap = {}; persist(); toast('تم المسح ✓', 'success'); render(); } }); });
+    const clearAll = document.getElementById('clearAllBtn');
+    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, categoryColors: {}, categoryNames: {}, categoryIcons: {}, photos: { mom: '', dad: '' }, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
+  }
+
+  function openIconPickerModal(catId) {
+    const cur = getCategoryIcon(catId);
+    const col = state.categoryColors?.[catId] || CATEGORIES[catId]?.color || '#7C3AED';
+    const html = `<div class="modal-handle"></div><h2>أيقونة ${getCategoryName(catId)}</h2><p class="m-sub">اضغط على أيقونة لتطبيقها فوراً</p>
+      <div class="icon-grid">${CAT_ICON_CHOICES.map(ic => `<button class="icon-opt ${ic.id === cur ? 'selected' : ''}" data-icon="${ic.id}"><span style="color:${col};">${svgIcon(ic.id, 26)}</span><small>${ic.label}</small></button>`).join('')}</div>
+      <div class="btn-group"><button class="btn" id="cancelIconBtn">رجوع</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#cancelIconBtn').onclick = () => closeModal(m);
+    m.querySelectorAll('[data-icon]').forEach(btn => btn.onclick = () => {
+      if (!state.categoryIcons) state.categoryIcons = {};
+      state.categoryIcons[catId] = btn.dataset.icon;
+      persist(); closeModal(m); render();
+      toast('الأيقونة اتحدثت', 'success');
+    });
+  }
+
+  function openEditTextModal({ title, label, value, placeholder, max, onSave }) {
+    const html = `<div class="modal-handle"></div><h2>${title}</h2><p class="m-sub">اكتب القيمة الجديدة</p>
+      <div class="field"><label>${label}</label><input type="text" id="editTextInp" placeholder="${placeholder || ''}" maxlength="${max || 40}" value="${escapeHTML(value || '')}" /></div>
+      <div class="btn-group"><button class="btn btn-primary" id="saveTextBtn">حفظ</button><button class="btn" id="cancelTextBtn">رجوع</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#cancelTextBtn').onclick = () => closeModal(m);
+    m.querySelector('#saveTextBtn').onclick = () => { const v = m.querySelector('#editTextInp').value; if (!v?.trim()) { toast('الحقل ده محتاجينه', 'error'); return; } closeModal(m); onSave(v); };
+  }
+
+  /* =============================
+     ORDER MODALS
+     ============================= */
+  function openAddOrderModal() { openOrderModal({ mode: 'add' }); }
+  function openEditOrderModal(id) { const o = state.orders.find(x => x.id === id); if (o) openOrderModal({ mode: 'edit', order: o }); }
+  function openOrderModal({ mode, order }) {
+    const editing = mode === 'edit'; const freqArr = editing ? [] : frequentOrders(8);
+    const html = `<div class="modal-handle"></div>
+      <div class="m-emblem">${svgIcon(editing ? 'pencil' : 'plus', 26)}</div>
+      <h2>${editing ? 'تعديل الطلب' : 'زوّد طلب'}</h2>
+      <p class="m-sub">${editing ? 'عدّل اسم الطلب وبياناته' : pickMsg(MSG.wifeGreeting)}</p>
+      ${!editing && freqArr.length ? `<div class="frequent-section"><div class="frequent-title">🔄 الطلبات اللي بتتكرر</div><div class="frequent-list">${freqArr.map(f => `<button class="frequent-chip" data-freq="${escapeHTML(f.name)}">${escapeHTML(f.name)} (${f.count})</button>`).join('')}</div></div>` : ''}
+      <div class="field"><label>اسم الطلب *</label>
+        <textarea id="ordName" rows="2" placeholder="اكتب طلب واحد في كل سطر\nأو اكتب: بطاطس وطماطم" maxlength="200">${editing ? escapeHTML(order.name) : ''}</textarea>
+        <div class="help-text">افصل بين الطلبات بـ "و" أو سطر جديد</div>
+      </div>
+      <div class="suggest-list hidden" id="ordSuggest"></div>
+      <div class="field"><label>ملاحظات (اختياري)</label><textarea id="ordNotes" rows="2" placeholder="مثلا: نوع معين — كبير — غير حار">${editing ? escapeHTML(order.notes || '') : ''}</textarea></div>
+      <label class="urgent-toggle ${editing && order.urgent ? 'on' : ''}" id="urgentToggle"><input type="checkbox" id="ordUrgent" ${editing && order.urgent ? 'checked' : ''} /><span class="ut-switch"></span><span class="ut-text">ضروري جداً — أولوية قصوى</span></label>
+      <div id="catQueryWrap" class="hidden"><div class="cat-pick-card"><div class="cat-pick-head"><span class="cat-pick-ico">${svgIcon('sparkle', 22)}</span><div><b>اختار القسم المناسب</b><small>صنف جديد علينا — اختاره مرة واحدة وهنفتكره بعد كده</small></div></div><div class="cat-options" id="catOptions">${CATEGORY_LIST.map(c => { const cc2 = state.categoryColors?.[c.id] || c.color; return `<button class="cat-opt" data-catid="${c.id}"><span class="cat-opt-ico" style="background:${cc2}18;color:${cc2};">${svgIcon(getCategoryIcon(c.id), 22)}</span><span>${getCategoryName(c.id)}</span></button>`; }).join('')}</div></div></div>
+      <div id="pharmacyNote" class="pharm-note hidden">⚠️ ده قسم صيدلية بس. التطبيق مش بيقدم تشخيص أو نصيحة طبية.</div>
+      <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="submitOrderBtn">${editing ? 'حفظ التعديل' : 'تأكيد الطلب'}</button><button class="btn" id="cancelOrderBtn">رجوع</button></div>`;
+    const m = openModal(html);
+    const nameInput = m.querySelector('#ordName'); const queryWrap = m.querySelector('#catQueryWrap');
+    const catOptions = m.querySelectorAll('#catOptions .cat-opt'); const pharmNote = m.querySelector('#pharmacyNote');
+    let selectedCatForUnknown = null;
+    function evalCategoryFromName() {
+      const val = nameInput.value.trim();
+      if (!val) { queryWrap.classList.add('hidden'); pharmNote.classList.add('hidden'); selectedCatForUnknown = null; catOptions.forEach(c => c.classList.remove('selected')); return; }
+      if (editing) { pharmNote.classList.toggle(order.categoryId === 'pharmacy'); return; }
+      const firstItem = val.split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').trim()).filter(Boolean)[0] || val;
+      const { categoryId, source } = classifyOrder(firstItem);
+      if (categoryId === 'pharmacy') pharmNote.classList.remove('hidden'); else pharmNote.classList.add('hidden');
+      if (source === 'unknown') { selectedCatForUnknown = null; queryWrap.classList.remove('hidden'); catOptions.forEach(c => c.classList.remove('selected')); }
+      else { queryWrap.classList.add('hidden'); selectedCatForUnknown = null; }
+    }
+    catOptions.forEach(c => c.onclick = () => { selectedCatForUnknown = c.dataset.catid; catOptions.forEach(x => x.classList.toggle('selected', x === c)); });
+    const suggestBox = m.querySelector('#ordSuggest');
+    function currentToken() {
+      const v = nameInput.value;
+      const idx = Math.max(v.lastIndexOf('\n'), v.lastIndexOf('،'), v.lastIndexOf(','));
+      let last = idx >= 0 ? v.slice(idx + 1) : v;
+      const w = last.split(/ و /);
+      return w[w.length - 1].replace(/^و\s*/, '').trim();
+    }
+    function suggestPool() {
+      const seen = new Set(); const out = [];
+      const push = (n) => { if (!n) return; const t = String(n).trim(); const k = normalizeTerm(t); if (t && !seen.has(k)) { seen.add(k); out.push(t); } };
+      Object.keys(state.usageFreq || {}).sort((a, b) => (state.usageFreq[b] || 0) - (state.usageFreq[a] || 0)).forEach(k => push(findOriginalName(k) || k));
+      (state.orders || []).forEach(o => push(o.name));
+      Object.keys(CLASSIFIER_MAP).forEach(c => CLASSIFIER_MAP[c].forEach(push));
+      Object.keys(state.learnedMap || {}).forEach(push);
+      return out;
+    }
+    function updateSuggest() {
+      if (!suggestBox) return;
+      const tok = normalizeTerm(currentToken());
+      if (tok.length < 2) { suggestBox.classList.add('hidden'); suggestBox.innerHTML = ''; return; }
+      const hits = suggestPool().filter(n => { const k = normalizeTerm(n); return k !== tok && (k.startsWith(tok) || k.includes(tok)); }).slice(0, 6);
+      if (!hits.length) { suggestBox.classList.add('hidden'); suggestBox.innerHTML = ''; return; }
+      suggestBox.classList.remove('hidden');
+      suggestBox.innerHTML = hits.map(h => `<button class="suggest-chip" data-sug="${escapeHTML(h)}">${escapeHTML(h)}</button>`).join('');
+      suggestBox.querySelectorAll('[data-sug]').forEach(ch => ch.onclick = (e) => { e.preventDefault(); applySuggest(ch.dataset.sug); });
+    }
+    function applySuggest(word) {
+      if (editing) { nameInput.value = word; }
+      else {
+        const v = nameInput.value;
+        const idx = Math.max(v.lastIndexOf('\n'), v.lastIndexOf('،'), v.lastIndexOf(','));
+        let head = idx >= 0 ? v.slice(0, idx + 1) : '';
+        const wIdx = v.lastIndexOf(' و ');
+        if (wIdx > idx) head = v.slice(0, wIdx + 3);
+        nameInput.value = head + word + '، ';
+      }
+      nameInput.focus();
+      updateSuggest(); evalCategoryFromName();
+    }
+    nameInput.addEventListener('input', evalCategoryFromName);
+    nameInput.addEventListener('input', updateSuggest);
+    setTimeout(evalCategoryFromName, 50);
+    m.querySelectorAll('[data-freq]').forEach(c => c.onclick = () => { nameInput.value = c.dataset.freq; evalCategoryFromName(); nameInput.focus(); });
+    m.querySelector('#cancelOrderBtn').onclick = () => closeModal(m);
+    const urgentToggle = m.querySelector('#urgentToggle'); const urgentInput = m.querySelector('#ordUrgent');
+    if (urgentInput) urgentInput.onchange = () => urgentToggle.classList.toggle('on', urgentInput.checked);
+    m.querySelector('#submitOrderBtn').onclick = () => {
+      const raw = nameInput.value.trim(); const notes = m.querySelector('#ordNotes').value.trim(); const urgent = !!(urgentInput && urgentInput.checked);
+      if (!raw) { nameInput.classList.add('error'); nameInput.focus(); return; }
+      nameInput.classList.remove('error');
+      if (!editing) {
+        const items = raw.split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').trim()).filter(Boolean);
+        if (!items.length) { nameInput.classList.add('error'); nameInput.focus(); return; }
+        for (const itemName of items) {
+          if (queryWrap && !queryWrap.classList.contains('hidden') && selectedCatForUnknown) saveLearning(itemName, selectedCatForUnknown);
+          addOrder({ name: itemName, notes, urgent });
+        }
+        toast(items.length === 1 ? pickMsg(MSG.addOrder) : `زوّدت ${items.length} طلبات ✓ 😂`, 'success');
+        closeModal(m); render();
+      } else {
+        updateOrder(order.id, { name: raw, notes, urgent });
+        toast('تم التعديل ✓', 'success');
+        closeModal(m); render();
+      }
+    };
+  }
+
+  function handleDeleteOrder(id) {
+    const o = state.orders.find(x => x.id === id); if (!o) return;
+    confirmDialog({ title: 'نحذف الطلب ده؟', message: `"${o.name}" هيمسح نهائياً.`, confirmText: '🗑️ امسحه', cancelText: '↩️ لا', danger: true }).then(ok => {
+      if (ok) { if (o.purchase) { const exp = state.expenses.find(e => e.sourceType === 'order' && e.sourceId === id); if (exp) deleteExpense(exp.id); } deleteOrder(id); toast('اتمسح ✓', 'success'); render(); }
+    });
+  }
+  function handleDeleteExpense(id) {
+    confirmDialog({ title: 'نحذف المصروف؟', message: 'هيمسح نهائياً.', confirmText: '🗑️ امسحه', cancelText: '↩️ لا', danger: true }).then(ok => { if (ok) { deleteExpense(id); toast('اتمسح ✓', 'success'); render(); } });
+  }
+
+  function openPurchaseModal(orderId) {
+    const o = state.orders.find(x => x.id === orderId); if (!o) return;
+    const html = `<div class="modal-handle"></div>
+      <h2>تم شراء "${escapeHTML(o.name)}"؟</h2>
+      <p class="m-sub">اكتب السعر عشان نسجله</p>
+      <div class="field"><label>السعر *</label><input type="number" id="finalPrice" min="0" step="0.01" placeholder="مثلا: 25.50" /></div>
+      <div class="btn-group"><button class="btn btn-success" id="confirmBuy">تأكيد الشراء</button><button class="btn" id="cancelBuy">رجوع</button></div>`;
+    const m = openModal(html); const fin = m.querySelector('#finalPrice');
+    m.querySelector('#cancelBuy').onclick = () => closeModal(m);
+    m.querySelector('#confirmBuy').onclick = () => {
+      const finalV = Number(fin.value);
+      if (!(finalV > 0)) { fin.classList.add('error'); fin.focus(); toast('اكتب السعر يا حبيبي', 'warning'); return; }
+      markPurchased(orderId, { originalPrice: finalV, finalPrice: finalV });
+      toast(pickMsg(MSG.purchaseDone), 'success');
+      closeModal(m); render();
+    };
+  }
+
+  function openAddExpenseModal() {
+    const html = `<div class="modal-handle"></div>
+      <h2>💰 مصروف جديد</h2>
+      <p class="m-sub">سجل مصروف مش مرتبط بطلب</p>
+      <div class="field"><label>اسم المصروف *</label><input type="text" id="expTitle" placeholder="مثلا: فاتورة كهرباء" maxlength="50" /></div>
+      <div class="field"><label>المبلغ *</label><input type="number" id="expAmount" min="0" step="0.01" placeholder="0" /></div>
+      <div class="field"><label>القسم</label><div class="cat-options">${CATEGORY_LIST.map((c, i) => { const cc3 = state.categoryColors?.[c.id] || c.color; return `<button class="cat-opt ${i === 5 ? 'selected' : ''}" data-catid="${c.id}"><span class="cat-opt-ico" style="background:${cc3}18;color:${cc3};">${svgIcon(getCategoryIcon(c.id), 22)}</span><span>${getCategoryName(c.id)}</span></button>`; }).join('')}</div></div>
+      <div class="field"><label>التاريخ</label><input type="date" id="expDate" value="${todayKey()}" /></div>
+      <div class="field"><label>ملاحظات (اختياري)</label><textarea id="expNotes" rows="2" placeholder="تفاصيل تانية"></textarea></div>
+      <div class="btn-group"><button class="btn btn-primary" id="saveExpBtn">حفظ المصروف</button><button class="btn" id="cancelExpBtn">رجوع</button></div>`;
+    const m = openModal(html); let catId = 'other';
+    m.querySelectorAll('[data-catid]').forEach(c => c.onclick = () => { catId = c.dataset.catid; m.querySelectorAll('[data-catid]').forEach(x => x.classList.toggle('selected', x === c)); });
+    m.querySelector('#cancelExpBtn').onclick = () => closeModal(m);
+    m.querySelector('#saveExpBtn').onclick = () => {
+      const title = m.querySelector('#expTitle').value.trim(); const amount = Number(m.querySelector('#expAmount').value); const notes = m.querySelector('#expNotes').value.trim(); const dateVal = m.querySelector('#expDate').value || todayKey();
+      if (!title) { const t = m.querySelector('#expTitle'); t.classList.add('error'); t.focus(); toast('اكتب اسم المصروف', 'warning'); return; }
+      if (!(amount > 0)) { const a = m.querySelector('#expAmount'); a.classList.add('error'); a.focus(); toast('اكتب المبلغ', 'warning'); return; }
+      addManualExpense({ title, amount, categoryId: catId, notes, createdAt: new Date(dateVal + 'T' + new Date().toTimeString().slice(0, 8)).toISOString() });
+      toast('تم تسجيل المصروف ✓', 'success');
+      closeModal(m); render();
+    };
+  }
+
+  /* =============================
+     INIT
+     ============================= */
+  function init() {
+    restore();
+    if (state.initialized && state.home && state.user) state._onboardingStep = null;
+    else if (!state.home || !state.user) state._onboardingStep = 'welcome';
+    render();
+    attachCloud();
+    const poll = () => { if (!state.initialized || !state.home || !state.user) { bindOnboarding(); requestAnimationFrame(() => setTimeout(poll, 400)); } };
+    if (!state.initialized || !state.user) poll();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  setInterval(() => { if (!state.initialized || !state.home || !state.user) bindOnboarding(); }, 150);
+})();
+</script>
+</body>
+</html>
