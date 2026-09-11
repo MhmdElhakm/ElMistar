@@ -5,8 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <meta name="theme-color" content="#FFB800" />
 <title>ناقصنا ايه | مشتريات البيت</title>
-<link rel="icon" type="image/png" href="icon.png" />
-<link rel="apple-touch-icon" href="icon.png" />
+<link rel="icon" type="image/png" href="logo.png" />
+<link rel="apple-touch-icon" href="logo.png" />
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="ناقصنا إيه" />
+<meta name="application-name" content="ناقصنا إيه" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -91,6 +97,16 @@
   .btn-danger { background: linear-gradient(135deg,#FB7185,#F43F5E); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 12px 26px rgba(244,63,94,.3); }
   .btn-group .btn:not(.btn-primary):not(.btn-success):not(.btn-danger), .btn-secondary { background: #fff; color: var(--primary-dark); border: 1.5px solid rgba(124,58,237,.28); box-shadow: 0 4px 12px rgba(124,58,237,.08); }
   .btn-group .btn:not(.btn-primary):not(.btn-success):not(.btn-danger):active { background: var(--primary-light); }
+  .btn:disabled { opacity: .45; filter: grayscale(.5); transform: none !important; box-shadow: none !important; cursor: not-allowed; }
+  /* ===== Items review (per-item classification) ===== */
+  #itemsReview { margin-bottom: 4px; }
+  .review-title { font-size: 12.5px; font-weight: 900; color: var(--primary-dark); margin-bottom: 8px; }
+  .rv-row { display: flex; align-items: center; gap: 9px; background: #fff; border: 1.5px solid var(--border); border-radius: 14px; padding: 9px 11px; margin-bottom: 7px; animation: popIn .2s ease-out; }
+  .rv-row.missing { border-color: var(--danger); background: var(--danger-light); }
+  .rv-name { flex: 1; min-width: 0; font-weight: 800; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rv-badge { display: inline-flex; align-items: center; gap: 4px; padding: 5px 11px; border-radius: 999px; font-size: 11.5px; font-weight: 800; flex-shrink: 0; }
+  .rv-badge svg { width: 15px; height: 15px; }
+  .rv-select { border: 1.5px solid var(--danger); border-radius: 10px; padding: 7px 9px; font-family: inherit; font-size: 12px; font-weight: 800; color: var(--danger); background: #fff; max-width: 150px; }
   .btn-ghost { background: transparent; border: none; box-shadow: none; width: auto; padding: 8px 14px; min-height: auto; font-weight: 800; color: var(--primary); }
   .btn-group { display: flex; flex-direction: column; gap: 12px; }
   .btn-sm { padding: 9px 15px; min-height: 38px; font-size: 13px; width: auto; border-radius: 14px; }
@@ -142,6 +158,12 @@
   .brand-icon.xl svg { width: 52px; height: 52px; }
   .app-logo { position: relative; overflow: hidden; padding: 0; }
   .app-logo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* ===== App logo showcase ===== */
+  .logo-show { position: relative; width: 136px; height: 136px; margin: 6px auto 18px; animation: logoFloat 3.4s ease-in-out infinite; }
+  .logo-show .logo-ring { position: absolute; inset: 0; border-radius: 40px; background: conic-gradient(from 0deg, #FBBF24, #EC4899, #8B5CF6, #14B8A6, #FBBF24); animation: ringSpin 6s linear infinite; filter: saturate(1.2); }
+  .logo-show .logo-fallback { position: absolute; inset: 5px; border-radius: 35px; background: var(--grad); display: flex; align-items: center; justify-content: center; box-shadow: 0 18px 40px rgba(124,58,237,.4); }
+  .logo-show img { position: absolute; inset: 5px; width: calc(100% - 10px); height: calc(100% - 10px); object-fit: cover; border-radius: 35px; box-shadow: 0 18px 40px rgba(124,58,237,.4); }
+  @keyframes logoFloat { 0%,100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-10px) rotate(1.5deg); } }
   .brand-title.grad { font-size: 40px; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 6px; }
   .feat-row { display: flex; gap: 8px; justify-content: center; margin: -22px 0 14px; }
   .feat-pill { display: flex; align-items: center; gap: 7px; background: #fff; border: 1.5px solid rgba(124,58,237,.14); border-radius: 999px; padding: 7px 13px 7px 8px; font-size: 12px; font-weight: 800; box-shadow: var(--shadow-sm); }
@@ -249,6 +271,8 @@
   .context-menu-item.delete .ctx-icon { background: var(--danger-light); }
   .context-menu-item.delete { color: var(--danger); }
   .context-menu-sep { height: 1px; background: var(--border); margin: 3px 10px; }
+  .ctx-backdrop { position: fixed; inset: 0; z-index: 9998; background: transparent; animation: fadeIn .15s ease-out; }
+  .order-card { -webkit-touch-callout: none; touch-action: pan-x pan-y; }
 
   .empty { text-align: center; padding: 40px 24px; }
   .empty-icon { font-size: 56px; margin-bottom: 12px; }
@@ -354,8 +378,16 @@
   .code-display.inline { margin-bottom: 0; white-space: nowrap; }
   .icon-copy-btn { width: 40px; height: 40px; border-radius: 13px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform .15s, background .15s; }
   .icon-copy-btn:active { transform: scale(.9); background: var(--primary); color: #fff; }
+  .app-mini-ico { position: relative; overflow: hidden !important; padding: 0 !important; }
+  .app-mini-ico img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .help-steps { font-size: 13.5px; font-weight: 700; line-height: 2.2; color: var(--text); background: var(--bg); border-radius: 14px; padding: 12px 16px; }
   .btn-row { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
   .color-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 16px 12px; }
+  .color-grid.single { grid-template-columns: 1fr; }
+  .custom-tag { font-size: 10px; font-weight: 800; color: var(--primary); background: var(--primary-light); padding: 1px 8px; border-radius: 999px; }
+  .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+  .swatch { width: 38px; height: 38px; border-radius: 12px; border: 2.5px solid transparent; transition: transform .12s; }
+  .swatch.selected { border-color: var(--text); transform: scale(1.1); }
   .color-item { display: flex; align-items: center; gap: 8px; padding: 10px; background: var(--bg); border-radius: 10px; }
   .color-item-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
   .color-item-info { flex: 1; min-width: 0; }
@@ -442,10 +474,26 @@
   .frequent-list { display: flex; flex-wrap: wrap; gap: 6px; }
   .frequent-chip { background: var(--card); border: 1.5px solid var(--primary); color: var(--primary-dark); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
   .frequent-chip:active { background: var(--primary-light); }
-  .suggest-list { display: flex; flex-wrap: wrap; gap: 6px; margin: -8px 0 12px; animation: popIn .2s ease-out; }
-  .suggest-list.hidden { display: none; }
-  .suggest-chip { background: var(--primary-light); color: var(--primary-dark); border: 1.5px solid rgba(124,58,237,.32); padding: 7px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 800; }
-  .suggest-chip:active { background: var(--primary); color: #fff; }
+  .ord-box textarea { resize: vertical; display: block; }
+  .suggest-drop { margin-top: 8px; background: #fff; border: 1.5px solid rgba(124,58,237,.22); border-radius: 16px; box-shadow: 0 12px 28px rgba(124,58,237,.14); overflow: hidden; animation: popIn .18s ease-out; max-height: 228px; overflow-y: auto; }
+  .suggest-drop.hidden { display: none; }
+  .sug-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; text-align: right; font-weight: 800; font-size: 13.5px; color: var(--text); background: #fff; }
+  .sug-row:active { background: var(--primary-light); }
+  .sug-row + .sug-row { border-top: 1px solid var(--border); }
+  .sug-ico { width: 34px; height: 34px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sug-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sug-name b { color: var(--primary); }
+  .sug-cat { font-size: 10.5px; color: var(--text-muted); font-weight: 800; flex-shrink: 0; }
+  .m-emblem.lg { width: 74px; height: 74px; border-radius: 26px; margin: 4px auto 12px; box-shadow: 0 16px 34px rgba(124,58,237,.45), inset 0 1px 0 rgba(255,255,255,.4); }
+  .m-title { font-size: 26px !important; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .m-hero { background: var(--grad); border-radius: 22px; padding: 16px 15px; display: flex; gap: 12px; align-items: center; color: #fff; margin-bottom: 14px; position: relative; overflow: hidden; box-shadow: 0 14px 30px rgba(124,58,237,.35); }
+  .m-hero::before, .m-hero::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.13); }
+  .m-hero::before { width: 130px; height: 130px; left: -40px; top: -60px; }
+  .m-hero::after { width: 90px; height: 90px; right: 30px; bottom: -55px; }
+  .m-hero-ico { width: 54px; height: 54px; border-radius: 18px; background: rgba(255,255,255,.22); display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; z-index: 1; box-shadow: inset 0 1px 0 rgba(255,255,255,.4); animation: emblemFloat 3s ease-in-out infinite; }
+  .m-hero-txt { position: relative; z-index: 1; min-width: 0; }
+  .m-hero-txt h2 { color: #fff !important; font-size: 20px !important; text-align: right !important; margin: 0 0 3px !important; }
+  .m-hero-txt p { font-size: 12.5px; font-weight: 700; opacity: .93; line-height: 1.7; margin: 0; }
   .category-query { background: var(--pending-light); border: 1px solid var(--pending); color: #7D6608; padding: 10px 12px; border-radius: var(--radius-sm); margin-bottom: 12px; font-size: 13px; font-weight: 600; }
   .cat-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 6px; }
   .cat-opt { background: #fff; border: 1.5px solid var(--border); padding: 12px 6px; border-radius: 16px; text-align: center; font-size: 12px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; transition: all .15s; color: var(--text); }
@@ -626,6 +674,9 @@
 <script>
 (() => {
   'use strict';
+
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
 
   /* =============================
      MESSAGES SYSTEM
@@ -1096,14 +1147,26 @@
   let state = {
     initialized: false, home: null, user: null,
     orders: [], expenses: [], learnedMap: {}, usageFreq: {},
-    categoryColors: {}, categoryNames: {}, categoryIcons: {},
+    categoryColors: {}, categoryNames: {}, categoryIcons: {}, customCats: [], hiddenCats: [],
     photos: { mom: '', dad: '' },
     currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: ''
   };
 
   function uid() { return Math.random().toString(36).slice(2, 10); }
-  function getCategoryName(catId) { return state.categoryNames?.[catId] || CATEGORIES[catId]?.name || catId; }
-  function getCategoryIcon(catId) { return state.categoryIcons?.[catId] || CATEGORIES[catId]?.icon || 'box'; }
+  function catById(catId) {
+    if (CATEGORIES[catId]) return CATEGORIES[catId];
+    const c = (state.customCats || []).find(x => x.id === catId);
+    return c || CATEGORIES.other;
+  }
+  function allCats() {
+    const hidden = state.hiddenCats || [];
+    return [...Object.values(CATEGORIES).filter(c => !hidden.includes(c.id)), ...(state.customCats || [])];
+  }
+  function getCategoryName(catId) { return state.categoryNames?.[catId] || catById(catId).name || catId; }
+  function getCategoryIcon(catId) { return state.categoryIcons?.[catId] || catById(catId).icon || 'box'; }
+  function catColor(catId) { return state.categoryColors?.[catId] || catById(catId).color; }
+  function catLocation(catId) { return CATEGORY_LOCATIONS[catId] || 'حسب المتوفر'; }
+  function isCustomCat(catId) { return !CATEGORIES[catId] && (state.customCats || []).some(x => x.id === catId); }
   const CAT_ICON_CHOICES = [
     { id: 'leaf', label: 'ورقة' }, { id: 'basket', label: 'سلة' },
     { id: 'cart', label: 'عربة' }, { id: 'sparkle', label: 'لمعان' },
@@ -1127,9 +1190,9 @@
   }
   function classifyOrder(name, opts) {
     opts = opts || {};
-    if (opts.forceCategory && CATEGORIES[opts.forceCategory]) return { categoryId: opts.forceCategory, source: 'forced' };
+    if (opts.forceCategory && (CATEGORIES[opts.forceCategory] || isCustomCat(opts.forceCategory))) return { categoryId: opts.forceCategory, source: 'forced' };
     const norm = normalizeTerm(name);
-    if (state.learnedMap[norm] && CATEGORIES[state.learnedMap[norm]]) return { categoryId: state.learnedMap[norm], source: 'learned' };
+    if (state.learnedMap[norm] && (CATEGORIES[state.learnedMap[norm]] || isCustomCat(state.learnedMap[norm]))) return { categoryId: state.learnedMap[norm], source: 'learned' };
     for (const cat of Object.keys(CLASSIFIER_MAP)) {
       for (const kw of CLASSIFIER_MAP[cat]) {
         if (norm === normalizeTerm(kw)) return { categoryId: cat, source: 'exact' };
@@ -1214,7 +1277,7 @@
      ============================= */
   function addOrder({ name, notes, urgent }) {
     const { categoryId } = classifyOrder(name);
-    const order = { id: uid(), name: name.trim(), notes: notes || '', urgent: !!urgent, categoryId, status: 'pending', createdAt: nowISO(), createdBy: state.user?.name || 'الزوجة', purchaseLocation: CATEGORY_LOCATIONS[categoryId] || '', purchase: null };
+    const order = { id: uid(), name: name.trim(), notes: notes || '', urgent: !!urgent, categoryId, status: 'pending', createdAt: nowISO(), createdBy: state.user?.name || 'الزوجة', purchaseLocation: catLocation(categoryId), purchase: null };
     state.orders.unshift(order);
     const key = normalizeTerm(order.name);
     state.usageFreq[key] = (state.usageFreq[key] || 0) + 1;
@@ -1227,7 +1290,7 @@
     if (patch.name !== undefined && patch.name.trim() !== o.name) {
       const { categoryId } = classifyOrder(patch.name);
       o.categoryId = categoryId;
-      o.purchaseLocation = CATEGORY_LOCATIONS[categoryId] || '';
+      o.purchaseLocation = catLocation(categoryId);
     }
     Object.assign(o, patch);
     if (patch.name) o.name = patch.name.trim();
@@ -1250,7 +1313,7 @@
     return { order: o, expense: exp };
   }
   function addManualExpense({ title, amount, categoryId, notes, createdAt }) {
-    const exp = { id: uid(), title: title.trim(), amount: Number(amount) || 0, savings: 0, categoryId: categoryId || 'other', sourceType: 'manual', sourceId: null, notes: notes || '', purchaseLocation: CATEGORY_LOCATIONS[categoryId] || '', createdAt: createdAt || nowISO() };
+    const exp = { id: uid(), title: title.trim(), amount: Number(amount) || 0, savings: 0, categoryId: categoryId || 'other', sourceType: 'manual', sourceId: null, notes: notes || '', purchaseLocation: catLocation(categoryId), createdAt: createdAt || nowISO() };
     state.expenses.unshift(exp);
     persist();
     return exp;
@@ -1313,7 +1376,7 @@
     return arr;
   }
   function categoryBreakdown(range) {
-    const breakdown = {}; for (const id of Object.keys(CATEGORIES)) breakdown[id] = 0; const now = new Date();
+    const breakdown = {}; for (const c of allCats()) breakdown[c.id] = 0; const now = new Date();
     for (const e of state.expenses) { const d = new Date(e.createdAt); let pass; if (range === 'day') pass = isSameDay(e.createdAt, now); else if (range === 'week') pass = (now - d) / 864e5 < 7; else if (range === 'month') pass = d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); else pass = true; if (pass) breakdown[e.categoryId] = (breakdown[e.categoryId] || 0) + (Number(e.amount) || 0); }
     return breakdown;
   }
@@ -1406,9 +1469,6 @@
     if (!state.initialized || !state.home || !state.user) { app.innerHTML = renderOnboarding(); return; }
     app.innerHTML = renderMain();
     app.insertAdjacentHTML('beforeend', renderBottomNav());
-    if (['home', 'orders'].includes(state.currentTab)) {
-      app.insertAdjacentHTML('beforeend', `<button class="fab" id="fabBtn" aria-label="زوّد طلب">+</button>`);
-    }
     bindMain();
   }
 
@@ -1431,7 +1491,7 @@
     ];
     return `<div class="onboarding wb"><div class="welcome-card">
       <div class="wb-blob b1"></div><div class="wb-blob b2"></div>
-      <div class="brand-icon xl app-logo w-anim" style="color:#fff;">${svgIcon('home', 52)}<img src="icon.png" alt="ناقصنا ايه" onerror="this.remove()" /></div>
+      <div class="logo-show w-anim"><span class="logo-ring"></span><span class="logo-fallback" style="color:#fff;">${svgIcon('home', 54)}</span><img src="logo.png" alt="ناقصنا ايه" onerror="this.remove()" /></div>
       <div class="brand-title grad w-anim d1">ناقصنا ايه</div>
       <div class="brand-desc w-anim d2">مشتريات البيت صارت لعبة ممتعة — مهام ونقاط وشارات لعيلتك كلها</div>
       <div class="feat-row w-anim d3">${feats.map(f => `<div class="feat-pill"><span class="feat-ico" style="background:${f.bg};color:${f.c};">${svgIcon(f.ic, 19)}</span><span>${f.t}</span></div>`).join('')}</div>
@@ -1590,7 +1650,7 @@
   }
 
   function renderOrderCard(o) {
-    const cat = CATEGORIES[o.categoryId] || CATEGORIES.other;
+    const cat = catById(o.categoryId);
     const purchased = o.status === 'purchased';
     const loc = o.purchaseLocation ? `<span class="meta-item">${escapeHTML(o.purchaseLocation)}</span>` : '';
     const notes = o.notes ? `<span class="meta-item">${escapeHTML(o.notes)}</span>` : '';
@@ -1613,7 +1673,8 @@
     else if (orderFilter === 'done') list = list.filter(o => o.status === 'purchased');
     if (categoryFilter !== 'all') list = list.filter(o => o.categoryId === categoryFilter);
     if (searchQuery) { const q = normalizeTerm(searchQuery); list = list.filter(o => normalizeTerm(o.name).includes(q)); }
-    const grouped = {}; for (const c of CATEGORY_LIST) grouped[c.id] = [];
+    const cats = allCats();
+    const grouped = {}; for (const c of cats) grouped[c.id] = [];
     for (const o of list) { if (!grouped[o.categoryId]) grouped[o.categoryId] = []; grouped[o.categoryId].push(o); }
     for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => ((b.urgent && b.status !== 'purchased') ? 1 : 0) - ((a.urgent && a.status !== 'purchased') ? 1 : 0));
     const urgentList = list.filter(o => o.urgent && o.status === 'pending');
@@ -1626,15 +1687,15 @@
 
       ${urgentList.length ? `<div class="urgent-banner"><h3>${svgIcon('bolt', 18)} ضروري جداً — ${urgentList.length} ${urgentList.length === 1 ? 'طلب' : 'طلبات'} لازم يتجابوا الأول</h3>${urgentList.map(o => renderOrderCard(o)).join('')}</div>` : ''}
 
-      ${list.length === 0 ? renderEmptyOrders() : CATEGORY_LIST.map(cat => {
+      ${list.length === 0 ? renderEmptyOrders() : cats.map(cat => {
         const arr = grouped[cat.id] || []; if (!arr.length) return '';
-        const catColor = state.categoryColors?.[cat.id] || cat.color;
+        const cc = catColor(cat.id);
         const pendingCount = arr.filter(o => o.status === 'pending').length;
         return `<div class="category-group"><div class="category-card">
-          <div class="category-card-header" style="background:${catColor}12;">
-            <div class="category-card-icon" style="background:${catColor}20;color:${catColor};">${svgIcon(getCategoryIcon(cat.id), 20)}</div>
-            <div class="category-card-info"><div class="category-card-name">${getCategoryName(cat.id)}</div><div class="category-card-count" style="color:${catColor};">${arr.length} طلب${arr.length > 1 ? 'ات' : ''}</div></div>
-            <div class="category-card-badge" style="background:${catColor}20;color:${catColor};border-color:${catColor};">${pendingCount > 0 ? `${pendingCount} مطلوب` : 'خلاص'}</div>
+          <div class="category-card-header" style="background:${cc}12;">
+            <div class="category-card-icon" style="background:${cc}20;color:${cc};">${svgIcon(getCategoryIcon(cat.id), 20)}</div>
+            <div class="category-card-info"><div class="category-card-name">${getCategoryName(cat.id)}</div><div class="category-card-count" style="color:${cc};">${arr.length} طلب${arr.length > 1 ? 'ات' : ''}</div></div>
+            <div class="category-card-badge" style="background:${cc}20;color:${cc};border-color:${cc};">${pendingCount > 0 ? `${pendingCount} مطلوب` : 'خلاص'}</div>
           </div>
           <div class="category-card-orders">${arr.map(o => renderOrderCard(o)).join('')}</div>
         </div></div>`;
@@ -1660,7 +1721,7 @@
 
       ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش مصروفات لسه</div><div class="empty-desc">لما هتشتري أو تزود مصروف هنسجله هنا</div><button class="btn btn-primary" id="emptyAddExpense">زوّد مصروف</button></div>` :
         state.expenses.map(e => {
-          const cat = CATEGORIES[e.categoryId] || CATEGORIES.other;
+          const cat = catById(e.categoryId);
           return `<div class="exp-list-item" data-eid="${e.id}">
             <div class="exp-cat" style="background:${cat.color}20;color:${cat.color}">${svgIcon(getCategoryIcon(e.categoryId), 20)}</div>
             <div class="exp-body"><div class="exp-name">${escapeHTML(e.title)}</div><div class="exp-detail">${getCategoryName(e.categoryId)} • ${formatDateShort(new Date(e.createdAt))}</div>
@@ -1709,7 +1770,7 @@
   }
 
   function renderDonut(breakdown, total) {
-    const entries = CATEGORY_LIST.map(c => ({ id: c.id, name: getCategoryName(c.id), icon: c.icon, color: state.categoryColors?.[c.id] || c.color, value: breakdown[c.id] || 0 })).filter(e => e.value > 0);
+    const entries = Object.keys(breakdown).map(id => ({ id, name: getCategoryName(id), color: catColor(id), value: breakdown[id] || 0 })).filter(e => e.value > 0);
     if (!entries.length) return `<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px;">مفيش بيانات الشهر ده</div>`;
     let cumulative = 0;
     const segments = entries.map(e => { const start = (cumulative / total) * 360; cumulative += e.value; const end = (cumulative / total) * 360; return { ...e, start, end, pct: total ? (e.value / total * 100) : 0 }; });
@@ -1739,6 +1800,10 @@
         <div class="settings-item"><div class="si-icon" style="background:#FCE7F3;color:#EC4899;">${svgIcon('star', 18)}</div><div class="si-body"><div class="si-label">اسم البيت</div><div class="si-value">${escapeHTML(state.home?.name || 'بيتنا')}</div></div><button class="si-action" id="editHomeNameBtn">تعديل</button></div>
         <div class="settings-item"><div class="si-icon" style="background:#FEF3C7;color:#D97706;">${svgIcon('check', 18)}</div><div class="si-body"><div class="si-label">كود البيت</div></div><span class="code-display inline">${escapeHTML(state.home?.code || '')}</span><button class="icon-copy-btn" id="copyHomeCode" aria-label="نسخ الكود">${svgIcon('copy', 18)}</button></div>
       </div>
+      <div class="settings-card"><div class="settings-title">التطبيق</div>
+        <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label">ناقصنا إيه</div><div class="si-value">ثبّته على شاشة موبايلك لفتح أسرع وشغل بدون نت</div></div></div>
+        <div style="padding:0 16px 14px;"><button class="btn btn-primary" id="installAppBtn">تثبيت التطبيق على الهاتف</button></div>
+      </div>
       <div class="settings-card"><div class="settings-title">صور العائلة</div>
         <div style="padding:6px 16px 2px;color:var(--text-sec);font-size:11px;font-weight:600;">ارفع صورة حقيقية للأم والأب من موبايلك</div>
         <div class="photo-row">
@@ -1753,10 +1818,13 @@
       <div class="settings-card"><button class="collapsible-head" id="catCustomHead"><span class="ch-icon">${svgIcon('sparkle', 22)}</span><span class="ch-texts"><b>تخصيص الأقسام</b><small>الأسماء والأيقونات والألوان • اضغط للعرض</small></span><span class="chev ${state._catOpen ? 'open' : ''}">‹</span></button>
         <div class="collapsible-body ${state._catOpen ? '' : 'hidden'}">
         <div style="padding:6px 16px 2px;color:var(--text-sec);font-size:11px;font-weight:600;">الأيقونة لتغييرها • اللون لتغييره • تعديل للاسم</div>
-        <div class="color-grid">${CATEGORY_LIST.map(cat => {
-          const currentColor = state.categoryColors?.[cat.id] || cat.color;
-          return `<div class="color-item" data-catcolor="${cat.id}"><button class="color-item-icon" data-iconcat="${cat.id}" style="background:${currentColor}20;color:${currentColor};" aria-label="تغيير الأيقونة">${svgIcon(getCategoryIcon(cat.id), 20)}</button><div class="color-item-info"><div class="color-item-name">${getCategoryName(cat.id)}</div><div class="color-item-preview" style="background:${currentColor};"></div></div><div style="display:flex;align-items:center;gap:6px;"><button class="btn btn-sm" data-editcat="${cat.id}">تعديل</button><div class="color-picker-wrap"><input type="color" value="${currentColor}" data-colorpick="${cat.id}" /></div></div></div>`;
+        <div class="color-grid single">${allCats().map(cat => {
+          const currentColor = catColor(cat.id);
+          const custom = isCustomCat(cat.id);
+          return `<div class="color-item" data-catcolor="${cat.id}"><button class="color-item-icon" data-iconcat="${cat.id}" style="background:${currentColor}20;color:${currentColor};" aria-label="تغيير الأيقونة">${svgIcon(getCategoryIcon(cat.id), 20)}</button><div class="color-item-info"><div class="color-item-name">${getCategoryName(cat.id)}${custom ? ' <span class="custom-tag">مخصص</span>' : ''}</div><div class="color-item-preview" style="background:${currentColor};"></div></div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn btn-sm" data-editcat="${cat.id}">تعديل</button>${custom ? `<button class="btn btn-sm btn-danger" data-delcat="${cat.id}">حذف</button>` : `<button class="btn btn-sm" data-hidecat="${cat.id}">إخفاء</button>`}<div class="color-picker-wrap"><input type="color" value="${currentColor}" data-colorpick="${cat.id}" /></div></div></div>`;
         }).join('')}</div>
+        <div style="padding:0 16px 12px;"><button class="btn btn-primary" id="addCatBtn">+ إضافة قسم جديد</button></div>
+        ${(state.hiddenCats || []).length ? `<div style="padding:0 16px 12px;"><div style="font-size:12px;font-weight:800;color:var(--text-sec);margin-bottom:6px;">أقسام مخفية</div><div class="learned-list">${state.hiddenCats.map(id => `<span class="learned-tag">${getCategoryName(id)}<button data-showcat="${id}" style="color:var(--success);">إظهار</button></span>`).join('')}</div></div>` : ''}
         </div>
       </div>
       <div class="settings-card"><div class="settings-title">البيانات</div>
@@ -1820,7 +1888,7 @@
       state.user = { id: uid(), name, joinedAt: nowISO() };
       if (state._pendingCloud && state._pendingCloud.home) {
         const rc = state._pendingCloud;
-        for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'categoryColors', 'categoryNames', 'photos', 'updatedAt']) {
+        for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'categoryColors', 'categoryNames', 'categoryIcons', 'customCats', 'hiddenCats', 'photos', 'updatedAt']) {
           if (rc[k] !== undefined) state[k] = rc[k];
         }
         state._pendingCloud = null;
@@ -1840,17 +1908,20 @@
     const ea = document.getElementById('emptyAddOrder'); if (ea) ea.onclick = openAddOrderModal;
     const ea2 = document.getElementById('emptyAddExpense'); if (ea2) ea2.onclick = openAddExpenseModal;
     document.querySelectorAll('.order-card').forEach(card => {
-      let pressTimer = null, moved = false; const id = card.dataset.id;
-      const startPress = (e) => { moved = false; pressTimer = setTimeout(() => { if (!moved) showContextMenu(e, id); }, 500); };
-      const cancelPress = () => clearTimeout(pressTimer);
-      const movePress = () => { moved = true; clearTimeout(pressTimer); };
-      card.addEventListener('touchstart', startPress, { passive: true });
-      card.addEventListener('touchend', cancelPress);
-      card.addEventListener('touchmove', movePress, { passive: true });
-      card.addEventListener('mousedown', startPress);
-      card.addEventListener('mouseup', cancelPress);
-      card.addEventListener('mouseleave', cancelPress);
-      card.addEventListener('mousemove', movePress);
+      let pressTimer = null, active = false, sx = 0, sy = 0; const id = card.dataset.id;
+      const startPress = (x, y) => { active = true; sx = x; sy = y; clearTimeout(pressTimer); pressTimer = setTimeout(() => { if (!active) return; active = false; if (navigator.vibrate) { try { navigator.vibrate(25); } catch {} } showContextMenuAt(x, y, id); }, 600); };
+      const movePress = (x, y) => { if (!active) return; if (Math.hypot(x - sx, y - sy) > 12) { active = false; clearTimeout(pressTimer); } };
+      const endPress = (isTouch) => { active = false; clearTimeout(pressTimer); if (isTouch) card._lastTouchEnd = Date.now(); };
+      const ignoreMouse = () => (Date.now() - (card._lastTouchEnd || 0)) < 800;
+      card.addEventListener('touchstart', (e) => { const t = e.touches[0]; startPress(t.clientX, t.clientY); }, { passive: true });
+      card.addEventListener('touchmove', (e) => { const t = e.touches[0]; movePress(t.clientX, t.clientY); }, { passive: true });
+      card.addEventListener('touchend', () => endPress(true));
+      card.addEventListener('touchcancel', () => endPress(true));
+      card.addEventListener('mousedown', (e) => { if (ignoreMouse()) return; startPress(e.clientX, e.clientY); });
+      card.addEventListener('mousemove', (e) => { if (ignoreMouse()) return; movePress(e.clientX, e.clientY); });
+      card.addEventListener('mouseup', () => { if (!ignoreMouse()) endPress(false); });
+      card.addEventListener('mouseleave', () => endPress(false));
+      card.addEventListener('contextmenu', (e) => e.preventDefault());
     });
     const al = document.getElementById('addExpenseLink'); if (al) al.onclick = (e) => { e.preventDefault(); openAddExpenseModal(); };
     document.querySelectorAll('[data-delexp]').forEach(b => b.onclick = () => handleDeleteExpense(b.dataset.delexp));
@@ -1862,9 +1933,15 @@
   }
 
   function showContextMenu(e, orderId) {
+    let x, y;
+    if (e.touches?.length) { x = e.touches[0].clientX; y = e.touches[0].clientY; } else { x = e.clientX; y = e.clientY; }
+    showContextMenuAt(x, y, orderId);
+  }
+  function showContextMenuAt(x, y, orderId) {
     closeContextMenu();
     const o = state.orders.find(x => x.id === orderId); if (!o) return;
     const purchased = o.status === 'purchased';
+    const back = document.createElement('div'); back.className = 'ctx-backdrop'; back.id = 'ctxBackdrop';
     const menu = document.createElement('div'); menu.className = 'context-menu'; menu.id = 'activeContextMenu';
     let items = '';
     if (!purchased) items += `<button class="context-menu-item buy" data-ctx-buy="${orderId}"><span class="ctx-icon">✅</span><span>جبتها يا بطل</span></button>`;
@@ -1872,33 +1949,51 @@
     if (!purchased) items += `<button class="context-menu-item" data-ctx-urg="${orderId}"><span class="ctx-icon" style="background:var(--danger-light);">!</span><span>${o.urgent ? 'شيلي علامة الضروري' : 'خليها ضروري جداً'}</span></button>`;
     if (!purchased) { items += `<div class="context-menu-sep"></div><button class="context-menu-item delete" data-ctx-del="${orderId}"><span class="ctx-icon">🗑️</span><span>خلاص بلاش دي</span></button>`; }
     menu.innerHTML = items;
-    let x, y;
-    if (e.touches?.length) { x = e.touches[0].clientX; y = e.touches[0].clientY; } else { x = e.clientX; y = e.clientY; }
+    document.body.appendChild(back);
     document.body.appendChild(menu);
     const rect = menu.getBoundingClientRect();
     if (x + rect.width > window.innerWidth - 10) x = window.innerWidth - rect.width - 10;
     if (y + rect.height > window.innerHeight - 10) y = window.innerHeight - rect.height - 10;
     if (x < 10) x = 10; if (y < 10) y = 10;
     menu.style.left = x + 'px'; menu.style.top = y + 'px';
-    menu.querySelector('[data-ctx-buy]')?.addEventListener('click', () => { closeContextMenu(); openPurchaseModal(orderId); });
-    menu.querySelector('[data-ctx-edit]')?.addEventListener('click', () => { closeContextMenu(); openEditOrderModal(orderId); });
-    menu.querySelector('[data-ctx-urg]')?.addEventListener('click', () => { closeContextMenu(); updateOrder(orderId, { urgent: !o.urgent }); toast(o.urgent ? 'اتشالت علامة الضروري' : 'بقى ضروري جداً', 'success'); render(); });
-    menu.querySelector('[data-ctx-del]')?.addEventListener('click', () => { closeContextMenu(); handleDeleteOrder(orderId); });
-    setTimeout(() => { document.addEventListener('click', closeContextMenu, { once: true }); document.addEventListener('touchstart', closeContextMenu, { once: true }); }, 10);
+    back.addEventListener('click', closeContextMenu);
+    back.addEventListener('touchend', (ev) => { ev.preventDefault(); closeContextMenu(); });
+    let acted = false;
+    const act = (fn) => (ev) => { if (acted) return; acted = true; ev.preventDefault(); ev.stopPropagation(); closeContextMenu(); setTimeout(fn, 30); };
+    menu.querySelector('[data-ctx-buy]')?.addEventListener('click', act(() => openPurchaseModal(orderId)));
+    menu.querySelector('[data-ctx-buy]')?.addEventListener('touchend', act(() => openPurchaseModal(orderId)));
+    menu.querySelector('[data-ctx-edit]')?.addEventListener('click', act(() => openEditOrderModal(orderId)));
+    menu.querySelector('[data-ctx-edit]')?.addEventListener('touchend', act(() => openEditOrderModal(orderId)));
+    menu.querySelector('[data-ctx-urg]')?.addEventListener('click', act(() => { updateOrder(orderId, { urgent: !o.urgent }); toast(o.urgent ? 'اتشالت علامة الضروري' : 'بقى ضروري جداً', 'success'); render(); }));
+    menu.querySelector('[data-ctx-urg]')?.addEventListener('touchend', act(() => { updateOrder(orderId, { urgent: !o.urgent }); toast(o.urgent ? 'اتشالت علامة الضروري' : 'بقى ضروري جداً', 'success'); render(); }));
+    menu.querySelector('[data-ctx-del]')?.addEventListener('click', act(() => handleDeleteOrder(orderId)));
+    menu.querySelector('[data-ctx-del]')?.addEventListener('touchend', act(() => handleDeleteOrder(orderId)));
   }
-  function closeContextMenu() { const m = document.getElementById('activeContextMenu'); if (m) m.remove(); }
+  function closeContextMenu() { const m = document.getElementById('activeContextMenu'); if (m) m.remove(); const bd = document.getElementById('ctxBackdrop'); if (bd) bd.remove(); }
 
   function bindSettings() {
     const b = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
     b('editUserBtn', () => openEditTextModal({ title: 'تعديل اسمك', label: 'الاسم', value: state.user?.name || '', placeholder: 'اسمك', max: 20, onSave: (v) => { state.user.name = v.trim(); persist(); toast('تمام، الاسم اتحدث ✓', 'success'); render(); } }));
     b('editHomeNameBtn', () => openEditTextModal({ title: 'تعديل اسم البيت', label: 'اسم البيت', value: state.home?.name || '', placeholder: 'اسم البيت', max: 30, onSave: (v) => { state.home.name = v.trim(); persist(); toast('اسم البيت اتحدث ✓', 'success'); render(); } }));
     b('copyHomeCode', () => { copyToClipboard(state.home.code).then(ok => toast(ok ? 'تم نسخ الكود' : 'مقدرش أنسخ', ok ? 'success' : 'error')); });
+    const ib = document.getElementById('installAppBtn');
+    if (ib) {
+      const isInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      if (isInstalled) { ib.disabled = true; ib.textContent = 'التطبيق مثبت بالفعل'; }
+      else ib.onclick = async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          try { const r = await deferredPrompt.userChoice; if (r && r.outcome === 'accepted') toast('جاري تثبيت التطبيق', 'success'); } catch {}
+          deferredPrompt = null;
+        } else openInstallHelpModal();
+      };
+    }
     document.querySelectorAll('[data-colorpick]').forEach(picker => {
       picker.addEventListener('input', (e) => { const catId = e.target.dataset.colorpick; const color = e.target.value; if (!state.categoryColors) state.categoryColors = {}; state.categoryColors[catId] = color; persist(); const item = e.target.closest('.color-item'); if (item) { const icon = item.querySelector('.color-item-icon'); const preview = item.querySelector('.color-item-preview'); if (icon) { icon.style.background = color + '20'; icon.style.color = color; } if (preview) preview.style.background = color; } });
       picker.addEventListener('change', () => render());
     });
     document.querySelectorAll('[data-editcat]').forEach(btn => {
-      btn.onclick = () => { const catId = btn.dataset.editcat; const cat = CATEGORIES[catId]; if (!cat) return;
+      btn.onclick = () => { const catId = btn.dataset.editcat; const cat = catById(catId); if (!cat) return;
         openEditTextModal({ title: `تعديل اسم القسم`, label: 'اسم القسم', value: getCategoryName(catId), placeholder: cat.name, max: 25, onSave: (v) => { if (!state.categoryNames) state.categoryNames = {}; const t = v.trim(); if (t === cat.name) delete state.categoryNames[catId]; else state.categoryNames[catId] = t; persist(); toast('اسم القسم اتحدث', 'success'); render(); } });
       };
     });
@@ -1911,15 +2006,58 @@
     const cch = document.getElementById('catCustomHead'); if (cch) cch.onclick = () => { state._catOpen = !state._catOpen; persist(); render(); scrollToId('catCustomHead'); };
     const lnh = document.getElementById('learnedHead'); if (lnh) lnh.onclick = () => { state._learnedOpen = !state._learnedOpen; persist(); render(); scrollToId('learnedHead'); };
     document.querySelectorAll('[data-iconcat]').forEach(btn => btn.onclick = () => openIconPickerModal(btn.dataset.iconcat));
+    b('addCatBtn', openAddCatModal);
+    document.querySelectorAll('[data-hidecat]').forEach(btn => btn.onclick = () => {
+      if (!state.hiddenCats) state.hiddenCats = [];
+      if (!state.hiddenCats.includes(btn.dataset.hidecat)) state.hiddenCats.push(btn.dataset.hidecat);
+      persist(); render(); toast('القسم اتخفى', 'success');
+    });
+    document.querySelectorAll('[data-showcat]').forEach(btn => btn.onclick = () => {
+      state.hiddenCats = (state.hiddenCats || []).filter(id => id !== btn.dataset.showcat);
+      persist(); render();
+    });
+    document.querySelectorAll('[data-delcat]').forEach(btn => btn.onclick = () => {
+      const id = btn.dataset.delcat;
+      confirmDialog({ title: 'حذف القسم؟', message: `"${getCategoryName(id)}" هيتحذف، وطلباته هتظهر تحت أخرى.`, confirmText: 'حذف', cancelText: 'لا', danger: true }).then(ok => {
+        if (!ok) return;
+        state.customCats = (state.customCats || []).filter(c => c.id !== id);
+        if (state.categoryNames) delete state.categoryNames[id];
+        if (state.categoryColors) delete state.categoryColors[id];
+        if (state.categoryIcons) delete state.categoryIcons[id];
+        persist(); render(); toast('القسم اتحذف', 'success');
+      });
+    });
     document.querySelectorAll('[data-unlearn]').forEach(btn => btn.onclick = () => { delete state.learnedMap[btn.dataset.unlearn]; persist(); toast('تمام، الكلمة اتمسحت', 'success'); render(); });
     b('clearLearned', () => { confirmDialog({ title: 'مسح الكلمات؟', message: 'هنمسح كل التصنيفات اللي اتعلمناها.', confirmText: 'مسح', cancelText: 'لا', danger: true }).then(ok => { if (ok) { state.learnedMap = {}; persist(); toast('تم المسح ✓', 'success'); render(); } }); });
     const clearAll = document.getElementById('clearAllBtn');
-    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, categoryColors: {}, categoryNames: {}, categoryIcons: {}, photos: { mom: '', dad: '' }, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
+    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, categoryColors: {}, categoryNames: {}, categoryIcons: {}, customCats: [], hiddenCats: [], photos: { mom: '', dad: '' }, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
+  }
+
+  function openAddCatModal() {
+    let icon = 'star', color = '#7C3AED';
+    const palette = ['#7C3AED', '#EC4899', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#F43F5E', '#F97316'];
+    const html = `<div class="modal-handle"></div><h2>قسم جديد</h2><p class="m-sub">اختار اسم وأيقونة ولون للقسم</p>
+      <div class="field"><label>اسم القسم *</label><input type="text" id="newCatName" placeholder="مثلا: حلويات" maxlength="25" /></div>
+      <div class="field"><label>الأيقونة</label><div class="icon-grid">${CAT_ICON_CHOICES.map(ic => `<button class="icon-opt ${ic.id === icon ? 'selected' : ''}" data-pickicon="${ic.id}"><span style="color:${color};">${svgIcon(ic.id, 24)}</span><small>${ic.label}</small></button>`).join('')}</div></div>
+      <div class="field"><label>اللون</label><div class="color-swatches">${palette.map(c => `<button class="swatch ${c === color ? 'selected' : ''}" data-pickcolor="${c}" style="background:${c};"></button>`).join('')}</div></div>
+      <div class="btn-group"><button class="btn btn-primary" id="saveCatBtn">إضافة القسم</button><button class="btn" id="cancelCatBtn">رجوع</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#cancelCatBtn').onclick = () => closeModal(m);
+    m.querySelectorAll('[data-pickicon]').forEach(btn => btn.onclick = () => { icon = btn.dataset.icon; m.querySelectorAll('[data-pickicon]').forEach(x => x.classList.toggle('selected', x === btn)); });
+    m.querySelectorAll('[data-pickcolor]').forEach(btn => btn.onclick = () => { color = btn.dataset.pickcolor; m.querySelectorAll('[data-pickcolor]').forEach(x => x.classList.toggle('selected', x === btn)); m.querySelectorAll('[data-pickicon] span').forEach(s => s.style.color = color); });
+    m.querySelector('#saveCatBtn').onclick = () => {
+      const name = m.querySelector('#newCatName').value.trim();
+      if (!name) { const t = m.querySelector('#newCatName'); t.classList.add('error'); t.focus(); return; }
+      if (!state.customCats) state.customCats = [];
+      state.customCats.push({ id: 'c' + uid(), name, icon, color });
+      persist(); closeModal(m); render();
+      toast('تمت إضافة القسم', 'success');
+    };
   }
 
   function openIconPickerModal(catId) {
     const cur = getCategoryIcon(catId);
-    const col = state.categoryColors?.[catId] || CATEGORIES[catId]?.color || '#7C3AED';
+    const col = catColor(catId);
     const html = `<div class="modal-handle"></div><h2>أيقونة ${getCategoryName(catId)}</h2><p class="m-sub">اضغط على أيقونة لتطبيقها فوراً</p>
       <div class="icon-grid">${CAT_ICON_CHOICES.map(ic => `<button class="icon-opt ${ic.id === cur ? 'selected' : ''}" data-icon="${ic.id}"><span style="color:${col};">${svgIcon(ic.id, 26)}</span><small>${ic.label}</small></button>`).join('')}</div>
       <div class="btn-group"><button class="btn" id="cancelIconBtn">رجوع</button></div>`;
@@ -1931,6 +2069,15 @@
       persist(); closeModal(m); render();
       toast('الأيقونة اتحدثت', 'success');
     });
+  }
+
+  function openInstallHelpModal() {
+    const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const html = `<div class="modal-handle"></div><h2>تثبيت ناقصنا إيه</h2><p class="m-sub">${isiOS ? 'على الآيفون من سفاري' : 'على الأندرويد من كروم'}</p>
+      <div class="help-steps">${isiOS ? '1) اضغط زر المشاركة بالأسفل<br>2) اختر إضافة إلى الشاشة الرئيسية<br>3) اضغط إضافة' : '1) اضغط قائمة النقاط ⋮ بالأعلى<br>2) اختر تثبيت التطبيق أو إضافة إلى الشاشة الرئيسية<br>3) اضغط تثبيت'}</div>
+      <div class="btn-group" style="margin-top:12px;"><button class="btn btn-primary" id="closeHelpBtn">تمام</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#closeHelpBtn').onclick = () => closeModal(m);
   }
 
   function openEditTextModal({ title, label, value, placeholder, max, onSave }) {
@@ -1950,35 +2097,54 @@
   function openOrderModal({ mode, order }) {
     const editing = mode === 'edit'; const freqArr = editing ? [] : frequentOrders(8);
     const html = `<div class="modal-handle"></div>
-      <div class="m-emblem">${svgIcon(editing ? 'pencil' : 'plus', 26)}</div>
-      <h2>${editing ? 'تعديل الطلب' : 'زوّد طلب'}</h2>
-      <p class="m-sub">${editing ? 'عدّل اسم الطلب وبياناته' : pickMsg(MSG.wifeGreeting)}</p>
+      <div class="m-hero"><span class="m-hero-ico">${svgIcon(editing ? 'pencil' : 'plus', 26)}</span><div class="m-hero-txt"><h2>${editing ? 'تعديل الطلب' : 'زوّد طلب'}</h2><p>${editing ? 'عدّل اسم الطلب وبياناته' : pickMsg(MSG.wifeGreeting)}</p></div></div>
       ${!editing && freqArr.length ? `<div class="frequent-section"><div class="frequent-title">🔄 الطلبات اللي بتتكرر</div><div class="frequent-list">${freqArr.map(f => `<button class="frequent-chip" data-freq="${escapeHTML(f.name)}">${escapeHTML(f.name)} (${f.count})</button>`).join('')}</div></div>` : ''}
       <div class="field"><label>اسم الطلب *</label>
-        <textarea id="ordName" rows="2" placeholder="اكتب طلب واحد في كل سطر\nأو اكتب: بطاطس وطماطم" maxlength="200">${editing ? escapeHTML(order.name) : ''}</textarea>
+        <div class="ord-box"><textarea id="ordName" rows="2" placeholder="اكتب طلب واحد في كل سطر\nأو اكتب: بطاطس وطماطم" maxlength="200" autocomplete="off">${editing ? escapeHTML(order.name) : ''}</textarea>
+        <div class="suggest-drop hidden" id="ordSuggest"></div></div>
         <div class="help-text">افصل بين الطلبات بـ "و" أو سطر جديد</div>
       </div>
-      <div class="suggest-list hidden" id="ordSuggest"></div>
       <div class="field"><label>ملاحظات (اختياري)</label><textarea id="ordNotes" rows="2" placeholder="مثلا: نوع معين — كبير — غير حار">${editing ? escapeHTML(order.notes || '') : ''}</textarea></div>
       <label class="urgent-toggle ${editing && order.urgent ? 'on' : ''}" id="urgentToggle"><input type="checkbox" id="ordUrgent" ${editing && order.urgent ? 'checked' : ''} /><span class="ut-switch"></span><span class="ut-text">ضروري جداً — أولوية قصوى</span></label>
-      <div id="catQueryWrap" class="hidden"><div class="cat-pick-card"><div class="cat-pick-head"><span class="cat-pick-ico">${svgIcon('sparkle', 22)}</span><div><b>اختار القسم المناسب</b><small>صنف جديد علينا — اختاره مرة واحدة وهنفتكره بعد كده</small></div></div><div class="cat-options" id="catOptions">${CATEGORY_LIST.map(c => { const cc2 = state.categoryColors?.[c.id] || c.color; return `<button class="cat-opt" data-catid="${c.id}"><span class="cat-opt-ico" style="background:${cc2}18;color:${cc2};">${svgIcon(getCategoryIcon(c.id), 22)}</span><span>${getCategoryName(c.id)}</span></button>`; }).join('')}</div></div></div>
+      <div id="itemsReview"></div>
       <div id="pharmacyNote" class="pharm-note hidden">⚠️ ده قسم صيدلية بس. التطبيق مش بيقدم تشخيص أو نصيحة طبية.</div>
       <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="submitOrderBtn">${editing ? 'حفظ التعديل' : 'تأكيد الطلب'}</button><button class="btn" id="cancelOrderBtn">رجوع</button></div>`;
     const m = openModal(html);
-    const nameInput = m.querySelector('#ordName'); const queryWrap = m.querySelector('#catQueryWrap');
-    const catOptions = m.querySelectorAll('#catOptions .cat-opt'); const pharmNote = m.querySelector('#pharmacyNote');
-    let selectedCatForUnknown = null;
-    function evalCategoryFromName() {
-      const val = nameInput.value.trim();
-      if (!val) { queryWrap.classList.add('hidden'); pharmNote.classList.add('hidden'); selectedCatForUnknown = null; catOptions.forEach(c => c.classList.remove('selected')); return; }
-      if (editing) { pharmNote.classList.toggle(order.categoryId === 'pharmacy'); return; }
-      const firstItem = val.split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').trim()).filter(Boolean)[0] || val;
-      const { categoryId, source } = classifyOrder(firstItem);
-      if (categoryId === 'pharmacy') pharmNote.classList.remove('hidden'); else pharmNote.classList.add('hidden');
-      if (source === 'unknown') { selectedCatForUnknown = null; queryWrap.classList.remove('hidden'); catOptions.forEach(c => c.classList.remove('selected')); }
-      else { queryWrap.classList.add('hidden'); selectedCatForUnknown = null; }
+    const nameInput = m.querySelector('#ordName'); const reviewBox = m.querySelector('#itemsReview');
+    const pharmNote = m.querySelector('#pharmacyNote'); const submitBtn = m.querySelector('#submitOrderBtn');
+    const manualCats = {};
+    function parseItems() {
+      return nameInput.value.trim().split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').trim()).filter(Boolean);
     }
-    catOptions.forEach(c => c.onclick = () => { selectedCatForUnknown = c.dataset.catid; catOptions.forEach(x => x.classList.toggle('selected', x === c)); });
+    function resolveItem(name) {
+      const r = classifyOrder(name);
+      if (r.source !== 'unknown') return { cat: r.categoryId, auto: true };
+      const picked = manualCats[normalizeTerm(name)];
+      if (picked && (CATEGORIES[picked] || isCustomCat(picked))) return { cat: picked, auto: false };
+      return { cat: null, auto: false };
+    }
+    function renderReview() {
+      const items = parseItems();
+      const seen = new Set(); const uniq = items.filter(n => { const k = normalizeTerm(n); if (seen.has(k)) return false; seen.add(k); return true; });
+      let allOk = uniq.length > 0; let showPharm = false;
+      reviewBox.innerHTML = uniq.length ? `<div class="review-title">مراجعة الأصناف (${uniq.length}) — لازم كل صنف يتصنف</div>` + uniq.map(n => {
+        const r = resolveItem(n); const k = normalizeTerm(n);
+        const cc = r.cat ? catColor(r.cat) : '#9CA3AF';
+        if (r.cat === 'pharmacy') showPharm = true;
+        if (!r.cat) allOk = false;
+        const badge = r.cat
+          ? `<span class="rv-badge" style="background:${cc}18;color:${cc};">${svgIcon(getCategoryIcon(r.cat), 15)} ${getCategoryName(r.cat)}${r.auto ? '' : ' ✓'}</span>`
+          : `<select class="rv-select" data-rv="${escapeHTML(n)}"><option value="">اختار القسم...</option>${allCats().map(c => `<option value="${c.id}">${getCategoryName(c.id)}</option>`).join('')}</select>`;
+        return `<div class="rv-row ${r.cat ? '' : 'missing'}"><span class="rv-name">${escapeHTML(n)}</span>${badge}</div>`;
+      }).join('') : '';
+      reviewBox.querySelectorAll('[data-rv]').forEach(sel => sel.onchange = () => {
+        if (sel.value) { manualCats[normalizeTerm(sel.dataset.rv)] = sel.value; saveLearning(sel.dataset.rv, sel.value); renderReview(); }
+      });
+      if (editing && order) showPharm = showPharm || order.categoryId === 'pharmacy';
+      pharmNote.classList.toggle('hidden', !showPharm);
+      if (submitBtn) submitBtn.disabled = !allOk;
+    }
+    function evalCategoryFromName() { renderReview(); }
     const suggestBox = m.querySelector('#ordSuggest');
     function currentToken() {
       const v = nameInput.value;
@@ -1996,14 +2162,26 @@
       Object.keys(state.learnedMap || {}).forEach(push);
       return out;
     }
+    function hiName(n, tok) {
+      const esc = escapeHTML(n); const k = normalizeTerm(n);
+      const i = k.indexOf(tok);
+      if (i < 0 || /[&<>"']/.test(n.slice(0, i))) return esc;
+      return esc.slice(0, i) + '<b>' + esc.slice(i, i + tok.length) + '</b>' + esc.slice(i + tok.length);
+    }
     function updateSuggest() {
       if (!suggestBox) return;
       const tok = normalizeTerm(currentToken());
       if (tok.length < 2) { suggestBox.classList.add('hidden'); suggestBox.innerHTML = ''; return; }
-      const hits = suggestPool().filter(n => { const k = normalizeTerm(n); return k !== tok && (k.startsWith(tok) || k.includes(tok)); }).slice(0, 6);
+      const pool = suggestPool();
+      if (pool.some(n => normalizeTerm(n) === tok)) { suggestBox.classList.add('hidden'); suggestBox.innerHTML = ''; return; }
+      const hits = pool.filter(n => { const k = normalizeTerm(n); return k !== tok && (k.startsWith(tok) || k.includes(tok)); }).slice(0, 5);
       if (!hits.length) { suggestBox.classList.add('hidden'); suggestBox.innerHTML = ''; return; }
       suggestBox.classList.remove('hidden');
-      suggestBox.innerHTML = hits.map(h => `<button class="suggest-chip" data-sug="${escapeHTML(h)}">${escapeHTML(h)}</button>`).join('');
+      suggestBox.innerHTML = hits.map(h => {
+        const cid = classifyOrder(h).categoryId;
+        const cc = catColor(cid);
+        return `<button class="sug-row" data-sug="${escapeHTML(h)}"><span class="sug-ico" style="background:${cc}18;color:${cc};">${svgIcon(getCategoryIcon(cid), 18)}</span><span class="sug-name">${hiName(h, tok)}</span><span class="sug-cat">${getCategoryName(cid)}</span></button>`;
+      }).join('');
       suggestBox.querySelectorAll('[data-sug]').forEach(ch => ch.onclick = (e) => { e.preventDefault(); applySuggest(ch.dataset.sug); });
     }
     function applySuggest(word) {
@@ -2014,7 +2192,7 @@
         let head = idx >= 0 ? v.slice(0, idx + 1) : '';
         const wIdx = v.lastIndexOf(' و ');
         if (wIdx > idx) head = v.slice(0, wIdx + 3);
-        nameInput.value = head + word + '، ';
+        nameInput.value = head + word;
       }
       nameInput.focus();
       updateSuggest(); evalCategoryFromName();
@@ -2034,12 +2212,15 @@
         const items = raw.split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').trim()).filter(Boolean);
         if (!items.length) { nameInput.classList.add('error'); nameInput.focus(); return; }
         for (const itemName of items) {
-          if (queryWrap && !queryWrap.classList.contains('hidden') && selectedCatForUnknown) saveLearning(itemName, selectedCatForUnknown);
+          const picked = manualCats[normalizeTerm(itemName)];
+          if (picked) saveLearning(itemName, picked);
           addOrder({ name: itemName, notes, urgent });
         }
         toast(items.length === 1 ? pickMsg(MSG.addOrder) : `زوّدت ${items.length} طلبات ✓ 😂`, 'success');
         closeModal(m); render();
       } else {
+        const picked = manualCats[normalizeTerm(raw)];
+        if (picked) saveLearning(raw, picked);
         updateOrder(order.id, { name: raw, notes, urgent });
         toast('تم التعديل ✓', 'success');
         closeModal(m); render();
@@ -2081,7 +2262,7 @@
       <p class="m-sub">سجل مصروف مش مرتبط بطلب</p>
       <div class="field"><label>اسم المصروف *</label><input type="text" id="expTitle" placeholder="مثلا: فاتورة كهرباء" maxlength="50" /></div>
       <div class="field"><label>المبلغ *</label><input type="number" id="expAmount" min="0" step="0.01" placeholder="0" /></div>
-      <div class="field"><label>القسم</label><div class="cat-options">${CATEGORY_LIST.map((c, i) => { const cc3 = state.categoryColors?.[c.id] || c.color; return `<button class="cat-opt ${i === 5 ? 'selected' : ''}" data-catid="${c.id}"><span class="cat-opt-ico" style="background:${cc3}18;color:${cc3};">${svgIcon(getCategoryIcon(c.id), 22)}</span><span>${getCategoryName(c.id)}</span></button>`; }).join('')}</div></div>
+      <div class="field"><label>القسم</label><div class="cat-options">${allCats().map((c) => { const cc3 = catColor(c.id); return `<button class="cat-opt ${c.id === 'other' ? 'selected' : ''}" data-catid="${c.id}"><span class="cat-opt-ico" style="background:${cc3}18;color:${cc3};">${svgIcon(getCategoryIcon(c.id), 22)}</span><span>${getCategoryName(c.id)}</span></button>`; }).join('')}</div></div>
       <div class="field"><label>التاريخ</label><input type="date" id="expDate" value="${todayKey()}" /></div>
       <div class="field"><label>ملاحظات (اختياري)</label><textarea id="expNotes" rows="2" placeholder="تفاصيل تانية"></textarea></div>
       <div class="btn-group"><button class="btn btn-primary" id="saveExpBtn">حفظ المصروف</button><button class="btn" id="cancelExpBtn">رجوع</button></div>`;
@@ -2113,6 +2294,9 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
   setInterval(() => { if (!state.initialized || !state.home || !state.user) bindOnboarding(); }, 150);
 })();
+</script>
+<script>
+if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
 </script>
 </body>
 </html>
