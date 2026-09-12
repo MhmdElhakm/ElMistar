@@ -1914,7 +1914,7 @@
         fcm: fcmUsable()
       };
     },
-    _fcm: null, _fcmBound: false,
+    _fcm: null, _fcmBound: false, _lastFcmErr: '',
     ensureMessaging() {
       if (this._fcm) return this._fcm;
       try {
@@ -1965,14 +1965,15 @@
       } catch {}
     },
     async registerFcm(reg) {
-      if (!FCM_VAPID_KEY || !reg) return false;
+      this._lastFcmErr = '';
+      if (!FCM_VAPID_KEY || !reg) { this._lastFcmErr = !FCM_VAPID_KEY ? 'vapid-missing' : 'no-service-worker'; return false; }
       try {
         const fm = this.ensureMessaging();
-        if (!fm || !fm.getToken) return false;
+        if (!fm || !fm.getToken) { this._lastFcmErr = 'messaging-unavailable'; return false; }
         const token = await fm.getToken({ vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: reg });
-        if (!token) return false;
+        if (!token) { this._lastFcmErr = 'empty-token'; return false; }
         return await this.saveFcmToken(token);
-      } catch { return false; }
+      } catch (e) { this._lastFcmErr = String((e && (e.code || e.message)) || 'unknown').slice(0, 120); return false; }
     },
     perm() {
       try { return ('Notification' in window) ? Notification.permission : 'unsupported'; }
@@ -2058,6 +2059,7 @@
       }
       try { notifyLocal({ id: 'test-welcome', type: 'info', title: 'إشعارات المتصفح اشتغلت', body: 'هتوصلك التنبيهات هنا حتى لو التطبيق في الخلفية', actionTab: 'notifs', createdAt: nowISO() }); } catch {}
       toast('إشعارات المتصفح اشتغلت', 'success');
+      if (!fcmOk && FCM_VAPID_KEY && PushSys._lastFcmErr) setTimeout(() => { try { toast('فشل توكن FCM: ' + PushSys._lastFcmErr, 'error'); } catch {} }, 800);
       if (!FCM_VAPID_KEY) setTimeout(() => { try { toast('تنبيه: مفتاح FCM غير مضبوط — راجع بطاقة التشخيص بالأسفل', 'warning'); } catch {} }, 800);
       try { render(); } catch {}
       return 'granted';
@@ -2101,6 +2103,51 @@
           try { localStorage.setItem('naqisna_pushtouch', String(Date.now())); } catch {}
         }
       } catch {}
+    },
+    async testFcmReal() {
+      const rep = { ok: false, rows: [], error: '' };
+      const R = (k, v) => rep.rows.push([k, String(v)]);
+      try {
+        R('الإذن', PushSys.perm());
+        if (PushSys.perm() !== 'granted') { rep.error = 'permission-' + PushSys.perm(); return rep; }
+        const reg = await PushSys.ensureReg();
+        R('Service Worker', reg ? (reg.active ? 'active' : 'registered') : 'error');
+        if (!reg) { rep.error = 'no-service-worker'; return rep; }
+        R('VAPID', FCM_VAPID_KEY ? 'مضبوط' : 'ناقص');
+        if (!FCM_VAPID_KEY) { rep.error = 'vapid-missing'; return rep; }
+        if (!PushSys.support().fcm) { rep.error = 'messaging-unsupported'; return rep; }
+        let token = '';
+        try {
+          const fm = PushSys.ensureMessaging();
+          token = fm && fm.getToken ? await fm.getToken({ vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: reg }) : '';
+        } catch (e) { rep.error = String((e && (e.code || e.message)) || 'unknown').slice(0, 120); return rep; }
+        if (!token) { rep.error = 'empty-token'; return rep; }
+        R('FCM Token', token.slice(0, 12) + '…' + token.slice(-6));
+        const saved = await PushSys.saveFcmToken(token);
+        R('الحفظ', saved ? 'تم' : 'فشل');
+        if (!saved) { rep.error = 'save-failed'; return rep; }
+        let confirmed = false, subCount = '—';
+        try {
+          if (db && state.home?.code) {
+            const snap = await db.collection('homes').doc(state.home.code).collection('pushSubs').doc(fcmDocId(token)).get();
+            confirmed = !!(snap && snap.exists);
+            try {
+              const all = await db.collection('homes').doc(state.home.code).collection('pushSubs').get();
+              subCount = String((all.docs || []).filter(dd => { try { const t = dd.data().token; return typeof t === 'string' && t.length > 10; } catch { return false; } }).length);
+            } catch {}
+          }
+        } catch (e) { rep.error = String((e && (e.code || e.message)) || 'read-failed').slice(0, 120); return rep; }
+        R('التأكيد من Firestore', confirmed ? 'موجود' : 'غير موجود');
+        try {
+          const sub = reg.pushManager ? await reg.pushManager.getSubscription() : null;
+          R('Subscription', sub && sub.endpoint ? 'active' : 'inactive');
+        } catch { R('Subscription', 'unknown'); }
+        R('homeId', (state.home && state.home.code) || '—');
+        R('أجهزة pushSubs', subCount);
+        rep.ok = confirmed;
+        if (!confirmed) rep.error = 'not-confirmed';
+        return rep;
+      } catch (e) { rep.error = String((e && (e.code || e.message)) || 'unknown').slice(0, 120); return rep; }
     }
   };
   let _diag = null, _diagFor = '';
@@ -2119,7 +2166,7 @@
     },
     epHost(ep) { try { return new URL(ep).host; } catch { return '—'; } },
     async refresh(auto) {
-      const d = { at: Date.now(), perm: PushSys.perm(), sw: 'error', push: PushSys.support().push, sub: 'inactive', host: '—', fcm: 'inactive', fcmKey: !!FCM_VAPID_KEY, user: (state.user && state.user.id) || '—', platform: this.platform(), pwa: this.pwa(), vapid: !!VAPID_PUBLIC_KEY };
+      const d = { at: Date.now(), perm: PushSys.perm(), sw: 'error', push: PushSys.support().push, sub: 'inactive', host: '—', fcm: 'inactive', fcmError: '', fcmKey: !!FCM_VAPID_KEY, user: (state.user && state.user.id) || '—', platform: this.platform(), pwa: this.pwa(), vapid: !!VAPID_PUBLIC_KEY };
       try {
         if (PushSys.support().sw) {
           const reg = await PushSys.ensureReg();
@@ -2140,8 +2187,13 @@
               if (fm && fm.getToken) {
                 const tok = await fm.getToken({ vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: reg });
                 if (tok) d.fcm = 'active';
-              }
-            } catch {}
+                else d.fcmError = 'empty-token';
+              } else d.fcmError = 'messaging-unavailable';
+            } catch (e) { d.fcmError = String((e && (e.code || e.message)) || 'unknown').slice(0, 120); }
+          } else if (d.perm === 'granted' && PushSys.support().fcm && reg && !FCM_VAPID_KEY) {
+            d.fcmError = 'vapid-missing';
+          } else if (FCM_VAPID_KEY && PushSys._lastFcmErr) {
+            d.fcmError = PushSys._lastFcmErr;
           }
         } else d.sw = 'unsupported';
       } catch {}
@@ -2154,6 +2206,7 @@
       const r = (k, v) => `<div class="exp-detail" style="display:flex;justify-content:space-between;gap:8px;"><span>${k}</span><b style="direction:ltr;">${escapeHTML(String(v))}</b></div>`;
       return r('الإذن', _diag.perm) + r('Service Worker', _diag.sw) + r('Push مدعوم', _diag.push ? 'true' : 'false')
         + r('الاشتراك', _diag.sub) + r('Endpoint', _diag.host) + r('توكن FCM', _diag.fcm || 'inactive')
+        + (_diag.fcmError ? r('خطأ FCM', _diag.fcmError) : '')
         + r('مفتاح FCM', _diag.fcmKey ? 'مضبوط' : 'ناقص') + r('المستخدم', _diag.user)
         + r('المنصة', _diag.platform) + r('وضع PWA', _diag.pwa ? 'true' : 'false') + r('VAPID مضبوط', _diag.vapid ? 'true' : 'false');
     }
@@ -2952,8 +3005,10 @@
         ${(_diag && !_diag.fcmKey) ? `<div style="padding:0 16px 4px;"><div class="exp-detail">⚠️ مفتاح FCM غير مضبوط — إشعارات التطبيق المغلق لن تعمل. انسخ Web Push certificate من Firebase Console ← Cloud Messaging.</div></div>` : ''}
         <div class="notif-actions" style="padding:10px 16px 14px;">
           <button class="btn btn-sm" id="diagRefresh">تحديث التشخيص</button>
+          <button class="btn btn-sm" id="fcmRealTest">اختبار FCM الحقيقي</button>
           <button class="btn btn-sm" id="serverTestNotif">تجربة عبر الخادم</button>
         </div>
+        <div style="padding:0 16px;" id="fcmTestRes"></div>
       </div>
       <div class="notif-actions">
         ${unread ? `<button class="btn" id="markAllRead">تعليم الكل كمقروء</button>` : ''}
@@ -3245,6 +3300,18 @@
       if (key && _diagFor !== key) { _diagFor = key; try { PushDiag.refresh(true); } catch {} }
     }
     const drb = document.getElementById('diagRefresh'); if (drb) drb.onclick = () => { try { PushDiag.refresh(false); } catch {} };
+    const frt = document.getElementById('fcmRealTest');
+    if (frt) frt.onclick = async () => {
+      frt.disabled = true; frt.textContent = 'جاري الاختبار...';
+      try {
+        const rep = await PushSys.testFcmReal();
+        const box = document.getElementById('fcmTestRes');
+        if (box) box.innerHTML = rep.rows.map(([k, v]) => `<div class="exp-detail" style="display:flex;justify-content:space-between;gap:8px;"><span>${escapeHTML(k)}</span><b style="direction:ltr;">${escapeHTML(v)}</b></div>`).join('')
+          + (rep.error ? `<div class="error-text">الخطأ: ${escapeHTML(rep.error)}</div>` : '');
+        toast(rep.ok ? 'اختبار FCM ناجح — التوكن محفوظ ومؤكد' : ('اختبار FCM فشل: ' + (rep.error || 'غير معروف')), rep.ok ? 'success' : 'error');
+      } catch { toast('اختبار FCM فشل', 'error'); }
+      frt.disabled = false; frt.textContent = 'اختبار FCM الحقيقي';
+    };
     const stb = document.getElementById('serverTestNotif');
     if (stb) stb.onclick = async () => {
       try {
@@ -4140,11 +4207,20 @@
     const editing = mode === 'edit';
     const html = `<div class="modal-handle"></div>
       <div class="m-hero"><span class="m-hero-ico">${svgIcon(editing ? 'pencil' : 'plus', 26)}</span><div class="m-hero-txt"><h2>${editing ? 'تعديل الطلب' : 'زوّد طلب'}</h2><p>${editing ? 'عدّل اسم الطلب وبياناته' : pickMsg(MSG.wifeGreeting)}</p></div></div>
-      <div class="field"><label>اسم الطلب *</label>
-        <div class="ord-box"><textarea id="ordName" rows="2" placeholder="اكتب طلب واحد في كل سطر\nأو اكتب: بطاطس وطماطم" maxlength="200" autocomplete="off">${editing ? escapeHTML(order.name) : ''}</textarea>
+      ${editing ? `<div class="field"><label>اسم الطلب *</label>
+        <div class="ord-box"><textarea id="ordName" rows="2" placeholder="اكتب اسم الطلب" maxlength="200" autocomplete="off">${escapeHTML(order.name)}</textarea>
         <div class="suggest-drop hidden" id="ordSuggest"></div></div>
-        <div class="help-text">افصل بين الطلبات بـ "و" أو سطر جديد</div>
+      </div>` : `<div class="field"><label>اختر الصنف *</label>
+        <div id="pickBox"></div>
       </div>
+      <div class="field"><label>بحث في الأصناف</label>
+        <input type="text" id="pickSearch" placeholder="دوّر على صنف..." autocomplete="off" maxlength="40" />
+      </div>
+      <div class="field"><label>التصفح حسب القسم</label>
+        <div id="pickDepts" class="filters-wrap" style="padding:0;"></div>
+        <div id="pickList" style="max-height:260px;overflow-y:auto;"></div>
+      </div>
+      <textarea id="ordName" class="hidden" maxlength="200" autocomplete="off"></textarea>`}
       <div class="voice-bar">
         <button class="mic-btn" id="voiceBtn" aria-label="إدخال صوتي" aria-pressed="false">${svgIcon('mic', 22)}</button>
         <div class="voice-info"><b id="voiceStatus">اضغط الميك وتكلم</b><small>يُضاف فقط الكلام الموجود في قائمة الموقع — افصل بـ «و»</small></div>
@@ -4305,7 +4381,22 @@
     });
     Voice.lang = 'ar-EG';
     const vBtn = m.querySelector('#voiceBtn'); const vStatus = m.querySelector('#voiceStatus');
-    const voiceUI = () => ({ onText: () => { qtyFor = null; updateSuggest(); renderQty(); }, onState: setVoiceUI, onCommit: (count) => { if (vStatus && count > 0) vStatus.textContent = 'تم التعرف على ' + count + ' كلمات'; qtyFor = null; updateSuggest(); renderQty(); } });
+    const voiceUI = () => ({
+      onText: () => {
+        if (editing) { qtyFor = null; updateSuggest(); renderQty(); return; }
+        const items = parseItems();
+        if (items.length) selectItem(items[0]);
+        else { qtyFor = null; renderQty(); }
+      },
+      onState: setVoiceUI,
+      onCommit: (count) => {
+        if (vStatus && count > 0) vStatus.textContent = 'تم التعرف على ' + count + ' كلمات';
+        if (editing) { qtyFor = null; updateSuggest(); renderQty(); return; }
+        const items = parseItems();
+        if (items.length) selectItem(items[0]);
+        else { qtyFor = null; renderQty(); }
+      }
+    });
     const setVoiceUI = (on, info) => {
       if (!vBtn) return;
       vBtn.classList.toggle('recording', on);
@@ -4317,18 +4408,70 @@
       }
     };
     if (vBtn) vBtn.onclick = () => Voice.toggle(nameInput, voiceUI());
+    let pickedName = null, pickDept = null;
+    function renderPick() {
+      const box = m.querySelector('#pickBox'); if (!box) return;
+      if (!pickedName) { box.innerHTML = `<div class="help-text">اختار صنف من القائمة أو البحث أو الصوت</div>`; return; }
+      const cid = classifyOrder(pickedName).categoryId; const cc = catColor(cid);
+      box.innerHTML = `<div class="rv-row"><span class="rv-name">${escapeHTML(pickedName)}</span><span class="rv-badge" style="background:${cc}18;color:${cc};">${svgIcon(getCategoryIcon(cid), 15)} ${getCategoryName(cid)}</span><button class="btn btn-sm" id="pickClear">✕</button></div>`;
+      m.querySelector('#pickClear').onclick = () => { pickedName = null; nameInput.value = ''; qtyFor = null; renderQty(); renderPick(); evalCategoryFromName(); };
+    }
+    function pickRowHTML(name, sub) {
+      const cid = classifyOrder(name).categoryId; const cc = catColor(cid);
+      return `<button class="sug-row" data-pick="${escapeHTML(name)}"><span class="sug-ico" style="background:${cc}18;color:${cc};">${svgIcon(getCategoryIcon(cid), 18)}</span><span class="sug-name">${escapeHTML(name)}</span><span class="sug-cat">${escapeHTML(sub || getCategoryName(cid))}</span></button>`;
+    }
+    function renderPickDepts() {
+      const box = m.querySelector('#pickDepts'); if (!box) return;
+      const cats = getCatalog();
+      box.innerHTML = cats.map(d => `<button class="filter-chip ${pickDept === d.id ? 'active' : ''}" data-pdept="${d.id}">${d.emoji} ${escapeHTML(getCategoryName(d.id))}</button>`).join('');
+      box.querySelectorAll('[data-pdept]').forEach(b => b.onclick = () => {
+        pickDept = (pickDept === b.dataset.pdept ? null : b.dataset.pdept);
+        const ps = m.querySelector('#pickSearch'); if (ps) ps.value = '';
+        renderPickDepts(); renderPickList();
+      });
+    }
+    function selectItem(name) {
+      pickedName = String(name || '').trim(); if (!pickedName) return;
+      nameInput.value = pickedName;
+      renderPick(); showQtyFor(pickedName);
+      updateSuggest(); evalCategoryFromName();
+    }
+    function renderPickList() {
+      const list = m.querySelector('#pickList'); if (!list) return;
+      const sinput = m.querySelector('#pickSearch');
+      const q = ((sinput && sinput.value) || '').trim();
+      let rows = [];
+      if (q.length >= 2) {
+        const toks = normalizeTerm(q).split(' ').filter(Boolean);
+        const seen = new Set();
+        searchCatalog(q, 20).forEach(r => { seen.add(normalizeTerm(r.item.ar)); rows.push(pickRowHTML(r.item.ar, getCategoryName(r.dept.id) + ' › ' + r.sub.name)); });
+        const pushX = (n, label) => { const k = normalizeTerm(n); if (!n || seen.has(k)) return; if (!toks.every(t => normalizeTerm(n).includes(t))) return; seen.add(k); rows.push(pickRowHTML(n, label)); };
+        Object.keys(state.usageFreq || {}).forEach(k => pushX(findOriginalName(k) || k, 'استخدمته قبل كده'));
+        (state.orders || []).forEach(o => pushX(o.name, 'من طلباتك'));
+        rows = rows.slice(0, 30);
+      } else if (pickDept) {
+        const d = getCatalog().find(x => x.id === pickDept);
+        rows = d ? d.subs.flatMap(s => s.items.map(it => pickRowHTML(it.ar, s.name))) : [];
+      } else {
+        rows = frequentOrders(8).map(f => pickRowHTML(f.name, 'الأكثر استخدامًا'));
+      }
+      list.innerHTML = rows.length ? rows.join('') : `<div class="help-text">${q.length >= 2 ? 'مفيش نتائج — جرّب كلمة تانية' : 'اختار قسم أو ابحث'}</div>`;
+      list.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => selectItem(b.dataset.pick));
+    }
+    if (!editing) {
+      renderPick(); renderPickDepts(); renderPickList();
+      m.querySelector('#pickSearch').oninput = renderPickList;
+    }
     setTimeout(evalCategoryFromName, 50);
     if (editing && order.qty) { qtyFor = order.name; qtyType = order.qty.t === 'w' ? 'weight' : 'count'; qtyVal = order.qty.v || 1; qtyUnit = order.qty.u || 'قطعة'; renderQty(); }
     m.querySelector('#cancelOrderBtn').onclick = () => closeModal(m);
     const urgentToggle = m.querySelector('#urgentToggle'); const urgentInput = m.querySelector('#ordUrgent');
     if (urgentInput) urgentInput.onchange = () => urgentToggle.classList.toggle('on', urgentInput.checked);
     m.querySelector('#submitOrderBtn').onclick = () => {
-      const raw = nameInput.value.trim(); const notes = m.querySelector('#ordNotes').value.trim(); const urgent = !!(urgentInput && urgentInput.checked);
-      if (!raw) { nameInput.classList.add('error'); nameInput.focus(); return; }
-      nameInput.classList.remove('error');
+      const notes = m.querySelector('#ordNotes').value.trim(); const urgent = !!(urgentInput && urgentInput.checked);
       if (!editing) {
-        const items = raw.split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').trim()).filter(Boolean);
-        if (!items.length) { nameInput.classList.add('error'); nameInput.focus(); return; }
+        const items = pickedName ? [pickedName] : parseItems();
+        if (!items.length) { toast('اختار صنف من القائمة أو البحث أو الصوت', 'warning'); return; }
         const added = []; let skipped = 0; const seenBatch = {};
         const singleQty = readQtyForSubmit(items);
         for (const itemName of items) {
@@ -4345,6 +4488,9 @@
         toast((added.length === 1 ? pickMsg(MSG.addOrder) : `زوّدت ${added.length} طلبات ✓ 😂`) + (skipped ? ` (تجاهلت ${skipped} مكرر)` : ''), 'success');
         closeModal(m); render();
       } else {
+        const raw = nameInput.value.trim();
+        if (!raw) { nameInput.classList.add('error'); nameInput.focus(); return; }
+        nameInput.classList.remove('error');
         const picked = manualCats[normalizeTerm(raw)];
         if (picked) saveLearning(raw, picked);
         updateOrder(order.id, { name: raw, notes, urgent, qty: (qtyFor && normalizeTerm(raw) === normalizeTerm(qtyFor)) ? readQtyValue() : null });
