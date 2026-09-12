@@ -1,0 +1,81 @@
+rules_version = '2';
+
+// Naqisna push rules. NOTE: the app uses custom local userIds (no Firebase Auth),
+// so these rules enforce shape/size/ownership-consistency, NOT identity.
+// Anyone holding a home code can read/write that home subtree — keep codes private.
+// Upgrade path: enable Anonymous Auth, then replace `true` with
+// `request.auth != null` and match token docs by owner UID.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function shortStr(v, max) {
+      return v is string && v.size() > 0 && v.size() < max;
+    }
+
+    match /homes/{homeId} {
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if request.resource.data.home is map
+        && request.resource.data.keys().hasAll(['home'])
+        && request.resource.data.size() <= 45
+        && (!('notifs' in request.resource.data)
+          || (request.resource.data.notifs is list
+            && request.resource.data.notifs.size() <= 60))
+        && (!('pushSent' in request.resource.data)
+          || (request.resource.data.pushSent is list
+            && request.resource.data.pushSent.size() <= 220));
+      allow delete: if false;
+
+      // Push subscriptions: one doc per device. userId/token required.
+      // update allowed only without changing owner; delete allowed (device removal).
+      match /pushSubs/{subId} {
+        allow get: if true;
+        allow list: if false;
+        allow create: if shortStr(request.resource.data.userId, 64)
+          && shortStr(request.resource.data.token, 2048)
+          && request.resource.data.token.size() > 10;
+        allow update: if shortStr(request.resource.data.userId, 64)
+          && shortStr(request.resource.data.token, 2048)
+          && request.resource.data.userId == resource.data.userId;
+        allow delete: if true;
+      }
+
+      // Legacy collection kept writable during client transition.
+      match /fcmTokens/{subId} {
+        allow get: if true;
+        allow list: if false;
+        allow create: if shortStr(request.resource.data.userId, 64)
+          && shortStr(request.resource.data.token, 2048)
+          && request.resource.data.token.size() > 10;
+        allow update: if shortStr(request.resource.data.userId, 64)
+          && shortStr(request.resource.data.token, 2048)
+          && request.resource.data.userId == resource.data.userId;
+        allow delete: if true;
+      }
+
+      // Queue: clients may only CREATE pending jobs. Sending/status is
+      // server-side (Admin SDK bypasses rules). No client updates/deletes.
+      match /pushQueue/{qid} {
+        allow get: if true;
+        allow list: if false;
+        allow create: if (!('status' in request.resource.data)
+            || request.resource.data.status == 'pending')
+          && shortStr(request.resource.data.title, 140)
+          && shortStr(request.resource.data.body, 400)
+          && (!('to' in request.resource.data) || request.resource.data.to is string)
+          && (!('userId' in request.resource.data) || request.resource.data.userId is string)
+          && !('processedAt' in request.resource.data)
+          && !('processingAt' in request.resource.data)
+          && !('sent' in request.resource.data)
+          && !('failed' in request.resource.data)
+          && !('cleaned' in request.resource.data)
+          && !('devices' in request.resource.data);
+        allow update, delete: if false;
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
