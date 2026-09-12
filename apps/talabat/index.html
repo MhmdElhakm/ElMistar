@@ -381,6 +381,43 @@
   .app-mini-ico { position: relative; overflow: hidden !important; padding: 0 !important; }
   .app-mini-ico img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .help-steps { font-size: 13.5px; font-weight: 700; line-height: 2.2; color: var(--text); background: var(--bg); border-radius: 14px; padding: 12px 16px; }
+  /* ===== Notifications ===== */
+  .nav-item { position: relative; }
+  .nav-badge { position: absolute; top: 4px; left: calc(50% - 20px); min-width: 19px; height: 19px; padding: 0 5px; border-radius: 999px; background: linear-gradient(135deg,#FB7185,#E11D48); color: #fff; font-size: 10.5px; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; box-shadow: 0 3px 8px rgba(225,29,72,.4); animation: popIn .3s ease-out; }
+  .notif-actions { display: flex; gap: 8px; padding: 0 20px 12px; flex-wrap: wrap; }
+  .notif-actions .btn { width: auto; flex: 1; min-width: 100px; min-height: 42px; font-size: 12.5px; }
+  .notif-item { display: flex; gap: 11px; align-items: flex-start; background: #fff; border: 1.5px solid var(--border); border-radius: 20px; padding: 13px 14px; margin: 0 20px 9px; box-shadow: var(--shadow-sm); cursor: pointer; transition: transform .12s; animation: popIn .3s ease-out; }
+  .notif-item:active { transform: scale(.98); }
+  .notif-item.unread { border-color: var(--primary); background: linear-gradient(180deg, #F5F0FF, #fff 75%); box-shadow: 0 8px 20px rgba(124,58,237,.16); }
+  .notif-ico { width: 44px; height: 44px; border-radius: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .notif-body { flex: 1; min-width: 0; }
+  .notif-title { font-size: 14px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+  .notif-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--primary); flex-shrink: 0; animation: dotBlink 1.4s infinite; }
+  .notif-text { font-size: 13px; font-weight: 700; color: var(--text-sec); line-height: 1.7; margin-top: 2px; }
+  .notif-items-names { font-size: 11.5px; color: var(--text-muted); font-weight: 700; margin-top: 3px; }
+  .notif-time { font-size: 11px; color: var(--text-muted); font-weight: 700; margin-top: 4px; }
+  /* ===== Meme sounds ===== */
+  .tgl-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; width: 100%; text-align: right; }
+  .tgl-row + .tgl-row { border-top: 1px solid var(--border); }
+  .tgl { flex: 1; min-width: 0; }
+  .tgl b { font-size: 13.5px; font-weight: 900; display: block; }
+  .tgl small { font-size: 11px; color: var(--text-sec); font-weight: 700; display: block; margin-top: 1px; }
+  .sw { width: 46px; height: 27px; border-radius: 999px; background: #D8D3E8; position: relative; flex-shrink: 0; transition: background .18s; }
+  .sw::after { content: ''; position: absolute; top: 3px; right: 3px; width: 21px; height: 21px; border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.2); transition: transform .18s; }
+  .sw.on { background: var(--primary); }
+  .sw.on::after { transform: translateX(-19px); }
+  .vol-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+  .vol-row input[type="range"] { flex: 1; accent-color: var(--primary); height: 30px; }
+  .vol-val { font-size: 13px; font-weight: 900; color: var(--primary-dark); min-width: 44px; text-align: center; }
+  .snd-row { display: flex; align-items: center; gap: 10px; padding: 9px 16px; }
+  .snd-row + .snd-row { border-top: 1px solid var(--border); }
+  .snd-play { width: 38px; height: 38px; border-radius: 12px; background: var(--primary-light); color: var(--primary-dark); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .snd-play:active { transform: scale(.9); }
+  .snd-info { flex: 1; min-width: 0; }
+  .snd-info b { font-size: 12.5px; font-weight: 900; display: block; }
+  .snd-info small { font-size: 10.5px; color: var(--text-sec); font-weight: 700; }
+  .snd-del { color: var(--danger); font-size: 16px; font-weight: 900; padding: 6px; }
+  .snd-add-row { padding: 0 16px 14px; }
   .btn-row { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
   .color-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 16px 12px; }
   .color-grid.single { grid-template-columns: 1fr; }
@@ -494,6 +531,19 @@
   .m-hero-txt { position: relative; z-index: 1; min-width: 0; }
   .m-hero-txt h2 { color: #fff !important; font-size: 20px !important; text-align: right !important; margin: 0 0 3px !important; }
   .m-hero-txt p { font-size: 12.5px; font-weight: 700; opacity: .93; line-height: 1.7; margin: 0; }
+  /* ===== Voice input ===== */
+  .voice-bar { display: flex; align-items: center; gap: 10px; background: #fff; border: 1.5px solid rgba(124,58,237,.16); border-radius: 18px; padding: 9px 12px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
+  .mic-btn { width: 50px; height: 50px; border-radius: 50%; background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 8px 18px rgba(124,58,237,.35); transition: transform .15s; }
+  .mic-btn:active { transform: scale(.9); }
+  .mic-btn.recording { background: linear-gradient(135deg,#FB7185,#E11D48); animation: micPulse 1.2s ease-out infinite; }
+  @keyframes micPulse { 0% { box-shadow: 0 0 0 0 rgba(225,29,72,.5); } 100% { box-shadow: 0 0 0 16px rgba(225,29,72,0); } }
+  .voice-info { flex: 1; min-width: 0; }
+  .voice-info b { font-size: 13px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+  .voice-info small { font-size: 11px; color: var(--text-sec); font-weight: 700; display: block; margin-top: 1px; }
+  .live-dot { width: 9px; height: 9px; border-radius: 50%; background: #E11D48; flex-shrink: 0; animation: dotBlink 1s infinite; }
+  .voice-langs { display: flex; background: var(--bg); border-radius: 12px; padding: 3px; gap: 2px; flex-shrink: 0; }
+  .vlang { padding: 8px 13px; border-radius: 9px; font-size: 12px; font-weight: 800; color: var(--text-sec); min-height: 38px; }
+  .vlang.active { background: #fff; color: var(--primary-dark); box-shadow: var(--shadow-sm); }
   .category-query { background: var(--pending-light); border: 1px solid var(--pending); color: #7D6608; padding: 10px 12px; border-radius: var(--radius-sm); margin-bottom: 12px; font-size: 13px; font-weight: 600; }
   .cat-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 6px; }
   .cat-opt { background: #fff; border: 1.5px solid var(--border); padding: 12px 6px; border-radius: 16px; text-align: center; font-size: 12px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; transition: all .15s; color: var(--text); }
@@ -825,7 +875,10 @@
     wa: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
     copy: '<rect x="9" y="9" width="12" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
     pencil: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
-    plus: '<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>'
+    plus: '<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>',
+    mic: '<rect x="9" y="2" width="6" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 0 1-3.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    music: '<path d="M9 18V5l12-2v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="18" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="16" r="3" fill="none" stroke="currentColor" stroke-width="2"/>'
   };
   function svgIcon(name, size) {
     return '<svg viewBox="0 0 24 24" width="' + (size || 20) + '" height="' + (size || 20) + '" fill="none">' + (ICONS[name] || ICONS.box) + '</svg>';
@@ -1146,7 +1199,7 @@
      ============================= */
   let state = {
     initialized: false, home: null, user: null,
-    orders: [], expenses: [], learnedMap: {}, usageFreq: {},
+    orders: [], expenses: [], learnedMap: {}, usageFreq: {}, notifs: [],
     categoryColors: {}, categoryNames: {}, categoryIcons: {}, customCats: [], hiddenCats: [],
     photos: { mom: '', dad: '' },
     currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: ''
@@ -1233,6 +1286,141 @@
       db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
     }
   } catch { db = null; }
+  /* =============================
+     NOTIFICATIONS (modular, extensible by type)
+     ============================= */
+  const NOTIF_TYPES = {
+    order_new: { icon: 'cart', bg: '#F1EAFE', c: '#7C3AED' },
+    order_done: { icon: 'check', bg: '#DCFCE7', c: '#059669' },
+    urgent: { icon: 'bolt', bg: '#FFE4E6', c: '#E11D48' },
+    info: { icon: 'bell', bg: '#E0F2FE', c: '#0284C7' }
+  };
+  const NOTIF_MSGS = {
+    order_new: [
+      'وصلك طلب جديد... شد حيلك!',
+      'تنبيه! {name} باعت طلب مستنيك',
+      'البريد السعيد وصل! عندك طلب جديد.',
+      'حد فاكر إنك فاضي... عندك طلب جديد!',
+      'مفاجأة! طلب جديد في انتظارك.',
+      'الطلب وصل... والكرة في ملعبك!',
+      'مش هنقول مين بعتلك... بس عندك طلب جديد!',
+      'دينج دينج! فيه طلب مستني ردك.',
+      'افتح بسرعة... فيه طلب جديد مستنيك!',
+      'طلب جديد وصل، والمهمة بدأت!',
+      'واضح إن حد محتاج خدماتك!',
+      'طلب جديد! متقولش إنك مشغول.',
+      'هدف جديد وصل لحسابك!',
+      'قبل ما تشرب القهوة... شوف الطلب الجديد!'
+    ],
+    order_done: [
+      'المهمة تمت! {name} جاب الطلب.',
+      'خلصت يا بطل! {name} اشترى الطلب.',
+      'كفو! {name} خلص المهمة بنجاح.',
+      '{name} رجع من المعركة منتصر!'
+    ],
+    urgent: [
+      'طلب مستعجل! {name} محتاجك ضروري.',
+      'عاجل جداً! فيه طلب مينفعش يستنى.',
+      '{name} بيستغيث... طلب ضروري وصل!'
+    ],
+    info: ['عندك تحديث جديد من {name}.']
+  };
+  function notifList() { return state.notifs || []; }
+  function unreadNotifs() {
+    const me = state.user?.id;
+    return notifList().filter(n => me && n.senderId !== me && !(n.readBy || []).includes(me));
+  }
+  function pushNotif(type, { names, orderIds }) {
+    if (!state.user || !state.home) return null;
+    const pool = NOTIF_MSGS[type] || NOTIF_MSGS.info;
+    const msg = pickMsg(pool).replaceAll('{name}', state.user.name);
+    const titles = {
+      order_new: `طلب جديد من ${state.user.name}`,
+      order_done: `${state.user.name} خلص طلب`,
+      urgent: `طلب مستعجل من ${state.user.name}`,
+      info: `تحديث من ${state.user.name}`
+    };
+    const n = {
+      id: 'n_' + uid(), type, title: titles[type] || titles.info, body: msg,
+      names: (names || []).slice(0, 4), extra: Math.max(0, (names || []).length - 4),
+      orderIds: orderIds || [], senderId: state.user.id, sender: state.user.name,
+      readBy: [state.user.id], createdAt: nowISO()
+    };
+    if (!state.notifs) state.notifs = [];
+    if (state.notifs.some(x => x.id === n.id)) return null;
+    state.notifs.unshift(n);
+    state.notifs = state.notifs.slice(0, 50);
+    persist();
+    return n;
+  }
+  function markNotifRead(id) {
+    const me = state.user?.id; if (!me) return;
+    const n = notifList().find(x => x.id === id); if (!n) return;
+    if (!(n.readBy || []).includes(me)) { n.readBy = [...(n.readBy || []), me]; persist(); }
+  }
+  function markAllNotifsRead() {
+    const me = state.user?.id; if (!me) return;
+    let changed = false;
+    for (const n of notifList()) {
+      if (n.senderId !== me && !(n.readBy || []).includes(me)) { n.readBy = [...(n.readBy || []), me]; changed = true; }
+    }
+    if (changed) persist();
+  }
+  function timeAgo(iso) {
+    try {
+      const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+      if (s < 60) return 'الآن';
+      const m = Math.floor(s / 60);
+      if (m === 1) return 'منذ دقيقة';
+      if (m === 2) return 'منذ دقيقتين';
+      if (m < 11) return `منذ ${m} دقائق`;
+      if (m < 60) return `منذ ${m} دقيقة`;
+      const h = Math.floor(m / 60);
+      if (h === 1) return 'منذ ساعة';
+      if (h === 2) return 'منذ ساعتين';
+      if (h < 11) return `منذ ${h} ساعات`;
+      if (h < 24) return `منذ ${h} ساعة`;
+      const d = Math.floor(h / 24);
+      if (d === 1) return 'منذ يوم';
+      if (d === 2) return 'منذ يومين';
+      return `منذ ${d} أيام`;
+    } catch { return ''; }
+  }
+  function notifSound() {
+    if (state._soundOn === false) return;
+    try {
+      const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+      const ctx = new C(); const t = ctx.currentTime;
+      [[880, 0], [1174.66, 0.13]].forEach(([f, d]) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t + d);
+        g.gain.exponentialRampToValueAtTime(0.22, t + d + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.35);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(t + d); o.stop(t + d + 0.4);
+      });
+      setTimeout(() => { try { ctx.close(); } catch {} }, 900);
+    } catch {}
+  }
+  function browserNotify(n) {
+    try {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      const nt = new Notification(n.title, { body: n.body, icon: 'logo.png', tag: n.id, dir: 'rtl', lang: 'ar' });
+      nt.onclick = () => { try { window.focus(); } catch {} markNotifRead(n.id); setTab('orders'); nt.close(); };
+    } catch {}
+  }
+  function handleIncomingNotifs(remoteNotifs) {
+    const known = new Set(notifList().map(n => n.id));
+    const me = state.user?.id;
+    for (const n of remoteNotifs || []) {
+      if (!known.has(n.id) && me && n.senderId && n.senderId !== me) {
+        notifSound();
+        browserNotify(n);
+      }
+    }
+  }
+
   const UI_ONLY_KEYS = ['currentTab', 'orderFilter', 'categoryFilter', 'searchQuery'];
   function cloudPayload() {
     const p = {};
@@ -1261,6 +1449,7 @@
         if (!snap.exists) { schedulePush(); return; }
         const remote = snap.data() || {};
         if ((remote.updatedAt || 0) > (state.updatedAt || 0) && remote.home) {
+          handleIncomingNotifs(remote.notifs);
           const ui = {};
           for (const k of UI_ONLY_KEYS) ui[k] = state[k];
           Object.assign(state, remote, ui);
@@ -1432,7 +1621,7 @@
     backdrop._node = backdrop.querySelector('.modal');
     return backdrop;
   }
-  function closeModal(b) { const n = b._node || b.querySelector('.modal'); if (n) { n.style.animation = 'toastOut .15s ease-in forwards'; setTimeout(() => b.remove(), 150); } else b.remove(); }
+  function closeModal(b) { stopVoice(); const n = b._node || b.querySelector('.modal'); if (n) { n.style.animation = 'toastOut .15s ease-in forwards'; setTimeout(() => b.remove(), 150); } else b.remove(); }
   function confirmDialog({ title, message, confirmText, cancelText, danger }) {
     return new Promise((resolve) => {
       const html = `<div class="confirm-dialog">
@@ -1567,17 +1756,20 @@
     const tabs = [
       { id: 'home', label: 'الرئيسية', icon: 'home' },
       { id: 'orders', label: 'الطلبات', icon: 'cart' },
+      { id: 'notifs', label: 'الإشعارات', icon: 'bell' },
       { id: 'expenses', label: 'المصروفات', icon: 'wallet' },
       { id: 'reports', label: 'التقارير', icon: 'chart' },
       { id: 'settings', label: 'الإعدادات', icon: 'gear' }
     ];
-    return `<nav class="bottom-nav">${tabs.map(tab => `<button class="nav-item ${t === tab.id ? 'active' : ''}" data-tab="${tab.id}"><span class="nav-ico">${svgIcon(tab.icon, 22)}</span><span>${tab.label}</span></button>`).join('')}</nav>`;
+    const unread = unreadNotifs().length;
+    return `<nav class="bottom-nav">${tabs.map(tab => `<button class="nav-item ${t === tab.id ? 'active' : ''}" data-tab="${tab.id}"><span class="nav-ico">${svgIcon(tab.icon, 22)}</span>${tab.id === 'notifs' && unread ? `<span class="nav-badge">${unread > 9 ? '9+' : unread}</span>` : ''}<span>${tab.label}</span></button>`).join('')}</nav>`;
   }
 
   function renderMain() {
     switch (state.currentTab) {
       case 'home': return renderHome();
       case 'orders': return renderOrders();
+      case 'notifs': return renderNotifs();
       case 'expenses': return renderExpenses();
       case 'reports': return renderReports();
       case 'settings': return renderSettings();
@@ -1700,6 +1892,38 @@
           <div class="category-card-orders">${arr.map(o => renderOrderCard(o)).join('')}</div>
         </div></div>`;
       }).join('')}
+    </div>`;
+  }
+
+  function renderNotifs() {
+    const list = notifList();
+    const unread = unreadNotifs().length;
+    const me = state.user?.id;
+    const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
+    const soundOn = state._soundOn !== false;
+    return `<div class="page">
+      <div class="topbar"><div class="greeting">مركز التنبيهات</div></div>
+      <div class="page-title">${unread ? `عندك ${unread} ${unread === 1 ? 'إشعار جديد' : 'إشعارات جديدة'}` : 'الإشعارات'}</div>
+      <div class="notif-actions">
+        ${unread ? `<button class="btn" id="markAllRead">تعليم الكل كمقروء</button>` : ''}
+        <button class="btn" id="toggleSound">${soundOn ? 'كتم الصوت' : 'تشغيل الصوت'}</button>
+        ${perm === 'granted' ? '' : perm === 'unsupported' ? '' : `<button class="btn btn-primary" id="enablePush">تفعيل إشعارات المتصفح</button>`}
+      </div>
+      ${!list.length ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش إشعارات لسه</div><div class="empty-desc">أول ما حد يبعت طلب هيوصلك تنبيه هنا فوراً</div></div>` :
+        list.map(n => {
+          const tp = NOTIF_TYPES[n.type] || NOTIF_TYPES.info;
+          const isNew = me && n.senderId !== me && !(n.readBy || []).includes(me);
+          const names = (n.names || []).join('، ') + (n.extra ? ` +${n.extra}` : '');
+          return `<div class="notif-item ${isNew ? 'unread' : ''}" data-nid="${n.id}">
+            <div class="notif-ico" style="background:${tp.bg};color:${tp.c};">${svgIcon(tp.icon, 22)}</div>
+            <div class="notif-body">
+              <div class="notif-title">${isNew ? '<span class="notif-dot"></span>' : ''}${escapeHTML(n.title)}</div>
+              <div class="notif-text">${escapeHTML(n.body)}</div>
+              ${names ? `<div class="notif-items-names">${escapeHTML(names)}</div>` : ''}
+              <div class="notif-time">${timeAgo(n.createdAt)} • من ${escapeHTML(n.sender || '')}</div>
+            </div>
+          </div>`;
+        }).join('')}
     </div>`;
   }
 
@@ -1888,7 +2112,7 @@
       state.user = { id: uid(), name, joinedAt: nowISO() };
       if (state._pendingCloud && state._pendingCloud.home) {
         const rc = state._pendingCloud;
-        for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'categoryColors', 'categoryNames', 'categoryIcons', 'customCats', 'hiddenCats', 'photos', 'updatedAt']) {
+        for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'notifs', 'categoryColors', 'categoryNames', 'categoryIcons', 'customCats', 'hiddenCats', 'photos', 'updatedAt']) {
           if (rc[k] !== undefined) state[k] = rc[k];
         }
         state._pendingCloud = null;
@@ -1927,6 +2151,18 @@
     document.querySelectorAll('[data-delexp]').forEach(b => b.onclick = () => handleDeleteExpense(b.dataset.delexp));
     document.querySelectorAll('[data-ofil]').forEach(b => b.onclick = () => { state.orderFilter = b.dataset.ofil; persist(); render(); });
     document.querySelectorAll('[data-cfil]').forEach(b => b.onclick = () => { state.categoryFilter = b.dataset.cfil; persist(); render(); });
+    document.querySelectorAll('.notif-item[data-nid]').forEach(el => el.onclick = () => { markNotifRead(el.dataset.nid); setTab('orders'); });
+    const mar = document.getElementById('markAllRead'); if (mar) mar.onclick = () => { markAllNotifsRead(); render(); };
+    const tsb = document.getElementById('toggleSound'); if (tsb) tsb.onclick = () => { state._soundOn = state._soundOn === false; persist(); render(); toast(state._soundOn === false ? 'صوت التنبيهات اتقفل' : 'صوت التنبيهات اشتغل', 'info'); };
+    const epb = document.getElementById('enablePush'); if (epb) epb.onclick = async () => {
+      try {
+        if (!('Notification' in window)) { toast('المتصفح مش بيدعم إشعارات النظام', 'error'); return; }
+        const r = await Notification.requestPermission();
+        if (r === 'granted') toast('إشعارات المتصفح اشتغلت', 'success');
+        else toast('اترفضت الصلاحية — فعّلها من إعدادات المتصفح', 'warning');
+        render();
+      } catch { toast('مقدرتش أطلب الصلاحية', 'error'); }
+    };
     const si = document.getElementById('orderSearch');
     if (si) { si.oninput = (e) => { state.searchQuery = e.target.value; if (si._to) clearTimeout(si._to); si._to = setTimeout(() => { persist(); render(); const i = document.getElementById('orderSearch'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 200); }; }
     bindSettings();
@@ -2030,7 +2266,7 @@
     document.querySelectorAll('[data-unlearn]').forEach(btn => btn.onclick = () => { delete state.learnedMap[btn.dataset.unlearn]; persist(); toast('تمام، الكلمة اتمسحت', 'success'); render(); });
     b('clearLearned', () => { confirmDialog({ title: 'مسح الكلمات؟', message: 'هنمسح كل التصنيفات اللي اتعلمناها.', confirmText: 'مسح', cancelText: 'لا', danger: true }).then(ok => { if (ok) { state.learnedMap = {}; persist(); toast('تم المسح ✓', 'success'); render(); } }); });
     const clearAll = document.getElementById('clearAllBtn');
-    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, categoryColors: {}, categoryNames: {}, categoryIcons: {}, customCats: [], hiddenCats: [], photos: { mom: '', dad: '' }, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
+    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, notifs: [], categoryColors: {}, categoryNames: {}, categoryIcons: {}, customCats: [], hiddenCats: [], photos: { mom: '', dad: '' }, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
   }
 
   function openAddCatModal() {
@@ -2090,9 +2326,247 @@
   }
 
   /* =============================
+     EGYPTIAN MEME SOUNDS (WebAudio synth, no files, no copyright)
+     Assets convention (optional overrides): sounds/<event>/<id>.mp3
+     ============================= */
+  const MEME_EVENTS = {
+    NEW_REQUEST: 'طلب جديد', URGENT: 'مستعجل', TASK_COMPLETED: 'إتمام مهمة',
+    NEW_MESSAGE: 'رسالة جديدة', FAIL: 'فشل كوميدي', ERROR: 'خطأ', OPEN: 'فتح مهمة'
+  };
+  const MEME_EVENT_SOUNDS = {
+    NEW_REQUEST: ['tabla', 'phoneRing', 'tokHorn'],
+    URGENT: ['tokHorn', 'whistle', 'suspense'],
+    TASK_COMPLETED: ['zaghrouta', 'fanfare', 'chaChing'],
+    NEW_MESSAGE: ['doorbell', 'popMsg'],
+    FAIL: ['slideDown', 'wahwah'],
+    ERROR: ['buzz'],
+    OPEN: ['popMsg', 'rising']
+  };
+  function memeTone(ctx, dest, o) {
+    const t0 = ctx.currentTime + (o.t || 0);
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = o.type || 'sine';
+    osc.frequency.setValueAtTime(o.f, t0);
+    if (o.f2) osc.frequency.exponentialRampToValueAtTime(Math.max(30, o.f2), t0 + o.d);
+    if (o.vib) {
+      const lfo = ctx.createOscillator(), lg = ctx.createGain();
+      lfo.frequency.value = o.vib; lg.gain.value = o.vibAmt || 200;
+      lfo.connect(lg); lg.connect(osc.frequency); lfo.start(t0); lfo.stop(t0 + o.d + 0.05);
+    }
+    if (o.trem) {
+      const lfo = ctx.createOscillator(), lg = ctx.createGain();
+      lfo.type = 'square'; lfo.frequency.value = o.trem; lg.gain.value = 0.5;
+      lfo.connect(lg); lg.connect(g.gain); lfo.start(t0); lfo.stop(t0 + o.d + 0.05);
+    }
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(Math.min(1, o.v || 0.8), t0 + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + o.d);
+    osc.connect(g); g.connect(dest);
+    osc.start(t0); osc.stop(t0 + o.d + 0.05);
+  }
+  let _noiseBuf = null;
+  function memeNoise(ctx, dest, o) {
+    const t0 = ctx.currentTime + (o.t || 0);
+    if (!_noiseBuf) {
+      _noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+      const d = _noiseBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    const src = ctx.createBufferSource(); src.buffer = _noiseBuf; src.loop = true;
+    const f = ctx.createBiquadFilter(); f.type = o.hp ? 'highpass' : 'lowpass'; f.frequency.value = o.ff || 1200;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(Math.min(1, o.v || 0.5), t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + o.d);
+    src.connect(f); f.connect(g); g.connect(dest);
+    src.start(t0); src.stop(t0 + o.d + 0.05);
+  }
+  const MEME_SOUNDS = [
+    { id: 'tabla', name: 'طبلة بلدي', event: 'NEW_REQUEST', dur: 0.6, play(p) {
+      p.tone({ f: 150, f2: 60, d: 0.18 }); p.noise({ d: 0.06, ff: 900 });
+      p.tone({ f: 320, d: 0.09, t: 0.13 }); p.tone({ f: 150, f2: 60, d: 0.2, t: 0.24 }); } },
+    { id: 'phoneRing', name: 'رنة موبايل قديم', event: 'NEW_REQUEST', dur: 1.0, play(p) {
+      [0, 0.28, 0.56].forEach(t => { p.tone({ f: 950, d: 0.12, t, type: 'square', v: 0.35 }); p.tone({ f: 750, d: 0.12, t: t + 0.13, type: 'square', v: 0.35 }); }); } },
+    { id: 'tokHorn', name: 'كلاكس توك توك', event: 'URGENT', dur: 0.55, play(p) {
+      [0, 0.28].forEach(t => { p.tone({ f: 370, d: 0.2, t, type: 'square', v: 0.4 }); p.tone({ f: 466, d: 0.2, t, type: 'square', v: 0.4 }); }); } },
+    { id: 'whistle', name: 'صفارة حكم', event: 'URGENT', dur: 0.7, play(p) {
+      p.tone({ f: 2150, d: 0.6, trem: 22, v: 0.5 }); } },
+    { id: 'suspense', name: 'دقات توتر', event: 'URGENT', dur: 1.1, play(p) {
+      [0, 0.22, 0.55, 0.77].forEach(t => p.tone({ f: 72, f2: 45, d: 0.14, t })); p.noise({ d: 0.7, t: 0.1, ff: 300, v: 0.25 }); } },
+    { id: 'zaghrouta', name: 'زغروطة فرح', event: 'TASK_COMPLETED', dur: 1.0, play(p) {
+      p.tone({ f: 1350, d: 0.9, type: 'square', v: 0.3, vib: 28, vibAmt: 350 }); } },
+    { id: 'fanfare', name: 'فانفار انتصار', event: 'TASK_COMPLETED', dur: 0.9, play(p) {
+      [523, 659, 784, 1046].forEach((f, i) => p.tone({ f, d: 0.14, t: i * 0.12, type: 'triangle' }));
+      p.tone({ f: 1046, d: 0.35, t: 0.5, type: 'triangle' }); p.tone({ f: 1318, d: 0.35, t: 0.5, type: 'triangle', v: 0.5 }); } },
+    { id: 'chaChing', name: 'كاشير فلوس', event: 'TASK_COMPLETED', dur: 0.6, play(p) {
+      p.tone({ f: 1568, d: 0.12 }); p.tone({ f: 2093, d: 0.35, t: 0.1 }); p.noise({ d: 0.1, t: 0.1, hp: true, ff: 6000, v: 0.2 }); } },
+    { id: 'doorbell', name: 'جرس باب', event: 'NEW_MESSAGE', dur: 0.7, play(p) {
+      p.tone({ f: 660, d: 0.25 }); p.tone({ f: 520, d: 0.4, t: 0.24 }); } },
+    { id: 'popMsg', name: 'فرقعة رسالة', event: 'NEW_MESSAGE', dur: 0.25, play(p) {
+      p.tone({ f: 420, f2: 950, d: 0.1 }); p.tone({ f: 950, f2: 1400, d: 0.1, t: 0.08 }); } },
+    { id: 'slideDown', name: 'وقعة كوميدية', event: 'FAIL', dur: 0.8, play(p) {
+      p.tone({ f: 900, f2: 140, d: 0.6 }); p.tone({ f: 90, f2: 50, d: 0.15, t: 0.6 }); } },
+    { id: 'wahwah', name: 'فشل حزين مضحك', event: 'FAIL', dur: 0.8, play(p) {
+      p.tone({ f: 300, f2: 240, d: 0.28, type: 'sawtooth', v: 0.4 }); p.tone({ f: 240, f2: 170, d: 0.4, t: 0.3, type: 'sawtooth', v: 0.4 }); } },
+    { id: 'buzz', name: 'طنين خطأ', event: 'ERROR', dur: 0.5, play(p) {
+      p.tone({ f: 110, d: 0.35, type: 'square', v: 0.45 }); p.tone({ f: 92, d: 0.35, type: 'square', v: 0.4 }); } },
+    { id: 'rising', name: 'انطلاقة مهمة', event: 'OPEN', dur: 0.5, play(p) {
+      p.tone({ f: 220, f2: 880, d: 0.35, type: 'sawtooth', v: 0.35 }); p.noise({ d: 0.3, hp: true, ff: 4000, v: 0.15 }); } },
+    { id: 'blip', name: 'تنبيه هادئ', event: 'OPEN', dur: 0.2, system: true, play(p) {
+      p.tone({ f: 740, d: 0.12, v: 0.5 }); } }
+  ];
+  const MemeSound = {
+    _ctx: null, _busyUntil: 0, _queue: [], _lastEv: {}, _lastId: {},
+    settings() {
+      return {
+        on: state._memeOn !== false,
+        mode: state._memeMode !== false,
+        vol: (state._memeVol == null ? 80 : state._memeVol) / 100,
+        off: state._memeOff || {},
+        custom: state._memeCustom || []
+      };
+    },
+    allSounds() {
+      return [...MEME_SOUNDS.map(s => ({ ...s })), ...(state._memeCustom || []).map(c => ({ ...c, custom: true }))];
+    },
+    find(id) { return this.allSounds().find(s => s.id === id); },
+    ctx() {
+      try {
+        if (!this._ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; this._ctx = new C(); }
+        if (this._ctx.state === 'suspended') this._ctx.resume().catch(() => {});
+        return this._ctx;
+      } catch { return null; }
+    },
+    playEvent(ev, opts) {
+      opts = opts || {};
+      const s = this.settings();
+      if (!s.on) return;
+      if (opts.notif && state._soundOn === false) return;
+      const now = Date.now();
+      if (!opts.force && (this._lastEv[ev] || 0) + 1800 > now) return;
+      this._lastEv[ev] = now;
+      if (!s.mode) { this._playId('blip', s, opts); return; }
+      const pool = (MEME_EVENT_SOUNDS[ev] || []).filter(id => !s.off[id]);
+      const ids = pool.length ? pool : (MEME_EVENT_SOUNDS[ev] || []);
+      if (!ids.length) return;
+      let id = ids[Math.floor(Math.random() * ids.length)];
+      if (ids.length > 1 && this._lastId[ev] === id) id = ids[(ids.indexOf(id) + 1) % ids.length];
+      this._lastId[ev] = id;
+      this._playId(id, s, opts);
+    },
+    playId(id, force) {
+      const s = this.settings();
+      if (force) { this._playId(id, { ...s, on: true }, { force: true }); return; }
+      if (!s.on || s.off[id]) return;
+      this._playId(id, s, {});
+    },
+    _playId(id, s, opts) {
+      const snd = this.find(id);
+      if (!snd) return;
+      const run = () => {
+        if (snd.url || snd.file) {
+          try {
+            const a = new Audio(snd.url || snd.file);
+            a.volume = Math.min(1, (snd.vol == null ? 1 : snd.vol) * s.vol);
+            a.play().catch(() => this._synth(snd, s));
+            return;
+          } catch { /* fallback to synth */ }
+        }
+        this._synth(snd, s);
+      };
+      const wait = Math.max(0, this._busyUntil - Date.now());
+      if (wait > 0 && !opts.force) {
+        if (this._queue.length >= 2) return;
+        this._queue.push(id);
+        setTimeout(() => { this._queue = this._queue.filter(x => x !== id); run(); this._busyUntil = Date.now() + ((snd.dur || 0.5) * 1000); }, wait);
+        return;
+      }
+      run();
+      this._busyUntil = Date.now() + ((snd.dur || 0.5) * 1000);
+    },
+    _synth(snd, s) {
+      const ctx = this.ctx(); if (!ctx) return;
+      try {
+        const master = ctx.createGain();
+        master.gain.value = Math.min(1, (snd.vol == null ? 1 : snd.vol) * s.vol);
+        master.connect(ctx.destination);
+        snd.play({
+          tone: (o) => memeTone(ctx, master, o),
+          noise: (o) => memeNoise(ctx, master, o)
+        });
+      } catch {}
+    }
+  };
+
+  /* =============================
+     VOICE INPUT (Web Speech API, no external libs)
+     ============================= */
+  const Voice = {
+    rec: null, on: false, _manual: false, lang: 'ar-EG',
+    supported() { return !!(window.SpeechRecognition || window.webkitSpeechRecognition); },
+    toggle(input, ui) {
+      if (this.on) { this.stop(); return; }
+      if (!this.supported()) { toast('المتصفح مش بيدعم الإدخال الصوتي — جرب متصفح كروم', 'error'); return; }
+      if (!document.contains(input)) return;
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const rec = new SR();
+      rec.lang = this.lang; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
+      let base = input.value ? input.value.replace(/\s+$/, '') : '';
+      let finalTxt = '';
+      const commit = () => {
+        const parts = [base, finalTxt.trim()].filter(Boolean);
+        input.value = parts.join(' ');
+        if (ui && ui.onText) ui.onText();
+      };
+      rec.onresult = (ev) => {
+        let interim = '';
+        for (let i = ev.resultIndex; i < ev.results.length; i++) {
+          const t = ev.results[i][0].transcript;
+          if (ev.results[i].isFinal) finalTxt += t + ' ';
+          else interim += t;
+        }
+        const parts = [base, finalTxt.trim(), interim.trim()].filter(Boolean);
+        input.value = parts.join(' ');
+        if (ui && ui.onText) ui.onText();
+      };
+      rec.onerror = (ev) => {
+        const type = (ev && ev.error) || '';
+        this.on = false; this._manual = false;
+        if (type !== 'aborted') commit();
+        if (ui && ui.onState) ui.onState(false);
+        const msgs = {
+          'not-allowed': 'تعذر الوصول إلى الميكروفون. اسمح باستخدامه من إعدادات المتصفح.',
+          'service-not-allowed': 'تعذر الوصول إلى الميكروفون. اسمح باستخدامه من إعدادات المتصفح.',
+          'no-speech': 'مسمعتش صوت واضح — قرب من الميك وجرب تاني.',
+          'audio-capture': 'مفيش ميكروفون متاح على الجهاز.',
+          'network': 'التعرف الصوتي محتاج اتصال بالإنترنت.',
+          'language-not-supported': 'اللغة دي مش مدعومة على جهازك.'
+        };
+        if (type && type !== 'aborted') toast(msgs[type] || 'حصلت مشكلة في التعرف الصوتي، جرب تاني.', 'error');
+      };
+      rec.onend = () => {
+        const manual = this._manual; this._manual = false;
+        commit();
+        if (manual || !this.on || !document.contains(input)) { this.on = false; if (ui && ui.onState) ui.onState(false); return; }
+        base = input.value; finalTxt = '';
+        try { rec.start(); } catch { this.on = false; if (ui && ui.onState) ui.onState(false); }
+      };
+      this.rec = rec; this.on = true;
+      try { rec.start(); if (ui && ui.onState) ui.onState(true); }
+      catch { this.on = false; if (ui && ui.onState) ui.onState(false); toast('مقدرتش أشغّل الميكروفون، جرب تاني.', 'error'); }
+    },
+    stop() {
+      if (!this.on) return;
+      this._manual = true;
+      try { if (this.rec) this.rec.stop(); } catch { this.on = false; }
+    }
+  };
+  function stopVoice() { try { Voice.stop(); } catch {} }
+
+  /* =============================
      ORDER MODALS
      ============================= */
-  function openAddOrderModal() { openOrderModal({ mode: 'add' }); }
+  function openAddOrderModal() { MemeSound.playEvent('OPEN'); openOrderModal({ mode: 'add' }); }
   function openEditOrderModal(id) { const o = state.orders.find(x => x.id === id); if (o) openOrderModal({ mode: 'edit', order: o }); }
   function openOrderModal({ mode, order }) {
     const editing = mode === 'edit'; const freqArr = editing ? [] : frequentOrders(8);
@@ -2103,6 +2577,11 @@
         <div class="ord-box"><textarea id="ordName" rows="2" placeholder="اكتب طلب واحد في كل سطر\nأو اكتب: بطاطس وطماطم" maxlength="200" autocomplete="off">${editing ? escapeHTML(order.name) : ''}</textarea>
         <div class="suggest-drop hidden" id="ordSuggest"></div></div>
         <div class="help-text">افصل بين الطلبات بـ "و" أو سطر جديد</div>
+      </div>
+      <div class="voice-bar">
+        <button class="mic-btn" id="voiceBtn" aria-label="إدخال صوتي" aria-pressed="false">${svgIcon('mic', 22)}</button>
+        <div class="voice-info"><b id="voiceStatus">اضغط الميك وتكلم</b><small>الكلام يتحول لنص فوراً جوه الخانة</small></div>
+        <div class="voice-langs"><button class="vlang" data-vlang="ar-EG">عربي</button><button class="vlang" data-vlang="en-US">EN</button></div>
       </div>
       <div class="field"><label>ملاحظات (اختياري)</label><textarea id="ordNotes" rows="2" placeholder="مثلا: نوع معين — كبير — غير حار">${editing ? escapeHTML(order.notes || '') : ''}</textarea></div>
       <label class="urgent-toggle ${editing && order.urgent ? 'on' : ''}" id="urgentToggle"><input type="checkbox" id="ordUrgent" ${editing && order.urgent ? 'checked' : ''} /><span class="ut-switch"></span><span class="ut-text">ضروري جداً — أولوية قصوى</span></label>
@@ -2199,6 +2678,23 @@
     }
     nameInput.addEventListener('input', evalCategoryFromName);
     nameInput.addEventListener('input', updateSuggest);
+    Voice.lang = state._voiceLang || 'ar-EG';
+    const vBtn = m.querySelector('#voiceBtn'); const vStatus = m.querySelector('#voiceStatus');
+    const setVoiceUI = (on) => {
+      if (!vBtn) return;
+      vBtn.classList.toggle('recording', on);
+      vBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      if (vStatus) vStatus.innerHTML = on ? '<span class="live-dot"></span> تحدث الآن...' : 'اضغط الميك وتكلم';
+    };
+    if (vBtn) vBtn.onclick = () => Voice.toggle(nameInput, { onText: () => { updateSuggest(); renderReview(); }, onState: setVoiceUI });
+    m.querySelectorAll('[data-vlang]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.vlang === Voice.lang);
+      btn.onclick = () => {
+        Voice.lang = btn.dataset.vlang; state._voiceLang = Voice.lang; persist();
+        m.querySelectorAll('[data-vlang]').forEach(x => x.classList.toggle('active', x === btn));
+        if (Voice.on) { Voice.stop(); setTimeout(() => Voice.toggle(nameInput, { onText: () => { updateSuggest(); renderReview(); }, onState: setVoiceUI }), 350); }
+      };
+    });
     setTimeout(evalCategoryFromName, 50);
     m.querySelectorAll('[data-freq]').forEach(c => c.onclick = () => { nameInput.value = c.dataset.freq; evalCategoryFromName(); nameInput.focus(); });
     m.querySelector('#cancelOrderBtn').onclick = () => closeModal(m);
@@ -2211,11 +2707,14 @@
       if (!editing) {
         const items = raw.split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').trim()).filter(Boolean);
         if (!items.length) { nameInput.classList.add('error'); nameInput.focus(); return; }
+        const added = [];
         for (const itemName of items) {
           const picked = manualCats[normalizeTerm(itemName)];
           if (picked) saveLearning(itemName, picked);
-          addOrder({ name: itemName, notes, urgent });
+          added.push(addOrder({ name: itemName, notes, urgent }));
         }
+        pushNotif(urgent ? 'urgent' : 'order_new', { names: added.map(o => o.name), orderIds: added.map(o => o.id) });
+        MemeSound.playEvent(urgent ? 'URGENT' : 'NEW_REQUEST');
         toast(items.length === 1 ? pickMsg(MSG.addOrder) : `زوّدت ${items.length} طلبات ✓ 😂`, 'success');
         closeModal(m); render();
       } else {
@@ -2251,6 +2750,8 @@
       const finalV = Number(fin.value);
       if (!(finalV > 0)) { fin.classList.add('error'); fin.focus(); toast('اكتب السعر يا حبيبي', 'warning'); return; }
       markPurchased(orderId, { originalPrice: finalV, finalPrice: finalV });
+      const doneOrder = state.orders.find(x => x.id === orderId);
+      pushNotif('order_done', { names: doneOrder ? [doneOrder.name] : [], orderIds: [orderId] });
       toast(pickMsg(MSG.purchaseDone), 'success');
       closeModal(m); render();
     };
