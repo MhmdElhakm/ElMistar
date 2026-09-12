@@ -738,6 +738,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <script>
 (() => {
   'use strict';
@@ -1714,21 +1715,7 @@
     } catch { return ''; }
   }
   function notifSound() {
-    if (state._soundOn === false) return;
-    try {
-      const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
-      const ctx = new C(); const t = ctx.currentTime;
-      [[880, 0], [1174.66, 0.13]].forEach(([f, d]) => {
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.type = 'sine'; o.frequency.value = f;
-        g.gain.setValueAtTime(0.0001, t + d);
-        g.gain.exponentialRampToValueAtTime(0.22, t + d + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.35);
-        o.connect(g); g.connect(ctx.destination);
-        o.start(t + d); o.stop(t + d + 0.4);
-      });
-      setTimeout(() => { try { ctx.close(); } catch {} }, 900);
-    } catch {}
+    try { AudioManager.playEvent('NEW_MESSAGE', { notif: true }); } catch {}
   }
   function handleIncomingNotifs(remoteNotifs) {
     const known = new Set(notifList().map(n => n.id));
@@ -1743,12 +1730,31 @@
     syncAppBadge();
   }
   /* =============================
-     PUSH NOTIFICATIONS (Web Push ready, Firestore-routed)
-     No secrets in frontend. VAPID public key only (safe).
-     Set window.VAPID_PUBLIC_KEY before scripts to enable push subscribe.
-     Server send (FCM/Cloud Function) is documented; page + SW already handle it.
+     PUSH NOTIFICATIONS (FCM channel, Firestore-routed)
+     Chain: Firestore -> Cloud Function -> FCM -> Service Worker -> Notification.
+     No secrets in frontend. Only the PUBLIC Web-Push certificate key is used here
+     (Firebase Console -> Project settings -> Cloud Messaging -> Web Push certificates).
+     Set window.FCM_VAPID_KEY (or legacy window.VAPID_PUBLIC_KEY) before scripts.
+     onSnapshot stays for in-app UI only; killed-app push comes from FCM, never the page.
      ============================= */
   const VAPID_PUBLIC_KEY = (window.VAPID_PUBLIC_KEY || '');
+  const FCM_VAPID_KEY = (window.FCM_VAPID_KEY || window.VAPID_PUBLIC_KEY || '');
+  function fcmUsable() {
+    try { return !!(window.firebase && firebase.messaging && firebase.messaging.isSupported && firebase.messaging.isSupported()); }
+    catch { return false; }
+  }
+  function browserName() {
+    try {
+      const ua = navigator.userAgent || '';
+      if (/Edg\//.test(ua)) return 'Edge';
+      if (/SamsungBrowser/.test(ua)) return 'Samsung';
+      if (/Chrome\//.test(ua)) return 'Chrome';
+      if (/Firefox\//.test(ua)) return 'Firefox';
+      if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) return 'Safari';
+      return 'Browser';
+    } catch { return 'Browser'; }
+  }
+  function fcmDocId(token) { return 'f_' + hashStr(token); }
   const NOTIF_PREF_DEFAULTS = { browser: true, orders: true, urgent: true, announcement: true, reminder: true };
   function notifPrefs() { return Object.assign({}, NOTIF_PREF_DEFAULTS, state.notifPrefs || {}); }
   function prefKeyForType(type) {
@@ -1792,8 +1798,69 @@
       return {
         notif: ('Notification' in window),
         sw: ('serviceWorker' in navigator),
-        push: ('serviceWorker' in navigator) && ('PushManager' in window)
+        push: ('serviceWorker' in navigator) && ('PushManager' in window),
+        fcm: fcmUsable()
       };
+    },
+    _fcm: null, _fcmBound: false,
+    ensureMessaging() {
+      if (this._fcm) return this._fcm;
+      try {
+        if (!fcmUsable()) return null;
+        this._fcm = firebase.messaging();
+        if (!this._fcmBound) {
+          this._fcmBound = true;
+          try {
+            this._fcm.onMessage((payload) => {
+              try {
+                const d = (payload && payload.data) || {};
+                const n = { id: d.nid || ('fcm_' + Date.now()), type: 'info', title: d.title || 'ناقصنا إيه', body: d.body || '', actionTab: d.tab || 'notifs', createdAt: nowISO() };
+                try { toast(n.title + (n.body ? ' — ' + n.body : ''), 'info'); } catch {}
+                try { notifyLocal(n); } catch {}
+              } catch {}
+            });
+          } catch {}
+        }
+        return this._fcm;
+      } catch { return null; }
+    },
+    async saveFcmToken(token) {
+      if (!db || !state.home?.code || !state.user || !token) return false;
+      try {
+        const info = this.deviceInfo();
+        await db.collection('homes').doc(state.home.code).collection('fcmTokens').doc(fcmDocId(token)).set({
+          userId: state.user.id, userName: state.user.name || '', token,
+          channel: 'fcm',
+          device: { ua: info.ua, platform: info.platform, lang: info.lang, browser: browserName() },
+          createdAt: nowISO(), updatedAt: Date.now()
+        }, { merge: true });
+        try { localStorage.setItem('naqisna_fcmtoken', fcmDocId(token)); } catch {}
+        return true;
+      } catch { return false; }
+    },
+    async removeFcmToken() {
+      try {
+        let id = null;
+        try { id = localStorage.getItem('naqisna_fcmtoken'); } catch {}
+        try { localStorage.removeItem('naqisna_fcmtoken'); } catch {}
+        try {
+          const fm = this.ensureMessaging();
+          if (fm && fm.deleteToken) { try { await fm.deleteToken(); } catch {} }
+        } catch {}
+        if (db && state.home?.code && id) {
+          try { await db.collection('homes').doc(state.home.code).collection('fcmTokens').doc(id).delete(); } catch {}
+        }
+      } catch {}
+    },
+    async registerFcm(reg) {
+      if (!FCM_VAPID_KEY || !reg) return false;
+      try {
+        const fm = this.ensureMessaging();
+        if (!fm || !fm.getToken) return false;
+        const token = await fm.getToken({ vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: reg });
+        if (!token) return false;
+        return await this.saveFcmToken(token);
+      } catch { return false; }
     },
     perm() {
       try { return ('Notification' in window) ? Notification.permission : 'unsupported'; }
@@ -1832,6 +1899,7 @@
       } catch { return false; }
     },
     async removeSub() {
+      try { await this.removeFcmToken(); } catch {}
       try {
         const reg = await this.ensureReg();
         const sub = reg ? await reg.pushManager.getSubscription() : null;
@@ -1858,13 +1926,17 @@
       if (!state.notifPrefs) state.notifPrefs = {};
       state.notifPrefs.browser = true; persist();
       const reg = await this.ensureReg();
-      if (s.push && reg && VAPID_PUBLIC_KEY) {
+      let fcmOk = false;
+      if (s.fcm && reg && FCM_VAPID_KEY) {
+        try { fcmOk = await this.registerFcm(reg); } catch { fcmOk = false; }
+      }
+      if (!fcmOk && s.push && reg && VAPID_PUBLIC_KEY) {
         try {
           let sub = await reg.pushManager.getSubscription();
           if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToU8(VAPID_PUBLIC_KEY) });
           await this.saveSub(sub);
         } catch { /* push subscribe failed: local notifications still work */ }
-      } else if (db && state.home?.code && state.user) {
+      } else if (!fcmOk && db && state.home?.code && state.user) {
         try {
           await db.collection('homes').doc(state.home.code).collection('pushSubs').doc('cap_' + state.user.id + '_' + hashStr(navigator.userAgent || '')).set({
             userId: state.user.id, userName: state.user.name || '', push: false,
@@ -1893,6 +1965,15 @@
           if (navigator.serviceWorker && navigator.serviceWorker.controller === null) { /* page not yet controlled; ready() still works */ }
         } catch {}
         const reg = await this.ensureReg();
+        try {
+          if (this.support().fcm && reg && FCM_VAPID_KEY) {
+            let flast = 0;
+            try { flast = Number(localStorage.getItem('naqisna_fcmtouch') || 0); } catch {}
+            if (Date.now() - flast > 86400000) {
+              if (await this.registerFcm(reg)) { try { localStorage.setItem('naqisna_fcmtouch', String(Date.now())); } catch {} }
+            }
+          }
+        } catch {}
         if (!reg || !('pushManager' in reg) || !VAPID_PUBLIC_KEY) return;
         let last = 0;
         try { last = Number(localStorage.getItem('naqisna_pushtouch') || 0); } catch {}
@@ -1925,7 +2006,7 @@
     },
     epHost(ep) { try { return new URL(ep).host; } catch { return '—'; } },
     async refresh(auto) {
-      const d = { at: Date.now(), perm: PushSys.perm(), sw: 'error', push: PushSys.support().push, sub: 'inactive', host: '—', user: (state.user && state.user.id) || '—', platform: this.platform(), pwa: this.pwa(), vapid: !!VAPID_PUBLIC_KEY };
+      const d = { at: Date.now(), perm: PushSys.perm(), sw: 'error', push: PushSys.support().push, sub: 'inactive', host: '—', fcm: 'inactive', fcmKey: !!FCM_VAPID_KEY, user: (state.user && state.user.id) || '—', platform: this.platform(), pwa: this.pwa(), vapid: !!VAPID_PUBLIC_KEY };
       try {
         if (PushSys.support().sw) {
           const reg = await PushSys.ensureReg();
@@ -1940,6 +2021,15 @@
               if (sub && sub.endpoint) { d.sub = 'active'; d.host = this.epHost(sub.endpoint); }
             } catch {}
           }
+          if (d.perm === 'granted' && PushSys.support().fcm && reg && FCM_VAPID_KEY) {
+            try {
+              const fm = PushSys.ensureMessaging();
+              if (fm && fm.getToken) {
+                const tok = await fm.getToken({ vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: reg });
+                if (tok) d.fcm = 'active';
+              }
+            } catch {}
+          }
         } else d.sw = 'unsupported';
       } catch {}
       _diag = d;
@@ -1950,7 +2040,8 @@
       if (!_diag) return `<div class="exp-detail">دوس «تحديث التشخيص» لعرض الحالة.</div>`;
       const r = (k, v) => `<div class="exp-detail" style="display:flex;justify-content:space-between;gap:8px;"><span>${k}</span><b style="direction:ltr;">${escapeHTML(String(v))}</b></div>`;
       return r('الإذن', _diag.perm) + r('Service Worker', _diag.sw) + r('Push مدعوم', _diag.push ? 'true' : 'false')
-        + r('الاشتراك', _diag.sub) + r('Endpoint', _diag.host) + r('المستخدم', _diag.user)
+        + r('الاشتراك', _diag.sub) + r('Endpoint', _diag.host) + r('توكن FCM', _diag.fcm || 'inactive')
+        + r('مفتاح FCM', _diag.fcmKey ? 'مضبوط' : 'ناقص') + r('المستخدم', _diag.user)
         + r('المنصة', _diag.platform) + r('وضع PWA', _diag.pwa ? 'true' : 'false') + r('VAPID مضبوط', _diag.vapid ? 'true' : 'false');
     }
   };
@@ -2890,6 +2981,13 @@
         <button class="tgl-row" data-npref="announcement"><span class="tgl"><b>الإعلانات والتحديثات</b><small>أخبار وإشعارات إدارية</small></span><span class="sw ${p.announcement !== false ? 'on' : ''}"></span></button>
         <button class="tgl-row" data-npref="reminder"><span class="tgl"><b>التذكيرات</b><small>مواعيد ومهام ونتائج</small></span><span class="sw ${p.reminder !== false ? 'on' : ''}"></span></button>`; })()}
       </div>
+      <div class="settings-card"><div class="settings-title">الأصوات 🔊</div>
+        <button class="tgl-row" id="tglAudio"><span class="tgl"><b>أصوات الميم</b><small>تشغيل مكتبة الأصوات</small></span><span class="sw ${state._audioOn !== false ? 'on' : ''}"></span></button>
+        <button class="tgl-row" id="tglNotifSnd"><span class="tgl"><b>أصوات الإشعارات</b><small>صوت عند وصول تنبيه</small></span><span class="sw ${state._notifSound !== false ? 'on' : ''}"></span></button>
+        <button class="tgl-row" id="tglFx"><span class="tgl"><b>مؤثرات صوتية</b><small>أصوات التفاعل داخل التطبيق</small></span><span class="sw ${state._fxOn !== false ? 'on' : ''}"></span></button>
+        <div class="vol-row"><span>🔉</span><input type="range" id="audioVolRange" min="0" max="100" step="1" value="${state._audioVol == null ? 80 : state._audioVol}"><span class="vol-val" id="audioVolVal">${state._audioVol == null ? 80 : state._audioVol}%</span></div>
+        <div class="snd-add-row"><button class="btn" id="openSoundLib">🎵 مكتبة الأصوات</button></div>
+      </div>
       <div class="settings-card"><div class="settings-title">صور العائلة</div>
         <div style="padding:6px 16px 2px;color:var(--text-sec);font-size:11px;font-weight:600;">ارفع صورة حقيقية للأم والأب من موبايلك</div>
         <div class="photo-row">
@@ -3019,7 +3117,13 @@
     document.querySelectorAll('.notif-item[data-nid]').forEach(el => el.onclick = (e) => { if (e.target.closest('[data-delnid]')) return; markNotifRead(el.dataset.nid); setTab(el.dataset.tab || 'orders'); });
     document.querySelectorAll('[data-delnid]').forEach(b => b.onclick = (e) => { e.stopPropagation(); deleteNotif(b.dataset.delnid); toast('اتمسح الإشعار', 'success'); render(); });
     const mar = document.getElementById('markAllRead'); if (mar) mar.onclick = () => { markAllNotifsRead(); render(); };
-    const tsb = document.getElementById('toggleSound'); if (tsb) tsb.onclick = () => { state._soundOn = state._soundOn === false; persist(); render(); toast(state._soundOn === false ? 'صوت التنبيهات اتقفل' : 'صوت التنبيهات اشتغل', 'info'); };
+    const tsb = document.getElementById('toggleSound'); if (tsb) tsb.onclick = () => { state._soundOn = state._soundOn === false; state._notifSound = state._soundOn; persist(); render(); toast(state._soundOn === false ? 'صوت التنبيهات اتقفل' : 'صوت التنبيهات اشتغل', 'info'); };
+    b('tglAudio', () => { state._audioOn = !(state._audioOn !== false); persist(); render(); });
+    b('tglNotifSnd', () => { state._notifSound = !(state._notifSound !== false); persist(); render(); });
+    b('tglFx', () => { state._fxOn = !(state._fxOn !== false); persist(); render(); });
+    const avr = document.getElementById('audioVolRange');
+    if (avr) avr.oninput = () => { state._audioVol = Number(avr.value) || 0; const vv = document.getElementById('audioVolVal'); if (vv) vv.textContent = state._audioVol + '%'; persist(); };
+    b('openSoundLib', openSoundLibrary);
     const nbb = document.getElementById('notifBrowserBtn');
     if (nbb) nbb.onclick = () => {
       const on = PushSys.perm() === 'granted' && notifPrefs().browser !== false;
@@ -3401,6 +3505,91 @@
       toast('اتنقل المنتج', 'success');
     };
   }
+  function sndRowsHTML() {
+    return AudioManager.registry().map(x => {
+      const off = (AudioManager.overrides().off || {})[x.id];
+      const miss = !!AudioManager._missing[x.id];
+      return `<div class="snd-row"><button class="snd-play" data-sndplay="${escapeHTML(x.id)}" aria-label="معاينة">▶</button>`
+        + `<div class="snd-info"><b>${escapeHTML(x.name)}${miss ? ' ⚠️ مفقود' : ''}${x.upload ? ' • مرفوع' : ''}</b><small>${escapeHTML(String(x.file).slice(0, 44))}</small></div>`
+        + `<select data-sndev="${escapeHTML(x.id)}" style="max-width:86px;font-size:11px;">${Object.keys(AUDIO_EVENT_LABELS).map(k => `<option value="${k}"${x.event === k ? ' selected' : ''}>${AUDIO_EVENT_LABELS[k]}</option>`).join('')}</select>`
+        + `<button class="btn btn-sm" data-sndoff="${escapeHTML(x.id)}">${off ? 'تفعيل' : 'تعطيل'}</button>`
+        + (x.upload ? `<button class="snd-del" data-snddel="${escapeHTML(x.id)}" aria-label="حذف">🗑</button>` : '')
+        + `</div>`;
+    }).join('') || '<div class="help-text">لا توجد أصوات بعد.</div>';
+  }
+  function openSoundLibrary() {
+    const regs = AudioManager.registry();
+    const miss = regs.filter(x => AudioManager._missing[x.id]);
+    const html = `<div class="modal-handle"></div><h2>🎵 مكتبة الأصوات</h2><p class="m-sub">${regs.length} صوت • الملفات من مجلد sounds/</p>`
+      + `<div id="sndMissing">${miss.length ? `<div class="error-text">⚠️ ملفات مفقودة: ${miss.map(x => escapeHTML(String(x.file).split('/').pop())).join('، ')}</div>` : ''}</div>`
+      + `<div class="field"><label>فحص الملفات</label><div class="btn-row"><button class="btn btn-sm" id="sndCheck">فحص الملفات</button></div><div class="help-text">يتأكد أن كل ملف موجود فعلًا</div></div>`
+      + `<div id="sndRows">${sndRowsHTML()}</div>`
+      + `<div class="field"><label>اسم الصوت الجديد</label><input type="text" id="sndName" placeholder="مثال: طلب جديد 9" maxlength="30" /></div>`
+      + `<div class="field"><label>الحدث</label><select id="sndEvent">${Object.keys(AUDIO_EVENT_LABELS).map(k => `<option value="${k}">${AUDIO_EVENT_LABELS[k]}</option>`).join('')}</select></div>`
+      + `<div class="field"><label>رفع ملف MP3 (حتى 400KB)</label><div class="btn-row"><label class="btn btn-sm" style="cursor:pointer;">اختار ملف<input type="file" id="sndFile" accept="audio/*" class="hidden" /></label><span class="help-text" id="sndFileName"></span></div></div>`
+      + `<div class="btn-group"><button class="btn btn-primary" id="sndUpload">رفع وحفظ</button><button class="btn" id="sndClose">رجوع</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#sndClose').onclick = () => closeModal(m);
+    const refresh = () => { const r = m.querySelector('#sndRows'); if (r) r.innerHTML = sndRowsHTML(); bindRows(); };
+    const bindRows = () => {
+      m.querySelectorAll('[data-sndplay]').forEach(btn => btn.onclick = () => { try { AudioManager.preview(btn.dataset.sndplay); } catch {} });
+      m.querySelectorAll('[data-sndoff]').forEach(btn => btn.onclick = () => {
+        const id = btn.dataset.sndoff; const ov = state._audioLib = state._audioLib || {}; ov.off = ov.off || {};
+        if (ov.off[id]) delete ov.off[id]; else ov.off[id] = true;
+        persist(); refresh();
+      });
+      m.querySelectorAll('[data-sndev]').forEach(sel => sel.onchange = () => {
+        const id = sel.dataset.sndev; const entry = AudioManager.registry().find(x => x.id === id); if (!entry) return;
+        if (entry.upload) {
+          const u = (state.audioUploads || []).find(x => x.id === id); if (u) u.event = sel.value;
+        } else { const ov = state._audioLib = state._audioLib || {}; ov.event = ov.event || {}; ov.event[id] = sel.value; }
+        persist(); refresh(); toast('اتغير الحدث', 'success');
+      });
+      m.querySelectorAll('[data-snddel]').forEach(btn => btn.onclick = () => {
+        const id = btn.dataset.snddel;
+        confirmDialog({ title: 'حذف الصوت؟', message: 'هيتحذف الملف المرفوع نهائيًا.', confirmText: 'حذف', cancelText: 'لا', danger: true }).then(ok => {
+          if (!ok) return;
+          state.audioUploads = (state.audioUploads || []).filter(u => u.id !== id);
+          persist(); refresh(); toast('اتحذف الصوت', 'success');
+        });
+      });
+    };
+    bindRows();
+    const fi = m.querySelector('#sndFile');
+    if (fi) fi.onchange = () => { const f = fi.files && fi.files[0]; const lb = m.querySelector('#sndFileName'); if (lb) lb.textContent = f ? f.name : ''; };
+    m.querySelector('#sndCheck').onclick = async () => {
+      const btn = m.querySelector('#sndCheck'); if (btn) { btn.disabled = true; btn.textContent = 'جاري الفحص...'; }
+      try { await AudioManager.checkFiles(); } catch {}
+      const miss2 = AudioManager.registry().filter(x => AudioManager._missing[x.id]);
+      const box = m.querySelector('#sndMissing');
+      if (box) box.innerHTML = miss2.length ? `<div class="error-text">⚠️ ملفات مفقودة: ${miss2.map(x => escapeHTML(String(x.file).split('/').pop())).join('، ')}</div>` : '';
+      refresh();
+      if (btn) { btn.disabled = false; btn.textContent = 'فحص الملفات'; }
+      toast(miss2.length ? ('ملفات مفقودة: ' + miss2.length) : 'كل الملفات موجودة', miss2.length ? 'warning' : 'success');
+    };
+    m.querySelector('#sndUpload').onclick = () => {
+      const name = (m.querySelector('#sndName').value || '').trim();
+      const ev = m.querySelector('#sndEvent').value;
+      const f = m.querySelector('#sndFile').files && m.querySelector('#sndFile').files[0];
+      if (!name) { toast('اكتب اسم الصوت', 'warning'); return; }
+      if (!f) { toast('اختار ملف صوت', 'warning'); return; }
+      if (f.size > 400 * 1024) { toast('الملف أكبر من 400KB', 'error'); return; }
+      if (audioLibSize(state.audioUploads) + f.size * 1.4 > 800 * 1024) { toast('مساحة الأصوات المرفوعة ممتلئة (800KB)', 'error'); return; }
+      const rd = new FileReader();
+      rd.onload = () => {
+        try {
+          const ups = state.audioUploads = state.audioUploads || [];
+          ups.push({ id: 'up_' + Date.now().toString(36), name, event: ev, dataUrl: String(rd.result || '') });
+          persist(); refresh();
+          m.querySelector('#sndName').value = ''; m.querySelector('#sndFile').value = '';
+          const lb = m.querySelector('#sndFileName'); if (lb) lb.textContent = '';
+          toast('اترفع الصوت', 'success');
+        } catch { toast('مقدرتش أحفظ الملف', 'error'); }
+      };
+      rd.onerror = () => toast('مقدرتش أقرا الملف', 'error');
+      try { rd.readAsDataURL(f); } catch { toast('مقدرتش أقرا الملف', 'error'); }
+    };
+  }
   function openAddCatModal() {
     let icon = 'star', color = '#7C3AED';
     const palette = ['#7C3AED', '#EC4899', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#F43F5E', '#F97316'];
@@ -3458,177 +3647,226 @@
   }
 
   /* =============================
-     EGYPTIAN MEME SOUNDS (WebAudio synth, no files, no copyright)
-     Assets convention (optional overrides): sounds/<event>/<id>.mp3
+     AUDIO LIBRARY (real human-recorded mp3 files only — no synth, no TTS)
+     Owner drops files into sounds/ and registers them in sounds/audio-library.json.
      ============================= */
-  const MEME_EVENTS = {
-    NEW_REQUEST: 'طلب جديد', URGENT: 'مستعجل', TASK_COMPLETED: 'إتمام مهمة',
-    NEW_MESSAGE: 'رسالة جديدة', FAIL: 'فشل كوميدي', ERROR: 'خطأ', OPEN: 'فتح مهمة'
+  const AUDIO_EVENTS = {
+    NEW_REQUEST: 'new_request', NEW_MESSAGE: 'new_message', REQUEST_ACCEPTED: 'success',
+    REQUEST_REJECTED: 'failure', REQUEST_COMPLETED: 'success', ERROR: 'failure',
+    WAITING: 'waiting', SURPRISE: 'surprise', URGENT: 'urgent',
+    TASK_COMPLETED: 'success', FAIL: 'failure', OPEN: 'general'
   };
-  const MEME_EVENT_SOUNDS = {
-    NEW_REQUEST: ['tabla', 'phoneRing', 'tokHorn'],
-    URGENT: ['tokHorn', 'whistle', 'suspense'],
-    TASK_COMPLETED: ['zaghrouta', 'fanfare', 'chaChing'],
-    NEW_MESSAGE: ['doorbell', 'popMsg'],
-    FAIL: ['slideDown', 'wahwah'],
-    ERROR: ['buzz'],
-    OPEN: ['popMsg', 'rising']
+  const AUDIO_EVENT_LABELS = {
+    new_request: 'طلب جديد', new_message: 'رسالة جديدة', success: 'نجاح',
+    funny: 'كوميديا', surprise: 'مفاجأة', failure: 'فشل',
+    waiting: 'انتظار', urgent: 'عاجل', general: 'عام'
   };
-  function memeTone(ctx, dest, o) {
-    const t0 = ctx.currentTime + (o.t || 0);
-    const osc = ctx.createOscillator(), g = ctx.createGain();
-    osc.type = o.type || 'sine';
-    osc.frequency.setValueAtTime(o.f, t0);
-    if (o.f2) osc.frequency.exponentialRampToValueAtTime(Math.max(30, o.f2), t0 + o.d);
-    if (o.vib) {
-      const lfo = ctx.createOscillator(), lg = ctx.createGain();
-      lfo.frequency.value = o.vib; lg.gain.value = o.vibAmt || 200;
-      lfo.connect(lg); lg.connect(osc.frequency); lfo.start(t0); lfo.stop(t0 + o.d + 0.05);
-    }
-    if (o.trem) {
-      const lfo = ctx.createOscillator(), lg = ctx.createGain();
-      lfo.type = 'square'; lfo.frequency.value = o.trem; lg.gain.value = 0.5;
-      lfo.connect(lg); lg.connect(g.gain); lfo.start(t0); lfo.stop(t0 + o.d + 0.05);
-    }
-    g.gain.setValueAtTime(0.0001, t0);
-    g.gain.exponentialRampToValueAtTime(Math.min(1, o.v || 0.8), t0 + 0.015);
-    g.gain.exponentialRampToValueAtTime(0.0001, t0 + o.d);
-    osc.connect(g); g.connect(dest);
-    osc.start(t0); osc.stop(t0 + o.d + 0.05);
+  const AUDIO_LIB_URL = 'sounds/audio-library.json';
+  function audioFallbackRegistry() {
+    const defs = [
+      ['new_request', 'requests', 'new_request_', 'طلب جديد ', 8],
+      ['new_message', 'messages', 'new_message_', 'رسالة جديدة ', 5],
+      ['success', 'success', 'success_', 'نجاح ', 5],
+      ['funny', 'general', 'funny_', 'ضحكة ', 6],
+      ['surprise', 'surprise', 'surprise_', 'مفاجأة ', 4],
+      ['failure', 'failure', 'failure_', 'فشل ', 4],
+      ['waiting', 'waiting', 'waiting_', 'انتظار ', 3],
+      ['urgent', 'urgent', 'urgent_', 'تنبيه عاجل ', 3],
+      ['general', 'general', 'general_', 'عام ', 2]
+    ];
+    const out = [];
+    defs.forEach(([ev, folder, prefix, name, n]) => {
+      for (let i = 1; i <= n; i++) {
+        const id = prefix + String(i).padStart(2, '0');
+        out.push({ id, file: 'sounds/' + folder + '/' + id + '.mp3', name: name + i, event: ev, builtin: true });
+      }
+    });
+    return out;
   }
-  let _noiseBuf = null;
-  function memeNoise(ctx, dest, o) {
-    const t0 = ctx.currentTime + (o.t || 0);
-    if (!_noiseBuf) {
-      _noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
-      const d = _noiseBuf.getChannelData(0);
-      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    }
-    const src = ctx.createBufferSource(); src.buffer = _noiseBuf; src.loop = true;
-    const f = ctx.createBiquadFilter(); f.type = o.hp ? 'highpass' : 'lowpass'; f.frequency.value = o.ff || 1200;
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0.0001, t0);
-    g.gain.exponentialRampToValueAtTime(Math.min(1, o.v || 0.5), t0 + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t0 + o.d);
-    src.connect(f); f.connect(g); g.connect(dest);
-    src.start(t0); src.stop(t0 + o.d + 0.05);
+  function audioPickNext(pool, lastId) {
+    if (!pool || !pool.length) return null;
+    if (pool.length === 1) return pool[0];
+    let pick = pool[Math.floor(Math.random() * pool.length)];
+    if (pick.id === lastId) pick = pool[(pool.findIndex(s => s.id === pick.id) + 1) % pool.length];
+    return pick;
   }
-  const MEME_SOUNDS = [
-    { id: 'tabla', name: 'طبلة بلدي', event: 'NEW_REQUEST', dur: 0.6, play(p) {
-      p.tone({ f: 150, f2: 60, d: 0.18 }); p.noise({ d: 0.06, ff: 900 });
-      p.tone({ f: 320, d: 0.09, t: 0.13 }); p.tone({ f: 150, f2: 60, d: 0.2, t: 0.24 }); } },
-    { id: 'phoneRing', name: 'رنة موبايل قديم', event: 'NEW_REQUEST', dur: 1.0, play(p) {
-      [0, 0.28, 0.56].forEach(t => { p.tone({ f: 950, d: 0.12, t, type: 'square', v: 0.35 }); p.tone({ f: 750, d: 0.12, t: t + 0.13, type: 'square', v: 0.35 }); }); } },
-    { id: 'tokHorn', name: 'كلاكس توك توك', event: 'URGENT', dur: 0.55, play(p) {
-      [0, 0.28].forEach(t => { p.tone({ f: 370, d: 0.2, t, type: 'square', v: 0.4 }); p.tone({ f: 466, d: 0.2, t, type: 'square', v: 0.4 }); }); } },
-    { id: 'whistle', name: 'صفارة حكم', event: 'URGENT', dur: 0.7, play(p) {
-      p.tone({ f: 2150, d: 0.6, trem: 22, v: 0.5 }); } },
-    { id: 'suspense', name: 'دقات توتر', event: 'URGENT', dur: 1.1, play(p) {
-      [0, 0.22, 0.55, 0.77].forEach(t => p.tone({ f: 72, f2: 45, d: 0.14, t })); p.noise({ d: 0.7, t: 0.1, ff: 300, v: 0.25 }); } },
-    { id: 'zaghrouta', name: 'زغروطة فرح', event: 'TASK_COMPLETED', dur: 1.0, play(p) {
-      p.tone({ f: 1350, d: 0.9, type: 'square', v: 0.3, vib: 28, vibAmt: 350 }); } },
-    { id: 'fanfare', name: 'فانفار انتصار', event: 'TASK_COMPLETED', dur: 0.9, play(p) {
-      [523, 659, 784, 1046].forEach((f, i) => p.tone({ f, d: 0.14, t: i * 0.12, type: 'triangle' }));
-      p.tone({ f: 1046, d: 0.35, t: 0.5, type: 'triangle' }); p.tone({ f: 1318, d: 0.35, t: 0.5, type: 'triangle', v: 0.5 }); } },
-    { id: 'chaChing', name: 'كاشير فلوس', event: 'TASK_COMPLETED', dur: 0.6, play(p) {
-      p.tone({ f: 1568, d: 0.12 }); p.tone({ f: 2093, d: 0.35, t: 0.1 }); p.noise({ d: 0.1, t: 0.1, hp: true, ff: 6000, v: 0.2 }); } },
-    { id: 'doorbell', name: 'جرس باب', event: 'NEW_MESSAGE', dur: 0.7, play(p) {
-      p.tone({ f: 660, d: 0.25 }); p.tone({ f: 520, d: 0.4, t: 0.24 }); } },
-    { id: 'popMsg', name: 'فرقعة رسالة', event: 'NEW_MESSAGE', dur: 0.25, play(p) {
-      p.tone({ f: 420, f2: 950, d: 0.1 }); p.tone({ f: 950, f2: 1400, d: 0.1, t: 0.08 }); } },
-    { id: 'slideDown', name: 'وقعة كوميدية', event: 'FAIL', dur: 0.8, play(p) {
-      p.tone({ f: 900, f2: 140, d: 0.6 }); p.tone({ f: 90, f2: 50, d: 0.15, t: 0.6 }); } },
-    { id: 'wahwah', name: 'فشل حزين مضحك', event: 'FAIL', dur: 0.8, play(p) {
-      p.tone({ f: 300, f2: 240, d: 0.28, type: 'sawtooth', v: 0.4 }); p.tone({ f: 240, f2: 170, d: 0.4, t: 0.3, type: 'sawtooth', v: 0.4 }); } },
-    { id: 'buzz', name: 'طنين خطأ', event: 'ERROR', dur: 0.5, play(p) {
-      p.tone({ f: 110, d: 0.35, type: 'square', v: 0.45 }); p.tone({ f: 92, d: 0.35, type: 'square', v: 0.4 }); } },
-    { id: 'rising', name: 'انطلاقة مهمة', event: 'OPEN', dur: 0.5, play(p) {
-      p.tone({ f: 220, f2: 880, d: 0.35, type: 'sawtooth', v: 0.35 }); p.noise({ d: 0.3, hp: true, ff: 4000, v: 0.15 }); } },
-    { id: 'blip', name: 'تنبيه هادئ', event: 'OPEN', dur: 0.2, system: true, play(p) {
-      p.tone({ f: 740, d: 0.12, v: 0.5 }); } }
-  ];
-  const MemeSound = {
-    _ctx: null, _busyUntil: 0, _queue: [], _lastEv: {}, _lastId: {},
+  function audioMergeRegistry(base, uploads, overrides) {
+    const ov = overrides || {};
+    const out = (base || []).filter(s => s && s.id && s.file).map(s => ({ id: s.id, file: s.file, name: s.name || s.id, event: ((ov.event || {})[s.id]) || s.event || 'general', builtin: true }));
+    (uploads || []).forEach(u => { if (u && u.id && u.dataUrl) out.push({ id: u.id, file: u.dataUrl, name: u.name || u.id, event: u.event || 'general', upload: true }); });
+    return out;
+  }
+  function audioLibSize(uploads) {
+    try { return (uploads || []).reduce((n, u) => n + String(u.dataUrl || '').length, 0); } catch { return 0; }
+  }
+  function migrateAudioSettings() {
+    try {
+      if (state._audioMigrated) return;
+      state._audioMigrated = true;
+      if (state._soundOn === false && state._notifSound == null) state._notifSound = false;
+      if (state._memeOn === false && state._audioOn == null) state._audioOn = false;
+      if (state._memeVol != null && state._audioVol == null) state._audioVol = state._memeVol;
+      if (state._memeOff && !state._audioLib) state._audioLib = { off: { ...state._memeOff } };
+      if (Array.isArray(state._memeCustom) && state._memeCustom.length) {
+        const ups = Array.isArray(state.audioUploads) ? state.audioUploads : [];
+        state._memeCustom.forEach((c, i) => {
+          if (c && (c.url || c.file) && !ups.some(u => u.id === ('legacy_' + i))) ups.push({ id: 'legacy_' + i, name: c.name || ('صوت ' + (i + 1)), event: 'general', dataUrl: c.url || c.file });
+        });
+        state.audioUploads = ups;
+      }
+      delete state._memeOn; delete state._memeMode; delete state._memeVol; delete state._memeOff; delete state._memeCustom;
+      try { persist(); } catch {}
+    } catch {}
+  }
+  const AudioManager = {
+    _lib: [], _loaded: false, _loading: null, _el: null, _queue: [], _busyUntil: 0, _lastEv: {}, _lastId: {}, _missing: {}, _unlocked: false,
     settings() {
       return {
-        on: state._memeOn !== false,
-        mode: state._memeMode !== false,
-        vol: (state._memeVol == null ? 80 : state._memeVol) / 100,
-        off: state._memeOff || {},
-        custom: state._memeCustom || []
+        on: state._audioOn !== false,
+        fx: state._fxOn !== false,
+        notif: state._notifSound !== false,
+        vol: Math.min(0.9, Math.max(0, (state._audioVol == null ? 80 : state._audioVol) / 100))
       };
     },
-    allSounds() {
-      return [...MEME_SOUNDS.map(s => ({ ...s })), ...(state._memeCustom || []).map(c => ({ ...c, custom: true }))];
+    uploads() { return state.audioUploads || []; },
+    overrides() { return state._audioLib || {}; },
+    registry() { return audioMergeRegistry(this._lib, this.uploads(), this.overrides()); },
+    poolFor(evKey, ignoreOff) {
+      const off = (this.overrides().off || {});
+      return this.registry().filter(x => x.event === evKey && !this._missing[x.id] && (ignoreOff || !off[x.id]));
     },
-    find(id) { return this.allSounds().find(s => s.id === id); },
-    ctx() {
+    loadLibrary() {
+      if (this._loaded) return Promise.resolve(true);
+      if (this._loading) return this._loading;
+      this._loading = (async () => {
+        try {
+          const r = await fetch(AUDIO_LIB_URL);
+          if (r && r.ok) { const j = await r.json(); if (j && Array.isArray(j.sounds)) this._lib = j.sounds; }
+        } catch {}
+        if (!this._lib.length) { try { this._lib = audioFallbackRegistry(); } catch {} }
+        this._loaded = true;
+        try { this.preload(); } catch {}
+        return true;
+      })();
+      return this._loading;
+    },
+    unlock() {
+      if (this._unlocked) return;
+      this._unlocked = true;
       try {
-        if (!this._ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; this._ctx = new C(); }
-        if (this._ctx.state === 'suspended') this._ctx.resume().catch(() => {});
-        return this._ctx;
-      } catch { return null; }
+        const C = window.AudioContext || window.webkitAudioContext;
+        if (C) { const ctx = new C(); if (ctx.state === 'suspended' && ctx.resume) ctx.resume().catch(() => {}); setTimeout(() => { try { ctx.close(); } catch {} }, 800); }
+      } catch {}
+      try { this.preload(); } catch {}
+    },
+    preload() {
+      try {
+        const seen = {}, off = (this.overrides().off || {});
+        this.registry().forEach(x => {
+          if (!x.file || seen[x.event] || this._missing[x.id] || off[x.id] || String(x.file).slice(0, 5) === 'data:') return;
+          seen[x.event] = 1;
+          try { const a = new Audio(); a.preload = 'auto'; a.src = x.file; } catch {}
+        });
+      } catch {}
     },
     playEvent(ev, opts) {
       opts = opts || {};
+      try { this.loadLibrary(); } catch {}
       const s = this.settings();
       if (!s.on) return;
-      if (opts.notif && state._soundOn === false) return;
+      if (opts.notif ? !s.notif : !s.fx) return;
       const now = Date.now();
       if (!opts.force && (this._lastEv[ev] || 0) + 1800 > now) return;
       this._lastEv[ev] = now;
-      if (!s.mode) { this._playId('blip', s, opts); return; }
-      const pool = (MEME_EVENT_SOUNDS[ev] || []).filter(id => !s.off[id]);
-      const ids = pool.length ? pool : (MEME_EVENT_SOUNDS[ev] || []);
-      if (!ids.length) return;
-      let id = ids[Math.floor(Math.random() * ids.length)];
-      if (ids.length > 1 && this._lastId[ev] === id) id = ids[(ids.indexOf(id) + 1) % ids.length];
-      this._lastId[ev] = id;
-      this._playId(id, s, opts);
+      const key = AUDIO_EVENTS[ev] || 'general';
+      let pool = this.poolFor(key, false);
+      if (!pool.length) pool = this.poolFor(key, true);
+      if (!pool.length) return;
+      const pick = audioPickNext(pool, this._lastId[ev]);
+      if (!pick) return;
+      this._lastId[ev] = pick.id;
+      this._play(pick, s, opts);
     },
     playId(id, force) {
+      try { this.loadLibrary(); } catch {}
+      const entry = this.registry().find(x => x.id === id);
+      if (!entry) return;
+      if (force) { const s = this.settings(); this.stop(); this._play(entry, { ...s, on: true }, { force: true }); return; }
       const s = this.settings();
-      if (force) { this._playId(id, { ...s, on: true }, { force: true }); return; }
-      if (!s.on || s.off[id]) return;
-      this._playId(id, s, {});
+      if (!s.on || (this.overrides().off || {})[id] || this._missing[id]) return;
+      this._play(entry, s, {});
     },
-    _playId(id, s, opts) {
-      const snd = this.find(id);
-      if (!snd) return;
-      const run = () => {
-        if (snd.url || snd.file) {
-          try {
-            const a = new Audio(snd.url || snd.file);
-            a.volume = Math.min(1, (snd.vol == null ? 1 : snd.vol) * s.vol);
-            a.play().catch(() => this._synth(snd, s));
-            return;
-          } catch { /* fallback to synth */ }
-        }
-        this._synth(snd, s);
-      };
-      const wait = Math.max(0, this._busyUntil - Date.now());
-      if (wait > 0 && !opts.force) {
-        if (this._queue.length >= 2) return;
-        this._queue.push(id);
-        setTimeout(() => { this._queue = this._queue.filter(x => x !== id); run(); this._busyUntil = Date.now() + ((snd.dur || 0.5) * 1000); }, wait);
+    preview(id) {
+      const entry = this.registry().find(x => x.id === id);
+      if (!entry) return;
+      const s = this.settings();
+      this.stop();
+      this._play(entry, { ...s, on: true }, { force: true });
+    },
+    stop() {
+      try { if (this._el) { try { this._el.pause(); } catch {} } } catch {}
+      this._el = null; this._queue = []; this._busyUntil = 0;
+    },
+    _next() {
+      const q = this._queue.shift();
+      if (!q) return;
+      const s = this.settings();
+      if (!s.on) return;
+      this._play(q.entry, s, { force: true });
+    },
+    _play(entry, s, opts) {
+      opts = opts || {};
+      if (this._el && !this._el.paused && !this._el.ended && !opts.force) {
+        if (this._queue.length < 2 && !this._queue.some(q => q.entry.id === entry.id)) this._queue.push({ entry, s });
         return;
       }
-      run();
-      this._busyUntil = Date.now() + ((snd.dur || 0.5) * 1000);
-    },
-    _synth(snd, s) {
-      const ctx = this.ctx(); if (!ctx) return;
+      let a = null;
       try {
-        const master = ctx.createGain();
-        master.gain.value = Math.min(1, (snd.vol == null ? 1 : snd.vol) * s.vol);
-        master.connect(ctx.destination);
-        snd.play({
-          tone: (o) => memeTone(ctx, master, o),
-          noise: (o) => memeNoise(ctx, master, o)
-        });
+        a = new Audio();
+        a.preload = 'auto';
+        try { a.volume = Math.min(0.9, Math.max(0, s.vol == null ? 0.8 : s.vol)); } catch {}
+        a.src = entry.file;
+      } catch { this._missing[entry.id] = 1; return; }
+      try { if (this._el && this._el !== a) { try { this._el.pause(); } catch {} } } catch {}
+      this._el = a;
+      this._busyUntil = Date.now() + 4000;
+      try {
+        a.onended = () => { if (this._el === a) this._el = null; try { this._next(); } catch {} };
+        a.onerror = () => {
+          this._missing[entry.id] = 1;
+          if (this._el === a) this._el = null;
+          const tried = (opts._tried || []).concat(entry.id);
+          const alt = (this.registry() || []).find(x => x.event === entry.event && !tried.includes(x.id) && !this._missing[x.id] && !(this.overrides().off || {})[x.id]);
+          if (alt) { try { this._play(alt, s, { ...opts, _tried: tried }); } catch {} return; }
+          try { this._next(); } catch {}
+        };
       } catch {}
+      try {
+        const pr = a.play();
+        if (pr && pr.catch) pr.catch(() => { if (this._el === a) this._el = null; try { this._next(); } catch {} });
+      } catch { if (this._el === a) this._el = null; }
+    },
+    async checkFiles() {
+      const out = {};
+      for (const x of this.registry()) {
+        if (!x.file) { out[x.id] = 'missing'; continue; }
+        if (String(x.file).slice(0, 5) === 'data:') { out[x.id] = 'ok'; continue; }
+        try {
+          const r = await fetch(x.file, { method: 'HEAD' });
+          out[x.id] = (r && r.ok) ? 'ok' : 'missing';
+        } catch { out[x.id] = 'unknown'; }
+        if (out[x.id] === 'missing') this._missing[x.id] = 1;
+        else if (out[x.id] === 'ok' && this._missing[x.id]) delete this._missing[x.id];
+      }
+      return out;
     }
   };
+  const MemeSound = {
+    playEvent(ev, opts) { try { AudioManager.playEvent(ev, opts); } catch {} },
+    playId(id, force) { try { AudioManager.playId(id, force); } catch {} }
+  };
+  try { document.addEventListener('pointerdown', () => { try { AudioManager.unlock(); } catch {} }, { once: true }); } catch {}
+  try { document.addEventListener('keydown', () => { try { AudioManager.unlock(); } catch {} }, { once: true }); } catch {}
 
   /* =============================
      VOICE INPUT (Web Speech API, no external libs)
@@ -4015,6 +4253,8 @@
     } catch {}
     render();
     attachCloud();
+    try { migrateAudioSettings(); } catch {}
+    try { AudioManager.loadLibrary(); } catch {}
     try { PushSys.refreshOnLoad(); } catch {}
     try {
       if ('serviceWorker' in navigator) {

@@ -1,5 +1,5 @@
-const CACHE = 'naqisna-v3';
-const ASSETS = ['./', './index.html', './logo.png', './icon-192.png', './icon-512.png', './badge.png', './manifest.webmanifest'];
+const CACHE = 'naqisna-v5';
+const ASSETS = ['./', './index.html', './logo.png', './icon-192.png', './icon-512.png', './badge.png', './manifest.webmanifest', './sounds/audio-library.json'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -18,6 +18,24 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  const url = e.request.url || '';
+  if (url.includes('/sounds/')) {
+    e.respondWith(
+      caches.match(e.request).then((cached) => {
+        const net = fetch(e.request)
+          .then((res) => {
+            if (res && res.ok) {
+              const cp = res.clone();
+              caches.open(CACHE).then((c) => c.put(e.request, cp)).catch(() => {});
+            }
+            return res;
+          })
+          .catch(() => cached);
+        return cached || net;
+      })
+    );
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then((cached) => {
       const net = fetch(e.request)
@@ -37,6 +55,39 @@ self.addEventListener('fetch', (e) => {
 self.addEventListener('message', (e) => {
   if (e && e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting().catch(() => {});
 });
+
+/* FCM background messages (data-only payloads from Cloud Functions).
+   Public Firebase config only — no secrets here. */
+try {
+  importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+  importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
+  firebase.initializeApp({
+    apiKey: 'AIzaSyC8Gj1hufwwXrdO4zzQjPMeMg_KD3XSKDQ',
+    projectId: 'project-84ae3235-3633-44c1-819',
+    messagingSenderId: '1009475192148',
+    appId: '1:1009475192148:web:5031fa8ddcbca4c860b4c1'
+  });
+  const fcm = firebase.messaging();
+  fcm.onBackgroundMessage((payload) => {
+    const d = (payload && payload.data) || {};
+    const title = d.title || 'ناقصنا إيه';
+    const tab = d.tab || 'notifs';
+    const url = './index.html#' + tab;
+    return self.registration.showNotification(title, {
+      body: d.body || 'عندك تحديث جديد',
+      icon: './icon-512.png',
+      badge: './badge.png',
+      dir: 'rtl',
+      lang: 'ar',
+      tag: d.nid || d.tag || 'naqisna-fcm',
+      renotify: true,
+      requireInteraction: d.urgent === 'true',
+      vibrate: [120, 60, 120],
+      data: { url: url, tab: tab, nid: d.nid || '' },
+      actions: [{ action: 'open', title: 'فتح' }, { action: 'dismiss', title: 'إغلاق' }]
+    });
+  });
+} catch (e) { /* FCM unavailable (offline CDN etc.): generic push handler below still works */}
 
 /* Web Push: show notification from server payload (title/body only, no secrets). */
 self.addEventListener('push', (e) => {
