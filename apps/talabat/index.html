@@ -713,6 +713,76 @@
   .section-header h3 { font-size: 17px; font-weight: 900; }
   .noura-bubble { border: 1.5px solid rgba(124,58,237,.16) !important; box-shadow: 0 8px 22px rgba(124,58,237,.14) !important; }
   .noura-msg { font-size: 14px; color: var(--text); }
+  /* ===== Product encyclopedia ===== */
+  .enc-hero { margin: 0 20px 12px; background: var(--grad); border-radius: 24px; padding: 16px; color: #fff; position: relative; overflow: hidden; box-shadow: 0 14px 30px rgba(124,58,237,.32); }
+  .enc-hero::before { content: ''; position: absolute; width: 150px; height: 150px; border-radius: 50%; background: rgba(255,255,255,.13); left: -40px; top: -60px; }
+  .enc-hero h2 { font-size: 18px; font-weight: 900; position: relative; z-index: 1; }
+  .enc-hero p { font-size: 12.5px; opacity: .92; font-weight: 700; position: relative; z-index: 1; }
+  .enc-search { display: flex; gap: 8px; padding: 0 20px 10px; }
+  .enc-search .search-box { flex: 1; }
+  .enc-scan { width: 50px; height: 50px; border-radius: 18px; background: #fff; border: 1.5px solid rgba(124,58,237,.2); color: var(--primary-dark); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+  .enc-scan:active { transform: scale(.92); }
+  .enc-suggest { margin: 0 20px 10px; background: #fff; border: 1.5px solid rgba(124,58,237,.22); border-radius: 16px; box-shadow: 0 12px 28px rgba(124,58,237,.14); overflow: hidden; max-height: 240px; overflow-y: auto; }
+  .enc-smart { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 10px; scrollbar-width: none; }
+  .enc-smart::-webkit-scrollbar { display: none; }
+  .smart-chip { display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; border-radius: 999px; background: #fff; border: 1.5px solid var(--border); font-size: 12.5px; font-weight: 800; white-space: nowrap; color: var(--text-sec); }
+  .smart-chip.active { background: var(--grad); color: #fff; border-color: transparent; box-shadow: 0 6px 16px rgba(124,58,237,.3); }
+  .enc-depts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 20px 12px; }
+  .enc-dept { background: #fff; border: 1.5px solid rgba(124,58,237,.1); border-radius: 18px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 5px; box-shadow: var(--shadow-sm); }
+  .enc-dept:active { transform: scale(.94); }
+  .enc-dept.sel { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 6px 16px rgba(124,58,237,.25); }
+  .enc-dept-ico { width: 42px; height: 42px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .enc-dept small { font-size: 10px; font-weight: 800; text-align: center; line-height: 1.4; }
+  .enc-dept .cnt { font-size: 9px; font-weight: 800; color: var(--text-muted); }
+  .enc-filters { display: flex; gap: 8px; padding: 0 20px 10px; flex-wrap: wrap; }
+  .enc-filters select { flex: 1; min-width: 100px; padding: 10px; border-radius: 14px; border: 1.5px solid var(--border); background: #fff; font-weight: 800; font-size: 12px; color: var(--text); }
+  .enc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 20px 12px; }
+  .enc-card { background: #fff; border-radius: 20px; border: 1.5px solid rgba(124,58,237,.1); box-shadow: var(--shadow-sm); overflow: hidden; animation: popIn .3s ease-out; }
+  .enc-card:active { transform: scale(.97); }
+  .enc-img { height: 86px; display: flex; align-items: center; justify-content: center; font-size: 44px; position: relative; }
+  .enc-off { position: absolute; top: 6px; right: 6px; background: linear-gradient(135deg,#FB7185,#E11D48); color: #fff; font-size: 10px; font-weight: 900; padding: 3px 9px; border-radius: 999px; }
+  .enc-new { position: absolute; top: 6px; left: 6px; background: linear-gradient(135deg,#34D399,#059669); color: #fff; font-size: 10px; font-weight: 900; padding: 3px 9px; border-radius: 999px; }
+  .enc-fav { position: absolute; bottom: 6px; left: 6px; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.9); display: flex; align-items: center; justify-content: center; font-size: 15px; box-shadow: var(--shadow-sm); }
+  .enc-body { padding: 8px 10px 10px; }
+  .enc-name { font-size: 12.5px; font-weight: 900; line-height: 1.5; min-height: 37px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .enc-brand { font-size: 10.5px; font-weight: 800; color: var(--primary); }
+  .enc-size { font-size: 10.5px; font-weight: 700; color: var(--text-muted); }
+  .enc-price-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .enc-price { font-size: 14px; font-weight: 900; color: var(--primary-dark); }
+  .enc-old { font-size: 10.5px; color: var(--text-muted); text-decoration: line-through; font-weight: 700; }
+  .enc-add { margin-top: 6px; width: 100%; background: var(--primary-light); color: var(--primary-dark); border-radius: 12px; padding: 8px; font-size: 12px; font-weight: 900; }
+  .enc-add:active { background: var(--primary); color: #fff; }
+  .enc-sec-title { display: flex; align-items: center; justify-content: space-between; margin: 4px 20px 8px; }
+  .enc-sec-title h3 { font-size: 15px; font-weight: 900; }
+  .enc-sec-title button { color: var(--primary); font-size: 12px; font-weight: 800; }
+  .enc-hscroll { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 12px; scrollbar-width: none; }
+  .enc-hscroll::-webkit-scrollbar { display: none; }
+  .enc-hscroll .enc-card { min-width: 150px; max-width: 150px; }
+  .brand-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 12px; scrollbar-width: none; }
+  .brand-row::-webkit-scrollbar { display: none; }
+  .brand-chip { display: flex; align-items: center; gap: 7px; background: #fff; border: 1.5px solid var(--border); border-radius: 999px; padding: 6px 12px 6px 14px; font-size: 12px; font-weight: 900; white-space: nowrap; box-shadow: var(--shadow-sm); }
+  .brand-chip i { width: 30px; height: 30px; border-radius: 50%; background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; font-style: normal; }
+  .p-hero { background: linear-gradient(135deg,#EDE9FE,#FDF4FF); border-radius: 22px; height: 170px; display: flex; align-items: center; justify-content: center; font-size: 88px; margin-bottom: 12px; position: relative; overflow: hidden; }
+  .p-path { font-size: 11.5px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px; }
+  .p-name { font-size: 20px; font-weight: 900; line-height: 1.6; }
+  .p-en { font-size: 13px; font-weight: 700; color: var(--text-sec); margin-bottom: 8px; }
+  .p-brand { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1.5px solid rgba(124,58,237,.25); color: var(--primary-dark); border-radius: 999px; padding: 6px 14px; font-size: 12.5px; font-weight: 900; margin-bottom: 10px; }
+  .p-price-box { display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 18px; padding: 12px 14px; border: 1.5px solid rgba(124,58,237,.12); margin-bottom: 12px; }
+  .p-price { font-size: 24px; font-weight: 900; color: var(--primary-dark); }
+  .p-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .p-meta-item { background: #fff; border-radius: 14px; padding: 9px 11px; border: 1px solid var(--border); }
+  .p-meta-item small { display: block; font-size: 10.5px; color: var(--text-muted); font-weight: 800; }
+  .p-meta-item b { font-size: 12.5px; font-weight: 900; }
+  .p-rate { color: #F59E0B; font-weight: 900; font-size: 14px; }
+  .stock-ok { color: var(--success); font-weight: 900; }
+  .stock-low { color: var(--pending); font-weight: 900; }
+  .stock-out { color: var(--danger); font-weight: 900; }
+  .enc-admin-row { display: flex; gap: 8px; padding: 0 20px 12px; }
+  .enc-admin-row .btn { min-height: 44px; font-size: 13px; }
+  .csv-area { width: 100%; min-height: 120px; border: 1.5px solid var(--border); border-radius: 14px; padding: 10px; font-family: monospace; font-size: 11px; background: #fff; }
+  .barcode-box { background: #fff; border: 1.5px dashed var(--primary); border-radius: 16px; padding: 14px; text-align: center; margin-bottom: 12px; }
+  .barcode-num { font-family: monospace; font-size: 20px; font-weight: 900; letter-spacing: 3px; }
+  #barcodeVideo { width: 100%; border-radius: 16px; background: #000; max-height: 240px; }
 </style>
 </head>
 <body>
@@ -1293,7 +1363,15 @@
     order_new: { icon: 'cart', bg: '#F1EAFE', c: '#7C3AED' },
     order_done: { icon: 'check', bg: '#DCFCE7', c: '#059669' },
     urgent: { icon: 'bolt', bg: '#FFE4E6', c: '#E11D48' },
-    info: { icon: 'bell', bg: '#E0F2FE', c: '#0284C7' }
+    info: { icon: 'bell', bg: '#E0F2FE', c: '#0284C7' },
+    message: { icon: 'bell', bg: '#F1EAFE', c: '#7C3AED' },
+    task: { icon: 'check', bg: '#FEF3C7', c: '#D97706' },
+    test: { icon: 'flame', bg: '#F1EAFE', c: '#7C3AED' },
+    result: { icon: 'trophy', bg: '#DCFCE7', c: '#059669' },
+    announcement: { icon: 'star', bg: '#FCE7F3', c: '#EC4899' },
+    reminder: { icon: 'bell', bg: '#FEF3C7', c: '#D97706' },
+    update: { icon: 'sparkle', bg: '#E0F2FE', c: '#0284C7' },
+    admin: { icon: 'gear', bg: '#EDE9FE', c: '#6D28D9' }
   };
   const NOTIF_MSGS = {
     order_new: [
@@ -1330,10 +1408,10 @@
     const me = state.user?.id;
     return notifList().filter(n => me && n.senderId !== me && !(n.readBy || []).includes(me));
   }
-  function pushNotif(type, { names, orderIds }) {
+  function pushNotif(type, { names, orderIds, title, body, actionTab } = {}) {
     if (!state.user || !state.home) return null;
     const pool = NOTIF_MSGS[type] || NOTIF_MSGS.info;
-    const msg = pickMsg(pool).replaceAll('{name}', state.user.name);
+    const msg = body || pickMsg(pool).replaceAll('{name}', state.user.name);
     const titles = {
       order_new: `طلب جديد من ${state.user.name}`,
       order_done: `${state.user.name} خلص طلب`,
@@ -1341,9 +1419,10 @@
       info: `تحديث من ${state.user.name}`
     };
     const n = {
-      id: 'n_' + uid(), type, title: titles[type] || titles.info, body: msg,
+      id: 'n_' + uid(), type, title: title || titles[type] || titles.info, body: msg,
       names: (names || []).slice(0, 4), extra: Math.max(0, (names || []).length - 4),
-      orderIds: orderIds || [], senderId: state.user.id, sender: state.user.name,
+      orderIds: orderIds || [], actionTab: actionTab || 'orders',
+      senderId: state.user.id, sender: state.user.name,
       readBy: [state.user.id], createdAt: nowISO()
     };
     if (!state.notifs) state.notifs = [];
@@ -1351,12 +1430,14 @@
     state.notifs.unshift(n);
     state.notifs = state.notifs.slice(0, 50);
     persist();
+    syncAppBadge();
     return n;
   }
   function markNotifRead(id) {
     const me = state.user?.id; if (!me) return;
     const n = notifList().find(x => x.id === id); if (!n) return;
     if (!(n.readBy || []).includes(me)) { n.readBy = [...(n.readBy || []), me]; persist(); }
+    syncAppBadge();
   }
   function markAllNotifsRead() {
     const me = state.user?.id; if (!me) return;
@@ -1365,6 +1446,7 @@
       if (n.senderId !== me && !(n.readBy || []).includes(me)) { n.readBy = [...(n.readBy || []), me]; changed = true; }
     }
     if (changed) persist();
+    syncAppBadge();
   }
   function timeAgo(iso) {
     try {
@@ -1403,23 +1485,212 @@
       setTimeout(() => { try { ctx.close(); } catch {} }, 900);
     } catch {}
   }
-  function browserNotify(n) {
-    try {
-      if (!('Notification' in window) || Notification.permission !== 'granted') return;
-      const nt = new Notification(n.title, { body: n.body, icon: 'logo.png', tag: n.id, dir: 'rtl', lang: 'ar' });
-      nt.onclick = () => { try { window.focus(); } catch {} markNotifRead(n.id); setTab('orders'); nt.close(); };
-    } catch {}
-  }
   function handleIncomingNotifs(remoteNotifs) {
     const known = new Set(notifList().map(n => n.id));
     const me = state.user?.id;
     for (const n of remoteNotifs || []) {
       if (!known.has(n.id) && me && n.senderId && n.senderId !== me) {
+        if (!notifTypeAllowed(n.type)) continue;
         notifSound();
-        browserNotify(n);
+        notifyLocal(n);
       }
     }
+    syncAppBadge();
   }
+  /* =============================
+     PUSH NOTIFICATIONS (Web Push ready, Firestore-routed)
+     No secrets in frontend. VAPID public key only (safe).
+     Set window.VAPID_PUBLIC_KEY before scripts to enable push subscribe.
+     Server send (FCM/Cloud Function) is documented; page + SW already handle it.
+     ============================= */
+  const VAPID_PUBLIC_KEY = (window.VAPID_PUBLIC_KEY || '');
+  const NOTIF_PREF_DEFAULTS = { browser: true, orders: true, urgent: true, announcement: true, reminder: true };
+  function notifPrefs() { return Object.assign({}, NOTIF_PREF_DEFAULTS, state.notifPrefs || {}); }
+  function prefKeyForType(type) {
+    if (type === 'urgent') return 'urgent';
+    if (type === 'announcement' || type === 'admin' || type === 'update') return 'announcement';
+    if (type === 'reminder' || type === 'task' || type === 'test' || type === 'result') return 'reminder';
+    return 'orders';
+  }
+  function notifTypeAllowed(type) {
+    try { const p = notifPrefs(); return p.browser !== false && p[prefKeyForType(type)] !== false; }
+    catch { return true; }
+  }
+  function deleteNotif(id) {
+    if (!state.notifs) return;
+    state.notifs = state.notifs.filter(n => n.id !== id);
+    persist(); syncAppBadge();
+  }
+  function fullDate(iso) { try { return new Date(iso).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' }); } catch { return ''; } }
+  function syncAppBadge() {
+    try {
+      if (!('setAppBadge' in navigator)) return;
+      const c = unreadNotifs().length;
+      if (c > 0) navigator.setAppBadge(c).catch(() => {});
+      else if ('clearAppBadge' in navigator) navigator.clearAppBadge().catch(() => {});
+    } catch {}
+  }
+  function hashStr(s) {
+    let h = 5381; s = String(s || '');
+    for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+    return h.toString(36);
+  }
+  function urlB64ToU8(s) {
+    const pad = '='.repeat((4 - (s.length % 4)) % 4);
+    const b = (s + pad).replace(/-/g, '+').replace(/_/g, '/');
+    const raw = atob(b); const out = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+    return out;
+  }
+  const PushSys = {
+    support() {
+      return {
+        notif: ('Notification' in window),
+        sw: ('serviceWorker' in navigator),
+        push: ('serviceWorker' in navigator) && ('PushManager' in window)
+      };
+    },
+    perm() {
+      try { return ('Notification' in window) ? Notification.permission : 'unsupported'; }
+      catch { return 'unsupported'; }
+    },
+    async ensureReg() {
+      if (!('serviceWorker' in navigator)) return null;
+      try {
+        let reg = await navigator.serviceWorker.ready;
+        if (!reg || !reg.active) {
+          try { reg = await navigator.serviceWorker.register('sw.js'); } catch {}
+        }
+        return reg || null;
+      } catch { return null; }
+    },
+    deviceInfo() {
+      let platform = '';
+      try { platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || ''; } catch {}
+      return { ua: String(navigator.userAgent || '').slice(0, 140), platform: String(platform).slice(0, 60), lang: String(navigator.language || '').slice(0, 12) };
+    },
+    subDocId(endpoint) { return 's_' + hashStr(endpoint); },
+    async saveSub(sub) {
+      if (!db || !state.home?.code || !state.user || !sub) return false;
+      try {
+        const id = this.subDocId(sub.endpoint);
+        await db.collection('homes').doc(state.home.code).collection('pushSubs').doc(id).set({
+          userId: state.user.id, userName: state.user.name || '',
+          endpoint: sub.endpoint,
+          p256dh: sub.toJSON().keys ? sub.toJSON().keys.p256dh || '' : '',
+          auth: sub.toJSON().keys ? sub.toJSON().keys.auth || '' : '',
+          device: this.deviceInfo(), permission: 'granted',
+          createdAt: nowISO(), updatedAt: Date.now()
+        }, { merge: true });
+        try { localStorage.setItem('naqisna_pushsub', id); } catch {}
+        return true;
+      } catch { return false; }
+    },
+    async removeSub() {
+      try {
+        const reg = await this.ensureReg();
+        const sub = reg ? await reg.pushManager.getSubscription() : null;
+        let id = null;
+        try { id = localStorage.getItem('naqisna_pushsub'); } catch {}
+        if (!id && sub) id = this.subDocId(sub.endpoint);
+        if (sub) { try { await sub.unsubscribe(); } catch {} }
+        try { localStorage.removeItem('naqisna_pushsub'); } catch {}
+        if (db && state.home?.code && id) {
+          try { await db.collection('homes').doc(state.home.code).collection('pushSubs').doc(id).delete(); } catch {}
+        }
+      } catch {}
+    },
+    async enable() {
+      const s = this.support();
+      if (!s.notif) { toast('المتصفح مش بيدعم إشعارات النظام', 'error'); return 'unsupported'; }
+      let r = 'default';
+      try { r = await Notification.requestPermission(); } catch { toast('مقدرتش أطلب الصلاحية', 'error'); return 'error'; }
+      if (r !== 'granted') {
+        toast('اترفضت الصلاحية — فعّلها من إعدادات المتصفح', 'warning');
+        try { render(); } catch {}
+        return r;
+      }
+      if (!state.notifPrefs) state.notifPrefs = {};
+      state.notifPrefs.browser = true; persist();
+      const reg = await this.ensureReg();
+      if (s.push && reg && VAPID_PUBLIC_KEY) {
+        try {
+          let sub = await reg.pushManager.getSubscription();
+          if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToU8(VAPID_PUBLIC_KEY) });
+          await this.saveSub(sub);
+        } catch { /* push subscribe failed: local notifications still work */ }
+      } else if (db && state.home?.code && state.user) {
+        try {
+          await db.collection('homes').doc(state.home.code).collection('pushSubs').doc('cap_' + state.user.id + '_' + hashStr(navigator.userAgent || '')).set({
+            userId: state.user.id, userName: state.user.name || '', push: false,
+            device: this.deviceInfo(), permission: 'granted', createdAt: nowISO(), updatedAt: Date.now()
+          }, { merge: true });
+        } catch {}
+      }
+      try { notifyLocal({ id: 'test-welcome', type: 'info', title: 'إشعارات المتصفح اشتغلت', body: 'هتوصلك التنبيهات هنا حتى لو التطبيق في الخلفية', actionTab: 'notifs', createdAt: nowISO() }); } catch {}
+      toast('إشعارات المتصفح اشتغلت', 'success');
+      try { render(); } catch {}
+      return 'granted';
+    },
+    async disable() {
+      try { await this.removeSub(); } catch {}
+      if (!state.notifPrefs) state.notifPrefs = {};
+      state.notifPrefs.browser = false; persist();
+      syncAppBadge();
+      toast('إشعارات المتصفح اتقفلت', 'info');
+      try { render(); } catch {}
+    },
+    async refreshOnLoad() {
+      try {
+        if (!state.user || !state.home) return;
+        if (this.perm() !== 'granted') return;
+        try {
+          if (navigator.serviceWorker && navigator.serviceWorker.controller === null) { /* page not yet controlled; ready() still works */ }
+        } catch {}
+        const reg = await this.ensureReg();
+        if (!reg || !('pushManager' in reg) || !VAPID_PUBLIC_KEY) return;
+        let last = 0;
+        try { last = Number(localStorage.getItem('naqisna_pushtouch') || 0); } catch {}
+        const sub = await reg.pushManager.getSubscription().catch(() => null);
+        if (!sub) {
+          try {
+            const fresh = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToU8(VAPID_PUBLIC_KEY) });
+            await this.saveSub(fresh);
+          } catch {}
+        } else if (Date.now() - last > 86400000) {
+          await this.saveSub(sub);
+          try { localStorage.setItem('naqisna_pushtouch', String(Date.now())); } catch {}
+        }
+      } catch {}
+    }
+  };
+  function notifyLocal(n) {
+    try {
+      if (!notifTypeAllowed(n.type)) return;
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      const showViaSW = async () => {
+        try {
+          const reg = await PushSys.ensureReg();
+          if (reg && reg.showNotification) {
+            await reg.showNotification(n.title || 'ناقصنا إيه', {
+              body: n.body || '', icon: 'logo.png', badge: 'logo.png',
+              dir: 'rtl', lang: 'ar', tag: n.id || 'naqisna',
+              renotify: true, vibrate: [120, 60, 120],
+              data: { url: './index.html#' + (n.actionTab || 'orders'), tab: (n.actionTab || 'orders'), nid: n.id || '' }
+            });
+            return true;
+          }
+        } catch {}
+        return false;
+      };
+      if (document.hidden) { showViaSW(); return; }
+      try {
+        const nt = new Notification(n.title || 'ناقصنا إيه', { body: n.body || '', icon: 'logo.png', tag: n.id || 'naqisna', dir: 'rtl', lang: 'ar' });
+        nt.onclick = () => { try { window.focus(); } catch {} try { markNotifRead(n.id); } catch {} try { setTab(n.actionTab || 'orders'); } catch {} try { nt.close(); } catch {} };
+      } catch { showViaSW(); }
+    } catch {}
+  }
+  function browserNotify(n) { notifyLocal(n); }
 
   const UI_ONLY_KEYS = ['currentTab', 'orderFilter', 'categoryFilter', 'searchQuery'];
   function cloudPayload() {
@@ -1621,7 +1892,7 @@
     backdrop._node = backdrop.querySelector('.modal');
     return backdrop;
   }
-  function closeModal(b) { stopVoice(); const n = b._node || b.querySelector('.modal'); if (n) { n.style.animation = 'toastOut .15s ease-in forwards'; setTimeout(() => b.remove(), 150); } else b.remove(); }
+  function closeModal(b) { stopVoice(); try { encStopScan(); } catch {} const n = b._node || b.querySelector('.modal'); if (n) { n.style.animation = 'toastOut .15s ease-in forwards'; setTimeout(() => b.remove(), 150); } else b.remove(); }
   function confirmDialog({ title, message, confirmText, cancelText, danger }) {
     return new Promise((resolve) => {
       const html = `<div class="confirm-dialog">
@@ -1756,6 +2027,7 @@
     const tabs = [
       { id: 'home', label: 'الرئيسية', icon: 'home' },
       { id: 'orders', label: 'الطلبات', icon: 'cart' },
+      { id: 'enc', label: 'الموسوعة', icon: 'search' },
       { id: 'notifs', label: 'الإشعارات', icon: 'bell' },
       { id: 'expenses', label: 'المصروفات', icon: 'wallet' },
       { id: 'reports', label: 'التقارير', icon: 'chart' },
@@ -1769,6 +2041,7 @@
     switch (state.currentTab) {
       case 'home': return renderHome();
       case 'orders': return renderOrders();
+      case 'enc': return renderEnc();
       case 'notifs': return renderNotifs();
       case 'expenses': return renderExpenses();
       case 'reports': return renderReports();
@@ -1907,21 +2180,23 @@
       <div class="notif-actions">
         ${unread ? `<button class="btn" id="markAllRead">تعليم الكل كمقروء</button>` : ''}
         <button class="btn" id="toggleSound">${soundOn ? 'كتم الصوت' : 'تشغيل الصوت'}</button>
-        ${perm === 'granted' ? '' : perm === 'unsupported' ? '' : `<button class="btn btn-primary" id="enablePush">تفعيل إشعارات المتصفح</button>`}
+        ${perm === 'granted' ? `<button class="btn" id="testNotif">تجربة إشعار</button>` : perm === 'unsupported' ? '' : `<button class="btn btn-primary" id="enablePush">تفعيل إشعارات المتصفح</button>`}
       </div>
+      ${perm === 'granted' ? `<div class="speech-bubble app-msg" style="margin-bottom:12px;">إشعارات المتصفح شغالة — هتوصلك التنبيهات حتى لو التطبيق في الخلفية. <a href="#" data-gotab2="settings" style="color:var(--primary-dark);font-weight:800;">إعدادات الإشعارات</a></div>` : perm === 'denied' ? `<div class="category-query">إشعارات المتصفح مقفولة من المتصفح. لإعادة التفعيل: <b>أندرويد/كمبيوتر:</b> دوس علامة القفل جنب عنوان الموقع ← الأذونات ← الإشعارات ← سماح. <b>آيفون:</b> ثبّت التطبيق من مشاركة ← إضافة للشاشة الرئيسية، ثم فعّل من إعدادات iOS ← التطبيق.</div>` : perm === 'default' ? `<div class="speech-bubble app-msg" style="margin-bottom:12px;">عايز التنبيهات توصلك بره التطبيق؟ دوس «تفعيل إشعارات المتصفح» — بنطلب الإذن لما تختار فقط.</div>` : ''}
       ${!list.length ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش إشعارات لسه</div><div class="empty-desc">أول ما حد يبعت طلب هيوصلك تنبيه هنا فوراً</div></div>` :
         list.map(n => {
           const tp = NOTIF_TYPES[n.type] || NOTIF_TYPES.info;
           const isNew = me && n.senderId !== me && !(n.readBy || []).includes(me);
           const names = (n.names || []).join('، ') + (n.extra ? ` +${n.extra}` : '');
-          return `<div class="notif-item ${isNew ? 'unread' : ''}" data-nid="${n.id}">
+          return `<div class="notif-item ${isNew ? 'unread' : ''}" data-nid="${n.id}" data-tab="${n.actionTab || 'orders'}">
             <div class="notif-ico" style="background:${tp.bg};color:${tp.c};">${svgIcon(tp.icon, 22)}</div>
             <div class="notif-body">
               <div class="notif-title">${isNew ? '<span class="notif-dot"></span>' : ''}${escapeHTML(n.title)}</div>
               <div class="notif-text">${escapeHTML(n.body)}</div>
               ${names ? `<div class="notif-items-names">${escapeHTML(names)}</div>` : ''}
-              <div class="notif-time">${timeAgo(n.createdAt)} • من ${escapeHTML(n.sender || '')}</div>
+              <div class="notif-time" title="${escapeHTML(fullDate(n.createdAt))}">${timeAgo(n.createdAt)} • ${escapeHTML(fullDate(n.createdAt))} • من ${escapeHTML(n.sender || '')}</div>
             </div>
+            <button class="si-action" data-delnid="${n.id}" aria-label="حذف الإشعار" style="align-self:flex-start;padding:6px;">✕</button>
           </div>`;
         }).join('')}
     </div>`;
@@ -2027,6 +2302,14 @@
       <div class="settings-card"><div class="settings-title">التطبيق</div>
         <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label">ناقصنا إيه</div><div class="si-value">ثبّته على شاشة موبايلك لفتح أسرع وشغل بدون نت</div></div></div>
         <div style="padding:0 16px 14px;"><button class="btn btn-primary" id="installAppBtn">تثبيت التطبيق على الهاتف</button></div>
+      </div>
+      <div class="settings-card"><div class="settings-title">الإشعارات</div>
+        ${(() => { const p = notifPrefs(); const perm = PushSys.perm(); const st = perm === 'granted' ? 'شغالة' : perm === 'denied' ? 'مرفوضة من المتصفح' : perm === 'unsupported' ? 'غير مدعومة' : 'مطفية'; return `
+        <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">${svgIcon('bell', 18)}</div><div class="si-body"><div class="si-label">إشعارات المتصفح</div><div class="si-value">${st}${perm === 'denied' ? ' — فعّلها من علامة القفل جنب العنوان' : ''}</div></div>${perm === 'granted' && p.browser !== false ? `<button class="si-action" id="notifBrowserBtn">إيقاف</button>` : perm === 'unsupported' ? '' : `<button class="si-action" id="notifBrowserBtn">تفعيل</button>`}</div>
+        <button class="tgl-row" data-npref="orders"><span class="tgl"><b>إشعارات الطلبات والرسائل</b><small>طلب جديد • تم الشراء</small></span><span class="sw ${p.orders !== false ? 'on' : ''}"></span></button>
+        <button class="tgl-row" data-npref="urgent"><span class="tgl"><b>الطلبات المستعجلة</b><small>تنبيهات الضروري جداً</small></span><span class="sw ${p.urgent !== false ? 'on' : ''}"></span></button>
+        <button class="tgl-row" data-npref="announcement"><span class="tgl"><b>الإعلانات والتحديثات</b><small>أخبار وإشعارات إدارية</small></span><span class="sw ${p.announcement !== false ? 'on' : ''}"></span></button>
+        <button class="tgl-row" data-npref="reminder"><span class="tgl"><b>التذكيرات</b><small>مواعيد ومهام ونتائج</small></span><span class="sw ${p.reminder !== false ? 'on' : ''}"></span></button>`; })()}
       </div>
       <div class="settings-card"><div class="settings-title">صور العائلة</div>
         <div style="padding:6px 16px 2px;color:var(--text-sec);font-size:11px;font-weight:600;">ارفع صورة حقيقية للأم والأب من موبايلك</div>
@@ -2151,20 +2434,27 @@
     document.querySelectorAll('[data-delexp]').forEach(b => b.onclick = () => handleDeleteExpense(b.dataset.delexp));
     document.querySelectorAll('[data-ofil]').forEach(b => b.onclick = () => { state.orderFilter = b.dataset.ofil; persist(); render(); });
     document.querySelectorAll('[data-cfil]').forEach(b => b.onclick = () => { state.categoryFilter = b.dataset.cfil; persist(); render(); });
-    document.querySelectorAll('.notif-item[data-nid]').forEach(el => el.onclick = () => { markNotifRead(el.dataset.nid); setTab('orders'); });
+    document.querySelectorAll('.notif-item[data-nid]').forEach(el => el.onclick = (e) => { if (e.target.closest('[data-delnid]')) return; markNotifRead(el.dataset.nid); setTab(el.dataset.tab || 'orders'); });
+    document.querySelectorAll('[data-delnid]').forEach(b => b.onclick = (e) => { e.stopPropagation(); deleteNotif(b.dataset.delnid); toast('اتمسح الإشعار', 'success'); render(); });
     const mar = document.getElementById('markAllRead'); if (mar) mar.onclick = () => { markAllNotifsRead(); render(); };
     const tsb = document.getElementById('toggleSound'); if (tsb) tsb.onclick = () => { state._soundOn = state._soundOn === false; persist(); render(); toast(state._soundOn === false ? 'صوت التنبيهات اتقفل' : 'صوت التنبيهات اشتغل', 'info'); };
-    const epb = document.getElementById('enablePush'); if (epb) epb.onclick = async () => {
-      try {
-        if (!('Notification' in window)) { toast('المتصفح مش بيدعم إشعارات النظام', 'error'); return; }
-        const r = await Notification.requestPermission();
-        if (r === 'granted') toast('إشعارات المتصفح اشتغلت', 'success');
-        else toast('اترفضت الصلاحية — فعّلها من إعدادات المتصفح', 'warning');
-        render();
-      } catch { toast('مقدرتش أطلب الصلاحية', 'error'); }
+    const nbb = document.getElementById('notifBrowserBtn');
+    if (nbb) nbb.onclick = () => {
+      const on = PushSys.perm() === 'granted' && notifPrefs().browser !== false;
+      if (on) PushSys.disable(); else PushSys.enable();
     };
+    document.querySelectorAll('[data-npref]').forEach(b => b.onclick = () => {
+      const k = b.dataset.npref;
+      if (!state.notifPrefs) state.notifPrefs = {};
+      state.notifPrefs[k] = notifPrefs()[k] === false;
+      persist(); render();
+      toast(state.notifPrefs[k] === false ? 'اتقفلت الإشعارات دي' : 'اشتغلت الإشعارات دي', 'info');
+    });
+    const epb = document.getElementById('enablePush'); if (epb) epb.onclick = () => PushSys.enable();
+    const tnb = document.getElementById('testNotif'); if (tnb) tnb.onclick = () => { try { notifyLocal({ id: 'test-' + Date.now(), type: 'info', title: 'إشعار تجريبي', body: 'كده الإشعارات شغالة تمام', actionTab: 'notifs', createdAt: nowISO() }); toast('اتبعت إشعار تجريبي', 'success'); } catch { toast('مقدرتش أبعت الإشعار', 'error'); } };
     const si = document.getElementById('orderSearch');
     if (si) { si.oninput = (e) => { state.searchQuery = e.target.value; if (si._to) clearTimeout(si._to); si._to = setTimeout(() => { persist(); render(); const i = document.getElementById('orderSearch'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 200); }; }
+    try { if (state.currentTab === 'enc') bindEnc(); } catch {}
     bindSettings();
   }
 
@@ -2266,7 +2556,7 @@
     document.querySelectorAll('[data-unlearn]').forEach(btn => btn.onclick = () => { delete state.learnedMap[btn.dataset.unlearn]; persist(); toast('تمام، الكلمة اتمسحت', 'success'); render(); });
     b('clearLearned', () => { confirmDialog({ title: 'مسح الكلمات؟', message: 'هنمسح كل التصنيفات اللي اتعلمناها.', confirmText: 'مسح', cancelText: 'لا', danger: true }).then(ok => { if (ok) { state.learnedMap = {}; persist(); toast('تم المسح ✓', 'success'); render(); } }); });
     const clearAll = document.getElementById('clearAllBtn');
-    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, notifs: [], categoryColors: {}, categoryNames: {}, categoryIcons: {}, customCats: [], hiddenCats: [], photos: { mom: '', dad: '' }, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
+    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { try { PushSys.removeSub(); } catch {} Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, notifs: [], categoryColors: {}, categoryNames: {}, categoryIcons: {}, customCats: [], hiddenCats: [], photos: { mom: '', dad: '' }, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
   }
 
   function openAddCatModal() {
@@ -2519,6 +2809,7 @@
     (state.orders || []).forEach(o => add(o.name));
     Object.keys(CLASSIFIER_MAP).forEach(c => CLASSIFIER_MAP[c].forEach(add));
     Object.keys(state.learnedMap || {}).forEach(k => add(findOriginalName(k) || k));
+    try { encNamesForVoice().forEach(add); } catch {}
     return map;
   }
   function cleanVoiceRaw(s) {
@@ -2876,14 +3167,943 @@
   }
 
   /* =============================
+     PRODUCT ENCYCLOPEDIA — data layer
+     Hierarchy: Dept -> Sub -> Group -> Type -> Brand -> Flavor -> Size -> Product
+     One product record appears in many lists without duplication.
+     ============================= */
+  const ENC_VER = 3;
+  const ENC_KEY = 'baytna_enc_v1';
+  // [id, name, emoji, color, orderCat, [subs]]
+  const ENC_DEPTS = [
+    ['veg','الخضروات','🥬','#16A34A','produce',['خضروات طازجة','خضروات ورقية','خضروات جذرية','خضروات مجمدة','خضروات مقطعة وجاهزة','أعشاب طازجة']],
+    ['fruit','الفواكه','🍎','#F59E0B','produce',['فاكهة طازجة','فاكهة موسمية','فاكهة مستوردة','فاكهة مجففة','فاكهة مقطعة وجاهزة','سلطات فواكه']],
+    ['dairy','الألبان والجبن','🧀','#38BDF8','grocery',['الحليب','الزبادي','الجبن الأبيض','الجبن المطبوخ','الجبن الصلب','منتجات ألبان أخرى']],
+    ['grocery','البقالة والمواد الغذائية','🛒','#E67E22','grocery',['أساسيات المطبخ','المكرونة','الدقيق والنشا','السكر والملح','الزيوت والخل','البقوليات والحبوب']],
+    ['snacks','الشيبسي والسناكس','🍟','#F97316','grocery',['شيبسي بطاطس','مقرمشات ذرة','فشار وتسالي','مكسرات','نكهات متنوعة']],
+    ['bakery','الكيك والحلويات والمخبوزات','🍰','#EC4899','grocery',['كيك مغلف','كرواسون وباتيه','دونات ومافن','مخبوزات طازجة','كيك عائلي']],
+    ['biscuits','البسكويت والويفر','🍪','#B45309','grocery',['بسكويت سادة','بسكويت محشو','كوكيز ودايجستيف','بسكويت أطفال','ويفر']],
+    ['choco','الشوكولاتة والحلويات','🍫','#7C3AED','grocery',['ألواح شوكولاتة','شوكولاتة محشوة','توفي وكراميل','جيلي ومارشميلو','علكة ولبان']],
+    ['canned','المعلبات','🥫','#64748B','grocery',['أسماك معلبة','بقوليات معلبة','خضروات معلبة','فواكه معلبة']],
+    ['basics','المواد الغذائية الأساسية','🌾','#A16207','grocery',['الحبوب','الزيوت والسمن','السكر والملح','الدقيق']],
+    ['instant','الأطعمة سريعة التحضير','⚡','#EF4444','grocery',['نودلز سريعة','شوربات سريعة','وجبات سريعة']],
+    ['breakfast','الإفطار','🍯','#FBBF24','grocery',['عسل ومربى','حلاوة وطحينة','كورن فليكس وشوفان','سبريد للدهن']],
+    ['spices','العطارة والتوابل والأعشاب','🌿','#059669','grocery',['التوابل','الأعشاب','خلطات التوابل','المكسرات والبذور']],
+    ['sauces','الصلصات والمخللات والإضافات','🫙','#DC2626','grocery',['كاتشب ومايونيز','الصوصات','المخللات','الزيتون']],
+    ['meat','اللحوم','🥩','#B91C1C','grocery',['لحم بقري','لحم ضأن','مفروم ومصنعات','كبدة وأحشاء']],
+    ['poultry','الدواجن','🍗','#EA580C','grocery',['دجاج كامل','صدور وأوراك','أجنحة ودبابيس','مصنعات دجاج']],
+    ['fish','الأسماك والمأكولات البحرية','🐟','#0284C7','grocery',['طازج','مجمد','فيليه','جمبري ومأكولات بحرية']],
+    ['eggs','البيض','🥚','#D97706','grocery',['أبيض','أحمر','بلدي','سمان']],
+    ['drinks','المشروبات','🥤','#06B6D4','grocery',['المياه','العصائر','المشروبات الغازية','المشروبات الساخنة','مشروبات الطاقة']],
+    ['cleaning','المنظفات','🧹','#3B82F6','cleaning',['منظفات الملابس','منظفات المنزل','منظفات الأطباق','المعطرات']],
+    ['personal','العناية الشخصية','🧴','#8B5CF6','pharmacy',['الشعر','الجسم','الأسنان','الحلاقة']],
+    ['skincare','العناية بالبشرة والشعر','💆','#EC4899','pharmacy',['البشرة','الشعر','الحماية من الشمس','العناية اليومية']],
+    ['baby','الأطفال والرضع','👶','#F472B6','pharmacy',['الحفاضات','حليب الأطفال','أطعمة الأطفال','العناية بالأطفال','الرضاعة']],
+    ['pharmacy','الصيدلية والمستلزمات الطبية','💊','#E11D48','pharmacy',['أدوية بدون وصفة','المسكنات','البرد والحساسية','الفيتامينات','الإسعافات الأولية','أجهزة القياس']],
+    ['paper','الورقيات والمناديل','🧻','#94A3B8','cleaning',['مناديل الوجه','ورق التواليت','مناديل المطبخ','ورق وأكياس الحفظ']],
+    ['homewash','أدوات النظافة','🧽','#14B8A6','cleaning',['مكانس ومساحات','فوط وإسفنج','قفازات وأكياس قمامة']],
+    ['kitchen','أدوات المطبخ والمنزل','🍳','#78716C','other',['أطباق وأكواب','أواني وطاسات','التخزين','أدوات التقطيع والطبخ']],
+    ['pets','مستلزمات الحيوانات الأليفة','🐱','#F59E0B','other',['طعام القطط','طعام الكلاب','الرمل والمستلزمات','الألعاب']],
+    ['office','الأدوات المكتبية والمدرسية','✏️','#6366F1','other',['أقلام وألوان','كراسات ودفاتر','ملفات وحافظات','الأدوات الهندسية']],
+    ['electro','الإلكترونيات والإكسسوارات','🔌','#FBBF24','emergency',['شواحن وكابلات','سماعات','بطاريات ولمبات','إكسسوارات الهاتف']],
+    ['clothes','الملابس والمستلزمات الشخصية','👕','#0EA5E9','other',['رجالي','حريمي','أطفال','داخلية وجوارب']],
+    ['gifts','الهدايا والمناسبات','🎁','#D946EF','other',['هدايا وتغليف','بالونات وزينة','مستلزمات الحفلات','كروت التهنئة']],
+    ['auto','مستلزمات السيارات','🚗','#475569','emergency',['منظفات السيارات','المعطرات','شواحن وكابلات','طوارئ السيارة']],
+    ['frozen','المنتجات المجمدة','🧊','#38BDF8','grocery',['خضروات مجمدة','لحوم مجمدة','وجبات مجمدة','آيس كريم']],
+    ['readymeal','المنتجات الجاهزة للأكل','🍱','#FB7185','grocery',['وجبات جاهزة','سندوتشات','سلطات جاهزة']],
+    ['healthy','المنتجات الصحية والغذائية','🥗','#10B981','grocery',['دايت ولايت','شوفان وجرانولا','بدون سكر','بروتين']],
+    ['organic','المنتجات العضوية والطبيعية','🌱','#65A30D','grocery',['عضوي طازج','عضوي معبأ','طبيعي']],
+    ['dailyneed','مستلزمات المنزل اليومية','🏠','#7C3AED','other',['أساسيات يومية','صيانة خفيفة','تخزين منزلي']]
+  ];
+  // [id, ar, en, country]
+  const ENC_BRANDS = [
+    ['juhayna','جهينة','Juhayna','مصر'],['almarai','المراعي','Almarai','السعودية'],['obour','عبور لاند','Obour Land','مصر'],
+    ['domty','دومتي','Domty','مصر'],['president','بريزيدن','President','فرنسا'],['kiri','لافاش كيري','La Vache Qui Rit','فرنسا'],
+    ['chipsy','شيبسي','Chipsy','مصر'],['lays','لايز',"Lay's",'أمريكا'],['doritos','دوريتوس','Doritos','أمريكا'],
+    ['crunchy','كرانشي','Crunchy','مصر'],['sunbites','صن بايتس','Sunbites','مصر'],['molto','مولتو','Molto','مصر'],
+    ['hohoz','هوهوز','Hohoz','مصر'],['twinkies','توينكيز','Twinkies','مصر'],['edita','إيديتا','Edita','مصر'],
+    ['oreo','أوريو','Oreo','أمريكا'],['mcvities','ماكفيتيز',"McVitie's",'إنجلترا'],['cadbury','كادبوري','Cadbury','إنجلترا'],
+    ['galaxy','جالاكسي','Galaxy','الإمارات'],['corona','كورونا','Corona','مصر'],['dream','دريم','Dream','مصر'],
+    ['nesquik','نسكويك','Nesquik','سويسرا'],['lipton','ليبتون','Lipton','إنجلترا'],['ahmedtea','أحمد تي','Ahmed Tea','إنجلترا'],
+    ['nescafe','نسكافيه','Nescafe','سويسرا'],['arosa','العروسة','El Arosa','مصر'],['cola','كوكاكولا','Coca-Cola','أمريكا'],
+    ['pepsi','بيبسي','Pepsi','أمريكا'],['sprite','سبرايت','Sprite','أمريكا'],['fanta','فانتا','Fanta','أمريكا'],
+    ['tide','تايد','Tide','أمريكا'],['persil','برسيل','Persil','ألمانيا'],['downy','داوني','Downy','أمريكا'],
+    ['dettol','ديتول','Dettol','إنجلترا'],['clorox','كلوركس','Clorox','أمريكا'],['hands','هيد آند شولدرز','Head & Shoulders','أمريكا'],
+    ['pantene','بانتين','Pantene','أمريكا'],['loreal',"لوريال","L'Oreal",'فرنسا'],['nivea','نيفيا','Nivea','ألمانيا'],
+    ['colgate','كولجيت','Colgate','أمريكا'],['signal','سيجنال','Signal','فرنسا'],['lux','لوكس','Lux','إنجلترا'],
+    ['fine','فاين','Fine','الأردن'],['zeina','زينة','Zeina','مصر'],['pampers','بامبرز','Pampers','أمريكا'],
+    ['molfix','مولفيكس','Molfix','تركيا'],['babyjoy','بيبي جوي','BabyJoy','السعودية'],['nido','نيدو','Nido','سويسرا'],
+    ['bebelac','بيبيلاك','Bebelac','هولندا'],['vitrac','فيتراك','Vitrac','مصر'],['heinz','هاينز','Heinz','أمريكا'],
+    ['americana','أمريكانا','Americana','مصر'],['halwani','حلواني','Halwani','مصر'],['doha','الضحى','El Doha','مصر'],
+    ['maleka','الملكة','El Maleka','مصر'],['regina','ريجينا','Regina','مصر'],['generic','عام / سايب','Generic','—']
+  ];
+  // [dept, sub, group, ar, en, brand, flavor, size, price, old, stock, rating, sold, tags, isNew]
+  const ENC_SEED = [
+    ['veg','خضروات طازجة','طماطم','طماطم بلدي 1ك','Tomatoes 1kg','generic','','1 كجم',25,0,40,4.6,520,'',0],
+    ['veg','خضروات طازجة','بطاطس','بطاطس تحمير 1ك','Potatoes 1kg','generic','','1 كجم',22,0,50,4.7,610,'',0],
+    ['veg','خضروات طازجة','بصل','بصل أحمر 1ك','Red Onions 1kg','generic','','1 كجم',30,0,35,4.5,300,'',0],
+    ['veg','خضروات طازجة','ثوم','ثوم بلدي 500جم','Garlic 500g','generic','','500 جم',35,0,25,4.6,180,'',0],
+    ['veg','خضروات طازجة','خيار','خيار بلدي 1ك','Cucumber 1kg','generic','','1 كجم',24,0,30,4.5,260,'',0],
+    ['veg','خضروات طازجة','فلفل','فلفل رومي 500جم','Bell Pepper 500g','generic','','500 جم',20,0,25,4.4,150,'',0],
+    ['veg','خضروات طازجة','كوسة','كوسة 1ك','Zucchini 1kg','generic','','1 كجم',28,0,25,4.4,140,'',0],
+    ['veg','خضروات طازجة','باذنجان','باذنجان رومي 1ك','Eggplant 1kg','generic','','1 كجم',24,0,25,4.4,160,'',0],
+    ['veg','خضروات طازجة','بامية','بامية 500جم','Okra 500g','generic','','500 جم',30,0,20,4.7,200,'',0],
+    ['veg','خضروات طازجة','ذرة','ذرة حلوة 1ك','Sweet Corn 1kg','generic','','1 كجم',25,0,20,4.5,120,'',0],
+    ['veg','خضروات ورقية','ملوخية','ملوخية خضرا','Molokhia','generic','','500 جم',18,0,25,4.8,240,'',0],
+    ['veg','خضروات ورقية','سبانخ','سبانخ طازجة','Spinach','generic','','500 جم',22,0,20,4.6,150,'',0],
+    ['veg','خضروات ورقية','خس','خس بلدي','Lettuce','generic','','1 قطعة',15,0,20,4.5,130,'',0],
+    ['veg','خضروات ورقية','جرجير','جرجير','Arugula','generic','','1 حزمة',8,0,30,4.5,170,'',0],
+    ['veg','خضروات جذرية','جزر','جزر 1ك','Carrots 1kg','generic','','1 كجم',26,0,25,4.5,190,'',0],
+    ['veg','خضروات جذرية','بنجر','بنجر 1ك','Beetroot 1kg','generic','','1 كجم',28,0,15,4.4,80,'',0],
+    ['veg','خضروات جذرية','لفت','لفت 1ك','Turnip 1kg','generic','','1 كجم',18,0,15,4.3,60,'',0],
+    ['veg','خضروات جذرية','فجل','فجل أحمر','Radish','generic','','1 حزمة',12,0,20,4.3,70,'',0],
+    ['veg','خضروات مجمدة','مجمد','بسلة مجمدة 400جم','Frozen Peas 400g','generic','','400 جم',32,0,25,4.4,110,'مجمد',0],
+    ['veg','خضروات مجمدة','مجمد','ملوخية مجمدة 400جم','Frozen Molokhia','generic','','400 جم',28,0,25,4.4,100,'مجمد',0],
+    ['veg','خضروات مجمدة','مجمد','خضار مشكل مجمد','Frozen Mix','generic','','400 جم',35,0,20,4.3,90,'مجمد',0],
+    ['veg','خضروات مقطعة وجاهزة','جاهز','خضار شوربة جاهز','Soup Mix','generic','','500 جم',30,0,15,4.2,60,'',1],
+    ['veg','أعشاب طازجة','بقدونس','بقدونس','Parsley','generic','','1 حزمة',5,0,40,4.6,300,'',0],
+    ['veg','أعشاب طازجة','كزبرة','كزبرة خضرا','Coriander','generic','','1 حزمة',5,0,40,4.6,280,'',0],
+    ['veg','أعشاب طازجة','شبت','شبت','Dill','generic','','1 حزمة',6,0,30,4.5,150,'',0],
+    ['veg','أعشاب طازجة','نعناع','نعناع بلدي','Mint','generic','','1 حزمة',6,0,30,4.7,200,'',0],
+    ['veg','أعشاب طازجة','كرفس','كرفس','Celery','generic','','1 حزمة',12,0,15,4.3,50,'',0],
+    ['veg','خضروات طازجة','مشروم','مشروم طازج 200جم','Mushroom 200g','generic','','200 جم',70,0,12,4.5,90,'',1],
+    ['veg','خضروات طازجة','بروكلي','بروكلي','Broccoli','generic','','500 جم',45,0,12,4.4,70,'صحي',0],
+    ['veg','خضروات طازجة','قرنبيط','قرنبيط','Cauliflower','generic','','1 قطعة',30,0,15,4.4,80,'',0],
+    ['fruit','فاكهة طازجة','تفاح','تفاح أحمر 1ك','Red Apples 1kg','generic','','1 كجم',55,0,30,4.7,420,'',0],
+    ['fruit','فاكهة طازجة','تفاح','تفاح أخضر 1ك','Green Apples 1kg','generic','','1 كجم',60,0,25,4.6,250,'',0],
+    ['fruit','فاكهة طازجة','برتقال','برتقال بصرة 1ك','Oranges 1kg','generic','','1 كجم',35,0,35,4.7,480,'',0],
+    ['fruit','فاكهة طازجة','برتقال','برتقال بلدي للعصير 2ك','Juice Oranges 2kg','generic','','2 كجم',50,0,25,4.6,300,'',0],
+    ['fruit','فاكهة موسمية','يوسفي','يوسفي 1ك','Mandarins 1kg','generic','','1 كجم',40,0,25,4.7,350,'',0],
+    ['fruit','فاكهة طازجة','ليمون','ليمون 1ك','Lemons 1kg','generic','','1 كجم',30,0,30,4.6,320,'',0],
+    ['fruit','فاكهة طازجة','موز','موز 1ك','Bananas 1kg','generic','','1 كجم',40,0,35,4.8,550,'',0],
+    ['fruit','فاكهة موسمية','فراولة','فراولة 500جم','Strawberries 500g','generic','','500 جم',45,0,20,4.8,380,'',0],
+    ['fruit','فاكهة موسمية','عنب','عنب أحمر 1ك','Red Grapes 1kg','generic','','1 كجم',65,0,20,4.7,260,'',0],
+    ['fruit','فاكهة موسمية','مانجو','مانجو عويسي 1ك','Mango Owaisi 1kg','generic','','1 كجم',90,0,20,4.9,400,'',0],
+    ['fruit','فاكهة موسمية','مانجو','مانجو زبدية 1ك','Mango Zebda 1kg','generic','','1 كجم',60,0,20,4.7,280,'',0],
+    ['fruit','فاكهة موسمية','جوافة','جوافة 1ك','Guava 1kg','generic','','1 كجم',35,0,20,4.6,220,'',0],
+    ['fruit','فاكهة موسمية','رمان','رمان 1ك','Pomegranate 1kg','generic','','1 كجم',55,0,18,4.7,180,'',0],
+    ['fruit','فاكهة موسمية','بطيخ','بطيخ','Watermelon','generic','','1 قطعة',80,0,15,4.7,200,'',0],
+    ['fruit','فاكهة موسمية','شمام','شمام','Cantaloupe','generic','','1 قطعة',45,0,15,4.6,150,'',0],
+    ['fruit','فاكهة موسمية','خوخ','خوخ 1ك','Peaches 1kg','generic','','1 كجم',50,0,18,4.6,170,'',0],
+    ['fruit','فاكهة موسمية','كمثرى','كمثرى 1ك','Pears 1kg','generic','','1 كجم',55,0,15,4.5,120,'',0],
+    ['fruit','فاكهة مستوردة','كيوي','كيوي 500جم','Kiwi 500g','generic','','500 جم',70,0,12,4.6,110,'',0],
+    ['fruit','فاكهة مستوردة','أناناس','أناناس','Pineapple','generic','','1 قطعة',75,0,12,4.6,100,'',0],
+    ['fruit','فاكهة مستوردة','أفوكادو','أفوكادو','Avocado','generic','','1 قطعة',40,0,15,4.5,130,'صحي',1],
+    ['fruit','فاكهة مستوردة','كرز','كرز مستورد 500جم','Cherries 500g','generic','','500 جم',120,0,10,4.7,80,'',1],
+    ['fruit','فاكهة طازجة','تين','تين 500جم','Figs 500g','generic','','500 جم',50,0,12,4.7,90,'',0],
+    ['fruit','فاكهة طازجة','تمر','تمر سكري 1ك','Sukkari Dates 1kg','generic','','1 كجم',110,0,20,4.8,210,'',0],
+    ['fruit','فاكهة مجففة','زبيب','زبيب 500جم','Raisins 500g','generic','','500 جم',65,0,15,4.5,90,'',0],
+    ['fruit','فاكهة مجففة','مشمشية','مشمشية 500جم','Dried Apricots','generic','','500 جم',80,0,12,4.5,70,'',0],
+    ['fruit','فاكهة مقطعة وجاهزة','سلطة','سلطة فواكه جاهزة','Fruit Salad','generic','','400 جم',55,0,10,4.3,50,'',1],
+    ['dairy','الحليب','حليب','حليب جهينة كامل 1لتر','Juhayna Full Milk 1L','juhayna','كامل الدسم','1 لتر',42,48,40,4.7,700,'',0],
+    ['dairy','الحليب','حليب','حليب جهينة قليل الدسم 1لتر','Juhayna Low Fat 1L','juhayna','قليل الدسم','1 لتر',44,0,30,4.6,300,'صحي',0],
+    ['dairy','الحليب','حليب','حليب المراعي كامل 1لتر','Almarai Full Milk 1L','almarai','كامل الدسم','1 لتر',48,0,30,4.8,450,'',0],
+    ['dairy','الحليب','حليب','حليب بالشوكولاتة 200مل','Chocolate Milk 200ml','juhayna','شوكولاتة','200 مل',15,0,40,4.6,380,'أطفال',0],
+    ['dairy','الحليب','حليب','حليب بالفراولة 200مل','Strawberry Milk 200ml','juhayna','فراولة','200 مل',15,0,40,4.5,320,'أطفال',0],
+    ['dairy','الزبادي','زبادي','زبادي جهينة سادة','Juhayna Yogurt Plain','juhayna','سادة','105 جم',12,0,50,4.6,500,'',0],
+    ['dairy','الزبادي','زبادي','زبادي بالفراولة','Strawberry Yogurt','juhayna','فراولة','105 جم',14,0,40,4.6,350,'',0],
+    ['dairy','الزبادي','زبادي','زبادي يوناني','Greek Yogurt','almarai','يوناني','170 جم',28,0,25,4.7,220,'صحي',0],
+    ['dairy','الزبادي','زبادي','زبادي لايت','Light Yogurt','juhayna','لايت','105 جم',13,0,30,4.4,180,'صحي',0],
+    ['dairy','الجبن الأبيض','فيتا','جبن عبور لاند فيتا 500جم','Obour Feta 500g','obour','فيتا','500 جم',75,90,25,4.6,400,'',0],
+    ['dairy','الجبن الأبيض','قريش','جبن قريش 500جم','Cottage Cheese 500g','generic','','500 جم',60,0,20,4.7,200,'صحي',0],
+    ['dairy','الجبن الأبيض','دمياطي','جبن دمياطي 500جم','Damietta Cheese 500g','generic','','500 جم',70,0,15,4.5,120,'',0],
+    ['dairy','الجبن المطبوخ','مثلثات','جبن مثلثات 8 قطع','Triangles 8pc','kiri','','8 قطع',55,0,30,4.8,480,'أطفال',0],
+    ['dairy','الجبن المطبوخ','مثلثات','جبن مثلثات 24 قطعة','Triangles 24pc','kiri','','24 قطعة',140,160,15,4.8,250,'أطفال',0],
+    ['dairy','الجبن المطبوخ','دهن','جبن دومتي للدهن','Domty Spread','domty','كريمية','240 جم',65,0,20,4.5,230,'',0],
+    ['dairy','الجبن الصلب','رومي','جبن رومي 500جم','Roumy Cheese 500g','generic','','500 جم',120,0,15,4.7,190,'',0],
+    ['dairy','الجبن الصلب','شيدر','جبن شيدر 500جم','Cheddar 500g','domty','','500 جم',110,0,15,4.6,170,'',0],
+    ['dairy','الجبن الصلب','موتزاريلا','موتزاريلا 500جم','Mozzarella 500g','domty','','500 جم',115,0,18,4.7,260,'',0],
+    ['dairy','منتجات ألبان أخرى','لبنة','لبنة 400جم','Labneh 400g','almarai','','400 جم',85,0,15,4.6,140,'',0],
+    ['dairy','منتجات ألبان أخرى','قشطة','قشطة 100جم','Cream 100g','juhayna','','100 جم',25,0,25,4.6,200,'',0],
+    ['dairy','منتجات ألبان أخرى','كريمة','كريمة طبخ 250مل','Cooking Cream 250ml','juhayna','طبخ','250 مل',38,0,20,4.5,150,'',0],
+    ['dairy','منتجات ألبان أخرى','زبدة','زبدة 500جم','Butter 500g','generic','','500 جم',140,0,15,4.7,130,'',0],
+    ['dairy','منتجات ألبان أخرى','سمن','سمن بلدي 1ك','Ghee 1kg','generic','','1 كجم',380,0,10,4.8,90,'',0],
+    ['grocery','أساسيات المطبخ','أرز','أرز الضحى 1ك','El Doha Rice 1kg','doha','','1 كجم',55,65,30,4.7,420,'',0],
+    ['grocery','أساسيات المطبخ','أرز','أرز بسمتي 5ك','Basmati 5kg','doha','','5 كجم',450,0,12,4.8,150,'',0],
+    ['grocery','المكرونة','سباجيتي','مكرونة الملكة سباجيتي','El Maleka Spaghetti','maleka','سباجيتي','1 كجم',32,0,35,4.6,380,'',0],
+    ['grocery','المكرونة','قلم','مكرونة الملكة قلم','El Maleka Penne','maleka','قلم','1 كجم',32,0,35,4.6,400,'',0],
+    ['grocery','المكرونة','لسان عصفور','لسان عصفور ريجينا','Regina Orzo','regina','لسان عصفور','500 جم',22,0,25,4.5,200,'',0],
+    ['grocery','الدقيق والنشا','دقيق','دقيق الضحى 1ك','Flour 1kg','doha','','1 كجم',35,0,30,4.6,250,'',0],
+    ['grocery','السكر والملح','سكر','سكر 1ك','Sugar 1kg','generic','','1 كجم',40,0,40,4.6,500,'',0],
+    ['grocery','السكر والملح','ملح','ملح طعام 1ك','Salt 1kg','generic','','1 كجم',12,0,40,4.5,300,'',0],
+    ['grocery','الزيوت والخل','زيت','زيت ذرة 1.5لتر','Corn Oil 1.5L','generic','','1.5 لتر',150,175,20,4.5,350,'',0],
+    ['grocery','الزيوت والخل','خل','خل أبيض 1لتر','Vinegar 1L','generic','','1 لتر',25,0,25,4.4,150,'',0],
+    ['grocery','البقوليات والحبوب','عدس','عدس أصفر 500جم','Yellow Lentils 500g','doha','','500 جم',45,0,25,4.6,220,'',0],
+    ['grocery','البقوليات والحبوب','فول','فول مدمس 500جم','Fava Beans 500g','doha','','500 جم',35,0,25,4.5,200,'',0],
+    ['grocery','البقوليات والحبوب','حمص','حمص الشام 500جم','Chickpeas 500g','doha','','500 جم',50,0,20,4.5,160,'',0],
+    ['grocery','البقوليات والحبوب','لوبيا','لوبيا 500جم','Black Eyed Peas','doha','','500 جم',55,0,18,4.4,120,'',0],
+    ['snacks','شيبسي بطاطس','شيبسي','شيبسي ملح كبير','Chipsy Salt Large','chipsy','ملح','90 جم',20,0,50,4.6,650,'',0],
+    ['snacks','شيبسي بطاطس','شيبسي','شيبسي جبنة كبير','Chipsy Cheese Large','chipsy','جبنة','90 جم',20,25,50,4.7,700,'',0],
+    ['snacks','شيبسي بطاطس','شيبسي','شيبسي شطة وليمون','Chipsy Chili Lemon','chipsy','شطة وليمون','90 جم',20,0,45,4.7,680,'',0],
+    ['snacks','شيبسي بطاطس','شيبسي','شيبسي خل','Chipsy Vinegar','chipsy','خل','90 جم',20,0,40,4.5,400,'',0],
+    ['snacks','شيبسي بطاطس','شيبسي','شيبسي باربكيو','Chipsy BBQ','chipsy','باربكيو','90 جم',20,0,40,4.6,420,'',0],
+    ['snacks','شيبسي بطاطس','لايز','لايز جبنة','Lays Cheese','lays','جبنة','90 جم',25,0,35,4.6,350,'',0],
+    ['snacks','مقرمشات ذرة','دوريتوس','دوريتوس جبنة','Doritos Cheese','doritos','جبنة','90 جم',25,0,35,4.7,450,'',0],
+    ['snacks','مقرمشات ذرة','كرانشي','كرانشي شطة','Crunchy Chili','crunchy','شطة','90 جم',15,0,40,4.5,380,'',0],
+    ['snacks','مقرمشات ذرة','صن بايتس','صن بايتس زعتر','Sunbites Zaatar','sunbites','زعتر','90 جم',18,0,30,4.4,250,'',1],
+    ['snacks','فشار وتسالي','فشار','فشار بالزبدة','Butter Popcorn','generic','زبدة','100 جم',20,0,30,4.4,200,'',0],
+    ['snacks','مكسرات','سوداني','سوداني محمص 500جم','Roasted Peanuts 500g','generic','','500 جم',70,0,20,4.5,180,'',0],
+    ['snacks','مكسرات','لب','لب سوري 500جم','Sunflower Seeds 500g','generic','','500 جم',60,0,20,4.5,170,'',0],
+    ['bakery','كيك مغلف','هوهوز','هوهوز شوكولاتة','Hohoz Chocolate','hohoz','شوكولاتة','35 جم',12,15,60,4.7,750,'',0],
+    ['bakery','كيك مغلف','توينكيز','توينكيز فانيليا','Twinkies Vanilla','twinkies','فانيليا','35 جم',12,0,55,4.6,600,'',0],
+    ['bakery','كرواسون وباتيه','مولتو','مولتو كرواسون شوكولاتة','Molto Croissant Choco','molto','شوكولاتة','80 جم',18,0,50,4.7,650,'',0],
+    ['bakery','كرواسون وباتيه','مولتو','مولتو كرواسون جبنة','Molto Croissant Cheese','molto','جبنة','80 جم',18,0,45,4.6,500,'',0],
+    ['bakery','كيك مغلف','كيك رول','كيك رول فراولة','Cake Roll Strawberry','edita','فراولة','50 جم',15,0,40,4.5,300,'',0],
+    ['bakery','دونات ومافن','دونات','دونات شوكولاتة','Chocolate Donut','generic','شوكولاتة','60 جم',25,0,25,4.5,180,'',1],
+    ['bakery','دونات ومافن','مافن','مافن فانيليا','Vanilla Muffin','generic','فانيليا','70 جم',22,0,25,4.4,150,'',0],
+    ['bakery','مخبوزات طازجة','باتيه','باتيه جبنة','Cheese Patty','generic','جبنة','100 جم',15,0,30,4.5,220,'',0],
+    ['bakery','كيك عائلي','كيك','كيك عائلي شوكولاتة','Family Cake Choco','dream','شوكولاتة','500 جم',85,0,15,4.6,120,'',0],
+    ['biscuits','بسكويت سادة','شاي','بسكويت شاي','Tea Biscuits','generic','سادة','200 جم',20,0,40,4.5,350,'',0],
+    ['biscuits','بسكويت محشو','محشو','بسكويت محشو شوكولاتة','Choco Filled Biscuits','generic','شوكولاتة','200 جم',28,0,35,4.6,400,'',0],
+    ['biscuits','بسكويت محشو','أوريو','أوريو كلاسيك','Oreo Classic','oreo','كريمة','150 جم',30,36,40,4.8,550,'',0],
+    ['biscuits','كوكيز ودايجستيف','دايجستيف','دايجستيف ماكفيتيز','McVities Digestive','mcvities','','250 جم',45,0,25,4.7,280,'',0],
+    ['biscuits','كوكيز ودايجستيف','كوكيز','كوكيز شوكولاتة','Choco Cookies','generic','شوكولاتة','200 جم',35,0,30,4.5,250,'',0],
+    ['biscuits','بسكويت أطفال','أطفال','بسكويت أطفال بالحليب','Baby Biscuits Milk','generic','حليب','150 جم',25,0,30,4.6,200,'أطفال',0],
+    ['biscuits','ويفر','ويفر','ويفر شوكولاتة','Chocolate Wafer','generic','شوكولاتة','100 جم',22,0,40,4.6,380,'',0],
+    ['biscuits','ويفر','ويفر','ويفر فانيليا','Vanilla Wafer','generic','فانيليا','100 جم',22,0,35,4.5,300,'',0],
+    ['biscuits','ويفر','ويفر','ويفر بندق','Hazelnut Wafer','generic','بندق','100 جم',28,0,30,4.7,320,'',0],
+    ['choco','ألواح شوكولاتة','كادبوري','كادبوري ديري ميلك','Cadbury Dairy Milk','cadbury','حليب','90 جم',55,65,30,4.8,420,'',0],
+    ['choco','ألواح شوكولاتة','جالاكسي','جالاكسي حليب','Galaxy Milk','galaxy','حليب','90 جم',60,0,28,4.8,400,'',0],
+    ['choco','ألواح شوكولاتة','كورونا','كورونا شوكولاتة','Corona Chocolate','corona','حليب','80 جم',35,0,35,4.6,380,'',0],
+    ['choco','ألواح شوكولاتة','داكنة','شوكولاتة داكنة 70%','Dark 70%','cadbury','داكنة','90 جم',65,0,20,4.6,150,'صحي',0],
+    ['choco','شوكولاتة محشوة','محشوة','شوكولاتة بالبندق','Hazelnut Chocolate','galaxy','بندق','90 جم',65,0,25,4.7,280,'',0],
+    ['choco','شوكولاتة محشوة','محشوة','شوكولاتة بالكراميل','Caramel Chocolate','cadbury','كراميل','90 جم',60,0,25,4.7,260,'',0],
+    ['choco','توفي وكراميل','توفي','توفي كراميل','Toffee Caramel','generic','كراميل','200 جم',40,0,25,4.5,200,'',0],
+    ['choco','جيلي ومارشميلو','جيلي','جيلي فواكه','Fruit Jelly','generic','فواكه','100 جم',25,0,30,4.4,220,'أطفال',0],
+    ['choco','جيلي ومارشميلو','مارشميلو','مارشميلو','Marshmallow','generic','','150 جم',30,0,25,4.4,180,'أطفال',0],
+    ['choco','علكة ولبان','علكة','علكة نعناع','Mint Gum','generic','نعناع','1 علبة',20,0,40,4.3,300,'',0],
+    ['canned','أسماك معلبة','تونة','تونة قطع','Tuna Chunks','generic','','170 جم',55,0,30,4.5,320,'',0],
+    ['canned','أسماك معلبة','سردين','سردين معلب','Canned Sardines','generic','','125 جم',35,0,25,4.4,150,'',0],
+    ['canned','أسماك معلبة','ماكريل','ماكريل معلب','Canned Mackerel','generic','','200 جم',40,0,20,4.3,120,'',0],
+    ['canned','بقوليات معلبة','فول','فول معلب','Canned Fava Beans','americana','','400 جم',28,0,30,4.4,220,'',0],
+    ['canned','بقوليات معلبة','حمص','حمص معلب','Canned Chickpeas','americana','','400 جم',30,0,25,4.4,150,'',0],
+    ['canned','خضروات معلبة','ذرة','ذرة معلبة','Canned Corn','americana','','400 جم',35,0,25,4.4,160,'',0],
+    ['canned','خضروات معلبة','مشروم','مشروم معلب','Canned Mushroom','americana','','400 جم',45,0,20,4.3,110,'',0],
+    ['canned','فواكه معلبة','أناناس','أناناس معلب','Canned Pineapple','americana','','565 جم',60,0,15,4.4,90,'',0],
+    ['basics','الحبوب','أرز','أرز مصري فاخر 5ك','Premium Rice 5kg','doha','','5 كجم',280,0,12,4.7,140,'',0],
+    ['basics','الزيوت والسمن','زيت','زيت زيتون 500مل','Olive Oil 500ml','generic','','500 مل',180,0,12,4.7,100,'صحي',0],
+    ['basics','الزيوت والسمن','سمن','سمن نباتي 1ك','Vegetable Ghee 1kg','generic','','1 كجم',160,0,12,4.4,90,'',0],
+    ['basics','الدقيق','دقيق','دقيق فاخر 5ك','Flour 5kg','doha','','5 كجم',150,0,10,4.6,80,'',0],
+    ['basics','السكر والملح','سكر','سكر بني 500جم','Brown Sugar 500g','generic','','500 جم',45,0,15,4.4,70,'',1],
+    ['instant','نودلز سريعة','نودلز','نودلز فراخ','Chicken Noodles','generic','فراخ','70 جم',15,0,50,4.5,450,'',0],
+    ['instant','نودلز سريعة','نودلز','نودلز شطة','Chili Noodles','generic','شطة','70 جم',15,0,45,4.6,420,'',0],
+    ['instant','نودلز سريعة','نودلز','نودلز خضار','Veggie Noodles','generic','خضار','70 جم',15,0,45,4.4,350,'',0],
+    ['instant','شوربات سريعة','شوربة','شوربة عدس سريعة','Instant Lentil Soup','generic','عدس','60 جم',18,0,30,4.3,150,'',0],
+    ['instant','وجبات سريعة','وجبة','وجبة مكرونة سريعة','Instant Pasta Meal','generic','','100 جم',25,0,25,4.2,120,'',1],
+    ['breakfast','عسل ومربى','عسل','عسل أبيض 500جم','White Honey 500g','generic','','500 جم',150,0,15,4.8,140,'طبيعي',0],
+    ['breakfast','عسل ومربى','عسل','عسل أسود 500جم','Molasses 500g','generic','','500 جم',60,0,20,4.7,160,'',0],
+    ['breakfast','عسل ومربى','مربى','مربى فراولة فيتراك','Vitrac Strawberry Jam','vitrac','فراولة','350 جم',55,0,20,4.6,200,'',0],
+    ['breakfast','عسل ومربى','مربى','مربى تين','Fig Jam','vitrac','تين','350 جم',60,0,15,4.6,120,'',0],
+    ['breakfast','حلاوة وطحينة','حلاوة','حلاوة طحينية سادة','Halawa Plain','halwani','سادة','500 جم',85,0,18,4.7,180,'',0],
+    ['breakfast','حلاوة وطحينة','طحينة','طحينة 500جم','Tahini 500g','halwani','','500 جم',95,0,18,4.7,170,'',0],
+    ['breakfast','كورن فليكس وشوفان','كورن','كورن فليكس عسل','Honey Corn Flakes','generic','عسل','500 جم',90,0,15,4.5,140,'أطفال',0],
+    ['breakfast','كورن فليكس وشوفان','شوفان','شوفان 500جم','Oats 500g','generic','','500 جم',75,0,20,4.6,190,'صحي',0],
+    ['breakfast','سبريد للدهن','سبريد','شوكولاتة للدهن','Choco Spread','generic','شوكولاتة','350 جم',95,0,15,4.7,210,'',0],
+    ['spices','التوابل','فلفل','فلفل أسود 100جم','Black Pepper 100g','doha','أسود','100 جم',55,0,20,4.7,160,'',0],
+    ['spices','التوابل','كمون','كمون مطحون 100جم','Cumin 100g','doha','','100 جم',40,0,20,4.6,150,'',0],
+    ['spices','التوابل','كركم','كركم 100جم','Turmeric 100g','doha','','100 جم',35,0,18,4.6,120,'صحي',0],
+    ['spices','التوابل','قرفة','قرفة مطحونة 100جم','Cinnamon 100g','doha','','100 جم',45,0,18,4.6,110,'',0],
+    ['spices','التوابل','حبهان','حبهان 50جم','Cardamom 50g','doha','','50 جم',90,0,12,4.7,80,'',0],
+    ['spices','الأعشاب','يانسون','يانسون 100جم','Anise 100g','generic','','100 جم',30,0,20,4.5,100,'',0],
+    ['spices','الأعشاب','كركديه','كركديه 200جم','Hibiscus 200g','generic','','200 جم',40,0,18,4.6,110,'',0],
+    ['spices','الأعشاب','زعتر','زعتر 100جم','Thyme 100g','generic','','100 جم',35,0,18,4.5,90,'',0],
+    ['spices','خلطات التوابل','مشكلة','بهارات مشكلة','Mixed Spices','doha','','100 جم',40,0,20,4.6,130,'',0],
+    ['spices','خلطات التوابل','فراخ','بهارات فراخ','Chicken Spices','doha','','100 جم',38,0,18,4.5,100,'',0],
+    ['spices','المكسرات والبذور','لوز','لوز 500جم','Almonds 500g','generic','','500 جم',220,0,12,4.8,90,'صحي',0],
+    ['spices','المكسرات والبذور','كاجو','كاجو 500جم','Cashew 500g','generic','','500 جم',240,0,12,4.8,85,'',0],
+    ['spices','المكسرات والبذور','سمسم','سمسم 500جم','Sesame 500g','generic','','500 جم',90,0,15,4.5,70,'',0],
+    ['sauces','كاتشب ومايونيز','كاتشب','كاتشب هاينز 500جم','Heinz Ketchup 500g','heinz','','500 جم',55,0,25,4.7,350,'',0],
+    ['sauces','كاتشب ومايونيز','مايونيز','مايونيز 500جم','Mayonnaise 500g','heinz','','500 جم',60,0,22,4.6,250,'',0],
+    ['sauces','الصوصات','باربكيو','صوص باربكيو','BBQ Sauce','heinz','','400 جم',55,0,18,4.5,150,'',0],
+    ['sauces','الصوصات','حار','صوص حار','Hot Sauce','generic','حار','200 مل',35,0,20,4.4,180,'',0],
+    ['sauces','المخللات','مشكل','مخلل مشكل 1ك','Mixed Pickles 1kg','generic','','1 كجم',50,0,18,4.5,140,'',0],
+    ['sauces','المخللات','خيار','خيار مخلل 500جم','Pickled Cucumber','generic','','500 جم',35,0,20,4.5,130,'',0],
+    ['sauces','الزيتون','زيتون','زيتون أسود 500جم','Black Olives 500g','generic','أسود','500 جم',65,0,18,4.6,150,'',0],
+    ['sauces','الزيتون','زيتون','زيتون أخضر 500جم','Green Olives 500g','generic','أخضر','500 جم',60,0,18,4.6,140,'',0],
+    ['meat','لحم بقري','بقري','لحم بقري 1ك','Beef 1kg','generic','','1 كجم',420,480,10,4.8,120,'',0],
+    ['meat','لحم ضأن','ضأن','لحم ضأن 1ك','Lamb 1kg','generic','','1 كجم',480,0,8,4.8,80,'',0],
+    ['meat','مفروم ومصنعات','مفروم','لحم مفروم 1ك','Minced Meat 1kg','generic','','1 كجم',430,0,10,4.7,150,'',0],
+    ['meat','مفروم ومصنعات','كفتة','كفتة جاهزة 500جم','Kofta 500g','americana','','500 جم',150,0,12,4.5,130,'',0],
+    ['meat','مفروم ومصنعات','برجر','برجر لحم 1ك','Beef Burger 1kg','americana','','1 كجم',220,0,12,4.6,200,'',0],
+    ['meat','مفروم ومصنعات','سجق','سجق بلدي 500جم','Sausage 500g','generic','','500 جم',140,0,10,4.6,110,'',0],
+    ['meat','كبدة وأحشاء','كبدة','كبدة بقري 500جم','Beef Liver 500g','generic','','500 جم',180,0,8,4.7,90,'',0],
+    ['poultry','دجاج كامل','كامل','دجاج كامل 1.5ك','Whole Chicken 1.5kg','generic','','1.5 كجم',180,0,12,4.7,250,'',0],
+    ['poultry','صدور وأوراك','صدور','صدور دجاج 1ك','Chicken Breasts 1kg','generic','','1 كجم',220,0,10,4.7,220,'صحي',0],
+    ['poultry','صدور وأوراك','أوراك','أوراك دجاج 1ك','Chicken Thighs 1kg','generic','','1 كجم',170,0,12,4.6,180,'',0],
+    ['poultry','مصنعات دجاج','بانيه','بانيه دجاج 1ك','Chicken Pane 1kg','americana','','1 كجم',200,0,12,4.6,240,'',0],
+    ['poultry','مصنعات دجاج','ناجتس','ناجتس دجاج 500جم','Nuggets 500g','americana','','500 جم',120,0,12,4.5,200,'أطفال',0],
+    ['poultry','مصنعات دجاج','لانشون','لانشون فراخ','Chicken Luncheon','americana','فراخ','400 جم',90,0,15,4.4,160,'',0],
+    ['fish','طازج','بلطي','سمك بلطي 1ك','Tilapia 1kg','generic','','1 كجم',120,0,10,4.7,150,'',0],
+    ['fish','طازج','بوري','سمك بوري 1ك','Mullet 1kg','generic','','1 كجم',160,0,8,4.7,100,'',0],
+    ['fish','فيليه','فيليه','فيليه بلطي 500جم','Fillet 500g','generic','','500 جم',110,0,10,4.6,110,'صحي',0],
+    ['fish','جمبري ومأكولات بحرية','جمبري','جمبري 500جم','Shrimp 500g','generic','','500 جم',280,0,8,4.8,90,'',0],
+    ['fish','جمبري ومأكولات بحرية','سبيط','سبيط 500جم','Squid 500g','generic','','500 جم',180,0,8,4.6,60,'',0],
+    ['fish','مجمد','ماكريل','ماكريل مجمد 1ك','Frozen Mackerel 1kg','generic','','1 كجم',100,0,10,4.4,80,'مجمد',0],
+    ['eggs','أبيض','أبيض','بيض أبيض 30','White Eggs 30pc','generic','','30 قطعة',180,0,15,4.6,300,'',0],
+    ['eggs','أحمر','أحمر','بيض أحمر 30','Brown Eggs 30pc','generic','','30 قطعة',190,0,15,4.6,280,'',0],
+    ['eggs','بلدي','بلدي','بيض بلدي 10','Baladi Eggs 10pc','generic','','10 قطع',80,0,12,4.8,120,'طبيعي',0],
+    ['eggs','سمان','سمان','بيض سمان 24','Quail Eggs 24pc','generic','','24 قطعة',60,0,10,4.4,50,'',1],
+    ['drinks','المياه','مياه','مياه صغيرة 600مل','Water 600ml','generic','','600 مل',8,0,100,4.5,600,'',0],
+    ['drinks','المياه','مياه','مياه 1.5لتر','Water 1.5L','generic','','1.5 لتر',12,0,80,4.5,550,'',0],
+    ['drinks','العصائر','عصير','عصير جهينة مانجو 1لتر','Juhayna Mango 1L','juhayna','مانجو','1 لتر',45,0,30,4.6,400,'',0],
+    ['drinks','العصائر','عصير','عصير جهينة جوافة 1لتر','Juhayna Guava 1L','juhayna','جوافة','1 لتر',45,0,28,4.6,350,'',0],
+    ['drinks','المشروبات الغازية','كولا','كوكاكولا 1لتر','Coca-Cola 1L','cola','كولا','1 لتر',30,35,40,4.6,500,'',0],
+    ['drinks','المشروبات الغازية','برتقال','فانتا برتقال 1لتر','Fanta Orange 1L','fanta','برتقال','1 لتر',30,0,35,4.5,380,'',0],
+    ['drinks','المشروبات الغازية','ليمون','سبرايت 1لتر','Sprite 1L','sprite','ليمون','1 لتر',30,0,35,4.5,360,'',0],
+    ['drinks','المشروبات الساخنة','شاي','شاي ليبتون 100 فتلة','Lipton 100 bags','lipton','','100 فتلة',120,0,20,4.7,300,'',0],
+    ['drinks','المشروبات الساخنة','شاي','شاي العروسة 250جم','El Arosa Tea 250g','arosa','','250 جم',65,0,25,4.7,350,'',0],
+    ['drinks','المشروبات الساخنة','قهوة','قهوة تركي 200جم','Turkish Coffee 200g','generic','','200 جم',85,0,20,4.7,220,'',0],
+    ['drinks','المشروبات الساخنة','نسكافيه','نسكافيه كلاسيك 200جم','Nescafe Classic 200g','nescafe','','200 جم',180,210,15,4.7,250,'',0],
+    ['drinks','المشروبات الساخنة','كاكاو','نسكويك 500جم','Nesquik 500g','nesquik','','500 جم',120,0,18,4.7,280,'أطفال',0],
+    ['cleaning','منظفات الملابس','مسحوق','مسحوق تايد 2.5ك','Tide 2.5kg','tide','','2.5 كجم',320,380,15,4.7,300,'',0],
+    ['cleaning','منظفات الملابس','مسحوق','مسحوق برسيل 2.5ك','Persil 2.5kg','persil','','2.5 كجم',340,0,12,4.7,250,'',0],
+    ['cleaning','منظفات الملابس','جل','جل غسيل مركز','Laundry Gel','persil','','1 لتر',180,0,12,4.6,150,'',1],
+    ['cleaning','منظفات الملابس','منعم','منعم داوني 1لتر','Downy 1L','downy','','1 لتر',150,0,15,4.7,220,'',0],
+    ['cleaning','منظفات الملابس','مبيض','كلور أبيض 2لتر','Bleach 2L','clorox','','2 لتر',60,0,20,4.6,200,'',0],
+    ['cleaning','منظفات المنزل','أرضيات','منظف أرضيات 1.5لتر','Floor Cleaner 1.5L','generic','','1.5 لتر',85,0,15,4.5,150,'',0],
+    ['cleaning','منظفات المنزل','زجاج','ملمع زجاج','Glass Cleaner','generic','','500 مل',55,0,15,4.4,120,'',0],
+    ['cleaning','منظفات المنزل','مطهر','مطهر ديتول 1لتر','Dettol 1L','dettol','','1 لتر',140,0,12,4.8,200,'',0],
+    ['cleaning','منظفات الأطباق','سائل','سائل أطباق 1لتر','Dish Soap 1L','generic','ليمون','1 لتر',65,0,20,4.5,250,'',0],
+    ['cleaning','منظفات الأطباق','ليف','ليفة مواعين','Sponge','generic','','3 قطع',25,0,30,4.3,180,'',0],
+    ['cleaning','المعطرات','جو','معطر جو','Air Freshener','generic','لافندر','300 مل',75,0,15,4.4,130,'',0],
+    ['personal','الشعر','شامبو','شامبو هيد آند شولدرز','Head & Shoulders','hands','ضد القشرة','400 مل',220,260,12,4.7,220,'',0],
+    ['personal','الشعر','شامبو','شامبو بانتين','Pantene Shampoo','pantene','','400 مل',200,0,12,4.6,180,'',0],
+    ['personal','الشعر','بلسم','بلسم بانتين','Pantene Conditioner','pantene','','360 مل',190,0,10,4.5,120,'',0],
+    ['personal','الشعر','زيت','زيت شعر','Hair Oil','generic','','200 مل',90,0,15,4.4,100,'طبيعي',0],
+    ['personal','الجسم','صابون','صابون لوكس','Lux Soap','lux','','120 جم',35,0,30,4.6,300,'',0],
+    ['personal','الجسم','شاور','شاور جل','Shower Gel','lux','','500 مل',140,0,12,4.6,150,'',0],
+    ['personal','الجسم','مزيل','مزيل عرق','Deodorant','nivea','','150 مل',130,0,12,4.5,160,'',0],
+    ['personal','الأسنان','معجون','معجون كولجيت','Colgate','colgate','','100 مل',65,0,25,4.7,350,'',0],
+    ['personal','الأسنان','فرشاة','فرشاة أسنان','Toothbrush','signal','','1 قطعة',45,0,25,4.5,200,'',0],
+    ['personal','الأسنان','غسول','غسول فم','Mouthwash','signal','','500 مل',110,0,12,4.5,110,'',0],
+    ['skincare','البشرة','غسول','غسول بشرة','Face Wash','nivea','','150 مل',150,0,12,4.6,130,'',0],
+    ['skincare','البشرة','مرطب','كريم مرطب','Moisturizer','nivea','','200 مل',180,0,10,4.7,120,'',0],
+    ['skincare','الحماية من الشمس','واقي','واقي شمس SPF50','Sunscreen SPF50','loreal','50','125 مل',320,0,8,4.7,90,'',1],
+    ['skincare','الشعر','ماسك','ماسك شعر','Hair Mask','loreal','','300 مل',250,0,8,4.6,80,'',0],
+    ['skincare','الشعر','صبغة','صبغة شعر','Hair Dye','loreal','بني','1 علبة',280,0,8,4.5,70,'',0],
+    ['baby','الحفاضات','بامبرز','بامبرز مقاس 4','Pampers Size 4','pampers','4','58 قطعة',450,520,12,4.8,300,'أطفال',0],
+    ['baby','الحفاضات','مولفيكس','مولفيكس مقاس 3','Molfix Size 3','molfix','3','62 قطعة',380,0,12,4.7,250,'أطفال',0],
+    ['baby','الحفاضات','مناديل','مناديل مبللة أطفال','Baby Wipes','fine','','72 منديل',85,0,20,4.7,280,'أطفال',0],
+    ['baby','حليب الأطفال','نيدو','نيدو 1+ 900جم','Nido 1+ 900g','nido','1+','900 جم',420,0,10,4.8,200,'أطفال',0],
+    ['baby','حليب الأطفال','بيبيلاك','بيبيلاك 2 400جم','Bebelac 2 400g','bebelac','2','400 جم',380,0,8,4.8,150,'أطفال',0],
+    ['baby','أطعمة الأطفال','طعام','طعام أطفال خضار','Baby Food Veggies','generic','خضار','120 جم',35,0,20,4.5,130,'أطفال',0],
+    ['baby','الرضاعة','زجاجة','زجاجة رضاعة','Feeding Bottle','generic','','250 مل',150,0,12,4.5,90,'أطفال',0],
+    ['baby','العناية بالأطفال','شامبو','شامبو أطفال','Baby Shampoo','generic','','200 مل',110,0,15,4.7,140,'أطفال',0],
+    ['baby','العناية بالأطفال','كريم','كريم حفاض','Diaper Cream','generic','','100 جم',95,0,15,4.6,120,'أطفال',0],
+    ['baby','العناية بالأطفال','زيت','زيت أطفال','Baby Oil','generic','','200 مل',85,0,15,4.5,100,'أطفال',0],
+    ['pharmacy','المسكنات','بنادول','بنادول إكسترا 24 قرص','Panadol Extra 24','generic','','24 قرص',65,0,20,4.8,400,'',0],
+    ['pharmacy','المسكنات','بروفين','بروفين 400 20 قرص','Brufen 400 20','generic','','20 قرص',55,0,18,4.7,250,'',0],
+    ['pharmacy','البرد والحساسية','كحة','دواء كحة أعشاب','Cough Syrup Herbal','generic','أعشاب','120 مل',75,0,15,4.6,180,'',0],
+    ['pharmacy','البرد والحساسية','استحلاب','استحلاب زور','Throat Lozenges','generic','نعناع','24 قطعة',40,0,20,4.5,150,'',0],
+    ['pharmacy','أدوية بدون وصفة','حموضة','مضاد حموضة','Antacid','generic','','20 قرص',50,0,18,4.5,140,'',0],
+    ['pharmacy','الفيتامينات','سي','فيتامين سي 20 قرص فوار','Vitamin C 20','generic','','20 قرص',90,0,15,4.7,200,'صحي',0],
+    ['pharmacy','الفيتامينات','د','فيتامين د 1000','Vitamin D 1000','generic','','30 كبسولة',120,0,12,4.7,150,'صحي',0],
+    ['pharmacy','الإسعافات الأولية','شاش','شاش طبي','Medical Gauze','generic','','1 بكرة',25,0,25,4.5,120,'',0],
+    ['pharmacy','الإسعافات الأولية','بلاستر','بلاستر جروح','Bandages','generic','','20 قطعة',35,0,25,4.5,160,'',0],
+    ['pharmacy','الإسعافات الأولية','كمامات','كمامات طبية 50','Masks 50pc','generic','','50 قطعة',75,0,20,4.5,180,'',0],
+    ['pharmacy','أجهزة القياس','حرارة','ترمومتر ديجيتال','Digital Thermometer','generic','','1 قطعة',150,0,10,4.6,90,'',0],
+    ['pharmacy','أجهزة القياس','ضغط','جهاز قياس ضغط','BP Monitor','generic','','1 جهاز',1200,0,5,4.7,40,'',1],
+    ['paper','مناديل الوجه','وجه','مناديل وجه فاين 5 علب','Fine Tissues 5pk','fine','','5 علب',140,0,15,4.7,250,'',0],
+    ['paper','ورق التواليت','تواليت','ورق تواليت 12 بكرة','Toilet Paper 12','zeina','','12 بكرة',180,0,12,4.6,220,'',0],
+    ['paper','مناديل المطبخ','مطبخ','مناديل مطبخ 2 بكرة','Kitchen Towels 2','fine','','2 بكرة',70,0,18,4.6,180,'',0],
+    ['paper','ورق وأكياس الحفظ','فويل','ورق فويل','Aluminum Foil','generic','','50 متر',85,0,15,4.5,140,'',0],
+    ['paper','ورق وأكياس الحفظ','زبدة','ورق زبدة','Parchment Paper','generic','','10 متر',55,0,15,4.4,100,'',0],
+    ['paper','ورق وأكياس الحفظ','أكياس','أكياس قمامة 30','Trash Bags 30','generic','','30 كيس',60,0,20,4.4,200,'',0],
+    ['homewash','مكانس ومساحات','مقشة','مقشة بلاستيك','Broom','generic','','1 قطعة',65,0,15,4.3,90,'',0],
+    ['homewash','مكانس ومساحات','مساحة','مساحة أرضيات','Mop','generic','','1 قطعة',120,0,10,4.4,70,'',0],
+    ['homewash','مكانس ومساحات','جردل','جردل بلاستيك','Bucket','generic','','15 لتر',85,0,12,4.3,60,'',0],
+    ['homewash','فوط وإسفنج','فوط','فوط تنظيف 5','Cleaning Cloths 5','generic','','5 قطع',50,0,18,4.4,110,'',0],
+    ['homewash','قفازات وأكياس قمامة','قفازات','قفازات تنظيف','Cleaning Gloves','generic','','1 زوج',35,0,20,4.3,130,'',0],
+    ['kitchen','أطباق وأكواب','أطباق','طقم أطباق 24','Dinner Set 24','generic','','24 قطعة',950,0,5,4.6,40,'',1],
+    ['kitchen','أطباق وأكواب','أكواب','طقم أكواب 6','Glasses 6pc','generic','','6 قطع',220,0,8,4.5,60,'',0],
+    ['kitchen','أواني وطاسات','حلل','حلة استانلس','Steel Pot','generic','','28 سم',650,0,5,4.6,35,'',0],
+    ['kitchen','أواني وطاسات','طاسات','طاسة تيفال','Non-stick Pan','generic','','26 سم',480,0,6,4.6,45,'',0],
+    ['kitchen','التخزين','علب','علب تخزين 3','Storage Boxes 3','generic','','3 قطع',180,0,10,4.4,70,'',0],
+    ['kitchen','أدوات التقطيع والطبخ','تقطيع','طقم سكاكين','Knife Set','generic','','6 قطع',350,0,6,4.5,50,'',0],
+    ['pets','طعام القطط','جاف','طعام قطط جاف 1ك','Dry Cat Food 1kg','generic','دجاج','1 كجم',220,0,10,4.6,90,'',0],
+    ['pets','طعام القطط','رطب','طعام قطط رطب','Wet Cat Food','generic','','400 جم',60,0,15,4.5,80,'',0],
+    ['pets','طعام الكلاب','جاف','طعام كلاب جاف 3ك','Dry Dog Food 3kg','generic','','3 كجم',450,0,6,4.5,50,'',0],
+    ['pets','الرمل والمستلزمات','رمل','رمل قطط 5ك','Cat Litter 5kg','generic','','5 كجم',150,0,10,4.4,70,'',0],
+    ['pets','الألعاب','ألعاب','لعبة قطط','Cat Toy','generic','','1 قطعة',45,0,15,4.3,60,'',1],
+    ['office','أقلام وألوان','جاف','أقلام جاف 10','Ballpoint Pens 10','generic','أزرق','10 أقلام',60,0,20,4.4,150,'',0],
+    ['office','أقلام وألوان','ألوان','علبة ألوان 24','Colors 24pc','generic','','24 لون',85,0,15,4.6,130,'',0],
+    ['office','كراسات ودفاتر','كراسات','كراسة 100 ورقة','Notebook 100','generic','','100 ورقة',35,0,25,4.4,180,'',0],
+    ['office','ملفات وحافظات','ملفات','ملف بلاستيك','File Folder','generic','','1 قطعة',20,0,25,4.3,120,'',0],
+    ['office','الأدوات الهندسية','هندسية','طقم هندسي','Geometry Set','generic','','1 طقم',75,0,12,4.4,80,'',0],
+    ['electro','شواحن وكابلات','شاحن','شاحن سريع 25W','Fast Charger 25W','generic','','25 واط',350,0,10,4.5,110,'',1],
+    ['electro','شواحن وكابلات','كابل','كابل شحن Type-C','Type-C Cable','generic','','1 متر',120,0,15,4.4,140,'',0],
+    ['electro','سماعات','سماعات','سماعات أذن','Earphones','generic','','1 قطعة',250,0,10,4.4,90,'',0],
+    ['electro','بطاريات ولمبات','بطاريات','بطاريات AA 4','AA Batteries 4','generic','','4 قطع',90,0,20,4.5,150,'',0],
+    ['electro','بطاريات ولمبات','لمبات','لمبة ليد 12W','LED Bulb 12W','generic','','12 واط',75,0,20,4.6,130,'',0],
+    ['electro','إكسسوارات الهاتف','مشترك','مشترك كهرباء 4','Power Strip 4','generic','','4 مخارج',220,0,8,4.4,70,'',0],
+    ['clothes','رجالي','تيشرت','تيشرت رجالي قطن','Men Cotton T-shirt','generic','','L',180,0,12,4.4,80,'',0],
+    ['clothes','حريمي','بلوزة','بلوزة حريمي','Women Blouse','generic','','M',250,0,10,4.4,60,'',1],
+    ['clothes','أطفال','بيجامة','بيجامة أطفال','Kids Pajama','generic','','6 سنوات',220,0,10,4.5,70,'أطفال',0],
+    ['clothes','داخلية وجوارب','جوارب','جوارب قطن 3','Cotton Socks 3','generic','','3 أزواج',60,0,20,4.3,110,'',0],
+    ['gifts','هدايا وتغليف','هدايا','علبة هدية فاخرة','Gift Box','generic','','1 قطعة',120,0,10,4.5,60,'',0],
+    ['gifts','هدايا وتغليف','تغليف','ورق تغليف هدايا','Wrapping Paper','generic','','5 متر',45,0,15,4.3,70,'',0],
+    ['gifts','بالونات وزينة','بالونات','بالونات ملونة 20','Balloons 20pc','generic','ملون','20 قطعة',55,0,15,4.4,80,'',0],
+    ['gifts','مستلزمات الحفلات','شموع','شموع عيد ميلاد','Birthday Candles','generic','','24 شمعة',30,0,20,4.3,90,'',0],
+    ['auto','منظفات السيارات','منظف','منظف سيارات','Car Cleaner','generic','','500 مل',95,0,12,4.4,70,'',0],
+    ['auto','المعطرات','معطر','معطر سيارة','Car Freshener','generic','فانيليا','1 قطعة',45,0,18,4.3,100,'',0],
+    ['auto','شواحن وكابلات','شاحن','شاحن سيارة سريع','Car Charger','generic','','1 قطعة',180,0,10,4.4,60,'',0],
+    ['frozen','خضروات مجمدة','بسلة','بسلة مجمدة 500جم','Frozen Peas 500g','americana','','500 جم',38,0,20,4.4,130,'مجمد',0],
+    ['frozen','لحوم مجمدة','برجر','برجر مجمد 1ك','Frozen Burger 1kg','americana','','1 كجم',230,0,10,4.6,150,'مجمد',0],
+    ['frozen','وجبات مجمدة','وجبة','وجبة مجمدة','Frozen Meal','americana','','400 جم',95,0,12,4.3,80,'مجمد',1],
+    ['frozen','آيس كريم','آيس','آيس كريم فانيليا 1لتر','Vanilla Ice Cream 1L','generic','فانيليا','1 لتر',110,0,12,4.7,180,'مجمد',0],
+    ['frozen','آيس كريم','آيس','آيس كريم شوكولاتة','Chocolate Ice Cream','generic','شوكولاتة','1 لتر',115,0,12,4.7,170,'مجمد',0],
+    ['readymeal','وجبات جاهزة','وجبة','وجبة فراخ جاهزة','Ready Chicken Meal','americana','فراخ','350 جم',85,0,10,4.4,90,'',1],
+    ['readymeal','سندوتشات','سندوتش','سندوتش جبنة','Cheese Sandwich','generic','جبنة','1 قطعة',35,0,15,4.3,100,'',0],
+    ['readymeal','سلطات جاهزة','سلطة','سلطة سيزر جاهزة','Caesar Salad','generic','','300 جم',65,0,10,4.4,70,'صحي',0],
+    ['healthy','دايت ولايت','زبادي','زبادي يوناني لايت','Light Greek Yogurt','almarai','لايت','170 جم',30,0,20,4.6,160,'صحي',0],
+    ['healthy','شوفان وجرانولا','شوفان','شوفان كامل 500جم','Whole Oats 500g','generic','','500 جم',75,0,18,4.6,170,'صحي',0],
+    ['healthy','شوفان وجرانولا','جرانولا','جرانولا عسل','Honey Granola','generic','عسل','400 جم',110,0,12,4.5,100,'صحي',1],
+    ['healthy','بدون سكر','سكر','سكر دايت 100 كيس','Diet Sugar 100','generic','','100 كيس',95,0,15,4.5,120,'صحي',0],
+    ['healthy','بروتين','بار','بروتين بار شوكولاتة','Protein Bar Choco','generic','شوكولاتة','60 جم',65,0,15,4.4,90,'صحي',1],
+    ['organic','عضوي طازج','خضار','خضار عضوي مشكل','Organic Veggies','generic','','1 كجم',80,0,10,4.7,70,'طبيعي',1],
+    ['organic','عضوي طازج','عسل','عسل عضوي 250جم','Organic Honey 250g','generic','','250 جم',220,0,8,4.8,60,'طبيعي',0],
+    ['organic','عضوي معبأ','زيت','زيت زيتون عضوي','Organic Olive Oil','generic','','500 مل',260,0,8,4.8,55,'طبيعي',0],
+    ['organic','عضوي معبأ','شاي','شاي أخضر عضوي','Organic Green Tea','ahmedtea','','25 فتلة',95,0,12,4.6,80,'طبيعي',0],
+    ['organic','طبيعي','تمر','تمر عضوي 500جم','Organic Dates 500g','generic','','500 جم',130,0,10,4.8,65,'طبيعي',0],
+    ['dailyneed','أساسيات يومية','أكياس','أكياس قمامة كبيرة','Large Trash Bags','generic','','20 كيس',55,0,20,4.4,150,'',0],
+    ['dailyneed','أساسيات يومية','بطاريات','بطاريات ريموت','Remote Batteries','generic','','2 قطعة',40,0,20,4.4,120,'',0],
+    ['dailyneed','صيانة خفيفة','شمع','شمع طوارئ','Emergency Candles','generic','','6 قطع',35,0,18,4.3,80,'',0],
+    ['dailyneed','صيانة خفيفة','ولاعة','ولاعة','Lighter','generic','','1 قطعة',25,0,25,4.3,140,'',0],
+    ['dailyneed','تخزين منزلي','حبل','حبل غسيل','Clothes Line','generic','','10 متر',40,0,15,4.3,90,'',0]
+  ];
+  let ENC = null;
+  function encSave() { try { localStorage.setItem(ENC_KEY, JSON.stringify(ENC)); } catch {} }
+  function encLoad() {
+    try { const r = localStorage.getItem(ENC_KEY); if (r) { const o = JSON.parse(r); if (o && o.v === ENC_VER && Array.isArray(o.products)) return o; } } catch {}
+    return null;
+  }
+  function encInit() {
+    if (ENC) return ENC;
+    const saved = encLoad();
+    if (saved) { ENC = saved; }
+    else {
+      ENC = { v: ENC_VER, products: ENC_SEED.map(s => encFromSeed(s)), brands: ENC_BRANDS.map(b => ({ id: b[0], ar: b[1], en: b[2], co: b[3] })), customDepts: [], favs: [] };
+      encSave();
+    }
+    return ENC;
+  }
+  let _encBc = 622100100000;
+  // seed tuple: [dept, sub, group, ar, en, brand, flavor, size, price, old, stock, rating, sold, tags, isNew]
+  function encFromSeed(s) {
+    _encBc++;
+    return { id: 'p' + _encBc, d: s[0], s: s[1], g: s[2] || '', ar: s[3], en: s[4] || '', b: s[5] || 'generic', f: s[6] || '', z: s[7] || '', p: Number(s[8]) || 0, o: Number(s[9]) || 0, c: String(622100000000 + _encBc), k: s[10] == null ? 20 : Number(s[10]), r: Number(s[11]) || 4, n: 10 + (_encBc % 90), sold: Number(s[12]) || 0, t: (s[13] || '').split('|').filter(Boolean), nw: !!s[14] };
+  }
+  function encDepts() { encInit(); const m = {}; ENC_DEPTS.forEach(d => m[d[0]] = { id: d[0], n: d[1], em: d[2], c: d[3], oc: d[4], subs: d[5].slice() }); (ENC.customDepts || []).forEach(d => m[d.id] = d); return m; }
+  function encDept(id) { return encDepts()[id] || null; }
+  function encBrand(id) { encInit(); return (ENC.brands || []).find(b => b.id === id) || { id: id || 'generic', ar: 'عام', en: 'Generic', co: '—' }; }
+  function encProduct(id) { encInit(); return (ENC.products || []).find(p => p.id === id) || null; }
+  function encLoose(s) { return normalizeTerm(s || '').replace(/[هة](?=\s|$)/g, ''); }
+  function encHay(p) {
+    const b = encBrand(p.b); const d = encDept(p.d);
+    return encLoose([p.ar, p.en, b.ar, b.en, d ? d.n : '', p.s, p.g, p.f, p.z, p.c, p.id].join(' '));
+  }
+  function encSearch(q, f) {
+    encInit();
+    f = f || {};
+    const toks = encLoose(q).split(' ').filter(t => t.length > 0);
+    let list = ENC.products.filter(p => {
+      if (f.dept && p.d !== f.dept) return false;
+      if (f.sub && p.s !== f.sub) return false;
+      if (f.brand && p.b !== f.brand) return false;
+      if (f.offers && !(p.o > p.p)) return false;
+      if (f.instock && !(p.k > 0)) return false;
+      if (f.smart === 'baby' && p.d !== 'baby') return false;
+      if (f.smart === 'frozen' && p.d !== 'frozen') return false;
+      if (toks.length) { const h = encHay(p); for (const t of toks) { if (h.indexOf(t) < 0) return false; } }
+      return true;
+    });
+    const sort = f.sort || 'pop';
+    list.sort((a, b) => {
+      if (sort === 'plo') return a.p - b.p;
+      if (sort === 'phi') return b.p - a.p;
+      if (sort === 'rate') return (b.r - a.r) || (b.n - a.n);
+      if (sort === 'new') return ((b.nw ? 1 : 0) - (a.nw ? 1 : 0)) || (b.sold - a.sold);
+      if (sort === 'disc') return (((b.o > b.p) ? (b.o - b.p) / b.o : 0) - ((a.o > a.p) ? (a.o - a.p) / a.o : 0));
+      return (b.sold - a.sold) || (b.r - a.r);
+    });
+    return list;
+  }
+  const ENC_SMARTS = [
+    ['all', '📦 الكل'], ['best', '🔥 الأكثر مبيعًا'], ['rated', '⭐ الأعلى تقييمًا'], ['new', '🆕 وصل حديثًا'],
+    ['offers', '🏷️ العروض'], ['value', '💰 الأفضل سعرًا'], ['fav', '❤️ المفضلة'], ['again', '🔄 اشترِ مرة أخرى'],
+    ['family', '📦 العبوات الاقتصادية'], ['baby', '👶 الأطفال'], ['healthy', '🥗 صحي'], ['natural', '🌱 طبيعي'], ['frozen', '🧊 مجمد']
+  ];
+  function encSmartList(key) {
+    encInit();
+    const P = ENC.products;
+    if (key === 'best') return P.filter(p => p.sold > 0).sort((a, b) => b.sold - a.sold).slice(0, 20);
+    if (key === 'rated') return P.filter(p => p.r >= 4.3).sort((a, b) => (b.r - a.r) || (b.n - a.n)).slice(0, 20);
+    if (key === 'new') return P.filter(p => p.nw).concat(P.filter(p => !p.nw)).slice(0, 20);
+    if (key === 'offers' || key === 'value') return P.filter(p => p.o > p.p).sort((a, b) => ((b.o - b.p) / b.o) - ((a.o - a.p) / a.o)).slice(0, 20);
+    if (key === 'fav') return (ENC.favs || []).map(encProduct).filter(Boolean);
+    if (key === 'again') { const keys = Object.keys(state.usageFreq || {}).map(encLoose).filter(Boolean); return P.filter(p => { const h = encHay(p); return keys.some(k => k.split(' ').filter(Boolean).every(t => h.indexOf(t) >= 0)); }).slice(0, 20); }
+    if (key === 'family') return P.filter(p => /عائلي|كبير|توفير|2\s*ك|5\s*ك|3\s*لتر|اقتصاد/i.test(p.z + ' ' + p.ar)).slice(0, 20);
+    if (key === 'baby') return P.filter(p => p.d === 'baby').slice(0, 20);
+    if (key === 'healthy') return P.filter(p => p.d === 'healthy' || (p.t || []).includes('صحي')).slice(0, 20);
+    if (key === 'natural') return P.filter(p => p.d === 'organic' || (p.t || []).includes('طبيعي')).slice(0, 20);
+    if (key === 'frozen') return P.filter(p => p.d === 'frozen').slice(0, 20);
+    return [];
+  }
+  function encToggleFav(id) { encInit(); ENC.favs = ENC.favs || []; const i = ENC.favs.indexOf(id); if (i >= 0) ENC.favs.splice(i, 1); else ENC.favs.push(id); encSave(); }
+  function encIsFav(id) { encInit(); return (ENC.favs || []).includes(id); }
+  function encCountByDept() { encInit(); const m = {}; ENC.products.forEach(p => m[p.d] = (m[p.d] || 0) + 1); return m; }
+  function encNamesForVoice() { try { encInit(); const out = []; ENC.products.forEach(p => { if (p.ar) out.push(p.ar); }); (ENC.brands || []).forEach(b => { if (b.ar && b.id !== 'generic') out.push(b.ar); }); return out; } catch { return []; } }
+
+  /* =============================
+     PRODUCT ENCYCLOPEDIA — UI layer
+     ============================= */
+  function encUI() { if (!state._enc) state._enc = { q: '', dept: '', sub: '', brand: '', offers: false, instock: false, sort: 'pop', smart: 'all', limit: 24 }; return state._enc; }
+  function encStars(r) { const f = Math.round(Number(r) || 0); return '★★★★★'.slice(0, f) + '☆☆☆☆☆'.slice(0, 5 - f); }
+  function encStockLabel(k) { k = Number(k) || 0; if (k <= 0) return '<span class="stock-out">نفد المخزون</span>'; if (k < 5) return '<span class="stock-low">باقي ' + k + ' فقط</span>'; return '<span class="stock-ok">متوفر</span>'; }
+  function encCardHTML(p) {
+    const d = encDept(p.d) || { em: '📦', c: '#7C3AED' }; const b = encBrand(p.b);
+    const disc = (p.o > p.p) ? Math.round((p.o - p.p) / p.o * 100) : 0;
+    return `<div class="enc-card" data-pid="${p.id}">
+      <div class="enc-img" style="background:${d.c}18;">${d.em || '📦'}
+        ${disc ? `<span class="enc-off">-${disc}%</span>` : ''}
+        ${p.nw ? `<span class="enc-new">جديد</span>` : ''}
+        <button class="enc-fav" data-fav="${p.id}" aria-label="مفضلة">${encIsFav(p.id) ? '❤️' : '🤍'}</button>
+      </div>
+      <div class="enc-body">
+        <div class="enc-name">${escapeHTML(p.ar)}</div>
+        <div class="enc-brand">${escapeHTML(b.ar)}</div>
+        <div class="enc-size">${escapeHTML([p.f, p.z].filter(Boolean).join(' • '))}</div>
+        <div class="enc-price-row"><span class="enc-price">${formatCurrency(p.p)} ج</span>${p.o > p.p ? `<span class="enc-old">${formatCurrency(p.o)}</span>` : ''}</div>
+        <button class="enc-add" data-add="${p.id}">+ أضف للطلبات</button>
+      </div>
+    </div>`;
+  }
+  function renderEnc() {
+    encInit(); const u = encUI();
+    const depts = encDepts(); const counts = encCountByDept();
+    const total = ENC.products.length;
+    let res;
+    if (u.smart !== 'all') {
+      res = encSmartList(u.smart);
+      if (u.q.trim()) { const toks = normalizeTerm(u.q).split(' ').filter(Boolean); res = res.filter(p => { const h = encHay(p); return toks.every(t => h.indexOf(t) >= 0); }); }
+      if (u.dept) res = res.filter(p => p.d === u.dept);
+    } else {
+      res = encSearch(u.q, { dept: u.dept || undefined, sub: u.sub || undefined, brand: u.brand || undefined, offers: u.offers, instock: u.instock, sort: u.sort });
+    }
+    const shown = res.slice(0, u.limit);
+    const sug = (u.q.trim().length >= 2) ? encSearch(u.q, {}).slice(0, 6) : [];
+    const deptArr = Object.values(depts).sort((a, b) => (counts[b.id] || 0) - (counts[a.id] || 0));
+    const brandCount = {}; ENC.products.forEach(p => brandCount[p.b] = (brandCount[p.b] || 0) + 1);
+    const topBrands = Object.keys(brandCount).filter(id => id !== 'generic').sort((a, b) => brandCount[b] - brandCount[a]).slice(0, 14);
+    const subOpts = u.dept && depts[u.dept] ? depts[u.dept].subs : [];
+    const smartLabel = (ENC_SMARTS.find(s => s[0] === u.smart) || ['all', ''])[1];
+    return `<div class="page">
+      <div class="topbar"><div class="greeting">موسوعة المنتجات</div></div>
+      <div class="page-title">${total} منتج في مكان واحد</div>
+      <div class="enc-hero"><h2>دوّر على أي منتج 🛒</h2><p>ابحث بالاسم أو العلامة أو الباركود — عربي وإنجليزي</p></div>
+      <div class="enc-search">
+        <div class="search-box"><input id="encSearch" placeholder="دوّر: هوهوز، جبنة مثلثات، شيبسي جبنة..." value="${escapeHTML(u.q)}" autocomplete="off" /><span class="sicon">${svgIcon('search', 16)}</span></div>
+        <button class="enc-scan" id="encScanBtn" aria-label="مسح باركود">${svgIcon('search', 20)}</button>
+      </div>
+      ${sug.length ? `<div class="enc-suggest">${sug.map(p => `<button class="sug-row" data-sug="${escapeHTML(p.ar)}"><span class="sug-name">${escapeHTML(p.ar)}</span><span class="sug-cat">${escapeHTML(encBrand(p.b).ar)}</span></button>`).join('')}</div>` : ''}
+      <div class="enc-smart">${ENC_SMARTS.map(s => `<button class="smart-chip ${u.smart === s[0] ? 'active' : ''}" data-smart="${s[0]}">${s[1]}</button>`).join('')}</div>
+      ${u.smart !== 'all' ? `<div class="enc-sec-title"><h3>${smartLabel} (${res.length})</h3></div><div class="enc-grid">${shown.map(encCardHTML).join('') || '<div class="empty-desc">لا توجد منتجات هنا بعد</div>'}</div>` : `
+      <div class="enc-sec-title"><h3>الأقسام (${deptArr.length})</h3>${(u.dept || u.brand) ? '<button id="encClear">مسح الفلاتر ✕</button>' : ''}</div>
+      <div class="enc-depts">${deptArr.map(d => `<button class="enc-dept ${u.dept === d.id ? 'sel' : ''}" data-dept="${d.id}"><span class="enc-dept-ico" style="background:${d.c}18;">${d.em || '📦'}</span><small>${escapeHTML(d.n)}</small><span class="cnt">${counts[d.id] || 0}</span></button>`).join('')}</div>
+      <div class="enc-sec-title"><h3>العلامات التجارية</h3></div>
+      <div class="brand-row">${topBrands.map(id => { const b = encBrand(id); return `<button class="brand-chip ${u.brand === id ? 'active' : ''}" data-brandchip="${id}" ${u.brand === id ? 'style="border-color:var(--primary);background:var(--primary-light);"' : ''}><i>${escapeHTML((b.ar || '?').charAt(0))}</i>${escapeHTML(b.ar)}</button>`; }).join('')}</div>
+      <div class="enc-filters">
+        <select id="encSub"><option value="">كل الأقسام الفرعية</option>${subOpts.map(s => `<option value="${escapeHTML(s)}" ${u.sub === s ? 'selected' : ''}>${escapeHTML(s)}</option>`).join('')}</select>
+        <select id="encSort">
+          <option value="pop" ${u.sort === 'pop' ? 'selected' : ''}>الأكثر مبيعًا</option>
+          <option value="plo" ${u.sort === 'plo' ? 'selected' : ''}>السعر: الأقل</option>
+          <option value="phi" ${u.sort === 'phi' ? 'selected' : ''}>السعر: الأعلى</option>
+          <option value="rate" ${u.sort === 'rate' ? 'selected' : ''}>الأعلى تقييمًا</option>
+          <option value="disc" ${u.sort === 'disc' ? 'selected' : ''}>أكبر خصم</option>
+          <option value="new" ${u.sort === 'new' ? 'selected' : ''}>الأحدث</option>
+        </select>
+      </div>
+      <div class="enc-filters">
+        <button class="smart-chip ${u.offers ? 'active' : ''}" id="encOffers">🏷️ العروض فقط</button>
+        <button class="smart-chip ${u.instock ? 'active' : ''}" id="encStock">✅ المتوفر فقط</button>
+      </div>
+      <div class="enc-sec-title"><h3>المنتجات (${res.length})</h3></div>
+      <div class="enc-grid">${shown.map(encCardHTML).join('') || '<div class="empty-desc">لا توجد نتائج — جرّب كلمة تانية</div>'}</div>`}
+      ${res.length > shown.length ? `<div class="section"><button class="btn" id="encMore">عرض المزيد (${res.length - shown.length})</button></div>` : ''}
+      <div class="enc-admin-row"><button class="btn" id="encAdminBtn">⚙️ إدارة الموسوعة</button></div>
+    </div>`;
+  }
+  function bindEnc() {
+    const u = encUI();
+    const si = document.getElementById('encSearch');
+    if (si) { si.oninput = (e) => { u.q = e.target.value; u.limit = 24; if (si._to) clearTimeout(si._to); si._to = setTimeout(() => { render(); const i = document.getElementById('encSearch'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 300); }; }
+    const sc = document.getElementById('encScanBtn'); if (sc) sc.onclick = openBarcodeModal;
+    document.querySelectorAll('[data-sug]').forEach(b => b.onclick = () => { u.q = b.dataset.sug; u.limit = 24; render(); });
+    document.querySelectorAll('[data-smart]').forEach(b => b.onclick = () => { u.smart = b.dataset.smart; u.limit = 24; render(); });
+    document.querySelectorAll('[data-dept]').forEach(b => b.onclick = () => { const id = b.dataset.dept; u.dept = (u.dept === id ? '' : id); u.sub = ''; u.smart = 'all'; u.limit = 24; render(); });
+    document.querySelectorAll('[data-brandchip]').forEach(b => b.onclick = () => { const id = b.dataset.brandchip; u.brand = (u.brand === id ? '' : id); u.smart = 'all'; u.limit = 24; render(); });
+    const clr = document.getElementById('encClear'); if (clr) clr.onclick = () => { u.dept = ''; u.sub = ''; u.brand = ''; u.q = ''; u.smart = 'all'; u.limit = 24; render(); };
+    const ss = document.getElementById('encSub'); if (ss) ss.onchange = () => { u.sub = ss.value; u.limit = 24; render(); };
+    const so = document.getElementById('encSort'); if (so) so.onchange = () => { u.sort = so.value; render(); };
+    const of = document.getElementById('encOffers'); if (of) of.onclick = () => { u.offers = !u.offers; render(); };
+    const st = document.getElementById('encStock'); if (st) st.onclick = () => { u.instock = !u.instock; render(); };
+    const mo = document.getElementById('encMore'); if (mo) mo.onclick = () => { u.limit += 24; render(); };
+    const ad = document.getElementById('encAdminBtn'); if (ad) ad.onclick = openEncAdmin;
+    document.querySelectorAll('[data-fav]').forEach(b => b.onclick = (e) => { e.stopPropagation(); encToggleFav(b.dataset.fav); render(); });
+    document.querySelectorAll('[data-add]').forEach(b => b.onclick = (e) => { e.stopPropagation(); encAddToOrders(b.dataset.add, false); });
+    document.querySelectorAll('[data-pid]').forEach(c => c.onclick = (e) => { if (e.target.closest('[data-fav],[data-add]')) return; openProductModal(c.dataset.pid); });
+  }
+  function encAddToOrders(id, buyNow) {
+    const p = encProduct(id); if (!p) return;
+    const d = encDept(p.d); const b = encBrand(p.b);
+    const name = (p.ar + (p.z ? ' ' + p.z : '')).trim();
+    const o = addOrder({ name, notes: 'من الموسوعة • ' + b.ar, urgent: false });
+    if (o && d && CATEGORIES[d.oc || 'other']) { o.categoryId = d.oc; o.purchaseLocation = catLocation(d.oc); saveLearning(name, d.oc); persist(); }
+    if (buyNow) { markPurchased(o.id, { originalPrice: p.p, finalPrice: p.p }); p.sold = (p.sold || 0) + 1; p.k = Math.max(0, (p.k || 0) - 1); encSave(); toast('اتشترى وسجّلناه في المصروفات ✓', 'success'); }
+    else toast('اتضاف للطلبات: ' + p.ar, 'success');
+    render();
+  }
+  function openProductModal(id) {
+    const p = encProduct(id); if (!p) return;
+    const d = encDept(p.d) || { n: '', em: '📦', c: '#7C3AED' }; const b = encBrand(p.b);
+    const disc = (p.o > p.p) ? Math.round((p.o - p.p) / p.o * 100) : 0;
+    const similar = ENC.products.filter(x => x.id !== p.id && (x.g && x.g === p.g)).slice(0, 6);
+    const sim2 = ENC.products.filter(x => x.id !== p.id && x.d === p.d && x.g !== p.g).slice(0, 6);
+    const sameBrand = ENC.products.filter(x => x.id !== p.id && x.b === p.b).slice(0, 6);
+    const alt = ENC.products.filter(x => x.id !== p.id && x.s === p.s && x.b !== p.b).slice(0, 6);
+    const grid = (t, arr) => arr.length ? `<div class="review-title" style="margin-top:10px;">${t}</div><div class="enc-hscroll">${arr.map(encCardHTML).join('')}</div>` : '';
+    const m = openModal(`<div class="modal-handle"></div>
+      <div class="p-hero" style="background:linear-gradient(135deg,${d.c}22,#FDF4FF);">${d.em || '📦'}${disc ? `<span class="enc-off">خصم ${disc}%</span>` : ''}</div>
+      <div class="p-path">${escapeHTML(d.n || '')} › ${escapeHTML(p.s || '')}${p.g ? ' › ' + escapeHTML(p.g) : ''}</div>
+      <div class="p-name">${escapeHTML(p.ar)}</div>
+      <div class="p-en">${escapeHTML(p.en || '')}</div>
+      <button class="p-brand" data-pbrand="${b.id}">Ⓑ ${escapeHTML(b.ar)} • ${escapeHTML(b.co || '')}</button>
+      <div class="p-price-box"><span class="p-price">${formatCurrency(p.p)} ج.م</span>${p.o > p.p ? `<span class="enc-old">${formatCurrency(p.o)} ج.م</span>` : ''}<span style="margin-right:auto;">${encStockLabel(p.k)}</span></div>
+      <div class="p-meta">
+        <div class="p-meta-item"><small>الحجم / الوزن</small><b>${escapeHTML(p.z || '—')}</b></div>
+        <div class="p-meta-item"><small>النكهة / النوع</small><b>${escapeHTML(p.f || p.g || '—')}</b></div>
+        <div class="p-meta-item"><small>التقييم</small><b class="p-rate">${encStars(p.r)} ${p.r}</b> <small>(${p.n} تقييم • ${p.sold || 0} مباع)</small></div>
+        <div class="p-meta-item"><small>الباركود</small><b style="font-family:monospace;letter-spacing:1px;">${escapeHTML(p.c || '—')}</b></div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" data-pbuy="${p.id}">🛒 اشترِ الآن (${formatCurrency(p.p)} ج)</button>
+        <button class="btn" data-padd="${p.id}">+ أضف لقائمة الطلبات</button>
+        <button class="btn" data-pfav="${p.id}">${encIsFav(p.id) ? '❤️ في المفضلة (اضغط للإزالة)' : '🤍 أضف للمفضلة'}</button>
+        <button class="btn" id="pBack">رجوع</button>
+      </div>
+      ${grid('🔗 منتجات مشابهة', similar.length ? similar : sim2)}
+      ${grid('Ⓑ من نفس العلامة', sameBrand)}
+      ${grid('🔄 بدائل', alt)}`);
+    m.querySelector('#pBack').onclick = () => closeModal(m);
+    m.querySelector('[data-pbrand]').onclick = () => { closeModal(m); setTimeout(() => openBrandModal(b.id), 200); };
+    m.querySelector('[data-padd]').onclick = () => { closeModal(m); setTimeout(() => encAddToOrders(p.id, false), 200); };
+    m.querySelector('[data-pbuy]').onclick = () => { closeModal(m); setTimeout(() => encAddToOrders(p.id, true), 200); };
+    m.querySelector('[data-pfav]').onclick = (e) => { encToggleFav(p.id); e.target.textContent = encIsFav(p.id) ? '❤️ في المفضلة (اضغط للإزالة)' : '🤍 أضف للمفضلة'; render(); };
+    m.querySelectorAll('[data-pid]').forEach(c => c.onclick = (e) => { if (e.target.closest('[data-fav],[data-add]')) return; closeModal(m); setTimeout(() => openProductModal(c.dataset.pid), 200); });
+    m.querySelectorAll('[data-fav]').forEach(x => x.onclick = (e) => { e.stopPropagation(); encToggleFav(x.dataset.fav); render(); closeModal(m); setTimeout(() => openProductModal(p.id), 200); });
+    m.querySelectorAll('[data-add]').forEach(x => x.onclick = (e) => { e.stopPropagation(); encAddToOrders(x.dataset.add, false); });
+  }
+  function openBrandModal(bid) {
+    const b = encBrand(bid);
+    const list = ENC.products.filter(p => p.b === bid);
+    const cats = [...new Set(list.map(p => (encDept(p.d) || {}).n).filter(Boolean))].slice(0, 8);
+    const m = openModal(`<div class="modal-handle"></div>
+      <div class="m-hero"><span class="m-hero-ico" style="font-size:26px;font-weight:900;">${escapeHTML((b.ar || '?').charAt(0))}</span><div class="m-hero-txt"><h2>${escapeHTML(b.ar)}</h2><p>${escapeHTML(b.en || '')} • ${escapeHTML(b.co || '')}</p></div></div>
+      <p class="m-sub">${list.length} منتج • ${cats.join('، ') || '—'}</p>
+      ${b.desc ? `<div class="category-query">${escapeHTML(b.desc)}</div>` : ''}
+      <div class="enc-grid">${list.slice(0, 30).map(encCardHTML).join('') || '<div class="empty-desc">لا توجد منتجات لهذه العلامة بعد</div>'}</div>
+      <div class="btn-group" style="margin-top:8px;"><button class="btn" id="bBack">رجوع</button></div>`);
+    m.querySelector('#bBack').onclick = () => closeModal(m);
+    m.querySelectorAll('[data-pid]').forEach(c => c.onclick = (e) => { if (e.target.closest('[data-fav],[data-add]')) return; closeModal(m); setTimeout(() => openProductModal(c.dataset.pid), 200); });
+    m.querySelectorAll('[data-fav]').forEach(x => x.onclick = (e) => { e.stopPropagation(); encToggleFav(x.dataset.fav); render(); });
+    m.querySelectorAll('[data-add]').forEach(x => x.onclick = (e) => { e.stopPropagation(); encAddToOrders(x.dataset.add, false); });
+  }
+  let _bcStream = null, _bcRAF = 0;
+  function encStopScan() {
+    try { if (_bcRAF) cancelAnimationFrame(_bcRAF); } catch {} _bcRAF = 0;
+    try { if (_bcStream) { _bcStream.getTracks().forEach(t => { try { t.stop(); } catch {} }); _bcStream = null; } } catch {}
+    const v = document.getElementById('barcodeVideo'); if (v) { try { v.srcObject = null; } catch {} }
+  }
+  function openBarcodeModal() {
+    const m = openModal(`<div class="modal-handle"></div>
+      <h2>البحث بالباركود</h2>
+      <p class="m-sub">اكتب الباركود أو امسحه بالكاميرا — كل باركود مرتبط بمنتج واحد فقط</p>
+      <div class="barcode-box"><div class="barcode-num" id="bcEcho">—</div></div>
+      <div class="field"><label>الباركود</label><input type="text" id="bcInput" inputmode="numeric" placeholder="مثال: 622100..." /></div>
+      <video id="barcodeVideo" class="hidden" playsinline muted></video>
+      <div id="bcRes"></div>
+      <div class="btn-group" style="margin-top:8px;">
+        <button class="btn btn-primary" id="bcFind">🔍 دوّر بالباركود</button>
+        <button class="btn" id="bcCam">📷 مسح بالكاميرا</button>
+        <button class="btn" id="bcBack">رجوع</button>
+      </div>`);
+    const inp = m.querySelector('#bcInput'); const res = m.querySelector('#bcRes'); const echo = m.querySelector('#bcEcho'); const vid = m.querySelector('#barcodeVideo');
+    inp.oninput = () => echo.textContent = inp.value.trim() || '—';
+    const find = () => {
+      const q = inp.value.trim(); if (!q) { toast('اكتب الباركود الأول', 'warning'); return; }
+      const hit = ENC.products.find(p => (p.c || '') === q);
+      if (hit) { encStopScan(); closeModal(m); setTimeout(() => openProductModal(hit.id), 200); return; }
+      const like = ENC.products.filter(p => (p.c || '').indexOf(q) >= 0).slice(0, 5);
+      res.innerHTML = like.length ? like.map(encCardHTML).join('') : '<div class="error-text">مفيش منتج بالباركود ده</div>';
+      res.querySelectorAll('[data-pid]').forEach(c => c.onclick = () => { encStopScan(); closeModal(m); setTimeout(() => openProductModal(c.dataset.pid), 200); });
+    };
+    m.querySelector('#bcFind').onclick = find;
+    inp.onkeydown = (e) => { if (e.key === 'Enter') find(); };
+    m.querySelector('#bcBack').onclick = () => { encStopScan(); closeModal(m); };
+    m.querySelector('#bcCam').onclick = async () => {
+      try {
+        if (!('BarcodeDetector' in window)) { toast('جهازك مش بيدعم المسح التلقائي — اكتب الباركود يدويًا', 'warning'); return; }
+        _bcStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        vid.srcObject = _bcStream; vid.classList.remove('hidden'); await vid.play().catch(() => {});
+        const det = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code'] });
+        const loop = async () => {
+          if (!document.contains(vid)) { encStopScan(); return; }
+          try { const codes = await det.detect(vid); if (codes && codes.length) { inp.value = codes[0].rawValue || ''; echo.textContent = inp.value; encStopScan(); vid.classList.add('hidden'); find(); return; } } catch {}
+          _bcRAF = requestAnimationFrame(() => setTimeout(loop, 300));
+        };
+        loop();
+      } catch { toast('مقدرتش أشغّل الكاميرا — اتأكد من الصلاحية', 'error'); }
+    };
+  }
+
+  /* =============================
+     PRODUCT ENCYCLOPEDIA — admin + bulk import/export
+     CSV columns: ID,ar,en,dept,sub,group,brand,flavor,size,price,old,barcode,stock,tags,new
+     ============================= */
+  function encDownload(name, text, mime) {
+    try {
+      const blob = new Blob(["\ufeff" + text], { type: (mime || 'text/plain') + ';charset=utf-8' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+      document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    } catch { toast('مقدرتش أنزّل الملف', 'error'); }
+  }
+  function encSplitCSV(line) {
+    const out = []; let cur = '', q = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (q) { if (ch === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+      else if (ch === '"') q = true;
+      else if (ch === ',' || ch === ';') { out.push(cur); cur = ''; }
+      else cur += ch;
+    }
+    out.push(cur); return out.map(s => s.trim());
+  }
+  function encResolveDept(v) {
+    if (!v) return null; const t = String(v).trim();
+    const all = encDepts();
+    if (all[t]) return t;
+    const k = normalizeTerm(t);
+    for (const id of Object.keys(all)) { if (normalizeTerm(all[id].n) === k) return id; }
+    return null;
+  }
+  function encResolveBrand(v) {
+    if (!v) return 'generic'; const t = String(v).trim();
+    let f = ENC.brands.find(b => b.id === t); if (f) return f.id;
+    const k = normalizeTerm(t);
+    f = ENC.brands.find(b => normalizeTerm(b.ar) === k || normalizeTerm(b.en) === k); if (f) return f.id;
+    const id = 'b' + Date.now().toString(36) + Math.floor(Math.random() * 99);
+    ENC.brands.push({ id, ar: t, en: '', co: '' });
+    return id;
+  }
+  function encImportCSV(text) {
+    encInit();
+    const lines = String(text || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (!lines.length) return { added: 0, updated: 0, errors: [{ line: 0, msg: 'الملف فاضي' }] };
+    let start = 0;
+    const head = encSplitCSV(lines[0]).map(c => normalizeTerm(c));
+    if (head.includes('ar') || head.join(' ').indexOf('اسم') >= 0 || isNaN(Number(encSplitCSV(lines[0])[9]))) start = 1;
+    const seenBc = new Set(ENC.products.map(p => p.c).filter(Boolean));
+    const fileBc = new Set();
+    let added = 0, updated = 0; const errors = [];
+    for (let li = start; li < lines.length; li++) {
+      const c = encSplitCSV(lines[li]);
+      try {
+        const [id, ar, en, dept, sub, group, brand, flavor, size, price, old, barcode, stock, tags, isnew] = c;
+        if (!ar) throw new Error('اسم المنتج مطلوب');
+        const pr = Number(price); if (!(pr > 0)) throw new Error('السعر غير صالح');
+        const dId = encResolveDept(dept); if (!dId) throw new Error('القسم غير معروف: ' + (dept || '—'));
+        const dd = encDept(dId);
+        const subN = (sub || dd.subs[0] || '').trim();
+        const bId = encResolveBrand(brand);
+        const bc = String(barcode || '').trim();
+        if (bc) {
+          if (fileBc.has(bc)) throw new Error('باركود مكرر في الملف: ' + bc);
+          fileBc.add(bc);
+          const dup = ENC.products.find(p => p.c === bc && p.id !== (id || '').trim());
+          if (dup) throw new Error('الباركود موجود لمنتج تاني: ' + dup.ar);
+        }
+        const rec = { d: dId, s: subN, g: (group || '').trim(), ar: ar.trim(), en: (en || '').trim(), b: bId, f: (flavor || '').trim(), z: (size || '').trim(), p: pr, o: Number(old) || 0, k: stock === '' || stock == null ? 20 : Number(stock), t: String(tags || '').split('|').map(x => x.trim()).filter(Boolean), nw: String(isnew || '').trim() === '1' };
+        const eid = (id || '').trim();
+        const ex = eid && ENC.products.find(p => p.id === eid);
+        if (ex) { Object.assign(ex, rec); if (bc) ex.c = bc; updated++; }
+        else {
+          if (bc && seenBc.has(bc)) throw new Error('الباركود موجود: ' + bc);
+          const nid = 'p' + Date.now().toString(36) + li;
+          ENC.products.push(Object.assign({ id: nid, c: bc || String(622199000000 + ENC.products.length), r: 4, n: 5, sold: 0 }, rec));
+          if (bc) seenBc.add(bc);
+          added++;
+        }
+      } catch (err) { errors.push({ line: li + 1, msg: err.message || 'صف غير صالح' }); }
+    }
+    encSave();
+    return { added, updated, errors };
+  }
+  function encExportCSV() {
+    encInit();
+    const rows = [['ID', 'ar', 'en', 'dept', 'sub', 'group', 'brand', 'flavor', 'size', 'price', 'old', 'barcode', 'stock', 'tags', 'new']];
+    ENC.products.forEach(p => rows.push([p.id, p.ar, p.en, p.d, p.s, p.g, p.b, p.f, p.z, p.p, p.o, p.c, p.k, (p.t || []).join('|'), p.nw ? 1 : 0].map(v => { v = String(v == null ? '' : v); return /[",;\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(',')));
+    encDownload('products.csv', rows.map(r => Array.isArray(r) ? r.join(',') : r).join('\n'), 'text/csv');
+  }
+  function openEncAdmin() {
+    encInit();
+    const m = openModal(`<div class="modal-handle"></div>
+      <div class="m-hero"><span class="m-hero-ico">${svgIcon('gear', 26)}</span><div class="m-hero-txt"><h2>إدارة الموسوعة</h2><p>${ENC.products.length} منتج • ${ENC.brands.length} علامة • ${Object.keys(encDepts()).length} قسم</p></div></div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="admNew">➕ منتج جديد</button>
+        <button class="btn" id="admList">📦 بحث وتعديل المنتجات</button>
+        <button class="btn" id="admDept">🗂️ الأقسام والأقسام الفرعية</button>
+        <button class="btn" id="admBrand">Ⓑ علامة تجارية جديدة</button>
+        <button class="btn" id="admImport">📥 استيراد CSV جماعي</button>
+        <button class="btn" id="admExport">📤 تصدير CSV / JSON</button>
+        <button class="btn" id="admBack">رجوع</button>
+      </div><div id="admBody"></div>`);
+    const body = m.querySelector('#admBody');
+    m.querySelector('#admBack').onclick = () => closeModal(m);
+    m.querySelector('#admNew').onclick = () => openEncProductForm(null, () => { closeModal(m); render(); });
+    m.querySelector('#admList').onclick = () => {
+      body.innerHTML = `<div class="field" style="margin-top:10px;"><label>دوّر في القاعدة</label><input id="admQ" placeholder="اسم أو باركود..." /></div><div id="admRes"></div>`;
+      const q = body.querySelector('#admQ'); const res = body.querySelector('#admRes');
+      const draw = () => {
+        const hits = encSearch(q.value, {}).slice(0, 20);
+        res.innerHTML = hits.map(p => `<div class="rv-row"><span class="rv-name">${escapeHTML(p.ar)} <small style="color:var(--text-muted);">(${(encDept(p.d) || {}).n || ''})</small></span><button class="btn btn-sm" data-aedit="${p.id}">تعديل</button><button class="btn btn-sm btn-danger" data-adel="${p.id}">حذف</button></div>`).join('') || '<div class="empty-desc">لا نتائج</div>';
+        res.querySelectorAll('[data-aedit]').forEach(b => b.onclick = () => openEncProductForm(b.dataset.aedit, () => { closeModal(m); render(); openEncAdmin(); }));
+        res.querySelectorAll('[data-adel]').forEach(b => b.onclick = () => {
+          const p = encProduct(b.dataset.adel);
+          confirmDialog({ title: 'حذف المنتج؟', message: '"' + (p ? p.ar : '') + '" هيتمسح نهائيًا.', confirmText: 'امسح', cancelText: 'لا', danger: true }).then(ok => { if (ok) { ENC.products = ENC.products.filter(x => x.id !== b.dataset.adel); ENC.favs = (ENC.favs || []).filter(x => x !== b.dataset.adel); encSave(); toast('اتمسح', 'success'); closeModal(m); render(); } });
+        });
+      };
+      q.oninput = draw; draw(); setTimeout(() => q.focus(), 100);
+    };
+    m.querySelector('#admDept').onclick = () => {
+      const all = encDepts();
+      body.innerHTML = `<div style="margin-top:10px;">${Object.values(all).map(d => `<div class="rv-row"><span class="rv-name">${d.em || ''} ${escapeHTML(d.n)} <small style="color:var(--text-muted);">(${(ENC.products.filter(p => p.d === d.id)).length})</small></span>${d.custom ? `<button class="btn btn-sm btn-danger" data-ddel="${d.id}">حذف</button>` : ''}</div>`).join('')}</div>
+        <div class="field"><label>قسم فرعي جديد</label><div class="row-2"><select id="admDSel">${Object.values(all).map(d => `<option value="${d.id}">${escapeHTML(d.n)}</option>`).join('')}</select><input id="admSName" placeholder="اسم القسم الفرعي" /></div></div>
+        <div class="btn-group"><button class="btn" id="admSAdd">➕ إضافة القسم الفرعي</button></div>
+        <div class="field"><label>قسم رئيسي جديد</label><input id="admDName" placeholder="مثال: منتجات رمضان" /></div>
+        <div class="btn-group"><button class="btn" id="admDAdd">➕ إضافة القسم</button></div>`;
+      body.querySelector('#admSAdd').onclick = () => {
+        const did = body.querySelector('#admDSel').value; const nm = body.querySelector('#admSName').value.trim();
+        if (!nm) { toast('اكتب اسم القسم الفرعي', 'warning'); return; }
+        const base = ENC_DEPTS.find(d => d[0] === did);
+        if (base) { if (!base[5].includes(nm)) base[5].push(nm); }
+        else { const c = (ENC.customDepts || []).find(d => d.id === did); if (c && !c.subs.includes(nm)) c.subs.push(nm); }
+        encSave(); toast('اتضاف القسم الفرعي', 'success'); closeModal(m); render();
+      };
+      body.querySelector('#admDAdd').onclick = () => {
+        const nm = body.querySelector('#admDName').value.trim();
+        if (!nm) { toast('اكتب اسم القسم', 'warning'); return; }
+        ENC.customDepts = ENC.customDepts || [];
+        ENC.customDepts.push({ id: 'c' + Date.now().toString(36), n: nm, em: '📦', c: '#7C3AED', oc: 'other', subs: ['عام'], custom: true });
+        encSave(); toast('اتضاف القسم', 'success'); closeModal(m); render();
+      };
+      body.querySelectorAll('[data-ddel]').forEach(b => b.onclick = () => {
+        if ((ENC.products.filter(p => p.d === b.dataset.ddel)).length) { toast('القسم فيه منتجات — انقلها الأول', 'error'); return; }
+        ENC.customDepts = (ENC.customDepts || []).filter(d => d.id !== b.dataset.ddel); encSave(); closeModal(m); render();
+      });
+    };
+    m.querySelector('#admBrand').onclick = () => {
+      body.innerHTML = `<div class="field" style="margin-top:10px;"><label>اسم العلامة *</label><input id="admBAr" placeholder="مثال: المراعي" /></div>
+        <div class="row-2"><div class="field"><label>بالإنجليزية</label><input id="admBEn" placeholder="Almarai" /></div><div class="field"><label>الدولة</label><input id="admBCo" placeholder="السعودية" /></div></div>
+        <div class="field"><label>وصف مختصر</label><textarea id="admBDe" rows="2"></textarea></div>
+        <div class="btn-group"><button class="btn btn-primary" id="admBSave">حفظ العلامة</button></div>`;
+      body.querySelector('#admBSave').onclick = () => {
+        const ar = body.querySelector('#admBAr').value.trim();
+        if (!ar) { toast('اكتب اسم العلامة', 'warning'); return; }
+        ENC.brands.push({ id: 'b' + Date.now().toString(36), ar, en: body.querySelector('#admBEn').value.trim(), co: body.querySelector('#admBCo').value.trim(), desc: body.querySelector('#admBDe').value.trim() });
+        encSave(); toast('اتضافت العلامة', 'success'); closeModal(m); render();
+      };
+    };
+    m.querySelector('#admImport').onclick = () => {
+      body.innerHTML = `<div class="field" style="margin-top:10px;"><label>الصق CSV أو اختار ملف</label>
+        <textarea id="admCSV" class="csv-area" placeholder="ID,ar,en,dept,sub,group,brand,flavor,size,price,old,barcode,stock,tags,new"></textarea>
+        <div class="help-text">الأعمدة: ID,ar,en,dept,sub,group,brand,flavor,size,price,old,barcode,stock,tags,new — أول صف عناوين اختياري. الباركود المكرر مرفوض.</div></div>
+        <div class="btn-group"><button class="btn" id="admPick">📁 اختار ملف CSV/Excel</button><input type="file" id="admFile" accept=".csv,.txt" class="hidden" /><button class="btn btn-primary" id="admGo">استيراد</button></div><div id="admRep"></div>`;
+      const ta = body.querySelector('#admCSV');
+      body.querySelector('#admPick').onclick = () => body.querySelector('#admFile').click();
+      body.querySelector('#admFile').onchange = (e) => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => ta.value = String(r.result || ''); r.readAsText(f); };
+      body.querySelector('#admGo').onclick = () => {
+        const r = encImportCSV(ta.value);
+        body.querySelector('#admRep').innerHTML = `<div class="report-card" style="margin:10px 0;">اتضاف: <b>${r.added}</b> • اتحدّث: <b>${r.updated}</b> • أخطاء: <b>${r.errors.length}</b>${r.errors.slice(0, 8).map(e => `<div class="exp-detail">سطر ${e.line}: ${escapeHTML(e.msg)}</div>`).join('')}</div>`;
+        toast('اتضاف ' + r.added + ' واتحدّث ' + r.updated, r.errors.length ? 'warning' : 'success');
+        render();
+      };
+    };
+    m.querySelector('#admExport').onclick = () => {
+      body.innerHTML = `<div class="btn-group" style="margin-top:10px;"><button class="btn" id="expCSV">📥 تنزيل CSV (${ENC.products.length} منتج)</button><button class="btn" id="expJSON">📥 تنزيل JSON نسخة احتياطية</button></div>`;
+      body.querySelector('#expCSV').onclick = encExportCSV;
+      body.querySelector('#expJSON').onclick = () => encDownload('products-backup.json', JSON.stringify(ENC, null, 1), 'application/json');
+    };
+  }
+  function openEncProductForm(id, done) {
+    const p = id ? encProduct(id) : null;
+    const all = encDepts();
+    const m = openModal(`<div class="modal-handle"></div>
+      <h2>${p ? 'تعديل منتج' : 'منتج جديد'}</h2>
+      <p class="m-sub">${p ? escapeHTML(p.ar) : 'املأ البيانات — الباركود المكرر مرفوض'}</p>
+      <div class="field"><label>اسم المنتج *</label><input id="pfAr" value="${escapeHTML(p?.ar || '')}" placeholder="مثال: شيبسي جبنة 50 جم" /></div>
+      <div class="field"><label>الاسم الإنجليزي</label><input id="pfEn" value="${escapeHTML(p?.en || '')}" dir="ltr" /></div>
+      <div class="row-2"><div class="field"><label>القسم *</label><select id="pfDept">${Object.values(all).map(d => `<option value="${d.id}" ${p?.d === d.id ? 'selected' : ''}>${escapeHTML(d.n)}</option>`).join('')}</select></div>
+      <div class="field"><label>القسم الفرعي</label><input id="pfSub" list="pfSubs" value="${escapeHTML(p?.s || '')}" /><datalist id="pfSubs"></datalist></div></div>
+      <div class="row-2"><div class="field"><label>المجموعة</label><input id="pfGroup" value="${escapeHTML(p?.g || '')}" placeholder="شيبسي / حليب..." /></div>
+      <div class="field"><label>العلامة التجارية</label><select id="pfBrand">${ENC.brands.map(b => `<option value="${b.id}" ${p?.b === b.id ? 'selected' : ''}>${escapeHTML(b.ar)}</option>`).join('')}</select></div></div>
+      <div class="row-2"><div class="field"><label>النكهة / النوع</label><input id="pfFlavor" value="${escapeHTML(p?.f || '')}" placeholder="جبنة / شوكولاتة..." /></div>
+      <div class="field"><label>الحجم / الوزن</label><input id="pfSize" value="${escapeHTML(p?.z || '')}" placeholder="50 جم / 1 لتر..." /></div></div>
+      <div class="row-2"><div class="field"><label>السعر *</label><input id="pfPrice" type="number" min="0" step="0.5" value="${p?.p ?? ''}" /></div>
+      <div class="field"><label>قبل الخصم</label><input id="pfOld" type="number" min="0" step="0.5" value="${p?.o || ''}" /></div></div>
+      <div class="row-2"><div class="field"><label>الباركود</label><input id="pfBarcode" value="${escapeHTML(p?.c || '')}" inputmode="numeric" /></div>
+      <div class="field"><label>المخزون</label><input id="pfStock" type="number" min="0" step="1" value="${p?.k ?? 20}" /></div></div>
+      <div class="field"><label>وسوم (| للفصل: صحي|طبيعي|أطفال)</label><input id="pfTags" value="${escapeHTML((p?.t || []).join('|'))}" /></div>
+      <label class="urgent-toggle" style="background:var(--success-light);border-color:var(--success);color:var(--success);" id="pfNewW"><input type="checkbox" id="pfNew" ${p?.nw ? 'checked' : ''} /><span class="ut-switch"></span><span class="ut-text">منتج جديد (وصل حديثًا)</span></label>
+      <div class="btn-group"><button class="btn btn-primary" id="pfSave">حفظ المنتج</button><button class="btn" id="pfBack">رجوع</button></div>`);
+    const deptSel = m.querySelector('#pfDept'); const subDL = m.querySelector('#pfSubs');
+    const fillSubs = () => { const d = all[deptSel.value]; subDL.innerHTML = d ? d.subs.map(s => `<option value="${escapeHTML(s)}">`).join('') : ''; };
+    deptSel.onchange = fillSubs; fillSubs();
+    m.querySelector('#pfBack').onclick = () => closeModal(m);
+    m.querySelector('#pfSave').onclick = () => {
+      const ar = m.querySelector('#pfAr').value.trim();
+      const price = Number(m.querySelector('#pfPrice').value);
+      const bc = m.querySelector('#pfBarcode').value.trim();
+      if (!ar) { toast('اكتب اسم المنتج', 'warning'); return; }
+      if (!(price > 0)) { toast('اكتب سعر صالح', 'warning'); return; }
+      if (bc && ENC.products.some(x => x.c === bc && x.id !== (p ? p.id : ''))) { toast('الباركود ده موجود لمنتج تاني', 'error'); return; }
+      const rec = { d: deptSel.value, s: m.querySelector('#pfSub').value.trim() || (all[deptSel.value]?.subs[0] || ''), g: m.querySelector('#pfGroup').value.trim(), ar, en: m.querySelector('#pfEn').value.trim(), b: m.querySelector('#pfBrand').value, f: m.querySelector('#pfFlavor').value.trim(), z: m.querySelector('#pfSize').value.trim(), p: price, o: Number(m.querySelector('#pfOld').value) || 0, c: bc || (p ? p.c : String(622199000000 + ENC.products.length)), k: Math.max(0, Number(m.querySelector('#pfStock').value) || 0), t: m.querySelector('#pfTags').value.split('|').map(x => x.trim()).filter(Boolean), nw: m.querySelector('#pfNew').checked };
+      if (p) Object.assign(p, rec);
+      else ENC.products.push(Object.assign({ id: 'p' + Date.now().toString(36), r: 4, n: 5, sold: 0 }, rec));
+      encSave(); toast('اتحفظ المنتج ✓', 'success'); closeModal(m); if (done) done(); else render();
+    };
+  }
+
+  /* =============================
      INIT
      ============================= */
   function init() {
     restore();
     if (state.initialized && state.home && state.user) state._onboardingStep = null;
     else if (!state.home || !state.user) state._onboardingStep = 'welcome';
+    try {
+      const h = String(location.hash || '').replace('#', '');
+      if (['home', 'orders', 'enc', 'notifs', 'expenses', 'reports', 'settings'].includes(h) && state.initialized) state.currentTab = h;
+    } catch {}
     render();
     attachCloud();
+    try { PushSys.refreshOnLoad(); } catch {}
+    try {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', (e) => {
+          if (e && e.data && e.data.type === 'PUSH_RESUBSCRIBE') { try { PushSys.refreshOnLoad(); } catch {} }
+        });
+      }
+    } catch {}
+    try { syncAppBadge(); } catch {}
     const poll = () => { if (!state.initialized || !state.home || !state.user) { bindOnboarding(); requestAnimationFrame(() => setTimeout(poll, 400)); } };
     if (!state.initialized || !state.user) poll();
   }
