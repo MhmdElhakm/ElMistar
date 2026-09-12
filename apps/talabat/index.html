@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <meta name="theme-color" content="#FFB800" />
 <title>ناقصنا ايه | مشتريات البيت</title>
-<link rel="icon" type="image/png" href="logo.png" />
-<link rel="apple-touch-icon" href="logo.png" />
+<link rel="icon" type="image/png" href="icon-192.png" />
+<link rel="apple-touch-icon" href="icon-192.png" />
 <link rel="manifest" href="manifest.webmanifest" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -550,6 +550,23 @@
   .cat-opt:active { transform: scale(.95); }
   .cat-opt-ico { width: 44px; height: 44px; border-radius: 15px; display: flex; align-items: center; justify-content: center; }
   .cat-opt.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); box-shadow: 0 8px 18px rgba(124,58,237,.25); transform: translateY(-2px); }
+  .shop-grid .cat-opt { border-radius: 20px; padding: 14px 6px; background: #fff; border: 1.5px solid rgba(124,58,237,.1); box-shadow: var(--shadow-sm); }
+  .shop-grid .cat-opt:active { transform: scale(.94); }
+  .shop-grid .cat-opt-ico { width: 56px; height: 56px; border-radius: 19px; font-size: 30px; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.7), 0 4px 10px rgba(0,0,0,.06); }
+  .shop-name { font-size: 13px; font-weight: 900; }
+  .shop-count { font-size: 10.5px; font-weight: 800; color: var(--text-muted); background: var(--bg); padding: 2px 10px; border-radius: 999px; }
+  .shop-back { display: inline-flex; align-items: center; background: #fff; border: 1.5px solid rgba(124,58,237,.16); border-radius: 999px; padding: 9px 22px; font-size: 13px; font-weight: 900; color: var(--primary-dark); box-shadow: var(--shadow-sm); margin-bottom: 12px; }
+  .shop-back:active { transform: scale(.95); }
+  .shop-dept-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .shop-dept-bar .shop-back { margin-bottom: 0; flex-shrink: 0; }
+  .shop-dept-bar .shop-dept-head { margin-bottom: 0; min-width: 0; }
+  .shop-dept-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .shop-dept-ico { width: 54px; height: 54px; border-radius: 19px; display: flex; align-items: center; justify-content: center; font-size: 29px; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.7), 0 6px 14px rgba(0,0,0,.07); flex-shrink: 0; }
+  .shop-dept-head h3 { font-size: 20px; font-weight: 900; }
+  .shop-items .rv-row { border-radius: 16px; padding: 12px 14px; border: 1.5px solid rgba(124,58,237,.1); box-shadow: var(--shadow-sm); margin-bottom: 8px; background: #fff; }
+  .shop-items .rv-name { font-size: 14px; }
+  .shop-items .btn-sm { background: var(--grad); color: #fff; border-radius: 12px; padding: 8px 18px; font-size: 13px; box-shadow: 0 6px 14px rgba(124,58,237,.3); }
+  .shop-items .btn-sm:active { transform: scale(.93); }
   .cat-pick-card { background: linear-gradient(180deg, #F5F0FF, #fff 70%); border: 1.5px solid rgba(124,58,237,.22); border-radius: 20px; padding: 14px; margin-bottom: 12px; box-shadow: 0 10px 24px rgba(124,58,237,.12); animation: popIn .25s ease-out; }
   .cat-pick-head { display: flex; gap: 10px; align-items: center; margin-bottom: 11px; }
   .cat-pick-ico { width: 44px; height: 44px; border-radius: 15px; background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 8px 16px rgba(124,58,237,.35); }
@@ -1079,21 +1096,15 @@
   /* =============================
      CATEGORIES
      ============================= */
-  const CATEGORIES = {
-    produce: { id: 'produce', name: 'خضار وفاكهة', icon: 'leaf', color: '#16A34A' },
-    grocery: { id: 'grocery', name: 'بقالة ودكان', icon: 'basket', color: '#F59E0B' },
-    cleaning: { id: 'cleaning', name: 'نظافة ومنزل', icon: 'sparkle', color: '#06B6D4' },
-    pharmacy: { id: 'pharmacy', name: 'صيدلية', icon: 'pill', color: '#EC4899' },
-    other: { id: 'other', name: 'أخرى', icon: 'box', color: '#7C3AED' }
-  };
-  const CATEGORY_LIST = Object.values(CATEGORIES);
+  /* Default sections = shopping departments (single source, built after ORDER_CATALOG) */
+  const CATEGORIES = {};
+  let CATEGORY_LIST = [];
 
   const CATEGORY_LOCATIONS = {
-    produce: 'محل الخضار',
-    grocery: 'البقالة أو السوبرماركت',
-    cleaning: 'السوبرماركت أو البقالة',
+    veg: 'محل الخضار', fruit: 'محل الخضار',
     pharmacy: 'الصيدلية',
-    other: 'حسب المتوفر'
+    grocery: 'البقالة أو السوبرماركت', dairy: 'البقالة أو السوبرماركت',
+    cleaning: 'السوبرماركت أو البقالة', paper: 'السوبرماركت أو البقالة', washtools: 'السوبرماركت أو البقالة'
   };
 
   const CLASSIFIER_MAP = {
@@ -1477,11 +1488,15 @@
   function catById(catId) {
     if (CATEGORIES[catId]) return CATEGORIES[catId];
     const c = (state.customCats || []).find(x => x.id === catId);
-    return c || CATEGORIES.other;
+    if (c) return c;
+    const ad = ((state.catalogCustom || {}).addedDepts || []).find(x => x.id === catId);
+    if (ad) return { id: ad.id, name: ad.name, icon: 'box', color: '#7C3AED' };
+    return CATEGORIES.grocery;
   }
   function allCats() {
     const hidden = state.hiddenCats || [];
-    return [...Object.values(CATEGORIES).filter(c => !hidden.includes(c.id)), ...(state.customCats || [])];
+    const ads = ((state.catalogCustom || {}).addedDepts || []).filter(d => !hidden.includes(d.id)).map(d => ({ id: d.id, name: d.name, icon: 'box', color: '#7C3AED' }));
+    return [...Object.values(CATEGORIES).filter(c => !hidden.includes(c.id)), ...(state.customCats || []), ...ads];
   }
   function getCategoryName(catId) { return state.categoryNames?.[catId] || catById(catId).name || catId; }
   function getCategoryIcon(catId) { return state.categoryIcons?.[catId] || catById(catId).icon || 'box'; }
@@ -1513,18 +1528,27 @@
     opts = opts || {};
     if (opts.forceCategory && (CATEGORIES[opts.forceCategory] || isCustomCat(opts.forceCategory))) return { categoryId: opts.forceCategory, source: 'forced' };
     const norm = normalizeTerm(name);
+    if (!norm) return { categoryId: 'grocery', source: 'unknown' };
     if (state.learnedMap[norm] && (CATEGORIES[state.learnedMap[norm]] || isCustomCat(state.learnedMap[norm]))) return { categoryId: state.learnedMap[norm], source: 'learned' };
+    const cats = getCatalog();
+    for (const d of cats) for (const s of d.subs) for (const it of s.items) {
+      if (norm === normalizeTerm(it.ar)) return { categoryId: d.id, source: 'exact' };
+    }
+    for (const d of cats) for (const s of d.subs) for (const it of s.items) {
+      const k = normalizeTerm(it.ar);
+      if (norm.includes(k) || k.includes(norm)) return { categoryId: d.id, source: 'partial' };
+    }
     for (const cat of Object.keys(CLASSIFIER_MAP)) {
       for (const kw of CLASSIFIER_MAP[cat]) {
-        if (norm === normalizeTerm(kw)) return { categoryId: cat === 'tools' ? 'other' : cat, source: 'exact' };
+        if (norm === normalizeTerm(kw)) return { categoryId: LEGACY_CAT_TO_DEPT[cat] || 'grocery', source: 'exact' };
       }
     }
     for (const cat of Object.keys(CLASSIFIER_MAP)) {
       for (const kw of CLASSIFIER_MAP[cat]) {
-        if (norm.includes(normalizeTerm(kw)) || normalizeTerm(kw).includes(norm)) return { categoryId: cat === 'tools' ? 'other' : cat, source: 'partial' };
+        if (norm.includes(normalizeTerm(kw)) || normalizeTerm(kw).includes(norm)) return { categoryId: LEGACY_CAT_TO_DEPT[cat] || 'grocery', source: 'partial' };
       }
     }
-    return { categoryId: 'other', source: 'unknown' };
+    return { categoryId: 'grocery', source: 'unknown' };
   }
   function saveLearning(term, catId) { state.learnedMap[normalizeTerm(term)] = catId; persist(); }
 
@@ -1532,20 +1556,29 @@
      PERSIST
      ============================= */
   function persist() { state.updatedAt = Date.now(); Storage.save(state); schedulePush(); }
-  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); migrateCats(); return true; } return false; }
+  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); migrateCats(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
   function migrateCats() {
-    const mv = (o) => { if (o && (o.categoryId === 'emergency' || o.categoryId === 'tools')) o.categoryId = 'other'; };
-    (state.orders || []).forEach(mv);
-    (state.expenses || []).forEach(mv);
-    if (state.learnedMap) for (const k of Object.keys(state.learnedMap)) if (state.learnedMap[k] === 'emergency' || state.learnedMap[k] === 'tools') state.learnedMap[k] = 'other';
-    for (const f of ['categoryColors', 'categoryNames', 'categoryIcons']) {
-      if (state[f] && (state[f].emergency !== undefined || state[f].tools !== undefined)) {
-        if (state[f].other === undefined) state[f].other = state[f].emergency !== undefined ? state[f].emergency : state[f].tools;
-        delete state[f].emergency; delete state[f].tools;
-      }
+    const t = { produce: 'veg', grocery: 'grocery', cleaning: 'cleaning', pharmacy: 'pharmacy' };
+    for (const f of ['categoryNames', 'categoryColors', 'categoryIcons']) {
+      const o = state[f]; if (!o) continue;
+      if (o.produce !== undefined && o.veg === undefined) o.veg = o.produce;
+      delete o.produce; delete o.other; delete o.tools; delete o.emergency;
     }
-    if (state.hiddenCats) state.hiddenCats = state.hiddenCats.filter(id => id !== 'emergency' && id !== 'tools');
-    if (state.categoryFilter === 'emergency' || state.categoryFilter === 'tools') state.categoryFilter = 'all';
+    const valid = (id) => !!(CATEGORIES[id] || (state.customCats || []).some(c => c.id === id));
+    if (state.learnedMap) for (const k of Object.keys(state.learnedMap)) {
+      const v = state.learnedMap[k];
+      if (t[v]) state.learnedMap[k] = t[v];
+      else if (!valid(v)) delete state.learnedMap[k];
+    }
+    const fix = (o) => { if (o && !valid(o.categoryId)) { try { const r = classifyOrder(o.name || o.title || ''); o.categoryId = r.categoryId; o.purchaseLocation = catLocation(r.categoryId); } catch {} } };
+    (state.orders || []).forEach(fix);
+    (state.expenses || []).forEach(fix);
+    if (state.categoryFilter && state.categoryFilter !== 'all' && !valid(state.categoryFilter)) state.categoryFilter = 'all';
+    const cc = state.catalogCustom;
+    if (cc && cc.hiddenDepts && cc.hiddenDepts.length) {
+      state.hiddenCats = [...new Set([...(state.hiddenCats || []), ...cc.hiddenDepts])];
+      cc.hiddenDepts = [];
+    }
   }
 
   /* =============================
@@ -1930,7 +1963,7 @@
           const reg = await PushSys.ensureReg();
           if (reg && reg.showNotification) {
             await reg.showNotification(n.title || 'ناقصنا إيه', {
-              body: n.body || '', icon: 'logo.png', badge: 'logo.png',
+              body: n.body || '', icon: 'icon-512.png', badge: 'badge.png',
               dir: 'rtl', lang: 'ar', tag: n.id || 'naqisna',
               renotify: true, vibrate: [120, 60, 120],
               data: { url: './index.html#' + (n.actionTab || 'orders'), tab: (n.actionTab || 'orders'), nid: n.id || '' }
@@ -1942,7 +1975,7 @@
       };
       if (document.hidden) { showViaSW(); return; }
       try {
-        const nt = new Notification(n.title || 'ناقصنا إيه', { body: n.body || '', icon: 'logo.png', tag: n.id || 'naqisna', dir: 'rtl', lang: 'ar' });
+        const nt = new Notification(n.title || 'ناقصنا إيه', { body: n.body || '', icon: 'icon-192.png', tag: n.id || 'naqisna', dir: 'rtl', lang: 'ar' });
         nt.onclick = () => { try { window.focus(); } catch {} try { markNotifRead(n.id); } catch {} try { setTab(n.actionTab || 'orders'); } catch {} try { nt.close(); } catch {} };
       } catch { showViaSW(); }
     } catch {}
@@ -1992,8 +2025,12 @@
   /* =============================
      ACTIONS
      ============================= */
-  function addOrder({ name, notes, urgent }) {
-    const { categoryId } = classifyOrder(name);
+  function pendingOrderExists(name) {
+    const k = normalizeTerm(name);
+    return state.orders.some(o => o.status !== 'purchased' && normalizeTerm(o.name) === k);
+  }
+  function addOrder({ name, notes, urgent, categoryId }) {
+    if (!(categoryId && (CATEGORIES[categoryId] || (state.customCats || []).some(c => c.id === categoryId)))) categoryId = classifyOrder(name).categoryId;
     const order = { id: uid(), name: name.trim(), notes: notes || '', urgent: !!urgent, categoryId, status: 'pending', createdAt: nowISO(), createdBy: state.user?.name || 'الزوجة', purchaseLocation: catLocation(categoryId), purchase: null };
     state.orders.unshift(order);
     const key = normalizeTerm(order.name);
@@ -2030,7 +2067,7 @@
     return { order: o, expense: exp };
   }
   function addManualExpense({ title, amount, categoryId, notes, createdAt }) {
-    const exp = { id: uid(), title: title.trim(), amount: Number(amount) || 0, savings: 0, categoryId: categoryId || 'other', sourceType: 'manual', sourceId: null, notes: notes || '', purchaseLocation: catLocation(categoryId), createdAt: createdAt || nowISO() };
+    const exp = { id: uid(), title: title.trim(), amount: Number(amount) || 0, savings: 0, categoryId: categoryId || 'grocery', sourceType: 'manual', sourceId: null, notes: notes || '', purchaseLocation: catLocation(categoryId), createdAt: createdAt || nowISO() };
     state.expenses.unshift(exp);
     persist();
     return exp;
@@ -2308,8 +2345,8 @@
   function renderHome() {
     const { pending, done } = statsCounts();
     const today = sumExpensesInRange('day');
-    const month = sumExpensesInRange('month');
     const userName = state.user?.name || 'صديقي';
+    const shopCount = getCatalog().reduce((a, d) => a + catDeptCount(d), 0);
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'صباح الخير' : hour < 17 ? 'مساء النور' : 'مساء الخير';
     const recent = state.orders.filter(o => !(o.status === 'purchased' && o.purchase && !isSameDay(o.purchase.purchasedAt))).sort((a, b) => ((b.urgent && b.status !== 'purchased') ? 1 : 0) - ((a.urgent && a.status !== 'purchased') ? 1 : 0)).slice(0, 5);
@@ -2336,7 +2373,7 @@
         <div class="hero-progress"><span style="width:${progress}%"></span></div>
         <div class="hero-meta"><span>تقدم مهام اليوم ${progress}%</span><span>${done}/${totalTasks}</span></div>
         <div class="hero-meta" style="margin-top:2px;">${speakWaves()}</div>
-        <div class="hero-cta"><button class="btn cta-main" id="heroAddOrder">يلا نبدأ مهمة جديدة</button><button class="btn cta-ghost" data-gotab2="orders">عرض القائمة</button></div>
+        <div class="hero-cta"><button class="btn cta-main" id="heroAddOrder">اضافة طلب</button><button class="btn cta-ghost" data-gotab2="orders">عرض الطلبات</button></div>
       </div>
 
       <div class="streak-row">
@@ -2352,8 +2389,10 @@
         <div class="stat-card"><div class="stat-icon" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('cart', 20)}</div><div class="stat-label">مطلوب لسه</div><div class="stat-value">${pending}</div></div>
         <div class="stat-card"><div class="stat-icon" style="background:#DCFCE7;color:#059669;">${svgIcon('check', 20)}</div><div class="stat-label">اتشترى النهارده</div><div class="stat-value">${done}</div></div>
         <div class="stat-card"><div class="stat-icon" style="background:#FEF3C7;color:#D97706;">${svgIcon('wallet', 20)}</div><div class="stat-label">مصروف اليوم</div><div class="stat-value">${formatCurrency(today.total)}<span class="currency"> ج.م</span></div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#E0F2FE;color:#0284C7;">${svgIcon('chart', 20)}</div><div class="stat-label">مصروف الشهر</div><div class="stat-value">${formatCurrency(month.total)}<span class="currency"> ج.م</span></div></div>
+        <div class="stat-card" id="shopCardBtn" style="cursor:pointer;"><div class="stat-icon" style="background:#FCE7F3;color:#EC4899;">${svgIcon('basket', 20)}</div><div class="stat-label">تسوق المنتجات</div><div class="stat-value" style="font-size:14px;">${shopCount} صنف</div></div>
       </div></div>
+
+      ${state._shopOpen ? `<div class="section"><div class="section-header"><h3>🛍️ تسوق المنتجات</h3><button class="btn btn-sm" id="shopCloseBtn">إخفاء</button></div><div class="help-text" style="margin:-4px 0 10px;">دوس على القسم واختار المنتج وضيفه لطلباتك</div></div>${state._catBrowse ? renderCatalogDept(state._catBrowse) : renderCatalogHome(true)}` : ''}
 
       <div class="section"><div class="section-header"><h3>آخر الطلبات</h3><a href="#" data-gotab="orders">شوف كلهم ←</a></div></div>
       ${recent.length === 0 ? renderEmptyOrders() : recent.map(o => renderOrderCard(o)).join('')}
@@ -2386,6 +2425,282 @@
     </div>`;
   }
 
+  /* =============================
+     ORDER CATALOG (inside Orders tab: dept > sub > product names, no prices)
+     Item format: 'arabic' or 'arabic|English'
+     ============================= */
+  const ORDER_CATALOG = [
+    { id: 'veg', name: 'خضروات', emoji: '🥬', orderCat: 'produce', subs: [
+      { n: 'خضروات طازجة', items: ['طماطم','بطاطس','بصل','بصل أخضر','ثوم','خيار','جزر','فلفل أخضر','فلفل ألوان','فلفل حار','فلفل رومي','كوسة','باذنجان','بامية','فاصوليا خضراء','بسلة','ذرة','كرنب','قرنبيط','بروكلي'] },
+      { n: 'خضروات ورقية', items: ['خس','جرجير','سبانخ','ملوخية','بقدونس','كزبرة','شبت','كرفس','نعناع','ريحان','سلق','كابوتشي'] },
+      { n: 'خضروات جذرية', items: ['لفت','فجل','بنجر','بطاطا','بطاطا حلوة','قلقاس','زنجبيل'] },
+      { n: 'أعشاب ومشروم', items: ['مشروم','خرشوف','شمر أخضر','زعتر أخضر','روزماري أخضر','مرمرية'] }
+    ] },
+    { id: 'fruit', name: 'فواكه', emoji: '🍎', orderCat: 'produce', subs: [
+      { n: 'فاكهة طازجة', items: ['تفاح','برتقال','يوسفي','ليمون','ليمون أخضر','موز','فراولة','عنب','مانجو','جوافة','رمان','بطيخ','شمام','خوخ','مشمش','برقوق','كمثرى','تين','تمر','بلح'] },
+      { n: 'فاكهة مستوردة', items: ['كيوي','أناناس','أفوكادو','كرز','توت','عنب أحمر','تفاح أخضر','جريب فروت'] },
+      { n: 'فاكهة مجففة', items: ['زبيب','مشمشية','قراصيا','تين مجفف','تمر عجوة'] }
+    ] },
+    { id: 'dairy', name: 'ألبان وجبن', emoji: '🧀', orderCat: 'grocery', subs: [
+      { n: 'الحليب', items: ['حليب كامل الدسم','حليب قليل الدسم','حليب خالي الدسم','حليب طازج','حليب طويل الأجل','حليب بالشوكولاتة','حليب بالفراولة','حليب بالموز'] },
+      { n: 'الزبادي', items: ['زبادي سادة','زبادي بالفواكه','زبادي يوناني','زبادي لايت','زبادي أطفال','زبادي للشرب','لبن رايب'] },
+      { n: 'الجبن الأبيض', items: ['جبنة بيضاء','جبنة فيتا','جبنة دمياطي','جبنة قريش','جبنة براميلي','جبنة ملح خفيف'] },
+      { n: 'الجبن المطبوخ', items: ['جبنة مثلثات','جبنة قابلة للدهن','جبنة شرائح','جبنة علب','جبنة كريمية','جبنة أطفال'] },
+      { n: 'الجبن الصلب', items: ['جبنة رومي','جبنة شيدر','جبنة موتزاريلا','جبنة بارميزان','جبنة جودة','جبنة إيدام','جبنة بيتزا'] },
+      { n: 'منتجات ألبان أخرى', items: ['لبنة','قشطة','كريمة','كريمة طبخ','كريمة خفق','زبدة','سمن','سمن بلدي'] }
+    ] },
+    { id: 'grocery', name: 'بقالة', emoji: '🛒', orderCat: 'grocery', subs: [
+      { n: 'أساسيات المطبخ', items: ['أرز','أرز بسمتي','دقيق','نشا','سكر','ملح','زيت','زيت ذرة','زيت عباد الشمس','زيت زيتون','خل'] },
+      { n: 'بقوليات وحبوب', items: ['عدس','عدس أصفر','عدس بجبة','فول','فول مدمس','حمص','حمص الشام','فاصوليا بيضاء','فاصوليا حمراء','لوبيا','ترمس','برغل','فريك','كسكسي'] }
+    ] },
+    { id: 'snacks', name: 'شيبسي وسناكس', emoji: '🥔', orderCat: 'grocery', subs: [
+      { n: 'شيبسي', items: ['شيبسي ملح','شيبسي جبنة','شيبسي شطة','شيبسي خل','شيبسي باربكيو','دوريتوس','تشيتوس','برينجلز','مقرمشات البطاطس'] },
+      { n: 'مقرمشات', items: ['مقرمشات الذرة','أصابع الذرة','حلقات الذرة','مثلثات الذرة','مقرمشات الأرز'] },
+      { n: 'تسالي ومكسرات', items: ['فشار','ذرة محمصة','سوداني','لب','لب عباد','لب أبيض','حمص محمص','مكسرات','لوز','عين جمل','بندق','كاجو','فستق'] }
+    ] },
+    { id: 'bakery', name: 'كيك ومخبوزات', emoji: '🍰', orderCat: 'grocery', subs: [
+      { n: 'كيك مغلف', items: ['هوهوز','توينكيز','كيك رول','سويس رول','كيك شوكولاتة','كيك فانيليا','كيك فراولة','كيك بالفواكه','كيك محشو'] },
+      { n: 'مخبوزات طازجة', items: ['كرواسون','دونات','مافن','كب كيك','باتيه','فطائر','كيك عائلي','عيش فينو','عيش بلدي','توست'] }
+    ] },
+    { id: 'biscuits', name: 'بسكويت وويفر', emoji: '🍪', orderCat: 'grocery', subs: [
+      { n: 'بسكويت', items: ['بسكويت سادة','بسكويت شاي','بسكويت بالسكر','بسكويت بالزبدة','بسكويت محشو','بسكويت شوكولاتة','بسكويت كريمة','بسكويت فراولة','كوكيز','دايجستيف','بسكويت شوفان','بسكويت أطفال'] },
+      { n: 'ويفر', items: ['ويفر شوكولاتة','ويفر فانيليا','ويفر فراولة','ويفر بندق','ويفر كراميل'] }
+    ] },
+    { id: 'choco', name: 'شوكولاتة وحلويات', emoji: '🍫', orderCat: 'grocery', subs: [
+      { n: 'شوكولاتة', items: ['شوكولاتة بالحليب','شوكولاتة داكنة','شوكولاتة بيضاء','شوكولاتة بالبندق','شوكولاتة بالكراميل','شوكولاتة محشوة','شوكولاتة قابلة للدهن'] },
+      { n: 'حلويات', items: ['توفي','كراميل','جيلي','مارشميلو','مصاصات','علكة','لبان','حلوى صلبة','حلوى طرية','ملبس'] }
+    ] },
+    { id: 'canned', name: 'معلبات', emoji: '🥫', orderCat: 'grocery', subs: [
+      { n: 'أسماك معلبة', items: ['تونة','سردين','ماكريل'] },
+      { n: 'بقوليات معلبة', items: ['فول معلب','حمص معلب','فاصوليا معلبة','لوبيا معلبة','عدس معلب'] },
+      { n: 'خضروات معلبة', items: ['ذرة معلبة','مشروم معلب','بسلة معلبة','فاصوليا خضراء معلبة','خضروات مشكلة معلبة'] },
+      { n: 'فواكه معلبة', items: ['أناناس معلب','خوخ معلب','كمثرى معلبة','كوكتيل فواكه'] }
+    ] },
+    { id: 'grains', name: 'أرز ومكرونة وحبوب', emoji: '🍝', orderCat: 'grocery', subs: [
+      { n: 'الأرز', items: ['أرز مصري','أرز بسمتي'] },
+      { n: 'المكرونة', items: ['سباجيتي','مكرونة قلم','مكرونة خواتم','لسان عصفور','مكرونة فرن','مكرونة صغيرة','مكرونة أطفال','شعرية'] },
+      { n: 'حبوب أخرى', items: ['شوفان','برغل','فريك','كسكسي','ذرة صفراء','قمح','سميد','بقسماط'] }
+    ] },
+    { id: 'breakfast', name: 'إفطار', emoji: '🍯', orderCat: 'grocery', subs: [
+      { n: 'تحلية الفطار', items: ['عسل','عسل أسود','مربى','مربى فراولة','مربى تين','مربى مشمش','حلاوة طحينية','طحينة','زبدة فول سوداني','شوكولاتة قابلة للدهن'] },
+      { n: 'حبوب الفطار', items: ['كورن فليكس','شوفان','جرانولا','موسلي'] }
+    ] },
+    { id: 'spices', name: 'عطارة وتوابل وأعشاب', emoji: '🌿', orderCat: 'grocery', subs: [
+      { n: 'توابل', items: ['فلفل أسود','فلفل أبيض','كمون','كزبرة ناشفة','كركم','بابريكا','قرفة','زنجبيل مطحون','قرنفل','حبهان','جوزة الطيب','ورق لورا','شطة','سماق','دقة','بهارات مشكلة'] },
+      { n: 'خلطات التوابل', items: ['بهارات لحوم','بهارات فراخ','بهارات أسماك','بهارات شاورما','بهارات كبسة','بهارات محشي','بهارات كفتة'] },
+      { n: 'أعشاب', items: ['يانسون','شمر','نعناع ناشف','كركديه','زعتر','روزماري','بابونج','مرمرية','تليو','بردقوش','عرقسوس','تمر هندي','خروب','حبة البركة','سمسم'] }
+    ] },
+    { id: 'sauces', name: 'صلصات ومخللات', emoji: '🌶️', orderCat: 'grocery', subs: [
+      { n: 'صلصات', items: ['كاتشب','مايونيز','مستردة','باربكيو','صوص حار','صوص جبنة','صوص بيتزا','صوص مكرونة','صلصة طماطم','خل تفاح','خل أبيض'] },
+      { n: 'مخللات وزيتون', items: ['زيتون','زيتون أسود','زيتون أخضر','مخلل مشكل','خيار مخلل','فلفل مخلل','ليمون مخلل','بصل مخلل'] }
+    ] },
+    { id: 'meat', name: 'لحوم', emoji: '🥩', orderCat: 'grocery', subs: [
+      { n: 'لحوم طازجة', items: ['لحم بقري','لحم ضأن','لحم مفروم','شرائح لحم','مكعبات لحم','كبدة','كلاوي','كوارع','فشة','طحال'] },
+      { n: 'لحوم مصنعة', items: ['برجر','سجق','هوت دوج','لانشون','بسطرمة','كفتة'] }
+    ] },
+    { id: 'poultry', name: 'دواجن', emoji: '🍗', orderCat: 'grocery', subs: [
+      { n: 'دواجن طازجة', items: ['دجاج كامل','صدور دجاج','أوراك دجاج','أجنحة دجاج','دبابيس دجاج','كبد وقوانص','بط','وز','حمام','أرانب','ديك رومي'] },
+      { n: 'مصنعات الدجاج', items: ['بانيه','ناجتس','استربس','لانشون فراخ','سجق فراخ'] }
+    ] },
+    { id: 'fish', name: 'أسماك', emoji: '🐟', orderCat: 'grocery', subs: [
+      { n: 'أسماك طازجة', items: ['سمك بلطي','سمك بوري','سمك دنيس','سمك قاروص','سمك موسى','سمك لوت','سمك وقار','سردين بلدي','ماكريل طازج','رنجة','فسيخ'] },
+      { n: 'مأكولات بحرية', items: ['جمبري','سبيط','كابوريا','جندوفلي','فيليه سمك'] },
+      { n: 'مجمدة ومصنعة', items: ['فيليه مجمد','جمبري مجمد','أصابع سمك'] }
+    ] },
+    { id: 'eggs', name: 'بيض', emoji: '🥚', orderCat: 'grocery', subs: [
+      { n: 'بيض', items: ['بيض','بيض أحمر','بيض أبيض','بيض بلدي','بيض سمان'] }
+    ] },
+    { id: 'drinks', name: 'مشروبات', emoji: '🥤', orderCat: 'grocery', subs: [
+      { n: 'مياه وعصائر', items: ['مياه','مياه غازية','عصير مانجو','عصير جوافة','عصير برتقال','عصير تفاح','عصير أناناس','عصير فراولة','نكتار','عصائر أطفال','عصير قصب'] },
+      { n: 'مشروبات غازية', items: ['كوكاكولا','بيبسي','فانتا','سبرايت','ميرندا','مشروب غازي برتقال','مشروب غازي ليمون'] },
+      { n: 'مشروبات ساخنة', items: ['شاي','شاي أخضر','شاي بالنعناع','شاي باللبن','قهوة','قهوة تركي','نسكافيه','كابتشينو','كاكاو','هوت شوكليت'] },
+      { n: 'مشروبات طاقة', items: ['مشروب طاقة','مشروب رياضي'] }
+    ] },
+    { id: 'frozen', name: 'مجمدات', emoji: '🧊', orderCat: 'grocery', subs: [
+      { n: 'مجمدات', items: ['خضار مجمد','بسلة مجمدة','فاصوليا مجمدة','ملوخية مجمدة','فراولة مجمدة','مانجو مجمدة','بطاطس نصف مقلية','ناجتس مجمد','برجر مجمد','بانيه مجمد','بيتزا مجمدة','آيس كريم','سمبوسك مجمد'] }
+    ] },
+    { id: 'cleaning', name: 'منظفات', emoji: '🧼', orderCat: 'cleaning', subs: [
+      { n: 'منظفات الملابس', items: ['مسحوق غسيل','جل غسيل','كبسولات غسيل','منعم أقمشة','داوني','مزيل بقع','مبيض'] },
+      { n: 'منظفات المنزل', items: ['منظف أرضيات','منظف أسطح','منظف مطابخ','منظف حمامات','منظف زجاج','منظف سجاد','منظف خشب','منظف استانلس','مطهر','ديتول','كلور','فلاش'] },
+      { n: 'منظفات الأطباق', items: ['سائل أطباق','أقراص غسالة أطباق','ملح غسالة أطباق','ملمع غسالة أطباق','إسفنج مواعين','ليف مواعين','سلك مواعين'] },
+      { n: 'معطرات', items: ['معطر جو','معطر مفروشات','معطر حمام','معطر سيارات','بخور','فحم بخور'] }
+    ] },
+    { id: 'washtools', name: 'أدوات نظافة', emoji: '🧽', orderCat: 'cleaning', subs: [
+      { n: 'أدوات التنظيف', items: ['مقشة','مساحة','جردل','شرشوبة','فرشاة بلاط','فرشاة حمام','مكنسة يدوية','فوط تنظيف','فوط ميكروفايبر','قفازات تنظيف','أكياس زبالة','سبت غسيل'] }
+    ] },
+    { id: 'paper', name: 'ورقيات ومناديل', emoji: '🧻', orderCat: 'cleaning', subs: [
+      { n: 'مناديل وورقيات', items: ['مناديل وجه','مناديل سفرة','مناديل مبللة','مناديل مطبخ','ورق تواليت','ورق فويل','ورق زبدة','استرتش','أكياس حفظ','أكياس ساندوتش','أطباق فويل','كبايات ورق'] }
+    ] },
+    { id: 'personal', name: 'عناية شخصية', emoji: '🧴', orderCat: 'cleaning', subs: [
+      { n: 'الجسم', items: ['صابون','صابون سائل','شاور جل','لوشن جسم','كريم جسم','مزيل عرق'] },
+      { n: 'الأسنان', items: ['معجون أسنان','فرشاة أسنان','خيط أسنان','غسول فم'] },
+      { n: 'الحلاقة', items: ['ماكينات حلاقة','شفرات حلاقة','كريم حلاقة','جل حلاقة'] },
+      { n: 'أخرى', items: ['مزيل مكياج','قطن مكياج'] }
+    ] },
+    { id: 'hair', name: 'عناية بالشعر', emoji: '💇', orderCat: 'cleaning', subs: [
+      { n: 'العناية بالشعر', items: ['شامبو','شامبو قشرة','بلسم','حمام كريم','كريم شعر','زيت شعر','زيت خروع','سيرم شعر','جل شعر','مثبت شعر','صبغة شعر','حنة','مشط','فرشاة شعر','توك شعر'] }
+    ] },
+    { id: 'skin', name: 'عناية بالبشرة', emoji: '🧴', orderCat: 'cleaning', subs: [
+      { n: 'العناية بالبشرة', items: ['غسول وجه','مرطب وجه','واقي شمس','كريم نهار','كريم ليل','كريم عين','ماسك وجه','مقشر','تونر','ماء ورد','فازلين','جلسرين','زبدة شيا'] },
+      { n: 'مكياج', items: ['مكياج','أحمر شفاه','ماسكرا','كحل','بودرة','كريم أساس'] }
+    ] },
+    { id: 'baby', name: 'أطفال ورضع', emoji: '👶', orderCat: 'cleaning', subs: [
+      { n: 'الحفاضات والنظافة', items: ['حفاضات','حفاضات حديثي الولادة','مناديل مبللة أطفال'] },
+      { n: 'تغذية الرضع', items: ['حليب أطفال','سيريلاك','أطعمة أطفال','بسكويت أطفال','زجاجات رضاعة','لهايات'] },
+      { n: 'العناية بالأطفال', items: ['شامبو أطفال','صابون أطفال','كريم أطفال','كريم حفاض','زيت أطفال','بودرة أطفال'] }
+    ] },
+    { id: 'pharmacy', name: 'صيدلية ومستلزمات طبية', emoji: '💊', orderCat: 'pharmacy', subs: [
+      { n: 'مسكنات وخافض حرارة', items: ['بنادول','بنادول إكسترا','بنادول كولد','بروفين','أسبرين'] },
+      { n: 'برد وحساسية', items: ['استحلاب','نقط أنف','بخاخ أنف','دواء كحة أعشاب','أقراص حساسية'] },
+      { n: 'هضم وحموضة', items: ['مالوكس','جافيسكون','أقراص حموضة','دواء انتفاخ'] },
+      { n: 'فيتامينات ومكملات', items: ['فيتامين سي','فيتامين د','حديد','كالسيوم','مغنيسيوم','أوميجا 3','زنك','ملتي فيتامين'] },
+      { n: 'إسعافات أولية', items: ['شاش','قطن طبي','بلاستر','رباط ضاغط','مطهر جروح','كحول','كمامات','قفازات طبية','ترمومتر','لاصق طبي'] },
+      { n: 'أجهزة قياس', items: ['جهاز ضغط','جهاز سكر','شرايط سكر'] }
+    ] },
+    { id: 'kitchen', name: 'منزل ومطبخ', emoji: '🏠', orderCat: 'other', subs: [
+      { n: 'أدوات المطبخ', items: ['أطباق','أكواب','مجات','ملاعق','شوك','سكاكين','حلل','طاسات','صواني','صينية فرن','علب تخزين','برطمانات','زجاجات مياه','مصفاة','مبشرة','قطاعة','أطقم توابل','فوطة مطبخ'] }
+    ] },
+    { id: 'pets', name: 'حيوانات أليفة', emoji: '🐱', orderCat: 'other', subs: [
+      { n: 'طعام ومستلزمات', items: ['طعام قطط','طعام كلاب','طعام جاف','طعام رطب','مكافآت','رمل قطط','طبق أكل','طبق مياه','ألعاب قطط','ألعاب كلاب','فرشاة شعر حيوانات','شامبو حيوانات','بوكس نقل'] }
+    ] },
+    { id: 'office', name: 'مكتبية ومدرسية', emoji: '📝', orderCat: 'other', subs: [
+      { n: 'أدوات مكتبية', items: ['أقلام جاف','أقلام رصاص','ماركر','ألوان خشب','ألوان فلوماستر','كراسات','دفتر','ورق طباعة','ملفات','حافظات أوراق','مساطر','برايات','أستيكة','مقص','لاصق','سلوتيب','دباسة','دبابيس','أجندة'] }
+    ] },
+    { id: 'electro', name: 'إلكترونيات وإكسسوارات', emoji: '🔌', orderCat: 'other', subs: [
+      { n: 'إلكترونيات', items: ['شواحن','شاحن سريع','كابلات','كابل شاحن','سماعات','سماعات بلوتوث','بطاريات','حجارة قلم','لمبات','لمبة ليد','كشاف','مشترك كهرباء','محول','جراب موبايل','واقي شاشة'] }
+    ] },
+    { id: 'clothes', name: 'ملابس', emoji: '👕', orderCat: 'other', subs: [
+      { n: 'ملابس', items: ['ملابس رجالي','ملابس حريمي','ملابس أطفال','ملابس داخلية','جوارب','بيجامات','عباية','طرح وإيشاربات','ملابس شتوية','ملابس صيفية','لبس بيت','شبشب'] }
+    ] },
+    { id: 'gifts', name: 'هدايا ومناسبات', emoji: '🎁', orderCat: 'other', subs: [
+      { n: 'هدايا وحفلات', items: ['هدايا','ورق تغليف','أكياس هدايا','علب هدايا','بالونات','شموع','شمع أرقام','زينة عيد ميلاد','طراطير حفلات','كروت تهنئة','كارت معايدة','شريط ستان'] }
+    ] },
+    { id: 'auto', name: 'مستلزمات سيارات', emoji: '🚗', orderCat: 'other', subs: [
+      { n: 'السيارة', items: ['منظف سيارات','ملمع تابلوه','معطر سيارة','مناديل سيارة','شاحن سيارة','وصلة aux','دواسات سيارة','غطاء سيارة','فوطة سيارة','مكنسة سيارة','طفاية حريق','مثلث طوارئ','كوريك سيارة'] }
+    ] },
+    { id: 'healthy', name: 'منتجات طبيعية وصحية', emoji: '🌱', orderCat: 'grocery', subs: [
+      { n: 'أغذية صحية', items: ['شوفان','جرانولا','عسل جبلي','سكر دايت','سكر بني','ملح الهيمالايا','زيت جوز هند','زيت زيتون بكر','خل عضوي','كينوا','بذور الشيا','بذور الكتان','زيت حبة البركة','دقيق أسمر','دقيق شوفان','مكرونة شوفان','أرز بني','ماتشا','قهوة خضراء','بروتين بار'] },
+      { n: 'ألبان نباتية وعضوي', items: ['حليب نباتي','حليب لوز','حليب شوفان','تمر سكري','خضار عضوي','فاكهة عضوية'] }
+    ] }
+  ];
+  const DEPT_STYLE = {
+    veg: { icon: 'leaf', color: '#16A34A' }, fruit: { icon: 'basket', color: '#EF4444' },
+    dairy: { icon: 'box', color: '#0EA5E9' }, grocery: { icon: 'cart', color: '#E67E22' },
+    snacks: { icon: 'flame', color: '#F97316' }, bakery: { icon: 'star', color: '#EC4899' },
+    biscuits: { icon: 'box', color: '#B45309' }, choco: { icon: 'trophy', color: '#7C3AED' },
+    canned: { icon: 'box', color: '#64748B' }, grains: { icon: 'basket', color: '#A16207' },
+    breakfast: { icon: 'flame', color: '#EAB308' }, spices: { icon: 'leaf', color: '#059669' },
+    sauces: { icon: 'cart', color: '#DC2626' }, meat: { icon: 'flame', color: '#B91C1C' },
+    poultry: { icon: 'cart', color: '#EA580C' }, fish: { icon: 'sparkle', color: '#0284C7' },
+    eggs: { icon: 'box', color: '#D97706' }, drinks: { icon: 'sparkle', color: '#06B6D4' },
+    frozen: { icon: 'box', color: '#38BDF8' }, cleaning: { icon: 'sparkle', color: '#3B82F6' },
+    washtools: { icon: 'home', color: '#14B8A6' }, paper: { icon: 'box', color: '#94A3B8' },
+    personal: { icon: 'sparkle', color: '#8B5CF6' }, hair: { icon: 'sparkle', color: '#EC4899' },
+    skin: { icon: 'sparkle', color: '#D946EF' }, baby: { icon: 'star', color: '#F472B6' },
+    pharmacy: { icon: 'pill', color: '#E11D48' }, kitchen: { icon: 'home', color: '#78716C' },
+    pets: { icon: 'star', color: '#F59E0B' }, office: { icon: 'wallet', color: '#6366F1' },
+    electro: { icon: 'bolt', color: '#EAB308' }, clothes: { icon: 'box', color: '#0EA5E9' },
+    gifts: { icon: 'trophy', color: '#D946EF' }, auto: { icon: 'bolt', color: '#475569' },
+    healthy: { icon: 'leaf', color: '#10B981' }
+  };
+  ORDER_CATALOG.forEach(d => { const s = DEPT_STYLE[d.id] || { icon: 'box', color: '#7C3AED' }; CATEGORIES[d.id] = { id: d.id, name: d.name, icon: s.icon, color: s.color }; });
+  CATEGORY_LIST = Object.values(CATEGORIES);
+  const LEGACY_CAT_TO_DEPT = { produce: 'veg', grocery: 'grocery', cleaning: 'cleaning', pharmacy: 'pharmacy', tools: 'kitchen' };
+  function parseCatItem(s) { const i = String(s).indexOf('|'); return i < 0 ? { ar: String(s), en: '' } : { ar: String(s).slice(0, i).trim(), en: String(s).slice(i + 1).trim() }; }
+  function catKey(d, s, ar) { return d + '\n' + s + '\n' + normalizeTerm(ar); }
+  function catCustom() {
+    if (!state.catalogCustom) state.catalogCustom = { hiddenDepts: [], hiddenItems: [], addedDepts: [], addedSubs: {}, addedItems: {}, renamed: {}, moved: {}, order: {} };
+    return state.catalogCustom;
+  }
+  function getCatalog(showHidden) {
+    const cc = state.catalogCustom || {};
+    const hiddenD = [...new Set([...(cc.hiddenDepts || []), ...((state.hiddenCats) || [])])], hiddenI = cc.hiddenItems || [], renamed = cc.renamed || {}, moved = cc.moved || {}, order = cc.order || {};
+    const inMoved = {};
+    Object.keys(moved).forEach(k => { const m = moved[k]; if (m && m.toDept && m.toSub) { const tk = m.toDept + '|' + m.toSub; (inMoved[tk] = inMoved[tk] || []).push({ key: k, ar: m.ar, en: m.en || '', custom: !!m.custom }); } });
+    const buildSub = (deptId, subName, baseArr, addedArr) => {
+      let arr = baseArr.map(s => { const p = parseCatItem(s); return { ar: p.ar, en: p.en, custom: false, hidden: false, key: catKey(deptId, subName, p.ar) }; });
+      (addedArr || []).forEach(p => arr.push({ ar: p.ar, en: p.en || '', custom: true, hidden: false, key: catKey(deptId, subName, p.ar) }));
+      const seen = {}; arr = arr.filter(it => { if (seen[it.key]) return false; seen[it.key] = 1; return true; });
+      arr = arr.filter(it => { const mv = moved[it.key]; return !(mv && mv.toDept && mv.toSub && (mv.toDept !== deptId || mv.toSub !== subName)); });
+      (inMoved[deptId + '|' + subName] || []).forEach(m => { if (!seen[m.key]) { arr.push(Object.assign({ hidden: false }, m)); seen[m.key] = 1; } });
+      arr.forEach(it => { if (renamed[it.key]) it.ar = renamed[it.key]; });
+      if (showHidden) arr.forEach(it => { it.hidden = hiddenI.indexOf(it.key) >= 0; });
+      else arr = arr.filter(it => hiddenI.indexOf(it.key) < 0);
+      const ord = order[deptId + '|' + subName];
+      if (ord && ord.length) { const pos = {}; ord.forEach((n, i) => pos[n] = i); arr.sort((a, b) => { const x = pos[a.ar], y = pos[b.ar]; return (x === undefined ? 9999 : x) - (y === undefined ? 9999 : y); }); }
+      return arr;
+    };
+    const out = [];
+    ORDER_CATALOG.forEach(d => {
+      const hid = hiddenD.indexOf(d.id) >= 0;
+      if (hid && !showHidden) return;
+      const subs = d.subs.map(s => ({ name: s.n, custom: false, items: buildSub(d.id, s.n, s.items, (cc.addedItems || {})[d.id + '|' + s.n]) }));
+      ((cc.addedSubs || {})[d.id] || []).forEach(s => subs.push({ name: s.name, custom: true, items: buildSub(d.id, s.name, [], (cc.addedItems || {})[d.id + '|' + s.name]) }));
+      out.push({ id: d.id, name: d.name, emoji: d.emoji, orderCat: d.orderCat, custom: false, hidden: hid, subs });
+    });
+    (cc.addedDepts || []).forEach(d => {
+      const hid = hiddenD.indexOf(d.id) >= 0;
+      if (hid && !showHidden) return;
+      const subs = (d.subs || []).map(s => ({ name: s.name, custom: true, items: buildSub(d.id, s.name, [], (cc.addedItems || {})[d.id + '|' + s.name]) }));
+      out.push({ id: d.id, name: d.name, emoji: d.emoji || '📦', orderCat: d.orderCat || 'other', custom: true, hidden: hid, subs });
+    });
+    return out;
+  }
+  function findCatalogItem(key) {
+    const cats = getCatalog();
+    for (const d of cats) for (const s of d.subs) for (const it of s.items) if (it.key === key) return { dept: d, sub: s, item: it };
+    return null;
+  }
+  function searchCatalog(q, limit) {
+    const toks = normalizeTerm(q || '').split(' ').filter(t => t.length > 0);
+    if (!toks.length) return [];
+    const res = [];
+    const cats = getCatalog();
+    for (const d of cats) for (const s of d.subs) for (const it of s.items) {
+      const hay = normalizeTerm(it.ar + ' ' + s.name);
+      let ok = true;
+      for (const t of toks) if (hay.indexOf(t) < 0) { ok = false; break; }
+      if (!ok) continue;
+      res.push({ dept: d, sub: s, item: it });
+      if (res.length >= (limit || 40)) return res;
+    }
+    return res;
+  }
+  function catDeptCount(d) { return d.subs.reduce((n, s) => n + s.items.length, 0); }
+  function quickAddCatalogItem(key) {
+    const f = findCatalogItem(key); if (!f) return;
+    if (pendingOrderExists(f.item.ar)) { toast('موجود بالفعل في الطلبات: ' + f.item.ar, 'warning'); return; }
+    addOrder({ name: f.item.ar, notes: '', urgent: false, categoryId: f.dept.id });
+    saveLearning(f.item.ar, f.dept.id);
+    toast('اتضاف: ' + f.item.ar, 'success');
+    render();
+  }
+  function catItemRow(key, ar, sub) {
+    return `<div class="rv-row"><span class="rv-name">${escapeHTML(ar)}${sub ? `<br><small style="color:var(--text-muted);font-weight:700;">${escapeHTML(sub)}</small>` : ''}</span><button class="btn btn-sm" data-addcat="${encodeURIComponent(key)}">+ ضيف</button></div>`;
+  }
+  function renderCatalogHome(noHead) {
+    const cats = getCatalog();
+    return `${noHead ? '' : `<div class="section"><div class="section-header"><h3>🛍️ تسوق المنتجات</h3><span style="font-size:12px;color:var(--text-sec);font-weight:700;">دوس على القسم واختار وضيف</span></div></div>`}
+      <div class="section"><div class="cat-options shop-grid">${cats.map(d => { const cc = catColor(d.id); return `<button class="cat-opt" data-catdept="${d.id}"><span class="cat-opt-ico" style="background:${cc}16;color:${cc};">${d.emoji}</span><span class="shop-name">${escapeHTML(getCategoryName(d.id))}</span><span class="shop-count">${catDeptCount(d)} صنف</span></button>`; }).join('')}</div></div>`;
+  }
+  function renderCatalogDept(id) {
+    const d = getCatalog().find(x => x.id === id);
+    if (!d) return renderCatalogHome();
+    const cc = catColor(d.id);
+    return `      <div class="section"><div class="shop-dept-bar">
+      <div class="shop-dept-head"><span class="shop-dept-ico" style="background:${cc}16;">${d.emoji}</span><h3>${escapeHTML(getCategoryName(d.id))}</h3></div>
+      <button class="shop-back" id="catBackBtn">رجوع للأقسام</button>
+    </div></div>
+      ${d.id === 'pharmacy' ? `<div class="category-query" style="margin:0 18px 12px;">💊 أدوية بدون وصفة ومستلزمات فقط — الأدوية التي تحتاج وصفة طبية غير معروضة هنا. استشر الصيدلي.</div>` : ''}
+      ${d.subs.map(s => `<div class="section"><div class="section-header"><h3>${escapeHTML(s.name)}</h3><span class="shop-count">${s.items.length} صنف</span></div>
+        <div class="shop-items">${s.items.map(it => catItemRow(it.key, it.ar, '')).join('') || '<div class="help-text">لا توجد أصناف هنا</div>'}</div></div>`).join('')}`;
+  }
+  function renderCatalogSearch(q) {
+    const res = searchCatalog(q, 40);
+    if (!res.length) return `<div class="section"><div class="help-text" style="text-align:center;">مفيش منتجات بالاسم ده — جرّب كلمة تانية</div></div>`;
+    return `<div class="section"><div class="section-header"><h3>🔍 نتائج المنتجات (${res.length})</h3></div>
+      ${res.map(r => catItemRow(r.item.key, r.item.ar, r.dept.name + ' › ' + r.sub.name)).join('')}</div>`;
+  }
   function renderOrders() {
     const { orderFilter, categoryFilter, searchQuery } = state;
     let list = state.orders.filter(o => !(o.status === 'purchased' && o.purchase && !isSameDay(o.purchase.purchasedAt)));
@@ -2404,6 +2719,8 @@
       <div class="page-title">${list.length === 0 ? 'مفيش طلبات' : list.length === 1 ? 'فيه طلب واحد' : `فيه ${list.length} طلبات`}</div>
 
       ${assistantSay(pickMsg(list.length === 0 ? MSG.empty : MSG.husbandView), null, 'دليل القائمة', list.length === 0 ? 'mom' : 'dad')}
+
+      <div class="search-bar"><div class="search-box"><input id="orderSearch" placeholder="دوّر على طلب..." value="${escapeHTML(searchQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div></div>
 
       ${urgentList.length ? `<div class="urgent-banner"><h3>${svgIcon('bolt', 18)} ضروري جداً — ${urgentList.length} ${urgentList.length === 1 ? 'طلب' : 'طلبات'} لازم يتجابوا الأول</h3>${urgentList.map(o => renderOrderCard(o)).join('')}</div>` : ''}
 
@@ -2596,6 +2913,9 @@
         ${(state.hiddenCats || []).length ? `<div style="padding:0 16px 12px;"><div style="font-size:12px;font-weight:800;color:var(--text-sec);margin-bottom:6px;">أقسام مخفية</div><div class="learned-list">${state.hiddenCats.map(id => `<span class="learned-tag">${getCategoryName(id)}<button data-showcat="${id}" style="color:var(--success);">إظهار</button></span>`).join('')}</div></div>` : ''}
         </div>
       </div>
+      <div class="settings-card"><div class="settings-title">كتالوج المنتجات</div>
+        ${(() => { const cats = getCatalog(); const n = cats.reduce((a, d) => a + catDeptCount(d), 0); return `<div class="settings-item"><div class="si-icon" style="background:#F1EAFE;color:#7C3AED;">🛍️</div><div class="si-body"><div class="si-label">موسوعة المنتجات</div><div class="si-value">${n} صنف في ${cats.length} قسم</div></div><button class="si-action" id="catManagerBtn">إدارة</button></div>`; })()}
+      </div>
       <div class="settings-card"><div class="settings-title">البيانات</div>
         <div class="settings-item"><div class="si-icon" style="background:#DCFCE7;color:#059669;">${svgIcon('trophy', 18)}</div><div class="si-body"><div class="si-label">التوفير الكلي</div><div class="si-value">${formatCurrency(totalSavings)} ج.م</div></div></div>
         <div class="settings-item"><div class="si-icon" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('cart', 18)}</div><div class="si-body"><div class="si-label">الطلبات</div><div class="si-value">${state.orders.length} طلب (${state.orders.filter(o => o.status === 'purchased').length} اتشترى)</div></div></div>
@@ -2657,7 +2977,7 @@
       state.user = { id: uid(), name, joinedAt: nowISO() };
       if (state._pendingCloud && state._pendingCloud.home) {
         const rc = state._pendingCloud;
-        for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'notifs', 'categoryColors', 'categoryNames', 'categoryIcons', 'customCats', 'hiddenCats', 'photos', 'updatedAt']) {
+        for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'notifs', 'categoryColors', 'categoryNames', 'categoryIcons', 'customCats', 'hiddenCats', 'photos', 'catalogCustom', 'updatedAt']) {
           if (rc[k] !== undefined) state[k] = rc[k];
         }
         state._pendingCloud = null;
@@ -2732,6 +3052,11 @@
     };
     const si = document.getElementById('orderSearch');
     if (si) { si.oninput = (e) => { state.searchQuery = e.target.value; if (si._to) clearTimeout(si._to); si._to = setTimeout(() => { persist(); render(); const i = document.getElementById('orderSearch'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 200); }; }
+    document.querySelectorAll('[data-catdept]').forEach(b => b.onclick = () => { state._catBrowse = b.dataset.catdept; state.searchQuery = ''; persist(); render(); });
+    const scb = document.getElementById('shopCardBtn'); if (scb) scb.onclick = () => { state._shopOpen = true; state._catBrowse = null; render(); };
+    const shb = document.getElementById('shopCloseBtn'); if (shb) shb.onclick = () => { state._shopOpen = false; state._catBrowse = null; render(); };
+    const cbb = document.getElementById('catBackBtn'); if (cbb) cbb.onclick = () => { state._catBrowse = null; render(); };
+    document.querySelectorAll('[data-addcat]').forEach(b => b.onclick = () => { try { quickAddCatalogItem(decodeURIComponent(b.dataset.addcat)); } catch {} });
     bindSettings();
   }
 
@@ -2810,6 +3135,7 @@
     const lnh = document.getElementById('learnedHead'); if (lnh) lnh.onclick = () => { state._learnedOpen = !state._learnedOpen; persist(); render(); scrollToId('learnedHead'); };
     document.querySelectorAll('[data-iconcat]').forEach(btn => btn.onclick = () => openIconPickerModal(btn.dataset.iconcat));
     b('addCatBtn', openAddCatModal);
+    b('catManagerBtn', openCatalogManager);
     document.querySelectorAll('[data-hidecat]').forEach(btn => btn.onclick = () => {
       if (!state.hiddenCats) state.hiddenCats = [];
       if (!state.hiddenCats.includes(btn.dataset.hidecat)) state.hiddenCats.push(btn.dataset.hidecat);
@@ -2833,9 +3159,248 @@
     document.querySelectorAll('[data-unlearn]').forEach(btn => btn.onclick = () => { delete state.learnedMap[btn.dataset.unlearn]; persist(); toast('تمام، الكلمة اتمسحت', 'success'); render(); });
     b('clearLearned', () => { confirmDialog({ title: 'مسح الكلمات؟', message: 'هنمسح كل التصنيفات اللي اتعلمناها.', confirmText: 'مسح', cancelText: 'لا', danger: true }).then(ok => { if (ok) { state.learnedMap = {}; persist(); toast('تم المسح ✓', 'success'); render(); } }); });
     const clearAll = document.getElementById('clearAllBtn');
-    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { try { PushSys.removeSub(); } catch {} Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, notifs: [], categoryColors: {}, categoryNames: {}, categoryIcons: {}, customCats: [], hiddenCats: [], photos: { mom: '', dad: '' }, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
+    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { try { PushSys.removeSub(); } catch {} Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, notifs: [], categoryColors: {}, categoryNames: {}, categoryIcons: {}, customCats: [], hiddenCats: [], photos: { mom: '', dad: '' }, catalogCustom: null, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
   }
 
+  function toggleCatItemHidden(key) {
+    const cc = catCustom(); const i = cc.hiddenItems.indexOf(key);
+    if (i >= 0) cc.hiddenItems.splice(i, 1); else cc.hiddenItems.push(key);
+    persist();
+  }
+  function purgeCatKey(key) {
+    const cc = catCustom();
+    cc.hiddenItems = (cc.hiddenItems || []).filter(k => k !== key);
+    delete (cc.renamed || {})[key];
+    delete (cc.moved || {})[key];
+  }
+  function deleteCatItemFull(key) {
+    const f = findCatalogItem(key); if (!f || !f.item.custom) return false;
+    const cc = catCustom(); const ak = f.dept.id + '|' + f.sub.name;
+    const norm = normalizeTerm(f.item.ar);
+    if ((cc.addedItems || {})[ak]) cc.addedItems[ak] = cc.addedItems[ak].filter(p => normalizeTerm(p.ar) !== norm);
+    purgeCatKey(key);
+    if ((cc.order || {})[ak]) cc.order[ak] = cc.order[ak].filter(n => normalizeTerm(n) !== norm);
+    persist();
+    return true;
+  }
+  function moveCatItem(deptId, subName, ar, dir) {
+    const sub = (getCatalog(true).find(d => d.id === deptId) || { subs: [] }).subs.find(s => s.name === subName);
+    if (!sub) return;
+    const names = sub.items.map(it => it.ar);
+    const i = names.indexOf(ar), j = i + dir;
+    if (i < 0 || j < 0 || j >= names.length) return;
+    const t = names[i]; names[i] = names[j]; names[j] = t;
+    catCustom().order[deptId + '|' + subName] = names;
+    persist();
+  }
+  function openCatalogManager() {
+    const cats = getCatalog(true);
+    const total = cats.reduce((a, d) => a + catDeptCount(d), 0);
+    const cc = catCustom();
+    const html = `<div class="modal-handle"></div><h2>إدارة الكتالوج</h2><p class="m-sub">${total} صنف في ${cats.length} قسم</p>
+      <div class="field"><label>بحث عن منتج</label><input type="text" id="cmSearch" placeholder="اكتب اسم المنتج..." autocomplete="off" /></div>
+      <div id="cmResults"></div>
+      <div id="cmDepts">${cats.map(d => `<div class="rv-row"><span class="rv-name">${d.emoji} ${escapeHTML(getCategoryName(d.id))} <small style="color:var(--text-muted);">(${catDeptCount(d)})</small>${d.custom ? ' <span class="custom-tag">مخصص</span>' : ''}${d.hidden ? ' <span class="custom-tag">مخفي</span>' : ''}</span><button class="btn btn-sm" data-cmopen="${d.id}">الأقسام</button>${d.custom ? `<button class="btn btn-sm btn-danger" data-cmdeld="${d.id}">حذف</button>` : `<button class="btn btn-sm" data-cmhided="${d.id}">${d.hidden ? 'إظهار' : 'إخفاء'}</button>`}</div>`).join('')}</div>
+      <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="cmAddDept">+ قسم جديد</button><button class="btn" id="cmBack">رجوع</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#cmBack').onclick = () => closeModal(m);
+    m.querySelector('#cmAddDept').onclick = () => { closeModal(m); openCatalogAddDept(); };
+    m.querySelectorAll('[data-cmopen]').forEach(b => b.onclick = () => { closeModal(m); openCatalogSubs(b.dataset.cmopen); });
+    m.querySelectorAll('[data-cmhided]').forEach(b => b.onclick = () => { const id = b.dataset.cmhided; const arr = state.hiddenCats = state.hiddenCats || []; const i = arr.indexOf(id); if (i >= 0) arr.splice(i, 1); else arr.push(id); persist(); render(); closeModal(m); openCatalogManager(); });
+    m.querySelectorAll('[data-cmdeld]').forEach(b => b.onclick = () => {
+      const id = b.dataset.cmdeld;
+      confirmDialog({ title: 'حذف القسم؟', message: 'هيتحذف القسم وكل اللي فيه نهائيًا.', confirmText: 'حذف', cancelText: 'لا', danger: true }).then(ok => {
+        if (!ok) return;
+        cc.addedDepts = (cc.addedDepts || []).filter(d => d.id !== id);
+        delete (cc.addedSubs || {})[id];
+        Object.keys(cc.addedItems || {}).forEach(k => { if (k.split('|')[0] === id) delete cc.addedItems[k]; });
+        Object.keys(cc.moved || {}).forEach(k => { const mv = cc.moved[k]; if (mv && mv.toDept === id) delete cc.moved[k]; });
+        Object.keys(cc.order || {}).forEach(k => { if (k.split('|')[0] === id) delete cc.order[k]; });
+        cc.hiddenDepts = (cc.hiddenDepts || []).filter(x => x !== id);
+        persist(); render(); openCatalogManager();
+      });
+    });
+    const si = m.querySelector('#cmSearch');
+    si.oninput = () => {
+      const q = si.value.trim(); const box = m.querySelector('#cmResults');
+      if (q.length < 2) { box.innerHTML = ''; return; }
+      const res = searchCatalog(q, 20);
+      box.innerHTML = res.length ? res.map(r => `<div class="rv-row"><span class="rv-name">${escapeHTML(r.item.ar)}<br><small style="color:var(--text-muted);">${escapeHTML(r.dept.name)} › ${escapeHTML(r.sub.name)}${r.item.hidden ? ' • مخفي' : ''}</small></span><button class="btn btn-sm" data-cmmove="${encodeURIComponent(r.item.key)}">نقل</button><button class="btn btn-sm" data-cmhide="${encodeURIComponent(r.item.key)}">${r.item.hidden ? 'إظهار' : 'إخفاء'}</button></div>`).join('') : '<div class="help-text">لا نتائج</div>';
+      box.querySelectorAll('[data-cmmove]').forEach(x => x.onclick = () => openCatalogMove(decodeURIComponent(x.dataset.cmmove), () => { closeModal(m); openCatalogManager(); }));
+      box.querySelectorAll('[data-cmhide]').forEach(x => x.onclick = () => { toggleCatItemHidden(decodeURIComponent(x.dataset.cmhide)); render(); closeModal(m); openCatalogManager(); });
+    };
+  }
+  function openCatalogAddDept() {
+    const cats = Object.keys(CATEGORIES).map(id => `<option value="${id}">${getCategoryName(id)}</option>`).join('');
+    const html = `<div class="modal-handle"></div><h2>قسم جديد</h2><p class="m-sub">القسم يظهر داخل الطلبات</p>
+      <div class="field"><label>اسم القسم *</label><input type="text" id="cadName" placeholder="مثال: حلويات شرقية" maxlength="30" /></div>
+      <div class="field"><label>أيقونة (إيموجي)</label><input type="text" id="cadEmoji" placeholder="🍬" maxlength="8" /></div>
+      <div class="field"><label>يتبع تصنيف</label><select id="cadCat">${cats}</select></div>
+      <div class="btn-group"><button class="btn btn-primary" id="cadSave">إضافة</button><button class="btn" id="cadBack">رجوع</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#cadBack').onclick = () => { closeModal(m); openCatalogManager(); };
+    m.querySelector('#cadSave').onclick = () => {
+      const name = m.querySelector('#cadName').value.trim();
+      if (!name) { m.querySelector('#cadName').classList.add('error'); return; }
+      const cc = catCustom();
+      cc.addedDepts.push({ id: 'x' + uid(), name, emoji: m.querySelector('#cadEmoji').value.trim() || '📦', orderCat: m.querySelector('#cadCat').value, subs: [] });
+      persist(); render(); closeModal(m); openCatalogManager();
+      toast('اتضاف القسم', 'success');
+    };
+  }
+  function openCatalogSubs(deptId) {
+    const d = getCatalog(true).find(x => x.id === deptId);
+    if (!d) { openCatalogManager(); return; }
+    const html = `<div class="modal-handle"></div><h2>${d.emoji} ${escapeHTML(getCategoryName(d.id))}</h2><p class="m-sub">الأقسام الفرعية</p>
+      ${d.subs.map(s => { const c = s.items.length; return `<div class="rv-row"><span class="rv-name">${escapeHTML(s.name)} <small style="color:var(--text-muted);">(${c})</small>${s.custom ? ' <span class="custom-tag">مخصص</span>' : ''}</span><button class="btn btn-sm" data-csopen="${escapeHTML(s.name)}">المنتجات</button>${s.custom ? `<button class="btn btn-sm btn-danger" data-csdelsub="${escapeHTML(s.name)}">حذف</button>` : ''}</div>`; }).join('') || '<div class="help-text">لا توجد أقسام فرعية بعد</div>'}
+      <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="csAddSub">+ قسم فرعي</button><button class="btn" id="csBack">رجوع</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#csBack').onclick = () => { closeModal(m); openCatalogManager(); };
+    m.querySelector('#csAddSub').onclick = () => { closeModal(m); openCatalogAddSub(deptId); };
+    m.querySelectorAll('[data-csopen]').forEach(b => b.onclick = () => { closeModal(m); openCatalogItems(deptId, b.dataset.csopen); });
+    m.querySelectorAll('[data-csdelsub]').forEach(b => b.onclick = () => {
+      const sn = b.dataset.csdelsub;
+      confirmDialog({ title: 'حذف القسم الفرعي؟', message: `"${sn}" وكل منتجاته المضافة هتتحذف.`, confirmText: 'حذف', cancelText: 'لا', danger: true }).then(ok => {
+        if (!ok) return; const cc = catCustom();
+        if ((cc.addedSubs || {})[deptId]) cc.addedSubs[deptId] = cc.addedSubs[deptId].filter(s => s.name !== sn);
+        const ad = (cc.addedDepts || []).find(x => x.id === deptId);
+        if (ad) ad.subs = (ad.subs || []).filter(s => s.name !== sn);
+        delete (cc.addedItems || {})[deptId + '|' + sn];
+        Object.keys(cc.moved || {}).forEach(k => { const mv = cc.moved[k]; if (mv && mv.toDept === deptId && mv.toSub === sn) delete cc.moved[k]; });
+        delete (cc.order || {})[deptId + '|' + sn];
+        persist(); render(); closeModal(m); openCatalogSubs(deptId);
+      });
+    });
+  }
+  function openCatalogAddSub(deptId) {
+    const html = `<div class="modal-handle"></div><h2>قسم فرعي جديد</h2>
+      <div class="field"><label>اسم القسم الفرعي *</label><input type="text" id="casName" placeholder="مثال: الجبن" maxlength="30" /></div>
+      <div class="btn-group"><button class="btn btn-primary" id="casSave">إضافة</button><button class="btn" id="casBack">رجوع</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#casBack').onclick = () => { closeModal(m); openCatalogSubs(deptId); };
+    m.querySelector('#casSave').onclick = () => {
+      const name = m.querySelector('#casName').value.trim();
+      if (!name) { m.querySelector('#casName').classList.add('error'); return; }
+      const cc = catCustom();
+      const exists = (getCatalog(true).find(x => x.id === deptId) || { subs: [] }).subs.some(s => s.name === name);
+      if (exists) { toast('القسم ده موجود بالفعل', 'warning'); return; }
+      const ad = (cc.addedDepts || []).find(x => x.id === deptId);
+      if (ad) { ad.subs = ad.subs || []; ad.subs.push({ name }); }
+      else { cc.addedSubs[deptId] = cc.addedSubs[deptId] || []; cc.addedSubs[deptId].push({ name }); }
+      persist(); render(); closeModal(m); openCatalogSubs(deptId);
+      toast('اتضاف القسم الفرعي', 'success');
+    };
+  }
+  function openCatalogItems(deptId, subName) {
+    const d = getCatalog(true).find(x => x.id === deptId);
+    const s = d ? d.subs.find(x => x.name === subName) : null;
+    if (!d || !s) { openCatalogManager(); return; }
+    const html = `<div class="modal-handle"></div><h2>${escapeHTML(subName)}</h2><p class="m-sub">${escapeHTML(getCategoryName(d.id))} • ${s.items.length} منتج</p>
+      ${s.items.map(it => `<div class="rv-row"><span class="rv-name">${escapeHTML(it.ar)}${it.custom ? ' <span class="custom-tag">مخصص</span>' : ''}${it.hidden ? ' <span class="custom-tag">مخفي</span>' : ''}</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn btn-sm" data-ciup="${encodeURIComponent(it.key)}">↑</button><button class="btn btn-sm" data-cidown="${encodeURIComponent(it.key)}">↓</button><button class="btn btn-sm" data-cirn="${encodeURIComponent(it.key)}">تعديل</button><button class="btn btn-sm" data-cimv="${encodeURIComponent(it.key)}">نقل</button>${it.custom ? `<button class="btn btn-sm btn-danger" data-cidel="${encodeURIComponent(it.key)}">حذف</button>` : `<button class="btn btn-sm" data-cihide="${encodeURIComponent(it.key)}">${it.hidden ? 'إظهار' : 'إخفاء'}</button>`}</span></div>`).join('') || '<div class="help-text">لا توجد منتجات بعد — ضيف أول منتج</div>'}
+      <div class="field" style="margin-top:10px;"><label>إضافة منتج</label><input type="text" id="ciAr" placeholder="اسم المنتج *" maxlength="40" /></div>
+      <div class="btn-group"><button class="btn btn-primary" id="ciAdd">+ إضافة المنتج</button></div>
+      <div class="field" style="margin-top:6px;"><label>إضافة دفعة واحدة (كل منتج في سطر)</label><textarea id="ciBulk" rows="3" placeholder="جبنة رومي&#10;زيتون أسود"></textarea></div>
+      <div class="btn-group"><button class="btn" id="ciBulkAdd">إضافة الدفعة</button><button class="btn" id="ciBack">رجوع</button></div>`;
+    const m = openModal(html);
+    const back = () => { closeModal(m); openCatalogSubs(deptId); };
+    m.querySelector('#ciBack').onclick = back;
+    const addOne = (ar, en) => {
+      ar = (ar || '').trim(); en = (en || '').trim();
+      if (!ar) return 'empty';
+      const cc = catCustom(); const ak = deptId + '|' + subName;
+      const dup = (getCatalog(true).find(x => x.id === deptId) || { subs: [] }).subs.find(x => x.name === subName).items.some(it => normalizeTerm(it.ar) === normalizeTerm(ar));
+      if (dup) return 'dup';
+      cc.addedItems[ak] = cc.addedItems[ak] || [];
+      cc.addedItems[ak].push({ ar, en });
+      return 'ok';
+    };
+    m.querySelector('#ciAdd').onclick = () => {
+      const r = addOne(m.querySelector('#ciAr').value, '');
+      if (r === 'empty') { m.querySelector('#ciAr').classList.add('error'); return; }
+      if (r === 'dup') { toast('المنتج ده موجود بالفعل', 'warning'); return; }
+      persist(); render(); closeModal(m); openCatalogItems(deptId, subName);
+      toast('اتضاف المنتج', 'success');
+    };
+    m.querySelector('#ciBulkAdd').onclick = () => {
+      const lines = m.querySelector('#ciBulk').value.split('\n').map(l => l.trim()).filter(Boolean);
+      if (!lines.length) return;
+      let added = 0, dup = 0;
+      lines.forEach(l => { const p = parseCatItem(l); if (!p.ar) return; const r = addOne(p.ar, p.en); if (r === 'ok') added++; else if (r === 'dup') dup++; });
+      persist(); render(); closeModal(m); openCatalogItems(deptId, subName);
+      toast(`اتضاف ${added} منتج${dup ? ` (${dup} مكرر)` : ''}`, 'success');
+    };
+    m.querySelectorAll('[data-ciup]').forEach(b => b.onclick = () => { const f = findCatalogItem(decodeURIComponent(b.dataset.ciup)); if (f) { moveCatItem(deptId, subName, f.item.ar, -1); render(); closeModal(m); openCatalogItems(deptId, subName); } });
+    m.querySelectorAll('[data-cidown]').forEach(b => b.onclick = () => { const f = findCatalogItem(decodeURIComponent(b.dataset.cidown)); if (f) { moveCatItem(deptId, subName, f.item.ar, 1); render(); closeModal(m); openCatalogItems(deptId, subName); } });
+    m.querySelectorAll('[data-cihide]').forEach(b => b.onclick = () => { toggleCatItemHidden(decodeURIComponent(b.dataset.cihide)); render(); closeModal(m); openCatalogItems(deptId, subName); });
+    m.querySelectorAll('[data-cidel]').forEach(b => b.onclick = () => {
+      const key = decodeURIComponent(b.dataset.cidel);
+      confirmDialog({ title: 'حذف المنتج؟', message: 'هيتحذف نهائيًا من الكتالوج.', confirmText: 'حذف', cancelText: 'لا', danger: true }).then(ok => {
+        if (!ok) return; deleteCatItemFull(key); render(); closeModal(m); openCatalogItems(deptId, subName);
+      });
+    });
+    m.querySelectorAll('[data-cirn]').forEach(b => b.onclick = () => {
+      const key = decodeURIComponent(b.dataset.cirn);
+      const f = findCatalogItem(key); if (!f) return;
+      if (f.item.custom) {
+        const html2 = `<div class="modal-handle"></div><h2>تعديل المنتج</h2>
+          <div class="field"><label>الاسم *</label><input type="text" id="rnAr" value="${escapeHTML(f.item.ar)}" maxlength="40" /></div>
+          <div class="btn-group"><button class="btn btn-primary" id="rnSave">حفظ</button><button class="btn" id="rnBack">رجوع</button></div>`;
+        const m2 = openModal(html2);
+        m2.querySelector('#rnBack').onclick = () => closeModal(m2);
+        m2.querySelector('#rnSave').onclick = () => {
+          const na = m2.querySelector('#rnAr').value.trim(), ne = '';
+          if (!na) return;
+          const cc = catCustom();
+          if ((cc.moved || {})[key]) { cc.moved[key].ar = na; cc.moved[key].en = ne; }
+          else {
+            const ak = f.dept.id + '|' + f.sub.name;
+            cc.addedItems[ak] = (cc.addedItems[ak] || []).filter(p => normalizeTerm(p.ar) !== normalizeTerm(f.item.ar));
+            cc.addedItems[ak].push({ ar: na, en: ne });
+            purgeCatKey(key);
+            const ok2 = (cc.order || {})[ak];
+            if (ok2) cc.order[ak] = ok2.map(n => normalizeTerm(n) === normalizeTerm(f.item.ar) ? na : n);
+          }
+          persist(); render(); closeModal(m2); closeModal(m); openCatalogItems(deptId, subName);
+          toast('اتعدل المنتج', 'success');
+        };
+      } else {
+        openEditTextModal({ title: 'تعديل المنتج', label: 'اسم المنتج', value: f.item.ar, max: 40, onSave: (v) => {
+          const cc = catCustom(); const na = v.trim();
+          cc.renamed[key] = na;
+          const ak = f.dept.id + '|' + f.sub.name;
+          if ((cc.order || {})[ak]) cc.order[ak] = cc.order[ak].map(n => normalizeTerm(n) === normalizeTerm(f.item.ar) ? na : n);
+          persist(); render(); closeModal(m); openCatalogItems(deptId, subName);
+          toast('اتعدل المنتج', 'success');
+        } });
+      }
+    });
+    m.querySelectorAll('[data-cimv]').forEach(b => b.onclick = () => openCatalogMove(decodeURIComponent(b.dataset.cimv), () => { closeModal(m); openCatalogItems(deptId, subName); }));
+  }
+  function openCatalogMove(key, back) {
+    const f = findCatalogItem(key); if (!f) return;
+    const cats = getCatalog(true);
+    const html = `<div class="modal-handle"></div><h2>نقل المنتج</h2><p class="m-sub">${escapeHTML(f.item.ar)}</p>
+      <div class="field"><label>إلى قسم</label><select id="mvDept">${cats.map(d => `<option value="${d.id}" ${d.id === f.dept.id ? 'selected' : ''}>${d.emoji} ${escapeHTML(d.name)}</option>`).join('')}</select></div>
+      <div class="field"><label>إلى قسم فرعي</label><select id="mvSub"></select></div>
+      <div class="btn-group"><button class="btn btn-primary" id="mvSave">نقل</button><button class="btn" id="mvBack">رجوع</button></div>`;
+    const m = openModal(html);
+    const ds = m.querySelector('#mvDept'), ss = m.querySelector('#mvSub');
+    const fill = () => { const d = cats.find(x => x.id === ds.value); ss.innerHTML = (d ? d.subs : []).map(s => `<option value="${escapeHTML(s.name)}" ${s.name === f.sub.name && d.id === f.dept.id ? 'selected' : ''}>${escapeHTML(s.name)}</option>`).join(''); };
+    ds.onchange = fill; fill();
+    m.querySelector('#mvBack').onclick = () => { closeModal(m); if (back) back(); };
+    m.querySelector('#mvSave').onclick = () => {
+      const cc = catCustom();
+      const td = ds.value, ts = ss.value;
+      if (!td || !ts) return;
+      if (f.item.custom && !(cc.moved || {})[key]) {
+        const ak = f.dept.id + '|' + f.sub.name;
+        cc.addedItems[ak] = (cc.addedItems[ak] || []).filter(p => normalizeTerm(p.ar) !== normalizeTerm(f.item.ar));
+      }
+      cc.moved[key] = { ar: f.item.ar, en: f.item.en || '', custom: f.item.custom, toDept: td, toSub: ts };
+      persist(); render(); closeModal(m); if (back) back();
+      toast('اتنقل المنتج', 'success');
+    };
+  }
   function openAddCatModal() {
     let icon = 'star', color = '#7C3AED';
     const palette = ['#7C3AED', '#EC4899', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#F43F5E', '#F97316'];
@@ -3238,7 +3803,6 @@
       <div class="voice-bar">
         <button class="mic-btn" id="voiceBtn" aria-label="إدخال صوتي" aria-pressed="false">${svgIcon('mic', 22)}</button>
         <div class="voice-info"><b id="voiceStatus">اضغط الميك وتكلم</b><small>يُضاف فقط الكلام الموجود في قائمة الموقع — افصل بـ «و»</small></div>
-        <div class="voice-langs"><button class="vlang" data-vlang="ar-EG">عربي</button><button class="vlang" data-vlang="en-US">EN</button></div>
       </div>
       <div class="field"><label>ملاحظات (اختياري)</label><textarea id="ordNotes" rows="2" placeholder="مثلا: نوع معين — كبير — غير حار">${editing ? escapeHTML(order.notes || '') : ''}</textarea></div>
       <label class="urgent-toggle ${editing && order.urgent ? 'on' : ''}" id="urgentToggle"><input type="checkbox" id="ordUrgent" ${editing && order.urgent ? 'checked' : ''} /><span class="ut-switch"></span><span class="ut-text">ضروري جداً — أولوية قصوى</span></label>
@@ -3335,7 +3899,7 @@
     }
     nameInput.addEventListener('input', evalCategoryFromName);
     nameInput.addEventListener('input', updateSuggest);
-    Voice.lang = state._voiceLang || 'ar-EG';
+    Voice.lang = 'ar-EG';
     const vBtn = m.querySelector('#voiceBtn'); const vStatus = m.querySelector('#voiceStatus');
     const voiceUI = () => ({ onText: () => { updateSuggest(); renderReview(); }, onState: setVoiceUI, onCommit: (count) => { if (vStatus && count > 0) vStatus.textContent = 'تم التعرف على ' + count + ' كلمات'; updateSuggest(); renderReview(); } });
     const setVoiceUI = (on, info) => {
@@ -3349,14 +3913,6 @@
       }
     };
     if (vBtn) vBtn.onclick = () => Voice.toggle(nameInput, voiceUI());
-    m.querySelectorAll('[data-vlang]').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.vlang === Voice.lang);
-      btn.onclick = () => {
-        Voice.lang = btn.dataset.vlang; state._voiceLang = Voice.lang; persist();
-        m.querySelectorAll('[data-vlang]').forEach(x => x.classList.toggle('active', x === btn));
-        if (Voice.on) { Voice.stop(); setTimeout(() => Voice.toggle(nameInput, voiceUI()), 350); }
-      };
-    });
     setTimeout(evalCategoryFromName, 50);
     m.querySelectorAll('[data-freq]').forEach(c => c.onclick = () => { nameInput.value = c.dataset.freq; evalCategoryFromName(); nameInput.focus(); });
     m.querySelector('#cancelOrderBtn').onclick = () => closeModal(m);
@@ -3369,15 +3925,19 @@
       if (!editing) {
         const items = raw.split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').trim()).filter(Boolean);
         if (!items.length) { nameInput.classList.add('error'); nameInput.focus(); return; }
-        const added = [];
+        const added = []; let skipped = 0; const seenBatch = {};
         for (const itemName of items) {
-          const picked = manualCats[normalizeTerm(itemName)];
+          const k = normalizeTerm(itemName);
+          if (seenBatch[k] || pendingOrderExists(itemName)) { skipped++; continue; }
+          seenBatch[k] = 1;
+          const picked = manualCats[k];
           if (picked) saveLearning(itemName, picked);
           added.push(addOrder({ name: itemName, notes, urgent }));
         }
+        if (!added.length) { toast(skipped ? 'كل الأصناف دي موجودة بالفعل في الطلبات' : 'اكتب صنف صحيح', 'warning'); return; }
         pushNotif(urgent ? 'urgent' : 'order_new', { names: added.map(o => o.name), orderIds: added.map(o => o.id) });
         MemeSound.playEvent(urgent ? 'URGENT' : 'NEW_REQUEST');
-        toast(items.length === 1 ? pickMsg(MSG.addOrder) : `زوّدت ${items.length} طلبات ✓ 😂`, 'success');
+        toast((added.length === 1 ? pickMsg(MSG.addOrder) : `زوّدت ${added.length} طلبات ✓ 😂`) + (skipped ? ` (تجاهلت ${skipped} مكرر)` : ''), 'success');
         closeModal(m); render();
       } else {
         const picked = manualCats[normalizeTerm(raw)];
@@ -3425,11 +3985,11 @@
       <p class="m-sub">سجل مصروف مش مرتبط بطلب</p>
       <div class="field"><label>اسم المصروف *</label><input type="text" id="expTitle" placeholder="مثلا: فاتورة كهرباء" maxlength="50" /></div>
       <div class="field"><label>المبلغ *</label><input type="number" id="expAmount" min="0" step="0.01" placeholder="0" /></div>
-      <div class="field"><label>القسم</label><div class="cat-options">${allCats().map((c) => { const cc3 = catColor(c.id); return `<button class="cat-opt ${c.id === 'other' ? 'selected' : ''}" data-catid="${c.id}"><span class="cat-opt-ico" style="background:${cc3}18;color:${cc3};">${svgIcon(getCategoryIcon(c.id), 22)}</span><span>${getCategoryName(c.id)}</span></button>`; }).join('')}</div></div>
+      <div class="field"><label>القسم</label><div class="cat-options">${allCats().map((c) => { const cc3 = catColor(c.id); return `<button class="cat-opt ${c.id === 'grocery' ? 'selected' : ''}" data-catid="${c.id}"><span class="cat-opt-ico" style="background:${cc3}18;color:${cc3};">${svgIcon(getCategoryIcon(c.id), 22)}</span><span>${getCategoryName(c.id)}</span></button>`; }).join('')}</div></div>
       <div class="field"><label>التاريخ</label><input type="date" id="expDate" value="${todayKey()}" /></div>
       <div class="field"><label>ملاحظات (اختياري)</label><textarea id="expNotes" rows="2" placeholder="تفاصيل تانية"></textarea></div>
       <div class="btn-group"><button class="btn btn-primary" id="saveExpBtn">حفظ المصروف</button><button class="btn" id="cancelExpBtn">رجوع</button></div>`;
-    const m = openModal(html); let catId = 'other';
+    const m = openModal(html); let catId = 'grocery';
     m.querySelectorAll('[data-catid]').forEach(c => c.onclick = () => { catId = c.dataset.catid; m.querySelectorAll('[data-catid]').forEach(x => x.classList.toggle('selected', x === c)); });
     m.querySelector('#cancelExpBtn').onclick = () => closeModal(m);
     m.querySelector('#saveExpBtn').onclick = () => {

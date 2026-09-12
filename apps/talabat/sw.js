@@ -1,5 +1,5 @@
-const CACHE = 'naqisna-v2';
-const ASSETS = ['./', './index.html', './logo.png', './icon.png', './manifest.webmanifest'];
+const CACHE = 'naqisna-v3';
+const ASSETS = ['./', './index.html', './logo.png', './icon-192.png', './icon-512.png', './badge.png', './manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -47,8 +47,8 @@ self.addEventListener('push', (e) => {
   const url = './index.html#' + tab;
   const opts = {
     body: d.body || 'عندك تحديث جديد',
-    icon: d.icon || './logo.png',
-    badge: d.badge || './logo.png',
+    icon: d.icon || './icon-512.png',
+    badge: d.badge || './badge.png',
     image: d.image,
     dir: 'rtl',
     lang: 'ar',
