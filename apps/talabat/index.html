@@ -98,9 +98,23 @@
   .btn-group .btn:not(.btn-primary):not(.btn-success):not(.btn-danger), .btn-secondary { background: #fff; color: var(--primary-dark); border: 1.5px solid rgba(124,58,237,.28); box-shadow: 0 4px 12px rgba(124,58,237,.08); }
   .btn-group .btn:not(.btn-primary):not(.btn-success):not(.btn-danger):active { background: var(--primary-light); }
   .btn:disabled { opacity: .45; filter: grayscale(.5); transform: none !important; box-shadow: none !important; cursor: not-allowed; }
-  /* ===== Items review (per-item classification) ===== */
-  #itemsReview { margin-bottom: 4px; }
-  .review-title { font-size: 12.5px; font-weight: 900; color: var(--primary-dark); margin-bottom: 8px; }
+  /* ===== Orders: pro collapsed items + voice + add-new ===== */
+  .order-exp .filter-chip { margin: 0; }
+  .ord-chev { width: 28px; height: 28px; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-size: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; transform: rotate(-90deg); transition: transform .22s; flex-shrink: 0; line-height: 1; }
+  .ord-chev.open { transform: rotate(90deg); background: var(--primary); color: #fff; }
+  .qty-pill { display: inline-flex; align-items: center; gap: 4px; background: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE; padding: 2px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 800; }
+  .badge-urgent { background: #FFE4E6; color: #E11D48; }
+  .search-voice-wrap { display: flex; gap: 8px; align-items: stretch; }
+  .search-voice-wrap .search-box { flex: 1; min-width: 0; }
+  .voice-mic-mini { width: 50px; height: 50px; border-radius: 50%; background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 8px 18px rgba(124,58,237,.35); }
+  .voice-mic-mini:active { transform: scale(.92); }
+  .voice-mic-mini.recording { background: linear-gradient(135deg,#FB7185,#E11D48); animation: micPulse 1.2s ease-out infinite; }
+  .addnew-card { background: linear-gradient(180deg,#F5F0FF,#fff 70%); border: 1.5px dashed var(--primary); border-radius: 16px; padding: 12px; margin-top: 8px; animation: popIn .2s ease-out; }
+  .addnew-card b { font-size: 13.5px; font-weight: 900; display: block; margin-bottom: 8px; }
+  .addnew-card .row { display: flex; gap: 8px; }
+  .addnew-card input, .addnew-card select { flex: 1; min-width: 0; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 12px; background: #fff; font-weight: 800; font-size: 13px; color: var(--text); }
+  .addnew-cats { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; max-height: 120px; overflow-y: auto; }
+  .addnew-cats .filter-chip { margin: 0; }
   .rv-row { display: flex; align-items: center; gap: 9px; background: #fff; border: 1.5px solid var(--border); border-radius: 14px; padding: 9px 11px; margin-bottom: 7px; animation: popIn .2s ease-out; }
   .rv-row.missing { border-color: var(--danger); background: var(--danger-light); }
   .rv-name { flex: 1; min-width: 0; font-weight: 800; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -253,6 +267,18 @@
   .meta-item { display: inline-flex; align-items: center; gap: 3px; }
   .purchase-info { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); font-size: 13px; }
   .purchase-info .price { color: var(--success); font-weight: 800; font-size: 14px; }
+  .order-card { flex-wrap: wrap; }
+  .badge-prio-high { background: #FFE4E6; color: #E11D48; }
+  .badge-prio-medium { background: #FEF3C7; color: #D97706; }
+  .badge-prio-low { background: #DCFCE7; color: #059669; }
+  .order-exp { flex-basis: 100%; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); display: flex; flex-direction: column; gap: 8px; }
+  .exp-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .exp-row .lbl { font-size: 12px; font-weight: 800; color: var(--text-sec); min-width: 52px; }
+  .exp-row .qty-num { width: 74px; padding: 8px 10px; border-radius: 12px; border: 1.5px solid var(--border); font-size: 15px; font-weight: 800; text-align: center; background: #fff; color: var(--text); }
+  .exp-row .rv-select { flex: 1; min-width: 110px; padding: 8px 10px; border-radius: 12px; border: 1.5px solid var(--border); font-size: 13px; font-weight: 700; background: #fff; color: var(--text); }
+  .exp-row .exp-notes { flex: 1; min-width: 140px; padding: 8px 12px; border-radius: 12px; border: 1.5px solid var(--border); font-size: 13px; background: #fff; color: var(--text); }
+  .list-chip-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 18px 6px; white-space: nowrap; scrollbar-width: none; }
+  .list-chip-row::-webkit-scrollbar { display: none; }
 
   .context-menu {
     position: fixed; background: var(--card); border-radius: var(--radius);
@@ -746,6 +772,19 @@
 <script>
 (() => {
   'use strict';
+
+  /* ============================================================
+     FCM Web Push — PUBLIC config only (no secrets here ever)
+     ------------------------------------------------------------
+     الصق مفتاح Web Push certificate العام هنا بعد إنشائه من:
+     Firebase Console → Project settings → Cloud Messaging
+     → Web Push certificates → Generate key pair
+     ثم ضع المفتاح العام (يبدأ عادة بـ B...) بين علامتي التنصيص.
+     ⚠️ مفتاح عام فقط — ممنوع Private Key أو Admin credentials هنا.
+     حالته الآن: فارغ عمدًا (لا يوجد مفتاح وهمي) → التشخيص يعرض
+     vapid-missing حتى يتم لصق المفتاح الحقيقي.
+     ============================================================ */
+  window.FCM_VAPID_KEY = (window.FCM_VAPID_KEY || '');
 
   let deferredPrompt = null;
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
@@ -1567,7 +1606,7 @@
      PERSIST
      ============================= */
   function persist() { state.updatedAt = Date.now(); Storage.save(state); schedulePush(); }
-  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); migrateCats(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
+  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); migrateCats(); migrateOrderLists(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
   function catDeptById(id) {
     if (CATEGORIES[id]) return CATEGORIES[id];
     const ad = ((state.catalogCustom || {}).addedDepts || []).find(x => x.id === id);
@@ -2284,13 +2323,67 @@
   /* =============================
      ACTIONS
      ============================= */
-  function pendingOrderExists(name) {
+  const QTY_COUNT_UNITS = ['قطعة', 'علبة', 'كيس', 'زجاجة', 'ربطة'];
+  const QTY_WEIGHT_UNITS = ['كجم', 'جرام'];
+  function pendingOrderExists(name, listId) {
     const k = normalizeTerm(name);
-    return state.orders.some(o => o.status !== 'purchased' && normalizeTerm(o.name) === k);
+    return state.orders.some(o => o.status !== 'purchased' && (o.listId || 'main') === (listId || activeListId()) && normalizeTerm(o.name) === k);
   }
-  function addOrder({ name, notes, urgent, categoryId, qty }) {
-    if (!(categoryId && (CATEGORIES[categoryId] || (state.customCats || []).some(c => c.id === categoryId)))) categoryId = classifyOrder(name).categoryId;
-    const order = { id: uid(), name: name.trim(), notes: notes || '', urgent: !!urgent, categoryId, qty: qty || null, status: 'pending', createdAt: nowISO(), createdBy: state.user?.name || 'الزوجة', purchaseLocation: catLocation(categoryId), purchase: null };
+  function createList(name) {
+    const n = (name || '').trim(); if (!n) return null;
+    const l = { id: uid(), name: n, createdAt: nowISO() };
+    orderLists().push(l); state._activeList = l.id; persist();
+    return l;
+  }
+  function renameList(id, name) {
+    const l = listById(id); if (!l) return;
+    const n = (name || '').trim(); if (!n) return;
+    l.name = n; persist();
+  }
+  function deleteList(id) {
+    if (id === 'main') return;
+    state.orders = (state.orders || []).filter(o => o && (o.listId || 'main') !== id);
+    state.orderLists = orderLists().filter(l => l.id !== id);
+    if (state._activeList === id) state._activeList = 'main';
+    persist();
+  }
+  const PRIO_LABEL = { high: 'عالية', medium: 'متوسطة', low: 'منخفضة' };
+  function normPriority(p) { return (p === 'high' || p === 'low') ? p : 'medium'; }
+  function orderLists() {
+    if (!Array.isArray(state.orderLists) || !state.orderLists.length) state.orderLists = [{ id: 'main', name: 'طلب البيت', createdAt: nowISO() }];
+    if (!state.orderLists.some(l => l && l.id === 'main')) state.orderLists.unshift({ id: 'main', name: 'طلب البيت', createdAt: nowISO() });
+    return state.orderLists;
+  }
+  function activeListId() {
+    const ls = orderLists();
+    if (!state._activeList || !ls.some(l => l.id === state._activeList)) state._activeList = 'main';
+    return state._activeList;
+  }
+  function listById(id) { return orderLists().find(l => l.id === id) || orderLists()[0]; }
+  function ordersOfList(listId, base) { return (base || state.orders || []).filter(o => o && (o.listId || 'main') === listId); }
+  function listStats(listId, base) {
+    const arr = ordersOfList(listId, base);
+    const pend = arr.filter(o => o.status !== 'purchased').length;
+    return { total: arr.length, pending: pend, done: arr.length - pend };
+  }
+  function migrateOrderLists() {
+    let dirty = false;
+    orderLists();
+    for (const o of state.orders || []) {
+      if (!o) continue;
+      if (!o.listId || !state.orderLists.some(l => l.id === o.listId)) { o.listId = 'main'; dirty = true; }
+      if (!o.priority) { o.priority = o.urgent ? 'high' : 'medium'; dirty = true; }
+      const shouldUrgent = o.priority === 'high';
+      if (!!o.urgent !== shouldUrgent) { o.urgent = shouldUrgent; dirty = true; }
+    }
+    if (!state._activeList || !state.orderLists.some(l => l.id === state._activeList)) state._activeList = 'main';
+    if (dirty) persist();
+  }
+  function addOrder({ name, notes, urgent, categoryId, qty, priority, listId }) {
+    const validCat = (id) => id && (CATEGORIES[id] || (state.customCats || []).some(c => c.id === id) || ((state.catalogCustom || {}).addedDepts || []).some(d => d.id === id));
+    if (!validCat(categoryId)) categoryId = classifyOrder(name).categoryId;
+    const prio = normPriority(priority || (urgent ? 'high' : 'medium'));
+    const order = { id: uid(), name: name.trim(), notes: notes || '', urgent: prio === 'high', priority: prio, listId: listId || 'main', categoryId, qty: qty || null, status: 'pending', createdAt: nowISO(), createdBy: state.user?.name || 'الزوجة', purchaseLocation: catLocation(categoryId), purchase: null };
     state.orders.unshift(order);
     const key = normalizeTerm(order.name);
     state.usageFreq[key] = (state.usageFreq[key] || 0) + 1;
@@ -2300,6 +2393,7 @@
   function updateOrder(id, patch) {
     const o = state.orders.find(x => x.id === id);
     if (!o) return null;
+    if (patch.priority !== undefined) { patch.priority = normPriority(patch.priority); patch.urgent = patch.priority === 'high'; }
     if (patch.name !== undefined && patch.name.trim() !== o.name) {
       const { categoryId } = classifyOrder(patch.name);
       o.categoryId = categoryId;
@@ -2461,6 +2555,23 @@
       const m = openModal(html, { dismissible: false });
       m.querySelector('#cancelBtn').onclick = () => { closeModal(m); resolve(false); };
       m.querySelector('#okBtn').onclick = () => { closeModal(m); resolve(true); };
+    });
+  }
+  function promptDialog({ title, message, confirmText, cancelText, initial }) {
+    return new Promise((resolve) => {
+      const html = `<div class="confirm-dialog">
+        <div class="confirm-icon" style="background:var(--primary-light);color:var(--primary);;">${svgIcon('pencil', 26)}</div>
+        <h3>${title}</h3><p>${message || ''}</p>
+        <div class="field" style="margin:0 0 4px;"><input type="text" id="promptInput" maxlength="40" value="${escapeHTML(initial || '')}" placeholder="اكتب هنا..." /></div>
+        <div class="confirm-buttons">
+          <button class="btn" id="cancelBtn">${cancelText || 'رجوع'}</button>
+          <button class="btn btn-primary" id="okBtn">${confirmText || 'تمام'}</button>
+        </div></div>`;
+      const m = openModal(html, { dismissible: false });
+      const inp = m.querySelector('#promptInput');
+      setTimeout(() => { try { inp.focus(); inp.select(); } catch {} }, 60);
+      m.querySelector('#cancelBtn').onclick = () => { closeModal(m); resolve(null); };
+      m.querySelector('#okBtn').onclick = () => { const v = inp.value.trim(); closeModal(m); resolve(v || null); };
     });
   }
 
@@ -2674,19 +2785,72 @@
   function renderOrderCard(o) {
     const cat = catById(o.categoryId);
     const purchased = o.status === 'purchased';
-    const loc = o.purchaseLocation ? `<span class="meta-item">${escapeHTML(o.purchaseLocation)}</span>` : '';
-    const notes = o.notes ? `<span class="meta-item">${escapeHTML(o.notes)}</span>` : '';
-    const qty = o.qty ? `<span class="meta-item">${escapeHTML(fmtQty(o.qty))}</span>` : '';
+    const loc = o.purchaseLocation ? `<span class="meta-item">📍 ${escapeHTML(o.purchaseLocation)}</span>` : '';
+    const notes = o.notes ? `<span class="meta-item">📝 ${escapeHTML(o.notes)}</span>` : '';
+    const qtyTxt = fmtQty(o.qty);
+    const qty = qtyTxt ? `<span class="qty-pill">📦 ${escapeHTML(qtyTxt)}</span>` : `<span class="meta-item" style="color:var(--text-muted);">بدون كمية</span>`;
     let pinfo = '';
     if (purchased && o.purchase) pinfo = `<div class="purchase-info"><span class="price">${formatCurrency(o.purchase.finalPrice)} ج.م</span></div>`;
+    const prio = o.priority || 'medium';
+    const prioBadge = purchased ? '' : (prio === 'high' ? '<span class="badge badge-urgent">🔴 عالية</span>' : prio === 'low' ? '<span class="badge badge-prio-low">🟢 منخفضة</span>' : '<span class="badge badge-prio-medium">🟡 متوسطة</span>');
+    const expanded = state._expandedOrder === o.id;
+    let panel = '';
+    if (state._expandedOrder === o.id) {
+      const d = state._expDraft || {};
+      const qt = d.qtyType || 'none';
+      const pr = d.priority || prio;
+      const selC = QTY_COUNT_UNITS.map(u => `<option value="${u}" ${d.qtyUnit === u ? 'selected' : ''}>${u}</option>`).join('');
+      const selW = QTY_WEIGHT_UNITS.map(u => `<option value="${u}" ${d.qtyUnit === u ? 'selected' : ''}>${u}</option>`).join('');
+      panel = `<div class="order-exp" data-exp-panel="${o.id}">
+        <div class="exp-row"><span class="lbl">الكمية</span>
+          <button class="filter-chip ${qt === 'none' ? 'active' : ''}" data-expqtype="none" data-id="${o.id}">بدون</button>
+          <button class="filter-chip ${qt === 'count' ? 'active' : ''}" data-expqtype="count" data-id="${o.id}">عدد</button>
+          <button class="filter-chip ${qt === 'weight' ? 'active' : ''}" data-expqtype="weight" data-id="${o.id}">وزن</button>
+        </div>
+        ${qt === 'count' ? `<div class="exp-row"><button class="btn btn-secondary btn-sm" data-expqminus="${o.id}">−</button><b style="min-width:30px;text-align:center;">${d.qtyVal ?? 1}</b><button class="btn btn-secondary btn-sm" data-expqplus="${o.id}">+</button><select class="rv-select" data-expunit="${o.id}">${selC}</select></div>` : ''}
+        ${qt === 'weight' ? `<div class="exp-row"><input type="number" class="qty-num" data-expvalw="${o.id}" value="${d.qtyVal ?? ''}" placeholder="0" min="0"><select class="rv-select" data-expunitw="${o.id}">${selW}</select></div>` : ''}
+        <div class="exp-row"><span class="lbl">الأولوية</span>
+          <button class="filter-chip ${pr === 'high' ? 'active' : ''}" data-expprio="high" data-id="${o.id}">🔴 عالية</button>
+          <button class="filter-chip ${pr === 'medium' ? 'active' : ''}" data-expprio="medium" data-id="${o.id}">🟡 متوسطة</button>
+          <button class="filter-chip ${pr === 'low' ? 'active' : ''}" data-expprio="low" data-id="${o.id}">🟢 منخفضة</button>
+        </div>
+        <div class="exp-row"><span class="lbl">ملاحظات</span><input class="exp-notes" data-expnotes="${o.id}" value="${escapeHTML(d.notes || '')}" placeholder="ملاحظة اختيارية..."></div>
+        <div class="exp-row"><button class="btn btn-primary btn-sm" data-expsave="${o.id}">حفظ</button><button class="btn btn-success btn-sm" data-expbuy="${o.id}">✓ اتشترى</button></div>
+      </div>`;
+    }
     return `<div class="order-card ${purchased ? 'purchased' : ''} ${o.urgent && !purchased ? 'urgent' : ''}" data-id="${o.id}">
       <div class="category-card-icon" style="background:${cat.color}18;color:${cat.color};">${svgIcon(getCategoryIcon(o.categoryId), 20)}</div>
-      <div class="order-main">
-        <div class="order-name ${purchased ? 'purchased-name' : ''}">${escapeHTML(o.name)} <span class="badge ${purchased ? 'badge-done' : 'badge-pending'}">${purchased ? 'اتشترى' : 'مطلوب'}</span>${o.urgent && !purchased ? '<span class="badge badge-urgent">ضروري جداً</span>' : ''}</div>
-        <div class="order-meta"><span class="meta-item">${getCategoryName(o.categoryId)}</span>${loc}${notes}${qty}</div>
+      <div class="order-main" data-exp="${o.id}">
+        <div class="order-name ${purchased ? 'purchased-name' : ''}">${escapeHTML(o.name)} <span class="badge ${purchased ? 'badge-done' : 'badge-pending'}">${purchased ? 'اتشترى' : 'مطلوب'}</span>${prioBadge}</div>
+        <div class="order-meta"><span class="meta-item">${getCategoryName(o.categoryId)}</span>${qty}</div>
+        <div class="order-meta">${loc}${notes}</div>
         ${pinfo}
+        ${expanded ? '' : `<div class="help-text" style="margin-top:2px;">اضغط للتعديل: الكمية • الوحدة • الأولوية • ملاحظات</div>`}
       </div>
+      <span class="ord-chev ${expanded ? 'open' : ''}">‹</span>
+      ${panel}
     </div>`;
+  }
+  function toggleExpand(id) {
+    if (state._expandedOrder === id) { state._expandedOrder = null; state._expDraft = null; }
+    else {
+      const o = state.orders.find(x => x && x.id === id); if (!o) return;
+      state._expandedOrder = id;
+      state._expDraft = { qtyType: o.qty ? (o.qty.t === 'w' ? 'weight' : 'count') : 'none', qtyVal: o.qty ? o.qty.v : 1, qtyUnit: o.qty ? (o.qty.u || 'قطعة') : 'قطعة', priority: o.priority || 'medium', notes: o.notes || '' };
+    }
+    render();
+  }
+  function saveExpandedOrder(id, quiet) {
+    const o = state.orders.find(x => x && x.id === id); if (!o) return null;
+    const d = state._expDraft || {};
+    const patch = { notes: (d.notes || '').trim(), priority: d.priority || 'medium' };
+    if (d.qtyType === 'count') { const v = Math.round(Number(d.qtyVal) || 0); patch.qty = (v >= 1 && v <= 99) ? { t: 'c', v, u: d.qtyUnit || 'قطعة' } : null; }
+    else if (d.qtyType === 'weight') { const v = Number(d.qtyVal); patch.qty = (v > 0 && v <= 10000) ? { t: 'w', v, u: d.qtyUnit || 'كجم' } : null; }
+    else patch.qty = null;
+    updateOrder(id, patch);
+    state._expandedOrder = null; state._expDraft = null;
+    if (!quiet) toast('اتحفظ ✓', 'success'); render();
+    return state.orders.find(x => x && x.id === id) || null;
   }
 
   /* =============================
@@ -2920,8 +3084,8 @@
   function catDeptCount(d) { return d.subs.reduce((n, s) => n + s.items.length, 0); }
   function quickAddCatalogItem(key) {
     const f = findCatalogItem(key); if (!f) return;
-    if (pendingOrderExists(f.item.ar)) { toast('موجود بالفعل في الطلبات: ' + f.item.ar, 'warning'); return; }
-    addOrder({ name: f.item.ar, notes: '', urgent: false, categoryId: f.dept.id });
+    if (pendingOrderExists(f.item.ar, activeListId())) { toast('موجود بالفعل في قائمة «' + listById(activeListId()).name + '»: ' + f.item.ar, 'warning'); return; }
+    addOrder({ name: f.item.ar, notes: '', urgent: false, categoryId: f.dept.id, listId: activeListId() });
     saveLearning(f.item.ar, f.dept.id);
     toast('اتضاف: ' + f.item.ar, 'success');
     render();
@@ -2954,7 +3118,9 @@
   }
   function renderOrders() {
     const { orderFilter, categoryFilter, searchQuery } = state;
-    let list = state.orders.filter(o => !(o.status === 'purchased' && o.purchase && !isSameDay(o.purchase.purchasedAt)));
+    const lid = activeListId();
+    const listBase = state.orders.filter(o => (o.listId || 'main') === lid);
+    let list = listBase.filter(o => !(o.status === 'purchased' && o.purchase && !isSameDay(o.purchase.purchasedAt)));
     if (orderFilter === 'pending') list = list.filter(o => o.status === 'pending');
     else if (orderFilter === 'done') list = list.filter(o => o.status === 'purchased');
     if (categoryFilter !== 'all') list = list.filter(o => o.categoryId === categoryFilter);
@@ -2962,8 +3128,13 @@
     const cats = allCats();
     const grouped = {}; for (const c of cats) grouped[c.id] = [];
     for (const o of list) { if (!grouped[o.categoryId]) grouped[o.categoryId] = []; grouped[o.categoryId].push(o); }
-    for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => ((b.urgent && b.status !== 'purchased') ? 1 : 0) - ((a.urgent && a.status !== 'purchased') ? 1 : 0));
+    const pw = { high: 0, medium: 1, low: 2 };
+    const prank = (o) => o.status === 'purchased' ? 3 : (pw[o.priority] !== undefined ? pw[o.priority] : 1);
+    for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => prank(a) - prank(b));
     const urgentList = list.filter(o => o.urgent && o.status === 'pending');
+    const lists = orderLists();
+    const cur = listById(lid) || { id: lid, name: lid };
+    const st = listStats(lid, listBase);
 
     return `<div class="page">
       <div class="topbar"><div class="greeting">مهام التسوق</div></div>
@@ -2971,7 +3142,19 @@
 
       ${assistantSay(pickMsg(list.length === 0 ? MSG.empty : MSG.husbandView), null, 'دليل القائمة', list.length === 0 ? 'mom' : 'dad')}
 
-      <div class="search-bar"><div class="search-box"><input id="orderSearch" placeholder="دوّر على طلب..." value="${escapeHTML(searchQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div></div>
+      <div class="section" style="margin-bottom:2px;"><div class="section-header"><h3>📋 قوائم الطلبات</h3></div></div>
+      <div class="list-chip-row">
+        ${lists.map(l => { const s = listStats(l.id, listBase); return `<button class="filter-chip ${l.id === lid ? 'active' : ''}" data-mylist="${l.id}">${escapeHTML(l.name)} • ${s.pending}</button>`; }).join('')}
+        <button class="filter-chip" data-mylist="__new">＋ قائمة جديدة</button>
+      </div>
+      <div class="section" style="margin-bottom:2px;"><div class="section-header"><h3>${escapeHTML(cur.name)}</h3><span style="font-size:12px;color:var(--text-sec);font-weight:700;">${st.pending} مطلوب • ${st.done} اتشترى</span></div>
+        <div style="display:flex;gap:8px;padding:0 18px 10px;">
+          <button class="btn btn-secondary btn-sm" data-listact="rename">إعادة تسمية</button>
+          ${lid !== 'main' ? `<button class="btn btn-danger btn-sm" data-listact="del">حذف القائمة</button>` : ''}
+        </div>
+      </div>
+
+      <div class="search-bar"><div class="search-voice-wrap"><div class="search-box"><input id="orderSearch" placeholder="دوّر على طلب..." value="${escapeHTML(searchQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div><button class="voice-mic-mini" id="orderSearchVoice" aria-label="بحث صوتي">🎤</button></div></div>
 
       ${urgentList.length ? `<div class="urgent-banner"><h3>${svgIcon('bolt', 18)} ضروري جداً — ${urgentList.length} ${urgentList.length === 1 ? 'طلب' : 'طلبات'} لازم يتجابوا الأول</h3>${urgentList.map(o => renderOrderCard(o)).join('')}</div>` : ''}
 
@@ -3272,6 +3455,14 @@
       card.addEventListener('mouseup', () => { if (!ignoreMouse()) endPress(false); });
       card.addEventListener('mouseleave', () => endPress(false));
       card.addEventListener('contextmenu', (e) => e.preventDefault());
+      card.addEventListener('touchstart', () => { card._pressStart = Date.now(); }, { passive: true });
+      card.addEventListener('mousedown', () => { card._pressStart = Date.now(); });
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('[data-exp-panel], button, input, select, textarea, a')) return;
+        const exp = card.querySelector('[data-exp]'); if (!exp) return;
+        if (Date.now() - (card._pressStart || 0) > 500) return;
+        toggleExpand(id);
+      });
     });
     const al = document.getElementById('addExpenseLink'); if (al) al.onclick = (e) => { e.preventDefault(); openAddExpenseModal(); };
     document.querySelectorAll('[data-delexp]').forEach(b => b.onclick = () => handleDeleteExpense(b.dataset.delexp));
@@ -3325,11 +3516,45 @@
     };
     const si = document.getElementById('orderSearch');
     if (si) { si.oninput = (e) => { state.searchQuery = e.target.value; if (si._to) clearTimeout(si._to); si._to = setTimeout(() => { persist(); render(); const i = document.getElementById('orderSearch'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 200); }; }
+    const osv = document.getElementById('orderSearchVoice');
+    if (osv) osv.onclick = () => {
+      try {
+        Voice.lang = 'ar-EG';
+        Voice.toggle(si, {
+          onText: () => { if (si) { state.searchQuery = si.value; render(); } },
+          onState: (on) => { osv.classList.toggle('recording', !!on); },
+          onCommit: () => { if (si) { state.searchQuery = si.value; persist(); render(); const i = document.getElementById('orderSearch'); if (i) i.focus(); } }
+        });
+      } catch { toast('البحث الصوتي غير مدعوم في المتصفح ده', 'warning'); }
+    };
     document.querySelectorAll('[data-catdept]').forEach(b => b.onclick = () => { state._catBrowse = b.dataset.catdept; state.searchQuery = ''; persist(); render(); });
     const scb = document.getElementById('shopCardBtn'); if (scb) scb.onclick = () => { state._shopOpen = true; state._catBrowse = null; render(); };
     const shb = document.getElementById('shopCloseBtn'); if (shb) shb.onclick = () => { state._shopOpen = false; state._catBrowse = null; render(); };
     const cbb = document.getElementById('catBackBtn'); if (cbb) cbb.onclick = () => { state._catBrowse = null; render(); };
     document.querySelectorAll('[data-addcat]').forEach(b => b.onclick = () => { try { quickAddCatalogItem(decodeURIComponent(b.dataset.addcat)); } catch {} });
+    document.querySelectorAll('[data-mylist]').forEach(b => b.onclick = () => {
+      if (b.dataset.mylist === '__new') {
+        promptDialog({ title: 'قائمة جديدة', message: 'اكتب اسم القائمة:', confirmText: 'إنشاء', cancelText: 'رجوع' }).then(n => { if (n) { createList(n); toast('اتعملت قائمة جديدة ✓', 'success'); render(); } });
+      } else { state._activeList = b.dataset.mylist; state.orderFilter = 'all'; state.categoryFilter = 'all'; state.searchQuery = ''; persist(); render(); }
+    });
+    document.querySelectorAll('[data-listact]').forEach(b => b.onclick = () => {
+      const lid = activeListId(); const cur = listById(lid);
+      if (b.dataset.listact === 'rename') {
+        promptDialog({ title: 'إعادة تسمية القائمة', message: 'اكتب الاسم الجديد:', confirmText: 'حفظ', cancelText: 'رجوع', initial: cur.name }).then(n => { if (n) { renameList(lid, n); toast('اتغير الاسم ✓', 'success'); render(); } });
+      } else if (b.dataset.listact === 'del' && lid !== 'main') {
+        confirmDialog({ title: 'نحذف القائمة؟', message: `«${cur.name}» وكل طلباتها هتتمسح نهائياً.`, confirmText: 'امسحها', cancelText: 'لا', danger: true }).then(ok => { if (ok) { deleteList(lid); toast('اتمسحت القائمة', 'success'); render(); } });
+      }
+    });
+    document.querySelectorAll('[data-expqtype]').forEach(b => b.onclick = () => { const d = state._expDraft || (state._expDraft = {}); d.qtyType = b.dataset.expqtype; if (d.qtyType === 'count' && !(d.qtyVal >= 1)) d.qtyVal = 1; render(); });
+    document.querySelectorAll('[data-expqminus]').forEach(b => b.onclick = () => { const d = state._expDraft || (state._expDraft = {}); d.qtyVal = Math.max(1, (Number(d.qtyVal) || 1) - 1); render(); });
+    document.querySelectorAll('[data-expqplus]').forEach(b => b.onclick = () => { const d = state._expDraft || (state._expDraft = {}); d.qtyVal = Math.min(99, (Number(d.qtyVal) || 1) + 1); render(); });
+    document.querySelectorAll('[data-expunit]').forEach(s => s.onchange = () => { const d = state._expDraft || (state._expDraft = {}); d.qtyUnit = s.value; });
+    document.querySelectorAll('[data-expvalw]').forEach(s => s.oninput = () => { const d = state._expDraft || (state._expDraft = {}); d.qtyVal = parseFloat(s.value) || 0; });
+    document.querySelectorAll('[data-expunitw]').forEach(s => s.onchange = () => { const d = state._expDraft || (state._expDraft = {}); d.qtyUnit = s.value; });
+    document.querySelectorAll('[data-expprio]').forEach(b => b.onclick = () => { const d = state._expDraft || (state._expDraft = {}); d.priority = b.dataset.expprio; render(); });
+    document.querySelectorAll('[data-expnotes]').forEach(s => s.oninput = () => { const d = state._expDraft || (state._expDraft = {}); d.notes = s.value; });
+    document.querySelectorAll('[data-expsave]').forEach(b => b.onclick = () => saveExpandedOrder(b.dataset.expsave));
+    document.querySelectorAll('[data-expbuy]').forEach(b => b.onclick = () => { const id = b.dataset.expbuy; if (saveExpandedOrder(id, true)) openPurchaseModal(id); });
     bindSettings();
   }
 
@@ -4214,7 +4439,11 @@
         <div id="pickBox"></div>
       </div>
       <div class="field"><label>بحث في الأصناف</label>
-        <input type="text" id="pickSearch" placeholder="دوّر على صنف..." autocomplete="off" maxlength="40" />
+        <div style="display:flex;gap:8px;align-items:stretch;">
+          <input type="text" id="pickSearch" placeholder="دور على الصنف..." autocomplete="off" maxlength="40" style="flex:1;min-width:0;" />
+          <button class="mic-btn" id="ordVoice" aria-label="بحث صوتي 🎤" title="بحث صوتي" style="flex-shrink:0;">🎤</button>
+        </div>
+        <div class="help-text">ابحث نصيًا أو بالصوت 🎤 — لو الصنف مش موجود هتقدر تضيفه جديد</div>
       </div>
       <div class="field"><label>التصفح حسب القسم</label>
         <div id="pickDepts" class="filters-wrap" style="padding:0;"></div>
@@ -4235,18 +4464,17 @@
           <div id="qtyControls"></div>
         </div>
       </div>
-      <div class="field"><label>ملاحظات (اختياري)</label><textarea id="ordNotes" rows="2" placeholder="مثلا: نوع معين — كبير — غير حار">${editing ? escapeHTML(order.notes || '') : ''}</textarea></div>
-      <label class="urgent-toggle ${editing && order.urgent ? 'on' : ''}" id="urgentToggle"><input type="checkbox" id="ordUrgent" ${editing && order.urgent ? 'checked' : ''} /><span class="ut-switch"></span><span class="ut-text">ضروري جداً — أولوية قصوى</span></label>
-      <div id="itemsReview"></div>
+      ${editing ? `<div class="field"><label>ملاحظات (اختياري)</label><textarea id="ordNotes" rows="2" placeholder="مثلا: نوع معين — كبير — غير حار">${escapeHTML(order.notes || '')}</textarea></div>` : ''}
+      ${editing
+        ? `<label class="urgent-toggle ${order.urgent ? 'on' : ''}" id="urgentToggle"><input type="checkbox" id="ordUrgent" ${order.urgent ? 'checked' : ''} /><span class="ut-switch"></span><span class="ut-text">ضروري جداً — أولوية قصوى</span></label>
+      <div class="field"><label>يُضاف إلى طلب (قائمة)</label><select id="ordListSel" class="rv-select">${orderLists().map(l => `<option value="${l.id}" ${l.id === activeListId() ? 'selected' : ''}>${escapeHTML(l.name)}</option>`).join('')}</select></div>` : ''}
       <div id="pharmacyNote" class="pharm-note hidden">⚠️ ده قسم صيدلية بس. التطبيق مش بيقدم تشخيص أو نصيحة طبية.</div>
       <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="submitOrderBtn">${editing ? 'حفظ التعديل' : 'تأكيد الطلب'}</button><button class="btn" id="cancelOrderBtn">رجوع</button></div>`;
     const m = openModal(html);
-    const nameInput = m.querySelector('#ordName'); const reviewBox = m.querySelector('#itemsReview');
+    const nameInput = m.querySelector('#ordName');
     const pharmNote = m.querySelector('#pharmacyNote'); const submitBtn = m.querySelector('#submitOrderBtn');
-    const manualCats = {};
     let qtyFor = null, qtyType = 'none', qtyVal = 1, qtyUnit = 'قطعة';
-    const QTY_COUNT_UNITS = ['قطعة', 'علبة', 'كيس', 'زجاجة', 'ربطة'];
-    const QTY_WEIGHT_UNITS = ['كجم', 'جرام'];
+    let newPrio = 'medium';
     function renderQty() {
       const box = m.querySelector('#qtyBox'); if (!box) return;
       box.classList.toggle('hidden', !qtyFor);
@@ -4264,7 +4492,7 @@
         m.querySelector('#qValW').oninput = (e) => { qtyVal = parseFloat(e.target.value) || 0; };
         m.querySelector('#qUnitW').onchange = (e) => { qtyUnit = e.target.value; };
       } else { c.innerHTML = `<div class="help-text">هتتضاف من غير تحديد كمية</div>`; }
-      renderReview();
+      evalCategoryFromName();
     }
     function showQtyFor(name) {
       qtyFor = name; qtyType = 'none'; qtyVal = 1; qtyUnit = 'قطعة';
@@ -4287,35 +4515,12 @@
     function parseItems() {
       return nameInput.value.trim().split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').trim()).filter(Boolean);
     }
-    function resolveItem(name) {
-      const r = classifyOrder(name);
-      if (r.source !== 'unknown') return { cat: r.categoryId, auto: true };
-      const picked = manualCats[normalizeTerm(name)];
-      if (picked && (CATEGORIES[picked] || isCustomCat(picked))) return { cat: picked, auto: false };
-      return { cat: null, auto: false };
+    function evalCategoryFromName() {
+      let cid = null;
+      if (editing && order) cid = (nameInput.value.trim() ? classifyOrder(nameInput.value.trim()).categoryId : order.categoryId);
+      else if (pickedName) cid = classifyOrder(pickedName).categoryId;
+      if (pharmNote) pharmNote.classList.toggle('hidden', cid !== 'pharmacy');
     }
-    function renderReview() {
-      const items = parseItems();
-      const seen = new Set(); const uniq = items.filter(n => { const k = normalizeTerm(n); if (seen.has(k)) return false; seen.add(k); return true; });
-      let allOk = uniq.length > 0; let showPharm = false;
-      reviewBox.innerHTML = uniq.length ? `<div class="review-title">مراجعة الأصناف (${uniq.length}) — لازم كل صنف يتصنف</div>` + uniq.map(n => {
-        const r = resolveItem(n); const k = normalizeTerm(n);
-        const cc = r.cat ? catColor(r.cat) : '#9CA3AF';
-        if (r.cat === 'pharmacy') showPharm = true;
-        if (!r.cat) allOk = false;
-        const badge = r.cat
-          ? `<span class="rv-badge" style="background:${cc}18;color:${cc};">${svgIcon(getCategoryIcon(r.cat), 15)} ${getCategoryName(r.cat)}${r.auto ? '' : ' ✓'}</span>`
-          : `<select class="rv-select" data-rv="${escapeHTML(n)}"><option value="">اختار القسم...</option>${allCats().map(c => `<option value="${c.id}">${getCategoryName(c.id)}</option>`).join('')}</select>`;
-        return `<div class="rv-row ${r.cat ? '' : 'missing'}"><span class="rv-name">${escapeHTML(n)}</span>${badge}</div>`;
-      }).join('') : '';
-      reviewBox.querySelectorAll('[data-rv]').forEach(sel => sel.onchange = () => {
-        if (sel.value) { manualCats[normalizeTerm(sel.dataset.rv)] = sel.value; saveLearning(sel.dataset.rv, sel.value); renderReview(); }
-      });
-      if (editing && order) showPharm = showPharm || order.categoryId === 'pharmacy';
-      pharmNote.classList.toggle('hidden', !showPharm);
-      if (submitBtn) submitBtn.disabled = !allOk;
-    }
-    function evalCategoryFromName() { renderReview(); }
     const suggestBox = m.querySelector('#ordSuggest');
     function currentToken() {
       const v = nameInput.value;
@@ -4408,7 +4613,7 @@
       }
     };
     if (vBtn) vBtn.onclick = () => Voice.toggle(nameInput, voiceUI());
-    let pickedName = null, pickDept = null;
+    let pickedName = null, pickDept = null, newItemCat = null;
     function renderPick() {
       const box = m.querySelector('#pickBox'); if (!box) return;
       if (!pickedName) { box.innerHTML = `<div class="help-text">اختار صنف من القائمة أو البحث أو الصوت</div>`; return; }
@@ -4426,6 +4631,7 @@
       box.innerHTML = cats.map(d => `<button class="filter-chip ${pickDept === d.id ? 'active' : ''}" data-pdept="${d.id}">${d.emoji} ${escapeHTML(getCategoryName(d.id))}</button>`).join('');
       box.querySelectorAll('[data-pdept]').forEach(b => b.onclick = () => {
         pickDept = (pickDept === b.dataset.pdept ? null : b.dataset.pdept);
+        try { newItemCat = pickDept; } catch {}
         const ps = m.querySelector('#pickSearch'); if (ps) ps.value = '';
         renderPickDepts(); renderPickList();
       });
@@ -4449,13 +4655,43 @@
         Object.keys(state.usageFreq || {}).forEach(k => pushX(findOriginalName(k) || k, 'استخدمته قبل كده'));
         (state.orders || []).forEach(o => pushX(o.name, 'من طلباتك'));
         rows = rows.slice(0, 30);
+        const exactExists = seen.has(normalizeTerm(q));
+        const addCard = `<div class="addnew-card" id="addNewCard">
+          <b>✨ "${escapeHTML(q)}" ${exactExists ? 'موجود — اختاره من فوق' : 'مش موجود — ضيفه كصنف جديد'}</b>
+          ${exactExists ? '' : `<input id="newItemName" value="${escapeHTML(q)}" maxlength="40" placeholder="اسم الصنف" />
+          <div class="addnew-cats">${getCatalog().map(d => `<button class="filter-chip ${newItemCat === d.id ? 'active' : ''}" data-newcat="${d.id}">${d.emoji} ${escapeHTML(getCategoryName(d.id))}</button>`).join('')}</div>
+          <div class="row"><button class="btn btn-primary btn-sm" id="confirmAddNew" style="flex:1;">+ إضافة للطلب الحالي</button></div>
+          <div class="help-text" style="margin-top:6px;">اكتب الاسم ← اختار التصنيف ← هيتضاف مباشرة للطلب الحالي</div>`}
+        </div>`;
+        list.innerHTML = (rows.length ? rows.join('') : `<div class="help-text">مفيش نتائج مطابقة</div>`) + addCard;
+        list.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => selectItem(b.dataset.pick));
+        list.querySelectorAll('[data-newcat]').forEach(b => b.onclick = () => { newItemCat = b.dataset.newcat; renderPickList(); });
+        const nm = list.querySelector('#newItemName');
+        if (nm) nm.oninput = () => { };
+        const cf = list.querySelector('#confirmAddNew');
+        if (cf) cf.onclick = () => {
+          const nameEl = list.querySelector('#newItemName');
+          const name = ((nameEl && nameEl.value) || '').trim();
+          if (!name) { toast('اكتب اسم الصنف الأول', 'warning'); return; }
+          if (!newItemCat) { toast('اختار التصنيف المناسب للصنف', 'warning'); return; }
+          const lid2 = (m.querySelector('#ordListSel') && m.querySelector('#ordListSel').value) || activeListId();
+          if (pendingOrderExists(name, lid2)) { toast('الصنف ده موجود بالفعل في الطلب ده', 'warning'); return; }
+          const notes = (m.querySelector('#ordNotes') && m.querySelector('#ordNotes').value.trim()) || '';
+          const added = addOrder({ name, notes, urgent: newPrio === 'high', priority: newPrio, qty: null, listId: lid2, categoryId: newItemCat });
+          saveLearning(name, newItemCat);
+          try { pushNotif(newPrio === 'high' ? 'urgent' : 'order_new', { names: [added.name], orderIds: [added.id] }); } catch {}
+          toast('اتضاف "' + added.name + '" في ' + getCategoryName(newItemCat) + ' ✓', 'success');
+          try { stopVoice(); } catch {}
+          closeModal(m); render();
+        };
+        return;
       } else if (pickDept) {
         const d = getCatalog().find(x => x.id === pickDept);
         rows = d ? d.subs.flatMap(s => s.items.map(it => pickRowHTML(it.ar, s.name))) : [];
       } else {
         rows = frequentOrders(8).map(f => pickRowHTML(f.name, 'الأكثر استخدامًا'));
       }
-      list.innerHTML = rows.length ? rows.join('') : `<div class="help-text">${q.length >= 2 ? 'مفيش نتائج — جرّب كلمة تانية' : 'اختار قسم أو ابحث'}</div>`;
+      list.innerHTML = rows.length ? rows.join('') : `<div class="help-text">اختار قسم أو ابحث — اكتب حرفين على الأقل</div>`;
       list.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => selectItem(b.dataset.pick));
     }
     if (!editing) {
@@ -4467,8 +4703,29 @@
     m.querySelector('#cancelOrderBtn').onclick = () => closeModal(m);
     const urgentToggle = m.querySelector('#urgentToggle'); const urgentInput = m.querySelector('#ordUrgent');
     if (urgentInput) urgentInput.onchange = () => urgentToggle.classList.toggle('on', urgentInput.checked);
+    m.querySelectorAll('[data-newprio]').forEach(b => b.onclick = () => { newPrio = b.dataset.newprio; m.querySelectorAll('[data-newprio]').forEach(x => x.classList.toggle('active', x === b)); });
+    const ordVoice = m.querySelector('#ordVoice');
+    if (ordVoice) ordVoice.onclick = () => {
+      const ps = m.querySelector('#pickSearch');
+      const target = ps || nameInput;
+      Voice.lang = 'ar-EG';
+      Voice.toggle(target, {
+        onText: () => {
+          if (ps) { renderPickList(); const items = parseItems(); if (items.length && !editing) selectItem(items[0]); else voiceUI().onText(); }
+          else voiceUI().onText();
+        },
+        onState: (on) => { ordVoice.classList.toggle('recording', !!on); try { setVoiceUI(on); } catch {} },
+        onCommit: (count) => {
+          if (ps) renderPickList();
+          try { voiceUI().onCommit(count); } catch {}
+        }
+      });
+    };
     m.querySelector('#submitOrderBtn').onclick = () => {
-      const notes = m.querySelector('#ordNotes').value.trim(); const urgent = !!(urgentInput && urgentInput.checked);
+      const notes = m.querySelector('#ordNotes').value.trim();
+      const selList = m.querySelector('#ordListSel');
+      const lid2 = (selList && selList.value) || activeListId();
+      const urgentInput2 = m.querySelector('#ordUrgent');
       if (!editing) {
         const items = pickedName ? [pickedName] : parseItems();
         if (!items.length) { toast('اختار صنف من القائمة أو البحث أو الصوت', 'warning'); return; }
@@ -4476,24 +4733,21 @@
         const singleQty = readQtyForSubmit(items);
         for (const itemName of items) {
           const k = normalizeTerm(itemName);
-          if (seenBatch[k] || pendingOrderExists(itemName)) { skipped++; continue; }
+          if (seenBatch[k] || pendingOrderExists(itemName, lid2)) { skipped++; continue; }
           seenBatch[k] = 1;
-          const picked = manualCats[k];
-          if (picked) saveLearning(itemName, picked);
-          added.push(addOrder({ name: itemName, notes, urgent, qty: singleQty }));
+          added.push(addOrder({ name: itemName, notes, urgent: newPrio === 'high', priority: newPrio, qty: singleQty, listId: lid2 }));
         }
-        if (!added.length) { toast(skipped ? 'كل الأصناف دي موجودة بالفعل في الطلبات' : 'اكتب صنف صحيح', 'warning'); return; }
-        pushNotif(urgent ? 'urgent' : 'order_new', { names: added.map(o => o.name), orderIds: added.map(o => o.id) });
-        MemeSound.playEvent(urgent ? 'URGENT' : 'NEW_REQUEST');
+        if (!added.length) { toast(skipped ? 'الصنف ده موجود بالفعل في القائمة دي' : 'اكتب صنف صحيح', 'warning'); return; }
+        pushNotif(newPrio === 'high' ? 'urgent' : 'order_new', { names: added.map(o => o.name), orderIds: added.map(o => o.id) });
+        MemeSound.playEvent(newPrio === 'high' ? 'URGENT' : 'NEW_REQUEST');
         toast((added.length === 1 ? pickMsg(MSG.addOrder) : `زوّدت ${added.length} طلبات ✓ 😂`) + (skipped ? ` (تجاهلت ${skipped} مكرر)` : ''), 'success');
         closeModal(m); render();
+        confirmDialog({ title: 'اتضاف ✓', message: 'تضيف صنف تاني في نفس القائمة؟', confirmText: 'أيوه ضيف', cancelText: 'خلاص' }).then(ok => { if (ok) { state._activeList = lid2; persist(); openOrderModal({ mode: 'add' }); } });
       } else {
         const raw = nameInput.value.trim();
         if (!raw) { nameInput.classList.add('error'); nameInput.focus(); return; }
         nameInput.classList.remove('error');
-        const picked = manualCats[normalizeTerm(raw)];
-        if (picked) saveLearning(raw, picked);
-        updateOrder(order.id, { name: raw, notes, urgent, qty: (qtyFor && normalizeTerm(raw) === normalizeTerm(qtyFor)) ? readQtyValue() : null });
+        updateOrder(order.id, { name: raw, notes, priority: (urgentInput2 && urgentInput2.checked) ? 'high' : (order.priority === 'high' ? 'medium' : order.priority), qty: (qtyFor && normalizeTerm(raw) === normalizeTerm(qtyFor)) ? readQtyValue() : null, listId: lid2 });
         toast('تم التعديل ✓', 'success');
         closeModal(m); render();
       }
