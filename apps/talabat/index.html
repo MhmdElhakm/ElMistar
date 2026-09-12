@@ -577,11 +577,12 @@
   .cat-pick-head small { font-size: 11.5px; color: var(--text-sec); font-weight: 700; display: block; margin-top: 1px; }
   .pharm-note { background: var(--danger-light); color: var(--danger); padding: 8px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; margin-bottom: 10px; border: 1px solid var(--danger); }
 
-  .confirm-dialog { max-width: 340px !important; width: calc(100% - 40px); align-self: center; margin: auto; border-radius: 20px !important; padding: 22px 20px; }
-  .confirm-dialog .confirm-icon { width: 54px; height: 54px; background: var(--danger-light); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 12px; }
-  .confirm-dialog h3 { text-align: center; font-size: 17px; margin-bottom: 4px; }
-  .confirm-dialog p { text-align: center; color: var(--text-sec); font-size: 13px; margin-bottom: 16px; }
-  .confirm-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .confirm-dialog { max-width: 340px !important; width: calc(100% - 40px); align-self: center; margin: auto; border-radius: 24px !important; padding: 26px 22px; text-align: center; }
+  .confirm-dialog .confirm-icon { width: 64px; height: 64px; border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.7), 0 8px 18px rgba(0,0,0,.08); }
+  .confirm-dialog h3 { text-align: center; font-size: 19px; font-weight: 900; margin-bottom: 6px; }
+  .confirm-dialog p { text-align: center; color: var(--text-sec); font-size: 13.5px; font-weight: 600; margin-bottom: 18px; line-height: 1.8; }
+  .confirm-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .confirm-buttons .btn { min-height: 50px; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 
   .toast-container { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 6px; width: calc(100% - 36px); max-width: 420px; pointer-events: none; }
   .toast { background: var(--card); padding: 12px 14px; border-radius: var(--radius); border: none; box-shadow: var(--shadow-lg); font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; animation: toastIn .25s ease-out, toastOut .25s ease-in 2.6s forwards; }
@@ -897,6 +898,8 @@
     copy: '<rect x="9" y="9" width="12" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
     pencil: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
     trash: '<polyline points="3 6 5 6 21 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    warn: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.8" r="1.1" fill="currentColor"/>',
+    help: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.4 2.1-2.4 3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="currentColor"/>',
     plus: '<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>',
     mic: '<rect x="9" y="2" width="6" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
     bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 0 1-3.4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
@@ -1937,9 +1940,9 @@
       if (!db || !state.home?.code || !state.user || !token) return false;
       try {
         const info = this.deviceInfo();
-        await db.collection('homes').doc(state.home.code).collection('fcmTokens').doc(fcmDocId(token)).set({
+        await db.collection('homes').doc(state.home.code).collection('pushSubs').doc(fcmDocId(token)).set({
           userId: state.user.id, userName: state.user.name || '', token,
-          channel: 'fcm',
+          channel: 'fcm', platform: info.platform,
           device: { ua: info.ua, platform: info.platform, lang: info.lang, browser: browserName() },
           createdAt: nowISO(), updatedAt: Date.now()
         }, { merge: true });
@@ -1957,7 +1960,7 @@
           if (fm && fm.deleteToken) { try { await fm.deleteToken(); } catch {} }
         } catch {}
         if (db && state.home?.code && id) {
-          try { await db.collection('homes').doc(state.home.code).collection('fcmTokens').doc(id).delete(); } catch {}
+          try { await db.collection('homes').doc(state.home.code).collection('pushSubs').doc(id).delete(); } catch {}
         }
       } catch {}
     },
@@ -2214,7 +2217,9 @@
           handleIncomingNotifs(remote.notifs);
           const ui = {};
           for (const k of UI_ONLY_KEYS) ui[k] = state[k];
+          const keepBrowser = state.notifPrefs ? state.notifPrefs.browser : undefined;
           Object.assign(state, remote, ui);
+          if (keepBrowser !== undefined) state.notifPrefs = Object.assign({}, state.notifPrefs, { browser: keepBrowser });
           Storage.save(state);
           render();
           if (state.initialized) toast('وصل تحديث جديد من جهاز تاني', 'info');
@@ -2390,12 +2395,15 @@
   function closeModal(b) { stopVoice(); const n = b._node || b.querySelector('.modal'); if (n) { n.style.animation = 'toastOut .15s ease-in forwards'; setTimeout(() => b.remove(), 150); } else b.remove(); }
   function confirmDialog({ title, message, confirmText, cancelText, danger }) {
     return new Promise((resolve) => {
+      const iconBg = danger ? 'var(--danger-light)' : 'var(--primary-light)';
+      const iconColor = danger ? 'var(--danger)' : 'var(--primary)';
+      const okIcon = danger ? svgIcon('trash', 17) : '';
       const html = `<div class="confirm-dialog">
-        <div class="confirm-icon">${danger ? '⚠️' : '❓'}</div>
+        <div class="confirm-icon" style="background:${iconBg};color:${iconColor};">${svgIcon(danger ? 'warn' : 'help', 30)}</div>
         <h3>${title}</h3><p>${message}</p>
         <div class="confirm-buttons">
-          <button class="btn" id="cancelBtn">${cancelText || '↩️ لا'}</button>
-          <button class="btn ${danger ? 'btn-danger' : 'btn-primary'}" id="okBtn">${confirmText || 'تمام'}</button>
+          <button class="btn" id="cancelBtn">${cancelText || 'لا'}</button>
+          <button class="btn ${danger ? 'btn-danger' : 'btn-primary'}" id="okBtn">${okIcon}${confirmText || 'تمام'}</button>
         </div></div>`;
       const m = openModal(html, { dismissible: false });
       m.querySelector('#cancelBtn').onclick = () => { closeModal(m); resolve(false); };
@@ -4348,12 +4356,12 @@
 
   function handleDeleteOrder(id) {
     const o = state.orders.find(x => x.id === id); if (!o) return;
-    confirmDialog({ title: 'نحذف الطلب ده؟', message: `"${o.name}" هيمسح نهائياً.`, confirmText: '🗑️ امسحه', cancelText: '↩️ لا', danger: true }).then(ok => {
+    confirmDialog({ title: 'نحذف الطلب ده؟', message: `"${o.name}" هيمسح نهائياً.`, confirmText: 'امسحه', cancelText: 'لا', danger: true }).then(ok => {
       if (ok) { if (o.purchase) { const exp = state.expenses.find(e => e.sourceType === 'order' && e.sourceId === id); if (exp) deleteExpense(exp.id); } deleteOrder(id); toast('اتمسح ✓', 'success'); render(); }
     });
   }
   function handleDeleteExpense(id) {
-    confirmDialog({ title: 'نحذف المصروف؟', message: 'هيمسح نهائياً.', confirmText: '🗑️ امسحه', cancelText: '↩️ لا', danger: true }).then(ok => { if (ok) { deleteExpense(id); toast('اتمسح ✓', 'success'); render(); } });
+    confirmDialog({ title: 'نحذف المصروف؟', message: 'هيمسح نهائياً.', confirmText: 'امسحه', cancelText: 'لا', danger: true }).then(ok => { if (ok) { deleteExpense(id); toast('اتمسح ✓', 'success'); render(); } });
   }
 
   function openPurchaseModal(orderId) {

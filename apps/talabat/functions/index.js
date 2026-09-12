@@ -2,6 +2,8 @@
  * Naqisna Push backend — FCM channel (Firebase Cloud Functions, Node 20).
  * Chain: Firestore -> here -> FCM -> browser -> Service Worker -> Notification.
  * Works even when the app page is fully closed (OS/browser permitting).
+ * Token source of truth: homes/{homeId}/pushSubs (docs carrying a string `token`).
+ * Legacy `fcmTokens` docs are still honored during transition (deduped by token).
  * No secrets in frontend; Admin SDK credentials come from the Functions runtime.
  * The public Web-Push certificate key lives client-side (Firebase Console copy).
  * Deploy: firebase deploy --only functions
@@ -21,13 +23,23 @@ const DEAD_TOKEN = new Set([
   'messaging/invalid-argument'
 ]);
 
+function tabFromUrl(url) {
+  const m = String(url || '').match(/#(home|orders|enc|notifs|expenses|reports|settings)\b/);
+  if (m) return m[1];
+  const s = String(url || '');
+  for (const t of TABS) { if (s.includes(t)) return t; }
+  return 'notifs';
+}
+
 function cleanPayload(q) {
+  const tab = TABS.includes(q && q.tab) ? q.tab : tabFromUrl(q && q.url);
   return {
     title: String((q && q.title) || 'ناقصنا إيه').slice(0, 120),
     body: String((q && q.body) || 'عندك تحديث جديد').slice(0, 300),
     tag: String((q && (q.nid || q.id)) || 'naqisna'),
-    tab: TABS.includes(q && q.tab) ? q.tab : 'notifs',
+    tab,
     nid: String((q && q.nid) || ''),
+    type: String((q && q.type) || '').slice(0, 32),
     urgent: (q && q.urgent) === true
   };
 }
@@ -39,6 +51,7 @@ function fcmData(p) {
     tag: p.tag,
     tab: p.tab,
     nid: p.nid,
+    type: p.type || '',
     urgent: p.urgent ? 'true' : 'false'
   };
 }
@@ -46,6 +59,19 @@ function fcmData(p) {
 function chunk(arr, n) {
   const out = [];
   for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
+  return out;
+}
+
+async function readTokenDocs(homeRef) {
+  const out = [];
+  for (const sub of ['pushSubs', 'fcmTokens']) {
+    try {
+      const snap = await homeRef.collection(sub).get();
+      out.push(...(snap.docs || []));
+    } catch (e) {
+      logger.warn('token read failed', { sub, msg: (e && e.message) || 'unknown' });
+    }
+  }
   return out;
 }
 
@@ -87,20 +113,35 @@ async function sendToTokens(tokenDocs, payload, logTag) {
   return { sent, failed, cleaned, devices: byToken.size };
 }
 
-/* Admin/queue send: client writes homes/{code}/pushQueue/{id}
- * {to:'all'|<userId>, title, body, tab, nid, urgent?, status:'pending'} */
+/* Queue send: client writes homes/{homeCode}/pushQueue/{qid}
+ * {to:'all'|<userId>, [userId alias], title, body, [tab|url], [type], [nid], [urgent],
+ *  status:'pending'} — claimed pending->processing->sent|failed|error (idempotent). */
 exports.pushQueueSend = onDocumentCreated('homes/{homeCode}/pushQueue/{qid}', async (event) => {
-  const q = (event.data && event.data.data()) || {};
-  if (q.status && q.status !== 'pending') return;
-  const ref = event.data.ref;
+  const homeRef = db.collection('homes').doc(event.params.homeCode);
+  const ref = homeRef.collection('pushQueue').doc(event.params.qid);
+  let q = null;
+  try {
+    q = await db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      const cur = snap.exists ? snap.data() : null;
+      if (!cur || (cur.status && cur.status !== 'pending')) return null;
+      tx.set(ref, { status: 'processing', processingAt: Date.now() }, { merge: true });
+      return cur;
+    });
+  } catch (e) {
+    logger.error('queue claim error', { msg: (e && e.message) || 'unknown' });
+    return;
+  }
+  if (!q) return;
+  if (q.to == null && q.userId != null) q.to = q.userId;
   try {
     const payload = cleanPayload(q);
-    const col = db.collection('homes').doc(event.params.homeCode).collection('fcmTokens');
-    const snap = (!q.to || q.to === 'all')
-      ? await col.get()
-      : await col.where('userId', '==', String(q.to)).get();
-    const r = await sendToTokens(snap.docs, payload, 'queue');
-    await ref.set({ status: 'sent', ...r, processedAt: Date.now() }, { merge: true });
+    const docs = await readTokenDocs(homeRef);
+    const all = (!q.to || q.to === 'all')
+      ? docs
+      : docs.filter((d) => String(((d.data && d.data()) || {}).userId || '') === String(q.to));
+    const r = await sendToTokens(all, payload, 'queue');
+    await ref.set({ status: r.failed > 0 && r.sent === 0 ? 'failed' : 'sent', ...r, processedAt: Date.now() }, { merge: true });
     logger.info('queue sent', { qid: event.params.qid, ...r });
   } catch (e) {
     logger.error('queue send error', { msg: (e && e.message) || 'unknown' });
@@ -108,19 +149,31 @@ exports.pushQueueSend = onDocumentCreated('homes/{homeCode}/pushQueue/{qid}', as
   }
 });
 
-/* Auto fan-out: new items in homes/{code}.notifs -> FCM to other members' devices. */
+/* Auto fan-out: new items in homes/{code}.notifs -> FCM to other members' devices.
+ * Idempotent via pushSent id list on the home doc (survives retries). */
 exports.homeNotifsFanout = onDocumentWritten('homes/{homeCode}', async (event) => {
   if (!event.data || !event.data.after || !event.data.after.exists) return;
+  const homeRef = db.collection('homes').doc(event.params.homeCode);
   const before = (event.data.before.data() || {}).notifs || [];
-  const after = (event.data.after.data() || {}).notifs || [];
+  const afterData = event.data.after.data() || {};
+  const after = afterData.notifs || [];
+  const already = new Set(Array.isArray(afterData.pushSent) ? afterData.pushSent : []);
   const known = new Set(before.map((n) => n && n.id).filter(Boolean));
-  const fresh = after.filter((n) => n && n.id && !known.has(n.id)).slice(-5);
+  const fresh = after.filter((n) => n && n.id && !known.has(n.id) && !already.has(n.id)).slice(-5);
   if (!fresh.length) return;
-  const subs = await db.collection('homes').doc(event.params.homeCode).collection('fcmTokens').get();
+  const docs = await readTokenDocs(homeRef);
+  const done = [];
   for (const n of fresh) {
-    const payload = cleanPayload({ title: n.title, body: n.body, tab: n.actionTab, nid: n.id, urgent: n.type === 'urgent' });
-    const targets = subs.docs.filter((d) => (d.data() || {}).userId !== n.senderId);
+    const payload = cleanPayload({ title: n.title, body: n.body, tab: n.actionTab, nid: n.id, type: n.type, urgent: n.type === 'urgent' });
+    const targets = docs.filter((d) => (d.data() || {}).userId !== n.senderId);
     const r = await sendToTokens(targets, payload, 'fanout');
     logger.info('fanout', { nid: n.id, ...r });
+    done.push(n.id);
+  }
+  try {
+    const merged = [...already, ...done].slice(-200);
+    await homeRef.set({ pushSent: merged }, { merge: true });
+  } catch (e) {
+    logger.warn('pushSent update failed', { msg: (e && e.message) || 'unknown' });
   }
 });
