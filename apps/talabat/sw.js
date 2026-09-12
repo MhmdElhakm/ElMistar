@@ -54,6 +54,7 @@ self.addEventListener('push', (e) => {
     lang: 'ar',
     tag: d.tag || 'naqisna-push',
     renotify: true,
+    requireInteraction: d.urgent === true,
     vibrate: [120, 60, 120],
     data: { url: url, tab: tab, nid: d.nid || '' },
     actions: [{ action: 'open', title: 'فتح' }, { action: 'dismiss', title: 'إغلاق' }]
