@@ -2500,7 +2500,86 @@
 
   /* =============================
      VOICE INPUT (Web Speech API, no external libs)
+     Pipeline: Mic -> Speech-to-Text -> Clean -> Tokenize ->
+     Match AllowedWords -> Drop unknown -> Dedupe ->
+     Keep first-seen order -> Join with " و " -> Show -> Edit -> Submit
+     Golden rule: no word in site list = no word in output. Never guess.
      ============================= */
+  function getAllowedWordsMap() {
+    const map = new Map();
+    const add = (display) => {
+      if (!display) return;
+      const t = String(display).trim();
+      if (!t) return;
+      const k = normalizeTerm(t);
+      if (!k) return;
+      if (!map.has(k)) map.set(k, t);
+    };
+    Object.keys(state.usageFreq || {}).sort((a, b) => (state.usageFreq[b] || 0) - (state.usageFreq[a] || 0)).forEach(k => add(findOriginalName(k) || k));
+    (state.orders || []).forEach(o => add(o.name));
+    Object.keys(CLASSIFIER_MAP).forEach(c => CLASSIFIER_MAP[c].forEach(add));
+    Object.keys(state.learnedMap || {}).forEach(k => add(findOriginalName(k) || k));
+    return map;
+  }
+  function cleanVoiceRaw(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/[ً-ٰٟ]/g, '')
+      .replace(/ـ/g, '')
+      .replace(/[.,،;؛:؟?؟!…‥¥"'"“”‘’´`«»()\[\]{}<>—–\-_/\\|@#$%^&*=+~]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  function parseExistingVoiceItems(text) {
+    if (!text) return [];
+    const t = String(text).trim().replace(/(?:\s*(?:و|،|,)\s*)+$/g, '').trim();
+    if (!t) return [];
+    return t.split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').replace(/\s*و$/, '').trim()).filter(Boolean);
+  }
+  function extractAllowedItems(transcript, allowedMap) {
+    const cleaned = cleanVoiceRaw(transcript);
+    if (!cleaned || !allowedMap || !allowedMap.size) return [];
+    const tokens = cleaned.split(' ').filter(Boolean);
+    if (!tokens.length) return [];
+    let maxLen = 1;
+    allowedMap.forEach((_, k) => { const w = k.split(' ').length; if (w > maxLen) maxLen = w; });
+    maxLen = Math.min(maxLen, 5);
+    const out = []; const seen = new Set();
+    let i = 0;
+    while (i < tokens.length) {
+      let matched = null; let matchedLen = 0;
+      const top = Math.min(maxLen, tokens.length - i);
+      for (let len = top; len >= 1; len--) {
+        const phrase = tokens.slice(i, i + len).join(' ');
+        const k = normalizeTerm(phrase);
+        if (k && allowedMap.has(k) && !seen.has(k)) { matched = allowedMap.get(k); matchedLen = len; seen.add(k); break; }
+        if (k && allowedMap.has(k) && seen.has(k)) { matchedLen = len; matched = null; break; }
+      }
+      if (matched) out.push(matched);
+      i += (matchedLen || 1);
+    }
+    return out;
+  }
+  function processVoiceTranscript(rawTranscript, existingText, allowedMap) {
+    const map = allowedMap || getAllowedWordsMap();
+    const existingKeys = new Set(parseExistingVoiceItems(existingText).map(n => normalizeTerm(n)));
+    const items = extractAllowedItems(rawTranscript, map).filter(n => {
+      const k = normalizeTerm(n);
+      if (existingKeys.has(k)) return false;
+      existingKeys.add(k);
+      return true;
+    });
+    return { items, count: items.length, text: items.join(' و ') };
+  }
+  function buildVoiceFinalValue(baseText, newItems) {
+    if (!newItems || !newItems.length) return (baseText || '').trim().replace(/(?:\s*(?:و|،|,)\s*)+$/g, '').trim();
+    const joined = newItems.join(' و ');
+    const base = (baseText || '').trim();
+    if (!base) return joined;
+    const cleanBase = base.replace(/(?:\s*(?:و|،|,)\s*)+$/g, '').trim();
+    if (!cleanBase) return joined;
+    return cleanBase + ' و ' + joined;
+  }
   const Voice = {
     rec: null, on: false, _manual: false, lang: 'ar-EG',
     supported() { return !!(window.SpeechRecognition || window.webkitSpeechRecognition); },
@@ -2513,10 +2592,20 @@
       rec.lang = this.lang; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
       let base = input.value ? input.value.replace(/\s+$/, '') : '';
       let finalTxt = '';
-      const commit = () => {
-        const parts = [base, finalTxt.trim()].filter(Boolean);
-        input.value = parts.join(' ');
+      const commit = (announce) => {
+        const r = processVoiceTranscript(finalTxt, base, getAllowedWordsMap());
+        input.value = buildVoiceFinalValue(base, r.items);
         if (ui && ui.onText) ui.onText();
+        if (announce) {
+          if (r.count > 0) {
+            toast('تم التعرف على ' + r.count + ' كلمات', 'success');
+            if (ui && ui.onCommit) ui.onCommit(r.count, r.items);
+          } else if ((finalTxt || '').trim()) {
+            toast('لم يتم التعرف على كلمات موجودة في قائمة الموقع', 'warning');
+            if (ui && ui.onCommit) ui.onCommit(0, []);
+          }
+        }
+        return r;
       };
       rec.onresult = (ev) => {
         let interim = '';
@@ -2525,14 +2614,15 @@
           if (ev.results[i].isFinal) finalTxt += t + ' ';
           else interim += t;
         }
-        const parts = [base, finalTxt.trim(), interim.trim()].filter(Boolean);
-        input.value = parts.join(' ');
+        const r = processVoiceTranscript(finalTxt, base, getAllowedWordsMap());
+        const preview = buildVoiceFinalValue(base, r.items);
+        input.value = interim.trim() ? (preview ? preview + ' ' + interim.trim() : interim.trim()) : preview;
         if (ui && ui.onText) ui.onText();
       };
       rec.onerror = (ev) => {
         const type = (ev && ev.error) || '';
         this.on = false; this._manual = false;
-        if (type !== 'aborted') commit();
+        if (type !== 'aborted') commit(false);
         if (ui && ui.onState) ui.onState(false);
         const msgs = {
           'not-allowed': 'تعذر الوصول إلى الميكروفون. اسمح باستخدامه من إعدادات المتصفح.',
@@ -2546,8 +2636,8 @@
       };
       rec.onend = () => {
         const manual = this._manual; this._manual = false;
-        commit();
-        if (manual || !this.on || !document.contains(input)) { this.on = false; if (ui && ui.onState) ui.onState(false); return; }
+        const r = commit(manual);
+        if (manual || !this.on || !document.contains(input)) { this.on = false; if (ui && ui.onState) ui.onState(false, r); return; }
         base = input.value; finalTxt = '';
         try { rec.start(); } catch { this.on = false; if (ui && ui.onState) ui.onState(false); }
       };
@@ -2580,7 +2670,7 @@
       </div>
       <div class="voice-bar">
         <button class="mic-btn" id="voiceBtn" aria-label="إدخال صوتي" aria-pressed="false">${svgIcon('mic', 22)}</button>
-        <div class="voice-info"><b id="voiceStatus">اضغط الميك وتكلم</b><small>الكلام يتحول لنص فوراً جوه الخانة</small></div>
+        <div class="voice-info"><b id="voiceStatus">اضغط الميك وتكلم</b><small>يُضاف فقط الكلام الموجود في قائمة الموقع — افصل بـ «و»</small></div>
         <div class="voice-langs"><button class="vlang" data-vlang="ar-EG">عربي</button><button class="vlang" data-vlang="en-US">EN</button></div>
       </div>
       <div class="field"><label>ملاحظات (اختياري)</label><textarea id="ordNotes" rows="2" placeholder="مثلا: نوع معين — كبير — غير حار">${editing ? escapeHTML(order.notes || '') : ''}</textarea></div>
@@ -2680,19 +2770,24 @@
     nameInput.addEventListener('input', updateSuggest);
     Voice.lang = state._voiceLang || 'ar-EG';
     const vBtn = m.querySelector('#voiceBtn'); const vStatus = m.querySelector('#voiceStatus');
-    const setVoiceUI = (on) => {
+    const voiceUI = () => ({ onText: () => { updateSuggest(); renderReview(); }, onState: setVoiceUI, onCommit: (count) => { if (vStatus && count > 0) vStatus.textContent = 'تم التعرف على ' + count + ' كلمات'; updateSuggest(); renderReview(); } });
+    const setVoiceUI = (on, info) => {
       if (!vBtn) return;
       vBtn.classList.toggle('recording', on);
       vBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-      if (vStatus) vStatus.innerHTML = on ? '<span class="live-dot"></span> تحدث الآن...' : 'اضغط الميك وتكلم';
+      if (vStatus) {
+        if (on) vStatus.innerHTML = '<span class="live-dot"></span> 🎙️ جارٍ الاستماع...';
+        else if (info && info.count > 0) vStatus.textContent = 'تم التعرف على ' + info.count + ' كلمات';
+        else vStatus.textContent = 'اضغط الميك وتكلم';
+      }
     };
-    if (vBtn) vBtn.onclick = () => Voice.toggle(nameInput, { onText: () => { updateSuggest(); renderReview(); }, onState: setVoiceUI });
+    if (vBtn) vBtn.onclick = () => Voice.toggle(nameInput, voiceUI());
     m.querySelectorAll('[data-vlang]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.vlang === Voice.lang);
       btn.onclick = () => {
         Voice.lang = btn.dataset.vlang; state._voiceLang = Voice.lang; persist();
         m.querySelectorAll('[data-vlang]').forEach(x => x.classList.toggle('active', x === btn));
-        if (Voice.on) { Voice.stop(); setTimeout(() => Voice.toggle(nameInput, { onText: () => { updateSuggest(); renderReview(); }, onState: setVoiceUI }), 350); }
+        if (Voice.on) { Voice.stop(); setTimeout(() => Voice.toggle(nameInput, voiceUI()), 350); }
       };
     });
     setTimeout(evalCategoryFromName, 50);
