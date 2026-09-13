@@ -44,6 +44,9 @@ function cleanPayload(q) {
   };
 }
 
+function isUrgentPayload(p) {
+  return (p && (p.urgent === true || p.urgent === 'true'));
+}
 function fcmData(p) {
   return {
     title: p.title,
@@ -52,7 +55,7 @@ function fcmData(p) {
     tab: p.tab,
     nid: p.nid,
     type: p.type || '',
-    urgent: p.urgent ? 'true' : 'false'
+    urgent: isUrgentPayload(p) ? 'true' : 'false'
   };
 }
 
@@ -75,6 +78,32 @@ async function readTokenDocs(homeRef) {
   return out;
 }
 
+function buildFcmMessage(token, payload, extra) {
+  const hi = isUrgentPayload(payload);
+  return Object.assign({
+    token,
+    data: fcmData(payload),
+    android: { priority: hi ? 'high' : 'normal', ttl: 86400 * 1000 },
+    apns: { headers: { 'apns-expiration': String(Math.floor(Date.now() / 1000) + 86400) } },
+    webpush: {
+      headers: { TTL: '86400', Urgency: hi ? 'high' : 'normal' },
+      notification: {
+        title: payload.title,
+        body: payload.body,
+        icon: './icon-512.png',
+        badge: './badge.png',
+        dir: 'rtl',
+        lang: 'ar',
+        tag: payload.tag,
+        renotify: true,
+        requireInteraction: true,
+        actions: [{ action: 'open', title: 'فتح' }, { action: 'dismiss', title: 'إغلاق' }]
+      },
+      fcmOptions: { link: './index.html#' + payload.tab }
+    }
+  }, extra || {});
+}
+
 async function sendToTokens(tokenDocs, payload, logTag) {
   const byToken = new Map();
   for (const doc of tokenDocs || []) {
@@ -90,8 +119,24 @@ async function sendToTokens(tokenDocs, payload, logTag) {
       resp = await messaging.sendEachForMulticast({
         tokens: batch,
         data: fcmData(payload),
-        android: { priority: payload.urgent ? 'high' : 'normal', ttl: 86400 * 1000 },
-        apns: { headers: { 'apns-expiration': String(Math.floor(Date.now() / 1000) + 86400) } }
+        android: { priority: isUrgentPayload(payload) ? 'high' : 'normal', ttl: 86400 * 1000 },
+        apns: { headers: { 'apns-expiration': String(Math.floor(Date.now() / 1000) + 86400) } },
+        webpush: {
+          headers: { TTL: '86400', Urgency: isUrgentPayload(payload) ? 'high' : 'normal' },
+          notification: {
+            title: payload.title,
+            body: payload.body,
+            icon: './icon-512.png',
+            badge: './badge.png',
+            dir: 'rtl',
+            lang: 'ar',
+            tag: payload.tag,
+            renotify: true,
+            requireInteraction: true,
+            actions: [{ action: 'open', title: 'فتح' }, { action: 'dismiss', title: 'إغلاق' }]
+          },
+          fcmOptions: { link: './index.html#' + payload.tab }
+        }
       });
     } catch (e) {
       logger.error('fcm batch error', { tag: logTag, msg: (e && e.message) || 'unknown' });
@@ -228,16 +273,11 @@ exports.orderNotify = onDocumentCreated('orders/{orderId}', async (event) => {
     tab: 'orders',
     nid: 'order-' + orderId,
     type: 'order',
-    urgent: isUrgent ? 'true' : 'false'
+    urgent: !!isUrgent
   };
 
   try {
-    await messaging.send({
-      token: fcmToken,
-      data: fcmData(payload),
-      android: { priority: isUrgent ? 'high' : 'normal', ttl: 86400 * 1000 },
-      apns: { headers: { 'apns-expiration': String(Math.floor(Date.now() / 1000) + 86400) } }
-    });
+    await messaging.send(buildFcmMessage(fcmToken, payload));
     logger.info('orderNotify: sent', { orderId, ownerId });
   } catch (e) {
     const code = e && e.code;
