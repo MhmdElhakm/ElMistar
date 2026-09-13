@@ -74,6 +74,36 @@ service cloud.firestore {
       }
     }
 
+    match /users/{userId} {
+      allow get: if true;
+      allow create, update: if request.resource.data is map
+        && request.resource.data.size() <= 20
+        && (!('fcmToken' in request.resource.data)
+          || (request.resource.data.fcmToken is string
+            && request.resource.data.fcmToken.size() > 10
+            && request.resource.data.fcmToken.size() < 2048));
+      allow delete: if false;
+
+      match /fcmTokens/{tokenId} {
+        allow get: if true;
+        allow list: if false;
+        allow create: if shortStr(request.resource.data.token, 2048)
+          && request.resource.data.token.size() > 10;
+        allow update: if false;
+        allow delete: if true;
+      }
+    }
+
+    match /orders/{orderId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.resource.data is map
+        && request.resource.data.size() <= 30
+        && shortStr(request.resource.data.name, 200);
+      allow update: if false;
+      allow delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

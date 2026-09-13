@@ -177,3 +177,77 @@ exports.homeNotifsFanout = onDocumentWritten('homes/{homeCode}', async (event) =
     logger.warn('pushSent update failed', { msg: (e && e.message) || 'unknown' });
   }
 });
+
+/* Auto-notify: new order in orders/{orderId} -> FCM to order owner.
+ * Reads owner fcmToken from users/{userId} or users/{userId}/fcmTokens,
+ * then sends a data-only push via admin.messaging().send(). */
+exports.orderNotify = onDocumentCreated('orders/{orderId}', async (event) => {
+  if (!event.data || !event.data.after || !event.data.after.exists) return;
+  const order = event.data.after.data();
+  const orderId = event.params.orderId;
+  const ownerId = order.createdBy || order.userId || order.ownerId;
+  if (!ownerId) {
+    logger.warn('orderNotify: no owner', { orderId });
+    return;
+  }
+
+  let fcmToken = null;
+  try {
+    const userDoc = await db.collection('users').doc(ownerId).get();
+    if (userDoc.exists) {
+      const ud = userDoc.data();
+      if (ud.fcmToken && typeof ud.fcmToken === 'string') {
+        fcmToken = ud.fcmToken;
+      }
+    }
+    if (!fcmToken) {
+      const tokensSnap = await db.collection('users').doc(ownerId).collection('fcmTokens').orderBy('createdAt', 'desc').limit(1).get();
+      if (!tokensSnap.empty) {
+        fcmToken = tokensSnap.docs[0].data().token;
+      }
+    }
+  } catch (e) {
+    logger.error('orderNotify: token lookup failed', { orderId, ownerId, msg: (e && e.message) || 'unknown' });
+    return;
+  }
+
+  if (!fcmToken) {
+    logger.warn('orderNotify: no token for user', { orderId, ownerId });
+    return;
+  }
+
+  const itemName = order.name || 'طلب جديد';
+  const isUrgent = order.urgent || order.priority === 'high';
+  const senderName = order.createdBy || 'الزوجة';
+  const payload = {
+    title: isUrgent ? '🚨 طلب عاجل!' : '🛒 طلب جديد',
+    body: isUrgent
+      ? `${senderName} أضاف طلب عاجل: ${itemName}`
+      : `${senderName} أضاف: ${itemName}`,
+    tag: 'order-' + orderId,
+    tab: 'orders',
+    nid: 'order-' + orderId,
+    type: 'order',
+    urgent: isUrgent ? 'true' : 'false'
+  };
+
+  try {
+    await messaging.send({
+      token: fcmToken,
+      data: fcmData(payload),
+      android: { priority: isUrgent ? 'high' : 'normal', ttl: 86400 * 1000 },
+      apns: { headers: { 'apns-expiration': String(Math.floor(Date.now() / 1000) + 86400) } }
+    });
+    logger.info('orderNotify: sent', { orderId, ownerId });
+  } catch (e) {
+    const code = e && e.code;
+    if (DEAD_TOKEN.has(code)) {
+      logger.info('orderNotify: dead token, cleaning', { orderId, ownerId });
+      try {
+        await db.collection('users').doc(ownerId).update({ fcmToken: admin.firestore.FieldValue.delete() });
+      } catch {}
+    } else {
+      logger.error('orderNotify: send failed', { orderId, ownerId, msg: (e && e.message) || 'unknown' });
+    }
+  }
+});

@@ -784,7 +784,7 @@
      حالته الآن: فارغ عمدًا (لا يوجد مفتاح وهمي) → التشخيص يعرض
      vapid-missing حتى يتم لصق المفتاح الحقيقي.
      ============================================================ */
-  window.FCM_VAPID_KEY = (window.FCM_VAPID_KEY || '');
+  window.FCM_VAPID_KEY = 'BKwyMTcIy40dd64IWRiEiP43icQZ-utGQ_pcZ-gMcL6YL-iZ6yQ5_N33Jq0hJSAvw-BwN4wUOeImZ0zP2qZIrag';
 
   let deferredPrompt = null;
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
@@ -1986,8 +1986,19 @@
           createdAt: nowISO(), updatedAt: Date.now()
         }, { merge: true });
         try { localStorage.setItem('naqisna_fcmtoken', fcmDocId(token)); } catch {}
+        try { await this.saveFcmTokenToUser(token); } catch {}
         return true;
       } catch { return false; }
+    },
+    async saveFcmTokenToUser(token) {
+      if (!db || !state.user || !token) return;
+      const userRef = db.collection('users').doc(state.user.id);
+      await userRef.set({ fcmToken: token, updatedAt: Date.now() }, { merge: true });
+      const tokensRef = userRef.collection('fcmTokens').doc(fcmDocId(token));
+      await tokensRef.set({
+        token, homeCode: state.home?.code || '',
+        device: this.deviceInfo(), createdAt: nowISO()
+      }, { merge: true });
     },
     async removeFcmToken() {
       try {
@@ -2388,7 +2399,22 @@
     const key = normalizeTerm(order.name);
     state.usageFreq[key] = (state.usageFreq[key] || 0) + 1;
     persist();
+    syncOrderToFirestore(order);
     return order;
+  }
+  function syncOrderToFirestore(order) {
+    if (!db || !state.user) return;
+    setTimeout(() => {
+      try {
+        db.collection('orders').doc(order.id).set({
+          name: order.name, notes: order.notes, urgent: order.urgent,
+          priority: order.priority, listId: order.listId, categoryId: order.categoryId,
+          qty: order.qty, status: order.status, createdAt: order.createdAt,
+          createdBy: state.user.name || 'الزوجة', userId: state.user.id,
+          homeCode: state.home?.code || ''
+        }).catch(() => {});
+      } catch {}
+    }, 0);
   }
   function updateOrder(id, patch) {
     const o = state.orders.find(x => x.id === id);
@@ -4450,10 +4476,6 @@
         <div id="pickList" style="max-height:260px;overflow-y:auto;"></div>
       </div>
       <textarea id="ordName" class="hidden" maxlength="200" autocomplete="off"></textarea>`}
-      <div class="voice-bar">
-        <button class="mic-btn" id="voiceBtn" aria-label="إدخال صوتي" aria-pressed="false">${svgIcon('mic', 22)}</button>
-        <div class="voice-info"><b id="voiceStatus">اضغط الميك وتكلم</b><small>يُضاف فقط الكلام الموجود في قائمة الموقع — افصل بـ «و»</small></div>
-      </div>
       <div id="qtyBox" class="hidden">
         <div class="field" style="margin-bottom:8px;"><label>الكمية (اختياري) — <span id="qtyForName"></span></label>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
@@ -4722,7 +4744,7 @@
       });
     };
     m.querySelector('#submitOrderBtn').onclick = () => {
-      const notes = m.querySelector('#ordNotes').value.trim();
+      const notes = (m.querySelector('#ordNotes') || {}).value || '';
       const selList = m.querySelector('#ordListSel');
       const lid2 = (selList && selList.value) || activeListId();
       const urgentInput2 = m.querySelector('#ordUrgent');
