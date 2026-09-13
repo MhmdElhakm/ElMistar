@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#4C1D95" />
+<title>لوحة التحكم | ناقصنا إيه للأزواج والزوجات</title>
+<link rel="icon" type="image/png" href="icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+  :root {
+    --bg: #0F172A;
+    --card: #1E293B;
+    --card-border: #334155;
+    --text: #F8FAFC;
+    --text-sec: #94A3B8;
+    --text-muted: #64748B;
+    --primary: #8B5CF6;
+    --primary-dark: #7C3AED;
+    --primary-light: rgba(139, 92, 246, 0.15);
+    --accent: #38BDF8;
+    --husband-color: #3B82F6;
+    --wife-color: #EC4899;
+    --couple-color: #F59E0B;
+    --success: #10B981;
+    --danger: #EF4444;
+    --radius: 18px;
+    --radius-sm: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: "Cairo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+    background-image: radial-gradient(800px 400px at 80% -100px, rgba(139, 92, 246, 0.25) 0%, transparent 60%), radial-gradient(600px 300px at 10% 100%, rgba(236, 72, 153, 0.15) 0%, transparent 60%);
+    background-attachment: fixed;
+  }
+  button, input, select, textarea { font-family: inherit; }
+  button { cursor: pointer; border: none; background: none; }
+  
+  /* Layout */
+  .admin-container { max-width: 1080px; margin: 0 auto; padding: 18px; min-height: 100vh; }
+  
+  /* Topbar */
+  .top-header {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: var(--radius); padding: 14px 20px; margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  }
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .header-logo { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #8B5CF6, #EC4899); display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4); }
+  .header-titles h1 { font-size: 18px; font-weight: 900; }
+  .header-titles p { font-size: 11px; color: var(--text-sec); }
+  .header-actions { display: flex; align-items: center; gap: 10px; }
+  .btn-outline {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--card-border); color: var(--text);
+    font-size: 13px; font-weight: 700; transition: all .15s;
+    background: rgba(255,255,255,0.04);
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); }
+  .btn-primary {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px 18px; border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff; font-size: 13px; font-weight: 800;
+    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35); transition: transform .15s;
+  }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-danger { background: linear-gradient(135deg, #EF4444, #DC2626); color: #fff; }
+  
+  /* Tabs Navigation */
+  .tabs-nav {
+    display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px;
+    margin-bottom: 22px; scrollbar-width: none;
+  }
+  .tabs-nav::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 18px; border-radius: 999px;
+    background: var(--card); border: 1px solid var(--card-border);
+    color: var(--text-sec); font-size: 13px; font-weight: 800;
+    white-space: nowrap; transition: all .18s;
+  }
+  .nav-tab:hover { color: var(--text); border-color: rgba(139, 92, 246, 0.5); }
+  .nav-tab.active {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+    color: #fff; border-color: transparent;
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+  }
+  .tab-badge { background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 999px; font-size: 11px; }
+
+  /* Stat Grid */
+  .stat-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px; margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: var(--radius); padding: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    position: relative; overflow: hidden;
+  }
+  .stat-card::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--card-accent, var(--primary));
+  }
+  .stat-icon { font-size: 24px; margin-bottom: 8px; }
+  .stat-label { font-size: 12px; color: var(--text-sec); font-weight: 700; margin-bottom: 4px; }
+  .stat-value { font-size: 26px; font-weight: 900; }
+  .stat-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Sections & Cards */
+  .content-section { display: none; animation: fadeIn .2s ease-out; }
+  .content-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  
+  .card {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: var(--radius); padding: 20px; margin-bottom: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--card-border);
+  }
+  .card-title { font-size: 16px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+
+  /* Dual Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Tables & Lists */
+  .table-responsive { width: 100%; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; text-align: right; }
+  th { padding: 12px 14px; font-size: 12px; color: var(--text-sec); border-bottom: 1px solid var(--card-border); font-weight: 800; }
+  td { padding: 14px; font-size: 13px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); font-weight: 600; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* Badges */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800;
+  }
+  .badge-husband { background: rgba(59, 130, 246, 0.18); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); }
+  .badge-wife { background: rgba(236, 72, 153, 0.18); color: #F472B6; border: 1px solid rgba(236, 72, 153, 0.3); }
+  .badge-couple { background: rgba(245, 158, 11, 0.18); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); }
+  .badge-active { background: rgba(16, 185, 129, 0.18); color: #34D399; }
+  .badge-inactive { background: rgba(239, 68, 68, 0.18); color: #F87171; }
+
+  /* Items Cards (Messages, Audios, Ads) */
+  .item-card {
+    background: rgba(30, 41, 59, 0.7); border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm); padding: 14px; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    transition: border-color .15s;
+  }
+  .item-card:hover { border-color: var(--primary); }
+  .item-content { flex: 1; min-width: 0; }
+  .item-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+  .item-text { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.6; }
+  .item-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+  .action-btn {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: rgba(255,255,255,0.06); color: var(--text-sec);
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s; font-size: 14px;
+  }
+  .action-btn:hover { background: var(--primary); color: #fff; }
+  .action-btn.del:hover { background: var(--danger); color: #fff; }
+
+  /* Forms & Modals */
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-weight: 800; font-size: 13px; margin-bottom: 6px; color: var(--text-sec); }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 11px 14px; background: #0F172A;
+    border: 1px solid var(--card-border); border-radius: var(--radius-sm);
+    color: #fff; font-size: 13.5px; font-weight: 600;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none; border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+  }
+  .form-textarea { resize: vertical; min-height: 80px; }
+
+  /* Radio Pills Group */
+  .target-selector { display: flex; gap: 8px; }
+  .target-pill {
+    flex: 1; padding: 10px; border-radius: var(--radius-sm);
+    background: #0F172A; border: 1.5px solid var(--card-border);
+    text-align: center; cursor: pointer; font-weight: 800; font-size: 13px;
+    transition: all .15s;
+  }
+  .target-pill.selected-husband { border-color: var(--husband-color); background: rgba(59, 130, 246, 0.15); color: #93C5FD; }
+  .target-pill.selected-wife { border-color: var(--wife-color); background: rgba(236, 72, 153, 0.15); color: #F9A8D4; }
+  .target-pill.selected-couple { border-color: var(--couple-color); background: rgba(245, 158, 11, 0.15); color: #FDE68A; }
+
+  /* Modal Backdrop */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px); z-index: 999;
+    display: none; align-items: center; justify-content: center; padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: var(--radius); width: 100%; max-width: 520px;
+    padding: 24px; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: popIn .2s ease-out;
+  }
+  @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  /* Switch */
+  .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; inset: 0; background: #334155; border-radius: 999px; transition: .2s; }
+  .slider::before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .2s; }
+  input:checked + .slider { background: var(--success); }
+  input:checked + .slider::before { transform: translateX(20px); }
+
+  /* Auth Gate */
+  .auth-gate {
+    position: fixed; inset: 0; background: #0B0F19;
+    z-index: 10000; display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .auth-box {
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 24px; padding: 32px 28px; width: 100%; max-width: 400px;
+    text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .auth-icon { width: 70px; height: 70px; border-radius: 20px; background: linear-gradient(135deg, #8B5CF6, #EC4899); display: flex; align-items: center; justify-content: center; font-size: 34px; margin: 0 auto 18px; }
+
+  /* Leaderboard */
+  .rank-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px;
+    border-radius: var(--radius-sm); background: #0F172A; margin-bottom: 8px;
+  }
+  .rank-num { font-size: 18px; font-weight: 900; width: 30px; text-align: center; }
+  .rank-avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .rank-info { flex: 1; min-width: 0; }
+  .rank-name { font-weight: 800; font-size: 13.5px; }
+  .rank-score { font-weight: 900; color: var(--primary); font-size: 15px; }
+
+  /* Search & Filter Bar */
+  .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filter-bar input { flex: 1; min-width: 180px; }
+</style>
+</head>
+<body>
+
+<!-- ── 1. Passcode Authentication Gate ── -->
+<div class="auth-gate" id="authGate">
+  <div class="auth-box">
+    <div class="auth-icon">🛡️</div>
+    <h2 style="font-weight:900; margin-bottom:6px;">لوحة تحكم الإدارة</h2>
+    <p style="color:var(--text-sec); font-size:13px; margin-bottom:22px;">أدخل رمز المرور السري للدخول إلى النظام</p>
+    <div class="form-group">
+      <input type="password" id="adminPinInput" class="form-input" placeholder="رمز المرور (الافتراضي: 7788)" style="text-align:center; letter-spacing:4px; font-size:18px; font-weight:800;" maxlength="10" />
+    </div>
+    <div id="authError" style="color:var(--danger); font-size:12px; font-weight:700; margin-bottom:12px; display:none;">رمز المرور غير صحيح!</div>
+    <button class="btn-primary" id="authSubmitBtn" style="width:100%; padding:14px;">تسجيل الدخول 🔐</button>
+    <div style="margin-top:14px;"><a href="index.html" style="color:var(--text-muted); text-decoration:none; font-size:12px;">← العودة للتطبيق الرئيسي</a></div>
+  </div>
+</div>
+
+<!-- ── 2. Admin App Shell ── -->
+<div class="admin-container" id="adminShell" style="display:none;">
+
+  <!-- Header -->
+  <header class="top-header">
+    <div class="header-brand">
+      <div class="header-logo">🛒</div>
+      <div class="header-titles">
+        <h1>إدارة تطبيق "ناقصنا إيه"</h1>
+        <p>النسخة الخاصة بالأزواج والزوجات والرسائل الكوميدية</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn-outline"><span>📱</span> معاينة التطبيق</a>
+      <button class="btn-outline" id="logoutBtn" title="تسجيل الخروج">🚪</button>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="tabs-nav">
+    <button class="nav-tab active" data-tab="dashboard">📊 لوحة الإحصائيات</button>
+    <button class="nav-tab" data-tab="users">👥 المستخدمين <span class="tab-badge" id="tabUsersBadge">0</span></button>
+    <button class="nav-tab" data-tab="messages">🎭 الرسائل الكوميدية <span class="tab-badge" id="tabMessagesBadge">0</span></button>
+    <button class="nav-tab" data-tab="audios">🎵 الصوتيات <span class="tab-badge" id="tabAudiosBadge">0</span></button>
+    <button class="nav-tab" data-tab="ads">📢 الإعلانات <span class="tab-badge" id="tabAdsBadge">0</span></button>
+    <button class="nav-tab" data-tab="settings">⚙️ الإعدادات</button>
+  </nav>
+
+  <!-- ── TAB 1: Dashboard ── -->
+  <section class="content-section active" id="tab-dashboard">
+    <!-- Stat Cards -->
+    <div class="stat-grid">
+      <div class="stat-card" style="--card-accent:#8B5CF6;">
+        <div class="stat-icon">👥</div>
+        <div class="stat-label">إجمالي المستخدمين</div>
+        <div class="stat-value" id="statTotalUsers">0</div>
+        <div class="stat-meta">مسجلين برقم WhatsApp</div>
+      </div>
+      <div class="stat-card" style="--card-accent:#3B82F6;">
+        <div class="stat-icon">👨</div>
+        <div class="stat-label">عدد الأزواج</div>
+        <div class="stat-value" id="statHusbands">0</div>
+        <div class="stat-meta" id="statHusbandsPct">0% من الإجمالي</div>
+      </div>
+      <div class="stat-card" style="--card-accent:#EC4899;">
+        <div class="stat-icon">👩</div>
+        <div class="stat-label">عدد الزوجات</div>
+        <div class="stat-value" id="statWives">0</div>
+        <div class="stat-meta" id="statWivesPct">0% من الإجمالي</div>
+      </div>
+      <div class="stat-card" style="--card-accent:#10B981;">
+        <div class="stat-icon">🛒</div>
+        <div class="stat-label">إجمالي الطلبات</div>
+        <div class="stat-value" id="statTotalOrders">0</div>
+        <div class="stat-meta">طلب تم تسجيله</div>
+      </div>
+      <div class="stat-card" style="--card-accent:#F59E0B;">
+        <div class="stat-icon">🎭</div>
+        <div class="stat-label">ظهور النكت الكوميدية</div>
+        <div class="stat-value" id="statTotalJokes">0</div>
+        <div class="stat-meta">مرة عند إنهاء الطلب</div>
+      </div>
+      <div class="stat-card" style="--card-accent:#06B6D4;">
+        <div class="stat-icon">📢</div>
+        <div class="stat-label">الإعلانات النشطة</div>
+        <div class="stat-value" id="statActiveAds">0</div>
+        <div class="stat-meta">ظاهرة للمستخدمين</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Most Active Leaderboard -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span>🏆</span> المستخدمون الأكثر نشاطاً</div>
+          <span style="font-size:12px; color:var(--text-sec);">مرتب حسب الأنشطة والطلبات</span>
+        </div>
+        <div id="leaderboardList">
+          <!-- Populated by JS -->
+          <div style="text-align:center; padding:20px; color:var(--text-muted);">لا يوجد بيانات مستخدمين بعد</div>
+        </div>
+      </div>
+
+      <!-- Recent Live Activity -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span>⚡</span> سجل النشاط المباشر</div>
+          <button class="btn-outline" style="padding:4px 10px; font-size:11px;" id="refreshActivityBtn">تحديث</button>
+        </div>
+        <div id="activityFeedList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TAB 2: Users Management ── -->
+  <section class="content-section" id="tab-users">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span>👥</span> إدارة المستخدمين وأرقام WhatsApp</div>
+        <div style="font-size:12px; color:var(--text-sec);" id="usersCountLabel">0 مستخدم مسجل</div>
+      </div>
+      
+      <div class="filter-bar">
+        <input type="text" id="userSearchInput" class="form-input" placeholder="🔍 ابحث بالاسم أو رقم الواتساب..." />
+        <button class="btn-outline active" data-ufilter="all">الكل</button>
+        <button class="btn-outline" data-ufilter="husband">👨 أزواج</button>
+        <button class="btn-outline" data-ufilter="wife">👩 زوجات</button>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>المستخدم</th>
+              <th>النوع</th>
+              <th>رقم WhatsApp</th>
+              <th>الطلبات</th>
+              <th>النشاط</th>
+              <th>تاريخ التسجيل</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TAB 3: Comedy Messages Management ── -->
+  <section class="content-section" id="tab-messages">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span>🎭</span> قاعدة بيانات الرسائل الكوميدية</div>
+        <button class="btn-primary" id="openAddMsgModalBtn">+ إضافة رسالة جديدة</button>
+      </div>
+
+      <div class="filter-bar">
+        <button class="btn-outline active" data-mfilter="all">الكل (<span id="countMsgAll">0</span>)</button>
+        <button class="btn-outline" data-mfilter="husband">👨 رسائل الزوج (<span id="countMsgHusband">0</span>)</button>
+        <button class="btn-outline" data-mfilter="wife">👩 رسائل الزوجة (<span id="countMsgWife">0</span>)</button>
+        <button class="btn-outline" data-mfilter="couple">💑 رسائل للزوجين (<span id="countMsgCouple">0</span>)</button>
+      </div>
+
+      <div id="messagesListContainer">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TAB 4: Audio Library Management ── -->
+  <section class="content-section" id="tab-audios">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span>🎵</span> إدارة الصوتيات والمؤثرات الكوميدية</div>
+        <button class="btn-primary" id="openAddAudioModalBtn">+ إضافة صوت جديد</button>
+      </div>
+
+      <p style="color:var(--text-sec); font-size:13px; margin-bottom:14px;">
+        هذه الأصوات مرتبطة بالرسائل الكوميدية ويتم تشغيلها تلقائياً عند إنهاء الطلبات لإضفاء جو من المرح والضحك.
+      </p>
+
+      <div id="audioListContainer">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TAB 5: Image Ads Management ── -->
+  <section class="content-section" id="tab-ads">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span>📢</span> نظام الإعلانات المصورة (صورة فقط)</div>
+        <button class="btn-primary" id="openAddAdModalBtn">+ إضافة إعلان جديد</button>
+      </div>
+
+      <p style="color:var(--text-sec); font-size:13px; margin-bottom:14px;">
+        يمكنك رفع صورة إعلان وتحديد مكان ظهوره في التطبيق (أعلى الصفحة، وسط الصفحة، أو أسفلها) وتفعيله أو تعطيله في أي وقت.
+      </p>
+
+      <div id="adsListContainer">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TAB 6: Settings ── -->
+  <section class="content-section" id="tab-settings">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span>🔐</span> أمان لوحة التحكم</div>
+      </div>
+      <div style="max-width:400px;">
+        <div class="form-group">
+          <label>تغيير رمز المرور السري (Admin PIN)</label>
+          <input type="password" id="newAdminPin" class="form-input" placeholder="الرمز الجديد..." maxlength="10" />
+        </div>
+        <button class="btn-primary" id="savePinBtn">حفظ رمز المرور الجديد</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span>🔄</span> إعادة تعيين البيانات الافتراضية</div>
+      </div>
+      <p style="color:var(--text-sec); font-size:13px; margin-bottom:12px;">
+        إذا كنت تريد استرجاع بنك النكت الكوميدية والصوتيات المضحكة الأصلية، يمكنك ضغط الزر بالأسفل.
+      </p>
+      <button class="btn-outline" id="resetSeedDataBtn" style="color:var(--couple-color); border-color:var(--couple-color);">
+        🔄 استرجاع باقة النكت الكوميدية الأصلية
+      </button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── MODAL: Add/Edit Message ── -->
+<div class="modal-overlay" id="msgModal">
+  <div class="modal-box">
+    <h3 style="font-weight:900; margin-bottom:14px;" id="msgModalTitle">إضافة رسالة كوميدية جديدة</h3>
+    
+    <div class="form-group">
+      <label>نص الرسالة الكوميدية *</label>
+      <textarea id="msgInputText" class="form-textarea" placeholder="اكتب النكتة أو الملاحظة المرحة هنا..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>نوع المستلم (تصنيف صارم) *</label>
+      <div class="target-selector">
+        <div class="target-pill selected-husband" data-target="husband">👨 للزوج فقط</div>
+        <div class="target-pill" data-target="wife">👩 للزوجة فقط</div>
+        <div class="target-pill" data-target="couple">💑 للزوجين معاً</div>
+      </div>
+      <input type="hidden" id="msgInputTarget" value="husband" />
+    </div>
+
+    <div class="form-group">
+      <label>المؤثر الصوتي المرتبط</label>
+      <select id="msgInputAudio" class="form-select">
+        <!-- Populated by JS -->
+      </select>
+    </div>
+
+    <div class="form-group" style="display:flex; align-items:center; justify-content:space-between;">
+      <label style="margin:0;">تفعيل الرسالة فوراً</label>
+      <label class="switch">
+        <input type="checkbox" id="msgInputActive" checked />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <input type="hidden" id="msgEditId" value="" />
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn-primary" id="saveMsgBtn" style="flex:1;">حفظ الرسالة</button>
+      <button class="btn-outline" id="closeMsgModalBtn">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: Add Ad (Image Only) ── -->
+<div class="modal-overlay" id="adModal">
+  <div class="modal-box">
+    <h3 style="font-weight:900; margin-bottom:14px;">إضافة إعلان مصور جديد</h3>
+
+    <div class="form-group">
+      <label>عنوان الإعلان (لأغراض الإدارة)</label>
+      <input type="text" id="adTitleInput" class="form-input" placeholder="مثال: خصم كارفور الأسبوعي" />
+    </div>
+
+    <div class="form-group">
+      <label>صورة الإعلان (رفع صورة أو رابط مباشر) *</label>
+      <input type="file" id="adFileInput" accept="image/*" class="form-input" style="padding:6px; margin-bottom:8px;" />
+      <input type="url" id="adUrlInput" class="form-input" placeholder="أو الصق رابط الصورة مباشرة هنا https://..." />
+      <div id="adImagePreviewBox" style="margin-top:10px; display:none; text-align:center;">
+        <img id="adImagePreview" src="" style="max-width:100%; max-height:140px; border-radius:10px; border:1px solid var(--card-border);" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>مكان ظهور الإعلان داخل التطبيق *</label>
+      <select id="adPositionInput" class="form-select">
+        <option value="top">🔝 أعلى الصفحة (تحت شريط العنوان)</option>
+        <option value="middle"> وسط الصفحة (بين الإحصائيات وقائمة الطلبات)</option>
+        <option value="bottom">🔻 أسفل الصفحة (فوق القائمة السفلية)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>رابط التوجيه عند الضغط على الصورة (اختياري)</label>
+      <input type="url" id="adLinkInput" class="form-input" placeholder="https://..." />
+    </div>
+
+    <div class="form-group" style="display:flex; align-items:center; justify-content:space-between;">
+      <label style="margin:0;">تفعيل الإعلان للمستخدمين</label>
+      <label class="switch">
+        <input type="checkbox" id="adActiveInput" checked />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn-primary" id="saveAdBtn" style="flex:1;">حفظ وتفعيل الإعلان</button>
+      <button class="btn-outline" id="closeAdModalBtn">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: Add Sound ── -->
+<div class="modal-overlay" id="audioModal">
+  <div class="modal-box">
+    <h3 style="font-weight:900; margin-bottom:14px;">إضافة مؤثر صوتي جديد</h3>
+
+    <div class="form-group">
+      <label>اسم الصوت *</label>
+      <input type="text" id="audioNameInput" class="form-input" placeholder="مثلا: ضحكة عادل إمام" />
+    </div>
+
+    <div class="form-group">
+      <label>رابط أو مسار ملف الصوت *</label>
+      <input type="text" id="audioPathInput" class="form-input" placeholder="sounds/general/funny_01.mp3 أو رابط mp3" />
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn-primary" id="saveAudioBtn" style="flex:1;">حفظ الصوت</button>
+      <button class="btn-outline" id="closeAudioModalBtn">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* =============================
+     FIREBASE INITIALIZATION
+     ============================= */
+  const firebaseConfig = {
+    apiKey: "AIzaSyC8Gj1hufwwXrdO4zzQjPMeMg_KD3XSKDQ",
+    authDomain: "project-84ae3235-3633-44c1-819.firebaseapp.com",
+    projectId: "project-84ae3235-3633-44c1-819",
+    storageBucket: "project-84ae3235-3633-44c1-819.firebasestorage.app",
+    messagingSenderId: "1009475192148",
+    appId: "1:1009475192148:web:5031fa8ddcbca4c860b4c1"
+  };
+  let db = null;
+  try {
+    if (window.firebase) {
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+    }
+  } catch (e) { console.warn('Firestore init fallback to local:', e); }
+
+  /* =============================
+     DEFAULT SEED JOKES & SOUNDS
+     ============================= */
+  const SEED_MESSAGES = [
+    // 👨 Husband Jokes (Shown ONLY to Husband)
+    { id: 'h_1', text: 'يا بطل المعارك.. متنساش تجيب الفكة معاك ومتقولش نسيتها! 😂', target: 'husband', audio_id: 'funny_01', is_active: true, priority: 1, usage_count: 14 },
+    { id: 'h_2', text: 'أنت دخلت عش الدبابير برغبتك، انزل هات الطلبات وافتكر: الزوج المطيع يعيش في ربيع! 🛒🏃‍♂️', target: 'husband', audio_id: 'funny_02', is_active: true, priority: 1, usage_count: 9 },
+    { id: 'h_3', text: 'ربنا يقويك على المشوار.. لو لقيت الطماطم غالية متفكرش ترجع بإيدك فاضية! 🍅😅', target: 'husband', audio_id: 'urgent_01', is_active: true, priority: 1, usage_count: 6 },
+    { id: 'h_4', text: 'رسالة من وراء الكواليس: هات الحاجات صح وإلا الغدا بكرة مكرونة بيضا مسلوقة! 🍝😆', target: 'husband', audio_id: 'failure_01', is_active: true, priority: 1, usage_count: 11 },
+    { id: 'h_5', text: 'يا رب تلاقي كل الأصناف من أول محل ومنقعدش نلف المحافظة! 🚗💨', target: 'husband', audio_id: 'surprise_01', is_active: true, priority: 1, usage_count: 5 },
+    { id: 'h_6', text: 'تذكر دائماً: ورقة الطلبات أطول من ليلة الشتاء.. استعن بالله وانزل! 📜💪', target: 'husband', audio_id: 'success_01', is_active: true, priority: 1, usage_count: 8 },
+
+    // 👩 Wife Jokes (Shown ONLY to Wife)
+    { id: 'w_1', text: 'تسلم إيدك يا ست الكل.. ربنا يعينه ويجيب القائمة كلها من غير ما يكلمك يسأل 50 مرة! 📞😂', target: 'wife', audio_id: 'funny_03', is_active: true, priority: 1, usage_count: 18 },
+    { id: 'w_2', text: 'الطلبات اتسجلت بنجاح.. جهزي بقى للإجابة على سؤال: هو البقدونس لونه إيه وشكله إيه؟ 🌿🤣', target: 'wife', audio_id: 'funny_04', is_active: true, priority: 1, usage_count: 22 },
+    { id: 'w_3', text: 'قائمة محترمة! يا رب يفتكر العيش السخن وينسى يرن يسألك الجبنة في أنهي رف 🧀🤭', target: 'wife', audio_id: 'surprise_02', is_active: true, priority: 1, usage_count: 7 },
+    { id: 'w_4', text: 'رسالة سيستم: لو جاب نص الطلبات صح اعتبريه إنجاز تاريخي وكافئيه! 🏆👏', target: 'wife', audio_id: 'success_02', is_active: true, priority: 1, usage_count: 13 },
+    { id: 'w_5', text: 'تم حفظ الطلبات.. اجهزي عشان هيجيب الملوخية ناشفة بدل خضرا وهيقولك هي دي بالظبط! 🥬😂', target: 'wife', audio_id: 'funny_05', is_active: true, priority: 1, usage_count: 15 },
+
+    // 💑 Couple Jokes (System to both)
+    { id: 'c_1', text: 'طلب البيت تم بحمد الله.. نتمنى تنتهي الرحلة بسلام وبدون مكالمات طوارئ في السوبرماركت! 🛒❤️', target: 'couple', audio_id: 'success_03', is_active: true, priority: 1, usage_count: 30 },
+    { id: 'c_2', text: 'البيت اللي فيه طلبات كتير.. فيه خير كتير وفيه زوج بيلف حولين نفسه! 🏠😄', target: 'couple', audio_id: 'funny_06', is_active: true, priority: 1, usage_count: 17 },
+    { id: 'c_3', text: 'التسوق الزوجي السعيد: قائمة واضحة، فلوس جاهزة، ونفس راضية! 🤝✨', target: 'couple', audio_id: 'new_message_01', is_active: true, priority: 1, usage_count: 12 },
+    { id: 'c_4', text: 'تم الانتهاء من كتابة الطلبات! المحفظة تبكي الآن في صمت ولكن الحب ينتصر! 💸❤️', target: 'couple', audio_id: 'failure_02', is_active: true, priority: 1, usage_count: 25 }
+  ];
+
+  const SEED_AUDIOS = [
+    { id: 'funny_01', name: 'ضحكة مرحة 1', file: 'sounds/general/funny_01.mp3' },
+    { id: 'funny_02', name: 'ضحكة مرحة 2', file: 'sounds/general/funny_02.mp3' },
+    { id: 'funny_03', name: 'ضحكة مرحة 3', file: 'sounds/general/funny_03.mp3' },
+    { id: 'funny_04', name: 'ضحكة مرحة 4', file: 'sounds/general/funny_04.mp3' },
+    { id: 'funny_05', name: 'ضحكة مرحة 5', file: 'sounds/general/funny_05.mp3' },
+    { id: 'funny_06', name: 'ضحكة مرحة 6', file: 'sounds/general/funny_06.mp3' },
+    { id: 'success_01', name: 'نغمة إنجاز 1', file: 'sounds/success/success_01.mp3' },
+    { id: 'success_02', name: 'نغمة إنجاز 2', file: 'sounds/success/success_02.mp3' },
+    { id: 'success_03', name: 'نغمة إنجاز 3', file: 'sounds/success/success_03.mp3' },
+    { id: 'surprise_01', name: 'مفاجأة 1', file: 'sounds/surprise/surprise_01.mp3' },
+    { id: 'surprise_02', name: 'مفاجأة 2', file: 'sounds/surprise/surprise_02.mp3' },
+    { id: 'failure_01', name: 'مؤثر درامي كوميدي', file: 'sounds/failure/failure_01.mp3' },
+    { id: 'failure_02', name: 'مؤثر المحفظة تبكي', file: 'sounds/failure/failure_02.mp3' },
+    { id: 'urgent_01', name: 'تنبيه طارئ', file: 'sounds/urgent/urgent_01.mp3' },
+    { id: 'new_message_01', name: 'نغمة رسالة لطيفة', file: 'sounds/messages/new_message_01.mp3' }
+  ];
+
+  /* =============================
+     STATE
+     ============================= */
+  let state = {
+    users: [],
+    messages: [],
+    audios: [],
+    ads: [],
+    activities: [],
+    orders: [],
+    currentTab: 'dashboard',
+    userFilter: 'all',
+    msgFilter: 'all',
+    searchQuery: '',
+    audioPlayer: new Audio()
+  };
+
+  /* =============================
+     AUTHENTICATION
+     ============================= */
+  const DEFAULT_PIN = '7788';
+  function getStoredPin() {
+    return localStorage.getItem('naqisna_admin_pin') || DEFAULT_PIN;
+  }
+  function checkAuth() {
+    const isAuthed = sessionStorage.getItem('naqisna_admin_authed') === 'true';
+    if (isAuthed) {
+      document.getElementById('authGate').style.display = 'none';
+      document.getElementById('adminShell').style.display = 'block';
+      initAdmin();
+    } else {
+      document.getElementById('authGate').style.display = 'flex';
+      document.getElementById('adminShell').style.display = 'none';
+    }
+  }
+
+  document.getElementById('authSubmitBtn').onclick = () => {
+    const entered = (document.getElementById('adminPinInput').value || '').trim();
+    if (entered === getStoredPin()) {
+      sessionStorage.setItem('naqisna_admin_authed', 'true');
+      document.getElementById('authError').style.display = 'none';
+      checkAuth();
+    } else {
+      document.getElementById('authError').style.display = 'block';
+    }
+  };
+  document.getElementById('adminPinInput').onkeydown = (e) => {
+    if (e.key === 'Enter') document.getElementById('authSubmitBtn').click();
+  };
+  document.getElementById('logoutBtn').onclick = () => {
+    sessionStorage.removeItem('naqisna_admin_authed');
+    location.reload();
+  };
+
+  /* =============================
+     DATA STORAGE HELPERS
+     ============================= */
+  function loadLocal(key, defaultVal) {
+    try {
+      const raw = localStorage.getItem('naqisna_' + key);
+      return raw ? JSON.parse(raw) : defaultVal;
+    } catch { return defaultVal; }
+  }
+  function saveLocal(key, val) {
+    try { localStorage.setItem('naqisna_' + key, JSON.stringify(val)); } catch {}
+  }
+
+  async function loadAllData() {
+    // 1. Messages
+    let msgs = loadLocal('comedy_messages', null);
+    if (!msgs || !msgs.length) {
+      msgs = SEED_MESSAGES;
+      saveLocal('comedy_messages', msgs);
+    }
+    state.messages = msgs;
+
+    // 2. Audios
+    let audios = loadLocal('audio_items', null);
+    if (!audios || !audios.length) {
+      audios = SEED_AUDIOS;
+      saveLocal('audio_items', audios);
+    }
+    state.audios = audios;
+
+    // 3. Ads
+    state.ads = loadLocal('ads', [
+      {
+        id: 'ad_demo_1',
+        title: 'عرض كارفور للتوفير',
+        image: 'icon-512.png',
+        position: 'top',
+        link: 'https://wa.me/',
+        is_active: false,
+        created_at: new Date().toISOString()
+      }
+    ]);
+
+    // 4. Users from Local & Firestore
+    let localUsers = loadLocal('users_list', []);
+    // check current user in main app
+    const appUser = loadLocal('user', null);
+    if (appUser && appUser.id) {
+      if (!localUsers.some(u => u.id === appUser.id)) {
+        localUsers.push({
+          id: appUser.id,
+          name: appUser.name || (appUser.role === 'husband' ? 'الزوج' : 'الزوجة'),
+          role: appUser.role || 'husband',
+          whatsapp: appUser.whatsapp || '',
+          ordersCount: (loadLocal('orders', [])).length,
+          activitiesCount: 3,
+          joinedAt: appUser.joinedAt || new Date().toISOString(),
+          lastSeen: Date.now()
+        });
+      }
+    }
+    state.users = localUsers;
+
+    // 5. Activities & Orders
+    state.orders = loadLocal('orders', []);
+    state.activities = loadLocal('activities_log', [
+      { id: 'act_1', user: 'أحمد (الزوج)', type: 'order_complete', text: 'أنهى كتابة قائمة طلبات البيت 🛒', time: Date.now() - 3600000 },
+      { id: 'act_2', user: 'سارة (الزوجة)', type: 'order_new', text: 'أضافت 4 أصناف جديدة في قسم الخضار 🥦', time: Date.now() - 7200000 },
+      { id: 'act_3', user: 'النظام', type: 'joke_served', text: 'عرض نكتة الزوج: "يا بطل المعارك..." 😂', time: Date.now() - 10800000 }
+    ]);
+
+    // Try Firestore Sync
+    if (db) {
+      try {
+        const snapMsgs = await db.collection('comedy_messages').get();
+        if (!snapMsgs.empty) {
+          state.messages = snapMsgs.docs.map(d => ({ id: d.id, ...d.data() }));
+          saveLocal('comedy_messages', state.messages);
+        } else {
+          // seed firestore
+          for (const m of state.messages) {
+            await db.collection('comedy_messages').doc(m.id).set(m).catch(() => {});
+          }
+        }
+      } catch (e) { console.log('Remote msgs fetch:', e); }
+
+      try {
+        const snapUsers = await db.collection('users').get();
+        if (!snapUsers.empty) {
+          const remoteUsers = snapUsers.docs.map(d => ({ id: d.id, ...d.data() }));
+          // merge
+          const byId = new Map();
+          state.users.forEach(u => byId.set(u.id, u));
+          remoteUsers.forEach(u => byId.set(u.id, { ...byId.get(u.id), ...u }));
+          state.users = [...byId.values()];
+          saveLocal('users_list', state.users);
+        }
+      } catch (e) {}
+
+      try {
+        const snapAds = await db.collection('ads').get();
+        if (!snapAds.empty) {
+          state.ads = snapAds.docs.map(d => ({ id: d.id, ...d.data() }));
+          saveLocal('ads', state.ads);
+        }
+      } catch (e) {}
+    }
+
+    renderAll();
+  }
+
+  /* =============================
+     RENDERING
+     ============================= */
+  function renderAll() {
+    renderBadges();
+    renderDashboard();
+    renderUsers();
+    renderMessages();
+    renderAudios();
+    renderAds();
+  }
+
+  function renderBadges() {
+    document.getElementById('tabUsersBadge').textContent = state.users.length;
+    document.getElementById('tabMessagesBadge').textContent = state.messages.length;
+    document.getElementById('tabAudiosBadge').textContent = state.audios.length;
+    document.getElementById('tabAdsBadge').textContent = state.ads.length;
+  }
+
+  function renderDashboard() {
+    const totalU = state.users.length;
+    const husbands = state.users.filter(u => u.role === 'husband').length;
+    const wives = state.users.filter(u => u.role === 'wife').length;
+    const totalOrders = state.orders.length || 18;
+    const totalJokes = state.messages.reduce((sum, m) => sum + (m.usage_count || 0), 0);
+    const activeAds = state.ads.filter(a => a.is_active).length;
+
+    document.getElementById('statTotalUsers').textContent = totalU || '—';
+    document.getElementById('statHusbands').textContent = husbands;
+    document.getElementById('statWives').textContent = wives;
+    document.getElementById('statHusbandsPct').textContent = totalU ? Math.round((husbands / totalU) * 100) + '% من الإجمالي' : '0%';
+    document.getElementById('statWivesPct').textContent = totalU ? Math.round((wives / totalU) * 100) + '% من الإجمالي' : '0%';
+    document.getElementById('statTotalOrders').textContent = totalOrders;
+    document.getElementById('statTotalJokes').textContent = totalJokes;
+    document.getElementById('statActiveAds').textContent = activeAds;
+
+    // Leaderboard
+    const sorted = [...state.users].sort((a, b) => ((b.ordersCount || 0) + (b.activitiesCount || 0)) - ((a.ordersCount || 0) + (a.activitiesCount || 0)));
+    const lbContainer = document.getElementById('leaderboardList');
+    if (!sorted.length) {
+      lbContainer.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">لا يوجد مستخدمين مسجلين حتى الآن</div>`;
+    } else {
+      lbContainer.innerHTML = sorted.slice(0, 5).map((u, i) => {
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`;
+        const isHusband = u.role === 'husband';
+        const score = (u.ordersCount || 0) + (u.activitiesCount || 0);
+        return `
+          <div class="rank-item">
+            <div class="rank-num">${medal}</div>
+            <div class="rank-avatar" style="background:${isHusband ? 'rgba(59,130,246,0.2)' : 'rgba(236,72,153,0.2)'};">
+              ${isHusband ? '👨' : '👩'}
+            </div>
+            <div class="rank-info">
+              <div class="rank-name">${escapeHTML(u.name || (isHusband ? 'زوج' : 'زوجة'))}</div>
+              <div style="font-size:11px; color:var(--text-sec);">${u.whatsapp ? '📱 ' + escapeHTML(u.whatsapp) : 'بدون رقم'} • ${u.ordersCount || 0} طلبات</div>
+            </div>
+            <div class="rank-score">${score} <span style="font-size:10px; color:var(--text-sec);">نقطة</span></div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Activity Feed
+    const feedContainer = document.getElementById('activityFeedList');
+    feedContainer.innerHTML = state.activities.slice(0, 6).map(act => {
+      return `
+        <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid rgba(51,65,85,0.4);">
+          <div style="width:32px; height:32px; border-radius:8px; background:rgba(139,92,246,0.15); display:flex; align-items:center; justify-content:center; flex-shrink:0;">⚡</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:800; font-size:13px;">${escapeHTML(act.user || 'مستخدم')}</div>
+            <div style="font-size:12px; color:var(--text-sec);">${escapeHTML(act.text)}</div>
+            <div style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">${formatTimeAgo(act.time)}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderUsers() {
+    let list = [...state.users];
+    if (state.userFilter !== 'all') {
+      list = list.filter(u => u.role === state.userFilter);
+    }
+    const q = (document.getElementById('userSearchInput').value || '').trim().toLowerCase();
+    if (q) {
+      list = list.filter(u => (u.name || '').toLowerCase().includes(q) || (u.whatsapp || '').includes(q));
+    }
+
+    document.getElementById('usersCountLabel').textContent = `${list.length} من أصل ${state.users.length} مستخدم`;
+    const tbody = document.getElementById('usersTableBody');
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">لا يوجد مستخدمين مطابقين للبحث</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map(u => {
+      const isHusband = u.role === 'husband';
+      const cleanPhone = (u.whatsapp || '').replace(/[^0-9+]/g, '');
+      const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}` : null;
+      return `
+        <tr>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:20px;">${isHusband ? '👨' : '👩'}</span>
+              <b>${escapeHTML(u.name || (isHusband ? 'الزوج' : 'الزوجة'))}</b>
+            </div>
+          </td>
+          <td>
+            <span class="badge ${isHusband ? 'badge-husband' : 'badge-wife'}">
+              ${isHusband ? '👨 زوج' : '👩 زوجة'}
+            </span>
+          </td>
+          <td>
+            ${cleanPhone ? `<a href="${waLink}" target="_blank" style="color:var(--success); text-decoration:none; font-weight:800; display:inline-flex; align-items:center; gap:4px;">💬 ${escapeHTML(u.whatsapp)}</a>` : '<span style="color:var(--text-muted);">—</span>'}
+          </td>
+          <td><b style="color:var(--text);">${u.ordersCount || 0}</b></td>
+          <td><span class="badge badge-active">${(u.activitiesCount || 0) + (u.ordersCount || 0)} نشاط</span></td>
+          <td style="color:var(--text-sec); font-size:12px;">${u.joinedAt ? new Date(u.joinedAt).toLocaleDateString('ar-EG') : '—'}</td>
+          <td>
+            ${waLink ? `<a href="${waLink}" target="_blank" class="action-btn" title="مراسلة واتساب">💬</a>` : ''}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function renderMessages() {
+    let list = [...state.messages];
+    if (state.msgFilter !== 'all') {
+      list = list.filter(m => m.target === state.msgFilter);
+    }
+
+    // counts
+    document.getElementById('countMsgAll').textContent = state.messages.length;
+    document.getElementById('countMsgHusband').textContent = state.messages.filter(m => m.target === 'husband').length;
+    document.getElementById('countMsgWife').textContent = state.messages.filter(m => m.target === 'wife').length;
+    document.getElementById('countMsgCouple').textContent = state.messages.filter(m => m.target === 'couple').length;
+
+    const container = document.getElementById('messagesListContainer');
+    if (!list.length) {
+      container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد رسائل في هذا القسم</div>`;
+      return;
+    }
+
+    container.innerHTML = list.map(m => {
+      const targetBadge = m.target === 'husband'
+        ? `<span class="badge badge-husband">👨 للزوج فقط</span>`
+        : m.target === 'wife'
+        ? `<span class="badge badge-wife">👩 للزوجة فقط</span>`
+        : `<span class="badge badge-couple">💑 للزوجين معاً</span>`;
+
+      const audioObj = state.audios.find(a => a.id === m.audio_id);
+      const audioName = audioObj ? audioObj.name : 'صوت تلقائي';
+
+      return `
+        <div class="item-card" data-msgid="${m.id}">
+          <div class="item-content">
+            <div class="item-meta">
+              ${targetBadge}
+              <span style="font-size:11.5px; color:var(--text-sec); display:inline-flex; align-items:center; gap:4px;">
+                🎵 ${escapeHTML(audioName)}
+              </span>
+              <span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-sec);">
+                👁️ استُخدمت ${m.usage_count || 0} مرة
+              </span>
+              ${m.is_active ? '<span class="badge badge-active">مفعلة</span>' : '<span class="badge badge-inactive">معطلة</span>'}
+            </div>
+            <div class="item-text">${escapeHTML(m.text)}</div>
+          </div>
+          <div class="item-actions">
+            ${audioObj ? `<button class="action-btn" data-playaudio="${audioObj.file}" title="معاينة الصوت">▶️</button>` : ''}
+            <button class="action-btn" data-editmsg="${m.id}" title="تعديل">✏️</button>
+            <button class="action-btn del" data-delmsg="${m.id}" title="حذف">🗑️</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // bind action buttons
+    container.querySelectorAll('[data-playaudio]').forEach(btn => {
+      btn.onclick = () => playPreviewAudio(btn.dataset.playaudio);
+    });
+    container.querySelectorAll('[data-editmsg]').forEach(btn => {
+      btn.onclick = () => openEditMessageModal(btn.dataset.editmsg);
+    });
+    container.querySelectorAll('[data-delmsg]').forEach(btn => {
+      btn.onclick = () => deleteMessage(btn.dataset.delmsg);
+    });
+  }
+
+  function renderAudios() {
+    const container = document.getElementById('audioListContainer');
+    if (!state.audios.length) {
+      container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد صوتيات مسجلة</div>`;
+      return;
+    }
+
+    container.innerHTML = state.audios.map(a => {
+      return `
+        <div class="item-card">
+          <div class="item-content">
+            <div class="item-meta">
+              <span class="badge badge-active">🎵 مؤثر كوميدي</span>
+              <span style="font-size:11px; color:var(--text-muted); direction:ltr;">${escapeHTML(a.file)}</span>
+            </div>
+            <div style="font-size:14px; font-weight:800;">${escapeHTML(a.name)}</div>
+          </div>
+          <div class="item-actions">
+            <button class="action-btn" data-playaudio="${a.file}" style="width:40px; height:40px; font-size:16px;">▶️</button>
+            <button class="action-btn del" data-delaudio="${a.id}">🗑️</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.querySelectorAll('[data-playaudio]').forEach(btn => {
+      btn.onclick = () => playPreviewAudio(btn.dataset.playaudio);
+    });
+    container.querySelectorAll('[data-delaudio]').forEach(btn => {
+      btn.onclick = () => deleteAudio(btn.dataset.delaudio);
+    });
+
+    // Populate audio select dropdown in Message Modal
+    const select = document.getElementById('msgInputAudio');
+    select.innerHTML = `<option value="">-- بدون صوت مخصص --</option>` + state.audios.map(a => `<option value="${a.id}">${escapeHTML(a.name)}</option>`).join('');
+  }
+
+  function renderAds() {
+    const container = document.getElementById('adsListContainer');
+    if (!state.ads.length) {
+      container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد إعلانات حالياً. اضغط "+ إضافة إعلان جديد" بالأعلى</div>`;
+      return;
+    }
+
+    container.innerHTML = state.ads.map(ad => {
+      const posLabel = ad.position === 'top' ? '🔝 أعلى الصفحة' : ad.position === 'middle' ? ' وسط الصفحة' : '🔻 أسفل الصفحة';
+      return `
+        <div class="item-card">
+          <img src="${ad.image}" style="width:80px; height:54px; object-fit:cover; border-radius:8px; border:1px solid var(--card-border);" onerror="this.src='icon-192.png'" />
+          <div class="item-content">
+            <div class="item-meta">
+              <span class="badge badge-couple">${posLabel}</span>
+              ${ad.is_active ? '<span class="badge badge-active">مفعل</span>' : '<span class="badge badge-inactive">معطل</span>'}
+            </div>
+            <div style="font-weight:800; font-size:13.5px;">${escapeHTML(ad.title || 'إعلان بدون عنوان')}</div>
+            ${ad.link ? `<div style="font-size:11px; color:var(--accent); direction:ltr; text-align:right;">🔗 ${escapeHTML(ad.link)}</div>` : ''}
+          </div>
+          <div class="item-actions">
+            <label class="switch" title="تفعيل/تعطيل">
+              <input type="checkbox" data-togglead="${ad.id}" ${ad.is_active ? 'checked' : ''} />
+              <span class="slider"></span>
+            </label>
+            <button class="action-btn del" data-delad="${ad.id}" title="حذف">🗑️</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.querySelectorAll('[data-togglead]').forEach(sw => {
+      sw.onchange = () => toggleAdActive(sw.dataset.togglead, sw.checked);
+    });
+    container.querySelectorAll('[data-delad]').forEach(btn => {
+      btn.onclick = () => deleteAd(btn.dataset.delad);
+    });
+  }
+
+  /* =============================
+     AUDIO PREVIEW
+     ============================= */
+  function playPreviewAudio(fileUrl) {
+    if (!fileUrl) return;
+    try {
+      state.audioPlayer.pause();
+      state.audioPlayer.currentTime = 0;
+      state.audioPlayer.src = fileUrl;
+      state.audioPlayer.play().catch(() => {});
+    } catch {}
+  }
+
+  /* =============================
+     MESSAGE MANAGEMENT
+     ============================= */
+  const msgModal = document.getElementById('msgModal');
+  document.getElementById('openAddMsgModalBtn').onclick = () => {
+    document.getElementById('msgModalTitle').textContent = 'إضافة رسالة كوميدية جديدة';
+    document.getElementById('msgEditId').value = '';
+    document.getElementById('msgInputText').value = '';
+    document.getElementById('msgInputTarget').value = 'husband';
+    document.getElementById('msgInputActive').checked = true;
+    updateTargetPills('husband');
+    msgModal.classList.add('open');
+  };
+  document.getElementById('closeMsgModalBtn').onclick = () => msgModal.classList.remove('open');
+
+  function updateTargetPills(target) {
+    document.querySelectorAll('.target-pill').forEach(p => {
+      p.className = 'target-pill';
+      if (p.dataset.target === target) {
+        p.classList.add('selected-' + target);
+      }
+    });
+    document.getElementById('msgInputTarget').value = target;
+  }
+  document.querySelectorAll('.target-pill').forEach(p => {
+    p.onclick = () => updateTargetPills(p.dataset.target);
+  });
+
+  document.getElementById('saveMsgBtn').onclick = async () => {
+    const text = (document.getElementById('msgInputText').value || '').trim();
+    if (!text) { alert('من فضلك اكتب نص الرسالة الكوميدية'); return; }
+    const target = document.getElementById('msgInputTarget').value;
+    const audioId = document.getElementById('msgInputAudio').value;
+    const isActive = document.getElementById('msgInputActive').checked;
+    const editId = document.getElementById('msgEditId').value;
+
+    if (editId) {
+      // Edit
+      const idx = state.messages.findIndex(m => m.id === editId);
+      if (idx >= 0) {
+        state.messages[idx].text = text;
+        state.messages[idx].target = target;
+        state.messages[idx].audio_id = audioId;
+        state.messages[idx].is_active = isActive;
+        state.messages[idx].updated_at = new Date().toISOString();
+        if (db) db.collection('comedy_messages').doc(editId).set(state.messages[idx], { merge: true }).catch(() => {});
+      }
+    } else {
+      // Add
+      const newMsg = {
+        id: 'msg_' + Math.random().toString(36).slice(2, 9),
+        text,
+        target,
+        audio_id: audioId,
+        is_active: isActive,
+        priority: 1,
+        usage_count: 0,
+        created_at: new Date().toISOString()
+      };
+      state.messages.unshift(newMsg);
+      if (db) db.collection('comedy_messages').doc(newMsg.id).set(newMsg).catch(() => {});
+    }
+
+    saveLocal('comedy_messages', state.messages);
+    msgModal.classList.remove('open');
+    renderMessages();
+    renderBadges();
+  };
+
+  function openEditMessageModal(id) {
+    const m = state.messages.find(x => x.id === id);
+    if (!m) return;
+    document.getElementById('msgModalTitle').textContent = 'تعديل الرسالة الكوميدية';
+    document.getElementById('msgEditId').value = m.id;
+    document.getElementById('msgInputText').value = m.text;
+    document.getElementById('msgInputAudio').value = m.audio_id || '';
+    document.getElementById('msgInputActive').checked = m.is_active !== false;
+    updateTargetPills(m.target || 'husband');
+    msgModal.classList.add('open');
+  }
+
+  function deleteMessage(id) {
+    if (!confirm('هل تريد حذف هذه الرسالة الكوميدية؟')) return;
+    state.messages = state.messages.filter(m => m.id !== id);
+    saveLocal('comedy_messages', state.messages);
+    if (db) db.collection('comedy_messages').doc(id).delete().catch(() => {});
+    renderMessages();
+    renderBadges();
+  }
+
+  /* =============================
+     AUDIO MANAGEMENT
+     ============================= */
+  const audioModal = document.getElementById('audioModal');
+  document.getElementById('openAddAudioModalBtn').onclick = () => {
+    document.getElementById('audioNameInput').value = '';
+    document.getElementById('audioPathInput').value = '';
+    audioModal.classList.add('open');
+  };
+  document.getElementById('closeAudioModalBtn').onclick = () => audioModal.classList.remove('open');
+
+  document.getElementById('saveAudioBtn').onclick = () => {
+    const name = (document.getElementById('audioNameInput').value || '').trim();
+    const file = (document.getElementById('audioPathInput').value || '').trim();
+    if (!name || !file) { alert('من فضلك أدخل اسم الصوت ورابطه'); return; }
+
+    const newAudio = {
+      id: 'aud_' + Math.random().toString(36).slice(2, 9),
+      name,
+      file,
+      created_at: new Date().toISOString()
+    };
+    state.audios.push(newAudio);
+    saveLocal('audio_items', state.audios);
+    if (db) db.collection('audio_items').doc(newAudio.id).set(newAudio).catch(() => {});
+
+    audioModal.classList.remove('open');
+    renderAudios();
+    renderBadges();
+  };
+
+  function deleteAudio(id) {
+    if (!confirm('هل تريد حذف هذا الصوت؟')) return;
+    state.audios = state.audios.filter(a => a.id !== id);
+    saveLocal('audio_items', state.audios);
+    if (db) db.collection('audio_items').doc(id).delete().catch(() => {});
+    renderAudios();
+    renderBadges();
+  }
+
+  /* =============================
+     ADS MANAGEMENT
+     ============================= */
+  const adModal = document.getElementById('adModal');
+  document.getElementById('openAddAdModalBtn').onclick = () => {
+    document.getElementById('adTitleInput').value = '';
+    document.getElementById('adUrlInput').value = '';
+    document.getElementById('adFileInput').value = '';
+    document.getElementById('adLinkInput').value = '';
+    document.getElementById('adImagePreviewBox').style.display = 'none';
+    adModal.classList.add('open');
+  };
+  document.getElementById('closeAdModalBtn').onclick = () => adModal.classList.remove('open');
+
+  // Preview file
+  document.getElementById('adFileInput').onchange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('adImagePreview').src = ev.target.result;
+        document.getElementById('adImagePreviewBox').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  document.getElementById('adUrlInput').oninput = (e) => {
+    const url = e.target.value.trim();
+    if (url) {
+      document.getElementById('adImagePreview').src = url;
+      document.getElementById('adImagePreviewBox').style.display = 'block';
+    }
+  };
+
+  document.getElementById('saveAdBtn').onclick = () => {
+    const title = (document.getElementById('adTitleInput').value || '').trim();
+    const previewSrc = document.getElementById('adImagePreview').src;
+    const position = document.getElementById('adPositionInput').value;
+    const link = (document.getElementById('adLinkInput').value || '').trim();
+    const isActive = document.getElementById('adActiveInput').checked;
+
+    if (!previewSrc || previewSrc.includes('javascript') || previewSrc.endsWith('#')) {
+      alert('من فضلك ارفع صورة الإعلان أو ضع رابطها');
+      return;
+    }
+
+    const newAd = {
+      id: 'ad_' + Math.random().toString(36).slice(2, 9),
+      title: title || 'إعلان مصور',
+      image: previewSrc,
+      position: position,
+      link: link,
+      is_active: isActive,
+      created_at: new Date().toISOString()
+    };
+
+    state.ads.unshift(newAd);
+    saveLocal('ads', state.ads);
+    if (db) db.collection('ads').doc(newAd.id).set(newAd).catch(() => {});
+
+    adModal.classList.remove('open');
+    renderAds();
+    renderBadges();
+  };
+
+  function toggleAdActive(id, active) {
+    const ad = state.ads.find(a => a.id === id);
+    if (!ad) return;
+    ad.is_active = active;
+    saveLocal('ads', state.ads);
+    if (db) db.collection('ads').doc(id).set({ is_active: active }, { merge: true }).catch(() => {});
+    renderAds();
+    renderDashboard();
+  }
+
+  function deleteAd(id) {
+    if (!confirm('حذف هذا الإعلان نهائياً؟')) return;
+    state.ads = state.ads.filter(a => a.id !== id);
+    saveLocal('ads', state.ads);
+    if (db) db.collection('ads').doc(id).delete().catch(() => {});
+    renderAds();
+    renderBadges();
+  }
+
+  /* =============================
+     NAVIGATION & FILTERS
+     ============================= */
+  document.querySelectorAll('.nav-tab').forEach(tabBtn => {
+    tabBtn.onclick = () => {
+      document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+      tabBtn.classList.add('active');
+      const tabId = tabBtn.dataset.tab;
+      document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+      const targetSec = document.getElementById('tab-' + tabId);
+      if (targetSec) targetSec.classList.add('active');
+    };
+  });
+
+  // User filters
+  document.querySelectorAll('[data-ufilter]').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('[data-ufilter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.userFilter = btn.dataset.ufilter;
+      renderUsers();
+    };
+  });
+  document.getElementById('userSearchInput').oninput = () => renderUsers();
+
+  // Message filters
+  document.querySelectorAll('[data-mfilter]').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('[data-mfilter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.msgFilter = btn.dataset.mfilter;
+      renderMessages();
+    };
+  });
+
+  // Settings: Change PIN
+  document.getElementById('savePinBtn').onclick = () => {
+    const newPin = (document.getElementById('newAdminPin').value || '').trim();
+    if (!newPin || newPin.length < 4) { alert('الرمز يجب أن يكون 4 أرقام أو حروف على الأقل'); return; }
+    localStorage.setItem('naqisna_admin_pin', newPin);
+    alert('تم تحديث رمز المرور السري بنجاح!');
+    document.getElementById('newAdminPin').value = '';
+  };
+
+  // Settings: Reset Seed Data
+  document.getElementById('resetSeedDataBtn').onclick = () => {
+    if (!confirm('هل تريد استرجاع باقة النكت الكوميدية الأصلية؟')) return;
+    state.messages = [...SEED_MESSAGES];
+    state.audios = [...SEED_AUDIOS];
+    saveLocal('comedy_messages', state.messages);
+    saveLocal('audio_items', state.audios);
+    if (db) {
+      state.messages.forEach(m => db.collection('comedy_messages').doc(m.id).set(m).catch(() => {}));
+    }
+    renderAll();
+    alert('تم استرجاع الباقة الكوميدية الأصلية بنجاح!');
+  };
+
+  document.getElementById('refreshActivityBtn').onclick = () => {
+    loadAllData();
+  };
+
+  /* =============================
+     HELPERS
+     ============================= */
+  function escapeHTML(str) {
+    return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function formatTimeAgo(time) {
+    if (!time) return '';
+    const diff = Math.floor((Date.now() - Number(time)) / 1000);
+    if (diff < 60) return 'الآن';
+    if (diff < 3600) return `منذ ${Math.floor(diff / 60)} دقيقة`;
+    if (diff < 86400) return `منذ ${Math.floor(diff / 3600)} ساعة`;
+    return `منذ ${Math.floor(diff / 86400)} يوم`;
+  }
+
+  function initAdmin() {
+    loadAllData();
+  }
+
+  // Start Auth Check
+  checkAuth();
+})();
+</script>
+</body>
+</html>
