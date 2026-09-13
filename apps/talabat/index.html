@@ -785,6 +785,8 @@
      vapid-missing حتى يتم لصق المفتاح الحقيقي.
      ============================================================ */
   window.FCM_VAPID_KEY = 'BKwyMTcIy40dd64IWRiEiP43icQZ-utGQ_pcZ-gMcL6YL-iZ6yQ5_N33Jq0hJSAvw-BwN4wUOeImZ0zP2qZIrag';
+  window.VAPID_PUBLIC_KEY = (window.VAPID_PUBLIC_KEY || window.FCM_VAPID_KEY || '');
+  window.isVapidValid = function () { try { const k = window.FCM_VAPID_KEY || window.VAPID_PUBLIC_KEY || ''; return Boolean(k && k.length > 20); } catch { return false; } };
 
   let deferredPrompt = null;
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
@@ -1888,8 +1890,9 @@
      Set window.FCM_VAPID_KEY (or legacy window.VAPID_PUBLIC_KEY) before scripts.
      onSnapshot stays for in-app UI only; killed-app push comes from FCM, never the page.
      ============================= */
-  const VAPID_PUBLIC_KEY = (window.VAPID_PUBLIC_KEY || '');
-  const FCM_VAPID_KEY = (window.FCM_VAPID_KEY || window.VAPID_PUBLIC_KEY || '');
+  const VAPID_PUBLIC_KEY = String(window.VAPID_PUBLIC_KEY || window.FCM_VAPID_KEY || '').trim();
+  const FCM_VAPID_KEY = String(window.FCM_VAPID_KEY || window.VAPID_PUBLIC_KEY || '').trim();
+  const isVapidValid = Boolean(FCM_VAPID_KEY && FCM_VAPID_KEY.length > 20);
   function fcmUsable() {
     try { return !!(window.firebase && firebase.messaging && firebase.messaging.isSupported && firebase.messaging.isSupported()); }
     catch { return false; }
@@ -2016,7 +2019,7 @@
     },
     async registerFcm(reg) {
       this._lastFcmErr = '';
-      if (!FCM_VAPID_KEY || !reg) { this._lastFcmErr = !FCM_VAPID_KEY ? 'vapid-missing' : 'no-service-worker'; return false; }
+      if (!isVapidValid || !reg) { this._lastFcmErr = !isVapidValid ? 'vapid-missing' : 'no-service-worker'; return false; }
       try {
         const fm = this.ensureMessaging();
         if (!fm || !fm.getToken) { this._lastFcmErr = 'messaging-unavailable'; return false; }
@@ -2090,7 +2093,7 @@
       state.notifPrefs.browser = true; persist();
       const reg = await this.ensureReg();
       let fcmOk = false;
-      if (s.fcm && reg && FCM_VAPID_KEY) {
+      if (s.fcm && reg && isVapidValid) {
         try { fcmOk = await this.registerFcm(reg); } catch { fcmOk = false; }
       }
       if (!fcmOk && s.push && reg && VAPID_PUBLIC_KEY) {
@@ -2109,8 +2112,8 @@
       }
       try { notifyLocal({ id: 'test-welcome', type: 'info', title: 'إشعارات المتصفح اشتغلت', body: 'هتوصلك التنبيهات هنا حتى لو التطبيق في الخلفية', actionTab: 'notifs', createdAt: nowISO() }); } catch {}
       toast('إشعارات المتصفح اشتغلت', 'success');
-      if (!fcmOk && FCM_VAPID_KEY && PushSys._lastFcmErr) setTimeout(() => { try { toast('فشل توكن FCM: ' + PushSys._lastFcmErr, 'error'); } catch {} }, 800);
-      if (!FCM_VAPID_KEY) setTimeout(() => { try { toast('تنبيه: مفتاح FCM غير مضبوط — راجع بطاقة التشخيص بالأسفل', 'warning'); } catch {} }, 800);
+      if (!fcmOk && isVapidValid && PushSys._lastFcmErr) setTimeout(() => { try { toast('فشل توكن FCM: ' + PushSys._lastFcmErr, 'error'); } catch {} }, 800);
+      if (!isVapidValid) setTimeout(() => { try { toast('تنبيه: مفتاح FCM غير مضبوط — راجع بطاقة التشخيص بالأسفل', 'warning'); } catch {} }, 800);
       try { render(); } catch {}
       return 'granted';
     },
@@ -2131,7 +2134,7 @@
         } catch {}
         const reg = await this.ensureReg();
         try {
-          if (this.support().fcm && reg && FCM_VAPID_KEY) {
+          if (this.support().fcm && reg && isVapidValid) {
             let flast = 0;
             try { flast = Number(localStorage.getItem('naqisna_fcmtouch') || 0); } catch {}
             if (Date.now() - flast > 86400000) {
@@ -2163,8 +2166,8 @@
         const reg = await PushSys.ensureReg();
         R('Service Worker', reg ? (reg.active ? 'active' : 'registered') : 'error');
         if (!reg) { rep.error = 'no-service-worker'; return rep; }
-        R('VAPID', FCM_VAPID_KEY ? 'مضبوط' : 'ناقص');
-        if (!FCM_VAPID_KEY) { rep.error = 'vapid-missing'; return rep; }
+        R('VAPID', isVapidValid ? 'مضبوط' : 'ناقص');
+        if (!isVapidValid) { rep.error = 'vapid-missing'; return rep; }
         if (!PushSys.support().fcm) { rep.error = 'messaging-unsupported'; return rep; }
         let token = '';
         try {
@@ -2216,7 +2219,7 @@
     },
     epHost(ep) { try { return new URL(ep).host; } catch { return '—'; } },
     async refresh(auto) {
-      const d = { at: Date.now(), perm: PushSys.perm(), sw: 'error', push: PushSys.support().push, sub: 'inactive', host: '—', fcm: 'inactive', fcmError: '', fcmKey: !!FCM_VAPID_KEY, user: (state.user && state.user.id) || '—', platform: this.platform(), pwa: this.pwa(), vapid: !!VAPID_PUBLIC_KEY };
+      const d = { at: Date.now(), perm: PushSys.perm(), sw: 'error', push: PushSys.support().push, sub: 'inactive', host: '—', fcm: 'inactive', fcmError: '', fcmKey: isVapidValid, user: (state.user && state.user.id) || '—', platform: this.platform(), pwa: this.pwa(), vapid: isVapidValid };
       try {
         if (PushSys.support().sw) {
           const reg = await PushSys.ensureReg();
@@ -2231,7 +2234,7 @@
               if (sub && sub.endpoint) { d.sub = 'active'; d.host = this.epHost(sub.endpoint); }
             } catch {}
           }
-          if (d.perm === 'granted' && PushSys.support().fcm && reg && FCM_VAPID_KEY) {
+          if (d.perm === 'granted' && PushSys.support().fcm && reg && isVapidValid) {
             try {
               const fm = PushSys.ensureMessaging();
               if (fm && fm.getToken) {
@@ -2240,9 +2243,9 @@
                 else d.fcmError = 'empty-token';
               } else d.fcmError = 'messaging-unavailable';
             } catch (e) { d.fcmError = String((e && (e.code || e.message)) || 'unknown').slice(0, 120); }
-          } else if (d.perm === 'granted' && PushSys.support().fcm && reg && !FCM_VAPID_KEY) {
+          } else if (d.perm === 'granted' && PushSys.support().fcm && reg && !isVapidValid) {
             d.fcmError = 'vapid-missing';
-          } else if (FCM_VAPID_KEY && PushSys._lastFcmErr) {
+          } else if (isVapidValid && PushSys._lastFcmErr) {
             d.fcmError = PushSys._lastFcmErr;
           }
         } else d.sw = 'unsupported';
