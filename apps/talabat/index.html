@@ -194,6 +194,76 @@
   .fin-seg button { flex: 1; padding: 11px 4px; border-radius: 12px; font-size: 13px; font-weight: 800; color: var(--text-sec); transition: all .18s; }
   .fin-seg button.active { background: #fff; color: var(--text); box-shadow: var(--shadow-sm); }
   .fin-seg button:active { transform: scale(.96); }
+  .finm-hero { display: flex; gap: 12px; align-items: center; border-radius: 22px; padding: 16px 15px; color: #fff; margin-bottom: 12px; position: relative; overflow: hidden; box-shadow: 0 14px 30px rgba(0,0,0,.18); transition: background .25s; }
+  .finm-hero.kind-expense { background: linear-gradient(135deg,#FB7185,#F43F5E 60%,#BE123C); box-shadow: 0 14px 30px rgba(244,63,94,.35); }
+  .finm-hero.kind-income { background: linear-gradient(135deg,#34D399,#10B981 60%,#047857); box-shadow: 0 14px 30px rgba(16,185,129,.35); }
+  .finm-hero.kind-debt { background: linear-gradient(135deg,#FBBF24,#F59E0B 60%,#B45309); box-shadow: 0 14px 30px rgba(245,158,11,.35); }
+  .finm-hero::before, .finm-hero::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.14); }
+  .finm-hero::before { width: 130px; height: 130px; left: -40px; top: -60px; }
+  .finm-hero::after { width: 90px; height: 90px; right: 30px; bottom: -55px; }
+  .finm-ico { width: 54px; height: 54px; border-radius: 17px; background: rgba(255,255,255,.22); display: flex; align-items: center; justify-content: center; font-size: 27px; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,.4); position: relative; z-index: 1; }
+  .finm-hero h2 { font-size: 20px; font-weight: 900; position: relative; z-index: 1; }
+  .finm-hero p { font-size: 12.5px; opacity: .93; font-weight: 700; position: relative; z-index: 1; }
+  .finm-kinds { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .finm-kind { background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: all .18s; box-shadow: var(--shadow-sm); }
+  .finm-kind:active { transform: scale(.95); }
+  .finm-kind .k-ico { width: 40px; height: 40px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .finm-kind[data-finkind="expense"] .k-ico { background: #FFE4E6; }
+  .finm-kind[data-finkind="income"] .k-ico { background: #DCFCE7; }
+  .finm-kind[data-finkind="debt"] .k-ico { background: #FEF3C7; }
+  .fin-ctl-card { background: #fff; border: 1.5px solid var(--border); border-radius: 20px; padding: 12px; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+  .fin-ctl-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .fin-ctl-add { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--grad); color: #fff; font-weight: 900; font-size: 14px; padding: 13px; border-radius: 15px; text-decoration: none; box-shadow: 0 10px 22px rgba(124,58,237,.35), inset 0 1px 0 rgba(255,255,255,.35); transition: transform .15s; }
+  .fin-ctl-add:active { transform: scale(.97); }
+  .fin-ctl-add .plus { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; }
+  .fin-ctl-count { min-width: 74px; text-align: center; background: var(--bg); border: 1.5px solid var(--border); border-radius: 15px; padding: 9px 10px; }
+  .fin-ctl-count b { display: block; font-size: 17px; font-weight: 900; }
+  .fin-ctl-count small { display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); }
+  .fin-ctl-seg { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 15px; padding: 5px; }
+  .fin-ctl-seg button { display: flex; align-items: center; justify-content: center; gap: 5px; padding: 10px 4px; border-radius: 11px; font-size: 12.5px; font-weight: 900; color: var(--text-sec); transition: all .18s; }
+  .fin-ctl-seg button:active { transform: scale(.95); }
+  .fin-ctl-seg button .n { font-size: 10.5px; font-weight: 900; background: rgba(0,0,0,.07); padding: 1px 8px; border-radius: 999px; }
+  .fin-ctl-seg button[data-expkind="expense"].active { background: linear-gradient(135deg,#FB7185,#F43F5E); color: #fff; box-shadow: 0 6px 14px rgba(244,63,94,.35); }
+  .fin-ctl-seg button[data-expkind="income"].active { background: linear-gradient(135deg,#34D399,#059669); color: #fff; box-shadow: 0 6px 14px rgba(16,185,129,.35); }
+  .fin-ctl-seg button[data-expkind="debt"].active { background: linear-gradient(135deg,#FBBF24,#D97706); color: #fff; box-shadow: 0 6px 14px rgba(245,158,11,.35); }
+  .fin-ctl-seg button.active .n { background: rgba(255,255,255,.28); }
+  .finm-kind b { font-size: 12.5px; font-weight: 900; }
+  .finm-kind small { font-size: 10px; color: var(--text-muted); font-weight: 700; }
+  .finm-kind[data-finkind="expense"].active { border-color: #F43F5E; background: #FFF1F2; box-shadow: 0 8px 18px rgba(244,63,94,.22); }
+  .finm-kind[data-finkind="income"].active { border-color: #10B981; background: #ECFDF5; box-shadow: 0 8px 18px rgba(16,185,129,.22); }
+  .finm-kind[data-finkind="debt"].active { border-color: #F59E0B; background: #FFFBEB; box-shadow: 0 8px 18px rgba(245,158,11,.22); }
+  .finm-body { animation: fadePage .3s ease-out; }
+  .finm-field { background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 10px 12px 12px; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+  .finm-field > label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 900; margin-bottom: 8px; }
+  .finm-field > label i { width: 30px; height: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-style: normal; flex-shrink: 0; }
+  .finm-field input, .finm-field textarea { width: 100%; border: none; background: var(--bg); border-radius: 12px; padding: 12px 13px; font-weight: 800; font-size: 14px; color: var(--text); }
+  .finm-field input:focus, .finm-field textarea:focus { outline: none; background: #fff; box-shadow: 0 0 0 2px var(--fin-accent, var(--primary)); }
+  .finm-field input.error { background: var(--danger-light); box-shadow: 0 0 0 2px var(--danger); }
+  .finm-field textarea { resize: vertical; min-height: 56px; }
+  .finm-save-expense { background: linear-gradient(135deg,#FB7185,#F43F5E) !important; box-shadow: 0 12px 26px rgba(244,63,94,.38) !important; }
+  .finm-save-income { background: linear-gradient(135deg,#34D399,#10B981) !important; box-shadow: 0 12px 26px rgba(16,185,129,.38) !important; }
+  .finm-save-debt { background: linear-gradient(135deg,#FBBF24,#D97706) !important; box-shadow: 0 12px 26px rgba(245,158,11,.38) !important; }
+  .fcat { background: #fff; border: 1.5px solid var(--border); border-radius: 16px; margin-bottom: 8px; overflow: hidden; box-shadow: var(--shadow-sm); }
+  .fcat-head { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; text-align: right; }
+  .fcat-head:active { background: var(--bg); }
+  .fcat-ico { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .fcat-ico svg { width: 19px; height: 19px; }
+  .fcat-txt { flex: 1; min-width: 0; }
+  .fcat-txt b { display: block; font-size: 13.5px; font-weight: 900; }
+  .fcat-txt small { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-top: 1px; }
+  .fcat-chev { width: 28px; height: 28px; border-radius: 50%; background: var(--bg); color: var(--text-sec); font-size: 18px; font-weight: 900; display: flex; align-items: center; justify-content: center; transform: rotate(-90deg); transition: transform .25s; flex-shrink: 0; line-height: 1; }
+  .fcat.open .fcat-chev { transform: rotate(90deg); background: var(--fin-accent, var(--primary)); color: #fff; }
+  .fcat-body { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .3s cubic-bezier(.22,1,.36,1), opacity .25s; }
+  .fcat.open .fcat-body { grid-template-rows: 1fr; opacity: 1; }
+  .fcat-body-in { overflow: hidden; min-height: 0; }
+  .fcat-grid { display: flex; flex-wrap: wrap; gap: 7px; padding: 0 12px 12px; }
+  .fitem { display: inline-flex; align-items: center; gap: 7px; padding: 9px 13px 9px 10px; border-radius: 999px; background: var(--bg); border: 1.5px solid var(--border); font-size: 12.5px; font-weight: 800; color: var(--text); transition: all .15s; }
+  .fitem:active { transform: scale(.95); }
+  .fitem .fi-ico { font-size: 15px; line-height: 1; }
+  .fitem .fi-check { display: none; font-weight: 900; }
+  .fitem.sel { color: #fff; }
+  .fitem.sel .fi-check { display: inline; }
+  .finCats-close { display: none; }
   .fin-group { background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 10px 12px 12px; margin-bottom: 8px; box-shadow: var(--shadow-sm); }
   .fin-group-h { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 900; color: var(--primary-dark); margin-bottom: 8px; }
   .fin-group-h i { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
@@ -353,6 +423,19 @@
   .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 800; border: none; }
   .badge-pending { background: var(--pending-light); color: #B7950B; }
   .badge-done { background: var(--success-light); color: #1E8449; }
+  .badge-urgent { background: #FFE4E6; color: #BE123C; border: 1px solid #FECDD3; animation: urgPulse 1.6s ease-in-out infinite; }
+  @keyframes urgPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,.35); } 50% { box-shadow: 0 0 0 5px rgba(244,63,94,0); } }
+  .order-card.is-urgent { border-color: #F43F5E !important; background: #FFF5F6 !important; }
+  .urg-toggle { display: flex; align-items: center; gap: 10px; background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 11px 13px; width: 100%; text-align: right; transition: all .18s; box-shadow: var(--shadow-sm); }
+  .urg-toggle:active { transform: scale(.98); }
+  .urg-toggle .u-ico { width: 38px; height: 38px; border-radius: 12px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
+  .urg-toggle b { flex: 1; font-size: 13.5px; font-weight: 900; }
+  .urg-toggle small { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); }
+  .urg-toggle .sw { width: 46px; height: 27px; border-radius: 999px; background: #D8D3E8; position: relative; flex-shrink: 0; transition: background .18s; }
+  .urg-toggle .sw::after { content: ''; position: absolute; top: 3px; right: 3px; width: 21px; height: 21px; border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.2); transition: transform .18s; }
+  .urg-toggle.on { border-color: #F43F5E; background: #FFF1F2; box-shadow: 0 6px 16px rgba(244,63,94,.18); }
+  .urg-toggle.on .sw { background: #F43F5E; }
+  .urg-toggle.on .sw::after { transform: translateX(-19px); }
   .order-meta { font-size: 12px; color: var(--text-sec); display: flex; flex-wrap: wrap; gap: 6px; }
   .meta-item { display: inline-flex; align-items: center; gap: 3px; }
   .purchase-info { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); font-size: 13px; }
@@ -383,6 +466,8 @@
   .context-menu-item .ctx-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
   .context-menu-item.buy .ctx-icon { background: var(--success-light); }
   .context-menu-item.edit .ctx-icon { background: var(--primary-light); }
+  .context-menu-item.urg .ctx-icon { background: #FFE4E6; }
+  .context-menu-item.urg.is-on { color: #BE123C; }
   .context-menu-item.delete .ctx-icon { background: var(--danger-light); }
   .context-menu-item.delete { color: var(--danger); }
   .context-menu-sep { height: 1px; background: var(--border); margin: 3px 10px; }
@@ -833,10 +918,27 @@
   .ad-banner { margin: 0 20px 12px; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow); border: 1.5px solid rgba(124,58,237,.12); background: #fff; animation: popIn .3s ease-out; }
   .ad-banner img { width: 100%; height: auto; max-height: 220px; object-fit: cover; display: block; }
   .ad-banner .ad-cap { padding: 8px 12px; font-size: 12px; font-weight: 800; color: var(--text-sec); display: flex; align-items: center; justify-content: space-between; }
-  .finish-bar { margin: 0 20px 14px; background: linear-gradient(135deg,#10B981,#059669); border-radius: 20px; padding: 14px; color: #fff; box-shadow: 0 10px 24px rgba(16,185,129,.3); }
-  .finish-bar b { display: block; font-size: 15px; font-weight: 900; margin-bottom: 2px; }
-  .finish-bar small { font-size: 12px; opacity: .92; font-weight: 700; display: block; margin-bottom: 10px; }
-  .finish-bar .btn { background: #fff; color: #059669; }
+  .finish-bar { margin: 0 20px 14px; background: linear-gradient(135deg,#10B981,#059669 55%,#047857); border-radius: 22px; padding: 15px 14px 14px; color: #fff; box-shadow: 0 14px 30px rgba(16,185,129,.38); position: relative; overflow: hidden; animation: popIn .35s ease-out; }
+  .finish-bar::before, .finish-bar::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.13); }
+  .finish-bar::before { width: 150px; height: 150px; left: -45px; top: -70px; }
+  .finish-bar::after { width: 100px; height: 100px; right: 20px; bottom: -60px; }
+  .finish-bar .fin-top { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; margin-bottom: 2px; }
+  .finish-bar .fin-mascot { width: 46px; height: 46px; border-radius: 15px; background: rgba(255,255,255,.22); display: flex; align-items: center; justify-content: center; font-size: 25px; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,.4); animation: logoFloat 2.6s ease-in-out infinite; }
+  .finish-bar b { display: block; font-size: 15px; font-weight: 900; margin-bottom: 1px; position: relative; z-index: 1; }
+  .finish-bar small { font-size: 12px; opacity: .94; font-weight: 700; display: block; margin-bottom: 10px; position: relative; z-index: 1; }
+  .finish-bar .btn { background: #fff; color: #047857; position: relative; z-index: 1; font-weight: 900; animation: btnWiggle 2.4s ease-in-out infinite; }
+  @keyframes btnWiggle { 0%,100% { transform: rotate(0); } 92% { transform: rotate(0); } 94% { transform: rotate(-1.2deg) scale(1.015); } 96% { transform: rotate(1.2deg) scale(1.015); } 98% { transform: rotate(0); } }
+  .party-hero { background: linear-gradient(135deg,#FBBF24,#EC4899 50%,#8B5CF6); border-radius: 22px; padding: 18px 15px; color: #fff; text-align: center; position: relative; overflow: hidden; box-shadow: 0 16px 36px rgba(236,72,153,.4); margin-bottom: 12px; }
+  .party-hero::before { content: '🎉🎊🥳🎉🎊'; position: absolute; top: 6px; right: 0; left: 0; font-size: 15px; opacity: .85; animation: partySlide 3s linear infinite; }
+  @keyframes partySlide { 0% { transform: translateX(18px); } 50% { transform: translateX(-18px); } 100% { transform: translateX(18px); } }
+  .party-hero .big { font-size: 52px; display: block; margin: 8px 0 2px; animation: logoFloat 2.2s ease-in-out infinite; }
+  .party-hero h2 { font-size: 22px; font-weight: 900; }
+  .party-hero p { font-size: 13px; font-weight: 700; opacity: .94; margin-top: 3px; }
+  .confetti-row { display: flex; justify-content: center; gap: 6px; font-size: 18px; margin: 2px 0 10px; }
+  .confetti-row span { display: inline-block; animation: confDrop 1.4s ease-in-out infinite; }
+  .confetti-row span:nth-child(2) { animation-delay: .15s; } .confetti-row span:nth-child(3) { animation-delay: .3s; }
+  .confetti-row span:nth-child(4) { animation-delay: .45s; } .confetti-row span:nth-child(5) { animation-delay: .6s; }
+  @keyframes confDrop { 0%,100% { transform: translateY(0) rotate(-8deg); } 50% { transform: translateY(-7px) rotate(8deg); } }
   </style>
 </head>
 <body>
@@ -975,6 +1077,25 @@
     _lastMsgIdx[arr.join(',')] = idx;
     return arr[idx];
   }
+  const FUNNY_FINISH = [
+    'البطل داخل على معركة السوبر ماركت 🦸‍♂️😂',
+    'المحفظة بتترعش دلوقتي 💸😂',
+    'ربنا يستر على جيب أبو العيال 😂❤️',
+    'القايمة أطول من ليلة الشتاء 📜😂',
+    'جهز الشنط والعضلات 💪🛒',
+    'الزوج المطيع يعيش في ربيع... انزل يا بطل 🏃‍♂️😂'
+  ];
+  function finishFunMsg(n) { return FUNNY_FINISH[(Number(n) || 0) % FUNNY_FINISH.length]; }
+  function finishBarHTML(n, btnId) {
+    return `<div class="finish-bar"><div class="fin-top"><span class="fin-mascot">🛒</span><div><b>✅ خلصت كتابة الطلبات؟ (${n} معلق)</b><small>😂 ${finishFunMsg(n)}</small></div></div><button class="btn" id="${btnId}">إنهاء وإرسال واتساب 🎉📱</button></div>`;
+  }
+  const FUNNY_BOUGHT = [
+    'المهمة تمت يا بطل... المحفظة استشهدت بشرف 😂💸',
+    'رجع بالسلامة ومعاه كل حاجة... معجزة بكل المقاييس 🏆😂',
+    'التلاجة اتملت والجيب اتفلس... بس البيت مبسوط ❤️😂',
+    'تستاهل قهوة على حساب البيت ☕😂'
+  ];
+  function boughtFunMsg() { return FUNNY_BOUGHT[Math.floor(Math.random() * FUNNY_BOUGHT.length)]; }
 
   /* EdTech SVG icon system - rounded, friendly */
   const ICONS = {
@@ -1250,7 +1371,74 @@
       { id: 'collect', name: 'تحصيل/استلام من جهة خارجية (استلام)', icon: 'trophy', items: ['تحصيل دين لك عند الغير', 'اقتراض مبلغ جديد'] }
     ]}
   };
-  function finCustom() { if (!state.finCustom) state.finCustom = { groupNames: {}, itemNames: {}, hidden: [], addedGroups: [], addedItems: [], delGroups: [], delItems: [] }; return state.finCustom; }
+  function finCustom() { if (!state.finCustom) state.finCustom = { groupNames: {}, itemNames: {}, groupIcons: {}, itemIcons: {}, hidden: [], addedGroups: [], addedItems: [], delGroups: [], delItems: [] }; if (!state.finCustom.groupIcons) state.finCustom.groupIcons = {}; if (!state.finCustom.itemIcons) state.finCustom.itemIcons = {}; return state.finCustom; }
+  const FIN_ITEM_EMOJIS = ['🏠','💡','💧','🌐','📞','🔥','🛠️','🛒','🍔','☕','⛽','📦','🧰','🚌','🚕','🧾','🩺','🏥','💊','💅','🏋️','🧸','🎒','📚','🐈','👕','👟','📱','⌚','💎','🎮','🎬','📺','✈️','🛡️','🏧','💳','🤲','🎁','💵','💼','🛍️','🏆','📈','🏘️','↩️','🤝','📥','📤','🍎','🥦','🍞','🥩','🧀','🚗','💰','🏦','⭐','📝','•'];
+  function finItemEmojiBase(nm) {
+    const n = String(nm || '');
+    const has = (...ks) => ks.some(k => n.includes(k));
+    if (has('إيجار')) return '🏠';
+    if (has('كهرباء')) return '💡';
+    if (has('مياه', 'المياه')) return '💧';
+    if (has('إنترنت')) return '🌐';
+    if (has('اتصالات')) return '📞';
+    if (has('غاز', 'الغاز')) return '🔥';
+    if (has('صيانة منزلية', 'الصيانة المنزلية')) return '🛠️';
+    if (has('بقالة', 'مواد غذائية')) return '🛒';
+    if (has('مطاعم', 'مقاهي', 'المقاهي')) return '🍔';
+    if (has('وقود', 'شحن')) return '⛽';
+    if (has('قطع الغيار', 'الصيانة وقطع')) return '🧰';
+    if (has('مواصلات', 'أجرة')) return '🚌';
+    if (has('مواقف', 'رسوم')) return '🧾';
+    if (has('أطباء')) return '🩺';
+    if (has('مستشفيات')) return '🏥';
+    if (has('أدوية', 'صيدلية')) return '💊';
+    if (has('عناية', 'جمال')) return '💅';
+    if (has('رياضة', 'لياقة')) return '🏋️';
+    if (has('أطفال')) return '🧸';
+    if (has('مدارس', 'جامعات')) return '🎒';
+    if (has('دورات', 'كتب')) return '📚';
+    if (has('حيوانات')) return '🐈';
+    if (has('ملابس', 'أحذية')) return '👕';
+    if (has('إلكترونيات', 'تقنية')) return '📱';
+    if (has('إكسسوارات', 'مجوهرات')) return '⌚';
+    if (has('ألعاب')) return '🎮';
+    if (has('سينما', 'أحداث')) return '🎬';
+    if (has('اشتراكات')) return '📺';
+    if (has('سفر', 'سياحة')) return '✈️';
+    if (has('تأمين')) return '🛡️';
+    if (has('بنكية', 'عمولات')) return '🏧';
+    if (has('تحويلات')) return '💳';
+    if (has('زكاة', 'صدقات')) return '🤲';
+    if (has('هدايا', 'مناسبات')) return '🎁';
+    if (has('سحب نقدي')) return '💵';
+    if (has('راتب')) return '💵';
+    if (has('حر', 'Freelance')) return '💼';
+    if (has('مبيعات')) return '🛍️';
+    if (has('مكافآت', 'بونص')) return '🏆';
+    if (has('استثمار')) return '📈';
+    if (has('عقارية', 'إيجارات')) return '🏘️';
+    if (has('مستردات')) return '↩️';
+    if (has('سداد', 'قسط')) return '🧾';
+    if (has('إقراض')) return '🤝';
+    if (has('تحصيل')) return '📥';
+    if (has('اقتراض')) return '📤';
+    return '•';
+  }
+  function finItemIcon(key, nm) {
+    try { const c = (state.finCustom || {}).itemIcons || {}; if (c[key]) return c[key]; } catch {}
+    return finItemEmojiBase(nm);
+  }
+  function orderDeptsForFin() {
+    try { return getCatalog().filter(d => d && !d.hidden); } catch { return []; }
+  }
+  function finCatDisplay(key) {
+    try {
+      const lk = finLookup(key);
+      if (lk) return { group: lk.group, name: lk.name };
+    } catch {}
+    if (key && validCatId(key)) return { group: '🛒 أقسام الطلبات', name: getCategoryName(key) };
+    return null;
+  }
   function finGroups(root, showHidden) {
     const R = FINANCE[root]; if (!R) return [];
     const cc = state.finCustom || {};
@@ -1266,11 +1454,12 @@
         items.push({ key: 'fin:' + key, name: (cc.itemNames || {})[key] || nm, custom: false, hidden: hid });
       });
       (cc.addedItems || []).filter(a => a.root === root && a.gid === g.id).forEach(a => items.push({ key: a.id, name: (cc.itemNames || {})[a.id] || a.name, custom: true, hidden: false }));
-      out.push({ id: g.id, name: (cc.groupNames || {})[gk] || g.name, icon: g.icon, custom: false, items });
+      out.push({ id: g.id, name: (cc.groupNames || {})[gk] || g.name, icon: (cc.groupIcons || {})[gk] || g.icon, custom: false, items });
     });
     (cc.addedGroups || []).filter(a => a.root === root).forEach(a => {
       const items = (cc.addedItems || []).filter(x => x.root === root && x.gid === a.id).map(x => ({ key: x.id, name: (cc.itemNames || {})[x.id] || x.name, custom: true, hidden: false }));
-      out.push({ id: a.id, name: a.name, icon: a.icon || 'box', custom: true, items });
+      const agk = root + ':' + a.id;
+      out.push({ id: a.id, name: a.name, icon: (cc.groupIcons || {})[agk] || a.icon || 'box', custom: true, items });
     });
     return out;
   }
@@ -1286,13 +1475,14 @@
       const gb = R.groups.find(g => g.id === gid);
       const ga = (cc.addedGroups || []).find(g => g.root === root && g.id === gid);
       const gname = gb ? ((cc.groupNames || {})[root + ':' + gid] || gb.name) : (ga ? ga.name : gid);
-      return { id, root, groupId: gid, group: gname, name: (cc.itemNames || {})[id] || a.name, icon: (gb && gb.icon) || (ga && ga.icon) || 'box', color: R.color };
+      const gicon = (cc.groupIcons || {})[root + ':' + gid] || (gb && gb.icon) || (ga && ga.icon) || 'box';
+      return { id, root, groupId: gid, group: gname, name: (cc.itemNames || {})[id] || a.name, icon: gicon, color: R.color };
     }
     const g = R.groups.find(g => g.id === gid); if (!g) return null;
     const idx = Number(ref); if (!Number.isInteger(idx) || idx < 0 || idx >= g.items.length) return null;
     const key = root + ':' + gid + ':' + idx;
     if ((cc.delItems || []).includes(key)) return null;
-    return { id, root, groupId: gid, group: (cc.groupNames || {})[root + ':' + gid] || g.name, name: (cc.itemNames || {})[key] || g.items[idx], icon: g.icon, color: R.color };
+    return { id, root, groupId: gid, group: (cc.groupNames || {})[root + ':' + gid] || g.name, name: (cc.itemNames || {})[key] || g.items[idx], icon: (cc.groupIcons || {})[root + ':' + gid] || g.icon, color: R.color };
   }
   function finKindOf(e) { return (e && e.kind) || 'expense'; }
   function finFirstId(kind) { const gs = finGroups(kind); for (const g of gs) if (g.items.length) return g.items[0].key; return 'fin:' + kind + ':other:0'; }
@@ -1314,7 +1504,7 @@
   let state = {
     initialized: false, home: null, user: null,
     orders: [], expenses: [], learnedMap: {}, usageFreq: {},
-    categoryColors: {}, categoryNames: {}, categoryIcons: {}, customCats: [], hiddenCats: [],
+    categoryColors: {}, categoryNames: {}, categoryIcons: {}, productIcons: {}, customCats: [], hiddenCats: [],
     photos: { mom: '', dad: '' },
     currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: ''
   };
@@ -1339,6 +1529,88 @@
   function getCategoryIcon(catId) { const f = finLookup(catId); if (f) return f.icon; return state.categoryIcons?.[catId] || catById(catId).icon || 'box'; }
   function catColor(catId) { const f = finLookup(catId); if (f) return f.color; return state.categoryColors?.[catId] || catById(catId).color; }
   function catLocation(catId) { return CATEGORY_LOCATIONS[catId] || 'حسب المتوفر'; }
+  const PRODUCT_EMOJIS = ['🥛','🥚','🍞','🥖','🍅','🥔','🍟','🍚','🧂','🫗','🧈','🧀','🍗','🥩','🐟','🧅','🧄','🌶️','🥒','🥕','🍌','🍎','🍊','🥭','🍇','🍉','🍑','🥬','🥦','🍆','🫑','🌽','🍋','☕','🍵','🧃','🥤','🍪','🍫','🍿','🥜','🍯','🫘','🧴','🧼','🧻','💊','🩹','🧷','👶','🐈','🧅','🥨','🍩','🧁','🥧','🍝','🫓','🧆','🥗','🍲','🫖','🧋','🥫','🫙','🧺','🛒','📦','⭐','•'];
+  function productEmojiBase(nm) {
+    const n = String(nm || '');
+    const has = (...ks) => ks.some(k => n.includes(k));
+    if (has('لبن', 'حليب')) return '🥛';
+    if (has('بيض')) return '🥚';
+    if (has('عيش بلدي', 'عيش')) return '🍞';
+    if (has('فينو', 'بقسماط')) return '🥖';
+    if (has('طماطم')) return '🍅';
+    if (has('بطاطس')) return '🥔';
+    if (has('شيبسي', 'شيبس', 'مقرمشات')) return '🍟';
+    if (has('أرز', 'رز')) return '🍚';
+    if (has('سكر')) return '🧂';
+    if (has('زيت')) return '🫗';
+    if (has('سمن', 'زبدة')) return '🧈';
+    if (has('جبن')) return '🧀';
+    if (has('زبادي', 'رايب')) return '🥛';
+    if (has('فراخ', 'دجاج')) return '🍗';
+    if (has('لحم', 'لحمة')) return '🥩';
+    if (has('سمك', 'تونة', 'سردين')) return '🐟';
+    if (has('بصل')) return '🧅';
+    if (has('ثوم')) return '🧄';
+    if (has('فلفل', 'شطة')) return '🌶️';
+    if (has('خيار')) return '🥒';
+    if (has('جزر')) return '🥕';
+    if (has('موز')) return '🍌';
+    if (has('تفاح')) return '🍎';
+    if (has('برتقال', 'يوسفي')) return '🍊';
+    if (has('مانجو', 'مانجا')) return '🥭';
+    if (has('عنب')) return '🍇';
+    if (has('بطيخ')) return '🍉';
+    if (has('خوخ', 'مشمش')) return '🍑';
+    if (has('ملوخية', 'سبانخ', 'جرجير')) return '🥬';
+    if (has('قرنبيط', 'بروكلي')) return '🥦';
+    if (has('باذنجان')) return '🍆';
+    if (has('فلفل رومي', 'فلفل الوان')) return '🫑';
+    if (has('ذرة')) return '🌽';
+    if (has('ليمون')) return '🍋';
+    if (has('شاي')) return '☕';
+    if (has('قهوة', 'نسكافيه')) return '☕';
+    if (has('عصير')) return '🧃';
+    if (has('بيبسي', 'كولا', 'حاجة ساقعة')) return '🥤';
+    if (has('بسكويت', 'كوكيز')) return '🍪';
+    if (has('شيكولاتة', 'شوكولاتة')) return '🍫';
+    if (has('فشار')) return '🍿';
+    if (has('فول', 'عدس', 'حمص')) return '🫘';
+    if (has('عسل')) return '🍯';
+    if (has('مكرونة', 'شعرية', 'لسان')) return '🍝';
+    if (has('صلصة', 'معجون طماطم')) return '🥫';
+    if (has('خل', 'مخلل')) return '🫙';
+    if (has('ملح', 'كمون', 'بهارات', 'فلفل اسود')) return '🧂';
+    if (has('صابون', 'شاور', 'شامبو')) return '🧴';
+    if (has('مسحوق', 'منظف', 'كلور', 'ديتول')) return '🧼';
+    if (has('مناديل', 'ورق تواليت')) return '🧻';
+    if (has('دواء', 'علاج', 'برشام')) return '💊';
+    if (has('بامبرز', 'حفاض')) return '👶';
+    if (has('دراي', 'قطط', 'كلاب')) return '🐈';
+    return '';
+  }
+  const CAT_FALLBACK_EMOJI = { vegfruit: '🥦', dairy: '🥛', grocery: '🛒', snacks: '🍿', spices: '🧂', meat: '🥩', drinks: '🥤', cleaning: '🧼', pharmacy: '💊', personal: '🧴', baby: '👶', pets: '🐈', kitchen: '🍽️', electro: '💡', gifts: '🎁' };
+  function productIcon(name, catId) {
+    try {
+      const k = normalizeTerm(name);
+      const ov = (state.productIcons || {})[k];
+      if (ov) return ov;
+    } catch {}
+    const b = productEmojiBase(name);
+    if (b) return b;
+    return CAT_FALLBACK_EMOJI[catId] || '🛒';
+  }
+  function collectProducts() {
+    const map = new Map();
+    const add = (nm) => {
+      const n = String(nm || '').trim(); if (!n) return;
+      const k = normalizeTerm(n); if (!k || map.has(k)) return;
+      map.set(k, { name: n, cat: classifyOrder(n).categoryId });
+    };
+    (state.orders || []).forEach(o => add(o.name));
+    Object.keys(state.usageFreq || {}).forEach(k => add(findOriginalName(k) || k));
+    Object.keys(state.learnedMap || {}).forEach(k => add(findOriginalName(k) || k));
+    return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+  }
   function isCustomCat(catId) { return !CATEGORIES[catId] && (state.customCats || []).some(x => x.id === catId); }
   const CAT_ICON_CHOICES = [
     { id: 'leaf', label: 'ورقة' }, { id: 'basket', label: 'سلة' },
@@ -1711,6 +1983,17 @@
     persist();
     return exp;
   }
+  function updateExpense(id, patch) {
+    const e = state.expenses.find(x => x.id === id); if (!e) return;
+    if (patch.title !== undefined) e.title = String(patch.title).trim() || e.title;
+    if (patch.amount !== undefined) e.amount = Number(patch.amount) || e.amount;
+    if (patch.categoryId !== undefined) e.categoryId = patch.categoryId;
+    if (patch.kind !== undefined) e.kind = patch.kind;
+    if (patch.notes !== undefined) e.notes = patch.notes;
+    if (patch.createdAt !== undefined) e.createdAt = patch.createdAt;
+    e.purchaseLocation = catLocation(e.categoryId);
+    persist();
+  }
   function deleteExpense(id) {
     const idx = state.expenses.findIndex(x => x.id === id);
     if (idx >= 0) {
@@ -2082,7 +2365,7 @@
       </div></div>
 
       ${adsByPosition('middle')}
-      ${pending ? `<div class="finish-bar"><b>✅ خلصت كتابة الطلبات؟ (${pending} معلق)</b><button class="btn" id="finishOrdersHome">إنهاء وإرسال واتساب 🎉</button></div>` : ''}
+      ${pending ? finishBarHTML(pending, 'finishOrdersHome') : ''}
       ${state._shopOpen ? `<div class="section"><div class="section-header"><h3>🛍️ تسوق المنتجات</h3><button class="btn btn-sm" id="shopCloseBtn">إخفاء</button></div><div class="help-text" style="margin:-4px 0 10px;">دوس على القسم واختار المنتج وضيفه لطلباتك</div></div>${state._catBrowse ? renderCatalogDept(state._catBrowse) : renderCatalogHome(true)}` : ''}
 
       <div class="section"><div class="section-header"><h3>آخر الطلبات</h3><a href="#" data-gotab="orders">شوف كلهم ←</a></div></div>
@@ -2103,9 +2386,11 @@
   function fmtQty(q) { if (!q || !(q.v > 0)) return ''; return q.v + ' ' + (q.u || (q.t === 'w' ? 'كجم' : 'قطعة')); }
   function renderOrderCard(o) {
     const cat = catById(o.categoryId);
+    const cc = catColor(o.categoryId);
     const purchased = o.status === 'purchased';
-    const loc = o.purchaseLocation ? `<span class="meta-item">📍 ${escapeHTML(o.purchaseLocation)}</span>` : '';
-    const notes = o.notes ? `<span class="meta-item">📝 ${escapeHTML(o.notes)}</span>` : '';
+    const shop = o.purchaseLocation || catLocation(o.categoryId);
+    const locLine = `<span class="meta-item">📍 ${escapeHTML(shop)}</span>`;
+    const notesLine = o.notes ? `<div class="order-meta"><span class="meta-item">📝 ${escapeHTML(o.notes)}</span></div>` : '';
     const qtyTxt = fmtQty(o.qty);
     const qtyLine = qtyTxt ? `<span class="qty-inline">— ${escapeHTML(qtyTxt)}</span>` : '';
     let pinfo = '';
@@ -2129,14 +2414,14 @@
         <div class="exp-row"><button class="btn btn-primary btn-sm" data-expsave="${o.id}">حفظ التعديل</button><button class="btn btn-success btn-sm" data-expbuy="${o.id}">✓ اتشترى</button><button class="btn btn-danger btn-sm" data-expdel="${o.id}">حذف الصنف</button></div>
       </div>`;
     }
-    return `<div class="order-card ${purchased ? 'purchased' : ''}" data-id="${o.id}">
-      <div class="category-card-icon" style="background:${cat.color}18;color:${cat.color};">${svgIcon(getCategoryIcon(o.categoryId), 20)}</div>
+    const isUrg = !purchased && (o.priority === 'high' || o.urgent);
+    return `<div class="order-card ${purchased ? 'purchased' : ''} ${isUrg ? 'is-urgent' : ''}" data-id="${o.id}">
+      <div class="category-card-icon" style="background:${cc}18;font-size:22px;">${productIcon(o.name, o.categoryId)}</div>
       <div class="order-main" data-exp="${o.id}">
-        <div class="order-name ${purchased ? 'purchased-name' : ''}">${escapeHTML(o.name)} ${qtyLine} <span class="badge ${purchased ? 'badge-done' : 'badge-pending'}">${purchased ? 'اتشترى' : 'مطلوب'}</span></div>
-        <div class="order-meta"><span class="meta-item">${getCategoryName(o.categoryId)}</span></div>
-        <div class="order-meta">${loc}${notes}</div>
+        <div class="order-name ${purchased ? 'purchased-name' : ''}">${escapeHTML(o.name)} ${qtyLine} <span class="badge ${purchased ? 'badge-done' : 'badge-pending'}">${purchased ? 'اتشترى' : 'مطلوب'}</span>${isUrg ? ' <span class="badge badge-urgent">🔥 ضروري</span>' : ''}</div>
+        <div class="order-meta">${locLine}</div>
+        ${notesLine}
         ${pinfo}
-        ${expanded ? '' : `<div class="help-text" style="margin-top:2px;">اضغط للتعديل: الكمية • الوحدة • ملاحظات</div>`}
       </div>
       <span class="ord-chev ${expanded ? 'open' : ''}">‹</span>
       ${panel}
@@ -2331,7 +2616,7 @@
     }
     return `<div class="section"><div class="pick-list-card">
       <div class="pick-sub-head"><span>🔍 نتائج الأصناف</span><span class="cnt">${res.length}</span></div>
-      ${res.map(r => { const cc = catColor(r.dept.id); return `<button class="sug-row" data-qpick-name="${escapeHTML(r.item.ar)}" data-qpick-dept="${r.dept.id}"><span class="sug-ico" style="background:${cc}16;color:${cc};">${svgIcon(getCategoryIcon(r.dept.id), 18)}</span><span class="sug-name">${escapeHTML(r.item.ar)}</span></button>`; }).join('')}
+      ${res.map(r => { const cc = catColor(r.dept.id); return `<button class="sug-row" data-qpick-name="${escapeHTML(r.item.ar)}" data-qpick-dept="${r.dept.id}"><span class="sug-ico" style="background:${cc}16;font-size:19px;">${productIcon(r.item.ar, r.dept.id)}</span><span class="sug-name">${escapeHTML(r.item.ar)}</span></button>`; }).join('')}
     </div></div>`;
   }
   function renderOrders() {
@@ -2344,7 +2629,7 @@
     const cats = allCats();
     const grouped = {}; for (const c of cats) grouped[c.id] = [];
     for (const o of list) { if (!grouped[o.categoryId]) grouped[o.categoryId] = []; grouped[o.categoryId].push(o); }
-    for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => (a.status === 'purchased' ? 1 : 0) - (b.status === 'purchased' ? 1 : 0));
+    for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => ((a.status === 'purchased' ? 1 : 0) - (b.status === 'purchased' ? 1 : 0)) || (((b.priority === 'high' || b.urgent) ? 1 : 0) - ((a.priority === 'high' || a.urgent) ? 1 : 0)));
 
     const myRole2 = state.user?.role || 'husband';
     const pendAll = (state.orders || []).filter(o => o.status === 'pending').length;
@@ -2353,7 +2638,7 @@
       <div class="page-title">${list.length === 0 ? 'مفيش طلبات' : list.length === 1 ? 'فيه طلب واحد' : `فيه ${list.length} طلبات`}</div>
       ${adsByPosition('top')}
 
-      ${pendAll ? `<div class="finish-bar"><b>✅ خلصت كتابة الطلبات؟ (${pendAll} معلق)</b><button class="btn" id="finishOrdersBtn">إنهاء وإرسال واتساب 🎉</button></div>` : ''}
+      ${pendAll ? finishBarHTML(pendAll, 'finishOrdersBtn') : ''}
       ${adsByPosition('middle')}
 
       <div class="search-bar"><div class="search-voice-wrap"><div class="search-box"><input id="orderSearch" placeholder="دور على الصنف..." value="${escapeHTML(searchQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div><button class="voice-mic-mini" id="orderSearchVoice" aria-label="بحث صوتي">${svgIcon('mic', 20)}</button></div></div>
@@ -2380,8 +2665,8 @@
   function renderExpenses() {
     const today = sumExpensesInRange('day'); const week = sumExpensesInRange('week'); const month = sumExpensesInRange('month');
     const monthInc = sumExpensesInRange('month', 'income'); const monthDebt = sumExpensesInRange('month', 'debt');
-    const fk = state._expKind || 'all';
-    const shown = state.expenses.filter(e => fk === 'all' || finKindOf(e) === fk);
+    const fk = (state._expKind === 'income' || state._expKind === 'debt') ? state._expKind : 'expense';
+    const shown = state.expenses.filter(e => finKindOf(e) === fk);
     return `<div class="page">
       <div class="topbar"><div class="greeting">تتبع التقدم</div></div>
       <div class="page-title">المصروفات</div>
@@ -2396,12 +2681,13 @@
         </div>
       </div>
 
-      <div class="section"><div class="fin-log-head"><div class="fin-log-title"><span class="fin-log-ico">🧾</span><h3>سجل الحركات</h3><span class="pick-count">${shown.length}</span></div><a href="#" id="addExpenseLink" class="fin-add-btn">+ إضافة جديد</a></div>
-      <div class="list-chip-row" style="margin-bottom:8px;">
-        <button class="filter-chip ${fk === 'all' ? 'active' : ''}" data-expkind="all">الكل</button>
-        <button class="filter-chip ${fk === 'expense' ? 'active' : ''}" data-expkind="expense">💸 مصروفات</button>
-        <button class="filter-chip ${fk === 'income' ? 'active' : ''}" data-expkind="income">💰 دخل</button>
-        <button class="filter-chip ${fk === 'debt' ? 'active' : ''}" data-expkind="debt">🏦 ديون</button>
+      <div class="section"><div class="fin-ctl-card">
+        <div class="fin-ctl-top"><a href="#" id="addExpenseLink" class="fin-ctl-add"><span class="plus">+</span> إضافة حركة جديدة</a><span class="fin-ctl-count"><b>${shown.length}</b><small>حركة معروضة</small></span></div>
+        <div class="fin-ctl-seg">
+          <button class="${fk === 'expense' ? 'active' : ''}" data-expkind="expense">💸 مصروفات <span class="n">${state.expenses.filter(e => finKindOf(e) === 'expense').length}</span></button>
+          <button class="${fk === 'income' ? 'active' : ''}" data-expkind="income">💰 دخل <span class="n">${state.expenses.filter(e => finKindOf(e) === 'income').length}</span></button>
+          <button class="${fk === 'debt' ? 'active' : ''}" data-expkind="debt">🏦 ديون <span class="n">${state.expenses.filter(e => finKindOf(e) === 'debt').length}</span></button>
+        </div>
       </div></div>
 
       ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش حركات لسه</div><div class="empty-desc">لما هتشتري أو تسجل حركة هنسجلها هنا</div><button class="btn btn-primary" id="emptyAddExpense">سجل حركة</button></div>` :
@@ -2411,10 +2697,10 @@
           const kc = kind === 'income' ? '#059669' : kind === 'debt' ? '#D97706' : '#7C3AED';
           const klabel = kind === 'income' ? 'دخل' : kind === 'debt' ? 'ديون' : 'مصروف';
           const cat = catById(e.categoryId);
-          return `<div class="exp-list-item" data-eid="${e.id}" style="border-inline-start:4px solid ${kc};">
+          const canEdit = e.sourceType === 'manual';
+          return `<div class="exp-list-item" ${canEdit ? `data-editexp="${e.id}" style="border-inline-start:4px solid ${kc};cursor:pointer;"` : `style="border-inline-start:4px solid ${kc};"`}>
             <div class="exp-cat" style="background:${cat.color}20;color:${cat.color}">${svgIcon(getCategoryIcon(e.categoryId), 20)}</div>
             <div class="exp-body"><div class="exp-name">${escapeHTML(e.title)}</div><div class="exp-detail"><span class="fin-pill" style="color:${kc};background:${kc}14;">${FINANCE[kind].emoji} ${klabel}</span> ${getCategoryName(e.categoryId)} • ${formatDateShort(new Date(e.createdAt))}</div>
-              ${e.sourceType === 'manual' ? `<button class="btn-ghost" data-delexp="${e.id}" style="padding:3px 6px;font-size:11px;color:var(--danger)">شيل</button>` : ''}
             </div>
             <div class="exp-price"${kc ? ` style="color:${kc}"` : ''}>${formatCurrency(e.amount)} ج.م</div>
           </div>`;
@@ -2507,6 +2793,13 @@
         <div class="vol-row"><span>🔉</span><input type="range" id="audioVolRange" min="0" max="100" step="1" value="${state._audioVol == null ? 80 : state._audioVol}"><span class="vol-val" id="audioVolVal">${state._audioVol == null ? 80 : state._audioVol}%</span></div>
         <div class="snd-add-row"><button class="btn" id="openSoundLib">🎵 مكتبة الأصوات</button></div>
       </div>
+      <div class="settings-card"><div class="settings-title">مساعد البيت الظريف 🎭</div>
+        <button class="tgl-row" id="tglCharShow"><span class="tgl"><b>إظهار المساعد</b><small>شخصية عائمة مرحة داخل التطبيق</small></span><span class="sw ${state._charShow !== false ? 'on' : ''}"></span></button>
+        <button class="tgl-row" id="tglCharTalk"><span class="tgl"><b>تعليقات المساعد</b><small>فقاعات كلام طريفة مع الأحداث</small></span><span class="sw ${state._charTalk !== false ? 'on' : ''}"></span></button>
+        <button class="tgl-row" id="tglCharSound"><span class="tgl"><b>صوت المساعد</b><small>تنبيه لطيف خفيف</small></span><span class="sw ${state._charSound !== false ? 'on' : ''}"></span></button>
+        <button class="tgl-row" id="tglCharRole"><span class="tgl"><b>نكت حسب الدور</b><small>تعليقات مرحة مختلفة للزوج والزوجة</small></span><span class="sw ${state._charRole !== false ? 'on' : ''}"></span></button>
+        <div class="snd-add-row"><button class="btn" id="charTestBtn">🎭 جرّب المساعد</button></div>
+      </div>
       <div class="settings-card"><div class="settings-title">صور العائلة</div>
         <div style="padding:6px 16px 2px;color:var(--text-sec);font-size:11px;font-weight:600;">ارفع صورة حقيقية للأم والأب من موبايلك</div>
         <div class="photo-row">
@@ -2532,6 +2825,7 @@
       </div>
       <div class="settings-card"><div class="settings-title">كتالوج المنتجات</div>
         ${(() => { const cats = getCatalog(); const n = cats.reduce((a, d) => a + catDeptCount(d), 0); return `<div class="settings-item"><div class="si-icon" style="background:#F1EAFE;color:#7C3AED;">🛍️</div><div class="si-body"><div class="si-label">موسوعة المنتجات</div><div class="si-value">${n} صنف في ${cats.length} قسم</div></div><button class="si-action" id="catManagerBtn">إدارة</button></div>`; })()}
+        ${(() => { const pl = collectProducts(); return `<div class="settings-item"><div class="si-icon" style="background:#FCE7F3;color:#EC4899;">${productIcon(pl[0]?.name || 'لبن', pl[0]?.cat || 'dairy')}</div><div class="si-body"><div class="si-label">أيقونات المنتجات</div><div class="si-value">${pl.length} منتج • الأيقونة حسب اسم المنتج</div></div><button class="si-action" id="prodIconsBtn">إدارة</button></div>`; })()}
         ${(() => { const c = finCounts(); return `<div class="settings-item"><div class="si-icon" style="background:#FEF3C7;color:#D97706;">💼</div><div class="si-body"><div class="si-label">الأقسام المالية</div><div class="si-value">${c.it} بند في ${c.g} مجموعة (مصروفات / دخل / ديون)</div></div><button class="si-action" id="finManagerBtn">إدارة</button></div>`; })()}
       </div>
       <div class="settings-card"><div class="settings-title">البيانات</div>
@@ -2612,7 +2906,7 @@
       state.user = { id: prevId || uid(), name, role, whatsapp, joinedAt: state.user?.joinedAt || nowISO() };
       if (state._pendingCloud && state._pendingCloud.home) {
         const rc = state._pendingCloud;
-        for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'categoryColors', 'categoryNames', 'categoryIcons', 'customCats', 'hiddenCats', 'photos', 'catalogCustom', 'updatedAt']) {
+        for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'categoryColors', 'categoryNames', 'categoryIcons', 'productIcons', 'customCats', 'hiddenCats', 'photos', 'catalogCustom', 'updatedAt']) {
           if (rc[k] !== undefined) state[k] = rc[k];
         }
         state._pendingCloud = null;
@@ -2671,7 +2965,7 @@
     });
     const al = document.getElementById('addExpenseLink'); if (al) al.onclick = (e) => { e.preventDefault(); openAddExpenseModal(); };
     document.querySelectorAll('[data-expkind]').forEach(b => b.onclick = () => { state._expKind = b.dataset.expkind; persist(); render(); });
-    document.querySelectorAll('[data-delexp]').forEach(b => b.onclick = () => handleDeleteExpense(b.dataset.delexp));
+    document.querySelectorAll('[data-editexp]').forEach(el => el.onclick = (e) => { if (e.target.closest('button, a, input, select, textarea')) return; openEditExpenseModal(el.dataset.editexp); });
     document.querySelectorAll('[data-ofil]').forEach(b => b.onclick = () => { state.orderFilter = b.dataset.ofil; persist(); render(); });
     document.querySelectorAll('[data-cfil]').forEach(b => b.onclick = () => { state.categoryFilter = b.dataset.cfil; persist(); render(); });
     const si = document.getElementById('orderSearch');
@@ -2719,8 +3013,10 @@
     const purchased = o.status === 'purchased';
     const back = document.createElement('div'); back.className = 'ctx-backdrop'; back.id = 'ctxBackdrop';
     const menu = document.createElement('div'); menu.className = 'context-menu'; menu.id = 'activeContextMenu';
+    const isUrg = !purchased && (o.priority === 'high' || o.urgent);
     let items = '';
     if (!purchased) items += `<button class="context-menu-item buy" data-ctx-buy="${orderId}"><span class="ctx-icon" style="color:var(--success);">${svgIcon('check', 18)}</span><span>جبتها يا بطل</span></button>`;
+    if (!purchased) items += `<button class="context-menu-item urg ${isUrg ? 'is-on' : ''}" data-ctx-urg="${orderId}"><span class="ctx-icon">🔥</span><span>${isUrg ? 'إلغاء الضروري' : 'اجعلها ضروري'}</span></button>`;
     items += `<button class="context-menu-item edit" data-ctx-edit="${orderId}"><span class="ctx-icon" style="color:var(--primary);">${svgIcon('pencil', 18)}</span><span>تعديل</span></button>`;
     if (!purchased) { items += `<div class="context-menu-sep"></div><button class="context-menu-item delete" data-ctx-del="${orderId}"><span class="ctx-icon">${svgIcon('trash', 18)}</span><span>خلاص بلاش دي</span></button>`; }
     menu.innerHTML = items;
@@ -2737,6 +3033,14 @@
     const act = (fn) => (ev) => { if (acted) return; acted = true; ev.preventDefault(); ev.stopPropagation(); closeContextMenu(); setTimeout(fn, 30); };
     menu.querySelector('[data-ctx-buy]')?.addEventListener('click', act(() => openPurchaseModal(orderId)));
     menu.querySelector('[data-ctx-buy]')?.addEventListener('touchend', act(() => openPurchaseModal(orderId)));
+    const urgFn = () => {
+      const ord = state.orders.find(x => x.id === orderId); if (!ord) return;
+      const on = !(ord.priority === 'high' || ord.urgent);
+      updateOrder(orderId, { priority: on ? 'high' : 'medium' });
+      toast(on ? 'بقت ضروري 🔥' : 'رجعت عادية ✓', on ? 'warning' : 'success'); render();
+    };
+    menu.querySelector('[data-ctx-urg]')?.addEventListener('click', act(urgFn));
+    menu.querySelector('[data-ctx-urg]')?.addEventListener('touchend', act(urgFn));
     menu.querySelector('[data-ctx-edit]')?.addEventListener('click', act(() => openEditOrderModal(orderId)));
     menu.querySelector('[data-ctx-edit]')?.addEventListener('touchend', act(() => openEditOrderModal(orderId)));
     menu.querySelector('[data-ctx-del]')?.addEventListener('click', act(() => handleDeleteOrder(orderId)));
@@ -2780,6 +3084,7 @@
     const lnh = document.getElementById('learnedHead'); if (lnh) lnh.onclick = () => { state._learnedOpen = !state._learnedOpen; persist(); render(); scrollToId('learnedHead'); };
     document.querySelectorAll('[data-iconcat]').forEach(btn => btn.onclick = () => openIconPickerModal(btn.dataset.iconcat));
     b('addCatBtn', openAddCatModal);
+    b('prodIconsBtn', openProductIcons);
     b('catManagerBtn', openCatalogManager);
     b('finManagerBtn', openFinManager);
     b('tglAudio', () => { state._audioOn = !(state._audioOn !== false); persist(); render(); });
@@ -2788,6 +3093,11 @@
     const avr = document.getElementById('audioVolRange');
     if (avr) avr.oninput = () => { state._audioVol = Number(avr.value) || 0; const vv = document.getElementById('audioVolVal'); if (vv) vv.textContent = state._audioVol + '%'; persist(); };
     b('openSoundLib', openSoundLibrary);
+    b('tglCharShow', () => { state._charShow = !(state._charShow !== false); persist(); render(); try { window.Character && Character.applySettings(); } catch {} });
+    b('tglCharTalk', () => { state._charTalk = !(state._charTalk !== false); persist(); render(); try { window.Character && Character.applySettings(); } catch {} });
+    b('tglCharSound', () => { state._charSound = !(state._charSound !== false); persist(); render(); try { window.Character && Character.applySettings(); } catch {} });
+    b('tglCharRole', () => { state._charRole = !(state._charRole !== false); persist(); render(); try { window.Character && Character.applySettings(); } catch {} });
+    b('charTestBtn', () => { try { window.Character && Character.test(); } catch {} });
     document.querySelectorAll('[data-hidecat]').forEach(btn => btn.onclick = () => {
       if (!state.hiddenCats) state.hiddenCats = [];
       if (!state.hiddenCats.includes(btn.dataset.hidecat)) state.hiddenCats.push(btn.dataset.hidecat);
@@ -2811,7 +3121,7 @@
     document.querySelectorAll('[data-unlearn]').forEach(btn => btn.onclick = () => { delete state.learnedMap[btn.dataset.unlearn]; persist(); toast('تمام، الكلمة اتمسحت', 'success'); render(); });
     b('clearLearned', () => { confirmDialog({ title: 'مسح الكلمات؟', message: 'هنمسح كل التصنيفات اللي اتعلمناها.', confirmText: 'مسح', cancelText: 'لا', danger: true }).then(ok => { if (ok) { state.learnedMap = {}; persist(); toast('تم المسح ✓', 'success'); render(); } }); });
     const clearAll = document.getElementById('clearAllBtn');
-    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, categoryColors: {}, categoryNames: {}, categoryIcons: {}, customCats: [], hiddenCats: [], photos: { mom: '', dad: '' }, catalogCustom: null, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
+    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, categoryColors: {}, categoryNames: {}, categoryIcons: {}, productIcons: {}, customCats: [], hiddenCats: [], photos: { mom: '', dad: '' }, catalogCustom: null, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
   }
 
   function toggleCatItemHidden(key) {
@@ -2851,7 +3161,8 @@
     const tabs = Object.keys(FINANCE).map(r => `<button class="filter-chip ${tab === r ? 'active' : ''}" data-fintab="${r}">${FINANCE[r].emoji} ${FINANCE[r].label}</button>`).join('');
     const html = `<div class="modal-handle"></div><h2>💼 الأقسام المالية</h2><p class="m-sub">عدّل المجموعات والبنود — التغيير ينعكس على المودال فورًا</p>
       <div class="field"><div class="fin-seg">${tabs}</div></div>
-      <div id="finGroups">${gs.map(g => `<div class="rv-row"><span class="rv-name">${escapeHTML(g.name)} <small style="color:var(--text-muted);">(${g.items.length})</small>${g.custom ? ' <span class="custom-tag">مخصصة</span>' : ''}</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn btn-sm" data-finopen="${tab}|${g.id}">البنود</button><button class="btn btn-sm" data-finrename="${tab}|${g.id}">تسمية</button>${g.custom ? `<button class="btn btn-sm btn-danger" data-findel="${tab}|${g.id}">حذف</button>` : ''}</span></div>`).join('') || '<div class="help-text">لا توجد مجموعات</div>'}</div>
+      <div style="padding:0 0 8px;color:var(--text-sec);font-size:11px;font-weight:700;">💡 اضغط على الأيقونة لتغييرها من المعرض</div>
+      <div id="finGroups">${gs.map(g => `<div class="rv-row"><button class="color-item-icon" data-fingroupicon="${tab}|${g.id}" title="تغيير الأيقونة" style="background:${FINANCE[tab].color}18;color:${FINANCE[tab].color};">${svgIcon(g.icon || 'box', 20)}</button><span class="rv-name">${escapeHTML(g.name)} <small style="color:var(--text-muted);">(${g.items.length})</small>${g.custom ? ' <span class="custom-tag">مخصصة</span>' : ''}</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn btn-sm" data-finopen="${tab}|${g.id}">البنود</button><button class="btn btn-sm" data-finrename="${tab}|${g.id}">تسمية</button>${g.custom ? `<button class="btn btn-sm btn-danger" data-findel="${tab}|${g.id}">حذف</button>` : ''}</span></div>`).join('') || '<div class="help-text">لا توجد مجموعات</div>'}</div>
       <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="finAddGroup">+ مجموعة جديدة</button><button class="btn" id="finBack">رجوع</button></div>`;
     const m = openModal(html);
     m.querySelector('#finBack').onclick = () => closeModal(m);
@@ -2865,6 +3176,7 @@
         toast('اتضافت المجموعة ✓', 'success');
       });
     };
+    m.querySelectorAll('[data-fingroupicon]').forEach(b => b.onclick = () => { const [r, gid] = b.dataset.fingroupicon.split('|'); closeModal(m); openFinGroupIconModal(r, gid); });
     m.querySelectorAll('[data-finopen]').forEach(b => b.onclick = () => { const [r, gid] = b.dataset.finopen.split('|'); closeModal(m); openFinItems(r, gid); });
     m.querySelectorAll('[data-finrename]').forEach(b => b.onclick = () => {
       const [r, gid] = b.dataset.finrename.split('|');
@@ -2889,11 +3201,28 @@
       });
     });
   }
+  function openFinGroupIconModal(root, gid) {
+    const g = finGroups(root, true).find(x => x.id === gid);
+    if (!g) { openFinManager(); return; }
+    const col = FINANCE[root].color;
+    const cur = g.icon || 'box';
+    const html = `<div class="modal-handle"></div><h2>أيقونة ${escapeHTML(g.name)}</h2><p class="m-sub">${FINANCE[root].emoji} ${FINANCE[root].label} • اضغط على أيقونة لتطبيقها فوراً</p>
+      <div class="icon-grid">${CAT_ICON_CHOICES.map(ic => `<button class="icon-opt ${ic.id === cur ? 'selected' : ''}" data-finicon="${ic.id}"><span style="color:${col};">${svgIcon(ic.id, 26)}</span><small>${ic.label}</small></button>`).join('')}</div>
+      <div class="btn-group"><button class="btn" id="finIconBack">رجوع</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#finIconBack').onclick = () => { closeModal(m); openFinManager(); };
+    m.querySelectorAll('[data-finicon]').forEach(btn => btn.onclick = () => {
+      finCustom().groupIcons[root + ':' + gid] = btn.dataset.finicon;
+      persist(); render(); closeModal(m); openFinManager();
+      toast('أيقونة المجموعة اتحدثت ✓', 'success');
+    });
+  }
   function openFinItems(root, gid) {
     const g = finGroups(root, true).find(x => x.id === gid);
     if (!g) { openFinManager(); return; }
     const html = `<div class="modal-handle"></div><h2>${escapeHTML(g.name)}</h2><p class="m-sub">${FINANCE[root].emoji} ${FINANCE[root].label} • ${g.items.length} بند</p>
-      ${g.items.map(it => `<div class="rv-row"><span class="rv-name">${escapeHTML(it.name)}${it.custom ? ' <span class="custom-tag">مخصص</span>' : ''}${it.hidden ? ' <span class="custom-tag">مخفي</span>' : ''}</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn btn-sm" data-finrn="${it.key}">تسمية</button>${it.custom ? `<button class="btn btn-sm btn-danger" data-findl="${it.key}">حذف</button>` : `<button class="btn btn-sm" data-finhide="${it.key}">${it.hidden ? 'إظهار' : 'إخفاء'}</button>`}</span></div>`).join('') || '<div class="help-text">لا توجد بنود بعد — ضيف أول بند</div>'}
+      <div style="padding:0 0 8px;color:var(--text-sec);font-size:11px;font-weight:700;">💡 اضغط على الأيقونة لتغييرها</div>
+      ${g.items.map(it => `<div class="rv-row"><button class="color-item-icon" data-finitemicon="${it.key}" title="تغيير الأيقونة" style="background:${FINANCE[root].color}18;">${finItemIcon(it.key, it.name)}</button><span class="rv-name">${escapeHTML(it.name)}${it.custom ? ' <span class="custom-tag">مخصص</span>' : ''}${it.hidden ? ' <span class="custom-tag">مخفي</span>' : ''}</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn btn-sm" data-finrn="${it.key}">تسمية</button>${it.custom ? `<button class="btn btn-sm btn-danger" data-findl="${it.key}">حذف</button>` : `<button class="btn btn-sm" data-finhide="${it.key}">${it.hidden ? 'إظهار' : 'إخفاء'}</button>`}</span></div>`).join('') || '<div class="help-text">لا توجد بنود بعد — ضيف أول بند</div>'}
       <div class="field" style="margin-top:10px;"><label>إضافة بند</label><input type="text" id="finAr" placeholder="اسم البند *" maxlength="40" /></div>
       <div class="btn-group"><button class="btn btn-primary" id="finAdd">+ إضافة البند</button><button class="btn" id="finBack2">رجوع</button></div>`;
     const m = openModal(html);
@@ -2932,8 +3261,26 @@
         const cc = finCustom();
         cc.addedItems = (cc.addedItems || []).filter(x => x.id !== key);
         if (cc.itemNames) delete cc.itemNames[key];
+        if (cc.itemIcons) delete cc.itemIcons[key];
         persist(); render(); closeModal(m); openFinItems(root, gid);
       });
+    });
+    m.querySelectorAll('[data-finitemicon]').forEach(b => b.onclick = () => { const key = b.dataset.finitemicon; closeModal(m); openFinItemIconModal(key, root, gid); });
+  }
+  function openFinItemIconModal(itemKey, root, gid) {
+    const it = finGroups(root, true).flatMap(x => x.items).find(x => x.key === itemKey);
+    if (!it) { openFinItems(root, gid); return; }
+    const col = FINANCE[root].color;
+    const cur = finItemIcon(it.key, it.name);
+    const html = `<div class="modal-handle"></div><h2>أيقونة ${escapeHTML(it.name)}</h2><p class="m-sub">اضغط على أيقونة لتطبيقها فوراً</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:6px 2px 12px;">${FIN_ITEM_EMOJIS.map(e => `<button class="icon-opt ${e === cur ? 'selected' : ''}" data-finitem="${e}" style="min-width:56px;"><span style="font-size:24px;">${e}</span></button>`).join('')}</div>
+      <div class="btn-group"><button class="btn" id="finItemIconBack">رجوع</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#finItemIconBack').onclick = () => { closeModal(m); openFinItems(root, gid); };
+    m.querySelectorAll('[data-finitem]').forEach(btn => btn.onclick = () => {
+      finCustom().itemIcons[itemKey] = btn.dataset.finitem;
+      persist(); render(); closeModal(m); openFinItems(root, gid);
+      toast('أيقونة البند اتحدثت ✓', 'success');
     });
   }
   function openCatalogManager() {
@@ -3327,6 +3674,42 @@
     });
   }
 
+  function openProductIcons() {
+    const list = collectProducts();
+    const html = `<div class="modal-handle"></div><h2>🖼️ أيقونات المنتجات</h2><p class="m-sub">الأيقونة حسب اسم المنتج • اضغط على أي منتج لتغييرها • النص المعروض: الاسم + الكمية + الملاحظة</p>
+      <div class="field"><label>بحث</label><input type="text" id="piSearch" placeholder="دور على منتج..." autocomplete="off" /></div>
+      <div id="piList">${list.map(p => { const cc = catColor(p.cat); return `<div class="rv-row" data-piname="${escapeHTML(p.name)}"><button class="color-item-icon" data-picon="${escapeHTML(p.name)}" style="background:${cc}18;font-size:20px;" title="تغيير الأيقونة">${productIcon(p.name, p.cat)}</button><span class="rv-name">${escapeHTML(p.name)}<br><small style="color:var(--text-muted);font-weight:700;">${escapeHTML(getCategoryName(p.cat))} • 📍 ${escapeHTML(catLocation(p.cat))}</small></span><span class="sug-cat">${escapeHTML(getCategoryName(p.cat))}</span></div>`; }).join('') || '<div class="help-text">لا توجد منتجات بعد — ضيف طلبات وستظهر هنا</div>'}</div>
+      <div class="btn-group" style="margin-top:8px;"><button class="btn" id="piBack">رجوع</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#piBack').onclick = () => closeModal(m);
+    const si = m.querySelector('#piSearch');
+    if (si) si.oninput = () => {
+      const q = normalizeTerm(si.value);
+      m.querySelectorAll('#piList [data-piname]').forEach(r => r.classList.toggle('hidden', !!q && !normalizeTerm(r.dataset.piname).includes(q)));
+    };
+    m.querySelectorAll('[data-picon]').forEach(b => b.onclick = () => { closeModal(m); openProductIconPicker(b.dataset.picon); });
+  }
+  function openProductIconPicker(prodName) {
+    const cid = classifyOrder(prodName).categoryId;
+    const col = catColor(cid);
+    const cur = productIcon(prodName, cid);
+    const html = `<div class="modal-handle"></div><h2>أيقونة ${escapeHTML(prodName)}</h2><p class="m-sub">${escapeHTML(getCategoryName(cid))} • 📍 ${escapeHTML(catLocation(cid))} • اضغط للتطبيق فوراً</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:6px 2px 12px;">${PRODUCT_EMOJIS.map(e => `<button class="icon-opt ${e === cur ? 'selected' : ''}" data-pickprod="${e}" style="min-width:56px;"><span style="font-size:24px;">${e}</span></button>`).join('')}</div>
+      <div class="btn-group"><button class="btn btn-sm" id="piReset">🔄 تلقائي حسب الاسم</button><button class="btn" id="piCancel">رجوع</button></div>`;
+    const m = openModal(html);
+    m.querySelector('#piCancel').onclick = () => { closeModal(m); openProductIcons(); };
+    m.querySelector('#piReset').onclick = () => {
+      if (state.productIcons) delete state.productIcons[normalizeTerm(prodName)];
+      persist(); closeModal(m); render(); openProductIcons();
+      toast('رجعت للأيقونة التلقائية ✓', 'success');
+    };
+    m.querySelectorAll('[data-pickprod]').forEach(btn => btn.onclick = () => {
+      if (!state.productIcons) state.productIcons = {};
+      state.productIcons[normalizeTerm(prodName)] = btn.dataset.pickprod;
+      persist(); closeModal(m); render(); openProductIcons();
+      toast('أيقونة المنتج اتحدثت ✓', 'success');
+    });
+  }
   function openInstallHelpModal() {
     const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     const html = `<div class="modal-handle"></div><h2>تثبيت ناقصنا إيه</h2><p class="m-sub">${isiOS ? 'على الآيفون من سفاري' : 'على الأندرويد من كروم'}</p>
@@ -3854,6 +4237,7 @@
       ${editing
         ? `<div class="field"><label>يُضاف إلى طلب (قائمة)</label><select id="ordListSel" class="rv-select">${orderLists().map(l => `<option value="${l.id}" ${l.id === activeListId() ? 'selected' : ''}>${escapeHTML(l.name)}</option>`).join('')}</select></div>` : ''}
       <div id="pharmacyNote" class="pharm-note hidden">⚠️ ده قسم صيدلية بس. التطبيق مش بيقدم تشخيص أو نصيحة طبية.</div>
+      <div class="field" style="margin-bottom:4px;"><button type="button" class="urg-toggle ${editing && order && (order.priority === 'high' || order.urgent) ? 'on' : ''}" id="urgToggle"><span class="u-ico">🔥</span><b>طلب ضروري<small>هيظهر بشارة حمرا ويطلع أول القائمة</small></b><span class="sw"></span></button></div>
       <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="submitOrderBtn">${editing ? 'حفظ التعديل' : 'تأكيد الطلب'}</button><button class="btn" id="cancelOrderBtn">رجوع</button></div>`;
     const m = openModal(html);
     const nameInput = m.querySelector('#ordName');
@@ -3862,7 +4246,8 @@
     let pqMenuOpen = false;
     function fmtVal(v) { const r = Math.round(Number(v) * 100) / 100; return Number.isInteger(r) ? String(r) : String(r); }
     function pqStep() { if (qtyType !== 'weight') return 1; return (qtyUnit === 'جرام' || qtyUnit === 'مل') ? 50 : 0.5; }
-    let newPrio = 'medium';
+    let newPrio = (editing && order && (order.priority === 'high' || order.urgent)) ? 'high' : 'medium';
+    function paintUrg() { const t = m.querySelector('#urgToggle'); if (t) t.classList.toggle('on', newPrio === 'high'); }
     function renderQty() {
       const box = m.querySelector('#qtyBox'); if (!box) return;
       box.classList.toggle('hidden', !qtyFor);
@@ -3944,7 +4329,7 @@
       suggestBox.innerHTML = hits.map(h => {
         const cid = classifyOrder(h).categoryId;
         const cc = catColor(cid);
-        return `<button class="sug-row" data-sug="${escapeHTML(h)}"><span class="sug-ico" style="background:${cc}18;color:${cc};">${svgIcon(getCategoryIcon(cid), 18)}</span><span class="sug-name">${hiName(h, tok)}</span><span class="sug-cat">${getCategoryName(cid)}</span></button>`;
+        return `<button class="sug-row" data-sug="${escapeHTML(h)}"><span class="sug-ico" style="background:${cc}18;font-size:19px;">${productIcon(h, cid)}</span><span class="sug-name">${hiName(h, tok)}</span><span class="sug-cat">${getCategoryName(cid)}</span></button>`;
       }).join('');
       suggestBox.querySelectorAll('[data-sug]').forEach(ch => ch.onclick = (e) => { e.preventDefault(); applySuggest(ch.dataset.sug); });
     }
@@ -4001,38 +4386,25 @@
       }
     };
     if (vBtn) vBtn.onclick = () => Voice.toggle(nameInput, voiceUI());
-    let pickedName = null, pickDept = null, newItemCat = null, pickedCat = null;
+    let pickedList = [], pickDept = null, newItemCat = null, pickedCat = null, pickedName = null;
+    function syncPickedCompat() { pickedName = pickedList.length ? pickedList[0] : null; try { nameInput.value = pickedList.join('\n'); } catch {} pickedCat = pickedName ? classifyOrder(pickedName).categoryId : null; }
     function renderPick() {
       const box = m.querySelector('#pickBox'); if (!box) return;
-      if (!pickedName) { box.innerHTML = `<div class="help-text">اختار صنف من القائمة أو البحث أو الصوت</div>`; return; }
-      const cid = classifyOrder(pickedName).categoryId; const cc = catColor(cid);
-      const isCount = qtyType === 'count', isWeight = qtyType === 'weight';
-      const pqUnits = isCount ? QTY_COUNT_UNITS : QTY_WEIGHT_UNITS;
-      let qtyCtl = '';
-      if (isCount || isWeight) {
-        qtyCtl = `<div class="pq-ctl"><button class="pq-step" id="pqMinus">−</button><b id="pqValShow">${fmtVal(qtyVal)}</b><button class="pq-step" id="pqPlus">+</button><div class="pq-drop ${pqMenuOpen ? 'open' : ''}"><button class="pq-drop-btn" id="pqDropBtn"><span>${escapeHTML(qtyUnit)}</span><span class="pq-chev">‹</span></button>${pqMenuOpen ? `<div class="pq-menu">${pqUnits.map(u => `<button data-pqunit="${u}" class="${u === qtyUnit ? 'sel' : ''}">${u}</button>`).join('')}</div>` : ''}</div></div>`;
-      }
-      box.innerHTML = `<div class="rv-row pq-row"><div class="pq-top"><span class="rv-name">${escapeHTML(pickedName)}</span><button class="pq-details ${qtyOpen ? 'open' : ''}" id="pqDetails" style="color:${cc};background:${cc}14;border-color:${cc}55;">تفاصيل الطلب <span class="pq-chev">▾</span></button><button class="btn btn-sm" id="pickClear">✕</button></div><div class="pq-qty ${qtyOpen ? 'open' : ''}"><div class="pq-qty-in"><div class="pq-qty-in-row"><span class="pq-lbl">الكمية:</span><button class="pq-chip ${isCount ? 'active' : ''}" data-pqtype="count">عدد</button><button class="pq-chip ${isWeight ? 'active' : ''}" data-pqtype="weight">وزن</button>${qtyCtl}</div></div></div></div>`;
-      m.querySelector('#pickClear').onclick = () => { pickedName = null; pickedCat = null; needCatFor = null; nameInput.value = ''; qtyFor = null; qtyOpen = false; pqMenuOpen = false; renderQty(); renderPick(); renderPickList(); evalCategoryFromName(); };
-      m.querySelector('#pqDetails').onclick = () => { qtyOpen = !qtyOpen; pqMenuOpen = false; renderPick(); };
-      box.querySelectorAll('[data-pqtype]').forEach(b => b.onclick = () => {
-        const t = b.dataset.pqtype;
-        qtyType = (qtyType === t) ? 'none' : t;
-        if (qtyType === 'count' && !QTY_COUNT_UNITS.includes(qtyUnit)) qtyUnit = 'قطعة';
-        if (qtyType === 'weight' && !QTY_WEIGHT_UNITS.includes(qtyUnit)) qtyUnit = 'كجم';
-        if (qtyType === 'count' && !(qtyVal >= 1)) qtyVal = 1;
-        pqMenuOpen = false;
-        renderPick();
+      if (!pickedList.length) { box.innerHTML = `<div class="help-text">اختار صنف من القائمة أو البحث أو الصوت — كل اختيار يتضاف فوق</div>`; return; }
+      box.innerHTML = pickedList.map(nm => {
+        const cid = classifyOrder(nm).categoryId; const cc = catColor(cid);
+        return `<div class="rv-row"><span class="sug-ico" style="background:${cc}18;width:30px;height:30px;font-size:17px;">${productIcon(nm, cid)}</span><span class="rv-name">${escapeHTML(nm)}</span><button class="btn btn-sm" data-unpick="${escapeHTML(nm)}">✕</button></div>`;
+      }).join('');
+      box.querySelectorAll('[data-unpick]').forEach(b => b.onclick = () => {
+        const k = normalizeTerm(b.dataset.unpick);
+        pickedList = pickedList.filter(x => normalizeTerm(x) !== k);
+        syncPickedCompat(); qtyFor = null; renderQty(); renderPick(); renderPickList(); evalCategoryFromName();
       });
-      const pqMin = qtyType === 'weight' ? 0 : 1, pqMax = qtyType === 'weight' ? 10000 : 99;
-      const pMn = m.querySelector('#pqMinus'); if (pMn) pMn.onclick = () => { qtyVal = Math.max(pqMin, Math.round((qtyVal - pqStep()) * 100) / 100); pqMenuOpen = false; renderPick(); };
-      const pPl = m.querySelector('#pqPlus'); if (pPl) pPl.onclick = () => { qtyVal = Math.min(pqMax, Math.round((qtyVal + pqStep()) * 100) / 100); pqMenuOpen = false; renderPick(); };
-      const pDb = m.querySelector('#pqDropBtn'); if (pDb) pDb.onclick = () => { pqMenuOpen = !pqMenuOpen; renderPick(); };
-      box.querySelectorAll('[data-pqunit]').forEach(b => b.onclick = () => { qtyUnit = b.dataset.pqunit; pqMenuOpen = false; renderPick(); });
     }
     function pickRowHTML(name, sub, bare) {
       const cid = classifyOrder(name).categoryId; const cc = catColor(cid);
-      return `<button class="sug-row" data-pick="${escapeHTML(name)}"><span class="sug-ico" style="background:${cc}18;color:${cc};">${svgIcon(getCategoryIcon(cid), 18)}</span><span class="sug-name">${escapeHTML(name)}</span>${bare ? '' : `<span class="sug-cat">${escapeHTML(sub || getCategoryName(cid))}</span>`}</button>`;
+      const sel = pickedList.some(x => normalizeTerm(x) === normalizeTerm(name));
+      return `<button class="sug-row" data-pick="${escapeHTML(name)}" ${sel ? 'style="background:var(--primary-light);"' : ''}><span class="sug-ico" style="background:${cc}18;font-size:19px;">${productIcon(name, cid)}</span><span class="sug-name">${escapeHTML(name)}${sel ? ' ✓' : ''}</span>${bare ? '' : `<span class="sug-cat">${escapeHTML(sub || getCategoryName(cid))}</span>`}</button>`;
     }
     function renderPickDepts() {
       const box = m.querySelector('#pickDepts'); if (!box) return;
@@ -4047,12 +4419,24 @@
       });
     }
     function selectItem(name) {
-      pickedName = String(name || '').trim(); if (!pickedName) return;
-      nameInput.value = pickedName;
-      pickedCat = classifyOrder(pickedName).categoryId;
+      const nm = String(name || '').trim(); if (!nm) return;
+      const k = normalizeTerm(nm);
+      if (pickedList.some(x => normalizeTerm(x) === k)) { toast('موجود فوق بالفعل ✓', 'info'); return; }
+      pickedList.push(nm);
       needCatFor = null;
-      renderPick(); showQtyFor(pickedName);
+      syncPickedCompat(); qtyFor = null;
+      renderPick(); renderPickList();
       updateSuggest(); evalCategoryFromName();
+    }
+    function unpickItem(name) {
+      const k = normalizeTerm(name);
+      pickedList = pickedList.filter(x => normalizeTerm(x) !== k);
+      syncPickedCompat(); qtyFor = null; renderQty(); renderPick(); renderPickList(); evalCategoryFromName();
+    }
+    function togglePick(name) {
+      const k = normalizeTerm(String(name || ''));
+      if (pickedList.some(x => normalizeTerm(x) === k)) unpickItem(name);
+      else selectItem(name);
     }
     let needCatFor = null;
     function foundInCatalog(nm) {
@@ -4094,9 +4478,10 @@
         saveLearning(name, newItemCat);
         persist();
         needCatFor = null;
-        pickedName = name; pickedCat = newItemCat; nameInput.value = name;
-        renderPick(); showQtyFor(name); renderPickDepts(); renderPickList();
-        toast('اتحفظ الصنف في قاعدة بياناتك — حدد الكمية والوحدة ثم أكد الطلب ✓', 'success');
+        if (!pickedList.some(x => normalizeTerm(x) === normalizeTerm(name))) pickedList.push(name);
+        syncPickedCompat(); qtyFor = null;
+        renderPick(); renderPickDepts(); renderPickList();
+        toast('اتحفظ الصنف واتضاف فوق ✓', 'success');
       };
     }
     function renderPickList() {
@@ -4120,7 +4505,7 @@
         (state.orders || []).forEach(o => pushX(o.name));
         rows = rows.slice(0, 30);
         list.innerHTML = rows.length ? `<div class="pick-sub-head"><span>🔍 نتائج البحث</span><span class="cnt">${rows.length}</span></div>` + rows.join('') : `<div class="help-text">مفيش نتائج مطابقة — دوس تأكيد الطلب لإضافته كصنف جديد</div>`;
-        list.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => selectItem(b.dataset.pick));
+        list.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => togglePick(b.dataset.pick));
         return;
       } else if (pickDept) {
         const d = getCatalog().find(x => x.id === pickDept);
@@ -4143,7 +4528,7 @@
         }
       }
       list.innerHTML = rows.length ? rows.join('') : `<div class="help-text">اختار قسم أو ابحث — اكتب حرفين على الأقل</div>`;
-      list.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => selectItem(b.dataset.pick));
+      list.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => togglePick(b.dataset.pick));
       const paf = list.querySelector('#pickAddFirst');
       if (paf) paf.onclick = () => { const si2 = m.querySelector('#pickSearch'); if (si2) si2.focus(); toast('اكتب اسم الصنف (حرفين على الأقل) ثم اختار تصنيفه وضيفه', 'info'); };
     }
@@ -4153,6 +4538,7 @@
     }
     setTimeout(evalCategoryFromName, 50);
     if (editing && order.qty) { qtyFor = order.name; qtyType = order.qty.t === 'w' ? 'weight' : 'count'; qtyVal = order.qty.v || 1; qtyUnit = order.qty.u || 'قطعة'; renderQty(); }
+    const urgBtn = m.querySelector('#urgToggle'); if (urgBtn) urgBtn.onclick = () => { newPrio = (newPrio === 'high') ? 'medium' : 'high'; paintUrg(); };
     m.querySelector('#cancelOrderBtn').onclick = () => closeModal(m);
 
 
@@ -4178,7 +4564,7 @@
       const selList = m.querySelector('#ordListSel');
       const lid2 = (selList && selList.value) || activeListId();
       if (!editing) {
-        let items = pickedName ? [pickedName] : parseItems();
+        let items = pickedList.length ? [...pickedList] : parseItems();
         if (!items.length) {
           const psv = ((m.querySelector('#pickSearch') || {}).value || '').trim();
           if (psv) items = [psv];
@@ -4191,8 +4577,8 @@
           return;
         }
         const added = []; let skipped = 0; const seenBatch = {};
-        const singleQty = readQtyForSubmit(items);
-        const useCat = (items.length === 1 && pickedName && pickedCat && normalizeTerm(items[0]) === normalizeTerm(pickedName)) ? pickedCat : null;
+        const singleQty = null;
+        const useCat = null;
         for (const itemName of items) {
           const k = normalizeTerm(itemName);
           if (seenBatch[k] || pendingOrderExists(itemName, lid2)) { skipped++; continue; }
@@ -4202,13 +4588,14 @@
         if (!added.length) { toast(skipped ? 'الصنف ده موجود بالفعل في القائمة دي' : 'اكتب صنف صحيح', 'warning'); return; }
         MemeSound.playEvent(newPrio === 'high' ? 'URGENT' : 'NEW_REQUEST');
         toast((added.length === 1 ? pickMsg(MSG.addOrder) : `زوّدت ${added.length} طلبات ✓ 😂`) + (skipped ? ` (تجاهلت ${skipped} مكرر)` : ''), 'success');
+        try { window.Character && Character.notify('NEW_REQUEST', { by: (state.user && state.user.name) || '', role: (state.user && state.user.role) || '' }); } catch {}
         closeModal(m); render();
         confirmDialog({ title: 'اتضاف ✓', message: 'تضيف صنف تاني في نفس القائمة؟', confirmText: 'أيوه ضيف', cancelText: 'خلاص' }).then(ok => { if (ok) { state._activeList = lid2; persist(); openOrderModal({ mode: 'add' }); } });
       } else {
         const raw = nameInput.value.trim();
         if (!raw) { nameInput.classList.add('error'); nameInput.focus(); return; }
         nameInput.classList.remove('error');
-        updateOrder(order.id, { name: raw, notes, qty: (qtyFor && normalizeTerm(raw) === normalizeTerm(qtyFor)) ? readQtyValue() : null, listId: lid2 });
+        updateOrder(order.id, { name: raw, notes, qty: (qtyFor && normalizeTerm(raw) === normalizeTerm(qtyFor)) ? readQtyValue() : null, listId: lid2, priority: newPrio });
         toast('تم التعديل ✓', 'success');
         closeModal(m); render();
       }
@@ -4237,45 +4624,167 @@
     m.querySelector('#confirmBuy').onclick = () => {
       const finalV = Number(fin.value);
       if (!(finalV > 0)) { fin.classList.add('error'); fin.focus(); toast('اكتب السعر يا حبيبي', 'warning'); return; }
+      const boughtName = o.name;
       markPurchased(orderId, { originalPrice: finalV, finalPrice: finalV });
-      toast(pickMsg(MSG.purchaseDone), 'success');
+      try { MemeSound.playEvent('TASK_COMPLETED', { force: true }); } catch {}
+      try { window.Character && Character.notify('COMPLETE', { name: boughtName }); } catch {}
       closeModal(m); render();
+      const left = (state.orders || []).filter(x => x.status !== 'purchased').length;
+      if (!left) {
+        const mm = openModal(`
+          <div class="party-hero"><span class="big">🏆🎉</span><h2>خلصنا التسوق يا أبطال!</h2><p>😂 ${boughtFunMsg()}</p><p style="margin-top:4px;">كل الطلبات اتشترت بنجاح... البيت مبسوط ❤️</p></div>
+          <div class="confetti-row"><span>🎉</span><span>🏆</span><span>🛒</span><span>😂</span><span>❤️</span></div>
+          <div class="btn-group"><button class="btn btn-success" id="partyOk">أحلى عيلة 🎉❤️</button></div>`);
+        mm.querySelector('#partyOk').onclick = () => closeModal(mm);
+      } else {
+        toast(`"${boughtName}" اتشترى ✓ 😂 ${boughtFunMsg()}`, 'success');
+      }
     };
   }
 
   function openAddExpenseModal() {
-    const KIND_TITLES = { expense: '💸 مصروف جديد', income: '💰 دخل جديد', debt: '🏦 دين / التزام جديد' };
+    const KIND_META = {
+      expense: { title: 'مصروف جديد', sub: 'سجل مصاريف البيت أول بأول 💸', ico: '💸', label: 'مصروف', hint: 'مصاريف', ph: 'مثلا: فاتورة كهرباء' },
+      income: { title: 'دخل جديد', sub: 'سجل أي فلوس داخلة البيت 💰', ico: '💰', label: 'دخل', hint: 'دخل', ph: 'مثلا: مرتب الشهر' },
+      debt: { title: 'دين / التزام جديد', sub: 'تابع اللي عليك واللي ليك 🏦', ico: '🏦', label: 'ديون', hint: 'ديون', ph: 'مثلا: قسط الجمعية' }
+    };
     const html = `<div class="modal-handle"></div>
-      <h2 id="finModalTitle">💸 مصروف جديد</h2>
-      <p class="m-sub">سجل حركة مالية (مصروف / دخل / ديون)</p>
-      <div class="field"><label>نوع الحركة</label><div class="fin-seg">
-        <button class="active" data-finkind="expense">💸 مصروف</button>
-        <button data-finkind="income">💰 دخل</button>
-        <button data-finkind="debt">🏦 ديون</button>
-      </div></div>
-      <div class="field"><label>الاسم *</label><input type="text" id="expTitle" placeholder="مثلا: فاتورة كهرباء" maxlength="50" /></div>
-      <div class="field"><label>المبلغ *</label><div class="amount-wrap"><input type="number" id="expAmount" min="0" step="0.01" placeholder="0" /><span class="amount-cur">ج.م</span></div></div>
-      <div class="field"><label>التصنيف</label><div id="finCats"></div></div>
-      <div class="field"><label>التاريخ</label><input type="date" id="expDate" value="${todayKey()}" /></div>
-      <div class="field"><label>ملاحظات (اختياري)</label><textarea id="expNotes" rows="2" placeholder="تفاصيل تانية"></textarea></div>
-      <div class="btn-group"><button class="btn btn-primary" id="saveExpBtn">حفظ الحركة</button><button class="btn" id="cancelExpBtn">رجوع</button></div>`;
+      <div class="finm-hero kind-expense" id="finmHero"><span class="finm-ico" id="finmIco">💸</span><div><h2 id="finModalTitle">مصروف جديد</h2><p id="finmSub">سجل مصاريف البيت أول بأول 💸</p></div></div>
+      <div class="finm-kinds">
+        <button class="finm-kind active" data-finkind="expense"><span class="k-ico">💸</span><b>💸 مصروف</b><small>خارج من البيت</small></button>
+        <button class="finm-kind" data-finkind="income"><span class="k-ico">💰</span><b>💰 دخل</b><small>داخل للبيت</small></button>
+        <button class="finm-kind" data-finkind="debt"><span class="k-ico">🏦</span><b>🏦 ديون</b><small>التزامات</small></button>
+      </div>
+      <div class="finm-body" id="finmBody">
+        <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><label><i style="background:#FFE4E6;">📝</i>الاسم *</label><input type="text" id="expTitle" placeholder="مثلا: فاتورة كهرباء" maxlength="50" /></div>
+        <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><button type="button" id="catsToggle" style="display:flex;align-items:center;gap:8px;width:100%;text-align:right;"><i style="background:#EDE9FE;width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;font-style:normal;">🗂️</i><b style="font-size:13px;font-weight:900;flex:1;">التصنيف <small id="catsToggleSub" style="display:block;font-size:11px;color:var(--text-muted);font-weight:700;">اضغط للعرض والاختيار</small></b><span class="fcat-chev" id="catsToggleChev" style="width:28px;height:28px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;transform:rotate(-90deg);transition:transform .25s;font-weight:900;">‹</span></button><div id="finCats" class="hidden" style="margin-top:10px;"></div></div>
+        <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><label><i style="background:#DCFCE7;">💵</i>المبلغ *</label><div class="amount-wrap"><input type="number" id="expAmount" min="0" step="0.01" placeholder="0" /><span class="amount-cur">ج.م</span></div></div>
+        <div class="row-2">
+          <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><label><i style="background:#E0F2FE;">📅</i>التاريخ</label><input type="date" id="expDate" value="${todayKey()}" /></div>
+          <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><label><i style="background:#FEF3C7;">✏️</i>ملاحظات</label><textarea id="expNotes" rows="1" placeholder="تفاصيل اختيارية..."></textarea></div>
+        </div>
+      </div>
+      <div class="btn-group"><button class="btn btn-primary finm-save-expense" id="saveExpBtn">💾 حفظ الحركة</button><button class="btn" id="cancelExpBtn">رجوع</button></div>`;
     const m = openModal(html);
     let finKind = 'expense';
     let finCat = finFirstId('expense');
+    function paintKind() {
+      const meta = KIND_META[finKind]; const col = FINANCE[finKind].color;
+      const hero = m.querySelector('#finmHero');
+      if (hero) hero.className = 'finm-hero kind-' + finKind;
+      const ico = m.querySelector('#finmIco'); if (ico) ico.textContent = meta.ico;
+      const h = m.querySelector('#finModalTitle'); if (h) h.textContent = meta.title;
+      const s = m.querySelector('#finmSub'); if (s) s.textContent = meta.sub;
+      const sv = m.querySelector('#saveExpBtn');
+      if (sv) { sv.className = 'btn btn-primary finm-save-' + finKind; sv.textContent = '💾 حفظ ' + meta.hint; }
+      m.querySelectorAll('.finm-field').forEach(f => f.style.setProperty('--fin-accent', col));
+      const body = m.querySelector('#finmBody');
+      if (body) { body.style.animation = 'none'; void body.offsetWidth; body.style.animation = ''; }
+    }
+    let openGid = null;
+    function finItemEmoji(nm) {
+      const n = String(nm || '');
+      const has = (...ks) => ks.some(k => n.includes(k));
+      if (has('إيجار')) return '🏠';
+      if (has('كهرباء')) return '💡';
+      if (has('مياه', 'المياه')) return '💧';
+      if (has('إنترنت')) return '🌐';
+      if (has('اتصالات')) return '📞';
+      if (has('غاز', 'الغاز')) return '🔥';
+      if (has('صيانة منزلية', 'الصيانة المنزلية')) return '🛠️';
+      if (has('بقالة', 'مواد غذائية')) return '🛒';
+      if (has('مطاعم', 'مقاهي', 'المقاهي')) return '🍔';
+      if (has('وقود', 'شحن')) return '⛽';
+      if (has('قطع الغيار', 'الصيانة وقطع')) return '🧰';
+      if (has('مواصلات', 'أجرة')) return '🚌';
+      if (has('مواقف', 'رسوم')) return '🧾';
+      if (has('أطباء')) return '🩺';
+      if (has('مستشفيات')) return '🏥';
+      if (has('أدوية', 'صيدلية')) return '💊';
+      if (has('عناية', 'جمال')) return '💅';
+      if (has('رياضة', 'لياقة')) return '🏋️';
+      if (has('أطفال')) return '🧸';
+      if (has('مدارس', 'جامعات')) return '🎒';
+      if (has('دورات', 'كتب')) return '📚';
+      if (has('حيوانات')) return '🐈';
+      if (has('ملابس', 'أحذية')) return '👕';
+      if (has('إلكترونيات', 'تقنية')) return '📱';
+      if (has('إكسسوارات', 'مجوهرات')) return '⌚';
+      if (has('ألعاب')) return '🎮';
+      if (has('سينما', 'أحداث')) return '🎬';
+      if (has('اشتراكات')) return '📺';
+      if (has('سفر', 'سياحة')) return '✈️';
+      if (has('تأمين')) return '🛡️';
+      if (has('بنكية', 'عمولات')) return '🏧';
+      if (has('تحويلات')) return '💳';
+      if (has('زكاة', 'صدقات')) return '🤲';
+      if (has('هدايا', 'مناسبات')) return '🎁';
+      if (has('سحب نقدي')) return '💵';
+      if (has('راتب')) return '💵';
+      if (has('حر', 'Freelance')) return '💼';
+      if (has('مبيعات')) return '🛍️';
+      if (has('مكافآت', 'بونص')) return '🏆';
+      if (has('استثمار')) return '📈';
+      if (has('عقارية', 'إيجارات')) return '🏘️';
+      if (has('مستردات')) return '↩️';
+      if (has('سداد', 'قسط')) return '🧾';
+      if (has('إقراض')) return '🤝';
+      if (has('تحصيل')) return '📥';
+      if (has('اقتراض')) return '📤';
+      return '•';
+    }
     function renderFinCats() {
       const box = m.querySelector('#finCats'); if (!box) return;
       const col = FINANCE[finKind].color;
-      const gs = finGroups(finKind).filter(g => g.items.length);
-      box.innerHTML = gs.length ? gs.map(g => `<div class="fin-group"><div class="fin-group-h"><i style="background:${col}"></i>${escapeHTML(g.name)}</div><div class="fin-cats">${g.items.map(it => `<button class="filter-chip ${finCat === it.key ? 'active' : ''}" data-fincat="${it.key}">${escapeHTML(it.name)}</button>`).join('')}</div></div>`).join('') : `<div class="help-text">لا توجد بنود — ضيف من الإعدادات ← الأقسام المالية</div>`;
-      box.querySelectorAll('[data-fincat]').forEach(b => b.onclick = () => { finCat = b.dataset.fincat; renderFinCats(); });
+      const gs0 = finGroups(finKind).filter(g => g.items.length);
+      const gs = [];
+      if (finKind === 'expense') {
+        const depts = orderDeptsForFin();
+        if (depts.length) gs.push({ id: '__orders', name: '🛒 أقسام الطلبات', icon: 'cart', items: depts.map(d => ({ key: d.id, name: getCategoryName(d.id), emoji: d.emoji || '🛒' })) });
+      }
+      gs0.forEach(g => gs.push(g));
+      if (!gs.length) { box.innerHTML = `<div class="help-text">لا توجد بنود — ضيف من الإعدادات ← الأقسام المالية</div>`; return; }
+      if (openGid && !gs.some(g => g.id === openGid)) openGid = null;
+      box.style.setProperty('--fin-accent', col);
+      box.innerHTML = gs.map(g => {
+        const open = openGid === g.id;
+        const selItem = g.items.find(it => it.key === finCat);
+        const sub = selItem ? ('المختار: ' + selItem.name) : (g.items.length + ' بنود');
+        return `<div class="fcat ${open ? 'open' : ''}" style="border-color:${open ? col + '66' : 'var(--border)'};">
+          <button class="fcat-head" data-fcathead="${g.id}">
+            <span class="fcat-ico" style="background:${col}18;color:${col};">${svgIcon(g.icon || 'box', 19)}</span>
+            <span class="fcat-txt"><b style="color:${open ? col : 'var(--text)'};">${escapeHTML(g.name)}</b><small>${escapeHTML(sub)}</small></span>
+            <span class="fcat-chev">‹</span>
+          </button>
+          <div class="fcat-body"><div class="fcat-body-in"><div class="fcat-grid">${g.items.map(it => {
+            const sel = finCat === it.key;
+            return `<button class="fitem ${sel ? 'sel' : ''}" data-fincat="${it.key}" ${sel ? `style="background:${col};border-color:${col};"` : ''}><span class="fi-ico">${it.emoji || finItemIcon(it.key, it.name)}</span><span>${escapeHTML(it.name)}</span><span class="fi-check">✓</span></button>`;
+          }).join('')}</div></div></div>
+        </div>`;
+      }).join('');
+      box.querySelectorAll('[data-fcathead]').forEach(b => b.onclick = () => { openGid = (openGid === b.dataset.fcathead) ? null : b.dataset.fcathead; renderFinCats(); });
+      box.querySelectorAll('[data-fincat]').forEach(b => b.onclick = () => { finCat = b.dataset.fincat; openGid = null; renderFinCats(); setCatsOpen(false); });
+      try {
+        const lk = finCatDisplay(finCat);
+        const sub = m.querySelector('#catsToggleSub');
+        if (sub) sub.textContent = lk ? ('المختار: ' + lk.group + ' • ' + lk.name) : 'اضغط للعرض والاختيار';
+      } catch {}
+    }
+    let catsOpen = false;
+    function setCatsOpen(on) {
+      catsOpen = !!on;
+      const box = m.querySelector('#finCats'); const chev = m.querySelector('#catsToggleChev');
+      if (box) box.classList.toggle('hidden', !catsOpen);
+      if (chev) chev.style.transform = catsOpen ? 'rotate(90deg)' : 'rotate(-90deg)';
     }
     m.querySelectorAll('[data-finkind]').forEach(b => b.onclick = () => {
-      finKind = b.dataset.finkind; finCat = finFirstId(finKind);
+      finKind = b.dataset.finkind; finCat = finFirstId(finKind); openGid = null;
       m.querySelectorAll('[data-finkind]').forEach(x => x.classList.toggle('active', x === b));
-      const h = m.querySelector('#finModalTitle'); if (h) h.textContent = KIND_TITLES[finKind];
+      paintKind();
       renderFinCats();
     });
-    renderFinCats();
+    paintKind(); renderFinCats(); setCatsOpen(false);
+    const ct0 = m.querySelector('#catsToggle'); if (ct0) ct0.onclick = () => setCatsOpen(!catsOpen);
     m.querySelector('#cancelExpBtn').onclick = () => closeModal(m);
     m.querySelector('#saveExpBtn').onclick = () => {
       const title = m.querySelector('#expTitle').value.trim(); const amount = Number(m.querySelector('#expAmount').value); const notes = m.querySelector('#expNotes').value.trim(); const dateVal = m.querySelector('#expDate').value || todayKey();
@@ -4283,6 +4792,112 @@
       if (!(amount > 0)) { const a = m.querySelector('#expAmount'); a.classList.add('error'); a.focus(); toast('اكتب المبلغ', 'warning'); return; }
       addManualExpense({ title, amount, categoryId: finCat, kind: finKind, notes, createdAt: new Date(dateVal + 'T' + new Date().toTimeString().slice(0, 8)).toISOString() });
       toast('تم تسجيل الحركة ✓', 'success');
+      closeModal(m); render();
+    };
+  }
+  function openEditExpenseModal(expId) {
+    const e = state.expenses.find(x => x.id === expId); if (!e || e.sourceType !== 'manual') return;
+    const KIND_META = {
+      expense: { title: 'تعديل مصروف', sub: 'عدّل بيانات الحركة 💸', ico: '💸', hint: 'التعديلات' },
+      income: { title: 'تعديل دخل', sub: 'عدّل بيانات الحركة 💰', ico: '💰', hint: 'التعديلات' },
+      debt: { title: 'تعديل دين / التزام', sub: 'عدّل بيانات الحركة 🏦', ico: '🏦', hint: 'التعديلات' }
+    };
+    let finKind = finKindOf(e);
+    let finCat = e.categoryId;
+    const html = `<div class="modal-handle"></div>
+      <div class="finm-hero kind-${finKind}" id="finmHero"><span class="finm-ico" id="finmIco">${KIND_META[finKind].ico}</span><div><h2 id="finModalTitle">${KIND_META[finKind].title}</h2><p id="finmSub">${KIND_META[finKind].sub}</p></div></div>
+      <div class="finm-kinds">
+        <button class="finm-kind ${finKind === 'expense' ? 'active' : ''}" data-finkind="expense"><span class="k-ico">💸</span><b>💸 مصروف</b><small>خارج من البيت</small></button>
+        <button class="finm-kind ${finKind === 'income' ? 'active' : ''}" data-finkind="income"><span class="k-ico">💰</span><b>💰 دخل</b><small>داخل للبيت</small></button>
+        <button class="finm-kind ${finKind === 'debt' ? 'active' : ''}" data-finkind="debt"><span class="k-ico">🏦</span><b>🏦 ديون</b><small>التزامات</small></button>
+      </div>
+      <div class="finm-body" id="finmBody">
+        <div class="finm-field" style="--fin-accent:${FINANCE[finKind].color};"><label><i style="background:#FFE4E6;">📝</i>الاسم *</label><input type="text" id="expTitle" value="${escapeHTML(e.title)}" maxlength="50" /></div>
+        <div class="finm-field" style="--fin-accent:${FINANCE[finKind].color};"><button type="button" id="catsToggle" style="display:flex;align-items:center;gap:8px;width:100%;text-align:right;"><i style="background:#EDE9FE;width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;font-style:normal;">🗂️</i><b style="font-size:13px;font-weight:900;flex:1;">التصنيف <small id="catsToggleSub" style="display:block;font-size:11px;color:var(--text-muted);font-weight:700;">اضغط للعرض والاختيار</small></b><span class="fcat-chev" id="catsToggleChev" style="width:28px;height:28px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;transform:rotate(-90deg);transition:transform .25s;font-weight:900;">‹</span></button><div id="finCats" class="hidden" style="margin-top:10px;"></div></div>
+        <div class="finm-field" style="--fin-accent:${FINANCE[finKind].color};"><label><i style="background:#DCFCE7;">💵</i>المبلغ *</label><div class="amount-wrap"><input type="number" id="expAmount" min="0" step="0.01" value="${e.amount}" /><span class="amount-cur">ج.م</span></div></div>
+        <div class="row-2">
+          <div class="finm-field" style="--fin-accent:${FINANCE[finKind].color};"><label><i style="background:#E0F2FE;">📅</i>التاريخ</label><input type="date" id="expDate" value="${String(e.createdAt || '').slice(0, 10) || todayKey()}" /></div>
+          <div class="finm-field" style="--fin-accent:${FINANCE[finKind].color};"><label><i style="background:#FEF3C7;">✏️</i>ملاحظات</label><textarea id="expNotes" rows="1" placeholder="تفاصيل اختيارية...">${escapeHTML(e.notes || '')}</textarea></div>
+        </div>
+      </div>
+      <div class="btn-group"><button class="btn btn-primary finm-save-${finKind}" id="saveExpBtn">💾 حفظ التعديل</button><button class="btn btn-danger" id="delExpBtn">🗑️ حذف الحركة</button><button class="btn" id="cancelExpBtn">رجوع</button></div>`;
+    const m = openModal(html);
+    let openGid = null;
+    function paintKind() {
+      const meta = KIND_META[finKind]; const col = FINANCE[finKind].color;
+      const hero = m.querySelector('#finmHero');
+      if (hero) hero.className = 'finm-hero kind-' + finKind;
+      const ico = m.querySelector('#finmIco'); if (ico) ico.textContent = meta.ico;
+      const h = m.querySelector('#finModalTitle'); if (h) h.textContent = meta.title;
+      const s = m.querySelector('#finmSub'); if (s) s.textContent = meta.sub;
+      const sv = m.querySelector('#saveExpBtn');
+      if (sv) sv.className = 'btn btn-primary finm-save-' + finKind;
+      m.querySelectorAll('.finm-field').forEach(f => f.style.setProperty('--fin-accent', col));
+    }
+    function renderFinCats() {
+      const box = m.querySelector('#finCats'); if (!box) return;
+      const col = FINANCE[finKind].color;
+      const gs0 = finGroups(finKind).filter(g => g.items.length);
+      const gs = [];
+      if (finKind === 'expense') {
+        const depts = orderDeptsForFin();
+        if (depts.length) gs.push({ id: '__orders', name: '🛒 أقسام الطلبات', icon: 'cart', items: depts.map(d => ({ key: d.id, name: getCategoryName(d.id), emoji: d.emoji || '🛒' })) });
+      }
+      gs0.forEach(g => gs.push(g));
+      if (!gs.length) { box.innerHTML = `<div class="help-text">لا توجد بنود</div>`; return; }
+      if (openGid && !gs.some(g => g.id === openGid)) openGid = null;
+      box.style.setProperty('--fin-accent', col);
+      box.innerHTML = gs.map(g => {
+        const open = openGid === g.id;
+        const selItem = g.items.find(it => it.key === finCat);
+        const sub = selItem ? ('المختار: ' + selItem.name) : (g.items.length + ' بنود');
+        return `<div class="fcat ${open ? 'open' : ''}" style="border-color:${open ? col + '66' : 'var(--border)'};">
+          <button class="fcat-head" data-fcathead="${g.id}">
+            <span class="fcat-ico" style="background:${col}18;color:${col};">${svgIcon(g.icon || 'box', 19)}</span>
+            <span class="fcat-txt"><b style="color:${open ? col : 'var(--text)'};">${escapeHTML(g.name)}</b><small>${escapeHTML(sub)}</small></span>
+            <span class="fcat-chev">‹</span>
+          </button>
+          <div class="fcat-body"><div class="fcat-body-in"><div class="fcat-grid">${g.items.map(it => {
+            const sel = finCat === it.key;
+            return `<button class="fitem ${sel ? 'sel' : ''}" data-fincat="${it.key}" ${sel ? `style="background:${col};border-color:${col};"` : ''}><span class="fi-ico">${it.emoji || finItemIcon(it.key, it.name)}</span><span>${escapeHTML(it.name)}</span><span class="fi-check">✓</span></button>`;
+          }).join('')}</div></div></div>
+        </div>`;
+      }).join('');
+      box.querySelectorAll('[data-fcathead]').forEach(b => b.onclick = () => { openGid = (openGid === b.dataset.fcathead) ? null : b.dataset.fcathead; renderFinCats(); });
+      box.querySelectorAll('[data-fincat]').forEach(b => b.onclick = () => { finCat = b.dataset.fincat; openGid = null; renderFinCats(); setCatsOpen(false); });
+      try {
+        const lk = finCatDisplay(finCat);
+        const sub2 = m.querySelector('#catsToggleSub');
+        if (sub2) sub2.textContent = lk ? ('المختار: ' + lk.group + ' • ' + lk.name) : 'اضغط للعرض والاختيار';
+      } catch {}
+    }
+    let catsOpen = false;
+    function setCatsOpen(on) {
+      catsOpen = !!on;
+      const box = m.querySelector('#finCats'); const chev = m.querySelector('#catsToggleChev');
+      if (box) box.classList.toggle('hidden', !catsOpen);
+      if (chev) chev.style.transform = catsOpen ? 'rotate(90deg)' : 'rotate(-90deg)';
+    }
+    m.querySelectorAll('[data-finkind]').forEach(b => b.onclick = () => {
+      finKind = b.dataset.finkind; finCat = finFirstId(finKind); openGid = null;
+      m.querySelectorAll('[data-finkind]').forEach(x => x.classList.toggle('active', x === b));
+      paintKind(); renderFinCats();
+    });
+    paintKind(); renderFinCats(); setCatsOpen(false);
+    const ct0 = m.querySelector('#catsToggle'); if (ct0) ct0.onclick = () => setCatsOpen(!catsOpen);
+    m.querySelector('#cancelExpBtn').onclick = () => closeModal(m);
+    m.querySelector('#delExpBtn').onclick = () => {
+      confirmDialog({ title: 'حذف الحركة؟', message: `"${e.title}" هتتحذف نهائياً.`, confirmText: 'حذف', cancelText: 'لا', danger: true }).then(ok => {
+        if (!ok) return;
+        deleteExpense(expId); toast('اتمسحت ✓', 'success'); closeModal(m); render();
+      });
+    };
+    m.querySelector('#saveExpBtn').onclick = () => {
+      const title = m.querySelector('#expTitle').value.trim(); const amount = Number(m.querySelector('#expAmount').value); const notes = m.querySelector('#expNotes').value.trim(); const dateVal = m.querySelector('#expDate').value || todayKey();
+      if (!title) { const t = m.querySelector('#expTitle'); t.classList.add('error'); t.focus(); toast('اكتب الاسم', 'warning'); return; }
+      if (!(amount > 0)) { const a = m.querySelector('#expAmount'); a.classList.add('error'); a.focus(); toast('اكتب المبلغ', 'warning'); return; }
+      updateExpense(expId, { title, amount, categoryId: finCat, kind: finKind, notes, createdAt: new Date(dateVal + 'T' + new Date().toTimeString().slice(0, 8)).toISOString() });
+      toast('تم حفظ التعديل ✓', 'success');
       closeModal(m); render();
     };
   }
@@ -4385,6 +5000,7 @@
   function openFinishOrdersFlow() {
     const pend = (state.orders || []).filter(o => o.status === 'pending');
     if (!pend.length) { toast('مفيش طلبات معلقة عشان ننهيها 😄', 'warning'); return; }
+    try { window.Character && Character.notify('SEND', {}); } catch {}
     const role = state.user?.role || 'husband';
     const joke = pickComedy(role);
     if (joke) {
@@ -4407,14 +5023,15 @@
     const waIntl = waNum.startsWith('01') ? '2' + waNum : waNum;
     const waUrl = `https://wa.me/${waIntl}?text=${encodeURIComponent(buildOrderWaText(joke))}`;
     const m = openModal(`
-      <div class="m-hero"><span class="m-hero-ico">🎉</span><div class="m-hero-txt"><h2>خلصت القائمة يا بطل!</h2><p>${pend.length} طلبات جاهزة • دوس إرسال واتساب عشان توصلك الرسالة التلقائية 📱</p></div></div>
+      <div class="modal-handle"></div>
+      <div class="m-hero"><span class="m-hero-ico">📱</span><div class="m-hero-txt"><h2>القائمة جاهزة للإرسال</h2><p>${pend.length} طلبات • ابعتها واتساب في ضغطة واحدة</p></div></div>
       <div class="joke-modal-card">
         ${badge}
         <div class="joke-text-box">${escapeHTML(joke?.text || 'القائمة جاهزة... ربنا يقوي قلبه 😂❤️')}</div>
         <div class="help-text" style="margin-bottom:12px;">🔊 اشتغل صوت مضحك تلقائياً • الرسالة دي مخصصة لـ ${role === 'wife' ? 'الزوجة 👩' : 'الزوج 👨'} حسب اختيارك أول مرة</div>
       </div>
       <div class="btn-group">
-        <a class="btn btn-success" id="sendWaAuto" href="${waUrl}" target="_blank" rel="noopener">📱 إرسال القائمة + النكتة واتساب (${escapeHTML(waNum || '')})</a>
+        <a class="btn btn-success" id="sendWaAuto" href="${waUrl}" target="_blank" rel="noopener">📱 إرسال فقط</a>
         <button class="btn" id="jokeAgain">🎭 نكتة تانية على مقاسك</button>
         <button class="btn btn-primary" id="jokeClose">تمام، قفل 😄</button>
       </div>`);
@@ -4487,6 +5104,7 @@
   setInterval(() => { if (!state.initialized || !state.home || !state.user) bindOnboarding(); }, 150);
 })();
 </script>
+<script src="character.js"></script>
 <script>
 if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
 </script>
