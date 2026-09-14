@@ -177,18 +177,20 @@
   .fin-cats { display: flex; flex-wrap: wrap; gap: 6px; }
   .fin-cats .filter-chip { margin: 0; }
   /* ===== Finance pro redesign ===== */
-  .fin-hero { margin: 0 20px 14px; background: var(--grad); border-radius: 24px; padding: 18px; color: #fff; position: relative; overflow: hidden; box-shadow: 0 16px 36px rgba(124,58,237,.32); animation: popIn .4s ease-out; }
-  .fin-hero::before, .fin-hero::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.14); }
-  .fin-hero::before { width: 170px; height: 170px; left: -50px; top: -70px; }
-  .fin-hero::after { width: 110px; height: 110px; right: -30px; bottom: -50px; }
-  .fin-hero-head { position: relative; z-index: 1; font-size: 12.5px; font-weight: 800; opacity: .9; }
-  .fin-hero-net { position: relative; z-index: 1; text-align: center; margin: 6px 0 12px; }
-  .fin-hero-net small { display: block; font-size: 11.5px; font-weight: 700; opacity: .85; }
-  .fin-hero-net b { font-size: 30px; font-weight: 900; letter-spacing: -.3px; }
-  .fin-hero-cols { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-  .fin-hero-cols > div { background: rgba(255,255,255,.16); border-radius: 16px; padding: 10px 6px; text-align: center; box-shadow: inset 0 1px 0 rgba(255,255,255,.25); }
-  .fin-hero-cols small { display: block; font-size: 10.5px; font-weight: 800; opacity: .9; margin-bottom: 2px; }
-  .fin-hero-cols b { font-size: 14px; font-weight: 900; }
+  .fin-hero { margin: 0 18px 12px; background: #fff; border: 1.5px solid var(--border); border-inline-start: 5px solid var(--primary); border-radius: 18px; padding: 14px; color: var(--text); box-shadow: var(--shadow-sm); }
+  .fin-hero::before, .fin-hero::after { display: none; }
+  .fin-hero-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 900; color: var(--text); }
+  .fin-hero-net { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 10px 0 4px; }
+  .fin-hero-net small { font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
+  .fin-hero-net b { font-size: 26px; font-weight: 900; letter-spacing: -.3px; }
+  .fin-hero-net.pos b { color: var(--success); }
+  .fin-hero-net.neg b { color: var(--danger); }
+  .fin-hero-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
+  .fin-hero-cols > div { display: flex; align-items: center; gap: 8px; background: none; border-radius: 0; padding: 0; box-shadow: none; }
+  .fin-hero-cols .fh-ico { width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .fin-hero-cols .fh-tx { min-width: 0; }
+  .fin-hero-cols small { display: block; font-size: 10.5px; font-weight: 800; color: var(--text-sec); opacity: 1; }
+  .fin-hero-cols b { font-size: 14.5px; font-weight: 900; }
   .fin-pill { display: inline-flex; align-items: center; gap: 3px; font-size: 10.5px; font-weight: 900; padding: 2px 9px; border-radius: 999px; }
   .fin-seg { display: flex; background: var(--bg); border: 1.5px solid var(--border); border-radius: 16px; padding: 4px; gap: 4px; }
   .fin-seg button { flex: 1; padding: 11px 4px; border-radius: 12px; font-size: 13px; font-weight: 800; color: var(--text-sec); transition: all .18s; }
@@ -227,6 +229,19 @@
   .fin-ctl-seg button[data-expkind="income"].active { background: linear-gradient(135deg,#34D399,#059669); color: #fff; box-shadow: 0 6px 14px rgba(16,185,129,.35); }
   .fin-ctl-seg button[data-expkind="debt"].active { background: linear-gradient(135deg,#FBBF24,#D97706); color: #fff; box-shadow: 0 6px 14px rgba(245,158,11,.35); }
   .fin-ctl-seg button.active .n { background: rgba(255,255,255,.28); }
+  .fin-hero-month { display: inline-block; font-size: 10.5px; font-weight: 800; background: var(--bg); border: 1px solid var(--border); padding: 2px 12px; border-radius: 999px; margin-right: 6px; }
+  .exp-card { background: #fff; border: 1.5px solid var(--border); border-inline-start: 4px solid var(--kc, var(--primary)); border-radius: 18px; padding: 12px; margin: 0 18px 9px; box-shadow: var(--shadow-sm); display: flex; gap: 11px; align-items: center; animation: popIn .3s ease-out; }
+  .exp-card[data-editexp] { cursor: pointer; }
+  .exp-card[data-editexp]:active { transform: scale(.98); }
+  .exp-ico { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.7); }
+  .exp-mid { flex: 1; min-width: 0; }
+  .exp-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .exp-top b:first-child { font-size: 14.5px; font-weight: 900; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .exp-amt { font-size: 15px; font-weight: 900; color: var(--kc, var(--text)); white-space: nowrap; }
+  .exp-amt small { font-size: 10.5px; font-weight: 700; opacity: .7; }
+  .exp-sub { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px; font-size: 11.5px; color: var(--text-sec); font-weight: 700; }
+  .exp-sub i { width: 3px; height: 3px; border-radius: 50%; background: var(--text-muted); opacity: .6; }
+  .exp-go { width: 26px; height: 26px; border-radius: 50%; background: var(--bg); color: var(--text-muted); font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .finm-kind b { font-size: 12.5px; font-weight: 900; }
   .finm-kind small { font-size: 10px; color: var(--text-muted); font-weight: 700; }
   .finm-kind[data-finkind="expense"].active { border-color: #F43F5E; background: #FFF1F2; box-shadow: 0 8px 18px rgba(244,63,94,.22); }
@@ -426,6 +441,11 @@
   .badge-urgent { background: #FFE4E6; color: #BE123C; border: 1px solid #FECDD3; animation: urgPulse 1.6s ease-in-out infinite; }
   @keyframes urgPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,.35); } 50% { box-shadow: 0 0 0 5px rgba(244,63,94,0); } }
   .order-card.is-urgent { border-color: #F43F5E !important; background: #FFF5F6 !important; }
+  .bask-head { background: linear-gradient(135deg, #EDE9FE, #FDF4FF 60%, #EFF6FF) !important; border-bottom: 1.5px dashed var(--primary); }
+  .bask-ico { width: 46px !important; height: 46px !important; font-size: 24px !important; background: #fff !important; box-shadow: var(--shadow-sm); }
+  .bask-count { min-width: 34px; height: 34px; padding: 0 10px; border-radius: 999px; background: var(--grad); color: #fff; font-size: 15px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 6px 14px rgba(124,58,237,.3); }
+  .bask-actions { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; padding: 10px 10px 4px; }
+  .bask-actions .btn { width: 100%; margin: 0; min-height: 46px; font-size: 14px; }
   .urg-toggle { display: flex; align-items: center; gap: 10px; background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 11px 13px; width: 100%; text-align: right; transition: all .18s; box-shadow: var(--shadow-sm); }
   .urg-toggle:active { transform: scale(.98); }
   .urg-toggle .u-ico { width: 38px; height: 38px; border-radius: 12px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
@@ -549,6 +569,31 @@
 
   .report-card { background: var(--card); border-radius: var(--radius); padding: 16px; margin: 0 18px 12px; border: none; box-shadow: var(--shadow-sm); }
   .report-card h4 { font-size: 15px; font-weight: 800; margin-bottom: 10px; color: var(--primary-dark); }
+  .rep-hero { margin: 0 18px 12px; background: var(--grad); border-radius: 24px; padding: 18px 15px; color: #fff; position: relative; overflow: hidden; box-shadow: 0 16px 36px rgba(124,58,237,.32); animation: popIn .4s ease-out; }
+  .rep-hero::before, .rep-hero::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.13); }
+  .rep-hero::before { width: 170px; height: 170px; left: -50px; top: -70px; }
+  .rep-hero::after { width: 110px; height: 110px; right: -30px; bottom: -50px; }
+  .rep-hero-head { position: relative; z-index: 1; font-size: 12.5px; font-weight: 800; opacity: .92; display: flex; align-items: center; gap: 6px; }
+  .rep-hero-net { position: relative; z-index: 1; text-align: center; margin: 8px 0 12px; }
+  .rep-hero-net small { display: block; font-size: 11.5px; font-weight: 700; opacity: .85; }
+  .rep-hero-net b { font-size: 30px; font-weight: 900; }
+  .rep-hero-cols { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .rep-hero-cols > div { background: rgba(255,255,255,.16); border-radius: 15px; padding: 10px 4px; text-align: center; box-shadow: inset 0 1px 0 rgba(255,255,255,.25); }
+  .rep-hero-cols small { display: block; font-size: 10.5px; font-weight: 800; opacity: .9; }
+  .rep-hero-cols b { font-size: 14px; font-weight: 900; }
+  .rep-card { background: #fff; border: 1.5px solid var(--border); border-radius: 22px; padding: 14px; margin: 0 18px 12px; box-shadow: var(--shadow-sm); animation: popIn .35s ease-out; }
+  .rep-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .rep-ico { width: 40px; height: 40px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.7); }
+  .rep-head b { font-size: 15px; font-weight: 900; flex: 1; }
+  .rep-head small { font-size: 11px; color: var(--text-muted); font-weight: 700; }
+  .rep-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .rep-tile { border-radius: 15px; padding: 10px; display: flex; gap: 9px; align-items: center; min-width: 0; }
+  .rep-tile .t-ico { width: 36px; height: 36px; border-radius: 11px; background: rgba(255,255,255,.8); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .rep-tile .t-tx { min-width: 0; flex: 1; }
+  .rep-tile small { display: block; font-size: 10.5px; font-weight: 800; opacity: .7; }
+  .rep-tile b { font-size: 14.5px; font-weight: 900; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rep-tile b span { font-size: 10.5px; font-weight: 700; opacity: .65; }
+  .rep-sec { font-size: 13px; font-weight: 900; color: var(--primary-dark); margin: 12px 2px 6px; display: flex; align-items: center; gap: 6px; }
   .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
   .rstat { background: var(--bg); padding: 10px; border-radius: var(--radius-sm); }
   .rstat .rl { font-size: 11px; color: var(--text-sec); font-weight: 700; }
@@ -918,16 +963,9 @@
   .ad-banner { margin: 0 20px 12px; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow); border: 1.5px solid rgba(124,58,237,.12); background: #fff; animation: popIn .3s ease-out; }
   .ad-banner img { width: 100%; height: auto; max-height: 220px; object-fit: cover; display: block; }
   .ad-banner .ad-cap { padding: 8px 12px; font-size: 12px; font-weight: 800; color: var(--text-sec); display: flex; align-items: center; justify-content: space-between; }
-  .finish-bar { margin: 0 20px 14px; background: linear-gradient(135deg,#10B981,#059669 55%,#047857); border-radius: 22px; padding: 15px 14px 14px; color: #fff; box-shadow: 0 14px 30px rgba(16,185,129,.38); position: relative; overflow: hidden; animation: popIn .35s ease-out; }
-  .finish-bar::before, .finish-bar::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.13); }
-  .finish-bar::before { width: 150px; height: 150px; left: -45px; top: -70px; }
-  .finish-bar::after { width: 100px; height: 100px; right: 20px; bottom: -60px; }
-  .finish-bar .fin-top { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; margin-bottom: 2px; }
-  .finish-bar .fin-mascot { width: 46px; height: 46px; border-radius: 15px; background: rgba(255,255,255,.22); display: flex; align-items: center; justify-content: center; font-size: 25px; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,.4); animation: logoFloat 2.6s ease-in-out infinite; }
-  .finish-bar b { display: block; font-size: 15px; font-weight: 900; margin-bottom: 1px; position: relative; z-index: 1; }
-  .finish-bar small { font-size: 12px; opacity: .94; font-weight: 700; display: block; margin-bottom: 10px; position: relative; z-index: 1; }
-  .finish-bar .btn { background: #fff; color: #047857; position: relative; z-index: 1; font-weight: 900; animation: btnWiggle 2.4s ease-in-out infinite; }
-  @keyframes btnWiggle { 0%,100% { transform: rotate(0); } 92% { transform: rotate(0); } 94% { transform: rotate(-1.2deg) scale(1.015); } 96% { transform: rotate(1.2deg) scale(1.015); } 98% { transform: rotate(0); } }
+  .finish-bar { margin: 0 20px 14px; background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm); }
+  .finish-bar span { flex: 1; font-size: 13.5px; font-weight: 800; }
+  .finish-bar .btn { width: auto; min-height: 42px; padding: 10px 18px; margin: 0; background: var(--success); color: #fff; font-size: 13px; border-radius: 12px; box-shadow: none; flex-shrink: 0; }
   .party-hero { background: linear-gradient(135deg,#FBBF24,#EC4899 50%,#8B5CF6); border-radius: 22px; padding: 18px 15px; color: #fff; text-align: center; position: relative; overflow: hidden; box-shadow: 0 16px 36px rgba(236,72,153,.4); margin-bottom: 12px; }
   .party-hero::before { content: '🎉🎊🥳🎉🎊'; position: absolute; top: 6px; right: 0; left: 0; font-size: 15px; opacity: .85; animation: partySlide 3s linear infinite; }
   @keyframes partySlide { 0% { transform: translateX(18px); } 50% { transform: translateX(-18px); } 100% { transform: translateX(18px); } }
@@ -1087,7 +1125,7 @@
   ];
   function finishFunMsg(n) { return FUNNY_FINISH[(Number(n) || 0) % FUNNY_FINISH.length]; }
   function finishBarHTML(n, btnId) {
-    return `<div class="finish-bar"><div class="fin-top"><span class="fin-mascot">🛒</span><div><b>✅ خلصت كتابة الطلبات؟ (${n} معلق)</b><small>😂 ${finishFunMsg(n)}</small></div></div><button class="btn" id="${btnId}">إنهاء وإرسال واتساب 🎉📱</button></div>`;
+    return `<div class="finish-bar"><span>✅ خلصت كتابة الطلبات؟ (${n} معلق)</span><button class="btn" id="${btnId}">إنهاء وإرسال واتساب</button></div>`;
   }
   const FUNNY_BOUGHT = [
     'المهمة تمت يا بطل... المحفظة استشهدت بشرف 😂💸',
@@ -1427,6 +1465,16 @@
   function finItemIcon(key, nm) {
     try { const c = (state.finCustom || {}).itemIcons || {}; if (c[key]) return c[key]; } catch {}
     return finItemEmojiBase(nm);
+  }
+  function expenseIcon(e) {
+    if (!e) return '💸';
+    const cid = e.categoryId;
+    if (cid && String(cid).slice(0, 4) === 'fin:') {
+      let nm = e.title;
+      try { const lk = finLookup(cid); if (lk && lk.name) nm = lk.name; } catch {}
+      return finItemIcon(cid, nm);
+    }
+    return productIcon(e.title, cid);
   }
   function orderDeptsForFin() {
     try { return getCatalog().filter(d => d && !d.hidden); } catch { return []; }
@@ -1967,6 +2015,96 @@
     if (idx >= 0) state.orders.splice(idx, 1);
     persist();
   }
+  /* سلة التجهيز: تجهيز الأصناف أولًا قبل تأكيدها كطلبات */
+  function basketItems() { if (!Array.isArray(state._basket)) state._basket = []; return state._basket; }
+  function basketExists(name) { const k = normalizeTerm(name); return basketItems().some(b => normalizeTerm(b.name) === k); }
+  function addToBasket({ name, notes, urgent, categoryId, qty, priority }) {
+    const nm = String(name || '').trim(); if (!nm) return null;
+    if (!validCatId(categoryId)) categoryId = classifyOrder(nm).categoryId;
+    const prio = normPriority(priority || (urgent ? 'high' : 'medium'));
+    const it = { id: uid(), name: nm, notes: notes || '', urgent: prio === 'high', priority: prio, categoryId, qty: qty || null, createdAt: nowISO() };
+    basketItems().push(it); persist(); return it;
+  }
+  function removeBasketItem(id) { state._basket = basketItems().filter(b => b.id !== id); persist(); }
+  function clearBasket() { state._basket = []; persist(); }
+  function confirmBasket() {
+    const lid = activeListId();
+    const added = []; let skipped = 0;
+    for (const it of basketItems()) {
+      if (pendingOrderExists(it.name, lid)) { skipped++; continue; }
+      added.push(addOrder({ name: it.name, notes: it.notes, urgent: it.urgent, priority: it.priority, qty: it.qty, listId: lid, categoryId: it.categoryId }));
+    }
+    state._basket = []; persist();
+    return { added, skipped };
+  }
+  function toggleBasketExpand(id) {
+    if (state._expandedBasket === id) { state._expandedBasket = null; state._basketDraft = null; }
+    else {
+      const it = basketItems().find(x => x && x.id === id); if (!it) return;
+      state._expandedBasket = id;
+      state._basketDraft = { qtyType: it.qty ? (it.qty.t === 'w' ? 'weight' : 'count') : 'none', qtyVal: it.qty ? it.qty.v : 1, qtyUnit: it.qty ? (it.qty.u || 'قطعة') : 'قطعة', notes: it.notes || '' };
+    }
+    render();
+  }
+  function saveBasketDraft(id, quiet) {
+    const it = basketItems().find(x => x && x.id === id); if (!it) return null;
+    const d = state._basketDraft || {};
+    const patch = { notes: (d.notes || '').trim() };
+    if (d.qtyType === 'count') { const v = Math.round(Number(d.qtyVal) || 0); patch.qty = (v >= 1 && v <= 99) ? { t: 'c', v, u: d.qtyUnit || 'قطعة' } : null; }
+    else if (d.qtyType === 'weight') { const v = Number(d.qtyVal); patch.qty = (v > 0 && v <= 10000) ? { t: 'w', v, u: d.qtyUnit || 'كجم' } : null; }
+    else patch.qty = null;
+    Object.assign(it, patch); persist();
+    if (!quiet) { state._expandedBasket = null; state._basketDraft = null; }
+    return it;
+  }
+  function renderBasketCard(it) {
+    const cc = catColor(it.categoryId);
+    const qtyTxt = fmtQty(it.qty);
+    const qtyLine = qtyTxt ? `<span class="qty-inline">— ${escapeHTML(qtyTxt)}</span>` : '';
+    const notesLine = it.notes ? `<div class="order-meta"><span class="meta-item">📝 ${escapeHTML(it.notes)}</span></div>` : '';
+    const expanded = state._expandedBasket === it.id;
+    let panel = '';
+    if (expanded) {
+      const d = state._basketDraft || {};
+      const qt = d.qtyType || 'none';
+      const selC = QTY_COUNT_UNITS.map(u => `<option value="${u}" ${d.qtyUnit === u ? 'selected' : ''}>${u}</option>`).join('');
+      const selW = QTY_WEIGHT_UNITS.map(u => `<option value="${u}" ${d.qtyUnit === u ? 'selected' : ''}>${u}</option>`).join('');
+      panel = `<div class="order-exp" data-bexp-panel="${it.id}">
+        <div class="exp-row"><span class="lbl">الكمية</span>
+          <button class="filter-chip ${qt === 'none' ? 'active' : ''}" data-bqtype="none" data-id="${it.id}">بدون</button>
+          <button class="filter-chip ${qt === 'count' ? 'active' : ''}" data-bqtype="count" data-id="${it.id}">عدد</button>
+          <button class="filter-chip ${qt === 'weight' ? 'active' : ''}" data-bqtype="weight" data-id="${it.id}">وزن</button>
+        </div>
+        ${qt === 'count' ? `<div class="exp-row"><button class="btn btn-secondary btn-sm" data-bqminus="${it.id}">−</button><b style="min-width:30px;text-align:center;">${d.qtyVal ?? 1}</b><button class="btn btn-secondary btn-sm" data-bqplus="${it.id}">+</button><select class="rv-select" data-bqunit="${it.id}">${selC}</select></div>` : ''}
+        ${qt === 'weight' ? `<div class="exp-row"><input type="number" class="qty-num" data-bqvalw="${it.id}" value="${d.qtyVal ?? ''}" placeholder="0" min="0"><select class="rv-select" data-bqunitw="${it.id}">${selW}</select></div>` : ''}
+        <div class="exp-row"><span class="lbl">ملاحظة</span><input class="exp-notes" data-bqnotes="${it.id}" value="${escapeHTML(d.notes || '')}" placeholder="اكتب ملاحظة اختيارية..."></div>
+        <div class="exp-row"><button class="btn btn-primary btn-sm" data-bqsave="${it.id}">حفظ التعديل</button><button class="btn btn-success btn-sm" data-bqconfirm="${it.id}">✓ تأكيد</button><button class="btn btn-danger btn-sm" data-bqdel="${it.id}">حذف الصنف</button></div>
+      </div>`;
+    }
+    return `<div class="order-card" data-bid="${it.id}">
+      <div class="category-card-icon" style="background:${cc}18;font-size:20px;">${productIcon(it.name, it.categoryId)}</div>
+      <div class="order-main" data-bexp="${it.id}">
+        <div class="order-name">${escapeHTML(it.name)} ${qtyLine} <span class="badge badge-pending">تجهيز</span>${it.priority === 'high' ? ' <span class="badge badge-urgent">🔥 ضروري</span>' : ''}</div>
+        <div class="order-meta"><span class="meta-item">📍 ${escapeHTML(catLocation(it.categoryId))}</span></div>
+        ${notesLine}
+      </div>
+      <span class="ord-chev ${expanded ? 'open' : ''}">‹</span>
+      ${panel}
+    </div>`;
+  }
+  function renderBasket() {
+    const items = basketItems();
+    if (!items.length) return '';
+    return `<div class="category-group"><div class="category-card" style="border:1.5px dashed var(--primary);">
+      <div class="category-card-header bask-head">
+        <div class="category-card-icon bask-ico">🧺</div>
+        <div class="category-card-info"><div class="category-card-name">سلة التجهيز</div><div class="category-card-count">${items.length} صنف • دوس على الصنف للتعديل</div></div>
+        <span class="bask-count">${items.length}</span>
+      </div>
+      <div class="bask-actions"><button class="btn btn-success" id="basketConfirm">✅ تأكيد الكل</button><button class="btn" id="basketClear">تفريغ</button></div>
+      <div class="category-card-orders">${items.map(it => renderBasketCard(it)).join('')}</div>
+    </div></div>`;
+  }
   function markPurchased(orderId, { originalPrice, finalPrice }) {
     const o = state.orders.find(x => x.id === orderId);
     if (!o) return null;
@@ -2294,6 +2432,7 @@
     const t = state.currentTab;
     const tabs = [
       { id: 'home', label: 'الرئيسية', icon: 'home' },
+      { id: 'shop', label: 'التسوق', icon: 'basket' },
       { id: 'orders', label: 'الطلبات', icon: 'cart' },
       { id: 'expenses', label: 'المصروفات', icon: 'wallet' },
       { id: 'reports', label: 'التقارير', icon: 'chart' },
@@ -2306,6 +2445,7 @@
     switch (state.currentTab) {
       case 'home': return renderHome();
       case 'orders': return renderOrders();
+      case 'shop': return renderShop();
       case 'expenses': return renderExpenses();
       case 'reports': return renderReports();
       case 'settings': return renderSettings();
@@ -2332,7 +2472,7 @@
     ];
 
     const myRole = state.user?.role || '';
-    const roleTag = myRole === 'wife' ? '👩 زوجة' : myRole === 'husband' ? '👨 زوج' : '';
+    const roleTag = '';
     const myJoke = (() => { try { const p = comedyForRole(myRole || 'husband'); return p.length ? p[Math.floor(Math.random() * p.length)].text : pickMsg(MSG.wifeGreeting); } catch { return pickMsg(MSG.wifeGreeting); } })();
     return `<div class="page">
       <div class="topbar"><div class="greeting">${greeting} يا ${escapeHTML(userName)} ${roleTag}</div></div>
@@ -2342,7 +2482,7 @@
       <div class="hero">
         <div class="hero-top">
           ${photoCharHTML('mom', 'noura-hero-char photo-char')}
-          <div style="flex:1;min-width:0;"><div class="noura-name" style="color:#fff;">${myRole === 'husband' ? '👨 رسالة الزوج' : myRole === 'wife' ? '👩 رسالة الزوجة' : '💑 رسالة البيت'} • ${roleTag}</div><h2 style="color:#fff;">${escapeHTML(myJoke)}</h2><p style="color:rgba(255,255,255,.9);">المستوى ${level.lvl} • ${level.title}</p></div>
+          <div style="flex:1;min-width:0;"><div class="noura-name" style="color:#fff;">💌 رسالة البيت</div><h2 style="color:#fff;">${escapeHTML(myJoke)}</h2><p style="color:rgba(255,255,255,.9);">المستوى ${level.lvl} • ${level.title}</p></div>
         </div>
         <div class="hero-progress"><span style="width:${progress}%"></span></div>
         <div class="hero-meta"><span>تقدم مهام اليوم ${progress}%</span><span>${done}/${totalTasks}</span></div>
@@ -2355,8 +2495,6 @@
         <div class="streak-pill"><div class="streak-ico" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('star', 20)}</div><div><b>${level.pct}%</b><small>للمستوى التالي</small></div></div>
       </div>
 
-      <div class="badge-row">${achv.map(a => `<div class="achv ${a.ok ? '' : 'locked'}"><div class="achv-ico" style="background:${a.bg};color:${a.c};">${svgIcon(a.ic, 22)}</div><div><b>${a.t}</b><small>${a.s}</small></div></div>`).join('')}</div>
-
       <div class="section"><div class="stats-row">
         <div class="stat-card"><div class="stat-icon" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('cart', 20)}</div><div class="stat-label">مطلوب لسه</div><div class="stat-value">${pending}</div></div>
         <div class="stat-card"><div class="stat-icon" style="background:#DCFCE7;color:#059669;">${svgIcon('check', 20)}</div><div class="stat-label">اتشترى النهارده</div><div class="stat-value">${done}</div></div>
@@ -2365,11 +2503,9 @@
       </div></div>
 
       ${adsByPosition('middle')}
-      ${pending ? finishBarHTML(pending, 'finishOrdersHome') : ''}
-      ${state._shopOpen ? `<div class="section"><div class="section-header"><h3>🛍️ تسوق المنتجات</h3><button class="btn btn-sm" id="shopCloseBtn">إخفاء</button></div><div class="help-text" style="margin:-4px 0 10px;">دوس على القسم واختار المنتج وضيفه لطلباتك</div></div>${state._catBrowse ? renderCatalogDept(state._catBrowse) : renderCatalogHome(true)}` : ''}
 
-      <div class="section"><div class="section-header"><h3>آخر الطلبات</h3><a href="#" data-gotab="orders">شوف كلهم ←</a></div></div>
-      ${recent.length === 0 ? renderEmptyOrders() : recent.map(o => renderOrderCard(o)).join('')}
+      <div class="section"><div class="section-header"><h3>🧺 سلة الطلبات</h3></div></div>
+      ${basketItems().length ? renderBasket() : `<div class="empty"><div class="empty-icon">🧺</div><div class="empty-title">السلة فاضية</div><div class="empty-desc">جهّز أصنافك هنا الأول وبعدين أكّدها كطلبات</div><button class="btn btn-primary" id="basketHomeAdd">جهّز أول صنف</button></div>`}
       ${adsByPosition('bottom')}
     </div>`;
   }
@@ -2572,10 +2708,10 @@
   function catDeptCount(d) { return d.subs.reduce((n, s) => n + s.items.length, 0); }
   function quickAddCatalogItem(key) {
     const f = findCatalogItem(key); if (!f) return;
-    if (pendingOrderExists(f.item.ar, activeListId())) { toast('موجود بالفعل في قائمة «' + listById(activeListId()).name + '»: ' + f.item.ar, 'warning'); return; }
-    addOrder({ name: f.item.ar, notes: '', urgent: false, categoryId: f.dept.id, listId: activeListId() });
+    if (pendingOrderExists(f.item.ar, activeListId()) || basketExists(f.item.ar)) { toast('موجود بالفعل في قائمة «' + listById(activeListId()).name + '»: ' + f.item.ar, 'warning'); return; }
+    addToBasket({ name: f.item.ar, notes: '', urgent: false, categoryId: f.dept.id });
     saveLearning(f.item.ar, f.dept.id);
-    toast('اتضاف: ' + f.item.ar, 'success');
+    toast('🧺 اتضاف للسلة: ' + f.item.ar, 'success');
     render();
   }
   function catItemRow(key, ar, sub) {
@@ -2607,6 +2743,16 @@
     return `<div class="section"><div class="section-header"><h3>🔍 نتائج المنتجات (${res.length})</h3></div>
       ${res.map(r => catItemRow(r.item.key, r.item.ar, r.dept.name + ' › ' + r.sub.name)).join('')}</div>`;
   }
+  function renderShop() {
+    const q = (state._shopQuery || '').trim();
+    return `<div class="page">
+      <div class="topbar"><div class="greeting">تسوّق براحتك 🛍️</div></div>
+      <div class="page-title">التسوق</div>
+      <div class="search-bar"><div class="search-box"><input id="shopSearch" placeholder="دوّر على أي منتج..." value="${escapeHTML(state._shopQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div></div>
+      <div class="section"><div class="help-text" style="margin:-2px 0 10px;">دوس <b>+ ضيف</b> والصنف يروح على السلة 🧺 للتجهيز قبل الإرسال</div></div>
+      ${q.length >= 2 ? renderCatalogSearch(q) : state._catBrowse ? renderCatalogDept(state._catBrowse) : renderCatalogHome(true)}
+    </div>`;
+  }
   function renderItemResults(q) {
     const query = (q || '').trim();
     if (query.length < 2) return '';
@@ -2627,18 +2773,20 @@
     else if (orderFilter === 'done') list = list.filter(o => o.status === 'purchased');
     if (categoryFilter !== 'all') list = list.filter(o => o.categoryId === categoryFilter);
     const cats = allCats();
+    const pendList = list.filter(o => o.status !== 'purchased');
+    const doneList = list.filter(o => o.status === 'purchased');
     const grouped = {}; for (const c of cats) grouped[c.id] = [];
-    for (const o of list) { if (!grouped[o.categoryId]) grouped[o.categoryId] = []; grouped[o.categoryId].push(o); }
-    for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => ((a.status === 'purchased' ? 1 : 0) - (b.status === 'purchased' ? 1 : 0)) || (((b.priority === 'high' || b.urgent) ? 1 : 0) - ((a.priority === 'high' || a.urgent) ? 1 : 0)));
+    for (const o of pendList) { if (!grouped[o.categoryId]) grouped[o.categoryId] = []; grouped[o.categoryId].push(o); }
+    for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => (((b.priority === 'high' || b.urgent) ? 1 : 0) - ((a.priority === 'high' || a.urgent) ? 1 : 0)));
 
-    const myRole2 = state.user?.role || 'husband';
     const pendAll = (state.orders || []).filter(o => o.status === 'pending').length;
     return `<div class="page">
-      <div class="topbar"><div class="greeting">مهام التسوق ${myRole2 === 'wife' ? '👩' : '👨'}</div></div>
+      <div class="topbar"><div class="greeting">مهام التسوق 🛒</div></div>
       <div class="page-title">${list.length === 0 ? 'مفيش طلبات' : list.length === 1 ? 'فيه طلب واحد' : `فيه ${list.length} طلبات`}</div>
+      ${renderBasket()}
       ${adsByPosition('top')}
 
-      ${pendAll ? finishBarHTML(pendAll, 'finishOrdersBtn') : ''}
+
       ${adsByPosition('middle')}
 
       <div class="search-bar"><div class="search-voice-wrap"><div class="search-box"><input id="orderSearch" placeholder="دور على الصنف..." value="${escapeHTML(searchQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div><button class="voice-mic-mini" id="orderSearchVoice" aria-label="بحث صوتي">${svgIcon('mic', 20)}</button></div></div>
@@ -2648,16 +2796,22 @@
       ${list.length === 0 ? renderEmptyOrders() : [...cats, ...Object.keys(grouped).filter(id => grouped[id].length && !cats.some(c => c.id === id)).map(id => ({ id }))].map(cat => {
         const arr = grouped[cat.id] || []; if (!arr.length) return '';
         const cc = catColor(cat.id);
-        const pendingCount = arr.filter(o => o.status === 'pending').length;
         return `<div class="category-group"><div class="category-card">
           <div class="category-card-header" style="background:${cc}12;">
             <div class="category-card-icon" style="background:${cc}20;color:${cc};">${svgIcon(getCategoryIcon(cat.id), 20)}</div>
             <div class="category-card-info"><div class="category-card-name">${getCategoryName(cat.id)}</div><div class="category-card-count" style="color:${cc};">${arr.length} طلب${arr.length > 1 ? 'ات' : ''}</div></div>
-            <div class="category-card-badge" style="background:${cc}20;color:${cc};border-color:${cc};">${pendingCount > 0 ? `${pendingCount} مطلوب` : 'خلاص'}</div>
+            <div class="category-card-badge" style="background:${cc}20;color:${cc};border-color:${cc};">${arr.length} مطلوب</div>
           </div>
           <div class="category-card-orders">${arr.map(o => renderOrderCard(o)).join('')}</div>
         </div></div>`;
       }).join('')}
+      ${doneList.length ? `<div class="category-group"><div class="category-card">
+        <div class="category-card-header" style="background:var(--success-light);">
+          <div class="category-card-icon" style="background:#fff;">✅</div>
+          <div class="category-card-info"><div class="category-card-name">تم شراءه اليوم</div><div class="category-card-count" style="color:var(--success);">${doneList.length} صنف</div></div>
+        </div>
+        <div class="category-card-orders">${doneList.map(o => renderOrderCard(o)).join('')}</div>
+      </div></div>` : ''}
       ${adsByPosition('bottom')}
     </div>`;
   }
@@ -2672,17 +2826,17 @@
       <div class="page-title">المصروفات</div>
 
       <div class="fin-hero">
-        <div class="fin-hero-head">💼 ملخص الشهر المالي</div>
-        <div class="fin-hero-net"><small>الصافي (دخل − مصروف)</small><b>${formatCurrency(monthInc.total - month.total)} ج.م</b></div>
+        <div class="fin-hero-head"><span>💼 ملخص الشهر المالي</span><span class="fin-hero-month">${new Date().toLocaleDateString('ar-EG', { month: 'long' })}</span></div>
+        <div class="fin-hero-net ${monthInc.total - month.total < 0 ? 'neg' : 'pos'}"><small>الصافي (دخل − مصروف)</small><b>${formatCurrency(monthInc.total - month.total)} ج.م</b></div>
         <div class="fin-hero-cols">
-          <div><small>💸 مصروفات</small><b>${formatCurrency(month.total)}</b></div>
-          <div><small>💰 دخل</small><b>${formatCurrency(monthInc.total)}</b></div>
-          <div><small>🏦 ديون</small><b>${formatCurrency(monthDebt.total)}</b></div>
+          <div><span class="fh-ico" style="background:#FFE4E6;">💸</span><span class="fh-tx"><b>${formatCurrency(month.total)}</b><small>مصروفات</small></span></div>
+          <div><span class="fh-ico" style="background:#DCFCE7;">💰</span><span class="fh-tx"><b>${formatCurrency(monthInc.total)}</b><small>دخل</small></span></div>
+          <div><span class="fh-ico" style="background:#FEF3C7;">🏦</span><span class="fh-tx"><b>${formatCurrency(monthDebt.total)}</b><small>ديون</small></span></div>
         </div>
       </div>
 
       <div class="section"><div class="fin-ctl-card">
-        <div class="fin-ctl-top"><a href="#" id="addExpenseLink" class="fin-ctl-add"><span class="plus">+</span> إضافة حركة جديدة</a><span class="fin-ctl-count"><b>${shown.length}</b><small>حركة معروضة</small></span></div>
+        <div class="fin-ctl-top"><a href="#" id="addExpenseLink" class="fin-ctl-add"><span class="plus">+</span> إضافة حركة جديدة</a></div>
         <div class="fin-ctl-seg">
           <button class="${fk === 'expense' ? 'active' : ''}" data-expkind="expense">💸 مصروفات <span class="n">${state.expenses.filter(e => finKindOf(e) === 'expense').length}</span></button>
           <button class="${fk === 'income' ? 'active' : ''}" data-expkind="income">💰 دخل <span class="n">${state.expenses.filter(e => finKindOf(e) === 'income').length}</span></button>
@@ -2698,11 +2852,13 @@
           const klabel = kind === 'income' ? 'دخل' : kind === 'debt' ? 'ديون' : 'مصروف';
           const cat = catById(e.categoryId);
           const canEdit = e.sourceType === 'manual';
-          return `<div class="exp-list-item" ${canEdit ? `data-editexp="${e.id}" style="border-inline-start:4px solid ${kc};cursor:pointer;"` : `style="border-inline-start:4px solid ${kc};"`}>
-            <div class="exp-cat" style="background:${cat.color}20;color:${cat.color}">${svgIcon(getCategoryIcon(e.categoryId), 20)}</div>
-            <div class="exp-body"><div class="exp-name">${escapeHTML(e.title)}</div><div class="exp-detail"><span class="fin-pill" style="color:${kc};background:${kc}14;">${FINANCE[kind].emoji} ${klabel}</span> ${getCategoryName(e.categoryId)} • ${formatDateShort(new Date(e.createdAt))}</div>
+          return `<div class="exp-card" ${canEdit ? `data-editexp="${e.id}"` : ''} style="--kc:${kc};">
+            <div class="exp-ico" style="background:${cat.color}20;font-size:22px;">${expenseIcon(e)}</div>
+            <div class="exp-mid">
+              <div class="exp-top"><b>${escapeHTML(e.title)}</b><span class="exp-amt">${formatCurrency(e.amount)} <small>ج.م</small></span></div>
+              <div class="exp-sub"><span class="fin-pill" style="color:${kc};background:${kc}14;">${FINANCE[kind].emoji} ${klabel}</span><span>${getCategoryName(e.categoryId)}</span><i></i><span>${formatDateShort(new Date(e.createdAt))}</span></div>
             </div>
-            <div class="exp-price"${kc ? ` style="color:${kc}"` : ''}>${formatCurrency(e.amount)} ج.م</div>
+            ${canEdit ? '<span class="exp-go">‹</span>' : ''}
           </div>`;
         }).join('')}
     </div>`;
@@ -2717,36 +2873,29 @@
       <div class="topbar"><div class="greeting">لوحة الإنجاز</div></div>
       <div class="page-title">إحصائيات البيت</div>
       ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش بيانات كفاية</div><div class="empty-desc">اشتري طلبات أو أضف مصروفات وهتظهر لك الإحصائيات</div></div>` : `
-      ${(() => { const mi = sumExpensesInRange('month', 'income'); const md = sumExpensesInRange('month', 'debt'); return `<div class="report-card"><h4>💼 الملخص المالي (الشهر)</h4><div class="report-grid">
-        <div class="rstat"><div class="rl">💸 المصروفات</div><div class="rv">${formatCurrency(month.total)}<span> ج.م</span></div></div>
-        <div class="rstat"><div class="rl">💰 الدخل</div><div class="rv">${formatCurrency(mi.total)}<span> ج.م</span></div></div>
-        <div class="rstat"><div class="rl">🏦 الديون</div><div class="rv">${formatCurrency(md.total)}<span> ج.م</span></div></div>
-        <div class="rstat"><div class="rl">الصافي (دخل − مصروف)</div><div class="rv">${formatCurrency(mi.total - month.total)}<span> ج.م</span></div></div>
-      </div></div>`; })()}
-      <div class="report-card"><h4>تقرير اليوم</h4><div class="report-grid">
-        <div class="rstat"><div class="rl">عدد المشتريات</div><div class="rv">${day.count}</div></div>
-        <div class="rstat"><div class="rl">إجمالي اليوم</div><div class="rv">${formatCurrency(day.total)}<span> ج.م</span></div></div>
-        <div class="rstat"><div class="rl">أعلى مصروف</div><div class="rv">${formatCurrency(day.total > 0 ? Math.max(...state.expenses.filter(e => finKindOf(e) === 'expense' && isSameDay(e.createdAt)).map(e => e.amount)) : 0)}<span> ج.م</span></div></div>
-        <div class="rstat"><div class="rl">أكثر قسم</div><div class="rv">${dayCat.id ? getCategoryName(dayCat.id) : '—'}</div></div>
+      <div class="rep-card"><div class="rep-head"><span class="rep-ico" style="background:#E0F2FE;">📅</span><b>تقرير اليوم</b><small>${day.count} مشتريات</small></div><div class="rep-grid">
+        <div class="rep-tile" style="background:#EDE9FE;"><span class="t-ico">🛒</span><span class="t-tx"><small>عدد المشتريات</small><b>${day.count}</b></span></div>
+        <div class="rep-tile" style="background:#DCFCE7;"><span class="t-ico">💸</span><span class="t-tx"><small>إجمالي اليوم</small><b>${formatCurrency(day.total)}<span> ج.م</span></b></span></div>
+        <div class="rep-tile" style="background:#FEF3C7;"><span class="t-ico">🔥</span><span class="t-tx"><small>أعلى مصروف</small><b>${formatCurrency(day.total > 0 ? Math.max(...state.expenses.filter(e => finKindOf(e) === 'expense' && isSameDay(e.createdAt)).map(e => e.amount)) : 0)}<span> ج.م</span></b></span></div>
+        <div class="rep-tile" style="background:#E0F2FE;"><span class="t-ico">🏷️</span><span class="t-tx"><small>أكثر قسم</small><b>${dayCat.id ? getCategoryName(dayCat.id) : '—'}</b></span></div>
       </div></div>
-      <div class="report-card"><h4>تقرير الأسبوع</h4><div class="report-grid">
-        <div class="rstat"><div class="rl">إجمالي الأسبوع</div><div class="rv">${formatCurrency(week.total)}<span> ج.م</span></div></div>
-        <div class="rstat"><div class="rl">المتوسط اليومي</div><div class="rv">${formatCurrency(week.count ? week.total / 7 : 0)}<span> ج.م</span></div></div>
-        <div class="rstat"><div class="rl">أكتر يوم صرف</div><div class="rv">${weekDay.total ? weekDay.label : '—'}<span>${weekDay.total ? ' (' + formatCurrency(weekDay.total) + ')' : ''}</span></div></div>
-        <div class="rstat"><div class="rl">أكثر قسم</div><div class="rv">${weekCat.id ? getCategoryName(weekCat.id) : '—'}</div></div>
-      </div><h4 style="margin-top:8px;">المصاريف (آخر 7 أيام)</h4>${renderBarChart(weekDays)}</div>
-      <div class="report-card"><h4>تقرير الشهر</h4><div class="report-grid">
-        <div class="rstat"><div class="rl">إجمالي الشهر</div><div class="rv">${formatCurrency(month.total)}<span> ج.م</span></div></div>
-        <div class="rstat"><div class="rl">متوسط اليوم</div><div class="rv">${formatCurrency(monthDays.filter(d => d.total > 0).length ? month.total / monthDays.filter(d => d.total > 0).length : 0)}<span> ج.م</span></div></div>
-        <div class="rstat"><div class="rl">أكثر قسم</div><div class="rv">${monthCat.id ? getCategoryName(monthCat.id) : '—'}</div></div>
-        <div class="rstat"><div class="rl">أيام الشراء</div><div class="rv">${monthDays.filter(d => d.total > 0).length}<span> يوم</span></div></div>
-      </div><h4 style="margin-top:10px;">التوزيع على الأقسام</h4>${renderDonut(monthBreak, totalMonth)}<h4 style="margin-top:14px;">المصاريف اليومية (الشهر)</h4>${renderBarChartSparse(monthDays)}</div>
-      <div class="report-card" style="background:var(--primary-light);">
-        <h4 style="color:var(--primary-dark);">ملخص كل شيء</h4>
-        <div style="font-size:26px;font-weight:900;color:var(--primary-dark);text-align:center;">${formatCurrency(all.total)} ج.م</div>
-        <div style="text-align:center;color:var(--primary);font-weight:700;font-size:12px;margin-top:2px;">الإجمالي الكلي • ${all.count} عملية شراء</div>
-        ${assistantSay(pickMsg(MSG.religious), null, 'احتفال بالإنجاز', 'mom')}
-      </div>`}
+      <div class="rep-card"><div class="rep-head"><span class="rep-ico" style="background:#FCE7F3;">📊</span><b>تقرير الأسبوع</b><small>آخر 7 أيام</small></div><div class="rep-grid">
+        <div class="rep-tile" style="background:#EDE9FE;"><span class="t-ico">💰</span><span class="t-tx"><small>إجمالي الأسبوع</small><b>${formatCurrency(week.total)}<span> ج.م</span></b></span></div>
+        <div class="rep-tile" style="background:#DCFCE7;"><span class="t-ico">📈</span><span class="t-tx"><small>المتوسط اليومي</small><b>${formatCurrency(week.count ? week.total / 7 : 0)}<span> ج.م</span></b></span></div>
+        <div class="rep-tile" style="background:#FEF3C7;"><span class="t-ico">🗓️</span><span class="t-tx"><small>أكتر يوم صرف</small><b>${weekDay.total ? weekDay.label : '—'}<span>${weekDay.total ? ' (' + formatCurrency(weekDay.total) + ')' : ''}</span></b></span></div>
+        <div class="rep-tile" style="background:#E0F2FE;"><span class="t-ico">🏷️</span><span class="t-tx"><small>أكثر قسم</small><b>${weekCat.id ? getCategoryName(weekCat.id) : '—'}</b></span></div>
+      </div><div class="rep-sec">📊 المصاريف (آخر 7 أيام)</div>${renderBarChart(weekDays)}</div>
+      <div class="rep-card"><div class="rep-head"><span class="rep-ico" style="background:#EDE9FE;">🗓️</span><b>تقرير الشهر</b><small>${monthDays.filter(d => d.total > 0).length} يوم شراء</small></div><div class="rep-grid">
+        <div class="rep-tile" style="background:#EDE9FE;"><span class="t-ico">💼</span><span class="t-tx"><small>إجمالي الشهر</small><b>${formatCurrency(month.total)}<span> ج.م</span></b></span></div>
+        <div class="rep-tile" style="background:#DCFCE7;"><span class="t-ico">📉</span><span class="t-tx"><small>متوسط اليوم</small><b>${formatCurrency(monthDays.filter(d => d.total > 0).length ? month.total / monthDays.filter(d => d.total > 0).length : 0)}<span> ج.م</span></b></span></div>
+        <div class="rep-tile" style="background:#FCE7F3;"><span class="t-ico">🏷️</span><span class="t-tx"><small>أكثر قسم</small><b>${monthCat.id ? getCategoryName(monthCat.id) : '—'}</b></span></div>
+        <div class="rep-tile" style="background:#E0F2FE;"><span class="t-ico">🛍️</span><span class="t-tx"><small>أيام الشراء</small><b>${monthDays.filter(d => d.total > 0).length}<span> يوم</span></b></span></div>
+      </div><div class="rep-sec">🍩 التوزيع على الأقسام</div>${renderDonut(monthBreak, totalMonth)}<div class="rep-sec">📊 المصاريف اليومية (الشهر)</div>${renderBarChartSparse(monthDays)}</div>
+      <div class="rep-hero">
+        <div class="rep-hero-head">🏆 ملخص كل شيء</div>
+        <div class="rep-hero-net"><small>الإجمالي الكلي • ${all.count} عملية شراء</small><b>${formatCurrency(all.total)} ج.م</b></div>
+      </div>
+      ${assistantSay(pickMsg(MSG.religious), null, 'احتفال بالإنجاز', 'mom')}`}
     </div>`;
   }
 
@@ -2793,12 +2942,14 @@
         <div class="vol-row"><span>🔉</span><input type="range" id="audioVolRange" min="0" max="100" step="1" value="${state._audioVol == null ? 80 : state._audioVol}"><span class="vol-val" id="audioVolVal">${state._audioVol == null ? 80 : state._audioVol}%</span></div>
         <div class="snd-add-row"><button class="btn" id="openSoundLib">🎵 مكتبة الأصوات</button></div>
       </div>
-      <div class="settings-card"><div class="settings-title">مساعد البيت الظريف 🎭</div>
-        <button class="tgl-row" id="tglCharShow"><span class="tgl"><b>إظهار المساعد</b><small>شخصية عائمة مرحة داخل التطبيق</small></span><span class="sw ${state._charShow !== false ? 'on' : ''}"></span></button>
-        <button class="tgl-row" id="tglCharTalk"><span class="tgl"><b>تعليقات المساعد</b><small>فقاعات كلام طريفة مع الأحداث</small></span><span class="sw ${state._charTalk !== false ? 'on' : ''}"></span></button>
-        <button class="tgl-row" id="tglCharSound"><span class="tgl"><b>صوت المساعد</b><small>تنبيه لطيف خفيف</small></span><span class="sw ${state._charSound !== false ? 'on' : ''}"></span></button>
-        <button class="tgl-row" id="tglCharRole"><span class="tgl"><b>نكت حسب الدور</b><small>تعليقات مرحة مختلفة للزوج والزوجة</small></span><span class="sw ${state._charRole !== false ? 'on' : ''}"></span></button>
-        <div class="snd-add-row"><button class="btn" id="charTestBtn">🎭 جرّب المساعد</button></div>
+      <div class="settings-card"><div class="settings-title">🔔 تنبيهات وتذكيرات</div>
+        <button class="tgl-row" id="tglNotif"><span class="tgl"><b>تفعيل التنبيهات</b><small>إشعارات أثناء استخدام التطبيق</small></span><span class="sw ${state._notifOn === true ? 'on' : ''}"></span></button>
+        <button class="tgl-row" id="tglNotifOrders"><span class="tgl"><b>التذكير بالطلبات</b><small>تنبيه كوميدي بالطلبات المعلقة</small></span><span class="sw ${state._notifOrders !== false ? 'on' : ''}"></span></button>
+        <button class="tgl-row" id="tglNotifExp"><span class="tgl"><b>التذكير بالمصروفات</b><small>يفكرك تسجل مصاريفك كل يوم</small></span><span class="sw ${state._notifExp !== false ? 'on' : ''}"></span></button>
+        <div class="vol-row"><span>🕘</span><input type="time" id="notifExpTime" value="${state._notifExpTime || '21:00'}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:12px;font-weight:800;color:var(--text);background:var(--bg);" /><span class="vol-val">التذكير</span></div>
+        <button class="tgl-row" id="tglNotifDaily"><span class="tgl"><b>التقرير اليومي</b><small>ملخص كوميدي لمصاريف اليوم</small></span><span class="sw ${state._notifDaily !== false ? 'on' : ''}"></span></button>
+        <div class="vol-row"><span>🕙</span><input type="time" id="notifDailyTime" value="${state._notifDailyTime || '22:00'}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:12px;font-weight:800;color:var(--text);background:var(--bg);" /><span class="vol-val">التقرير</span></div>
+        <div class="snd-add-row"><button class="btn" id="notifTestBtn">🔔 جرّب تنبيه</button></div>
       </div>
       <div class="settings-card"><div class="settings-title">صور العائلة</div>
         <div style="padding:6px 16px 2px;color:var(--text-sec);font-size:11px;font-weight:600;">ارفع صورة حقيقية للأم والأب من موبايلك</div>
@@ -2811,8 +2962,9 @@
           </div>
         </div>
       </div>
-      <div class="settings-card"><button class="collapsible-head" id="catCustomHead"><span class="ch-icon">${svgIcon('sparkle', 22)}</span><span class="ch-texts"><b>تخصيص الأقسام</b><small>الأسماء والأيقونات والألوان • اضغط للعرض</small></span><span class="chev ${state._catOpen ? 'open' : ''}">‹</span></button>
+      <div class="settings-card"><button class="collapsible-head" id="catCustomHead"><span class="ch-icon">${svgIcon('sparkle', 22)}</span><span class="ch-texts"><b>الأقسام والمنتجات</b><small>${allCats().length} قسم • ${getCatalog().reduce((a, d) => a + catDeptCount(d), 0)} صنف • ${finCounts().it} بند مالي • اضغط للعرض</small></span><span class="chev ${state._catOpen ? 'open' : ''}">‹</span></button>
         <div class="collapsible-body ${state._catOpen ? '' : 'hidden'}">
+        <div class="settings-title">تخصيص الأقسام</div>
         <div style="padding:6px 16px 2px;color:var(--text-sec);font-size:11px;font-weight:600;">الأيقونة لتغييرها • اللون لتغييره • تعديل للاسم</div>
         <div class="color-grid single">${allCats().map(cat => {
           const currentColor = catColor(cat.id);
@@ -2821,12 +2973,11 @@
         }).join('')}</div>
         <div style="padding:0 16px 12px;"><button class="btn btn-primary" id="addCatBtn">+ إضافة قسم جديد</button></div>
         ${(state.hiddenCats || []).length ? `<div style="padding:0 16px 12px;"><div style="font-size:12px;font-weight:800;color:var(--text-sec);margin-bottom:6px;">أقسام مخفية</div><div class="learned-list">${state.hiddenCats.map(id => `<span class="learned-tag">${getCategoryName(id)}<button data-showcat="${id}" style="color:var(--success);">إظهار</button></span>`).join('')}</div></div>` : ''}
-        </div>
-      </div>
-      <div class="settings-card"><div class="settings-title">كتالوج المنتجات</div>
+        <div class="settings-title">كتالوج المنتجات</div>
         ${(() => { const cats = getCatalog(); const n = cats.reduce((a, d) => a + catDeptCount(d), 0); return `<div class="settings-item"><div class="si-icon" style="background:#F1EAFE;color:#7C3AED;">🛍️</div><div class="si-body"><div class="si-label">موسوعة المنتجات</div><div class="si-value">${n} صنف في ${cats.length} قسم</div></div><button class="si-action" id="catManagerBtn">إدارة</button></div>`; })()}
         ${(() => { const pl = collectProducts(); return `<div class="settings-item"><div class="si-icon" style="background:#FCE7F3;color:#EC4899;">${productIcon(pl[0]?.name || 'لبن', pl[0]?.cat || 'dairy')}</div><div class="si-body"><div class="si-label">أيقونات المنتجات</div><div class="si-value">${pl.length} منتج • الأيقونة حسب اسم المنتج</div></div><button class="si-action" id="prodIconsBtn">إدارة</button></div>`; })()}
         ${(() => { const c = finCounts(); return `<div class="settings-item"><div class="si-icon" style="background:#FEF3C7;color:#D97706;">💼</div><div class="si-body"><div class="si-label">الأقسام المالية</div><div class="si-value">${c.it} بند في ${c.g} مجموعة (مصروفات / دخل / ديون)</div></div><button class="si-action" id="finManagerBtn">إدارة</button></div>`; })()}
+        </div>
       </div>
       <div class="settings-card"><div class="settings-title">البيانات</div>
         <div class="settings-item"><div class="si-icon" style="background:#DCFCE7;color:#059669;">${svgIcon('trophy', 18)}</div><div class="si-body"><div class="si-label">التوفير الكلي</div><div class="si-value">${formatCurrency(totalSavings)} ج.م</div></div></div>
@@ -2928,8 +3079,38 @@
 
   function bindMain() {
     try { syncUserToAdminDir(); } catch {}
-    const fin1 = document.getElementById('finishOrdersBtn'); if (fin1) fin1.onclick = () => openFinishOrdersFlow();
-    const fin2 = document.getElementById('finishOrdersHome'); if (fin2) fin2.onclick = () => openFinishOrdersFlow();
+
+    const bc = document.getElementById('basketConfirm'); if (bc) bc.onclick = () => { const r = confirmBasket(); if (r.added.length) { try { MemeSound.playEvent(r.added.some(o => o.priority === 'high' || o.urgent) ? 'URGENT' : 'NEW_REQUEST'); } catch {} } render(); toast(r.added.length ? `🧺 اتأكدت السلة: ${r.added.length} طلب ✓` + (r.skipped ? ` (تجاهلت ${r.skipped} مكرر)` : '') : 'السلة فاضية أو كلها موجودة بالفعل', r.added.length ? 'success' : 'warning'); };
+    const bcl = document.getElementById('basketClear'); if (bcl) bcl.onclick = () => { confirmDialog({ title: 'تفريغ السلة؟', message: 'كل الأصناف المجهزة هتتمسح من السلة.', confirmText: 'فرّغ', cancelText: 'لا' }).then(ok => { if (ok) { clearBasket(); render(); toast('اتفرغت السلة ✓', 'success'); } }); };
+    document.querySelectorAll('[data-bexp]').forEach(el => el.onclick = (e) => { if (e.target.closest('button, input, select, textarea, a')) return; toggleBasketExpand(el.dataset.bexp); });
+    document.querySelectorAll('[data-bqtype]').forEach(b => b.onclick = () => {
+      const d = state._basketDraft || (state._basketDraft = {});
+      d.qtyType = b.dataset.bqtype;
+      if (d.qtyType === 'count') {
+        if (!QTY_COUNT_UNITS.includes(d.qtyUnit)) d.qtyUnit = 'قطعة';
+        if (!(Number(d.qtyVal) >= 1)) d.qtyVal = 1;
+      } else if (d.qtyType === 'weight') {
+        if (!QTY_WEIGHT_UNITS.includes(d.qtyUnit)) d.qtyUnit = 'كجم';
+        if (!(Number(d.qtyVal) > 0)) d.qtyVal = 1;
+      }
+      render();
+    });
+    document.querySelectorAll('[data-bqminus]').forEach(b => b.onclick = () => { const d = state._basketDraft || (state._basketDraft = {}); d.qtyVal = Math.max(1, (Number(d.qtyVal) || 1) - 1); render(); });
+    document.querySelectorAll('[data-bqplus]').forEach(b => b.onclick = () => { const d = state._basketDraft || (state._basketDraft = {}); d.qtyVal = Math.min(99, (Number(d.qtyVal) || 1) + 1); render(); });
+    document.querySelectorAll('[data-bqunit]').forEach(s => s.onchange = () => { const d = state._basketDraft || (state._basketDraft = {}); d.qtyUnit = s.value; });
+    document.querySelectorAll('[data-bqvalw]').forEach(s => s.oninput = () => { const d = state._basketDraft || (state._basketDraft = {}); d.qtyVal = parseFloat(s.value) || 0; });
+    document.querySelectorAll('[data-bqunitw]').forEach(s => s.onchange = () => { const d = state._basketDraft || (state._basketDraft = {}); d.qtyUnit = s.value; });
+    document.querySelectorAll('[data-bqnotes]').forEach(s => s.oninput = () => { const d = state._basketDraft || (state._basketDraft = {}); d.notes = s.value; });
+    document.querySelectorAll('[data-bqsave]').forEach(b => b.onclick = () => { if (saveBasketDraft(b.dataset.bqsave)) { toast('اتحفظ ✓', 'success'); render(); } });
+    document.querySelectorAll('[data-bqconfirm]').forEach(b => b.onclick = () => {
+      const id = b.dataset.bqconfirm;
+      const it = saveBasketDraft(id, true); if (!it) return;
+      if (pendingOrderExists(it.name, activeListId())) { toast('موجود بالفعل في الطلبات', 'warning'); return; }
+      addOrder({ name: it.name, notes: it.notes, urgent: it.urgent, priority: it.priority, qty: it.qty, listId: activeListId(), categoryId: it.categoryId });
+      removeBasketItem(id); state._expandedBasket = null; state._basketDraft = null; render();
+      toast('🧺 اتأكد الصنف وبقى طلب ✓', 'success');
+    });
+    document.querySelectorAll('[data-bqdel]').forEach(b => b.onclick = () => { removeBasketItem(b.dataset.bqdel); state._expandedBasket = null; state._basketDraft = null; toast('اتمسح ✓', 'success'); render(); });
     const edRole = document.getElementById('editRoleBtn'); if (edRole) edRole.onclick = () => openProfileModal();
     const edWa = document.getElementById('editWaBtn'); if (edWa) edWa.onclick = () => openProfileModal();
     document.querySelectorAll('.nav-item[data-tab]').forEach(b => { b.onclick = () => setTab(b.dataset.tab); });
@@ -2938,6 +3119,7 @@
     const ha = document.getElementById('heroAddOrder'); if (ha) ha.onclick = openAddOrderModal;
     document.querySelectorAll('[data-gotab2]').forEach(b => { b.onclick = () => setTab(b.dataset.gotab2); });
     const ea = document.getElementById('emptyAddOrder'); if (ea) ea.onclick = openAddOrderModal;
+    const bha = document.getElementById('basketHomeAdd'); if (bha) bha.onclick = openAddOrderModal;
     const ea2 = document.getElementById('emptyAddExpense'); if (ea2) ea2.onclick = openAddExpenseModal;
     document.querySelectorAll('.order-card').forEach(card => {
       let pressTimer = null, active = false, sx = 0, sy = 0; const id = card.dataset.id;
@@ -2983,13 +3165,26 @@
         });
       } catch { toast('البحث الصوتي غير مدعوم في المتصفح ده', 'warning'); }
     };
-    document.querySelectorAll('[data-catdept]').forEach(b => b.onclick = () => { state._catBrowse = b.dataset.catdept; state.searchQuery = ''; persist(); render(); });
-    const scb = document.getElementById('shopCardBtn'); if (scb) scb.onclick = () => { state._shopOpen = true; state._catBrowse = null; render(); };
+    document.querySelectorAll('[data-catdept]').forEach(b => b.onclick = () => { state._catBrowse = b.dataset.catdept; state.searchQuery = ''; state._shopQuery = ''; persist(); render(); });
+    const scb = document.getElementById('shopCardBtn'); if (scb) scb.onclick = () => setTab('shop');
+    const shs = document.getElementById('shopSearch');
+    if (shs) { shs.oninput = (e) => { state._shopQuery = e.target.value; if (shs._to) clearTimeout(shs._to); shs._to = setTimeout(() => { persist(); render(); const i = document.getElementById('shopSearch'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 200); }; }
     const saf = document.getElementById('shopAddFirst'); if (saf) saf.onclick = () => openAddOrderModal();
     const shb = document.getElementById('shopCloseBtn'); if (shb) shb.onclick = () => { state._shopOpen = false; state._catBrowse = null; render(); };
     const cbb = document.getElementById('catBackBtn'); if (cbb) cbb.onclick = () => { state._catBrowse = null; render(); };
     document.querySelectorAll('[data-addcat]').forEach(b => b.onclick = () => { try { quickAddCatalogItem(decodeURIComponent(b.dataset.addcat)); } catch {} });
-    document.querySelectorAll('[data-expqtype]').forEach(b => b.onclick = () => { const d = state._expDraft || (state._expDraft = {}); d.qtyType = b.dataset.expqtype; if (d.qtyType === 'count' && !(d.qtyVal >= 1)) d.qtyVal = 1; render(); });
+    document.querySelectorAll('[data-expqtype]').forEach(b => b.onclick = () => {
+      const d = state._expDraft || (state._expDraft = {});
+      d.qtyType = b.dataset.expqtype;
+      if (d.qtyType === 'count') {
+        if (!QTY_COUNT_UNITS.includes(d.qtyUnit)) d.qtyUnit = 'قطعة';
+        if (!(Number(d.qtyVal) >= 1)) d.qtyVal = 1;
+      } else if (d.qtyType === 'weight') {
+        if (!QTY_WEIGHT_UNITS.includes(d.qtyUnit)) d.qtyUnit = 'كجم';
+        if (!(Number(d.qtyVal) > 0)) d.qtyVal = 1;
+      }
+      render();
+    });
     document.querySelectorAll('[data-expqminus]').forEach(b => b.onclick = () => { const d = state._expDraft || (state._expDraft = {}); d.qtyVal = Math.max(1, (Number(d.qtyVal) || 1) - 1); render(); });
     document.querySelectorAll('[data-expqplus]').forEach(b => b.onclick = () => { const d = state._expDraft || (state._expDraft = {}); d.qtyVal = Math.min(99, (Number(d.qtyVal) || 1) + 1); render(); });
     document.querySelectorAll('[data-expunit]').forEach(s => s.onchange = () => { const d = state._expDraft || (state._expDraft = {}); d.qtyUnit = s.value; });
@@ -3018,7 +3213,7 @@
     if (!purchased) items += `<button class="context-menu-item buy" data-ctx-buy="${orderId}"><span class="ctx-icon" style="color:var(--success);">${svgIcon('check', 18)}</span><span>جبتها يا بطل</span></button>`;
     if (!purchased) items += `<button class="context-menu-item urg ${isUrg ? 'is-on' : ''}" data-ctx-urg="${orderId}"><span class="ctx-icon">🔥</span><span>${isUrg ? 'إلغاء الضروري' : 'اجعلها ضروري'}</span></button>`;
     items += `<button class="context-menu-item edit" data-ctx-edit="${orderId}"><span class="ctx-icon" style="color:var(--primary);">${svgIcon('pencil', 18)}</span><span>تعديل</span></button>`;
-    if (!purchased) { items += `<div class="context-menu-sep"></div><button class="context-menu-item delete" data-ctx-del="${orderId}"><span class="ctx-icon">${svgIcon('trash', 18)}</span><span>خلاص بلاش دي</span></button>`; }
+    items += `<div class="context-menu-sep"></div><button class="context-menu-item delete" data-ctx-del="${orderId}"><span class="ctx-icon">${svgIcon('trash', 18)}</span><span>خلاص بلاش دي</span></button>`;
     menu.innerHTML = items;
     document.body.appendChild(back);
     document.body.appendChild(menu);
@@ -3093,11 +3288,19 @@
     const avr = document.getElementById('audioVolRange');
     if (avr) avr.oninput = () => { state._audioVol = Number(avr.value) || 0; const vv = document.getElementById('audioVolVal'); if (vv) vv.textContent = state._audioVol + '%'; persist(); };
     b('openSoundLib', openSoundLibrary);
-    b('tglCharShow', () => { state._charShow = !(state._charShow !== false); persist(); render(); try { window.Character && Character.applySettings(); } catch {} });
-    b('tglCharTalk', () => { state._charTalk = !(state._charTalk !== false); persist(); render(); try { window.Character && Character.applySettings(); } catch {} });
-    b('tglCharSound', () => { state._charSound = !(state._charSound !== false); persist(); render(); try { window.Character && Character.applySettings(); } catch {} });
-    b('tglCharRole', () => { state._charRole = !(state._charRole !== false); persist(); render(); try { window.Character && Character.applySettings(); } catch {} });
-    b('charTestBtn', () => { try { window.Character && Character.test(); } catch {} });
+    b('tglNotif', () => {
+      const on = !(state._notifOn === true);
+      const apply = (v) => { state._notifOn = v; persist(); render(); toast(v ? 'التنبيهات اشتغلت 🔔' : 'التنبيهات اتقفلت', v ? 'success' : 'info'); };
+      if (on && 'Notification' in window && Notification.permission === 'default') {
+        try { Notification.requestPermission().then(p => apply(p === 'granted')); } catch { apply(true); }
+      } else apply(on);
+    });
+    b('tglNotifOrders', () => { state._notifOrders = !(state._notifOrders !== false); persist(); render(); });
+    b('tglNotifExp', () => { state._notifExp = !(state._notifExp !== false); persist(); render(); });
+    b('tglNotifDaily', () => { state._notifDaily = !(state._notifDaily !== false); persist(); render(); });
+    const net = document.getElementById('notifExpTime'); if (net) net.onchange = () => { state._notifExpTime = net.value || '21:00'; persist(); };
+    const ndt = document.getElementById('notifDailyTime'); if (ndt) ndt.onchange = () => { state._notifDailyTime = ndt.value || '22:00'; persist(); };
+    b('notifTestBtn', () => notifFire('test', '🔔 ناقصنا إيه', 'التنبيهات شغالة تمام! 😄🔔'));
     document.querySelectorAll('[data-hidecat]').forEach(btn => btn.onclick = () => {
       if (!state.hiddenCats) state.hiddenCats = [];
       if (!state.hiddenCats.includes(btn.dataset.hidecat)) state.hiddenCats.push(btn.dataset.hidecat);
@@ -4071,7 +4274,7 @@
         if (announce) {
           if (r.count > 0) {
             toast('تم التعرف على ' + r.count + ' كلمات', 'success');
-            if (ui && ui.onCommit) ui.onCommit(r.count, r.items);
+            if (ui && ui.onCommit) ui.onCommit(r.count, r.items, finalTxt);
           } else if ((finalTxt || '').trim()) {
             toast('لم يتم التعرف على كلمات موجودة في قائمة الموقع', 'warning');
             if (ui && ui.onCommit) ui.onCommit(0, []);
@@ -4124,6 +4327,63 @@
     }
   };
   function stopVoice() { try { Voice.stop(); } catch {} }
+
+  /* =============================
+     LOCAL NOTIFICATIONS (تذكيرات كوميدية)
+     ============================= */
+  const NOTIF_ORDERS = [
+    'عندك {n} طلبات معلقة... البطل نايم ولا إيه؟ 😂',
+    'القايمة مستنياك يا معلم! {n} طلبات 🛒😂',
+    'الطلبات بتنادي عليك... رد عليها 😄📢',
+    '{n} طلبات لسه متجابوش... همتك يا بطل 💪😂'
+  ];
+  const NOTIF_EXP = [
+    'سجلت مصاريف النهارده؟ المحفظة عايزة تعترف 😂💸',
+    'قبل ما تنام... المصاريف اتسجلت ولا لسه؟ 😄📝',
+    'دقيقة واحدة وسجل مصاريفك... عشان التقرير ميزعلش 😂'
+  ];
+  function notifStore() { try { return JSON.parse(localStorage.getItem('naqisna_notif') || '{}'); } catch { return {}; } }
+  function notifSave(o) { try { localStorage.setItem('naqisna_notif', JSON.stringify(o)); } catch {} }
+  function notifFire(kind, title, body) {
+    let shown = false;
+    if (state._notifOn === true) {
+      try {
+        if ('Notification' in window && Notification.permission === 'granted') {
+          const n = new Notification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png', tag: 'naqisna-' + kind });
+          n.onclick = () => { try { window.focus(); } catch {} try { n.close(); } catch {} };
+          shown = true;
+        }
+      } catch {}
+    }
+    if (!shown) toast(title + ' — ' + body, 'info');
+  }
+  function notifDayKey() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function notifTimePassed(hhmm) { try { const p = String(hhmm || '00:00').split(':'); const h = Number(p[0]) || 0, m = Number(p[1]) || 0; const n = new Date(); return (n.getHours() * 60 + n.getMinutes()) >= (h * 60 + m); } catch { return false; } }
+  function notifTick() {
+    try {
+      if (!state || !state.initialized) return;
+      if (state._notifOn !== true) return;
+      const st = notifStore(); const now = Date.now(); const tk = notifDayKey();
+      const pend = (state.orders || []).filter(o => o && o.status !== 'purchased');
+      if (state._notifOrders !== false && pend.length) {
+        if (!st.ordTs) { st.ordTs = now; notifSave(st); }
+        else if (now - st.ordTs > 6 * 3600 * 1000) {
+          st.ordTs = now; notifSave(st);
+          notifFire('orders', '🛒 تذكير الطلبات', pickMsg(NOTIF_ORDERS).replace('{n}', pend.length));
+        }
+      } else if (!pend.length && st.ordTs) { st.ordTs = now; notifSave(st); }
+      if (state._notifExp !== false && notifTimePassed(state._notifExpTime || '21:00') && st.expDay !== tk) {
+        const hasToday = (state.expenses || []).some(e => { try { return new Date(e.createdAt).toDateString() === new Date().toDateString(); } catch { return false; } });
+        if (!hasToday) { st.expDay = tk; notifSave(st); notifFire('exp', '💸 تذكير المصروفات', pickMsg(NOTIF_EXP)); }
+      }
+      if (state._notifDaily !== false && notifTimePassed(state._notifDailyTime || '22:00') && st.dailyDay !== tk) {
+        st.dailyDay = tk; notifSave(st);
+        const list = (state.expenses || []).filter(e => { try { return new Date(e.createdAt).toDateString() === new Date().toDateString() && (e.kind || 'expense') === 'expense'; } catch { return false; } });
+        const t = list.reduce((a, e) => a + (Number(e.amount) || 0), 0);
+        notifFire('daily', '📊 التقرير اليومي', t > 0 ? `تقرير اليوم 😎: صرفت ${formatCurrency(t)} ج.م في ${list.length} عمليات... ربنا يعوض عليك 😂❤️` : 'تقرير اليوم: مصرفتش حاجة! معجزة تستحق الاحتفال 🎉😂');
+      }
+    } catch {}
+  }
 
   /* =============================
      ORDER MODALS
@@ -4195,9 +4455,9 @@
       if (qType === 'count') { const v = Math.round(Number(qVal) || 0); if (v >= 1 && v <= 99) qty = { t: 'c', v, u: QTY_COUNT_UNITS.includes(qUnit) ? qUnit : 'قطعة' }; }
       else if (qType === 'weight') { const v = Number(qVal); if (v > 0 && v <= 10000) qty = { t: 'w', v, u: QTY_WEIGHT_UNITS.includes(qUnit) ? qUnit : 'كجم' }; }
       const notes = (m.querySelector('#qaNotes').value || '').trim();
-      addOrder({ name: nm, notes, urgent: false, priority: 'medium', qty, listId: activeListId(), categoryId: qDept });
+      addToBasket({ name: nm, notes, urgent: false, priority: 'medium', qty, categoryId: qDept });
       closeModal(m); render();
-      toast('اتضاف "' + nm + '" للطلب ✓', 'success');
+      toast('🧺 اتضاف "' + nm + '" للسلة ✓', 'success');
     };
   }
   function openAddOrderModal() { MemeSound.playEvent('OPEN'); openOrderModal({ mode: 'add' }); }
@@ -4238,7 +4498,7 @@
         ? `<div class="field"><label>يُضاف إلى طلب (قائمة)</label><select id="ordListSel" class="rv-select">${orderLists().map(l => `<option value="${l.id}" ${l.id === activeListId() ? 'selected' : ''}>${escapeHTML(l.name)}</option>`).join('')}</select></div>` : ''}
       <div id="pharmacyNote" class="pharm-note hidden">⚠️ ده قسم صيدلية بس. التطبيق مش بيقدم تشخيص أو نصيحة طبية.</div>
       <div class="field" style="margin-bottom:4px;"><button type="button" class="urg-toggle ${editing && order && (order.priority === 'high' || order.urgent) ? 'on' : ''}" id="urgToggle"><span class="u-ico">🔥</span><b>طلب ضروري<small>هيظهر بشارة حمرا ويطلع أول القائمة</small></b><span class="sw"></span></button></div>
-      <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="submitOrderBtn">${editing ? 'حفظ التعديل' : 'تأكيد الطلب'}</button><button class="btn" id="cancelOrderBtn">رجوع</button></div>`;
+      <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="submitOrderBtn">${editing ? 'حفظ التعديل' : 'إضافة للسلة 🧺'}</button><button class="btn" id="cancelOrderBtn">رجوع</button></div>`;
     const m = openModal(html);
     const nameInput = m.querySelector('#ordName');
     const pharmNote = m.querySelector('#pharmacyNote'); const submitBtn = m.querySelector('#submitOrderBtn');
@@ -4439,6 +4699,50 @@
       else selectItem(name);
     }
     let needCatFor = null;
+    let voiceUnknownQueue = [];
+    const VOICE_FILLERS = new Set(['لو','سمحت','من','فضلك','عايز','عايزه','عاوز','عاوزه','هات','هاتي','ضيف','ضيفي','اضف','محتاج','محتاجه','محتاجين','ناقص','ناقصنا','ايه','كمان','شويه','عندنا','دي','ده','اللي','عشان','كده','اذنك','في','علي','يا','اه','جب','خد','بقي','يعني','ممكن','عاوزين']);
+    function splitVoicePhrases(raw) {
+      return cleanVoiceRaw(raw).split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').trim()).filter(Boolean);
+    }
+    function stripVoiceFillers(phrase) {
+      return String(phrase || '').split(' ').filter(t => t && !VOICE_FILLERS.has(normalizeTerm(t))).join(' ').trim();
+    }
+    function handleVoiceCommit(items, raw) {
+      const ps = m.querySelector('#pickSearch');
+      const seen = new Set(pickedList.map(x => normalizeTerm(x)));
+      const matchedNorms = new Set((items || []).map(n => normalizeTerm(n)).filter(Boolean));
+      const isCovered = (k) => [...matchedNorms].some(mk => mk && (k.includes(mk) || mk.includes(k)));
+      let added = 0;
+      (items || []).forEach(nm => {
+        const t = String(nm || '').trim(); const k = normalizeTerm(t);
+        if (k && !seen.has(k)) { seen.add(k); pickedList.push(t); added++; }
+      });
+      const unknown = [];
+      splitVoicePhrases(raw || '').forEach(ph => {
+        const k = normalizeTerm(ph);
+        if (!k || seen.has(k) || isCovered(k)) return;
+        const clean = stripVoiceFillers(ph);
+        const ck = normalizeTerm(clean);
+        if (!ck || seen.has(ck) || isCovered(ck)) return;
+        if (foundInCatalog(clean)) { seen.add(ck); pickedList.push(clean); added++; }
+        else unknown.push(clean);
+      });
+      if (ps) ps.value = '';
+      voiceUnknownQueue = unknown.filter(u => u && !seen.has(normalizeTerm(u)));
+      syncPickedCompat(); qtyFor = null;
+      try { renderQty(); } catch {}
+      renderPick(); renderPickList(); evalCategoryFromName();
+      if (added) toast(added === 1 ? '🎙️ اتضاف الصنف فوق ✓' : `🎙️ اتضاف ${added} أصناف فوق ✓`, 'success');
+      if (voiceUnknownQueue.length) {
+        const w = voiceUnknownQueue.shift();
+        needCatFor = w; newItemCat = null;
+        if (ps) ps.value = w;
+        renderPickList();
+        toast(`"${w}" مش موجود — اختار تصنيفه عشان نحفظه عندك ✓`, 'info');
+      } else if (!added) {
+        toast('مسمعتش صنف واضح — قرب من الميك وجرب تاني 🎙️', 'warning');
+      }
+    }
     function foundInCatalog(nm) {
       const k = normalizeTerm(nm); if (!k) return false;
       const cats = getCatalog();
@@ -4482,6 +4786,13 @@
         syncPickedCompat(); qtyFor = null;
         renderPick(); renderPickDepts(); renderPickList();
         toast('اتحفظ الصنف واتضاف فوق ✓', 'success');
+        if (voiceUnknownQueue.length) {
+          const w2 = voiceUnknownQueue.shift();
+          needCatFor = w2; newItemCat = null;
+          const ps2 = m.querySelector('#pickSearch'); if (ps2) ps2.value = w2;
+          renderPickList();
+          toast(`"${w2}" — اختار تصنيفه كمان عشان نحفظه ✓`, 'info');
+        }
       };
     }
     function renderPickList() {
@@ -4548,14 +4859,11 @@
       const target = ps || nameInput;
       Voice.lang = 'ar-EG';
       Voice.toggle(target, {
-        onText: () => {
-          if (ps) { renderPickList(); const items = parseItems(); if (items.length && !editing) selectItem(items[0]); else voiceUI().onText(); }
-          else voiceUI().onText();
-        },
+        onText: () => { if (ps) renderPickList(); else voiceUI().onText(); },
         onState: (on) => { ordVoice.classList.toggle('recording', !!on); try { setVoiceUI(on); } catch {} },
-        onCommit: (count) => {
-          if (ps) renderPickList();
-          try { voiceUI().onCommit(count); } catch {}
+        onCommit: (count, items, raw) => {
+          if (!editing && ps) handleVoiceCommit(items || [], raw || '');
+          else { if (ps) renderPickList(); try { voiceUI().onCommit(count); } catch {} }
         }
       });
     };
@@ -4581,14 +4889,12 @@
         const useCat = null;
         for (const itemName of items) {
           const k = normalizeTerm(itemName);
-          if (seenBatch[k] || pendingOrderExists(itemName, lid2)) { skipped++; continue; }
+          if (seenBatch[k] || pendingOrderExists(itemName, lid2) || basketExists(itemName)) { skipped++; continue; }
           seenBatch[k] = 1;
-          added.push(addOrder({ name: itemName, notes, urgent: newPrio === 'high', priority: newPrio, qty: singleQty, listId: lid2, categoryId: useCat }));
+          added.push(addToBasket({ name: itemName, notes, urgent: newPrio === 'high', priority: newPrio, qty: singleQty, categoryId: useCat }));
         }
-        if (!added.length) { toast(skipped ? 'الصنف ده موجود بالفعل في القائمة دي' : 'اكتب صنف صحيح', 'warning'); return; }
-        MemeSound.playEvent(newPrio === 'high' ? 'URGENT' : 'NEW_REQUEST');
-        toast((added.length === 1 ? pickMsg(MSG.addOrder) : `زوّدت ${added.length} طلبات ✓ 😂`) + (skipped ? ` (تجاهلت ${skipped} مكرر)` : ''), 'success');
-        try { window.Character && Character.notify('NEW_REQUEST', { by: (state.user && state.user.name) || '', role: (state.user && state.user.role) || '' }); } catch {}
+        if (!added.length) { toast(skipped ? 'الصنف ده موجود بالفعل في القائمة دي أو في السلة' : 'اكتب صنف صحيح', 'warning'); return; }
+        toast((added.length === 1 ? '🧺 اتضاف الصنف للسلة ✓' : `🧺 اتضاف ${added.length} أصناف للسلة ✓`) + (skipped ? ` (تجاهلت ${skipped} مكرر)` : ''), 'success');
         closeModal(m); render();
         confirmDialog({ title: 'اتضاف ✓', message: 'تضيف صنف تاني في نفس القائمة؟', confirmText: 'أيوه ضيف', cancelText: 'خلاص' }).then(ok => { if (ok) { state._activeList = lid2; persist(); openOrderModal({ mode: 'add' }); } });
       } else {
@@ -4627,7 +4933,6 @@
       const boughtName = o.name;
       markPurchased(orderId, { originalPrice: finalV, finalPrice: finalV });
       try { MemeSound.playEvent('TASK_COMPLETED', { force: true }); } catch {}
-      try { window.Character && Character.notify('COMPLETE', { name: boughtName }); } catch {}
       closeModal(m); render();
       const left = (state.orders || []).filter(x => x.status !== 'purchased').length;
       if (!left) {
@@ -5000,7 +5305,6 @@
   function openFinishOrdersFlow() {
     const pend = (state.orders || []).filter(o => o.status === 'pending');
     if (!pend.length) { toast('مفيش طلبات معلقة عشان ننهيها 😄', 'warning'); return; }
-    try { window.Character && Character.notify('SEND', {}); } catch {}
     const role = state.user?.role || 'husband';
     const joke = pickComedy(role);
     if (joke) {
@@ -5062,6 +5366,7 @@
     attachCloud();
     try { migrateAudioSettings(); } catch {}
     try { AudioManager.loadLibrary(); } catch {}
+    try { setInterval(notifTick, 60000); setTimeout(notifTick, 15000); } catch {}
     try {
       if ('serviceWorker' in navigator) {
         const upd = () => { try { navigator.serviceWorker.ready.then(r => r.update().catch(() => {})).catch(() => {}); } catch {} };
@@ -5104,7 +5409,6 @@
   setInterval(() => { if (!state.initialized || !state.home || !state.user) bindOnboarding(); }, 150);
 })();
 </script>
-<script src="character.js"></script>
 <script>
 if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
 </script>
