@@ -2,7 +2,7 @@
  * Keeps PWA offline caching only. All push/FCM/notification code removed.
  */
 
-const CACHE_NAME = 'naqisna-pwa-v8';
+const CACHE_NAME = 'naqisna-pwa-v9';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -37,8 +37,9 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = event.request.url || '';
 
-  // Bypass caching for Firestore and Google auth endpoints
+  // Bypass caching for Supabase API endpoints (always fresh)
   if (
+    url.includes('xivdqenmikhljdlmpsfc.supabase.co') ||
     url.includes('firestore.googleapis.com') ||
     url.includes('identitytoolkit') ||
     url.includes('securetoken.googleapis.com')

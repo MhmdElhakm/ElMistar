@@ -983,8 +983,7 @@
 <div class="app" id="app"></div>
 <div class="toast-container" id="toastContainer"></div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.10/dist/umd/supabase.min.js"></script>
 <script>
 (() => {
   'use strict';
@@ -1726,7 +1725,7 @@
     state.categoryIcons = {};
     return true;
   }
-  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); delete state.notifs; delete state.notifPrefs; delete state._notifSound; delete state._soundOn; wipeCatalogOnce(); migrateCats(); migrateOrderLists(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
+  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); delete state.notifs; delete state.notifPrefs; delete state._notifSound; delete state._soundOn; delete state._expandedOrder; delete state._expDraft; delete state._expandedBasket; delete state._basketDraft; wipeCatalogOnce(); migrateCats(); migrateOrderLists(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
   function catDeptById(id) {
     if (CATEGORIES[id]) return CATEGORIES[id];
     const ad = ((state.catalogCustom || {}).addedDepts || []).find(x => x.id === id);
@@ -1854,23 +1853,14 @@
   }
 
   /* =============================
-     FIREBASE FIRESTORE SYNC
+     SUPABASE CLOUD SYNC (replaces Firebase)
      ============================= */
-  const firebaseConfig = {
-    apiKey: "AIzaSyC8Gj1hufwwXrdO4zzQjPMeMg_KD3XSKDQ",
-    authDomain: "project-84ae3235-3633-44c1-819.firebaseapp.com",
-    projectId: "project-84ae3235-3633-44c1-819",
-    storageBucket: "project-84ae3235-3633-44c1-819.firebasestorage.app",
-    messagingSenderId: "1009475192148",
-    appId: "1:1009475192148:web:5031fa8ddcbca4c860b4c1",
-    measurementId: "G-97QYMTBRKS"
-  };
-  let db = null, cloudUnsub = null, cloudCode = null, cloudTimer = null;
+  const SUPABASE_URL = 'https://xivdqenmikhljdlmpsfc.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpdmRxZW5taWtobGpkbG1wc2ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MDcyMzYsImV4cCI6MjEwNDk4MzIzNn0.2QRZA1NoiuvLVaQHqLbIp1vLBAbNcvgrjgJbHc-DTZo';
+  let db = null, cloudUnsub = null, cloudCode = null, cloudTimer = null, cloudPoll = null;
   try {
-    if (window.firebase) {
-      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-      db = firebase.firestore();
-      db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+    if (window.supabase && window.supabase.createClient) {
+      db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     }
   } catch { db = null; }
   /* Cloud sync only (no notifications) */
@@ -1888,29 +1878,45 @@
     if (!db || !state.home?.code) return;
     if (cloudTimer) clearTimeout(cloudTimer);
     cloudTimer = setTimeout(() => {
-      try { db.collection('homes').doc(state.home.code).set(cloudPayload(), { merge: true }); }
-      catch { /* offline - SDK queues automatically */ }
+      try {
+        const p = cloudPayload();
+        db.from('homes').upsert({ code: state.home.code, data: p, updated_at: p.updatedAt || Date.now() }).then(() => {}, () => {});
+      } catch {}
     }, 800);
+  }
+  function applyCloudRemote(remote, ts) {
+    if (!remote) return;
+    if (((ts != null ? ts : remote.updatedAt) || 0) > (state.updatedAt || 0) && remote.home) {
+      const ui = {};
+      for (const k of UI_ONLY_KEYS) ui[k] = state[k];
+      Object.assign(state, remote, ui);
+      if (wipeCatalogOnce()) persist(); else Storage.save(state);
+      render();
+      if (state.initialized) toast('وصل تحديث جديد من جهاز تاني', 'info');
+    }
+  }
+  async function cloudFetchRow() {
+    if (!db || !state.home?.code) return;
+    try {
+      const r = await db.from('homes').select('data,updated_at').eq('code', state.home.code).maybeSingle();
+      if (r && !r.error && r.data) applyCloudRemote(r.data.data || {}, r.data.updated_at || 0);
+      else if (r && !r.error && !r.data) scheduleCloud();
+    } catch {}
   }
   function attachCloud() {
     if (!db || !state.home?.code) return;
     if (cloudCode === state.home.code) return;
-    if (cloudUnsub) { try { cloudUnsub(); } catch {} cloudUnsub = null; }
+    if (cloudUnsub) { try { cloudUnsub.unsubscribe(); } catch {} cloudUnsub = null; }
+    if (cloudPoll) { try { clearInterval(cloudPoll); } catch {} cloudPoll = null; }
     cloudCode = state.home.code;
     try {
-      cloudUnsub = db.collection('homes').doc(state.home.code).onSnapshot((snap) => {
-        if (!snap.exists) { scheduleCloud(); return; }
-        const remote = snap.data() || {};
-        if ((remote.updatedAt || 0) > (state.updatedAt || 0) && remote.home) {
-          const ui = {};
-          for (const k of UI_ONLY_KEYS) ui[k] = state[k];
-          Object.assign(state, remote, ui);
-          if (wipeCatalogOnce()) persist(); else Storage.save(state);
-          render();
-          if (state.initialized) toast('وصل تحديث جديد من جهاز تاني', 'info');
-        }
-      });
-    } catch { /* offline */ }
+      const ch = db.channel('home-' + state.home.code)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'homes', filter: 'code=eq.' + state.home.code }, () => { cloudFetchRow(); })
+        .subscribe((status) => { if (status !== 'SUBSCRIBED') cloudFetchRow(); });
+      cloudUnsub = ch;
+    } catch {}
+    cloudPoll = setInterval(() => { if (state.home && state.home.code === cloudCode) cloudFetchRow(); }, 20000);
+    cloudFetchRow();
   }
 
   /* =============================
@@ -1986,13 +1992,16 @@
     if (!db || !state.user) return;
     setTimeout(() => {
       try {
-        db.collection('orders').doc(order.id).set({
-          name: order.name, notes: order.notes, urgent: order.urgent,
-          priority: order.priority, listId: order.listId, categoryId: order.categoryId,
-          qty: order.qty, status: order.status, createdAt: order.createdAt,
-          createdBy: state.user.name || 'الزوجة', userId: state.user.id,
-          homeCode: state.home?.code || ''
-        }).catch(() => {});
+        db.from('orders').upsert({
+          id: order.id, home_code: state.home?.code || '',
+          data: {
+            name: order.name, notes: order.notes, urgent: order.urgent,
+            priority: order.priority, listId: order.listId, categoryId: order.categoryId,
+            qty: order.qty, status: order.status, createdAt: order.createdAt,
+            createdBy: state.user.name || 'الزوجة', userId: state.user.id,
+            homeCode: state.home?.code || ''
+          }
+        }).then(() => {}, () => {});
       } catch {}
     }, 0);
   }
@@ -2206,7 +2215,7 @@
   /* =============================
      ROUTER
      ============================= */
-  function setTab(tab) { state.currentTab = tab; persist(); render(); }
+  function setTab(tab) { state.currentTab = tab; state._expandedOrder = null; state._expDraft = null; state._expandedBasket = null; state._basketDraft = null; persist(); render(); }
 
   /* =============================
      UI HELPERS
@@ -2546,13 +2555,14 @@
         </div>
         ${qt === 'count' ? `<div class="exp-row"><button class="btn btn-secondary btn-sm" data-expqminus="${o.id}">−</button><b style="min-width:30px;text-align:center;">${d.qtyVal ?? 1}</b><button class="btn btn-secondary btn-sm" data-expqplus="${o.id}">+</button><select class="rv-select" data-expunit="${o.id}">${selC}</select></div>` : ''}
         ${qt === 'weight' ? `<div class="exp-row"><input type="number" class="qty-num" data-expvalw="${o.id}" value="${d.qtyVal ?? ''}" placeholder="0" min="0"><select class="rv-select" data-expunitw="${o.id}">${selW}</select></div>` : ''}
+        <div class="exp-row"><span class="lbl">صورة</span>${d.photo ? `<img src="${d.photo}" style="width:46px;height:46px;border-radius:12px;object-fit:cover;flex-shrink:0;" /><button class="btn btn-sm btn-danger" data-exprmphoto="${o.id}">حذف</button>` : `<label class="btn btn-secondary btn-sm" style="cursor:pointer;">📷 ضيف صورة المنتج<input type="file" accept="image/*" data-expphoto="${o.id}" class="hidden" /></label>`}</div>
         <div class="exp-row"><span class="lbl">ملاحظة</span><input class="exp-notes" data-expnotes="${o.id}" value="${escapeHTML(d.notes || '')}" placeholder="اكتب ملاحظة اختيارية..."></div>
         <div class="exp-row"><button class="btn btn-primary btn-sm" data-expsave="${o.id}">حفظ التعديل</button><button class="btn btn-success btn-sm" data-expbuy="${o.id}">✓ اتشترى</button><button class="btn btn-danger btn-sm" data-expdel="${o.id}">حذف الصنف</button></div>
       </div>`;
     }
     const isUrg = !purchased && (o.priority === 'high' || o.urgent);
     return `<div class="order-card ${purchased ? 'purchased' : ''} ${isUrg ? 'is-urgent' : ''}" data-id="${o.id}">
-      <div class="category-card-icon" style="background:${cc}18;font-size:22px;">${productIcon(o.name, o.categoryId)}</div>
+      <div class="category-card-icon" style="background:${cc}18;font-size:22px;overflow:hidden;">${o.photo ? `<img src="${o.photo}" data-zoomphoto="${o.id}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in;" />` : productIcon(o.name, o.categoryId)}</div>
       <div class="order-main" data-exp="${o.id}">
         <div class="order-name ${purchased ? 'purchased-name' : ''}">${escapeHTML(o.name)} ${qtyLine} <span class="badge ${purchased ? 'badge-done' : 'badge-pending'}">${purchased ? 'اتشترى' : 'مطلوب'}</span>${isUrg ? ' <span class="badge badge-urgent">🔥 ضروري</span>' : ''}</div>
         <div class="order-meta">${locLine}</div>
@@ -2563,19 +2573,50 @@
       ${panel}
     </div>`;
   }
+  function openPhotoViewer(id) {
+    const o = state.orders.find(x => x && x.id === id); if (!o || !o.photo) return;
+    const m = openModal(`<div class="modal-handle"></div>
+      <h2>${escapeHTML(o.name)}</h2>
+      <p class="m-sub">📷 صورة المنتج — دوس بره للقفل</p>
+      <img src="${o.photo}" style="width:100%;border-radius:18px;box-shadow:var(--shadow);" />
+      <div class="btn-group" style="margin-top:12px;"><button class="btn btn-primary" id="photoZoomClose">قفل</button></div>`);
+    m.querySelector('#photoZoomClose').onclick = () => closeModal(m);
+  }
   function toggleExpand(id) {
     if (state._expandedOrder === id) { state._expandedOrder = null; state._expDraft = null; }
     else {
       const o = state.orders.find(x => x && x.id === id); if (!o) return;
       state._expandedOrder = id;
-      state._expDraft = { qtyType: o.qty ? (o.qty.t === 'w' ? 'weight' : 'count') : 'none', qtyVal: o.qty ? o.qty.v : 1, qtyUnit: o.qty ? (o.qty.u || 'قطعة') : 'قطعة', notes: o.notes || '' };
+      state._expDraft = { qtyType: o.qty ? (o.qty.t === 'w' ? 'weight' : 'count') : 'none', qtyVal: o.qty ? o.qty.v : 1, qtyUnit: o.qty ? (o.qty.u || 'قطعة') : 'قطعة', notes: o.notes || '', photo: o.photo || '' };
     }
     render();
+  }
+  function readOrderPhoto(file, cb) {
+    try {
+      const rd = new FileReader();
+      rd.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const max = 480; let w = img.width, h = img.height;
+            const sc = Math.min(1, max / Math.max(w, h));
+            w = Math.max(1, Math.round(w * sc)); h = Math.max(1, Math.round(h * sc));
+            const c = document.createElement('canvas'); c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            cb(c.toDataURL('image/jpeg', 0.72));
+          } catch { cb(rd.result); }
+        };
+        img.onerror = () => cb(rd.result);
+        img.src = rd.result;
+      };
+      rd.onerror = () => toast('مقدرتش أقرا الصورة', 'error');
+      rd.readAsDataURL(file);
+    } catch { toast('مقدرتش أقرا الصورة', 'error'); }
   }
   function saveExpandedOrder(id, quiet) {
     const o = state.orders.find(x => x && x.id === id); if (!o) return null;
     const d = state._expDraft || {};
-    const patch = { notes: (d.notes || '').trim() };
+    const patch = { notes: (d.notes || '').trim(), photo: d.photo || '' };
     if (d.qtyType === 'count') { const v = Math.round(Number(d.qtyVal) || 0); patch.qty = (v >= 1 && v <= 99) ? { t: 'c', v, u: d.qtyUnit || 'قطعة' } : null; }
     else if (d.qtyType === 'weight') { const v = Number(d.qtyVal); patch.qty = (v > 0 && v <= 10000) ? { t: 'w', v, u: d.qtyUnit || 'كجم' } : null; }
     else patch.qty = null;
@@ -2851,14 +2892,13 @@
           const kc = kind === 'income' ? '#059669' : kind === 'debt' ? '#D97706' : '#7C3AED';
           const klabel = kind === 'income' ? 'دخل' : kind === 'debt' ? 'ديون' : 'مصروف';
           const cat = catById(e.categoryId);
-          const canEdit = e.sourceType === 'manual';
-          return `<div class="exp-card" ${canEdit ? `data-editexp="${e.id}"` : ''} style="--kc:${kc};">
+          return `<div class="exp-card" data-expact="${e.id}" style="--kc:${kc};">
             <div class="exp-ico" style="background:${cat.color}20;font-size:22px;">${expenseIcon(e)}</div>
             <div class="exp-mid">
               <div class="exp-top"><b>${escapeHTML(e.title)}</b><span class="exp-amt">${formatCurrency(e.amount)} <small>ج.م</small></span></div>
-              <div class="exp-sub"><span class="fin-pill" style="color:${kc};background:${kc}14;">${FINANCE[kind].emoji} ${klabel}</span><span>${getCategoryName(e.categoryId)}</span><i></i><span>${formatDateShort(new Date(e.createdAt))}</span></div>
+              <div class="exp-sub"><span class="fin-pill" style="color:${kc};background:${kc}14;">${FINANCE[kind].emoji} ${klabel}</span><span>${getCategoryName(e.categoryId)}</span><i></i><span>${formatDateShort(new Date(e.createdAt))}</span>${e.sourceType === 'order' ? '<span>•</span><span>من طلب 🛒</span>' : ''}</div>
             </div>
-            ${canEdit ? '<span class="exp-go">‹</span>' : ''}
+            <span class="exp-go">‹</span>
           </div>`;
         }).join('')}
     </div>`;
@@ -3023,9 +3063,9 @@
       if (!db) { showErr(); return; }
       const btn = document.getElementById('submitJoin');
       if (btn) { btn.disabled = true; btn.textContent = 'جاري البحث...'; }
-      db.collection('homes').doc(code).get().then((snap) => {
-        if (snap.exists && snap.data().home) {
-          const remote = snap.data();
+      db.from('homes').select('data').eq('code', code).maybeSingle().then(({ data, error }) => {
+        const remote = data && data.data;
+        if (!error && remote && remote.home) {
           state.home = remote.home;
           state._pendingCode = code; state._pendingName = remote.home.name;
           state._pendingCloud = remote;
@@ -3147,7 +3187,12 @@
     });
     const al = document.getElementById('addExpenseLink'); if (al) al.onclick = (e) => { e.preventDefault(); openAddExpenseModal(); };
     document.querySelectorAll('[data-expkind]').forEach(b => b.onclick = () => { state._expKind = b.dataset.expkind; persist(); render(); });
-    document.querySelectorAll('[data-editexp]').forEach(el => el.onclick = (e) => { if (e.target.closest('button, a, input, select, textarea')) return; openEditExpenseModal(el.dataset.editexp); });
+    document.querySelectorAll('[data-expact]').forEach(el => el.onclick = (e) => {
+      if (e.target.closest('button, a, input, select, textarea')) return;
+      const ex = state.expenses.find(x => x.id === el.dataset.expact); if (!ex) return;
+      if (ex.sourceType === 'manual') openEditExpenseModal(ex.id);
+      else openOrderExpenseActions(ex.id);
+    });
     document.querySelectorAll('[data-ofil]').forEach(b => b.onclick = () => { state.orderFilter = b.dataset.ofil; persist(); render(); });
     document.querySelectorAll('[data-cfil]').forEach(b => b.onclick = () => { state.categoryFilter = b.dataset.cfil; persist(); render(); });
     const si = document.getElementById('orderSearch');
@@ -3192,6 +3237,9 @@
     document.querySelectorAll('[data-expunitw]').forEach(s => s.onchange = () => { const d = state._expDraft || (state._expDraft = {}); d.qtyUnit = s.value; });
     document.querySelectorAll('[data-expdel]').forEach(b => b.onclick = () => handleDeleteOrder(b.dataset.expdel));
     document.querySelectorAll('[data-expnotes]').forEach(s => s.oninput = () => { const d = state._expDraft || (state._expDraft = {}); d.notes = s.value; });
+    document.querySelectorAll('[data-expphoto]').forEach(inp => inp.onchange = () => { const f = inp.files && inp.files[0]; if (!f) return; readOrderPhoto(f, (url) => { const d = state._expDraft || (state._expDraft = {}); d.photo = url; render(); toast('اتضافت الصورة ✓', 'success'); }); });
+    document.querySelectorAll('[data-exprmphoto]').forEach(b => b.onclick = () => { const d = state._expDraft || (state._expDraft = {}); d.photo = ''; render(); });
+    document.querySelectorAll('[data-zoomphoto]').forEach(im => im.onclick = (e) => { e.stopPropagation(); openPhotoViewer(im.dataset.zoomphoto); });
     document.querySelectorAll('[data-expsave]').forEach(b => b.onclick = () => saveExpandedOrder(b.dataset.expsave));
     document.querySelectorAll('[data-expbuy]').forEach(b => b.onclick = () => { const id = b.dataset.expbuy; if (saveExpandedOrder(id, true)) openPurchaseModal(id); });
     bindSettings();
@@ -4700,6 +4748,23 @@
     }
     let needCatFor = null;
     let voiceUnknownQueue = [];
+    let voiceLiveSeen = new Set();
+    /* إدراج لحظي أثناء التسجيل: أي اسم يطابق نتائج البحث يُضاف فوق فورًا */
+    function voiceLiveAdd() {
+      const ps = m.querySelector('#pickSearch'); if (!ps) return;
+      let changed = false;
+      splitVoicePhrases(ps.value || '').forEach(ph => {
+        const k = normalizeTerm(ph);
+        if (!k || voiceLiveSeen.has(k)) return;
+        voiceLiveSeen.add(k);
+        if (pickedList.some(x => normalizeTerm(x) === k)) return;
+        const clean = stripVoiceFillers(ph) || ph;
+        const ck = normalizeTerm(clean);
+        if (!ck || pickedList.some(x => normalizeTerm(x) === ck)) return;
+        if (foundInCatalog(clean)) { pickedList.push(clean.trim()); changed = true; }
+      });
+      if (changed) { syncPickedCompat(); renderPick(); renderPickList(); evalCategoryFromName(); }
+    }
     const VOICE_FILLERS = new Set(['لو','سمحت','من','فضلك','عايز','عايزه','عاوز','عاوزه','هات','هاتي','ضيف','ضيفي','اضف','محتاج','محتاجه','محتاجين','ناقص','ناقصنا','ايه','كمان','شويه','عندنا','دي','ده','اللي','عشان','كده','اذنك','في','علي','يا','اه','جب','خد','بقي','يعني','ممكن','عاوزين']);
     function splitVoicePhrases(raw) {
       return cleanVoiceRaw(raw).split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').trim()).filter(Boolean);
@@ -4858,11 +4923,12 @@
       const ps = m.querySelector('#pickSearch');
       const target = ps || nameInput;
       Voice.lang = 'ar-EG';
+      voiceLiveSeen = new Set();
       Voice.toggle(target, {
-        onText: () => { if (ps) renderPickList(); else voiceUI().onText(); },
+        onText: () => { if (ps) { voiceLiveAdd(); renderPickList(); } else voiceUI().onText(); },
         onState: (on) => { ordVoice.classList.toggle('recording', !!on); try { setVoiceUI(on); } catch {} },
         onCommit: (count, items, raw) => {
-          if (!editing && ps) handleVoiceCommit(items || [], raw || '');
+          if (!editing && ps) { handleVoiceCommit(items || [], raw || ''); voiceLiveSeen = new Set(); }
           else { if (ps) renderPickList(); try { voiceUI().onCommit(count); } catch {} }
         }
       });
@@ -5206,6 +5272,32 @@
       closeModal(m); render();
     };
   }
+  function openOrderExpenseActions(expId) {
+    const e = state.expenses.find(x => x.id === expId); if (!e) return;
+    const o = e.sourceId ? state.orders.find(x => x.id === e.sourceId) : null;
+    const m = openModal(`<div class="modal-handle"></div>
+      <h2>مصروف "${escapeHTML(e.title)}"</h2>
+      <p class="m-sub">🛒 جاي من طلب مشترى • ${formatCurrency(e.amount)} ج.م</p>
+      <div class="btn-group">
+        <button class="btn btn-danger" id="oaDelExp">🗑️ حذف المصروف فقط${o ? ' (والطلب يرجع معلق)' : ''}</button>
+        ${o ? '<button class="btn btn-danger" id="oaDelBoth">❌ حذف الطلب والمصروف معًا</button>' : ''}
+        <button class="btn" id="oaCancel">رجوع</button>
+      </div>`);
+    m.querySelector('#oaCancel').onclick = () => closeModal(m);
+    m.querySelector('#oaDelExp').onclick = () => {
+      confirmDialog({ title: 'حذف المصروف؟', message: `"${e.title}" هيتمسح من المصروفات${o ? ' والطلب هيرجع معلق' : ''}.`, confirmText: 'حذف', cancelText: 'لا', danger: true }).then(ok => {
+        if (!ok) return;
+        deleteExpense(expId); toast('اتمسح المصروف ✓', 'success'); closeModal(m); render();
+      });
+    };
+    const db2 = m.querySelector('#oaDelBoth');
+    if (db2) db2.onclick = () => {
+      confirmDialog({ title: 'حذف الطلب والمصروف؟', message: `"${e.title}" هيتمسح نهائيًا من الطلبات والمصروفات.`, confirmText: 'حذف الكل', cancelText: 'لا', danger: true }).then(ok => {
+        if (!ok) return;
+        deleteExpense(expId); deleteOrder(e.sourceId); toast('اتمسح الطلب والمصروف ✓', 'success'); closeModal(m); render();
+      });
+    };
+  }
 
   /* =============================
      COUPLE ENGINE: role + whatsapp + classified comedy + ads + auto-WhatsApp
@@ -5255,7 +5347,7 @@
       const arr = lsGet('naqisna_comedy_messages', []);
       const m = arr.find(x => x.id === id);
       if (m) { m.usage_count = (m.usage_count || 0) + 1; lsSet('naqisna_comedy_messages', arr); }
-      if (db) db.collection('comedy_messages').doc(id).set({ usage_count: (m?.usage_count || 1) }, { merge: true }).catch(() => {});
+      if (db && m) { try { db.from('comedy_messages').upsert({ id, data: m }).then(() => {}, () => {}); } catch {} }
     } catch {}
   }
   function logActivity(entry) {
@@ -5281,7 +5373,7 @@
       else list.push(rec);
       lsSet('naqisna_users_list', list);
       lsSet('naqisna_user', { id: rec.id, name: rec.name, role: rec.role, whatsapp: rec.whatsapp, joinedAt: rec.joinedAt });
-      if (db) db.collection('users').doc(rec.id).set(rec, { merge: true }).catch(() => {});
+      if (db) { try { db.from('users').upsert({ id: rec.id, home_code: rec.homeCode || '', data: rec }).then(() => {}, () => {}); } catch {} }
     } catch {}
   }
   function getActiveAds() {

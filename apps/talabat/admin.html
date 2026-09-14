@@ -9,8 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.10/dist/umd/supabase.min.js"></script>
 <style>
   :root {
     --bg: #0F172A;
@@ -612,23 +611,31 @@
   'use strict';
 
   /* =============================
-     FIREBASE INITIALIZATION
+     SUPABASE INITIALIZATION (replaces Firebase)
      ============================= */
-  const firebaseConfig = {
-    apiKey: "AIzaSyC8Gj1hufwwXrdO4zzQjPMeMg_KD3XSKDQ",
-    authDomain: "project-84ae3235-3633-44c1-819.firebaseapp.com",
-    projectId: "project-84ae3235-3633-44c1-819",
-    storageBucket: "project-84ae3235-3633-44c1-819.firebasestorage.app",
-    messagingSenderId: "1009475192148",
-    appId: "1:1009475192148:web:5031fa8ddcbca4c860b4c1"
-  };
+  const SUPABASE_URL = 'https://xivdqenmikhljdlmpsfc.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpdmRxZW5taWtobGpkbG1wc2ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MDcyMzYsImV4cCI6MjEwNDk4MzIzNn0.2QRZA1NoiuvLVaQHqLbIp1vLBAbNcvgrjgJbHc-DTZo';
   let db = null;
   try {
-    if (window.firebase) {
-      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-      db = firebase.firestore();
+    if (window.supabase && window.supabase.createClient) {
+      db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     }
-  } catch (e) { console.warn('Firestore init fallback to local:', e); }
+  } catch (e) { console.warn('Supabase init fallback to local:', e); }
+  async function sbRows(table) {
+    try {
+      const r = await db.from(table).select('id,data');
+      if (r && !r.error && Array.isArray(r.data)) return r.data.map(x => ({ id: x.id, ...(x.data || {}) }));
+    } catch {}
+    return null;
+  }
+  function sbUpsert(table, id, obj) {
+    if (!db) return;
+    try { db.from(table).upsert({ id, data: obj }).then(() => {}, () => {}); } catch {}
+  }
+  function sbDelete(table, id) {
+    if (!db) return;
+    try { db.from(table).delete().eq('id', id).then(() => {}, () => {}); } catch {}
+  }
 
   /* =============================
      DEFAULT SEED JOKES & SOUNDS
@@ -799,25 +806,22 @@
       { id: 'act_3', user: 'النظام', type: 'joke_served', text: 'عرض نكتة الزوج: "يا بطل المعارك..." 😂', time: Date.now() - 10800000 }
     ]);
 
-    // Try Firestore Sync
+    // Try Supabase Sync
     if (db) {
       try {
-        const snapMsgs = await db.collection('comedy_messages').get();
-        if (!snapMsgs.empty) {
-          state.messages = snapMsgs.docs.map(d => ({ id: d.id, ...d.data() }));
+        const remoteMsgs = await sbRows('comedy_messages');
+        if (remoteMsgs && remoteMsgs.length) {
+          state.messages = remoteMsgs;
           saveLocal('comedy_messages', state.messages);
-        } else {
-          // seed firestore
-          for (const m of state.messages) {
-            await db.collection('comedy_messages').doc(m.id).set(m).catch(() => {});
-          }
+        } else if (remoteMsgs) {
+          // seed supabase
+          for (const m of state.messages) sbUpsert('comedy_messages', m.id, m);
         }
       } catch (e) { console.log('Remote msgs fetch:', e); }
 
       try {
-        const snapUsers = await db.collection('users').get();
-        if (!snapUsers.empty) {
-          const remoteUsers = snapUsers.docs.map(d => ({ id: d.id, ...d.data() }));
+        const remoteUsers = await sbRows('users');
+        if (remoteUsers && remoteUsers.length) {
           // merge
           const byId = new Map();
           state.users.forEach(u => byId.set(u.id, u));
@@ -828,9 +832,9 @@
       } catch (e) {}
 
       try {
-        const snapAds = await db.collection('ads').get();
-        if (!snapAds.empty) {
-          state.ads = snapAds.docs.map(d => ({ id: d.id, ...d.data() }));
+        const remoteAds = await sbRows('ads');
+        if (remoteAds && remoteAds.length) {
+          state.ads = remoteAds;
           saveLocal('ads', state.ads);
         }
       } catch (e) {}
@@ -1163,7 +1167,7 @@
         state.messages[idx].audio_id = audioId;
         state.messages[idx].is_active = isActive;
         state.messages[idx].updated_at = new Date().toISOString();
-        if (db) db.collection('comedy_messages').doc(editId).set(state.messages[idx], { merge: true }).catch(() => {});
+        sbUpsert('comedy_messages', editId, state.messages[idx]);
       }
     } else {
       // Add
@@ -1178,7 +1182,7 @@
         created_at: new Date().toISOString()
       };
       state.messages.unshift(newMsg);
-      if (db) db.collection('comedy_messages').doc(newMsg.id).set(newMsg).catch(() => {});
+      sbUpsert('comedy_messages', newMsg.id, newMsg);
     }
 
     saveLocal('comedy_messages', state.messages);
@@ -1203,7 +1207,7 @@
     if (!confirm('هل تريد حذف هذه الرسالة الكوميدية؟')) return;
     state.messages = state.messages.filter(m => m.id !== id);
     saveLocal('comedy_messages', state.messages);
-    if (db) db.collection('comedy_messages').doc(id).delete().catch(() => {});
+    sbDelete('comedy_messages', id);
     renderMessages();
     renderBadges();
   }
@@ -1232,7 +1236,7 @@
     };
     state.audios.push(newAudio);
     saveLocal('audio_items', state.audios);
-    if (db) db.collection('audio_items').doc(newAudio.id).set(newAudio).catch(() => {});
+    sbUpsert('audio_items', newAudio.id, newAudio);
 
     audioModal.classList.remove('open');
     renderAudios();
@@ -1243,7 +1247,7 @@
     if (!confirm('هل تريد حذف هذا الصوت؟')) return;
     state.audios = state.audios.filter(a => a.id !== id);
     saveLocal('audio_items', state.audios);
-    if (db) db.collection('audio_items').doc(id).delete().catch(() => {});
+    sbDelete('audio_items', id);
     renderAudios();
     renderBadges();
   }
@@ -1306,7 +1310,7 @@
 
     state.ads.unshift(newAd);
     saveLocal('ads', state.ads);
-    if (db) db.collection('ads').doc(newAd.id).set(newAd).catch(() => {});
+    sbUpsert('ads', newAd.id, newAd);
 
     adModal.classList.remove('open');
     renderAds();
@@ -1318,7 +1322,7 @@
     if (!ad) return;
     ad.is_active = active;
     saveLocal('ads', state.ads);
-    if (db) db.collection('ads').doc(id).set({ is_active: active }, { merge: true }).catch(() => {});
+    sbUpsert('ads', id, ad);
     renderAds();
     renderDashboard();
   }
@@ -1327,7 +1331,7 @@
     if (!confirm('حذف هذا الإعلان نهائياً؟')) return;
     state.ads = state.ads.filter(a => a.id !== id);
     saveLocal('ads', state.ads);
-    if (db) db.collection('ads').doc(id).delete().catch(() => {});
+    sbDelete('ads', id);
     renderAds();
     renderBadges();
   }
@@ -1384,7 +1388,7 @@
     saveLocal('comedy_messages', state.messages);
     saveLocal('audio_items', state.audios);
     if (db) {
-      state.messages.forEach(m => db.collection('comedy_messages').doc(m.id).set(m).catch(() => {}));
+      state.messages.forEach(m => sbUpsert('comedy_messages', m.id, m));
     }
     renderAll();
     alert('تم استرجاع الباقة الكوميدية الأصلية بنجاح!');
