@@ -9,7 +9,27 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="supabase.min.js"></script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+  import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, where, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+  import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC8Gj1hufwwXrdO4zzQjPMeMg_KD3XSKDQ",
+    authDomain: "project-84ae3235-3633-44c1-819.firebaseapp.com",
+    projectId: "project-84ae3235-3633-44c1-819",
+    storageBucket: "project-84ae3235-3633-44c1-819.firebasestorage.app",
+    messagingSenderId: "1009475192148",
+    appId: "1:1009475192148:web:5031fa8ddcbca4c860b4c1",
+    measurementId: "G-97QYMTBRKS"
+  };
+
+  window._fbApp = initializeApp(firebaseConfig);
+  window._fbDb = getFirestore(window._fbApp);
+  window._fbAuth = getAuth(window._fbApp);
+  window._fbModules = { doc, getDoc, setDoc, collection, getDocs, query, where, deleteDoc, signInAnonymously };
+  window.dispatchEvent(new Event('firebase-ready'));
+</script>
 <style>
   :root {
     --bg: #0F172A;
@@ -611,30 +631,44 @@
   'use strict';
 
   /* =============================
-     SUPABASE INITIALIZATION
+     FIREBASE INITIALIZATION
      ============================= */
-const SUPABASE_URL = 'https://fijndjmcffqgganapgxv.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpam5kam1jZmZxZ2dhbmFwZ3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NTk1NDEsImV4cCI6MjEwNTAzNTU0MX0.xiYCTrukNsx6S8R6erQ32zrad2XStAbr-GbNRhK3pDY';
   let db = null;
-  try {
-    if (window.supabase && window.supabase.createClient) {
-      db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    }
-  } catch (e) { console.warn('Supabase init fallback to local:', e); }
+  function waitForFirebase() {
+    return new Promise((resolve) => {
+      if (window._fbDb) { resolve(); return; }
+      window.addEventListener('firebase-ready', () => resolve(), { once: true });
+      setTimeout(resolve, 5000);
+    });
+  }
+  async function initFirebase() {
+    await waitForFirebase();
+    db = window._fbDb;
+  }
   async function sbRows(table) {
+    await initFirebase();
+    if (!db) return null;
     try {
-      const r = await db.from(table).select('id,data');
-      if (r && !r.error && Array.isArray(r.data)) return r.data.map(x => ({ id: x.id, ...(x.data || {}) }));
+      const { collection, getDocs } = window._fbModules || {};
+      if (!collection || !getDocs) return null;
+      const snap = await getDocs(collection(db, table));
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
     } catch {}
     return null;
   }
   function sbUpsert(table, id, obj) {
     if (!db) return;
-    try { db.from(table).upsert({ id, data: obj }).then(() => {}, () => {}); } catch {}
+    try {
+      const { doc, setDoc } = window._fbModules || {};
+      if (doc && setDoc) setDoc(doc(db, table, id), obj, { merge: true }).catch(() => {});
+    } catch {}
   }
   function sbDelete(table, id) {
     if (!db) return;
-    try { db.from(table).delete().eq('id', id).then(() => {}, () => {}); } catch {}
+    try {
+      const { doc, deleteDoc } = window._fbModules || {};
+      if (doc && deleteDoc) deleteDoc(doc(db, table, id)).catch(() => {});
+    } catch {}
   }
 
   /* =============================
@@ -814,7 +848,7 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
           state.messages = remoteMsgs;
           saveLocal('comedy_messages', state.messages);
         } else if (remoteMsgs) {
-          // seed supabase
+          // seed firebase
           for (const m of state.messages) sbUpsert('comedy_messages', m.id, m);
         }
       } catch (e) { console.log('Remote msgs fetch:', e); }

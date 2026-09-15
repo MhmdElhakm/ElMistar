@@ -2,7 +2,7 @@
  * Keeps PWA offline caching only.
  */
 
-const CACHE_NAME = 'naqisna-pwa-v11';
+const CACHE_NAME = 'naqisna-pwa-v12';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -10,8 +10,7 @@ const ASSETS_TO_CACHE = [
   './icon-192.png',
   './icon-512.png',
   './manifest.webmanifest',
-  './sounds/audio-library.json',
-  './supabase.min.js'
+  './sounds/audio-library.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -36,12 +35,6 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-  const url = event.request.url || '';
-
-  // Bypass caching for Supabase API endpoints (always fresh)
-  if (url.includes('fijndjmcffqgganapgxv.supabase.co')) {
-    return;
-  }
 
   // Network-first for dynamic navigation, Cache-first for static assets
   event.respondWith(
