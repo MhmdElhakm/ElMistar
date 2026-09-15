@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.10/dist/umd/supabase.min.js"></script>
+<script src="supabase.min.js"></script>
 <style>
   :root {
     --bg: #0F172A;
@@ -611,10 +611,10 @@
   'use strict';
 
   /* =============================
-     SUPABASE INITIALIZATION (replaces Firebase)
+     SUPABASE INITIALIZATION
      ============================= */
-  const SUPABASE_URL = 'https://xivdqenmikhljdlmpsfc.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpdmRxZW5taWtobGpkbG1wc2ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MDcyMzYsImV4cCI6MjEwNDk4MzIzNn0.2QRZA1NoiuvLVaQHqLbIp1vLBAbNcvgrjgJbHc-DTZo';
+const SUPABASE_URL = 'https://fijndjmcffqgganapgxv.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpam5kam1jZmZxZ2dhbmFwZ3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NTk1NDEsImV4cCI6MjEwNTAzNTU0MX0.xiYCTrukNsx6S8R6erQ32zrad2XStAbr-GbNRhK3pDY';
   let db = null;
   try {
     if (window.supabase && window.supabase.createClient) {
@@ -778,7 +778,7 @@
       }
     ]);
 
-    // 4. Users from Local & Firestore
+    // 4. Users from Local & Supabase
     let localUsers = loadLocal('users_list', []);
     // check current user in main app
     const appUser = loadLocal('user', null);

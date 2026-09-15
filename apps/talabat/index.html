@@ -983,7 +983,7 @@
 <div class="app" id="app"></div>
 <div class="toast-container" id="toastContainer"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.10/dist/umd/supabase.min.js"></script>
+<script src="supabase.min.js"></script>
 <script>
 (() => {
   'use strict';
@@ -1853,16 +1853,44 @@
   }
 
   /* =============================
-     SUPABASE CLOUD SYNC (replaces Firebase)
+     SUPABASE CLOUD SYNC
      ============================= */
-  const SUPABASE_URL = 'https://xivdqenmikhljdlmpsfc.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpdmRxZW5taWtobGpkbG1wc2ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MDcyMzYsImV4cCI6MjEwNDk4MzIzNn0.2QRZA1NoiuvLVaQHqLbIp1vLBAbNcvgrjgJbHc-DTZo';
+const SUPABASE_URL = 'https://fijndjmcffqgganapgxv.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpam5kam1jZmZxZ2dhbmFwZ3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NTk1NDEsImV4cCI6MjEwNTAzNTU0MX0.xiYCTrukNsx6S8R6erQ32zrad2XStAbr-GbNRhK3pDY';
   let db = null, cloudUnsub = null, cloudCode = null, cloudTimer = null, cloudPoll = null;
+  let sbUid = null, sbAuthWarned = false;
   try {
     if (window.supabase && window.supabase.createClient) {
       db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     }
   } catch { db = null; }
+  /* جلسة مجهولة لكل جهاز = هوية العضو داخل RLS (يتطلب تفعيل Anonymous sign-ins) */
+  async function ensureSbSession() {
+    if (!db) return null;
+    if (sbUid) return sbUid;
+    try {
+      const s = await db.auth.getSession();
+      const su = s && s.data && s.data.session && s.data.session.user;
+      if (su && su.id) { sbUid = su.id; return sbUid; }
+      const r = await db.auth.signInAnonymously();
+      const u = r && r.data && ((r.data.session && r.data.session.user) || r.data.user);
+      if (u && u.id) { sbUid = u.id; return sbUid; }
+    } catch (e) { console.warn('sb session:', e && e.message); }
+    if (!sbAuthWarned) {
+      sbAuthWarned = true;
+      try { toast('المزامنة تحتاج تفعيل الدخول المجهول في Supabase', 'warning'); } catch {}
+    }
+    return null;
+  }
+  /* تأكيد عضوية الجهاز في كود بيته (family_id = كود البيت المشترك) */
+  async function ensureMembership() {
+    if (!db || !state.home?.code) return;
+    try {
+      await ensureSbSession();
+      const r = await db.rpc('ensure_membership', { p_code: state.home.code });
+      if (r && r.error) throw r.error;
+    } catch (e) { console.warn('membership:', e && e.message); }
+  }
   /* Cloud sync only (no notifications) */
   const UI_ONLY_KEYS = ['currentTab', 'orderFilter', 'categoryFilter', 'searchQuery'];
   function cloudPayload() {
@@ -1880,7 +1908,7 @@
     cloudTimer = setTimeout(() => {
       try {
         const p = cloudPayload();
-        db.from('homes').upsert({ code: state.home.code, data: p, updated_at: p.updatedAt || Date.now() }).then(() => {}, () => {});
+        db.from('homes').upsert({ code: state.home.code, data: p, updated_at: p.updatedAt || Date.now() }).then(() => { try { ensureMembership(); } catch {} }, () => {});
       } catch {}
     }, 800);
   }
@@ -1902,6 +1930,7 @@
       if (r && !r.error && r.data) applyCloudRemote(r.data.data || {}, r.data.updated_at || 0);
       else if (r && !r.error && !r.data) scheduleCloud();
     } catch {}
+    mergeOrdersFromCloud();
   }
   function attachCloud() {
     if (!db || !state.home?.code) return;
@@ -1912,11 +1941,58 @@
     try {
       const ch = db.channel('home-' + state.home.code)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'homes', filter: 'code=eq.' + state.home.code }, () => { cloudFetchRow(); })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders', filter: 'home_code=eq.' + state.home.code }, () => { mergeOrdersFromCloud(); })
         .subscribe((status) => { if (status !== 'SUBSCRIBED') cloudFetchRow(); });
       cloudUnsub = ch;
     } catch {}
     cloudPoll = setInterval(() => { if (state.home && state.home.code === cloudCode) cloudFetchRow(); }, 20000);
     cloudFetchRow();
+  }
+  /* دمج احتياطي من جدول الطلبات حسب كود البيت (family scope)
+     يضمن ظهور طلبات الطرف الآخر حتى لو تأخرت نسخة الـ blob */
+  async function mergeOrdersFromCloud() {
+    if (!db || !state.home?.code) return;
+    try {
+      const r = await db.from('orders').select('id,data').eq('home_code', state.home.code);
+      if (!r || r.error || !Array.isArray(r.data)) return;
+      let changed = false;
+      const byId = new Map((state.orders || []).map(o => [o && o.id, o]));
+      const seenRemote = new Set();
+      for (const row of r.data) {
+        if (!row || !row.id) continue;
+        const ro = row.data || {};
+        if (ro._deleted) {
+          if (byId.has(row.id)) {
+            state.orders = state.orders.filter(o => !o || o.id !== row.id);
+            byId.delete(row.id); changed = true;
+          }
+          try { db.from('orders').delete().eq('id', row.id).then(() => {}, () => {}); } catch {}
+          continue;
+        }
+        seenRemote.add(row.id);
+        ro.id = ro.id || row.id;
+        const local = byId.get(row.id);
+        if (!local) {
+          state.orders.unshift({ listId: 'main', ...ro });
+          byId.set(row.id, state.orders[0]); changed = true;
+        } else {
+          if (local.status !== ro.status && ro.status === 'purchased') {
+            local.status = 'purchased';
+            if (ro.purchase) local.purchase = ro.purchase;
+            if (ro.updatedAt) local.updatedAt = ro.updatedAt;
+            changed = true;
+          } else if (local.status === 'purchased' && ro.status !== 'purchased') {
+            try { syncOrderToCloud(local); } catch {}
+          } else if (ro.updatedAt && (local.updatedAt || 0) < ro.updatedAt) {
+            for (const k of ['name', 'notes', 'qty', 'categoryId', 'priority', 'urgent', 'purchaseLocation', 'photo']) {
+              if (ro[k] !== undefined) local[k] = ro[k];
+            }
+            local.updatedAt = ro.updatedAt; changed = true;
+          }
+        }
+      }
+      if (changed) { persist(); render(); }
+    } catch {}
   }
 
   /* =============================
@@ -1980,25 +2056,27 @@
   function addOrder({ name, notes, urgent, categoryId, qty, priority, listId }) {
     if (!validCatId(categoryId)) categoryId = classifyOrder(name).categoryId;
     const prio = normPriority(priority || (urgent ? 'high' : 'medium'));
-    const order = { id: uid(), name: name.trim(), notes: notes || '', urgent: prio === 'high', priority: prio, listId: listId || 'main', categoryId, qty: qty || null, status: 'pending', createdAt: nowISO(), createdBy: state.user?.name || 'الزوجة', purchaseLocation: catLocation(categoryId), purchase: null };
+    const order = { id: uid(), name: name.trim(), notes: notes || '', urgent: prio === 'high', priority: prio, listId: listId || 'main', categoryId, qty: qty || null, status: 'pending', createdAt: nowISO(), updatedAt: Date.now(), createdBy: state.user?.name || 'الزوجة', purchaseLocation: catLocation(categoryId), purchase: null };
     state.orders.unshift(order);
     const key = normalizeTerm(order.name);
     state.usageFreq[key] = (state.usageFreq[key] || 0) + 1;
     persist();
-    syncOrderToFirestore(order);
+    syncOrderToCloud(order);
     return order;
   }
-  function syncOrderToFirestore(order) {
+  function syncOrderToCloud(order) {
     if (!db || !state.user) return;
     setTimeout(() => {
       try {
         db.from('orders').upsert({
           id: order.id, home_code: state.home?.code || '',
           data: {
-            name: order.name, notes: order.notes, urgent: order.urgent,
+            id: order.id, name: order.name, notes: order.notes, urgent: order.urgent,
             priority: order.priority, listId: order.listId, categoryId: order.categoryId,
             qty: order.qty, status: order.status, createdAt: order.createdAt,
-            createdBy: state.user.name || 'الزوجة', userId: state.user.id,
+            updatedAt: order.updatedAt || Date.now(), purchase: order.purchase || null,
+            photo: order.photo || '',
+            createdBy: order.createdBy || state.user.name || 'الزوجة', userId: state.user.id,
             homeCode: state.home?.code || ''
           }
         }).then(() => {}, () => {});
@@ -2016,13 +2094,19 @@
     }
     Object.assign(o, patch);
     if (patch.name) o.name = patch.name.trim();
+    o.updatedAt = Date.now();
     persist();
+    try { syncOrderToCloud(o); } catch {}
     return o;
   }
   function deleteOrder(id) {
     const idx = state.orders.findIndex(x => x.id === id);
     if (idx >= 0) state.orders.splice(idx, 1);
     persist();
+    /* tombstone حتى يختفي الطلب عند الطرف الآخر أيضًا */
+    if (db && state.home?.code) {
+      try { db.from('orders').upsert({ id, home_code: state.home.code, data: { id, _deleted: true, updatedAt: Date.now() } }).then(() => {}, () => {}); } catch {}
+    }
   }
   /* سلة التجهيز: تجهيز الأصناف أولًا قبل تأكيدها كطلبات */
   function basketItems() { if (!Array.isArray(state._basket)) state._basket = []; return state._basket; }
@@ -2119,9 +2203,11 @@
     if (!o) return null;
     o.status = 'purchased';
     o.purchase = { originalPrice: Number(originalPrice) || 0, finalPrice: Number(finalPrice) || 0, purchasedAt: nowISO() };
+    o.updatedAt = Date.now();
     const exp = { id: uid(), title: o.name, amount: o.purchase.finalPrice, savings: 0, categoryId: o.categoryId, sourceType: 'order', sourceId: o.id, notes: '', purchaseLocation: o.purchaseLocation || '', createdAt: o.purchase.purchasedAt };
     state.expenses.unshift(exp);
     persist();
+    try { syncOrderToCloud(o); } catch {}
     return { order: o, expense: exp };
   }
   function addManualExpense({ title, amount, categoryId, kind, notes, createdAt }) {
@@ -3060,18 +3146,48 @@
       let code = inp.value.trim().toUpperCase();
       if (!/^HOME-\d{4,}$/.test(code)) code = 'HOME-' + (code.replace(/\D/g, ''));
       if (state.home && state.home.code && code === state.home.code) { state._pendingCode = code; state._pendingName = state.home.name; state._onboardingStep = 'username'; render(); return; }
-      if (!db) { showErr(); return; }
+      if (!db) { showErr(); toast('مفيش اتصال بقاعدة البيانات — اتأكد من الإنترنت', 'warning'); return; }
       const btn = document.getElementById('submitJoin');
       if (btn) { btn.disabled = true; btn.textContent = 'جاري البحث...'; }
-      db.from('homes').select('data').eq('code', code).maybeSingle().then(({ data, error }) => {
-        const remote = data && data.data;
-        if (!error && remote && remote.home) {
-          state.home = remote.home;
-          state._pendingCode = code; state._pendingName = remote.home.name;
-          state._pendingCloud = remote;
-          state._onboardingStep = 'username'; render();
-        } else showErr();
-      }).catch(showErr).finally(() => { const b2 = document.getElementById('submitJoin'); if (b2) { b2.disabled = false; b2.textContent = 'انضم للبيت'; } });
+      const acceptJoin = (remote) => {
+        state.home = remote.home;
+        state._pendingCode = code; state._pendingName = remote.home.name;
+        state._pendingCloud = remote;
+        state._onboardingStep = 'username'; render();
+      };
+      const fail = (why) => {
+        try { console.warn('[join]', why || 'unknown'); } catch {}
+        showErr();
+        if (why) toast(why, 'warning');
+      };
+      ensureSbSession().then(async () => {
+        try {
+          const { data, error } = await db.rpc('join_home', { p_code: code });
+          const remote = data;
+          if (!error && remote && remote.home) { acceptJoin(remote); return; }
+          const emsg = String((error && (error.message || error.code)) || '');
+          if (/NO_HOME/i.test(emsg)) return; // الكود غلط فعلًا — الرسالة الحمرا كفاية
+          if (/42883|does not exist|not.*function|PGRST202/i.test(emsg)) {
+            // ملف الترقية لم يُنفذ بعد — جرّب الطريقة المباشرة (سكيما قديمة)
+            try {
+              const r2 = await db.from('homes').select('data').eq('code', code).maybeSingle();
+              const remote2 = r2 && r2.data && r2.data.data;
+              if (!r2.error && remote2 && remote2.home) {
+                try { await ensureMembership(); } catch {}
+                acceptJoin(remote2); return;
+              }
+            } catch {}
+            fail('نفّذ ملف supabase-migration-family.sql في Supabase ثم حاول تاني');
+            return;
+          }
+          fail();
+        } catch (e) {
+          const m = String((e && e.message) || e || '');
+          if (/Failed to fetch|NetworkError|network|fetch/i.test(m)) fail('مفيش اتصال بالإنترنت — اتأكد من الشبكة وحاول تاني');
+          else if (/nonymous/i.test(m)) fail('المزامنة تحتاج تفعيل الدخول المجهول في Supabase');
+          else fail();
+        }
+      }).catch(() => fail()).finally(() => { const b2 = document.getElementById('submitJoin'); if (b2) { b2.disabled = false; b2.textContent = 'انضم للبيت'; } });
     });
     const rh = document.getElementById('roleHusband'), rw = document.getElementById('roleWife');
     const paintRole = () => {
@@ -3104,7 +3220,17 @@
       }
       if (!state.home) state.home = { code: state._pendingCode || genHomeCode(), name: state._pendingName || 'بيتنا', createdAt: nowISO() };
       state._pendingRole = null;
-      state.initialized = true; state.currentTab = 'home'; state._onboardingStep = null; persist(); attachCloud();
+      state.initialized = true; state.currentTab = 'home'; state._onboardingStep = null; persist();
+      (async () => {
+        try {
+          await ensureSbSession();
+          await ensureMembership();
+          if (db && sbUid && state.home?.code) {
+            try { await db.from('members').update({ name: state.user.name, role: state.user.role }).eq('device_uid', sbUid).eq('home_code', state.home.code); } catch {}
+          }
+        } catch {}
+        attachCloud();
+      })();
       try { syncUserToAdminDir(); } catch {}
       const rl = state.user.role === 'wife' ? 'يا ست الكل 👩' : 'يا بطل 👨';
       toast(`أهلاً ${rl} ${name}! 👋`, 'success'); render();
@@ -4409,6 +4535,15 @@
   function notifTimePassed(hhmm) { try { const p = String(hhmm || '00:00').split(':'); const h = Number(p[0]) || 0, m = Number(p[1]) || 0; const n = new Date(); return (n.getHours() * 60 + n.getMinutes()) >= (h * 60 + m); } catch { return false; } }
   function notifTick() {
     try {
+      if (db && state.home?.code) {
+        if (!sbUid) {
+          ensureSbSession().then(u => { if (u) { ensureMembership().then(() => attachCloud()); } }).catch(() => {});
+        } else {
+          ensureMembership().catch(() => {});
+        }
+      }
+    } catch {}
+    try {
       if (!state || !state.initialized) return;
       if (state._notifOn !== true) return;
       const st = notifStore(); const now = Date.now(); const tk = notifDayKey();
@@ -5455,7 +5590,7 @@
     }
     if (state.currentTab === 'notifs') state.currentTab = 'orders';
     render();
-    attachCloud();
+    (async () => { try { await ensureSbSession(); await ensureMembership(); } catch {} attachCloud(); })();
     try { migrateAudioSettings(); } catch {}
     try { AudioManager.loadLibrary(); } catch {}
     try { setInterval(notifTick, 60000); setTimeout(notifTick, 15000); } catch {}

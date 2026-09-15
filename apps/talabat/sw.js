@@ -1,5 +1,5 @@
 /* sw.js — Forwarding Worker.
- * PWA offline caching lives inside firebase-messaging-sw.js.
+ * PWA offline caching lives inside sw-cache.js.
  * This file delegates directly to ensure legacy client registrations seamlessly upgrade.
  */
-importScripts('./firebase-messaging-sw.js');
+importScripts('./sw-cache.js');
