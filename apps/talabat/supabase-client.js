@@ -65,10 +65,35 @@ window.NaqisnaSupabase = (function () {
   // inside data so no FK / multi-table schema is required.
   const BLOB_TABLE = 'app_homes';
 
+  function mergeMembers(remoteMembers, localMembers) {
+    const map = new Map();
+    (remoteMembers || []).forEach(m => { if (m && (m.id || m.whatsapp)) map.set(String(m.id || m.whatsapp), m); });
+    (localMembers || []).forEach(m => { if (m && (m.id || m.whatsapp)) map.set(String(m.id || m.whatsapp), { ...(map.get(String(m.id || m.whatsapp)) || {}), ...m }); });
+    return [...map.values()].slice(0, 10);
+  }
   function blobSnapshot(homeCode, state, extra) {
+    let members = Array.isArray(state.members) ? state.members.slice() : [];
+    if (state.user && state.user.whatsapp) {
+      const rec = { id: state.user.id, name: state.user.name, role: state.user.role, whatsapp: state.user.whatsapp };
+      const i = members.findIndex(m => m && String(m.id) === String(rec.id));
+      if (i >= 0) members[i] = { ...members[i], ...rec }; else members.push(rec);
+    }
+    const partner = state.partnerWhatsapp || (state.home && state.home.partnerWhatsapp) || '';
+    const partnerName = state.partnerName || (state.home && state.home.partnerName) || '';
+    if (partner && !members.some(m => m && m.whatsapp === partner)) {
+      members.push({ id: 'partner_' + String(partner).slice(-4), name: partnerName || (state.user?.role === 'wife' ? 'الزوج 👨' : 'الزوجة 👩'), role: state.user?.role === 'wife' ? 'husband' : 'wife', whatsapp: partner });
+    } else if (partner && partnerName) {
+      const pi = members.findIndex(m => m && m.whatsapp === partner);
+      if (pi >= 0 && !members[pi].name) members[pi].name = partnerName;
+    }
     return {
       name: (state.home && state.home.name) || 'منزلنا السعيد',
       user: state.user ? { id: state.user.id, name: state.user.name, role: state.user.role, whatsapp: state.user.whatsapp } : null,
+      partnerWhatsapp: partner || null,
+      partnerName: partnerName || null,
+      deliveryWhatsapp: state.deliveryWhatsapp || (state.home && state.home.deliveryWhatsapp) || null,
+      deliveryName: state.deliveryName || (state.home && state.home.deliveryName) || null,
+      members: members,
       orders: Array.isArray(state.orders) ? state.orders : [],
       expenses: Array.isArray(state.expenses) ? state.expenses : [],
       orderLists: Array.isArray(state.orderLists) ? state.orderLists : [],
@@ -137,6 +162,12 @@ window.NaqisnaSupabase = (function () {
       if (!blob) return null;
       return {
         name: blob.name || null,
+        partnerWhatsapp: blob.partnerWhatsapp || null,
+        partnerName: blob.partnerName || null,
+        deliveryWhatsapp: blob.deliveryWhatsapp || null,
+        deliveryName: blob.deliveryName || null,
+        members: Array.isArray(blob.members) ? blob.members : (blob.user ? [blob.user] : []),
+        user: blob.user || null,
         orders: Array.isArray(blob.orders) ? blob.orders : [],
         expenses: Array.isArray(blob.expenses) ? blob.expenses : [],
         orderLists: Array.isArray(blob.orderLists) ? blob.orderLists : [],
@@ -220,6 +251,11 @@ window.NaqisnaSupabase = (function () {
       const remote = (await readBlob(homeCode)) || {};
       const snap = blobSnapshot(homeCode, state);
       snap.expenses = Array.isArray(remote.expenses) ? remote.expenses : [];
+      snap.members = mergeMembers(remote.members || (remote.user ? [remote.user] : []), snap.members);
+      if (!snap.partnerWhatsapp && remote.partnerWhatsapp) snap.partnerWhatsapp = remote.partnerWhatsapp;
+      if (!snap.partnerName && remote.partnerName) snap.partnerName = remote.partnerName;
+      if (!snap.deliveryWhatsapp && remote.deliveryWhatsapp) snap.deliveryWhatsapp = remote.deliveryWhatsapp;
+      if (!snap.deliveryName && remote.deliveryName) snap.deliveryName = remote.deliveryName;
       await writeBlob(homeCode, snap);
     } catch (e) {
       console.error('Push orders-only error:', e);

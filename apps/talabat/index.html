@@ -805,17 +805,23 @@
   .topbar .greeting { font-size: 15px; font-weight: 800; color: var(--text-sec); }
   .page-title { font-size: 26px; font-weight: 900; letter-spacing: -.3px; margin: 2px 20px 14px; }
   .section { padding: 0 20px; }
-  .hero { margin: 0 20px 14px; background: var(--grad); border-radius: 24px; padding: 20px 18px; color: #fff; position: relative; overflow: hidden; box-shadow: 0 16px 36px rgba(124,58,237,.32); animation: popIn .4s ease-out; }
-  .hero::before, .hero::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.14); }
-  .hero::before { width: 180px; height: 180px; left: -50px; top: -70px; }
-  .hero::after { width: 120px; height: 120px; right: -30px; bottom: -50px; }
-  .hero-top { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+  .hero { margin: 0 16px 14px; background: radial-gradient(420px 220px at 88% -20%, rgba(251,191,36,.38), transparent 62%), radial-gradient(340px 220px at 5% 115%, rgba(236,72,153,.45), transparent 60%), radial-gradient(280px 180px at 15% -10%, rgba(255,255,255,.16), transparent 65%), linear-gradient(150deg,#1E1B4B 0%,#6D28D9 52%,#9333EA 78%,#5B21B6 100%); border-radius: 28px; padding: 22px 18px 16px; color: #fff; position: relative; overflow: hidden; box-shadow: 0 20px 44px rgba(76,29,149,.45), inset 0 1px 0 rgba(255,255,255,.25); animation: popIn .4s ease-out; border: 1px solid rgba(255,255,255,.22); text-align: center; }
+  .hero::before, .hero::after { content: ''; position: absolute; border-radius: 50%; pointer-events: none; }
+  .hero::before { width: 260px; height: 260px; left: -90px; top: -110px; background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.28), rgba(255,255,255,.05) 60%, transparent 72%); }
+  .hero::after { width: 190px; height: 190px; right: -55px; bottom: -85px; background: radial-gradient(circle at 60% 60%, rgba(251,191,36,.4), rgba(251,191,36,.08) 60%, transparent 72%); }
+  .hero-top { display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; z-index: 1; }
   .hero-mascot { width: 64px; height: 64px; flex-shrink: 0; border-radius: 20px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; animation: floaty 3.2s ease-in-out infinite; }
-  .hero h2 { font-size: 19px; font-weight: 900; line-height: 1.5; }
-  .hero p { font-size: 13px; opacity: .92; font-weight: 600; margin-top: 2px; }
-  .hero-progress { position: relative; z-index: 1; margin-top: 14px; background: rgba(255,255,255,.22); border-radius: 999px; height: 12px; overflow: hidden; }
-  .hero-progress > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg,#FDE68A,#FBBF24,#FB7185); transition: width .6s ease; }
+  .hero h2 { font-size: 20px; font-weight: 900; line-height: 1.7; text-align: center; }
+  .hero p { font-size: 12.5px; opacity: .92; font-weight: 700; margin-top: 2px; background: none; display: block; padding: 0; border-radius: 0; text-align: center; }
+  .hero-progress { position: relative; z-index: 1; margin-top: 14px; background: rgba(255,255,255,.25); border-radius: 999px; height: 10px; overflow: visible; box-shadow: inset 0 1px 3px rgba(0,0,0,.2); }
+  .hero-progress > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg,rgba(255,255,255,.55),#fff); transition: width .6s ease; position: relative; }
+  .hero-progress > span::after { content: ''; position: absolute; left: -2px; top: 50%; transform: translate(-50%,-50%); width: 16px; height: 16px; border-radius: 50%; background: #FBBF24; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
   .hero-meta { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 12px; font-weight: 800; }
+  .wa-bubble { position: relative; z-index: 1; background: #DCF8C6; color: #111B21; border-radius: 16px 16px 16px 4px; padding: 10px 12px 6px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.22); text-align: right; }
+  .wa-bubble::before { content: ''; position: absolute; right: -7px; top: 0; width: 0; height: 0; border: 8px solid transparent; border-top-color: #DCF8C6; border-right: 0; border-left: 0; margin-right: 0; }
+  .wa-bubble h2 { color: #111B21 !important; font-size: 16.5px !important; line-height: 1.7 !important; margin: 0 !important; font-family: "Cairo", "Nunito", sans-serif !important; font-weight: 800 !important; }
+  .wa-bubble .wa-meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 10px; font-weight: 700; color: #667781; margin-top: 2px; }
+  .wa-bubble .wa-meta .ticks { color: #53BDEB; font-size: 13px; font-weight: 900; }
   .streak-row { display: flex; gap: 8px; margin: 0 20px 14px; }
   .streak-pill { flex: 1; background: #fff; border-radius: 18px; padding: 10px 12px; display: flex; align-items: center; gap: 9px; box-shadow: var(--shadow-sm); border: 1px solid rgba(124,58,237,.07); animation: popIn .4s ease-out; }
   .streak-ico { width: 38px; height: 38px; border-radius: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -869,7 +875,7 @@
   .noura-bubble { flex: 1; background: #fff; border-radius: 20px 20px 20px 6px; padding: 12px 14px 10px; box-shadow: var(--shadow-sm); border: 1px solid rgba(124,58,237,.09); position: relative; }
   .noura-name { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 900; color: var(--primary); margin-bottom: 3px; }
   .noura-msg { font-size: 13.5px; font-weight: 700; color: var(--text); line-height: 1.7; }
-  .noura-live { display: flex; align-items: center; gap: 7px; margin-top: 7px; font-size: 10.5px; font-weight: 800; color: var(--text-muted); }
+  .noura-live { display: flex; align-items: center; justify-content: flex-end; gap: 7px; margin-top: 7px; font-size: 10.5px; font-weight: 800; color: var(--text-muted); }
   .waves { display: inline-flex; align-items: flex-end; gap: 2.5px; height: 14px; }
   .waves i { width: 3px; border-radius: 3px; background: var(--primary); height: 100%; transform: scaleY(.4); animation: waveGrow 1s ease-in-out infinite; }
   .waves i:nth-child(2) { animation-delay: .15s; background: var(--pink); }
@@ -884,10 +890,10 @@
   .photo-char img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .noura-hero-char.photo-char { width: 96px; height: 96px; margin-bottom: 0; animation: heroFloat 2.6s ease-in-out infinite; }
   .noura-hero-char svg { width: 100%; height: auto; display: block; }
-  .hero-cta { position: relative; z-index: 1; margin-top: 12px; display: flex; gap: 8px; }
-  .hero-cta .btn { min-height: 48px; font-size: 14px; }
-  .hero-cta .cta-main { background: #fff; color: var(--primary-dark); box-shadow: 0 8px 20px rgba(0,0,0,.18); }
-  .hero-cta .cta-ghost { background: rgba(255,255,255,.18); color: #fff; box-shadow: none; }
+  .hero-cta { position: relative; z-index: 1; margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .hero-cta .btn { min-height: 50px; font-size: 14px; border-radius: 16px; }
+  .hero-cta .cta-main { background: #fff; color: #6D28D9; box-shadow: 0 10px 22px rgba(0,0,0,.22); }
+  .hero-cta .cta-ghost { background: rgba(255,255,255,.14); color: #fff; box-shadow: none; border: 1.5px solid rgba(255,255,255,.3); }
   /* ===== Bolder, clearer cards ===== */
   .stat-card, .streak-pill, .achv { border: 1.5px solid rgba(124,58,237,.16) !important; box-shadow: 0 6px 18px rgba(124,58,237,.12) !important; }
   .stat-card { border-top: 4px solid var(--primary) !important; }
@@ -1151,9 +1157,8 @@
   function assistantSay(msg, mood, label, who) {
     const url = (who && state.photos && state.photos[who]) || '';
     const av = url ? '<div class="noura-char photo-char"><img src="' + url + '" alt=""/></div>' : '';
-    const whoName = who === 'dad' ? 'الزوج' : who === 'mom' ? 'الزوجة' : 'بيتنا';
     return '<div class="noura-card">' + av
-      + '<div class="noura-bubble"><div class="noura-name">' + svgIcon('star', 13) + ' ' + whoName + ' • ' + (label || 'رسالة جديدة') + '</div>'
+      + '<div class="noura-bubble"><div class="noura-name"><span class="waves"><i></i><i></i><i></i><i></i></span> ' + (label || 'رسالة جديدة') + '</div>'
       + '<div class="noura-msg">' + msg + '</div>'
       + '<div class="noura-live">' + speakWaves() + '</div></div></div>';
   }
@@ -1195,6 +1200,8 @@
     const names = ['مستكشف', 'متعلم', 'نشيط', 'بطل البيت', 'خبير', 'أسطورة', 'بطل خارق'];
     return { lvl, pct, title: names[lvl - 1] };
   }
+
+
 
   /* =============================
      CATEGORIES
@@ -1388,7 +1395,7 @@
     initialized: false, home: null, user: null,
     orders: [], expenses: [], learnedMap: {}, usageFreq: {},
     categoryColors: {}, categoryNames: {}, categoryIcons: {}, productIcons: {}, customCats: [], hiddenCats: [],
-    photos: { mom: '', dad: '' },
+    photos: { mom: '', dad: '' }, _shareExpenses: false,
     currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: ''
   };
 
@@ -1548,8 +1555,8 @@
      PERSIST
      ============================= */
   let _syncLock = false;
-  // Offline-First expenses: محلي دائماً، والمشاركة السحابية اختيارية
-  function shareExpensesOn() { return state._shareExpenses !== false; }
+  // Offline-First expenses: محلي افتراضياً، والمشاركة السحابية اختيارية (غير مفعّلة افتراضياً)
+  function shareExpensesOn() { return state._shareExpenses === true; }
   function cloudPushState() {
     if (shareExpensesOn()) return;
     // وضع الخصوصية: ارفع الطلبات فقط مع مشاركة المصروفات المعلّمة shared فقط
@@ -1585,7 +1592,7 @@
     state.categoryIcons = {};
     return true;
   }
-  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} try { localStorage.removeItem('naqisna_audio_items'); } catch {} try { localStorage.removeItem('naqisna_comedy_messages'); } catch {} try { localStorage.removeItem('naqisna_last_joke'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); delete state.notifs; delete state.notifPrefs; delete state._notifSound; delete state._soundOn; delete state._audioOn; delete state._audioVol; delete state._fxOn; delete state._audioLib; delete state.audioUploads; delete state._audioMigrated; delete state._memeOn; delete state._memeMode; delete state._memeVol; delete state._memeOff; delete state._memeCustom; delete state._expandedOrder; delete state._expDraft; delete state._expandedBasket; delete state._basketDraft; wipeCatalogOnce(); migrateCats(); migrateOrderLists(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
+  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} try { localStorage.removeItem('naqisna_audio_items'); } catch {} try { localStorage.removeItem('naqisna_comedy_messages'); } catch {} try { localStorage.removeItem('naqisna_last_joke'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); delete state.notifs; delete state.notifPrefs; delete state._notifSound; delete state._soundOn; delete state._audioOn; delete state._audioVol; delete state._fxOn; delete state._audioLib; delete state.audioUploads; delete state._audioMigrated; delete state._memeOn; delete state._memeMode; delete state._memeVol; delete state._memeOff; delete state._memeCustom; delete state._expandedOrder; delete state._expDraft; delete state._expandedBasket; delete state._basketDraft; state._accountOpen = false; state._notifOpen = false; state._catOpen = false; state._learnedOpen = false; wipeCatalogOnce(); migrateCats(); migrateOrderLists(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
   function catDeptById(id) {
     if (CATEGORIES[id]) return CATEGORIES[id];
     const ad = ((state.catalogCustom || {}).addedDepts || []).find(x => x.id === id);
@@ -2169,9 +2176,17 @@
 
   function renderUsernameScreen() {
     const preRole = state._pendingRole || state.user?.role || '';
+    const det = getDetectedPartner();
+    const pNameVal = state._pendingPartnerName ?? state.partnerName ?? state.home?.partnerName ?? det?.name ?? '';
+    const pWaVal = state._pendingPartnerWa ?? state.partnerWhatsapp ?? state.home?.partnerWhatsapp ?? det?.whatsapp ?? '';
+    const detBox = det && det.whatsapp ? `<div id="partnerDetectBox" style="background:#ECFDF5;border:1.5px solid #10B981;border-radius:16px;padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:center;">
+      <span style="font-size:26px;">🎯</span>
+      <div style="flex:1;min-width:0;"><b style="font-size:13.5px;">لقينا رقم متسجل للبيت ده ✅</b><div style="font-size:12.5px;font-weight:700;color:#065F46;">${escapeHTML(det.name || 'الطرف الآخر')} • <span dir="ltr">${escapeHTML(det.whatsapp)}</span></div></div>
+      <button class="btn btn-sm btn-success" id="useDetectedPartner" type="button">استخدام</button>
+    </div>` : '';
     return `<div class="onboarding"><div class="form-card">
       <h2 class="form-title">أهلاً بيك في بيتك 🏡</h2>
-      <p class="form-subtitle">أول مرة تدخل؟ حدد أنت مين</p>
+      <p class="form-subtitle">أول مرة تدخل؟ حدد أنت مين ومين شريكك</p>
       <div class="field">
         <label>أنت مين في البيت؟ *</label>
         <div class="role-grid">
@@ -2189,6 +2204,20 @@
         <input type="tel" id="userWaInput" class="wa-field" placeholder="01xxxxxxxxx" maxlength="15" inputmode="tel" value="${escapeHTML(state.user?.whatsapp || '')}" dir="ltr" />
         <div class="help-text">هيوصلك عليه رسالة واتساب تلقائية أول ما تخلص كتابة الطلبات ✅</div>
         <div id="waError" class="error-text hidden">اكتب رقم واتساب صحيح (11 رقم يبدأ بـ 01) 📱</div>
+      </div>
+      <div style="border-top:1.5px dashed var(--border);margin:4px 0 14px;padding-top:14px;">
+        <div style="font-weight:900;font-size:14px;margin-bottom:10px;">💑 بيانات الطرف الآخر</div>
+        ${detBox}
+        <div class="field">
+          <label id="partnerNameLabel">💑 اسم الطرف الآخر</label>
+          <input type="text" id="partnerNameInput" placeholder="مثال: سارة، محمد" maxlength="20" value="${escapeHTML(pNameVal)}" />
+        </div>
+        <div class="field">
+          <label>📱 رقم واتساب الطرف الآخر</label>
+          <input type="tel" id="partnerWaInput" class="wa-field" placeholder="01xxxxxxxxx" maxlength="15" inputmode="tel" value="${escapeHTML(pWaVal)}" dir="ltr" />
+          <div class="help-text" id="partnerDetectHint">${det && det.whatsapp ? '✅ اتملى تلقائي من الرقم المسجل للبيت — راجعه وعدّله لو محتاج' : 'هيتبعت عليه تأكيد السلة واتساب تلقائي 📩 (اختياري دلوقتي وتقدر تعدله بعدين)'}</div>
+          <div id="partnerWaError" class="error-text hidden">رقم الطرف الآخر غير صحيح (11 رقم يبدأ بـ 01) 📱</div>
+        </div>
       </div>
       <button class="btn btn-primary" id="submitUsername">يلا ندخل 🎉</button>
     </div></div>`;
@@ -2250,27 +2279,40 @@
     ];
 
     const roleTag = '';
-    const heroMsg = 'تابع مهام اليوم أول بأول';
+    const WIFE_HERO_MSGS = [
+      'ارحموني شوية من الطلبات 😂🛒',
+      'هو إحنا بنشتري حاجات ولا بنجهز فرح؟ 😂',
+      'بالراحة على الطلبات يا جماعة 😂 المحل لسه فاكرنا!',
+      'كل ما أقول خلصنا… طلب جديد يظهر 😂',
+      'الرحمة 😂 الطلبات بقت أكتر من سكان البيت!',
+      'هو في آخر للطلبات دي ولا هنكمّل للصبح؟ 😂',
+      'أنا مش معترض على الطلبات… بس ارحموني من كلمة «هات كمان حاجة» 😂',
+      'الطلبات وصلت لمرحلة محتاجة عربية نقل 🚚😂',
+      'يا جماعة بالراحة 😂 الميزانية بتستغيث!',
+      'كفاية طلبات لحد هنا… خلّوا المحلات ترتاح شوية 😂',
+      'كل يوم طلبات جديدة… هو البيت بيتبني من جديد ولا إيه؟ 😂',
+      'ارحموا المستر/المدام 😂🛒 مش هنلحق نخلص!',
+      'الطلبات مش بتخلص… دي بتتكاثر 😂',
+      'حد يقول للطلبات تهدى شوية 😂 إحنا لسه راجعين من المشوار اللي فات!',
+      'أنا بدأت أشك إن عندنا بيت ولا سوبر ماركت 😂',
+      'طلبات إيه يا جماعة؟ ارحمونا 😂❤️',
+      'نرجو تقليل الطلبات حفاظًا على سلامة المتسوق 😂🫡',
+      'تم استنفاد طاقة المتسوق… نرجو الانتظار 😂',
+      'كفاية كده 😂🛒 خلّونا نعيش يوم من غير طلبات!',
+      'آخر طلب بقى… والنبي 😂 وبعدها نتوب 😂❤️'
+    ];
+    const heroMsg = WIFE_HERO_MSGS[Math.floor(Math.random() * WIFE_HERO_MSGS.length)];
     return `<div class="page">
       <div class="topbar"><div class="greeting">${greeting} يا ${escapeHTML(userName)} ${roleTag}</div></div>
       <div class="page-title">رحلة بيتنا اليوم</div>
       ${adsByPosition('top')}
-
-      <div class="hero">
-        <div class="hero-top">
-          ${photoCharHTML('mom', 'noura-hero-char photo-char')}
-          <div style="flex:1;min-width:0;"><div class="noura-name" style="color:#fff;">🏠 بيتنا</div><h2 style="color:#fff;">${escapeHTML(heroMsg)}</h2><p style="color:rgba(255,255,255,.9);">المستوى ${level.lvl} • ${level.title}</p></div>
-        </div>
-        <div class="hero-progress"><span style="width:${progress}%"></span></div>
-        <div class="hero-meta"><span>تقدم مهام اليوم ${progress}%</span><span>${done}/${totalTasks}</span></div>
-        <div class="hero-meta" style="margin-top:2px;">${speakWaves()}</div>
-        <div class="hero-cta"><button class="btn cta-main" id="heroAddOrder">اضافة طلب</button><button class="btn cta-ghost" data-gotab2="orders">عرض الطلبات</button></div>
-      </div>
+      ${assistantSay(heroMsg, null, 'ترحيب', 'mom')}
 
       <div class="streak-row">
         <div class="streak-pill"><div class="streak-ico" style="background:#FEF3C7;color:#D97706;">${svgIcon('flame', 20)}</div><div><b>${streak} يوم</b><small>سلسلة الالتزام</small></div></div>
         <div class="streak-pill"><div class="streak-ico" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('star', 20)}</div><div><b>${level.pct}%</b><small>للمستوى التالي</small></div></div>
       </div>
+      <div class="badge-row">${achv.map(a => `<div class="achv ${a.ok ? '' : 'locked'}"><div class="achv-ico" style="background:${a.bg};color:${a.c};">${svgIcon(a.ic, 20)}</div><div><b>${a.t}</b><small>${a.s}</small></div></div>`).join('')}</div>
 
       <div class="section"><div class="stats-row">
         <div class="stat-card"><div class="stat-icon" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('cart', 20)}</div><div class="stat-label">مطلوب لسه</div><div class="stat-value">${pending}</div></div>
@@ -2594,7 +2636,7 @@
       <div class="topbar"><div class="greeting">مهام التسوق 🛒</div></div>
       <div class="page-title">${list.length === 0 ? 'مفيش طلبات' : list.length === 1 ? 'فيه طلب واحد' : `فيه ${list.length} طلبات`}</div>
       ${adsByPosition('top')}
-
+      ${assistantSay(pendAll ? `عندك ${pendAll} مهمة مستنياك 🛒<br>دوس على أي طلب للتعديل` : 'مفيش مهام معلقة… استمتع بيومك ❤️', null, 'مهام التسوق', 'mom')}
 
       ${adsByPosition('middle')}
 
@@ -2634,7 +2676,8 @@
     return `<div class="page">
       <div class="topbar"><div class="greeting">تتبع التقدم</div></div>
       <div class="page-title">المصروفات</div>
-      <div class="section"><button class="tgl-row" id="tglShareExp"><span class="tgl"><b>${shareOn ? '☁️ المصروفات مشتركة' : '🔒 المصروفات محلية فقط'}</b><small>${shareOn ? 'تظهر عند الطرف الآخر تلقائياً' : 'محفوظة على جهازك — شاركها وقت ما تحب'}</small></span><span class="sw ${shareOn ? 'on' : ''}"></span></button></div>
+      <div class="section hidden"><button class="tgl-row" id="tglShareExp" aria-label="مشاركة المصروفات"><span class="tgl"><b>${shareOn ? '☁️ المصروفات مشتركة' : '🔒 المصروفات محلية فقط'}</b><small>${shareOn ? 'تظهر عند الطرف الآخر تلقائياً' : 'محفوظة على جهازك — شاركها وقت ما تحب'}</small></span><span class="sw ${shareOn ? 'on' : ''}"></span></button></div>
+      ${assistantSay('مصروفاتك تحت السيطرة 💸 سجّل كل حركة أول بأول', null, 'تتبع المصروفات', 'mom')}
 
       <div class="fin-hero">
         <div class="fin-hero-head"><span>💼 ملخص الشهر المالي</span><span class="fin-hero-month">${new Date().toLocaleDateString('ar-EG', { month: 'long' })}</span></div>
@@ -2736,18 +2779,25 @@
     return `<div class="page">
       <div class="topbar"><div class="greeting">التحكم</div></div>
       <div class="page-title">إدارة البيت</div>
-      <div class="settings-card"><div class="settings-title">الحساب والبيت 👨‍👩‍👧</div>
-        <div class="settings-item"><div class="si-icon" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('home', 18)}</div><div class="si-body"><div class="si-label">اسمك</div><div class="si-value">${escapeHTML(state.user?.name || '')}</div></div><button class="si-action" id="editUserBtn">تعديل</button></div>
-        <div class="settings-item"><div class="si-icon" style="background:${state.user?.role === 'wife' ? '#FCE7F3' : '#DBEAFE'};color:${state.user?.role === 'wife' ? '#EC4899' : '#2563EB'};">${state.user?.role === 'wife' ? '👩' : '👨'}</div><div class="si-body"><div class="si-label">أنت مين؟</div><div class="si-value">${state.user?.role === 'wife' ? 'زوجة 👩' : state.user?.role === 'husband' ? 'زوج 👨' : 'غير محدد'}</div></div><button class="si-action" id="editRoleBtn">تعديل</button></div>
-        <div class="settings-item"><div class="si-icon" style="background:#DCFCE7;color:#059669;">📱</div><div class="si-body"><div class="si-label">رقم الواتساب</div><div class="si-value" dir="ltr">${escapeHTML(state.user?.whatsapp || 'غير مسجل')}</div></div><button class="si-action" id="editWaBtn">تعديل</button></div>
-        <div class="settings-item"><div class="si-icon" style="background:#FCE7F3;color:#EC4899;">${svgIcon('star', 18)}</div><div class="si-body"><div class="si-label">اسم البيت</div><div class="si-value">${escapeHTML(state.home?.name || 'بيتنا')}</div></div><button class="si-action" id="editHomeNameBtn">تعديل</button></div>
+      <div class="settings-card"><button class="collapsible-head" id="accountHead"><span class="ch-icon">👨‍👩‍👧</span><span class="ch-texts"><b>الحساب والبيت</b><small>بياناتك • اضغط للعرض</small></span><span class="chev ${state._accountOpen ? 'open' : ''}">‹</span></button>
+        <div class="collapsible-body ${state._accountOpen ? '' : 'hidden'}">
+        <div class="settings-item"><div class="si-icon" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('home', 18)}</div><div class="si-body"><div class="si-label">اسمك</div></div><button class="si-action" id="editUserBtn">تعديل</button></div>
+        <div class="settings-item"><div class="si-icon" style="background:#DCFCE7;color:#059669;">📱</div><div class="si-body"><div class="si-label">رقم الواتساب</div></div><button class="si-action" id="editWaBtn">تعديل</button></div>
+        <div class="settings-item"><div class="si-icon" style="background:#FCE7F3;color:#EC4899;">${svgIcon('star', 18)}</div><div class="si-body"><div class="si-label">اسم البيت</div></div><button class="si-action" id="editHomeNameBtn">تعديل</button></div>
         <div class="settings-item"><div class="si-icon" style="background:#FEF3C7;color:#D97706;">${svgIcon('check', 18)}</div><div class="si-body"><div class="si-label">كود البيت</div></div><span class="code-display inline">${escapeHTML(state.home?.code || '')}</span><button class="icon-copy-btn" id="copyHomeCode" aria-label="نسخ الكود">${svgIcon('copy', 18)}</button></div>
+        </div>
       </div>
       <div class="settings-card"><div class="settings-title">التطبيق</div>
         <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label">ناقصنا إيه</div><div class="si-value">ثبّته على شاشة موبايلك لفتح أسرع وشغل بدون نت</div></div></div>
         <div style="padding:0 16px 14px;"><button class="btn btn-primary" id="installAppBtn">تثبيت التطبيق على الهاتف</button></div>
       </div>
-      <div class="settings-card"><div class="settings-title">🔔 تنبيهات وتذكيرات</div>
+      <div class="settings-card"><div class="settings-title">🚴 الديليفري</div>
+        <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🚴</div><div class="si-body"><div class="si-label">${escapeHTML(state.deliveryName || state.home?.deliveryName || 'ديليفري')}</div><div class="si-value" dir="ltr">${escapeHTML(state.deliveryWhatsapp || state.home?.deliveryWhatsapp || 'غير مسجل')}</div></div><button class="si-action" id="editDeliveryBtn">تعديل</button></div>
+        <div style="padding:0 16px 14px;"><button class="btn btn-success" id="sendDeliveryBtn">💬 إرسال الطلبات واتساب للديليفري</button></div>
+      </div>
+
+      <div class="settings-card"><button class="collapsible-head" id="notifHead"><span class="ch-icon">🔔</span><span class="ch-texts"><b>تنبيهات وتذكيرات</b><small>إشعارات التطبيق • اضغط للعرض</small></span><span class="chev ${state._notifOpen ? 'open' : ''}">‹</span></button>
+        <div class="collapsible-body ${state._notifOpen ? '' : 'hidden'}">
         <button class="tgl-row" id="tglNotif"><span class="tgl"><b>تفعيل التنبيهات</b><small>إشعارات أثناء استخدام التطبيق</small></span><span class="sw ${state._notifOn === true ? 'on' : ''}"></span></button>
         <button class="tgl-row" id="tglNotifOrders"><span class="tgl"><b>التذكير بالطلبات</b><small>تنبيه بالطلبات المعلقة</small></span><span class="sw ${state._notifOrders !== false ? 'on' : ''}"></span></button>
         <button class="tgl-row" id="tglNotifExp"><span class="tgl"><b>التذكير بالمصروفات</b><small>يفكرك تسجل مصاريفك كل يوم</small></span><span class="sw ${state._notifExp !== false ? 'on' : ''}"></span></button>
@@ -2755,6 +2805,7 @@
         <button class="tgl-row" id="tglNotifDaily"><span class="tgl"><b>التقرير اليومي</b><small>ملخص مصاريف اليوم</small></span><span class="sw ${state._notifDaily !== false ? 'on' : ''}"></span></button>
         <div class="vol-row"><span>🕙</span><input type="time" id="notifDailyTime" value="${state._notifDailyTime || '22:00'}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:12px;font-weight:800;color:var(--text);background:var(--bg);" /><span class="vol-val">التقرير</span></div>
         <div class="snd-add-row"><button class="btn" id="notifTestBtn">🔔 جرّب تنبيه</button></div>
+        </div>
       </div>
       <div class="settings-card"><div class="settings-title">صور العائلة</div>
         <div style="padding:6px 16px 2px;color:var(--text-sec);font-size:11px;font-weight:600;">ارفع صورة حقيقية للأم والأب من موبايلك</div>
@@ -2830,6 +2881,15 @@
         state.home = remote.home;
         state._pendingCode = code; state._pendingName = remote.home.name;
         state._pendingCloud = remote;
+        try {
+          const mems = remote.members || [];
+          const pw = remote.partnerWhatsapp || (mems.length ? mems[0].whatsapp : '') || (remote.user?.whatsapp || '');
+          const pn = remote.partnerName || (mems.length ? mems[0].name : '') || (remote.user?.name || '');
+          if (pw && isValidEgyptPhone(pw)) state._detectedPartner = { name: pn || '', whatsapp: normalizeEgyptPhone(pw), role: (mems.length ? mems[0].role : remote.user?.role) || '', auto: true };
+          else state._detectedPartner = null;
+          state._pendingPartnerWa = state._detectedPartner?.whatsapp || '';
+          state._pendingPartnerName = state._detectedPartner?.name || '';
+        } catch { state._detectedPartner = null; }
         state._onboardingStep = 'username'; render();
       };
       if (state.home && state.home.code && code === state.home.code) {
@@ -2848,12 +2908,16 @@
           inp.disabled = true;
           const remoteData = await window.NaqisnaSupabase.fetchHomeData(code);
           inp.disabled = false;
-          if (remoteData && ((remoteData.orders && remoteData.orders.length) || (remoteData.expenses && remoteData.expenses.length) || remoteData.name)) {
+          if (remoteData && ((remoteData.orders && remoteData.orders.length) || (remoteData.expenses && remoteData.expenses.length) || remoteData.name || (remoteData.members && remoteData.members.length) || remoteData.user)) {
             acceptJoin({
               home: { code, name: remoteData.name || 'بيتنا', createdAt: nowISO() },
               orders: (remoteData.orders || []).map(normRemoteOrder).filter(Boolean),
               expenses: (remoteData.expenses || []).map(normRemoteExpense).filter(Boolean),
               orderLists: remoteData.orderLists || [],
+              members: remoteData.members || (remoteData.user ? [remoteData.user] : []),
+              partnerWhatsapp: remoteData.partnerWhatsapp || '',
+              partnerName: remoteData.partnerName || '',
+              user: remoteData.user || null,
               updatedAt: Number(remoteData.updatedAtMs) || Date.now()
             });
             return;
@@ -2875,32 +2939,68 @@
       if (rh) rh.className = 'role-card' + (state._pendingRole === 'husband' ? ' sel-husband' : '');
       if (rw) rw.className = 'role-card' + (state._pendingRole === 'wife' ? ' sel-wife' : '');
       const re = document.getElementById('roleError'); if (re) re.classList.add('hidden');
+      try {
+        const lbl = document.getElementById('partnerNameLabel');
+        if (lbl) lbl.textContent = state._pendingRole === 'husband' ? '👩 اسم الزوجة' : state._pendingRole === 'wife' ? '👨 اسم الزوج' : '💑 اسم الطرف الآخر';
+        const det = getDetectedPartner();
+        const pWa = document.getElementById('partnerWaInput'), pNm = document.getElementById('partnerNameInput');
+        if (det && det.whatsapp && pWa && !pWa.value) pWa.value = det.whatsapp;
+        if (det && det.name && pNm && !pNm.value) pNm.value = det.name;
+        if (det && det.role && state._pendingRole && det.role === state._pendingRole && pWa) {
+          const alt = ((state._pendingCloud?.members) || []).find(m => m && m.role !== state._pendingRole && m.whatsapp);
+          if (alt) { if (pWa) pWa.value = normalizeEgyptPhone(alt.whatsapp); if (pNm && !pNm.value) pNm.value = alt.name || ''; }
+        }
+      } catch {}
     };
     if (rh) rh.onclick = () => { state._pendingRole = 'husband'; paintRole(); };
     if (rw) rw.onclick = () => { state._pendingRole = 'wife'; paintRole(); };
+    const udp = document.getElementById('useDetectedPartner');
+    if (udp) udp.onclick = () => {
+      try {
+        const det = getDetectedPartner(); if (!det) return;
+        const pWa = document.getElementById('partnerWaInput'), pNm = document.getElementById('partnerNameInput');
+        if (pWa) { pWa.value = det.whatsapp; pWa.classList.remove('error'); }
+        if (pNm && det.name) pNm.value = det.name;
+        state._pendingPartnerWa = det.whatsapp; state._pendingPartnerName = det.name || '';
+        toast('اتملى رقم الطرف الآخر تلقائي ✅', 'success');
+      } catch {}
+    };
+    const pWaLive = document.getElementById('partnerWaInput'), pNmLive = document.getElementById('partnerNameInput');
+    if (pWaLive) pWaLive.oninput = () => { state._pendingPartnerWa = pWaLive.value.trim(); const e = document.getElementById('partnerWaError'); if (e) e.classList.add('hidden'); pWaLive.classList.remove('error'); };
+    if (pNmLive) pNmLive.oninput = () => { state._pendingPartnerName = pNmLive.value.trim(); };
     b('submitUsername', () => {
       const inp = document.getElementById('userNameInput'); const name = (inp.value || '').trim();
       const waInp = document.getElementById('userWaInput'); const waRaw = (waInp?.value || '').trim();
-      const roleErr = document.getElementById('roleError'), waErr = document.getElementById('waError');
+      const pNmInp = document.getElementById('partnerNameInput'); const pName = (pNmInp?.value || '').trim().slice(0, 20);
+      const pWaInp = document.getElementById('partnerWaInput'); const pWaRaw = (pWaInp?.value || '').trim();
+      const roleErr = document.getElementById('roleError'), waErr = document.getElementById('waError'), pWaErr = document.getElementById('partnerWaError');
       const role = state._pendingRole || state.user?.role || '';
       let ok = true;
       if (!role) { if (roleErr) roleErr.classList.remove('hidden'); ok = false; }
       if (!name) { inp.classList.add('error'); inp.focus(); ok = false; } else inp.classList.remove('error');
       if (!isValidEgyptPhone(waRaw)) { if (waErr) waErr.classList.remove('hidden'); if (waInp) { waInp.classList.add('error'); waInp.focus(); } ok = false; }
       else { if (waErr) waErr.classList.add('hidden'); if (waInp) waInp.classList.remove('error'); }
+      if (pWaRaw && !isValidEgyptPhone(pWaRaw)) { if (pWaErr) pWaErr.classList.remove('hidden'); if (pWaInp) { pWaInp.classList.add('error'); pWaInp.focus(); } ok = false; }
+      else { if (pWaErr) pWaErr.classList.add('hidden'); if (pWaInp) pWaInp.classList.remove('error'); }
       if (!ok) return;
       const whatsapp = normalizeEgyptPhone(waRaw);
       const prevId = state.user?.id;
       state.user = { id: prevId || uid(), name, role, whatsapp, joinedAt: state.user?.joinedAt || nowISO() };
       if (state._pendingCloud && state._pendingCloud.home) {
         const rc = state._pendingCloud;
-        for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'categoryColors', 'categoryNames', 'categoryIcons', 'productIcons', 'customCats', 'hiddenCats', 'photos', 'catalogCustom', 'updatedAt']) {
+        for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'categoryColors', 'categoryNames', 'categoryIcons', 'productIcons', 'customCats', 'hiddenCats', 'photos', 'catalogCustom', 'updatedAt', 'members']) {
           if (rc[k] !== undefined) state[k] = rc[k];
         }
         state._pendingCloud = null;
       }
       if (!state.home) state.home = { code: state._pendingCode || genHomeCode(), name: state._pendingName || 'بيتنا', createdAt: nowISO() };
-      state._pendingRole = null;
+      const pNorm = pWaRaw ? normalizeEgyptPhone(pWaRaw) : (getDetectedPartner()?.whatsapp || '');
+      const pFin = pNorm && isValidEgyptPhone(pNorm) ? pNorm : '';
+      const nFin = pName || getDetectedPartner()?.name || '';
+      if (pFin || nFin) savePartnerInfo(pFin, nFin);
+      else { state._pendingPartnerWa = ''; state._pendingPartnerName = ''; }
+      state._pendingRole = null; state._detectedPartner = null;
+      state._pendingPartnerWa = null; state._pendingPartnerName = null;
       state.initialized = true; state.currentTab = 'home'; state._onboardingStep = null; persist();
       try { initSupabaseSync(); } catch {}
       try { syncUserToAdminDir(); } catch {}
@@ -2918,7 +3018,7 @@
   function bindMain() {
     try { syncUserToAdminDir(); } catch {}
 
-    const bc = document.getElementById('basketConfirm'); if (bc) bc.onclick = () => { const r = confirmBasket(); render(); toast(r.added.length ? `🧺 اتأكدت السلة: ${r.added.length} طلب ✓` + (r.skipped ? ` (تجاهلت ${r.skipped} مكرر)` : '') : 'السلة فاضية أو كلها موجودة بالفعل', r.added.length ? 'success' : 'warning'); };
+    const bc = document.getElementById('basketConfirm'); if (bc) bc.onclick = () => { const r = confirmBasket(); render(); if (r.added.length) { try { const snd = new Audio(encodeURI('audio/np money.mp3')); snd.play().catch(() => {}); } catch (e) { console.warn(e); } toast(`🧺 اتأكدت السلة: ${r.added.length} طلب ✓` + (r.skipped ? ` (تجاهلت ${r.skipped} مكرر)` : ''), 'success'); try { sendBasketToPartner(r.added); } catch (e) { console.warn(e); } } else toast('السلة فاضية أو كلها موجودة بالفعل', 'warning'); };
     const bcl = document.getElementById('basketClear'); if (bcl) bcl.onclick = () => { confirmDialog({ title: 'تفريغ السلة؟', message: 'كل الأصناف المجهزة هتتمسح من السلة.', confirmText: 'فرّغ', cancelText: 'لا' }).then(ok => { if (ok) { clearBasket(); render(); toast('اتفرغت السلة ✓', 'success'); } }); };
     document.querySelectorAll('[data-bexp]').forEach(el => el.onclick = (e) => { if (e.target.closest('button, input, select, textarea, a')) return; toggleBasketExpand(el.dataset.bexp); });
     document.querySelectorAll('[data-bqtype]').forEach(b => b.onclick = () => {
@@ -2953,6 +3053,7 @@
     document.querySelectorAll('[data-bqdel]').forEach(b => b.onclick = () => { removeBasketItem(b.dataset.bqdel); state._expandedBasket = null; state._basketDraft = null; toast('اتمسح ✓', 'success'); render(); });
     const edRole = document.getElementById('editRoleBtn'); if (edRole) edRole.onclick = () => openProfileModal();
     const edWa = document.getElementById('editWaBtn'); if (edWa) edWa.onclick = () => openProfileModal();
+    const edPw = document.getElementById('editPartnerWaBtn'); if (edPw) edPw.onclick = () => openPartnerPhoneEditModal();
     document.querySelectorAll('.nav-item[data-tab]').forEach(b => { b.onclick = () => setTab(b.dataset.tab); });
     const gl = document.querySelector('[data-gotab="orders"]'); if (gl) gl.onclick = (e) => { e.preventDefault(); setTab('orders'); };
     const fab = document.getElementById('fabBtn'); if (fab) fab.onclick = openAddOrderModal;
@@ -3095,8 +3196,11 @@
   function bindSettings() {
     const b = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
     b('editUserBtn', () => openEditTextModal({ title: 'تعديل اسمك', label: 'الاسم', value: state.user?.name || '', placeholder: 'اسمك', max: 20, onSave: (v) => { state.user.name = v.trim(); persist(); toast('تمام، الاسم اتحدث ✓', 'success'); render(); } }));
+    b('editPartnerWaBtn', () => openPartnerPhoneEditModal());
     b('editHomeNameBtn', () => openEditTextModal({ title: 'تعديل اسم البيت', label: 'اسم البيت', value: state.home?.name || '', placeholder: 'اسم البيت', max: 30, onSave: (v) => { state.home.name = v.trim(); persist(); toast('اسم البيت اتحدث ✓', 'success'); render(); } }));
     b('copyHomeCode', () => { copyToClipboard(state.home.code).then(ok => toast(ok ? 'تم نسخ الكود' : 'مقدرش أنسخ', ok ? 'success' : 'error')); });
+    b('editDeliveryBtn', () => openDeliveryModal());
+    b('sendDeliveryBtn', () => sendDeliveryWa());
     const ib = document.getElementById('installAppBtn');
     if (ib) {
       const isInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
@@ -3124,8 +3228,16 @@
     if (dadIn) dadIn.onchange = (e) => handlePhotoUpload('dad', e.target.files[0]);
     document.querySelectorAll('[data-rmphoto]').forEach(btn => btn.onclick = () => { if (!state.photos) state.photos = { mom: '', dad: '' }; state.photos[btn.dataset.rmphoto] = ''; persist(); render(); });
     const scrollToId = (id) => { requestAnimationFrame(() => { const h = document.getElementById(id); if (h) h.scrollIntoView({ block: 'start', behavior: 'smooth' }); }); };
-    const cch = document.getElementById('catCustomHead'); if (cch) cch.onclick = () => { state._catOpen = !state._catOpen; persist(); render(); scrollToId('catCustomHead'); };
-    const lnh = document.getElementById('learnedHead'); if (lnh) lnh.onclick = () => { state._learnedOpen = !state._learnedOpen; persist(); render(); scrollToId('learnedHead'); };
+    const accKeys = ['_accountOpen', '_notifOpen', '_catOpen', '_learnedOpen'];
+    const toggleAcc = (key, id) => {
+      const willOpen = !state[key];
+      accKeys.forEach(k => { state[k] = (k === key ? willOpen : false); });
+      persist(); render(); scrollToId(id);
+    };
+    const cch = document.getElementById('catCustomHead'); if (cch) cch.onclick = () => toggleAcc('_catOpen', 'catCustomHead');
+    const lnh = document.getElementById('learnedHead'); if (lnh) lnh.onclick = () => toggleAcc('_learnedOpen', 'learnedHead');
+    const ntf = document.getElementById('notifHead'); if (ntf) ntf.onclick = () => toggleAcc('_notifOpen', 'notifHead');
+    const ach = document.getElementById('accountHead'); if (ach) ach.onclick = () => toggleAcc('_accountOpen', 'accountHead');
     document.querySelectorAll('[data-iconcat]').forEach(btn => btn.onclick = () => openIconPickerModal(btn.dataset.iconcat));
     b('addCatBtn', openAddCatModal);
     b('prodIconsBtn', openProductIcons);
@@ -3144,6 +3256,7 @@
         try { Notification.requestPermission().then(p => apply(p === 'granted')); } catch { apply(true); }
       } else apply(on);
     });
+
     b('tglNotifOrders', () => { state._notifOrders = !(state._notifOrders !== false); persist(); render(); });
     b('tglNotifExp', () => { state._notifExp = !(state._notifExp !== false); persist(); render(); });
     b('tglNotifDaily', () => { state._notifDaily = !(state._notifDaily !== false); persist(); render(); });
@@ -3173,7 +3286,7 @@
     document.querySelectorAll('[data-unlearn]').forEach(btn => btn.onclick = () => { delete state.learnedMap[btn.dataset.unlearn]; persist(); toast('تمام، الكلمة اتمسحت', 'success'); render(); });
     b('clearLearned', () => { confirmDialog({ title: 'مسح الكلمات؟', message: 'هنمسح كل التصنيفات اللي اتعلمناها.', confirmText: 'مسح', cancelText: 'لا', danger: true }).then(ok => { if (ok) { state.learnedMap = {}; persist(); toast('تم المسح ✓', 'success'); render(); } }); });
     const clearAll = document.getElementById('clearAllBtn');
-    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, categoryColors: {}, categoryNames: {}, categoryIcons: {}, productIcons: {}, customCats: [], hiddenCats: [], photos: { mom: '', dad: '' }, catalogCustom: null, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
+    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'مسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. مفيش رجوع!', confirmText: 'مسح كل حاجة', cancelText: 'لا keep', danger: true }).then(ok => { if (ok) { Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, categoryColors: {}, categoryNames: {}, categoryIcons: {}, productIcons: {}, customCats: [], hiddenCats: [], photos: { mom: '', dad: '' }, catalogCustom: null, _shareExpenses: false, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('تم المسح كله', 'warning'); render(); } }); };
   }
 
   function toggleCatItemHidden(key) {
@@ -3695,26 +3808,77 @@
     m.querySelector('#saveTextBtn').onclick = () => { const v = m.querySelector('#editTextInp').value; if (!v?.trim()) { toast('الحقل ده محتاجينه', 'error'); return; } closeModal(m); onSave(v); };
   }
   function openProfileModal() {
-    const cur = state.user?.role || 'husband';
-    const m = openModal(`<div class="modal-handle"></div><h2>تعديل بياناتك 👨‍👩‍👧</h2><p class="m-sub">الرقم بيوصله واتساب تلقائي</p>
-      <div class="field"><label>أنت مين؟</label><div class="role-grid">
-        <button class="role-card ${cur === 'husband' ? 'sel-husband' : ''}" id="pmH">👨‍🍳<br><b>زوج</b></button>
-        <button class="role-card ${cur === 'wife' ? 'sel-wife' : ''}" id="pmW">👩‍🍳<br><b>زوجة</b></button>
-      </div></div>
-      <div class="field"><label>رقم الواتساب</label><input type="tel" id="pmWa" class="wa-field" dir="ltr" value="${escapeHTML(state.user?.whatsapp || '')}" placeholder="01xxxxxxxxx" maxlength="15" inputmode="tel" /></div>
-      <div class="btn-group"><button class="btn btn-primary" id="pmSave">حفظ البيانات ✅</button><button class="btn" id="pmCancel">رجوع</button></div>`);
-    let role = cur;
-    const paint = () => { m.querySelector('#pmH').className = 'role-card' + (role === 'husband' ? ' sel-husband' : ''); m.querySelector('#pmW').className = 'role-card' + (role === 'wife' ? ' sel-wife' : ''); };
-    m.querySelector('#pmH').onclick = () => { role = 'husband'; paint(); };
-    m.querySelector('#pmW').onclick = () => { role = 'wife'; paint(); };
+    const m = openModal(`<div class="modal-handle"></div><h2>رقم الواتساب 📱</h2><p class="m-sub">هيوصلك عليه إشعارات الطلبات</p>
+      <div class="field"><label>📱 رقم الواتساب الخاص بيك</label><input type="tel" id="pmWa" class="wa-field" dir="ltr" value="${escapeHTML(state.user?.whatsapp || '')}" placeholder="01xxxxxxxxx" maxlength="15" inputmode="tel" /></div>
+      <div class="btn-group"><button class="btn btn-primary" id="pmSave">حفظ الرقم ✅</button><button class="btn" id="pmCancel">رجوع</button></div>`);
     m.querySelector('#pmCancel').onclick = () => closeModal(m);
     m.querySelector('#pmSave').onclick = () => {
       const wa = m.querySelector('#pmWa').value.trim();
       if (!isValidEgyptPhone(wa)) { toast('رقم الواتساب غير صحيح 📱', 'error'); return; }
-      state.user.role = role; state.user.whatsapp = normalizeEgyptPhone(wa);
+      state.user.whatsapp = normalizeEgyptPhone(wa);
       persist(); try { syncUserToAdminDir(); } catch {}
-      closeModal(m); render(); toast('اتحفظت بياناتك ✅', 'success');
+      closeModal(m); render(); toast('اتحفظ رقم الواتساب ✅', 'success');
     };
+  }
+  function openPartnerPhoneEditModal() {
+    const cur = getPartnerPhone() || state.partnerWhatsapp || state.home?.partnerWhatsapp || '';
+    const curNm = getPartnerName() || state.partnerName || state.home?.partnerName || '';
+    const m = openModal(`<div class="modal-handle"></div><h2>الطرف الآخر 💑</h2><p class="m-sub">تأكيد السلة هيتبعت عليه واتساب تلقائي</p>
+      <div class="field"><label>💑 اسم الطرف الآخر</label><input type="text" id="epName" value="${escapeHTML(curNm)}" placeholder="مثال: سارة، محمد" maxlength="20" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg);font-weight:800;" /></div>
+      <div class="field"><label>📱 رقم الواتساب</label><input type="tel" id="epWa" dir="ltr" value="${escapeHTML(cur)}" placeholder="01xxxxxxxxx" maxlength="15" inputmode="tel" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg);font-weight:800;" /></div>
+      <div class="btn-group"><button class="btn btn-primary" id="epSave">حفظ ✅</button><button class="btn" id="epCancel">رجوع</button></div>`);
+    m.querySelector('#epCancel').onclick = () => closeModal(m);
+    m.querySelector('#epSave').onclick = () => {
+      const v = m.querySelector('#epWa').value.trim();
+      const nm = m.querySelector('#epName').value.trim().slice(0, 20);
+      if (!isValidEgyptPhone(v)) { toast('رقم غير صحيح 📱', 'error'); return; }
+      savePartnerInfo(normalizeEgyptPhone(v), nm);
+      persist(); closeModal(m); render(); toast('اتحفظ الطرف الآخر 💑', 'success');
+    };
+  }
+  function getDeliveryInfo() {
+    try {
+      return {
+        name: state.deliveryName || state.home?.deliveryName || localStorage.getItem('naqisna_delivery_name') || '',
+        phone: normalizeEgyptPhone(state.deliveryWhatsapp || state.home?.deliveryWhatsapp || localStorage.getItem('naqisna_delivery_wa') || '')
+      };
+    } catch { return { name: '', phone: '' }; }
+  }
+  function openDeliveryModal() {
+    const d = getDeliveryInfo();
+    const m = openModal(`<div class="modal-handle"></div><h2>الديليفري 🚴</h2><p class="m-sub">سجل رقمه وابعتله الطلبات واتساب</p>
+      <div class="field"><label>🚴 اسم الديليفري</label><input type="text" id="dlName" value="${escapeHTML(d.name)}" placeholder="مثال: أحمد الديليفري" maxlength="20" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg);font-weight:800;" /></div>
+      <div class="field"><label>📱 رقم الواتساب</label><input type="tel" id="dlWa" dir="ltr" value="${escapeHTML(d.phone)}" placeholder="01xxxxxxxxx" maxlength="15" inputmode="tel" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg);font-weight:800;" /></div>
+      <div class="btn-group"><button class="btn btn-primary" id="dlSave">حفظ ✅</button><button class="btn" id="dlCancel">رجوع</button></div>`);
+    m.querySelector('#dlCancel').onclick = () => closeModal(m);
+    m.querySelector('#dlSave').onclick = () => {
+      const v = m.querySelector('#dlWa').value.trim();
+      const nm = m.querySelector('#dlName').value.trim().slice(0, 20);
+      if (!isValidEgyptPhone(v)) { toast('رقم غير صحيح 📱', 'error'); return; }
+      const pn = normalizeEgyptPhone(v);
+      state.deliveryWhatsapp = pn; state.deliveryName = nm;
+      try { if (state.home) { state.home.deliveryWhatsapp = pn; state.home.deliveryName = nm; } } catch {}
+      try { localStorage.setItem('naqisna_delivery_wa', pn); localStorage.setItem('naqisna_delivery_name', nm); } catch {}
+      persist(); closeModal(m); render(); toast('اتحفظ الديليفري 🚴', 'success');
+    };
+  }
+  function buildDeliveryWaMessage() {
+    const list = (state.orders || []).filter(o => o.status === 'pending').slice(0, 40);
+    const homeName = state.home?.name || 'بيتنا';
+    const d = getDeliveryInfo();
+    const lines = list.map((o, i) => {
+      const q = o.qty?.v ? ` (${o.qty.v} ${o.qty.u || ''})`.trimEnd() : '';
+      const nt = o.notes ? ` - ${o.notes}` : '';
+      return `${i + 1}. ${o.name}${q}${nt}`;
+    });
+    return `🚴 أهلاً ${d.name || 'يا بطل'}، طلبات توصيل من *${homeName}* 🏠\n\n🛒 الطلبات (${list.length}):\n${lines.length ? lines.join('\n') : 'لا توجد طلبات معلقة'}\n\n📍 برجاء التوصيل لعنوان البيت المسجل. شكرًا 🙏\n🏠 ${homeName} • تطبيق ناقصنا إيه`;
+  }
+  function sendDeliveryWa() {
+    const d = getDeliveryInfo();
+    if (!d.phone || !isValidEgyptPhone(d.phone)) { openDeliveryModal(); toast('سجل رقم الديليفري الأول 📱', 'warning'); return; }
+    const pend = (state.orders || []).filter(o => o.status === 'pending');
+    if (!pend.length) { toast('مفيش طلبات معلقة للديليفري', 'warning'); return; }
+    try { window.open(`https://wa.me/${toWaIntl(d.phone)}?text=${encodeURIComponent(buildDeliveryWaMessage())}`, '_blank'); toast('اتفتح واتساب للديليفري 🚴', 'success'); } catch {}
   }
 
   /* =============================
@@ -3854,7 +4018,7 @@
   function openOrderModal({ mode, order }) {
     const editing = mode === 'edit';
     const html = `<div class="modal-handle"></div>
-      <div class="m-hero"><span class="m-hero-ico">${svgIcon(editing ? 'pencil' : 'plus', 26)}</span><div class="m-hero-txt"><h2>${editing ? 'تعديل الطلب' : 'زوّد طلب'}</h2><p>${editing ? 'عدّل اسم الطلب وبياناته' : 'اكتب اسم الصنف وحدد الكمية'}</p></div></div>
+      <div class="m-hero" style="${editing ? '' : 'background:linear-gradient(135deg,#34D399 0%,#10B981 55%,#047857 100%);box-shadow:0 14px 30px rgba(16,185,129,.35);border-radius:18px;padding:13px 14px;'}"><span class="m-hero-ico" style="${editing ? '' : 'width:46px;height:46px;border-radius:14px;font-size:24px;'}">${editing ? svgIcon('pencil', 26) : '🧺'}</span><div class="m-hero-txt"><h2>${editing ? 'تعديل الطلب' : 'زوّد طلب 🧺'}</h2><p>${editing ? 'عدّل اسم الطلب وبياناته' : 'اختار صنفك من البحث وضيفه للسلة'}</p></div></div>
       ${editing ? `<div class="field"><label>اسم الطلب *</label>
         <div class="ord-box"><textarea id="ordName" rows="2" placeholder="اكتب اسم الطلب" maxlength="200" autocomplete="off">${escapeHTML(order.name)}</textarea>
         <div class="suggest-drop hidden" id="ordSuggest"></div></div>
@@ -3885,8 +4049,7 @@
       ${editing
         ? `<div class="field"><label>يُضاف إلى طلب (قائمة)</label><select id="ordListSel" class="rv-select">${orderLists().map(l => `<option value="${l.id}" ${l.id === activeListId() ? 'selected' : ''}>${escapeHTML(l.name)}</option>`).join('')}</select></div>` : ''}
       <div id="pharmacyNote" class="pharm-note hidden">⚠️ ده قسم صيدلية بس. التطبيق مش بيقدم تشخيص أو نصيحة طبية.</div>
-      <div class="field" style="margin-bottom:4px;"><button type="button" class="urg-toggle ${editing && order && (order.priority === 'high' || order.urgent) ? 'on' : ''}" id="urgToggle"><span class="u-ico">🔥</span><b>طلب ضروري<small>هيظهر بشارة حمرا ويطلع أول القائمة</small></b><span class="sw"></span></button></div>
-      <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="submitOrderBtn">${editing ? 'حفظ التعديل' : 'إضافة للسلة 🧺'}</button><button class="btn" id="cancelOrderBtn">رجوع</button></div>`;
+      <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="submitOrderBtn">${editing ? 'حفظ التعديل' : 'إضافة للسلة 🧺'}</button></div>`;
     const m = openModal(html);
     const nameInput = m.querySelector('#ordName');
     const pharmNote = m.querySelector('#pharmacyNote'); const submitBtn = m.querySelector('#submitOrderBtn');
@@ -4043,6 +4206,7 @@
       if (pickedList.some(x => normalizeTerm(x) === k)) { toast('موجود فوق بالفعل ✓', 'info'); return; }
       pickedList.push(nm);
       needCatFor = null;
+      try { const si = m.querySelector('#pickSearch'); if (si) si.value = ''; } catch {}
       syncPickedCompat(); qtyFor = null;
       renderPick(); renderPickList();
       updateSuggest(); evalCategoryFromName();
@@ -4158,7 +4322,7 @@
     setTimeout(evalCategoryFromName, 50);
     if (editing && order.qty) { qtyFor = order.name; qtyType = order.qty.t === 'w' ? 'weight' : 'count'; qtyVal = order.qty.v || 1; qtyUnit = order.qty.u || 'قطعة'; renderQty(); }
     const urgBtn = m.querySelector('#urgToggle'); if (urgBtn) urgBtn.onclick = () => { newPrio = (newPrio === 'high') ? 'medium' : 'high'; paintUrg(); };
-    m.querySelector('#cancelOrderBtn').onclick = () => closeModal(m);
+    const cancelBtn = m.querySelector('#cancelOrderBtn'); if (cancelBtn) cancelBtn.onclick = () => closeModal(m);
 
 
     m.querySelector('#submitOrderBtn').onclick = () => {
@@ -4214,14 +4378,25 @@
 
   function openPurchaseModal(orderId) {
     const o = state.orders.find(x => x.id === orderId); if (!o) return;
+    const cc = catColor(o.categoryId);
+    const prodVisual = o.photo ? `<img src="${o.photo}" style="width:100%;height:100%;object-fit:cover;" />` : productIcon(o.name, o.categoryId);
     const html = `<div class="modal-handle"></div>
-      <h2>تم شراء "${escapeHTML(o.name)}"؟</h2>
-      <p class="m-sub">اكتب السعر عشان نسجله</p>
-      <div class="field"><label>السعر *</label><input type="number" id="finalPrice" min="0" step="0.01" placeholder="مثلا: 25.50" /></div>
-      <div class="btn-group"><button class="btn btn-success" id="confirmBuy">تأكيد الشراء</button><button class="btn" id="cancelBuy">رجوع</button></div>`;
+      <div class="finm-hero kind-income"><span class="finm-ico">✅</span><div><h2>تم الشراء؟ 🎉</h2><p>سجّل السعر وهيتضاف للمصروفات تلقائياً</p></div></div>
+      <div class="exp-card" style="--kc:#059669;margin-bottom:10px;">
+        <div class="exp-ico" style="background:${cc}20;font-size:24px;overflow:hidden;">${prodVisual}</div>
+        <div class="exp-mid">
+          <div class="exp-top"><b>${escapeHTML(o.name)}</b></div>
+          <div class="exp-sub"><span>${escapeHTML(getCategoryName(o.categoryId))}</span><i></i><span>📍 ${escapeHTML(o.purchaseLocation || catLocation(o.categoryId))}</span>${o.qty && o.qty.v ? `<span>•</span><span>${escapeHTML(fmtQty(o.qty))}</span>` : ''}</div>
+        </div>
+      </div>
+      <div class="finm-body">
+        <div class="finm-field" style="--fin-accent:#10B981;"><label><i style="background:#DCFCE7;">💵</i>سعر الشراء *</label><div class="amount-wrap"><input type="number" id="finalPrice" min="0" step="0.01" placeholder="مثلا: 25.50" inputmode="decimal" /><span class="amount-cur">ج.م</span></div><div class="help-text">💸 هيتسجل تلقائياً في المصروفات</div></div>
+      </div>
+      <div class="btn-group"><button class="btn btn-success" id="confirmBuy">✓ تأكيد الشراء</button><button class="btn" id="cancelBuy">رجوع</button></div>`;
     const m = openModal(html); const fin = m.querySelector('#finalPrice');
+    try { setTimeout(() => fin.focus(), 150); } catch {}
     m.querySelector('#cancelBuy').onclick = () => closeModal(m);
-    m.querySelector('#confirmBuy').onclick = () => {
+    const doConfirm = () => {
       const finalV = Number(fin.value);
       if (!(finalV > 0)) { fin.classList.add('error'); fin.focus(); toast('اكتب السعر يا حبيبي', 'warning'); return; }
       const boughtName = o.name;
@@ -4238,6 +4413,9 @@
         toast(`"${boughtName}" اتشترى ✓`, 'success');
       }
     };
+    m.querySelector('#confirmBuy').onclick = doConfirm;
+    fin.onkeydown = (ev) => { if (ev.key === 'Enter') doConfirm(); };
+    fin.oninput = () => fin.classList.remove('error');
   }
 
   function openAddExpenseModal() {
@@ -4596,6 +4774,184 @@
     return `<div class="ad-banner">${inner}${cap}</div>`;
   }
   function adsByPosition(pos) { return getActiveAds().filter(a => (a.position || 'top') === pos).map(adBannerHTML).join(''); }
+  /* ===== إرسال سلة التجهيز للطرف الآخر واتساب: رسائل بسيطة عشوائية ===== */
+  const PARTNER_SIMPLE_MSGS = [
+    'حبيبي 😂❤️ في شوية طلبات مستنياك… ادخل شوفها قبل ما أبدأ فقرة التذكير اليومية 😂',
+    'تنبيه هام 🚨😂 في طلبات جديدة… برجاء دخول سيادتكم والاطلاع عليها فورًا 🫡',
+    'يا أبو الطلبات 😂🛒 في شوية حاجات ناقصانا… ادخل شوفهم قبل ما أنسى وأقولك للمرة الـ17 😂',
+    'حبيبي ❤️ الطلبات جاهزة… مستنية حضرتك تشرف عليها 😂',
+    'يا مدير المشتريات 🫡😂 عندك شوية طلبات، ادخل شوفها.',
+    'عاجل 🚨😂 الطلبات موجودة… والزوج لسه في عداد الغائبين 😌',
+    'حبيبي 😂❤️ ادخل شوف الطلبات، قبل ما أتحول من زوجة لطيفة لخدمة عملاء 😂',
+    'تم إضافة طلبات جديدة 📝😂 برجاء دخول السيد الزوج قبل تصعيد الأمر للإدارة العليا 😌',
+    'يا باشا 😂🛒 عندنا شوية طلبات مستنيين اللمسة السحرية بتاعتك.',
+    'الطلبات اتحطت… كل حاجة جاهزة… فاضل حضرتك بس 😂❤️',
+    'نداء أخير يا أبو الطلبات 📢😂 ادخل شوف المطلوب قبل ما أقولك: «فاكر لما قلتلك؟» 😂',
+    'حبيبي ❤️ في طلبات مستنياك… ادخل عليها قبل ما الطلبات نفسها تزعل منك 😂',
+    'مطلوب حضور الزوج شخصيًا 🫡😂 فيه طلبات محتاجة اهتمامك.',
+    'حبيبي 😂 في شوية حاجات ناقصانا… وأنت الوحيد القادر على إنقاذ الموقف 🦸‍♂️😂',
+    'إشعار زوجي رسمي 📢😂 برجاء الاطلاع على الطلبات، وشكرًا لحسن تعاونكم 😌❤️',
+    'الطلبات جاهزة يا نجم 😂🛒 مستنيين بس حضرتك تدينا شرف الدخول عليها.',
+    'حبيبي 😂❤️ ادخل شوف الطلبات… متخلينيش أضطر أستخدم سلاح «أنا قلتلك» 😂',
+    'يا سيادة الزوج 😂 الطلبات مستنياك، والموضوع تحت السيطرة… حاليًا 😂',
+    'عندنا مهمة بسيطة جدًا 😂🫡 ادخل شوف الطلبات والباقي على الله.',
+    'حبيبي ❤️ افتح وشوف الطلبات… قبل ما أفتكرلك كل طلبات الشهر اللي فات 😂'
+  ];
+  function getPartnerName() {
+    try { return state.partnerName || state.home?.partnerName || localStorage.getItem('naqisna_partner_name') || ''; } catch { return ''; }
+  }
+  function getDetectedPartner() {
+    try {
+      if (state._detectedPartner && state._detectedPartner.whatsapp) return state._detectedPartner;
+      const pc = state._pendingCloud || {};
+      if (pc.detectedPartner && pc.detectedPartner.whatsapp) return pc.detectedPartner;
+      const mems = pc.members || state.members || state.home?.members || [];
+      const myRole = state._pendingRole || state.user?.role || '';
+      let cand = (mems || []).filter(x => x && x.whatsapp && isValidEgyptPhone(x.whatsapp));
+      if (myRole) {
+        const opp = cand.find(x => x.role && x.role !== myRole);
+        if (opp) return { name: opp.name || '', whatsapp: normalizeEgyptPhone(opp.whatsapp), role: opp.role, auto: true };
+      }
+      if (cand.length) return { name: cand[0].name || '', whatsapp: normalizeEgyptPhone(cand[0].whatsapp), role: cand[0].role || '', auto: true };
+      if (pc.partnerWhatsapp && isValidEgyptPhone(pc.partnerWhatsapp)) return { name: pc.partnerName || '', whatsapp: normalizeEgyptPhone(pc.partnerWhatsapp), role: '', auto: true };
+      if (pc.user && pc.user.whatsapp && isValidEgyptPhone(pc.user.whatsapp)) return { name: pc.user.name || '', whatsapp: normalizeEgyptPhone(pc.user.whatsapp), role: pc.user.role || '', auto: true };
+      const hc = state._pendingCode || state.home?.code;
+      const list = JSON.parse(localStorage.getItem('naqisna_users_list') || '[]');
+      const hit = (list || []).find(u => u && u.homeCode === hc && u.whatsapp && isValidEgyptPhone(u.whatsapp));
+      if (hit) return { name: hit.name || '', whatsapp: normalizeEgyptPhone(hit.whatsapp), role: hit.role || '', auto: true };
+    } catch {}
+    return null;
+  }
+  function getPartnerPhone() {
+    try {
+      const direct = normalizeEgyptPhone(state.partnerWhatsapp || state.home?.partnerWhatsapp || localStorage.getItem('naqisna_partner_wa') || '');
+      if (isValidEgyptPhone(direct)) return direct;
+      const det = getDetectedPartner();
+      if (det && isValidEgyptPhone(det.whatsapp)) return normalizeEgyptPhone(det.whatsapp);
+      const list = JSON.parse(localStorage.getItem('naqisna_users_list') || '[]');
+      const myId = state.user?.id, hc = state.home?.code, myRole = state.user?.role;
+      const found = (list || []).find(u => u && u.homeCode === hc && String(u.id) !== String(myId) && u.whatsapp && isValidEgyptPhone(u.whatsapp));
+      if (found) return normalizeEgyptPhone(found.whatsapp);
+      const opp = (list || []).find(u => u && u.homeCode === hc && myRole && u.role && u.role !== myRole && u.whatsapp && isValidEgyptPhone(u.whatsapp));
+      if (opp) return normalizeEgyptPhone(opp.whatsapp);
+      const mems = state.members || state.home?.members || [];
+      const m = (mems || []).find(x => x && x.whatsapp && String(x.id) !== String(myId) && isValidEgyptPhone(x.whatsapp));
+      if (m) return normalizeEgyptPhone(m.whatsapp);
+    } catch {}
+    return '';
+  }
+  function toWaIntl(local) { const d = normalizeEgyptPhone(local || ''); if (!d) return ''; return d.startsWith('01') ? '2' + d : d; }
+  const PARTNER_SADAQA_MSGS = [
+    '🤲 قال ﷺ: «دينار أنفقته على أهلك أعظمها أجرًا» رواه مسلم 🌙',
+    '🤲 قال ﷺ: «ما أطعمت نفسك فهو لك صدقة، وما أطعمت أهلك فهو لك صدقة» 🤍',
+    '🤲 «وَمَا أَنفَقْتُم مِّن شَيْءٍ فَهُوَ يُخْلِفُهُ وَهُوَ خَيْرُ الرَّازِقِينَ» سبأ: 39 🌙',
+    '🤲 قال ﷺ: «خيركم خيركم لأهله» ❤️ ربنا يبارك فيك ويخلف عليك بالحلال',
+    '🤲 قال ﷺ: «ما نقص مال من صدقة» والنفقة على الأهل من أعظم الصدقات 🌙'
+  ];
+  function buildPartnerWaMessage(items) {
+    try {
+      const hook = PARTNER_SIMPLE_MSGS[Math.floor(Math.random() * PARTNER_SIMPLE_MSGS.length)];
+      const deeny = PARTNER_SADAQA_MSGS[Math.floor(Math.random() * PARTNER_SADAQA_MSGS.length)];
+      const list = (items && items.length ? items : (state.orders || []).filter(o => o.status === 'pending')).slice(0, 40);
+      if (!list.length) return `${hook}\n\n${deeny}`;
+      const lines = list.map((o, i) => {
+        const q = o.qty?.v ? ` (${o.qty.v} ${o.qty.u || ''})`.trimEnd() : '';
+        const nt = o.notes ? ` - ${o.notes}` : '';
+        return `${i + 1}. ${o.name}${q}${nt}`;
+      });
+      return `${hook}\n\n🛒 الطلبات (${list.length}):\n${lines.join('\n')}\n\n${deeny}`;
+    } catch { return 'حبيبي 😂❤️ في شوية طلبات مستنياك… ادخل شوفها 😂'; }
+  }
+  function openPartnerSendModal(items, phoneLocal) {
+    const text = buildPartnerWaMessage(items);
+    const url = `https://wa.me/${toWaIntl(phoneLocal)}?text=${encodeURIComponent(text)}`;
+    const preview = escapeHTML(text).replace(/\n/g, '<br>');
+    const m = openModal(`
+      <div class="modal-handle"></div>
+      <div class="m-hero"><span class="m-hero-ico">💌</span><div class="m-hero-txt"><h2>الرسالة جاهزة 📱</h2><p>${items.length} أصناف • دوس الزر عشان تبعتها واتساب</p></div></div>
+      <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:12px 14px;font-size:13.5px;font-weight:700;line-height:2;white-space:normal;max-height:260px;overflow-y:auto;margin-bottom:12px;">${preview}</div>
+      <div class="btn-group">
+        <a class="btn btn-success" href="${url}" target="_blank" rel="noopener" id="partnerWaGo">📱 إرسال واتساب للطرف الآخر</a>
+        <div style="display:flex;gap:8px;"><button class="btn" id="partnerWaCopy" style="flex:1;">📋 نسخ الرسالة</button><button class="btn btn-primary" id="partnerWaClose" style="flex:1;">قفل</button></div>
+      </div>`);
+    m.querySelector('#partnerWaClose').onclick = () => closeModal(m);
+    m.querySelector('#partnerWaCopy').onclick = () => { copyToClipboard(text).then(ok => toast(ok ? 'اتنسخت الرسالة 📋' : 'مقدرش أنسخ', ok ? 'success' : 'error')); };
+    m.querySelector('#partnerWaGo').onclick = () => { toast('اتفتح واتساب بالرسالة 💌', 'success'); };
+    return { text, url };
+  }
+  function askPartnerPhoneModal(pendingItems) {
+    const cur = getPartnerPhone() || '';
+    const curNm = getPartnerName() || '';
+    const text = buildPartnerWaMessage(pendingItems);
+    const preview = escapeHTML(text).replace(/\n/g, '<br>');
+    const m = openModal(`
+      <div class="modal-handle"></div>
+      <div class="m-hero"><span class="m-hero-ico">📱</span><div class="m-hero-txt"><h2>بيانات الطرف الآخر</h2><p>سجلها مرة واحدة وهنبعت عليها تلقائي كل مرة</p></div></div>
+      <div class="field"><label>💑 اسم الطرف الآخر</label><input type="text" id="partnerNameAsk" placeholder="مثال: سارة، محمد" maxlength="20" value="${escapeHTML(curNm)}" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg);font-weight:800;" /></div>
+      <div class="field"><label>📱 رقم واتساب الطرف الآخر *</label><input type="tel" id="partnerWaInput" dir="ltr" placeholder="01xxxxxxxxx" maxlength="15" inputmode="tel" value="${escapeHTML(cur)}" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg);font-weight:800;" /></div>
+      <div class="help-text">مثال: رقم الزوج لو انتِ الزوجة والعكس 💑</div>
+      <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:12px 14px;font-size:13px;font-weight:700;line-height:2;max-height:180px;overflow-y:auto;margin:10px 0 12px;">${preview}</div>
+      <div class="btn-group"><button class="btn btn-success" id="partnerWaSaveSend">💾 حفظ وإرسال واتساب</button><button class="btn" id="partnerWaSkip">تخطي الإرسال</button></div>`);
+    m.querySelector('#partnerWaSkip').onclick = () => closeModal(m);
+    m.querySelector('#partnerWaSaveSend').onclick = () => {
+      const v = m.querySelector('#partnerWaInput').value.trim();
+      const nm = m.querySelector('#partnerNameAsk').value.trim().slice(0, 20);
+      if (!isValidEgyptPhone(v)) { toast('اكتب رقم صحيح (11 رقم يبدأ بـ 01) 📱', 'error'); return; }
+      const norm = normalizeEgyptPhone(v);
+      savePartnerInfo(norm, nm);
+      persist(); closeModal(m); render();
+      const text2 = buildPartnerWaMessage(pendingItems);
+      try { window.open(`https://wa.me/${toWaIntl(norm)}?text=${encodeURIComponent(text2)}`, '_blank'); toast('اتبعتت الرسالة واتساب 💌', 'success'); } catch {}
+    };
+  }
+  function upsertMemberPhone(partnerNorm, partnerNm) {
+    try {
+      if (!state.members) state.members = [];
+      if (state.user && state.user.whatsapp) {
+        const i = state.members.findIndex(x => x && String(x.id) === String(state.user.id));
+        const rec = { id: state.user.id, name: state.user.name, role: state.user.role, whatsapp: normalizeEgyptPhone(state.user.whatsapp) };
+        if (i >= 0) state.members[i] = { ...state.members[i], ...rec }; else state.members.push(rec);
+      }
+      if (partnerNorm) {
+        const nm = (partnerNm || getPartnerName() || '').trim() || (state.user?.role === 'wife' ? 'الزوج 👨' : 'الزوجة 👩');
+        const j = state.members.findIndex(x => x && x.whatsapp === partnerNorm);
+        const prec = { id: 'partner_' + partnerNorm.slice(-4), name: nm, role: state.user?.role === 'wife' ? 'husband' : 'wife', whatsapp: partnerNorm };
+        if (j < 0) state.members.push(prec); else state.members[j] = { ...state.members[j], ...prec };
+      }
+    } catch {}
+  }
+  function savePartnerInfo(norm, nm) {
+    try {
+      if (norm) {
+        state.partnerWhatsapp = norm;
+        if (state.home) state.home.partnerWhatsapp = norm;
+        try { localStorage.setItem('naqisna_partner_wa', norm); } catch {}
+      }
+      if (nm !== undefined) {
+        const clean = String(nm || '').trim().slice(0, 20);
+        if (clean) {
+          state.partnerName = clean;
+          if (state.home) state.home.partnerName = clean;
+          try { localStorage.setItem('naqisna_partner_name', clean); } catch {}
+        } else {
+          state.partnerName = ''; if (state.home) state.home.partnerName = '';
+          try { localStorage.removeItem('naqisna_partner_name'); } catch {}
+        }
+      }
+      try { upsertMemberPhone(norm || getPartnerPhone(), nm !== undefined ? nm : getPartnerName()); } catch {}
+    } catch {}
+  }
+  function sendBasketToPartner(added) {
+    if (!added || !added.length) return;
+    try { upsertMemberPhone(); } catch {}
+    try { logActivity({ user: (state.user?.name || '') + (state.user?.role === 'wife' ? ' (الزوجة)' : ' (الزوج)'), type: 'order_complete', text: `أكد سلة التجهيز (${added.length} أصناف) 🧺` }); } catch {}
+    try { syncUserToAdminDir(); } catch {}
+    const phone = getPartnerPhone();
+    if (!phone) { askPartnerPhoneModal(added); return; }
+    const text = buildPartnerWaMessage(added);
+    const url = `https://wa.me/${toWaIntl(phone)}?text=${encodeURIComponent(text)}`;
+    try { window.open(url, '_blank'); toast('اتبعتت الرسالة واتساب 💌', 'success'); } catch {}
+  }
   function buildOrderWaText() {
     const pend = (state.orders || []).filter(o => o.status === 'pending');
     const lines = pend.slice(0, 30).map((o, i) => `${i + 1}. ${o.name}${o.qty?.v ? ` (${o.qty.v} ${o.qty.u || ''})` : ''}`);
@@ -4608,18 +4964,10 @@
     const role = state.user?.role || 'husband';
     try { logActivity({ user: (state.user?.name || '') + (role === 'wife' ? ' (الزوجة)' : ' (الزوج)'), type: 'order_complete', text: 'أنهى كتابة قائمة الطلبات 🛒' }); } catch {}
     try { syncUserToAdminDir(); } catch {}
-    const waNum = normalizeEgyptPhone(state.user?.whatsapp || '');
-    const waIntl = waNum.startsWith('01') ? '2' + waNum : waNum;
-    const waUrl = `https://wa.me/${waIntl}?text=${encodeURIComponent(buildOrderWaText())}`;
-    const m = openModal(`
-      <div class="modal-handle"></div>
-      <div class="m-hero"><span class="m-hero-ico">📱</span><div class="m-hero-txt"><h2>القائمة جاهزة للإرسال</h2><p>${pend.length} طلبات • ابعتها واتساب في ضغطة واحدة</p></div></div>
-      <div class="btn-group">
-        <a class="btn btn-success" id="sendWaAuto" href="${waUrl}" target="_blank" rel="noopener">📱 إرسال فقط</a>
-        <button class="btn btn-primary" id="finishClose">تمام، قفل</button>
-      </div>`);
-    m.querySelector('#finishClose').onclick = () => closeModal(m);
-    m.querySelector('#sendWaAuto').onclick = () => { toast('اتفتح واتساب بالرسالة التلقائية 📱', 'success'); };
+    const partner = getPartnerPhone();
+    if (!partner) { sendBasketToPartner(pend); return; }
+    const waUrl = `https://wa.me/${toWaIntl(partner)}?text=${encodeURIComponent(buildPartnerWaMessage(pend))}`;
+    try { window.open(waUrl, '_blank'); toast('اتبعتت الرسالة واتساب 💌', 'success'); } catch {}
   }
   function normRemoteOrder(ro) {
     if (!ro) return null;
@@ -4714,6 +5062,43 @@
         }
         if (remoteData.name && state.home && !state.home.name) state.home.name = remoteData.name;
       }
+      // مزامنة اسم ورقم الطرف الآخر والأعضاء للاكتشاف التلقائي
+      try {
+        if (remoteData.partnerWhatsapp && !state.partnerWhatsapp) {
+          state.partnerWhatsapp = remoteData.partnerWhatsapp;
+          if (state.home) state.home.partnerWhatsapp = remoteData.partnerWhatsapp;
+          try { localStorage.setItem('naqisna_partner_wa', remoteData.partnerWhatsapp); } catch {}
+        }
+        if (remoteData.partnerName && !getPartnerName()) {
+          state.partnerName = remoteData.partnerName;
+          if (state.home) state.home.partnerName = remoteData.partnerName;
+          try { localStorage.setItem('naqisna_partner_name', remoteData.partnerName); } catch {}
+        }
+        if (remoteData.deliveryWhatsapp && !getDeliveryInfo().phone) {
+          state.deliveryWhatsapp = remoteData.deliveryWhatsapp;
+          if (state.home) state.home.deliveryWhatsapp = remoteData.deliveryWhatsapp;
+          try { localStorage.setItem('naqisna_delivery_wa', remoteData.deliveryWhatsapp); } catch {}
+        }
+        if (remoteData.deliveryName && !getDeliveryInfo().name) {
+          state.deliveryName = remoteData.deliveryName;
+          if (state.home) state.home.deliveryName = remoteData.deliveryName;
+          try { localStorage.setItem('naqisna_delivery_name', remoteData.deliveryName); } catch {}
+        }
+        if (Array.isArray(remoteData.members) && remoteData.members.length) {
+          if (!state.members) state.members = [];
+          const mmap = new Map(state.members.map(m => [String(m.id || m.whatsapp), m]));
+          remoteData.members.forEach(rm => { if (rm && (rm.id || rm.whatsapp)) mmap.set(String(rm.id || rm.whatsapp), { ...(mmap.get(String(rm.id || rm.whatsapp)) || {}), ...rm }); });
+          state.members = [...mmap.values()].slice(0, 10);
+          if ((!state.partnerWhatsapp || !getPartnerName()) && state.user) {
+            const pm = state.members.find(m => m && m.whatsapp && String(m.id) !== String(state.user.id));
+            if (pm) {
+              if (!state.partnerWhatsapp) { state.partnerWhatsapp = pm.whatsapp; if (state.home) state.home.partnerWhatsapp = pm.whatsapp; }
+              if (!getPartnerName() && pm.name) { state.partnerName = pm.name; if (state.home) state.home.partnerName = pm.name; }
+            }
+          }
+        }
+      } catch {}
+      if (syncSig() === before && state.partnerWhatsapp) { try { Storage.save(state); } catch {} return false; }
       if (syncSig() === before) return false;
       Storage.save(state);
       try { if (state.home?.code) localStorage.setItem('baytna_home_' + state.home.code, JSON.stringify({ home: state.home, orders: state.orders, expenses: state.expenses, orderLists: state.orderLists, updatedAt: state.updatedAt })); } catch {}
