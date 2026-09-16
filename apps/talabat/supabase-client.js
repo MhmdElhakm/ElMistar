@@ -83,9 +83,11 @@ window.NaqisnaSupabase = (function () {
 
   async function readBlob(homeCode) {
     const sb = getClient();
-    if (!sb || !homeCode) return null;
+    if (!sb || !homeCode) { console.warn('⚠️ readBlob: client=', !!sb, 'homeCode=', homeCode); return null; }
     try {
+      console.log('🔍 readBlob: searching for code=', homeCode);
       const { data, error } = await sb.from(BLOB_TABLE).select('data').eq('code', homeCode).maybeSingle();
+      console.log('🔍 readBlob result: data=', data, 'error=', error);
       if (error) { console.warn('Supabase blob read warning:', error); return null; }
       return (data && data.data) || null;
     } catch (e) {

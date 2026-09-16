@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>window.SUPABASE_URL="https://fijndjmcffqgganapgxv.supabase.co";window.SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpam5kam1jZmZxZ2dhbmFwZ3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NTk1NDEsImV4cCI6MjEwNTAzNTU0MX0.xiYCTrukNsx6S8R6erQ32zrad2XStAbr-GbNRhK3pDY";</script>
+<script>window.SUPABASE_URL="https://dicnuwzxolqdtribhdnb.supabase.co";window.SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpY251d3p4b2xxZHRyaWJoZG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1Njg2OTMsImV4cCI6MjEwNTE0NDY5M30.ye-Bm9drZt4xoq-jKKI3koVV_vTa3HRYvz6dOPvLylc";</script>
 <script src="supabase-client.js"></script>
 <style>
   :root {
@@ -2817,17 +2817,21 @@
     b('submitJoin', async () => {
       const inp = document.getElementById('joinCodeInput'); const err = document.getElementById('joinError');
       const showErr = () => { err.classList.remove('hidden'); inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'), 1500); };
-      let code = inp.value.trim().toUpperCase();
-      if (!/^HOME-\d{4,}$/.test(code)) code = 'HOME-' + (code.replace(/\D/g, ''));
-      if (!code || code === 'HOME-') { showErr(); return; }
+      // تحويل الأرقام العربية والهندية إلى أرقام إنجليزية
+      let rawVal = inp.value.trim().replace(/[٠-٩]/g, d => d.charCodeAt(0) - 0x0660).replace(/[۰-۹]/g, d => d.charCodeAt(0) - 0x06f0);
+      let code = rawVal.toUpperCase();
+      // تنظيف الكود: إذا لم يبدأ بـ HOME- أضفها
+      if (!/^HOME-\d{4,}$/.test(code)) code = 'HOME-' + code.replace(/[^0-9]/g, '');
+      if (!code || code === 'HOME-' || !/^HOME-\d{4,}$/.test(code)) { showErr(); return; }
       const acceptJoin = (remote) => {
         state.home = remote.home;
         state._pendingCode = code; state._pendingName = remote.home.name;
         state._pendingCloud = remote;
+        state._isJoining = true;
         state._onboardingStep = 'username'; render();
       };
       if (state.home && state.home.code && code === state.home.code) {
-        state._pendingCode = code; state._pendingName = state.home.name; state._onboardingStep = 'username'; render(); return;
+        state._pendingCode = code; state._pendingName = state.home.name; state._isJoining = true; state._onboardingStep = 'username'; render(); return;
       }
       try {
         const raw = localStorage.getItem('baytna_home_' + code);
@@ -2836,13 +2840,16 @@
           if (saved && saved.home) { acceptJoin(saved); return; }
         }
       } catch {}
-      // أهم إصلاح: اسحب بيانات البيت من السحابة قبل إنشاء بيت فاضي يمسح الشير
+      // اسحب بيانات البيت من السحابة - يقبل حتى البيت الفاضي الموجود في Supabase
       try {
         if (window.NaqisnaSupabase && window.NaqisnaSupabase.isConfigured()) {
           inp.disabled = true;
+          const btnEl = document.getElementById('submitJoin'); if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'جاري البحث...'; }
           const remoteData = await window.NaqisnaSupabase.fetchHomeData(code);
           inp.disabled = false;
-          if (remoteData && ((remoteData.orders && remoteData.orders.length) || (remoteData.expenses && remoteData.expenses.length) || remoteData.name || remoteData.user)) {
+          if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'انضم للبيت'; }
+          if (remoteData !== null) {
+            // البيت موجود في Supabase (حتى لو فاضي)
             acceptJoin({
               home: { code, name: remoteData.name || 'بيتنا', createdAt: nowISO() },
               orders: (remoteData.orders || []).map(normRemoteOrder).filter(Boolean),
@@ -2854,15 +2861,8 @@
             return;
           }
         }
-      } catch { try { inp.disabled = false; } catch {} }
-      if (/^HOME-\d{4,}$/.test(code)) {
-        state.home = { code, name: 'بيتنا', createdAt: nowISO() };
-        state._pendingCode = code;
-        state._pendingName = state.home.name;
-        state._onboardingStep = 'username';
-        render();
-        return;
-      }
+      } catch (e) { console.warn('Supabase join error:', e); try { inp.disabled = false; const btnEl = document.getElementById('submitJoin'); if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'انضم للبيت'; } } catch {} }
+      // الكود صحيح لكن البيت مش موجود
       showErr();
     });
     b('submitUsername', () => {
@@ -2877,20 +2877,24 @@
       const whatsapp = normalizeEgyptPhone(waRaw);
       const prevId = state.user?.id;
       state.user = { id: prevId || uid(), name, role: state.user?.role || 'member', whatsapp, joinedAt: state.user?.joinedAt || nowISO() };
-      const isJoin = !!(state._pendingCloud && state._pendingCloud.home);
+      // isJoin = صحيح إذا جاي من انضمام لبيت موجود (سواء من السحابة أو localStorage)
+      const isJoin = !!(state._isJoining || (state._pendingCloud && state._pendingCloud.home));
       if (isJoin) {
         const rc = state._pendingCloud;
-        for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'categoryColors', 'categoryNames', 'categoryIcons', 'productIcons', 'customCats', 'hiddenCats', 'photos', 'catalogCustom', 'updatedAt']) {
-          if (rc[k] !== undefined) state[k] = rc[k];
+        if (rc) {
+          for (const k of ['orders', 'expenses', 'learnedMap', 'usageFreq', 'categoryColors', 'categoryNames', 'categoryIcons', 'productIcons', 'customCats', 'hiddenCats', 'photos', 'catalogCustom', 'updatedAt']) {
+            if (rc[k] !== undefined) state[k] = rc[k];
+          }
         }
         state._pendingCloud = null;
       }
+      state._isJoining = false;
       if (!state.home) state.home = { code: state._pendingCode || genHomeCode(), name: 'بيتنا', createdAt: nowISO() };
       state._pendingName = null;
       state.initialized = true; persist();
       try { initSupabaseSync(); } catch {}
       try { syncUserToAdminDir(); } catch {}
-      if (isJoin) { state.currentTab = 'home'; state._onboardingStep = null; persist(); toast(`أهلاً ${name}! 👋`, 'success'); render(); }
+      if (isJoin) { state.currentTab = 'home'; state._onboardingStep = null; persist(); toast(`أهلاً يا ${name}! 🎉`, 'success'); render(); }
       else { state._pendingCode = state.home.code; state._onboardingStep = 'created-success'; render(); }
     });
     // migration: old user without whatsapp -> force profile completion
