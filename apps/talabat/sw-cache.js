@@ -2,7 +2,7 @@
  * Keeps PWA offline caching only.
  */
 
-const CACHE_NAME = 'naqisna-pwa-v12';
+const CACHE_NAME = 'naqisna-pwa-v13';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -10,7 +10,7 @@ const ASSETS_TO_CACHE = [
   './icon-192.png',
   './icon-512.png',
   './manifest.webmanifest',
-  './sounds/audio-library.json'
+  './supabase-client.js'
 ];
 
 self.addEventListener('install', (event) => {

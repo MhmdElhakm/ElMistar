@@ -16,6 +16,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>window.SUPABASE_URL="https://fijndjmcffqgganapgxv.supabase.co";window.SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpam5kam1jZmZxZ2dhbmFwZ3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NTk1NDEsImV4cCI6MjEwNTAzNTU0MX0.xiYCTrukNsx6S8R6erQ32zrad2XStAbr-GbNRhK3pDY";</script>
+<script src="supabase-client.js"></script>
 <style>
   :root {
     --bg: #FAF8FF;
@@ -98,19 +101,13 @@
   .btn-group .btn:not(.btn-primary):not(.btn-success):not(.btn-danger), .btn-secondary { background: #fff; color: var(--primary-dark); border: 1.5px solid rgba(124,58,237,.28); box-shadow: 0 4px 12px rgba(124,58,237,.08); }
   .btn-group .btn:not(.btn-primary):not(.btn-success):not(.btn-danger):active { background: var(--primary-light); }
   .btn:disabled { opacity: .45; filter: grayscale(.5); transform: none !important; box-shadow: none !important; cursor: not-allowed; }
-  /* ===== Orders: pro collapsed items + voice + add-new ===== */
+  /* ===== Orders: pro collapsed items + add-new ===== */
   .order-exp .filter-chip { margin: 0; }
   .ord-chev { width: 28px; height: 28px; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-size: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; transform: rotate(-90deg); transition: transform .22s; flex-shrink: 0; line-height: 1; }
   .ord-chev.open { transform: rotate(90deg); background: var(--primary); color: #fff; }
   .qty-pill { display: inline-flex; align-items: center; gap: 4px; background: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE; padding: 2px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 800; }
 
-  .search-voice-wrap { display: flex; gap: 8px; align-items: center; }
-  .search-voice-wrap .search-box { flex: 1; min-width: 0; }
-  .voice-mic-mini { width: 44px; height: 44px; border-radius: 50%; background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 8px 18px rgba(124,58,237,.35); }
-  .voice-mic-mini svg { width: 20px; height: 20px; }
-  .voice-mic-mini:active { transform: scale(.92); }
-  .voice-mic-mini.recording { background: linear-gradient(135deg,#FB7185,#E11D48); animation: micPulse 1.2s ease-out infinite; }
-  /* ===== Pro voice-search row (modal) ===== */
+  /* ===== Pro search row (modal) ===== */
   .pick-search-row { display: flex; gap: 8px; align-items: center; }
   .pick-search { flex: 1; min-width: 0; height: 44px; padding: 0 14px; border: 1.5px solid var(--border); border-radius: 14px; background: #fff; font-size: 13.5px; font-weight: 700; color: var(--text); box-shadow: var(--shadow-sm); }
   .pick-search:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,58,237,.12); }
@@ -379,8 +376,8 @@
   .topbar .greeting { font-size: 20px; font-weight: 800; }
   .page-title { font-size: 22px; font-weight: 900; margin: 10px 18px 12px; }
   .section { padding: 0 18px; margin-bottom: 18px; }
-  .page { animation: fadePage .2s ease-out; }
-  @keyframes fadePage { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .page { animation: none; }
+  @keyframes fadePage { from { opacity: 1; transform: none; } to { opacity: 1; transform: none; } }
 
   .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .stat-card {
@@ -626,7 +623,7 @@
   .app-mini-ico { position: relative; overflow: hidden !important; padding: 0 !important; }
   .app-mini-ico img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .help-steps { font-size: 13.5px; font-weight: 700; line-height: 2.2; color: var(--text); background: var(--bg); border-radius: 14px; padding: 12px 16px; }
-  /* ===== Meme sounds ===== */
+  /* ===== Toggles ===== */
   .tgl-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; width: 100%; text-align: right; }
   .tgl-row + .tgl-row { border-top: 1px solid var(--border); }
   .tgl { flex: 1; min-width: 0; }
@@ -639,14 +636,6 @@
   .vol-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
   .vol-row input[type="range"] { flex: 1; accent-color: var(--primary); height: 30px; }
   .vol-val { font-size: 13px; font-weight: 900; color: var(--primary-dark); min-width: 44px; text-align: center; }
-  .snd-row { display: flex; align-items: center; gap: 10px; padding: 9px 16px; }
-  .snd-row + .snd-row { border-top: 1px solid var(--border); }
-  .snd-play { width: 38px; height: 38px; border-radius: 12px; background: var(--primary-light); color: var(--primary-dark); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .snd-play:active { transform: scale(.9); }
-  .snd-info { flex: 1; min-width: 0; }
-  .snd-info b { font-size: 12.5px; font-weight: 900; display: block; }
-  .snd-info small { font-size: 10.5px; color: var(--text-sec); font-weight: 700; }
-  .snd-del { color: var(--danger); font-size: 16px; font-weight: 900; padding: 6px; }
   .snd-add-row { padding: 0 16px 14px; }
   .btn-row { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
   .color-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 16px 12px; }
@@ -761,20 +750,6 @@
   .m-hero-txt { position: relative; z-index: 1; min-width: 0; }
   .m-hero-txt h2 { color: #fff !important; font-size: 20px !important; text-align: right !important; margin: 0 0 3px !important; }
   .m-hero-txt p { font-size: 12.5px; font-weight: 700; opacity: .93; line-height: 1.7; margin: 0; }
-  /* ===== Voice input ===== */
-  .voice-bar { display: flex; align-items: center; gap: 10px; background: #fff; border: 1.5px solid rgba(124,58,237,.16); border-radius: 18px; padding: 9px 12px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
-  .mic-btn { width: 44px; height: 44px; border-radius: 50%; background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 8px 18px rgba(124,58,237,.35); transition: transform .15s; }
-  .mic-btn svg { width: 20px; height: 20px; }
-  .mic-btn:active { transform: scale(.9); }
-  .mic-btn.recording { background: linear-gradient(135deg,#FB7185,#E11D48); animation: micPulse 1.2s ease-out infinite; }
-  @keyframes micPulse { 0% { box-shadow: 0 0 0 0 rgba(225,29,72,.5); } 100% { box-shadow: 0 0 0 16px rgba(225,29,72,0); } }
-  .voice-info { flex: 1; min-width: 0; }
-  .voice-info b { font-size: 13px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
-  .voice-info small { font-size: 11px; color: var(--text-sec); font-weight: 700; display: block; margin-top: 1px; }
-  .live-dot { width: 9px; height: 9px; border-radius: 50%; background: #E11D48; flex-shrink: 0; animation: dotBlink 1s infinite; }
-  .voice-langs { display: flex; background: var(--bg); border-radius: 12px; padding: 3px; gap: 2px; flex-shrink: 0; }
-  .vlang { padding: 8px 13px; border-radius: 9px; font-size: 12px; font-weight: 800; color: var(--text-sec); min-height: 38px; }
-  .vlang.active { background: #fff; color: var(--primary-dark); box-shadow: var(--shadow-sm); }
   .category-query { background: var(--pending-light); border: 1px solid var(--pending); color: #7D6608; padding: 10px 12px; border-radius: var(--radius-sm); margin-bottom: 12px; font-size: 13px; font-weight: 600; }
   .cat-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 6px; }
   .cat-opt { background: #fff; border: 1.5px solid var(--border); padding: 12px 6px; border-radius: 16px; text-align: center; font-size: 12px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; transition: all .15s; color: var(--text); }
@@ -820,9 +795,10 @@
   .toast-icon { font-size: 16px; flex-shrink: 0; }
   @keyframes toastIn { from { transform: translateY(-16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   @keyframes toastOut { to { transform: translateY(-16px); opacity: 0; } }
-  /* ===== EdTech friendly override ===== */
-  .page { animation: pageUp .35s ease-out; }
-  @keyframes pageUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  /* ===== ثبات الواجهة: بدون أنيميشن على مستوى الصفحة يسبب اهتزاز مع كل render ===== */
+  .page { animation: none; }
+  @keyframes pageUp { from { opacity: 1; transform: none; } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
   @keyframes popIn { from { opacity: 0; transform: scale(.94) translateY(8px); } to { opacity: 1; transform: none; } }
   .topbar { background: transparent; border: none; padding: 18px 20px 4px; position: static; }
@@ -945,7 +921,7 @@
   .section-header h3 { font-size: 17px; font-weight: 900; }
   .noura-bubble { border: 1.5px solid rgba(124,58,237,.16) !important; box-shadow: 0 8px 22px rgba(124,58,237,.14) !important; }
   .noura-msg { font-size: 14px; color: var(--text); }
-  /* ===== Role + WhatsApp onboarding / Comedy / Ads ===== */
+  /* ===== Role + WhatsApp onboarding / Ads ===== */
   .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
   .role-card { background: #fff; border: 2px solid var(--border); border-radius: 20px; padding: 16px 10px; text-align: center; transition: all .18s; }
   .role-card .rc-emoji { font-size: 42px; display: block; margin-bottom: 6px; }
@@ -954,12 +930,6 @@
   .role-card.sel-husband { border-color: #3B82F6; background: #EFF6FF; box-shadow: 0 8px 20px rgba(59,130,246,.22); transform: translateY(-2px); }
   .role-card.sel-wife { border-color: #EC4899; background: #FDF2F8; box-shadow: 0 8px 20px rgba(236,72,153,.22); transform: translateY(-2px); }
   .wa-field { direction: ltr; text-align: left; letter-spacing: 1px; font-weight: 800; }
-  .joke-modal-card { text-align: center; }
-  .joke-text-box { background: linear-gradient(180deg,#F5F0FF,#fff 75%); border: 1.5px solid rgba(124,58,237,.2); border-radius: 20px; padding: 16px; font-size: 16px; font-weight: 800; line-height: 1.9; margin: 12px 0; }
-  .joke-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 900; }
-  .joke-badge.husband { background: #DBEAFE; color: #1D4ED8; }
-  .joke-badge.wife { background: #FCE7F3; color: #BE185D; }
-  .joke-badge.couple { background: #FEF3C7; color: #92400E; }
   .ad-banner { margin: 0 20px 12px; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow); border: 1.5px solid rgba(124,58,237,.12); background: #fff; animation: popIn .3s ease-out; }
   .ad-banner img { width: 100%; height: auto; max-height: 220px; object-fit: cover; display: block; }
   .ad-banner .ad-cap { padding: 8px 12px; font-size: 12px; font-weight: 800; color: var(--text-sec); display: flex; align-items: center; justify-content: space-between; }
@@ -983,27 +953,6 @@
 <div class="app" id="app"></div>
 <div class="toast-container" id="toastContainer"></div>
 
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-  import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, where, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
-  import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyC8Gj1hufwwXrdO4zzQjPMeMg_KD3XSKDQ",
-    authDomain: "project-84ae3235-3633-44c1-819.firebaseapp.com",
-    projectId: "project-84ae3235-3633-44c1-819",
-    storageBucket: "project-84ae3235-3633-44c1-819.firebasestorage.app",
-    messagingSenderId: "1009475192148",
-    appId: "1:1009475192148:web:5031fa8ddcbca4c860b4c1",
-    measurementId: "G-97QYMTBRKS"
-  };
-
-  window._fbApp = initializeApp(firebaseConfig);
-  window._fbDb = getFirestore(window._fbApp);
-  window._fbAuth = getAuth(window._fbApp);
-  window._fbModules = { doc, getDoc, setDoc, onSnapshot, collection, query, where, deleteDoc, signInAnonymously, onAuthStateChanged };
-  window.dispatchEvent(new Event('firebase-ready'));
-</script>
 <script>
 (() => {
   'use strict';
@@ -1014,118 +963,6 @@
   /* =============================
      MESSAGES SYSTEM
      ============================= */
-  const MSG = {
-    wifeGreeting: [
-      "محتاجين إيه يا ست البنات؟ ❤️",
-      "قولي يا حبيبة القلب، إيه الطلبات؟ 😄",
-      "اتفضلي يا أم العيال... افتحي قائمة الطلبات 😂",
-      "يا ترى هنطلب إيه النهارده؟ ربنا يستر على جيب أبو العيال 😂",
-      "اكتبي يا ستي وأنا هبلّغ البطل 😄",
-      "قولي طلبات البيت يا مدام... وربنا يعينه علينا 😂",
-      "محتاجين حاجات ضروري ولا هنشتري ونقول ربنا يسهل؟ 😂",
-      "اكتبي براحتك يا روحي... بس بالراحة على الراجل شوية 😂❤️",
-      "ربنا يوسع عليه ويرزقه من واسع فضله ❤️",
-      "اكتبي اللي ناقصكم يا حبيبتي وربنا يبارك في رزقكم.",
-      "ادعي له يا حبيبتي... الراجل داخل على معركة السوبر ماركت 😂"
-    ],
-    addOrder: [
-      "واحدة واحدة يا مدام 😂",
-      "هو إحنا فاتحين فرع هايبر ماركت؟ 😂",
-      "تمام... واللي بعده يا ست الكل 😄",
-      "لسه في حاجات تانية؟ 😳",
-      "يا ساتر... كملي 😂",
-      "ربنا يعين أبو العيال ❤️",
-      "اكتبي يا حبيبتي، ربنا يوسع عليه.",
-      "ده طلب ضروري ولا من بتوع: طالما إحنا نازلين نجيبه؟ 😂",
-      "حاضر يا ستي... اتسجلت 😂",
-      "تمام، كده هو هيعرف ياخدリスト دي كلها 😂"
-    ],
-    finishList: [
-      "خلاص يا حبيبتي، القائمة جاهزة... ربنا يقوي قلبه 😂❤️",
-      "تمام يا ست الكل، كده الدور على البطل 🦸‍♂️",
-      "القائمة اتبعتت... ربنا يكون في عونه 😂",
-      "اللهم إني قد بلغت... 😂",
-      "ربنا يرزقه ويبارك له ويقدر يجيبهم كلهم ❤️",
-      "كده خلصنا؟ الحمد لله... ربنا يعينه على السوبر ماركت 😂"
-    ],
-    husbandView: [
-      "ربنا ما يحرمنيش منك يا بطلي ❤️",
-      "ربنا يرزقك من واسع فضله وكرمه يا حبيبي.",
-      "بص على الضروري الأول يا روحي، والباقي ربنا يسهل فيه.",
-      "متقلقش... إحنا مش طالبين القمر يعني 😂",
-      "ربنا يبارك لك في رزقك ويكفيك هم المصاريف ❤️",
-      "شد حيلك يا بطل... دي حاجات البيت 😂",
-      "ربنا يعينك علينا ويرزقك أضعاف اللي بتصرفه علينا ❤️",
-      "عارفة إن المصاريف كتير عليك، ربنا يوسع رزقك.",
-      "ربنا يبارك لك في كل جنيه بتصرفه على بيتك وأهلك.",
-      "خد نفس عميق... وبص على القائمة 😂",
-      "متبصش على الإجمالي مرة واحدة عشان قلبك 😂❤️"
-    ],
-    totalScreen: [
-      "بسم الله... خد نفس كده 😂",
-      "ماتقلقش، الرقم شكله كبير بس إحنا أسرة محترمة 😂",
-      "يا رب يكون معاك باقي المرتب 😂",
-      "اللهم بارك... ولا حول ولا قوة إلا بالله 😂",
-      "ربنا يعوض عليك يا بطل ❤️",
-      "ربنا يرزقك أكتر مما أنفقت.",
-      "الفلوس راحت... بس راحت في البيت يا حبيبي 😂❤️"
-    ],
-    purchaseDone: [
-      "تمت المهمة بنجاح يا بطل! 🦸‍♂️❤️",
-      "ربنا يبارك لك في رزقك ويخلف عليك خيرًا.",
-      "ربنا يجعل كل جنيه أنفقته على بيتك في ميزان حسناتك.",
-      "ربنا يوسع رزقك ويبارك لك في أهلك وبيتك.",
-      "ربنا يخليكم لبعض ويرزقكم من واسع فضله.",
-      "أهو كده الرجالة ولا بلاش 😂❤️",
-      "خلصت المهمة يا أبو العيال... تستاهل قهوة ☕😂",
-      "ربنا يعوض عليك ويبارك لك في اللي فاضل من المرتب 😂❤️",
-      "ربنا يجعل بيتكم مليان مودة ورحمة وبركة."
-    ],
-    skipPurchase: [
-      "ولا يهمك يا حبيبي ❤️",
-      "معلش، المهم الضروري وربنا يسهل في الباقي.",
-      "ولا يهمك يا بطلي، ربنا يوسع عليك.",
-      "الباقي نستناه لما ربنا يفرجها 😂❤️",
-      "عارفة إن الدنيا مش دايمًا سهلة، ربنا يرزقك من واسع فضله.",
-      "ولا يهمك يا روحي، ربنا يبارك لك في اللي قدرت تجيبه."
-    ],
-    religious: [
-      "ربنا يبارك لك في رزقك ويزيدك من فضله.",
-      "اللهم ارزقهم رزقًا واسعًا حلالًا طيبًا.",
-      "ربنا يجعل الإنفاق على أهل البيت بركة في الرزق.",
-      "اللهم بارك لهم في بيتهم وأهلهم ورزقهم.",
-      "ربنا يخلي بيوتكم عامرة بالمودة والرحمة.",
-      "اللهم اكفهم بحلالك عن حرامك وأغنهم بفضلك عمن سواك.",
-      "ربنا يوسع رزق كل أب بيجري على بيته.",
-      "اللهم ارزق كل بيت السكينة والبركة والرزق الحلال.",
-      "ربنا يجعل تعبك وشقاك من أجل أهلك في ميزان حسناتك.",
-      "ربنا يبارك في القليل ويزيده."
-    ],
-    empty: [
-      "مفيش طلبات لحد دلوقتي... هتسيبوا البيت كده؟ 😂",
-      "القائمة فاضية يا جماعة 😄",
-      "واضح إن الثلاجة لسه مليانة... الحمد لله 😂",
-      "مفيش حاجة ناقصة؟ طب الحمد لله ❤️",
-      "البيت متظبط... يعني كل حاجة موجودة 😂",
-      "إيه ده... مفيش طلبات النهارده؟ 😂"
-    ],
-    error: [
-      "استنى يا بطل... حصلت حاجة مش مفهومة 😂",
-      "معلش يا حبيبي، جرب تاني.",
-      "النت قرر ياخد أجازة 😂",
-      "واضح إن التطبيق محتاج قهوة ☕😂"
-    ],
-    toastSuccess: [
-      "تمام يا ستي ✓",
-      " handled ✓",
-      "上帝يا حبيبي، تمام ✓",
-      " يس equalTo ✓"
-    ],
-    wifeCharacter: "👩",
-    husbandCharacter: "🧔",
-    appCharacter: "🏠"
-  };
-
   let _lastMsgIdx = {};
   function pickMsg(arr) {
     if (!arr || !arr.length) return '';
@@ -1134,26 +971,6 @@
     _lastMsgIdx[arr.join(',')] = idx;
     return arr[idx];
   }
-  const FUNNY_FINISH = [
-    'البطل داخل على معركة السوبر ماركت 🦸‍♂️😂',
-    'المحفظة بتترعش دلوقتي 💸😂',
-    'ربنا يستر على جيب أبو العيال 😂❤️',
-    'القايمة أطول من ليلة الشتاء 📜😂',
-    'جهز الشنط والعضلات 💪🛒',
-    'الزوج المطيع يعيش في ربيع... انزل يا بطل 🏃‍♂️😂'
-  ];
-  function finishFunMsg(n) { return FUNNY_FINISH[(Number(n) || 0) % FUNNY_FINISH.length]; }
-  function finishBarHTML(n, btnId) {
-    return `<div class="finish-bar"><span>✅ خلصت كتابة الطلبات؟ (${n} معلق)</span><button class="btn" id="${btnId}">إنهاء وإرسال واتساب</button></div>`;
-  }
-  const FUNNY_BOUGHT = [
-    'المهمة تمت يا بطل... المحفظة استشهدت بشرف 😂💸',
-    'رجع بالسلامة ومعاه كل حاجة... معجزة بكل المقاييس 🏆😂',
-    'التلاجة اتملت والجيب اتفلس... بس البيت مبسوط ❤️😂',
-    'تستاهل قهوة على حساب البيت ☕😂'
-  ];
-  function boughtFunMsg() { return FUNNY_BOUGHT[Math.floor(Math.random() * FUNNY_BOUGHT.length)]; }
-
   /* EdTech SVG icon system - rounded, friendly */
   const ICONS = {
     home: '<path d="M4 11l8-7 8 7v8a2 2 0 0 1-2 2h-4v-6h-4v6H6a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -1181,7 +998,6 @@
     warn: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.8" r="1.1" fill="currentColor"/>',
     help: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.4 2.1-2.4 3.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="currentColor"/>',
     plus: '<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>',
-    mic: '<rect x="9" y="2" width="6" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
     music: '<path d="M9 18V5l12-2v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="18" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="16" r="3" fill="none" stroke="currentColor" stroke-width="2"/>'
   };
   function svgIcon(name, size) {
@@ -1731,7 +1547,31 @@
   /* =============================
      PERSIST
      ============================= */
-  function persist() { state.updatedAt = Date.now(); Storage.save(state); scheduleCloud(); }
+  let _syncLock = false;
+  // Offline-First expenses: محلي دائماً، والمشاركة السحابية اختيارية
+  function shareExpensesOn() { return state._shareExpenses !== false; }
+  function cloudPushState() {
+    if (shareExpensesOn()) return;
+    // وضع الخصوصية: ارفع الطلبات فقط مع مشاركة المصروفات المعلّمة shared فقط
+    try {
+      const shared = (state.expenses || []).filter(e => e && e.shared === true);
+      return Object.assign({}, state, { expenses: shared });
+    } catch { return state; }
+  }
+  function persist() {
+    state.updatedAt = Date.now();
+    Storage.save(state);
+    try {
+      if (state.home?.code) {
+        localStorage.setItem('baytna_home_' + state.home.code, JSON.stringify({ home: state.home, orders: state.orders, expenses: state.expenses, orderLists: state.orderLists, updatedAt: state.updatedAt, _shareExpenses: state._shareExpenses }));
+        if (!_syncLock && window.NaqisnaSupabase && window.NaqisnaSupabase.isConfigured()) {
+          if (shareExpensesOn()) window.NaqisnaSupabase.pushFullState(state.home.code, state);
+          else if (window.NaqisnaSupabase.pushOrdersOnly) window.NaqisnaSupabase.pushOrdersOnly(state.home.code, cloudPushState());
+          else window.NaqisnaSupabase.pushFullState(state.home.code, cloudPushState());
+        }
+      }
+    } catch {}
+  }
   function wipeCatalogOnce() {
     if (state._catalogV1) return false;
     state._catalogV1 = true;
@@ -1745,7 +1585,7 @@
     state.categoryIcons = {};
     return true;
   }
-  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); delete state.notifs; delete state.notifPrefs; delete state._notifSound; delete state._soundOn; delete state._expandedOrder; delete state._expDraft; delete state._expandedBasket; delete state._basketDraft; wipeCatalogOnce(); migrateCats(); migrateOrderLists(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
+  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} try { localStorage.removeItem('naqisna_audio_items'); } catch {} try { localStorage.removeItem('naqisna_comedy_messages'); } catch {} try { localStorage.removeItem('naqisna_last_joke'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); delete state.notifs; delete state.notifPrefs; delete state._notifSound; delete state._soundOn; delete state._audioOn; delete state._audioVol; delete state._fxOn; delete state._audioLib; delete state.audioUploads; delete state._audioMigrated; delete state._memeOn; delete state._memeMode; delete state._memeVol; delete state._memeOff; delete state._memeCustom; delete state._expandedOrder; delete state._expDraft; delete state._expandedBasket; delete state._basketDraft; wipeCatalogOnce(); migrateCats(); migrateOrderLists(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
   function catDeptById(id) {
     if (CATEGORIES[id]) return CATEGORIES[id];
     const ad = ((state.catalogCustom || {}).addedDepts || []).find(x => x.id === id);
@@ -1872,145 +1712,7 @@
     return s ? s.items : [];
   }
 
-  /* =============================
-     FIREBASE CLOUD SYNC
-     ============================= */
-  let db = null, fbAuth = null, cloudUnsub = null, cloudCode = null, cloudTimer = null, cloudPoll = null;
-  let sbUid = null;
-  function waitForFirebase() {
-    return new Promise((resolve) => {
-      if (window._fbDb) { resolve(); return; }
-      window.addEventListener('firebase-ready', () => resolve(), { once: true });
-      setTimeout(resolve, 5000);
-    });
-  }
-  async function ensureSbSession() {
-    await waitForFirebase();
-    if (!window._fbAuth) return null;
-    if (sbUid) return sbUid;
-    try {
-      db = window._fbDb;
-      fbAuth = window._fbAuth;
-      if (fbAuth.currentUser) { sbUid = fbAuth.currentUser.uid; return sbUid; }
-      const cred = await signInAnonymously(fbAuth);
-      if (cred && cred.user) { sbUid = cred.user.uid; return sbUid; }
-    } catch (e) { console.warn('fb auth:', e && e.message); }
-    return null;
-  }
-  async function ensureMembership() { /* Firestore doesn't need RLS membership */ }
-  const UI_ONLY_KEYS = ['currentTab', 'orderFilter', 'categoryFilter', 'searchQuery'];
-  function cloudPayload() {
-    const p = {};
-    for (const k of Object.keys(state)) {
-      if (k[0] === '_' || UI_ONLY_KEYS.includes(k)) continue;
-      p[k] = state[k];
-    }
-    p.updatedAt = state.updatedAt || Date.now();
-    return p;
-  }
-  function scheduleCloud() {
-    if (!db || !state.home?.code) return;
-    if (cloudTimer) clearTimeout(cloudTimer);
-    cloudTimer = setTimeout(() => {
-      try {
-        const p = cloudPayload();
-        const { doc, setDoc } = window._fbModules || {};
-        if (doc && setDoc) {
-          setDoc(doc(db, 'homes', state.home.code), { data: p, updated_at: p.updatedAt || Date.now() }, { merge: true }).catch(() => {});
-        }
-      } catch {}
-    }, 800);
-  }
-  function applyCloudRemote(remote, ts) {
-    if (!remote) return;
-    if (((ts != null ? ts : remote.updatedAt) || 0) > (state.updatedAt || 0) && remote.home) {
-      const ui = {};
-      for (const k of UI_ONLY_KEYS) ui[k] = state[k];
-      Object.assign(state, remote, ui);
-      if (wipeCatalogOnce()) persist(); else Storage.save(state);
-      render();
-      if (state.initialized) toast('وصل تحديث جديد من جهاز تاني', 'info');
-    }
-  }
-  async function cloudFetchRow() {
-    if (!db || !state.home?.code) return;
-    try {
-      const { doc, getDoc } = window._fbModules || {};
-      if (doc && getDoc) {
-        const snap = await getDoc(doc(db, 'homes', state.home.code));
-        if (snap.exists()) {
-          const d = snap.data();
-          applyCloudRemote(d.data || {}, d.updated_at || 0);
-        } else {
-          scheduleCloud();
-        }
-      }
-    } catch {}
-    mergeOrdersFromCloud();
-  }
-  function attachCloud() {
-    if (!db || !state.home?.code) return;
-    if (cloudCode === state.home.code) return;
-    if (cloudUnsub) { try { cloudUnsub(); } catch {} cloudUnsub = null; }
-    if (cloudPoll) { try { clearInterval(cloudPoll); } catch {} cloudPoll = null; }
-    cloudCode = state.home.code;
-    try {
-      const { doc, onSnapshot } = window._fbModules || {};
-      if (doc && onSnapshot) {
-        cloudUnsub = onSnapshot(doc(db, 'homes', state.home.code), (snap) => {
-          if (snap.exists()) {
-            const d = snap.data();
-            applyCloudRemote(d.data || {}, d.updated_at || 0);
-          }
-        }, () => {});
-      }
-    } catch {}
-    cloudPoll = setInterval(() => { if (state.home && state.home.code === cloudCode) cloudFetchRow(); }, 20000);
-    cloudFetchRow();
-  }
-  async function mergeOrdersFromCloud() {
-    if (!db || !state.home?.code) return;
-    try {
-      const { collection, query, where, getDocs } = window._fbModules || {};
-      if (!collection || !query || !where || !getDocs) return;
-      const q = query(collection(db, 'orders'), where('homeCode', '==', state.home.code));
-      const snap = await getDocs(q);
-      let changed = false;
-      const byId = new Map((state.orders || []).map(o => [o && o.id, o]));
-      for (const d of snap.docs) {
-        const ro = d.data();
-        const rid = ro.id || d.id;
-        if (ro._deleted) {
-          if (byId.has(rid)) {
-            state.orders = state.orders.filter(o => !o || o.id !== rid);
-            byId.delete(rid); changed = true;
-          }
-          try { const { doc, deleteDoc } = window._fbModules || {}; if (doc && deleteDoc) deleteDoc(doc(db, 'orders', d.id)); } catch {}
-          continue;
-        }
-        const local = byId.get(rid);
-        if (!local) {
-          state.orders.unshift({ listId: 'main', ...ro });
-          byId.set(rid, state.orders[0]); changed = true;
-        } else {
-          if (local.status !== ro.status && ro.status === 'purchased') {
-            local.status = 'purchased';
-            if (ro.purchase) local.purchase = ro.purchase;
-            if (ro.updatedAt) local.updatedAt = ro.updatedAt;
-            changed = true;
-          } else if (local.status === 'purchased' && ro.status !== 'purchased') {
-            try { syncOrderToCloud(local); } catch {}
-          } else if (ro.updatedAt && (local.updatedAt || 0) < ro.updatedAt) {
-            for (const k of ['name', 'notes', 'qty', 'categoryId', 'priority', 'urgent', 'purchaseLocation', 'photo']) {
-              if (ro[k] !== undefined) local[k] = ro[k];
-            }
-            local.updatedAt = ro.updatedAt; changed = true;
-          }
-        }
-      }
-      if (changed) { persist(); render(); }
-    } catch {}
-  }
+
 
   /* =============================
      ACTIONS
@@ -2070,35 +1772,15 @@
     if (!state._activeList || !state.orderLists.some(l => l.id === state._activeList)) state._activeList = 'main';
     if (dirty) persist();
   }
-  function addOrder({ name, notes, urgent, categoryId, qty, priority, listId }) {
+  function addOrder({ name, notes, urgent, categoryId, qty, priority, listId, photo }) {
     if (!validCatId(categoryId)) categoryId = classifyOrder(name).categoryId;
     const prio = normPriority(priority || (urgent ? 'high' : 'medium'));
-    const order = { id: uid(), name: name.trim(), notes: notes || '', urgent: prio === 'high', priority: prio, listId: listId || 'main', categoryId, qty: qty || null, status: 'pending', createdAt: nowISO(), updatedAt: Date.now(), createdBy: state.user?.name || 'الزوجة', purchaseLocation: catLocation(categoryId), purchase: null };
+    const order = { id: uid(), name: name.trim(), notes: notes || '', urgent: prio === 'high', priority: prio, listId: listId || 'main', categoryId, qty: qty || null, photo: photo || '', status: 'pending', createdAt: nowISO(), updatedAt: Date.now(), createdBy: state.user?.name || 'الزوجة', purchaseLocation: catLocation(categoryId), purchase: null };
     state.orders.unshift(order);
     const key = normalizeTerm(order.name);
     state.usageFreq[key] = (state.usageFreq[key] || 0) + 1;
     persist();
-    syncOrderToCloud(order);
     return order;
-  }
-  function syncOrderToCloud(order) {
-    if (!db || !state.user) return;
-    setTimeout(() => {
-      try {
-        const { doc, setDoc } = window._fbModules || {};
-        if (doc && setDoc) {
-          setDoc(doc(db, 'orders', order.id), {
-            id: order.id, name: order.name, notes: order.notes, urgent: order.urgent,
-            priority: order.priority, listId: order.listId, categoryId: order.categoryId,
-            qty: order.qty, status: order.status, createdAt: order.createdAt,
-            updatedAt: order.updatedAt || Date.now(), purchase: order.purchase || null,
-            photo: order.photo || '',
-            createdBy: order.createdBy || state.user.name || 'الزوجة', userId: state.user.id,
-            homeCode: state.home?.code || ''
-          }, { merge: true }).catch(() => {});
-        }
-      } catch {}
-    }, 0);
   }
   function updateOrder(id, patch) {
     const o = state.orders.find(x => x.id === id);
@@ -2113,30 +1795,21 @@
     if (patch.name) o.name = patch.name.trim();
     o.updatedAt = Date.now();
     persist();
-    try { syncOrderToCloud(o); } catch {}
     return o;
   }
   function deleteOrder(id) {
     const idx = state.orders.findIndex(x => x.id === id);
     if (idx >= 0) state.orders.splice(idx, 1);
     persist();
-    if (db && state.home?.code) {
-      try {
-        const { doc, setDoc } = window._fbModules || {};
-        if (doc && setDoc) {
-          setDoc(doc(db, 'orders', id), { id, _deleted: true, updatedAt: Date.now(), homeCode: state.home.code }, { merge: true }).catch(() => {});
-        }
-      } catch {}
-    }
   }
   /* سلة التجهيز: تجهيز الأصناف أولًا قبل تأكيدها كطلبات */
   function basketItems() { if (!Array.isArray(state._basket)) state._basket = []; return state._basket; }
   function basketExists(name) { const k = normalizeTerm(name); return basketItems().some(b => normalizeTerm(b.name) === k); }
-  function addToBasket({ name, notes, urgent, categoryId, qty, priority }) {
+  function addToBasket({ name, notes, urgent, categoryId, qty, priority, photo }) {
     const nm = String(name || '').trim(); if (!nm) return null;
     if (!validCatId(categoryId)) categoryId = classifyOrder(nm).categoryId;
     const prio = normPriority(priority || (urgent ? 'high' : 'medium'));
-    const it = { id: uid(), name: nm, notes: notes || '', urgent: prio === 'high', priority: prio, categoryId, qty: qty || null, createdAt: nowISO() };
+    const it = { id: uid(), name: nm, notes: notes || '', urgent: prio === 'high', priority: prio, categoryId, qty: qty || null, photo: photo || '', createdAt: nowISO() };
     basketItems().push(it); persist(); return it;
   }
   function removeBasketItem(id) { state._basket = basketItems().filter(b => b.id !== id); persist(); }
@@ -2146,7 +1819,7 @@
     const added = []; let skipped = 0;
     for (const it of basketItems()) {
       if (pendingOrderExists(it.name, lid)) { skipped++; continue; }
-      added.push(addOrder({ name: it.name, notes: it.notes, urgent: it.urgent, priority: it.priority, qty: it.qty, listId: lid, categoryId: it.categoryId }));
+      added.push(addOrder({ name: it.name, notes: it.notes, urgent: it.urgent, priority: it.priority, qty: it.qty, listId: lid, categoryId: it.categoryId, photo: it.photo || '' }));
     }
     state._basket = []; persist();
     return { added, skipped };
@@ -2156,14 +1829,14 @@
     else {
       const it = basketItems().find(x => x && x.id === id); if (!it) return;
       state._expandedBasket = id;
-      state._basketDraft = { qtyType: it.qty ? (it.qty.t === 'w' ? 'weight' : 'count') : 'none', qtyVal: it.qty ? it.qty.v : 1, qtyUnit: it.qty ? (it.qty.u || 'قطعة') : 'قطعة', notes: it.notes || '' };
+      state._basketDraft = { qtyType: it.qty ? (it.qty.t === 'w' ? 'weight' : 'count') : 'none', qtyVal: it.qty ? it.qty.v : 1, qtyUnit: it.qty ? (it.qty.u || 'قطعة') : 'قطعة', notes: it.notes || '', photo: it.photo || '' };
     }
     render();
   }
   function saveBasketDraft(id, quiet) {
     const it = basketItems().find(x => x && x.id === id); if (!it) return null;
     const d = state._basketDraft || {};
-    const patch = { notes: (d.notes || '').trim() };
+    const patch = { notes: (d.notes || '').trim(), photo: d.photo || '' };
     if (d.qtyType === 'count') { const v = Math.round(Number(d.qtyVal) || 0); patch.qty = (v >= 1 && v <= 99) ? { t: 'c', v, u: d.qtyUnit || 'قطعة' } : null; }
     else if (d.qtyType === 'weight') { const v = Number(d.qtyVal); patch.qty = (v > 0 && v <= 10000) ? { t: 'w', v, u: d.qtyUnit || 'كجم' } : null; }
     else patch.qty = null;
@@ -2191,12 +1864,13 @@
         </div>
         ${qt === 'count' ? `<div class="exp-row"><button class="btn btn-secondary btn-sm" data-bqminus="${it.id}">−</button><b style="min-width:30px;text-align:center;">${d.qtyVal ?? 1}</b><button class="btn btn-secondary btn-sm" data-bqplus="${it.id}">+</button><select class="rv-select" data-bqunit="${it.id}">${selC}</select></div>` : ''}
         ${qt === 'weight' ? `<div class="exp-row"><input type="number" class="qty-num" data-bqvalw="${it.id}" value="${d.qtyVal ?? ''}" placeholder="0" min="0"><select class="rv-select" data-bqunitw="${it.id}">${selW}</select></div>` : ''}
+        <div class="exp-row"><span class="lbl">صورة</span>${d.photo ? `<img src="${d.photo}" style="width:46px;height:46px;border-radius:12px;object-fit:cover;flex-shrink:0;" /><button class="btn btn-sm btn-danger" data-bqrmphoto="${it.id}">حذف</button>` : `<label class="btn btn-secondary btn-sm" style="cursor:pointer;">📷 ضيف صورة المنتج<input type="file" accept="image/*" data-bqphoto="${it.id}" class="hidden" /></label>`}</div>
         <div class="exp-row"><span class="lbl">ملاحظة</span><input class="exp-notes" data-bqnotes="${it.id}" value="${escapeHTML(d.notes || '')}" placeholder="اكتب ملاحظة اختيارية..."></div>
         <div class="exp-row"><button class="btn btn-primary btn-sm" data-bqsave="${it.id}">حفظ التعديل</button><button class="btn btn-success btn-sm" data-bqconfirm="${it.id}">✓ تأكيد</button><button class="btn btn-danger btn-sm" data-bqdel="${it.id}">حذف الصنف</button></div>
       </div>`;
     }
     return `<div class="order-card" data-bid="${it.id}">
-      <div class="category-card-icon" style="background:${cc}18;font-size:20px;">${productIcon(it.name, it.categoryId)}</div>
+      <div class="category-card-icon" style="background:${cc}18;font-size:20px;overflow:hidden;">${it.photo ? `<img src="${it.photo}" data-bzoomphoto="${it.id}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in;" />` : productIcon(it.name, it.categoryId)}</div>
       <div class="order-main" data-bexp="${it.id}">
         <div class="order-name">${escapeHTML(it.name)} ${qtyLine} <span class="badge badge-pending">تجهيز</span>${it.priority === 'high' ? ' <span class="badge badge-urgent">🔥 ضروري</span>' : ''}</div>
         <div class="order-meta"><span class="meta-item">📍 ${escapeHTML(catLocation(it.categoryId))}</span></div>
@@ -2225,14 +1899,13 @@
     o.status = 'purchased';
     o.purchase = { originalPrice: Number(originalPrice) || 0, finalPrice: Number(finalPrice) || 0, purchasedAt: nowISO() };
     o.updatedAt = Date.now();
-    const exp = { id: uid(), title: o.name, amount: o.purchase.finalPrice, savings: 0, categoryId: o.categoryId, sourceType: 'order', sourceId: o.id, notes: '', purchaseLocation: o.purchaseLocation || '', createdAt: o.purchase.purchasedAt };
+    const exp = { id: uid(), title: o.name, amount: o.purchase.finalPrice, savings: 0, categoryId: o.categoryId, sourceType: 'order', sourceId: o.id, notes: '', purchaseLocation: o.purchaseLocation || '', createdAt: o.purchase.purchasedAt, shared: shareExpensesOn(), owner: state.user?.name || '' };
     state.expenses.unshift(exp);
     persist();
-    try { syncOrderToCloud(o); } catch {}
     return { order: o, expense: exp };
   }
   function addManualExpense({ title, amount, categoryId, kind, notes, createdAt }) {
-    const exp = { id: uid(), title: title.trim(), amount: Number(amount) || 0, savings: 0, categoryId: categoryId || UNCATEGORIZED_ID, kind: kind || 'expense', sourceType: 'manual', sourceId: null, notes: notes || '', purchaseLocation: catLocation(categoryId), createdAt: createdAt || nowISO() };
+    const exp = { id: uid(), title: title.trim(), amount: Number(amount) || 0, savings: 0, categoryId: categoryId || UNCATEGORIZED_ID, kind: kind || 'expense', sourceType: 'manual', sourceId: null, notes: notes || '', purchaseLocation: catLocation(categoryId), createdAt: createdAt || nowISO(), shared: shareExpensesOn(), owner: state.user?.name || '' };
     state.expenses.unshift(exp);
     persist();
     return exp;
@@ -2367,7 +2040,7 @@
     backdrop._node = backdrop.querySelector('.modal');
     return backdrop;
   }
-  function closeModal(b) { stopVoice(); const n = b._node || b.querySelector('.modal'); if (n) { n.style.animation = 'toastOut .15s ease-in forwards'; setTimeout(() => b.remove(), 150); } else b.remove(); }
+  function closeModal(b) { const n = b._node || b.querySelector('.modal'); if (n) { n.style.animation = 'toastOut .15s ease-in forwards'; setTimeout(() => b.remove(), 150); } else b.remove(); }
   function confirmDialog({ title, message, confirmText, cancelText, danger }) {
     return new Promise((resolve) => {
       const iconBg = danger ? 'var(--danger-light)' : 'var(--primary-light)';
@@ -2404,27 +2077,17 @@
   }
 
   /* =============================
-     SPEECH BUBBLE HELPER
-     ============================= */
-  function speechBubble(msg, type) {
-    const url = type === 'wife' ? (state.photos && state.photos.mom) : type === 'husband' ? (state.photos && state.photos.dad) : '';
-    const av = url ? `<div class="bubble-avatar parent-avatar"><img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt=""/></div>` : '';
-    return `<div class="bubble-row ${type}">
-      ${av}
-      <div class="speech-bubble ${type}">${msg}</div>
-    </div>`;
-  }
-
-  /* =============================
      RENDERING
      ============================= */
   const app = document.getElementById('app');
 
   function render() {
-    if (!state.initialized || !state.home || !state.user) { app.innerHTML = renderOnboarding(); return; }
+    const sx = window.scrollX || 0, sy = window.scrollY || 0;
+    if (!state.initialized || !state.home || !state.user) { app.innerHTML = renderOnboarding(); bindOnboarding(); return; }
     app.innerHTML = renderMain();
     app.insertAdjacentHTML('beforeend', renderBottomNav());
     bindMain();
+    if ((sx || sy) && Math.abs(window.scrollY - sy) > 2) window.scrollTo(sx, sy);
   }
 
   function renderOnboarding() {
@@ -2441,7 +2104,6 @@
   function renderWelcome() {
     const feats = [
       { ic: 'cart', t: 'مهام ذكية', bg: '#F1EAFE', c: '#7C3AED' },
-      { ic: 'mic', t: 'بحث صوتي', bg: '#FFE4E6', c: '#E11D48' },
       { ic: 'chart', t: 'تقارير', bg: '#E0F2FE', c: '#0284C7' }
     ];
     return `<div class="onboarding wb"><div class="welcome-card">
@@ -2450,7 +2112,7 @@
       <div class="brand-title grad w-anim d1">ناقصنا ايه</div>
       <div class="brand-desc w-anim d2">مشتريات البيت صارت لعبة ممتعة — مهام ونقاط وشارات لعيلتك كلها</div>
       <div class="feat-row w-anim d3">${feats.map(f => `<div class="feat-pill"><span class="feat-ico" style="background:${f.bg};color:${f.c};">${svgIcon(f.ic, 19)}</span><span>${f.t}</span></div>`).join('')}</div>
-      <div class="w-anim d4">${assistantSay(pickMsg(MSG.wifeGreeting), null, 'أول مهمة', 'mom')}</div>
+      <div class="w-anim d4">${assistantSay('ابدأ بإنشاء بيتك ودعوة عائلتك لتنظيم المشتريات', null, 'أول مهمة', 'mom')}</div>
       <div class="btn-group w-anim d5">
         <button class="btn btn-primary btn-xl" id="goCreate">عمل بيت جديد</button>
         <button class="btn" id="goJoin">انضم لبيت موجود</button>
@@ -2509,12 +2171,12 @@
     const preRole = state._pendingRole || state.user?.role || '';
     return `<div class="onboarding"><div class="form-card">
       <h2 class="form-title">أهلاً بيك في بيتك 🏡</h2>
-      <p class="form-subtitle">أول مرة تدخل؟ حدد أنت مين عشان النكت والرسائل توصلك صح 😂</p>
+      <p class="form-subtitle">أول مرة تدخل؟ حدد أنت مين</p>
       <div class="field">
         <label>أنت مين في البيت؟ *</label>
         <div class="role-grid">
-          <button type="button" class="role-card ${preRole === 'husband' ? 'sel-husband' : ''}" id="roleHusband"><span class="rc-emoji">👨‍🍳</span><b>زوج</b><small>نكت الأزواج + نكت الزوجين</small></button>
-          <button type="button" class="role-card ${preRole === 'wife' ? 'sel-wife' : ''}" id="roleWife"><span class="rc-emoji">👩‍🍳</span><b>زوجة</b><small>نكت الزوجات + نكت الزوجين</small></button>
+          <button type="button" class="role-card ${preRole === 'husband' ? 'sel-husband' : ''}" id="roleHusband"><span class="rc-emoji">👨‍🍳</span><b>زوج</b><small>حساب الزوج</small></button>
+          <button type="button" class="role-card ${preRole === 'wife' ? 'sel-wife' : ''}" id="roleWife"><span class="rc-emoji">👩‍🍳</span><b>زوجة</b><small>حساب الزوجة</small></button>
         </div>
         <div id="roleError" class="error-text hidden">اختار: زوج ولا زوجة؟ 😄</div>
       </div>
@@ -2587,9 +2249,8 @@
       { t: 'بطل التسوق', s: done + ' مهمة', ok: done >= 4, bg: '#DCFCE7', c: '#059669', ic: 'trophy' }
     ];
 
-    const myRole = state.user?.role || '';
     const roleTag = '';
-    const myJoke = (() => { try { const p = comedyForRole(myRole || 'husband'); return p.length ? p[Math.floor(Math.random() * p.length)].text : pickMsg(MSG.wifeGreeting); } catch { return pickMsg(MSG.wifeGreeting); } })();
+    const heroMsg = 'تابع مهام اليوم أول بأول';
     return `<div class="page">
       <div class="topbar"><div class="greeting">${greeting} يا ${escapeHTML(userName)} ${roleTag}</div></div>
       <div class="page-title">رحلة بيتنا اليوم</div>
@@ -2598,7 +2259,7 @@
       <div class="hero">
         <div class="hero-top">
           ${photoCharHTML('mom', 'noura-hero-char photo-char')}
-          <div style="flex:1;min-width:0;"><div class="noura-name" style="color:#fff;">💌 رسالة البيت</div><h2 style="color:#fff;">${escapeHTML(myJoke)}</h2><p style="color:rgba(255,255,255,.9);">المستوى ${level.lvl} • ${level.title}</p></div>
+          <div style="flex:1;min-width:0;"><div class="noura-name" style="color:#fff;">🏠 بيتنا</div><h2 style="color:#fff;">${escapeHTML(heroMsg)}</h2><p style="color:rgba(255,255,255,.9);">المستوى ${level.lvl} • ${level.title}</p></div>
         </div>
         <div class="hero-progress"><span style="width:${progress}%"></span></div>
         <div class="hero-meta"><span>تقدم مهام اليوم ${progress}%</span><span>${done}/${totalTasks}</span></div>
@@ -2629,7 +2290,7 @@
   function renderEmptyOrders() {
     return `<div class="empty">
       <div class="empty-icon">${emptySVG()}</div>
-      <div class="empty-title">${pickMsg(MSG.empty)}</div>
+      <div class="empty-title">لا توجد طلبات بعد</div>
       <div class="empty-desc">اضغط على الزر + عشان تزوّد أول طلب</div>
       <button class="btn btn-primary" id="emptyAddOrder">زوّد طلب</button>
     </div>`;
@@ -2681,7 +2342,8 @@
     </div>`;
   }
   function openPhotoViewer(id) {
-    const o = state.orders.find(x => x && x.id === id); if (!o || !o.photo) return;
+    const o = state.orders.find(x => x && x.id === id) || basketItems().find(x => x && x.id === id);
+    if (!o || !o.photo) return;
     const m = openModal(`<div class="modal-handle"></div>
       <h2>${escapeHTML(o.name)}</h2>
       <p class="m-sub">📷 صورة المنتج — دوس بره للقفل</p>
@@ -2931,13 +2593,12 @@
     return `<div class="page">
       <div class="topbar"><div class="greeting">مهام التسوق 🛒</div></div>
       <div class="page-title">${list.length === 0 ? 'مفيش طلبات' : list.length === 1 ? 'فيه طلب واحد' : `فيه ${list.length} طلبات`}</div>
-      ${renderBasket()}
       ${adsByPosition('top')}
 
 
       ${adsByPosition('middle')}
 
-      <div class="search-bar"><div class="search-voice-wrap"><div class="search-box"><input id="orderSearch" placeholder="دور على الصنف..." value="${escapeHTML(searchQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div><button class="voice-mic-mini" id="orderSearchVoice" aria-label="بحث صوتي">${svgIcon('mic', 20)}</button></div></div>
+      <div class="search-bar"><div class="search-box"><input id="orderSearch" placeholder="دور على الصنف..." value="${escapeHTML(searchQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div></div>
 
       ${renderItemResults(searchQuery)}
 
@@ -2969,9 +2630,11 @@
     const monthInc = sumExpensesInRange('month', 'income'); const monthDebt = sumExpensesInRange('month', 'debt');
     const fk = (state._expKind === 'income' || state._expKind === 'debt') ? state._expKind : 'expense';
     const shown = state.expenses.filter(e => finKindOf(e) === fk);
+    const shareOn = shareExpensesOn();
     return `<div class="page">
       <div class="topbar"><div class="greeting">تتبع التقدم</div></div>
       <div class="page-title">المصروفات</div>
+      <div class="section"><button class="tgl-row" id="tglShareExp"><span class="tgl"><b>${shareOn ? '☁️ المصروفات مشتركة' : '🔒 المصروفات محلية فقط'}</b><small>${shareOn ? 'تظهر عند الطرف الآخر تلقائياً' : 'محفوظة على جهازك — شاركها وقت ما تحب'}</small></span><span class="sw ${shareOn ? 'on' : ''}"></span></button></div>
 
       <div class="fin-hero">
         <div class="fin-hero-head"><span>💼 ملخص الشهر المالي</span><span class="fin-hero-month">${new Date().toLocaleDateString('ar-EG', { month: 'long' })}</span></div>
@@ -2999,11 +2662,12 @@
           const kc = kind === 'income' ? '#059669' : kind === 'debt' ? '#D97706' : '#7C3AED';
           const klabel = kind === 'income' ? 'دخل' : kind === 'debt' ? 'ديون' : 'مصروف';
           const cat = catById(e.categoryId);
+          const priv = !shareExpensesOn() && e.shared !== true;
           return `<div class="exp-card" data-expact="${e.id}" style="--kc:${kc};">
             <div class="exp-ico" style="background:${cat.color}20;font-size:22px;">${expenseIcon(e)}</div>
             <div class="exp-mid">
               <div class="exp-top"><b>${escapeHTML(e.title)}</b><span class="exp-amt">${formatCurrency(e.amount)} <small>ج.م</small></span></div>
-              <div class="exp-sub"><span class="fin-pill" style="color:${kc};background:${kc}14;">${FINANCE[kind].emoji} ${klabel}</span><span>${getCategoryName(e.categoryId)}</span><i></i><span>${formatDateShort(new Date(e.createdAt))}</span>${e.sourceType === 'order' ? '<span>•</span><span>من طلب 🛒</span>' : ''}</div>
+              <div class="exp-sub"><span class="fin-pill" style="color:${kc};background:${kc}14;">${FINANCE[kind].emoji} ${klabel}</span><span>${getCategoryName(e.categoryId)}</span><i></i><span>${formatDateShort(new Date(e.createdAt))}</span>${e.sourceType === 'order' ? '<span>•</span><span>من طلب 🛒</span>' : ''}${priv ? '<span>•</span><span>🔒 خاص</span>' : ''}${e.shared === true && !shareExpensesOn() ? '<span>•</span><span>☁️ مشترك</span>' : ''}</div>
             </div>
             <span class="exp-go">‹</span>
           </div>`;
@@ -3042,7 +2706,7 @@
         <div class="rep-hero-head">🏆 ملخص كل شيء</div>
         <div class="rep-hero-net"><small>الإجمالي الكلي • ${all.count} عملية شراء</small><b>${formatCurrency(all.total)} ج.م</b></div>
       </div>
-      ${assistantSay(pickMsg(MSG.religious), null, 'احتفال بالإنجاز', 'mom')}`}
+      ${assistantSay('تم عرض تقارير اليوم بنجاح', null, 'تقرير الإنجاز', 'mom')}`}
     </div>`;
   }
 
@@ -3083,18 +2747,12 @@
         <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label">ناقصنا إيه</div><div class="si-value">ثبّته على شاشة موبايلك لفتح أسرع وشغل بدون نت</div></div></div>
         <div style="padding:0 16px 14px;"><button class="btn btn-primary" id="installAppBtn">تثبيت التطبيق على الهاتف</button></div>
       </div>
-      <div class="settings-card"><div class="settings-title">الأصوات 🔊</div>
-        <button class="tgl-row" id="tglAudio"><span class="tgl"><b>أصوات الميم</b><small>تشغيل مكتبة الأصوات</small></span><span class="sw ${state._audioOn !== false ? 'on' : ''}"></span></button>
-        <button class="tgl-row" id="tglFx"><span class="tgl"><b>مؤثرات صوتية</b><small>أصوات التفاعل داخل التطبيق</small></span><span class="sw ${state._fxOn !== false ? 'on' : ''}"></span></button>
-        <div class="vol-row"><span>🔉</span><input type="range" id="audioVolRange" min="0" max="100" step="1" value="${state._audioVol == null ? 80 : state._audioVol}"><span class="vol-val" id="audioVolVal">${state._audioVol == null ? 80 : state._audioVol}%</span></div>
-        <div class="snd-add-row"><button class="btn" id="openSoundLib">🎵 مكتبة الأصوات</button></div>
-      </div>
       <div class="settings-card"><div class="settings-title">🔔 تنبيهات وتذكيرات</div>
         <button class="tgl-row" id="tglNotif"><span class="tgl"><b>تفعيل التنبيهات</b><small>إشعارات أثناء استخدام التطبيق</small></span><span class="sw ${state._notifOn === true ? 'on' : ''}"></span></button>
-        <button class="tgl-row" id="tglNotifOrders"><span class="tgl"><b>التذكير بالطلبات</b><small>تنبيه كوميدي بالطلبات المعلقة</small></span><span class="sw ${state._notifOrders !== false ? 'on' : ''}"></span></button>
+        <button class="tgl-row" id="tglNotifOrders"><span class="tgl"><b>التذكير بالطلبات</b><small>تنبيه بالطلبات المعلقة</small></span><span class="sw ${state._notifOrders !== false ? 'on' : ''}"></span></button>
         <button class="tgl-row" id="tglNotifExp"><span class="tgl"><b>التذكير بالمصروفات</b><small>يفكرك تسجل مصاريفك كل يوم</small></span><span class="sw ${state._notifExp !== false ? 'on' : ''}"></span></button>
         <div class="vol-row"><span>🕘</span><input type="time" id="notifExpTime" value="${state._notifExpTime || '21:00'}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:12px;font-weight:800;color:var(--text);background:var(--bg);" /><span class="vol-val">التذكير</span></div>
-        <button class="tgl-row" id="tglNotifDaily"><span class="tgl"><b>التقرير اليومي</b><small>ملخص كوميدي لمصاريف اليوم</small></span><span class="sw ${state._notifDaily !== false ? 'on' : ''}"></span></button>
+        <button class="tgl-row" id="tglNotifDaily"><span class="tgl"><b>التقرير اليومي</b><small>ملخص مصاريف اليوم</small></span><span class="sw ${state._notifDaily !== false ? 'on' : ''}"></span></button>
         <div class="vol-row"><span>🕙</span><input type="time" id="notifDailyTime" value="${state._notifDailyTime || '22:00'}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:12px;font-weight:800;color:var(--text);background:var(--bg);" /><span class="vol-val">التقرير</span></div>
         <div class="snd-add-row"><button class="btn" id="notifTestBtn">🔔 جرّب تنبيه</button></div>
       </div>
@@ -3129,7 +2787,7 @@
       <div class="settings-card"><div class="settings-title">البيانات</div>
         <div class="settings-item"><div class="si-icon" style="background:#DCFCE7;color:#059669;">${svgIcon('trophy', 18)}</div><div class="si-body"><div class="si-label">التوفير الكلي</div><div class="si-value">${formatCurrency(totalSavings)} ج.م</div></div></div>
         <div class="settings-item"><div class="si-icon" style="background:#F1EAFE;color:#7C3AED;">${svgIcon('cart', 18)}</div><div class="si-body"><div class="si-label">الطلبات</div><div class="si-value">${state.orders.length} طلب (${state.orders.filter(o => o.status === 'purchased').length} اتشترى)</div></div></div>
-        <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">${svgIcon('wallet', 18)}</div><div class="si-body"><div class="si-label">المصروفات</div><div class="si-value">${state.expenses.length} عملية</div></div></div>
+        <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">${svgIcon('wallet', 18)}</div><div class="si-body"><div class="si-label">المصروفات</div><div class="si-value">${state.expenses.length} عملية • ${shareExpensesOn() ? '☁️ مشتركة' : '🔒 محلية'}</div></div><button class="si-action" id="shareExpSettingsBtn">${shareExpensesOn() ? 'خاص' : 'مشاركة'}</button></div>
         <div style="padding:8px 16px 0;"><button class="collapsible-head sub" id="learnedHead"><span class="ch-texts"><b>الكلمات اللي اتعلمناها (${learnedEntries.length})</b><small>اضغط للعرض</small></span><span class="chev ${state._learnedOpen ? 'open' : ''}">‹</span></button></div>
         <div class="collapsible-body ${state._learnedOpen ? '' : 'hidden'}">
         ${!learnedEntries.length ? `<div style="padding:2px 16px 12px;color:var(--text-muted);font-size:12px;">مفيش تصنيفات مخصوصة لسه.</div>` : `<div class="learned-list">${learnedEntries.map(([term, catId]) => `<span class="learned-tag">${escapeHTML(term)} → ${getCategoryName(catId)}<button data-unlearn="${escapeHTML(term)}">✕</button></span>`).join('')}</div><div style="padding:0 16px 12px;"><button class="btn btn-sm" id="clearLearned">مسح الكل</button></div>`}
@@ -3157,45 +2815,60 @@
       const code = genHomeCode();
       state._pendingName = name; state._pendingCode = code;
       state.home = { code, name, createdAt: nowISO() }; persist();
+      try { initSupabaseSync(); } catch {}
       state._onboardingStep = 'created-success'; render();
     });
     b('copyCodeBtn', () => { const code = document.getElementById('codeDisplay').textContent; copyToClipboard(code).then(ok => toast(ok ? 'تم النسخ ✓' : 'مقدرش أنسخ', ok ? 'success' : 'error')); });
     b('gotoUsername', () => { state._onboardingStep = 'username'; render(); });
-    b('submitJoin', () => {
+    b('submitJoin', async () => {
       const inp = document.getElementById('joinCodeInput'); const err = document.getElementById('joinError');
       const showErr = () => { err.classList.remove('hidden'); inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'), 1500); };
       let code = inp.value.trim().toUpperCase();
       if (!/^HOME-\d{4,}$/.test(code)) code = 'HOME-' + (code.replace(/\D/g, ''));
-      if (state.home && state.home.code && code === state.home.code) { state._pendingCode = code; state._pendingName = state.home.name; state._onboardingStep = 'username'; render(); return; }
-      if (!db) { showErr(); toast('مفيش اتصال بقاعدة البيانات — اتأكد من الإنترنت', 'warning'); return; }
-      const btn = document.getElementById('submitJoin');
-      if (btn) { btn.disabled = true; btn.textContent = 'جاري البحث...'; }
+      if (!code || code === 'HOME-') { showErr(); return; }
       const acceptJoin = (remote) => {
         state.home = remote.home;
         state._pendingCode = code; state._pendingName = remote.home.name;
         state._pendingCloud = remote;
         state._onboardingStep = 'username'; render();
       };
-      const fail = (why) => {
-        try { console.warn('[join]', why || 'unknown'); } catch {}
-        showErr();
-        if (why) toast(why, 'warning');
-      };
-      ensureSbSession().then(async () => {
-        try {
-          const { doc, getDoc } = window._fbModules || {};
-          if (!doc || !getDoc) { fail('خطأ في تحميل Firebase'); return; }
-          const snap = await getDoc(doc(db, 'homes', code));
-          if (!snap.exists()) { fail('الكود غلط أو البيت مش موجود 😅'); return; }
-          const remote2 = snap.data().data;
-          if (remote2 && remote2.home) { acceptJoin(remote2); return; }
-          fail();
-        } catch (e) {
-          const m = String((e && e.message) || e || '');
-          if (/Failed to fetch|NetworkError|network|fetch/i.test(m)) fail('مفيش اتصال بالإنترنت — اتأكد من الشبكة وحاول تاني');
-          else fail();
+      if (state.home && state.home.code && code === state.home.code) {
+        state._pendingCode = code; state._pendingName = state.home.name; state._onboardingStep = 'username'; render(); return;
+      }
+      try {
+        const raw = localStorage.getItem('baytna_home_' + code);
+        if (raw) {
+          const saved = JSON.parse(raw);
+          if (saved && saved.home) { acceptJoin(saved); return; }
         }
-      }).catch(() => fail()).finally(() => { const b2 = document.getElementById('submitJoin'); if (b2) { b2.disabled = false; b2.textContent = 'انضم للبيت'; } });
+      } catch {}
+      // أهم إصلاح: اسحب بيانات البيت من السحابة قبل إنشاء بيت فاضي يمسح الشير
+      try {
+        if (window.NaqisnaSupabase && window.NaqisnaSupabase.isConfigured()) {
+          inp.disabled = true;
+          const remoteData = await window.NaqisnaSupabase.fetchHomeData(code);
+          inp.disabled = false;
+          if (remoteData && ((remoteData.orders && remoteData.orders.length) || (remoteData.expenses && remoteData.expenses.length) || remoteData.name)) {
+            acceptJoin({
+              home: { code, name: remoteData.name || 'بيتنا', createdAt: nowISO() },
+              orders: (remoteData.orders || []).map(normRemoteOrder).filter(Boolean),
+              expenses: (remoteData.expenses || []).map(normRemoteExpense).filter(Boolean),
+              orderLists: remoteData.orderLists || [],
+              updatedAt: Number(remoteData.updatedAtMs) || Date.now()
+            });
+            return;
+          }
+        }
+      } catch { try { inp.disabled = false; } catch {} }
+      if (/^HOME-\d{4,}$/.test(code)) {
+        state.home = { code, name: 'بيتنا', createdAt: nowISO() };
+        state._pendingCode = code;
+        state._pendingName = state.home.name;
+        state._onboardingStep = 'username';
+        render();
+        return;
+      }
+      showErr();
     });
     const rh = document.getElementById('roleHusband'), rw = document.getElementById('roleWife');
     const paintRole = () => {
@@ -3229,12 +2902,7 @@
       if (!state.home) state.home = { code: state._pendingCode || genHomeCode(), name: state._pendingName || 'بيتنا', createdAt: nowISO() };
       state._pendingRole = null;
       state.initialized = true; state.currentTab = 'home'; state._onboardingStep = null; persist();
-      (async () => {
-        try {
-          await ensureSbSession();
-        } catch {}
-        attachCloud();
-      })();
+      try { initSupabaseSync(); } catch {}
       try { syncUserToAdminDir(); } catch {}
       const rl = state.user.role === 'wife' ? 'يا ست الكل 👩' : 'يا بطل 👨';
       toast(`أهلاً ${rl} ${name}! 👋`, 'success'); render();
@@ -3250,7 +2918,7 @@
   function bindMain() {
     try { syncUserToAdminDir(); } catch {}
 
-    const bc = document.getElementById('basketConfirm'); if (bc) bc.onclick = () => { const r = confirmBasket(); if (r.added.length) { try { MemeSound.playEvent(r.added.some(o => o.priority === 'high' || o.urgent) ? 'URGENT' : 'NEW_REQUEST'); } catch {} } render(); toast(r.added.length ? `🧺 اتأكدت السلة: ${r.added.length} طلب ✓` + (r.skipped ? ` (تجاهلت ${r.skipped} مكرر)` : '') : 'السلة فاضية أو كلها موجودة بالفعل', r.added.length ? 'success' : 'warning'); };
+    const bc = document.getElementById('basketConfirm'); if (bc) bc.onclick = () => { const r = confirmBasket(); render(); toast(r.added.length ? `🧺 اتأكدت السلة: ${r.added.length} طلب ✓` + (r.skipped ? ` (تجاهلت ${r.skipped} مكرر)` : '') : 'السلة فاضية أو كلها موجودة بالفعل', r.added.length ? 'success' : 'warning'); };
     const bcl = document.getElementById('basketClear'); if (bcl) bcl.onclick = () => { confirmDialog({ title: 'تفريغ السلة؟', message: 'كل الأصناف المجهزة هتتمسح من السلة.', confirmText: 'فرّغ', cancelText: 'لا' }).then(ok => { if (ok) { clearBasket(); render(); toast('اتفرغت السلة ✓', 'success'); } }); };
     document.querySelectorAll('[data-bexp]').forEach(el => el.onclick = (e) => { if (e.target.closest('button, input, select, textarea, a')) return; toggleBasketExpand(el.dataset.bexp); });
     document.querySelectorAll('[data-bqtype]').forEach(b => b.onclick = () => {
@@ -3271,12 +2939,14 @@
     document.querySelectorAll('[data-bqvalw]').forEach(s => s.oninput = () => { const d = state._basketDraft || (state._basketDraft = {}); d.qtyVal = parseFloat(s.value) || 0; });
     document.querySelectorAll('[data-bqunitw]').forEach(s => s.onchange = () => { const d = state._basketDraft || (state._basketDraft = {}); d.qtyUnit = s.value; });
     document.querySelectorAll('[data-bqnotes]').forEach(s => s.oninput = () => { const d = state._basketDraft || (state._basketDraft = {}); d.notes = s.value; });
+    document.querySelectorAll('[data-bqphoto]').forEach(inp => inp.onchange = () => { const f = inp.files && inp.files[0]; if (!f) return; readOrderPhoto(f, (url) => { const d = state._basketDraft || (state._basketDraft = {}); d.photo = url; render(); toast('اتضافت الصورة ✓', 'success'); }); });
+    document.querySelectorAll('[data-bqrmphoto]').forEach(b => b.onclick = () => { const d = state._basketDraft || (state._basketDraft = {}); d.photo = ''; render(); });
     document.querySelectorAll('[data-bqsave]').forEach(b => b.onclick = () => { if (saveBasketDraft(b.dataset.bqsave)) { toast('اتحفظ ✓', 'success'); render(); } });
     document.querySelectorAll('[data-bqconfirm]').forEach(b => b.onclick = () => {
       const id = b.dataset.bqconfirm;
       const it = saveBasketDraft(id, true); if (!it) return;
       if (pendingOrderExists(it.name, activeListId())) { toast('موجود بالفعل في الطلبات', 'warning'); return; }
-      addOrder({ name: it.name, notes: it.notes, urgent: it.urgent, priority: it.priority, qty: it.qty, listId: activeListId(), categoryId: it.categoryId });
+      addOrder({ name: it.name, notes: it.notes, urgent: it.urgent, priority: it.priority, qty: it.qty, listId: activeListId(), categoryId: it.categoryId, photo: it.photo || '' });
       removeBasketItem(id); state._expandedBasket = null; state._basketDraft = null; render();
       toast('🧺 اتأكد الصنف وبقى طلب ✓', 'success');
     });
@@ -3316,6 +2986,17 @@
       });
     });
     const al = document.getElementById('addExpenseLink'); if (al) al.onclick = (e) => { e.preventDefault(); openAddExpenseModal(); };
+    const tse = document.getElementById('tglShareExp'); if (tse) tse.onclick = async () => {
+      state._shareExpenses = !shareExpensesOn();
+      persist(); render();
+      toast(state._shareExpenses ? 'المصروفات بقت مشتركة ☁️' : 'المصروفات بقت محلية فقط 🔒', 'success');
+      try {
+        if (state._shareExpenses && state.home?.code && window.NaqisnaSupabase?.isConfigured()) {
+          await window.NaqisnaSupabase.pushFullState(state.home.code, state);
+          try { initSupabaseSync(); } catch {}
+        }
+      } catch {}
+    };
     document.querySelectorAll('[data-expkind]').forEach(b => b.onclick = () => { state._expKind = b.dataset.expkind; persist(); render(); });
     document.querySelectorAll('[data-expact]').forEach(el => el.onclick = (e) => {
       if (e.target.closest('button, a, input, select, textarea')) return;
@@ -3329,17 +3010,6 @@
     if (si) { si.oninput = (e) => { state.searchQuery = e.target.value; if (si._to) clearTimeout(si._to); si._to = setTimeout(() => { persist(); render(); const i = document.getElementById('orderSearch'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 200); }; }
     document.querySelectorAll('[data-qpick-name]').forEach(b => b.onclick = () => { try { openQuickAddModal(b.dataset.qpickName || '', b.dataset.qpickDept || null); } catch {} });
     const qan = document.getElementById('qAddNew'); if (qan) qan.onclick = () => { try { openQuickAddModal((state.searchQuery || '').trim(), null); } catch {} };
-    const osv = document.getElementById('orderSearchVoice');
-    if (osv) osv.onclick = () => {
-      try {
-        Voice.lang = 'ar-EG';
-        Voice.toggle(si, {
-          onText: () => { if (si) { state.searchQuery = si.value; render(); } },
-          onState: (on) => { osv.classList.toggle('recording', !!on); },
-          onCommit: () => { if (si) { state.searchQuery = si.value; persist(); render(); const i = document.getElementById('orderSearch'); if (i) i.focus(); } }
-        });
-      } catch { toast('البحث الصوتي غير مدعوم في المتصفح ده', 'warning'); }
-    };
     document.querySelectorAll('[data-catdept]').forEach(b => b.onclick = () => { state._catBrowse = b.dataset.catdept; state.searchQuery = ''; state._shopQuery = ''; persist(); render(); });
     const scb = document.getElementById('shopCardBtn'); if (scb) scb.onclick = () => setTab('shop');
     const shs = document.getElementById('shopSearch');
@@ -3370,6 +3040,7 @@
     document.querySelectorAll('[data-expphoto]').forEach(inp => inp.onchange = () => { const f = inp.files && inp.files[0]; if (!f) return; readOrderPhoto(f, (url) => { const d = state._expDraft || (state._expDraft = {}); d.photo = url; render(); toast('اتضافت الصورة ✓', 'success'); }); });
     document.querySelectorAll('[data-exprmphoto]').forEach(b => b.onclick = () => { const d = state._expDraft || (state._expDraft = {}); d.photo = ''; render(); });
     document.querySelectorAll('[data-zoomphoto]').forEach(im => im.onclick = (e) => { e.stopPropagation(); openPhotoViewer(im.dataset.zoomphoto); });
+    document.querySelectorAll('[data-bzoomphoto]').forEach(im => im.onclick = (e) => { e.stopPropagation(); openPhotoViewer(im.dataset.bzoomphoto); });
     document.querySelectorAll('[data-expsave]').forEach(b => b.onclick = () => saveExpandedOrder(b.dataset.expsave));
     document.querySelectorAll('[data-expbuy]').forEach(b => b.onclick = () => { const id = b.dataset.expbuy; if (saveExpandedOrder(id, true)) openPurchaseModal(id); });
     bindSettings();
@@ -3460,12 +3131,12 @@
     b('prodIconsBtn', openProductIcons);
     b('catManagerBtn', openCatalogManager);
     b('finManagerBtn', openFinManager);
-    b('tglAudio', () => { state._audioOn = !(state._audioOn !== false); persist(); render(); });
-
-    b('tglFx', () => { state._fxOn = !(state._fxOn !== false); persist(); render(); });
-    const avr = document.getElementById('audioVolRange');
-    if (avr) avr.oninput = () => { state._audioVol = Number(avr.value) || 0; const vv = document.getElementById('audioVolVal'); if (vv) vv.textContent = state._audioVol + '%'; persist(); };
-    b('openSoundLib', openSoundLibrary);
+    b('shareExpSettingsBtn', async () => {
+      state._shareExpenses = !shareExpensesOn();
+      persist(); render();
+      toast(state._shareExpenses ? 'المصروفات بقت مشتركة ☁️' : 'المصروفات بقت محلية فقط 🔒', 'success');
+      try { if (state._shareExpenses && state.home?.code && window.NaqisnaSupabase?.isConfigured()) await window.NaqisnaSupabase.pushFullState(state.home.code, state); } catch {}
+    });
     b('tglNotif', () => {
       const on = !(state._notifOn === true);
       const apply = (v) => { state._notifOn = v; persist(); render(); toast(v ? 'التنبيهات اشتغلت 🔔' : 'التنبيهات اتقفلت', v ? 'success' : 'info'); };
@@ -3932,91 +3603,6 @@
       toast('اتنقل المنتج', 'success');
     };
   }
-  function sndRowsHTML() {
-    return AudioManager.registry().map(x => {
-      const off = (AudioManager.overrides().off || {})[x.id];
-      const miss = !!AudioManager._missing[x.id];
-      return `<div class="snd-row"><button class="snd-play" data-sndplay="${escapeHTML(x.id)}" aria-label="معاينة">▶</button>`
-        + `<div class="snd-info"><b>${escapeHTML(x.name)}${miss ? ' ⚠️ مفقود' : ''}${x.upload ? ' • مرفوع' : ''}</b><small>${escapeHTML(String(x.file).slice(0, 44))}</small></div>`
-        + `<select data-sndev="${escapeHTML(x.id)}" style="max-width:86px;font-size:11px;">${Object.keys(AUDIO_EVENT_LABELS).map(k => `<option value="${k}"${x.event === k ? ' selected' : ''}>${AUDIO_EVENT_LABELS[k]}</option>`).join('')}</select>`
-        + `<button class="btn btn-sm" data-sndoff="${escapeHTML(x.id)}">${off ? 'تفعيل' : 'تعطيل'}</button>`
-        + (x.upload ? `<button class="snd-del" data-snddel="${escapeHTML(x.id)}" aria-label="حذف">🗑</button>` : '')
-        + `</div>`;
-    }).join('') || '<div class="help-text">لا توجد أصوات بعد.</div>';
-  }
-  function openSoundLibrary() {
-    const regs = AudioManager.registry();
-    const miss = regs.filter(x => AudioManager._missing[x.id]);
-    const html = `<div class="modal-handle"></div><h2>🎵 مكتبة الأصوات</h2><p class="m-sub">${regs.length} صوت • الملفات من مجلد sounds/</p>`
-      + `<div id="sndMissing">${miss.length ? `<div class="error-text">⚠️ ملفات مفقودة: ${miss.map(x => escapeHTML(String(x.file).split('/').pop())).join('، ')}</div>` : ''}</div>`
-      + `<div class="field"><label>فحص الملفات</label><div class="btn-row"><button class="btn btn-sm" id="sndCheck">فحص الملفات</button></div><div class="help-text">يتأكد أن كل ملف موجود فعلًا</div></div>`
-      + `<div id="sndRows">${sndRowsHTML()}</div>`
-      + `<div class="field"><label>اسم الصوت الجديد</label><input type="text" id="sndName" placeholder="مثال: طلب جديد 9" maxlength="30" /></div>`
-      + `<div class="field"><label>الحدث</label><select id="sndEvent">${Object.keys(AUDIO_EVENT_LABELS).map(k => `<option value="${k}">${AUDIO_EVENT_LABELS[k]}</option>`).join('')}</select></div>`
-      + `<div class="field"><label>رفع ملف MP3 (حتى 400KB)</label><div class="btn-row"><label class="btn btn-sm" style="cursor:pointer;">اختار ملف<input type="file" id="sndFile" accept="audio/*" class="hidden" /></label><span class="help-text" id="sndFileName"></span></div></div>`
-      + `<div class="btn-group"><button class="btn btn-primary" id="sndUpload">رفع وحفظ</button><button class="btn" id="sndClose">رجوع</button></div>`;
-    const m = openModal(html);
-    m.querySelector('#sndClose').onclick = () => closeModal(m);
-    const refresh = () => { const r = m.querySelector('#sndRows'); if (r) r.innerHTML = sndRowsHTML(); bindRows(); };
-    const bindRows = () => {
-      m.querySelectorAll('[data-sndplay]').forEach(btn => btn.onclick = () => { try { AudioManager.preview(btn.dataset.sndplay); } catch {} });
-      m.querySelectorAll('[data-sndoff]').forEach(btn => btn.onclick = () => {
-        const id = btn.dataset.sndoff; const ov = state._audioLib = state._audioLib || {}; ov.off = ov.off || {};
-        if (ov.off[id]) delete ov.off[id]; else ov.off[id] = true;
-        persist(); refresh();
-      });
-      m.querySelectorAll('[data-sndev]').forEach(sel => sel.onchange = () => {
-        const id = sel.dataset.sndev; const entry = AudioManager.registry().find(x => x.id === id); if (!entry) return;
-        if (entry.upload) {
-          const u = (state.audioUploads || []).find(x => x.id === id); if (u) u.event = sel.value;
-        } else { const ov = state._audioLib = state._audioLib || {}; ov.event = ov.event || {}; ov.event[id] = sel.value; }
-        persist(); refresh(); toast('اتغير الحدث', 'success');
-      });
-      m.querySelectorAll('[data-snddel]').forEach(btn => btn.onclick = () => {
-        const id = btn.dataset.snddel;
-        confirmDialog({ title: 'حذف الصوت؟', message: 'هيتحذف الملف المرفوع نهائيًا.', confirmText: 'حذف', cancelText: 'لا', danger: true }).then(ok => {
-          if (!ok) return;
-          state.audioUploads = (state.audioUploads || []).filter(u => u.id !== id);
-          persist(); refresh(); toast('اتحذف الصوت', 'success');
-        });
-      });
-    };
-    bindRows();
-    const fi = m.querySelector('#sndFile');
-    if (fi) fi.onchange = () => { const f = fi.files && fi.files[0]; const lb = m.querySelector('#sndFileName'); if (lb) lb.textContent = f ? f.name : ''; };
-    m.querySelector('#sndCheck').onclick = async () => {
-      const btn = m.querySelector('#sndCheck'); if (btn) { btn.disabled = true; btn.textContent = 'جاري الفحص...'; }
-      try { await AudioManager.checkFiles(); } catch {}
-      const miss2 = AudioManager.registry().filter(x => AudioManager._missing[x.id]);
-      const box = m.querySelector('#sndMissing');
-      if (box) box.innerHTML = miss2.length ? `<div class="error-text">⚠️ ملفات مفقودة: ${miss2.map(x => escapeHTML(String(x.file).split('/').pop())).join('، ')}</div>` : '';
-      refresh();
-      if (btn) { btn.disabled = false; btn.textContent = 'فحص الملفات'; }
-      toast(miss2.length ? ('ملفات مفقودة: ' + miss2.length) : 'كل الملفات موجودة', miss2.length ? 'warning' : 'success');
-    };
-    m.querySelector('#sndUpload').onclick = () => {
-      const name = (m.querySelector('#sndName').value || '').trim();
-      const ev = m.querySelector('#sndEvent').value;
-      const f = m.querySelector('#sndFile').files && m.querySelector('#sndFile').files[0];
-      if (!name) { toast('اكتب اسم الصوت', 'warning'); return; }
-      if (!f) { toast('اختار ملف صوت', 'warning'); return; }
-      if (f.size > 400 * 1024) { toast('الملف أكبر من 400KB', 'error'); return; }
-      if (audioLibSize(state.audioUploads) + f.size * 1.4 > 800 * 1024) { toast('مساحة الأصوات المرفوعة ممتلئة (800KB)', 'error'); return; }
-      const rd = new FileReader();
-      rd.onload = () => {
-        try {
-          const ups = state.audioUploads = state.audioUploads || [];
-          ups.push({ id: 'up_' + Date.now().toString(36), name, event: ev, dataUrl: String(rd.result || '') });
-          persist(); refresh();
-          m.querySelector('#sndName').value = ''; m.querySelector('#sndFile').value = '';
-          const lb = m.querySelector('#sndFileName'); if (lb) lb.textContent = '';
-          toast('اترفع الصوت', 'success');
-        } catch { toast('مقدرتش أحفظ الملف', 'error'); }
-      };
-      rd.onerror = () => toast('مقدرتش أقرا الملف', 'error');
-      try { rd.readAsDataURL(f); } catch { toast('مقدرتش أقرا الملف', 'error'); }
-    };
-  }
   function openAddCatModal() {
     let icon = 'star', color = '#7C3AED';
     const palette = ['#7C3AED', '#EC4899', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#F43F5E', '#F97316'];
@@ -4110,7 +3696,7 @@
   }
   function openProfileModal() {
     const cur = state.user?.role || 'husband';
-    const m = openModal(`<div class="modal-handle"></div><h2>تعديل بياناتك 👨‍👩‍👧</h2><p class="m-sub">النوع بيحدد النكت اللي توصلك • الرقم بيوصله واتساب تلقائي</p>
+    const m = openModal(`<div class="modal-handle"></div><h2>تعديل بياناتك 👨‍👩‍👧</h2><p class="m-sub">الرقم بيوصله واتساب تلقائي</p>
       <div class="field"><label>أنت مين؟</label><div class="role-grid">
         <button class="role-card ${cur === 'husband' ? 'sel-husband' : ''}" id="pmH">👨‍🍳<br><b>زوج</b></button>
         <button class="role-card ${cur === 'wife' ? 'sel-wife' : ''}" id="pmW">👩‍🍳<br><b>زوجة</b></button>
@@ -4132,393 +3718,18 @@
   }
 
   /* =============================
-     AUDIO LIBRARY (real human-recorded mp3 files only — no synth, no TTS)
-     Owner drops files into sounds/ and registers them in sounds/audio-library.json.
-     ============================= */
-  const AUDIO_EVENTS = {
-    NEW_REQUEST: 'new_request', NEW_MESSAGE: 'new_message', REQUEST_ACCEPTED: 'success',
-    REQUEST_REJECTED: 'failure', REQUEST_COMPLETED: 'success', ERROR: 'failure',
-    WAITING: 'waiting', SURPRISE: 'surprise', URGENT: 'urgent',
-    TASK_COMPLETED: 'success', FAIL: 'failure', OPEN: 'general'
-  };
-  const AUDIO_EVENT_LABELS = {
-    new_request: 'طلب جديد', new_message: 'رسالة جديدة', success: 'نجاح',
-    funny: 'كوميديا', surprise: 'مفاجأة', failure: 'فشل',
-    waiting: 'انتظار', urgent: 'عاجل', general: 'عام'
-  };
-  const AUDIO_LIB_URL = 'sounds/audio-library.json';
-  function audioFallbackRegistry() {
-    const defs = [
-      ['new_request', 'requests', 'new_request_', 'طلب جديد ', 8],
-      ['new_message', 'messages', 'new_message_', 'رسالة جديدة ', 5],
-      ['success', 'success', 'success_', 'نجاح ', 5],
-      ['funny', 'general', 'funny_', 'ضحكة ', 6],
-      ['surprise', 'surprise', 'surprise_', 'مفاجأة ', 4],
-      ['failure', 'failure', 'failure_', 'فشل ', 4],
-      ['waiting', 'waiting', 'waiting_', 'انتظار ', 3],
-      ['urgent', 'urgent', 'urgent_', 'تنبيه عاجل ', 3],
-      ['general', 'general', 'general_', 'عام ', 2]
-    ];
-    const out = [];
-    defs.forEach(([ev, folder, prefix, name, n]) => {
-      for (let i = 1; i <= n; i++) {
-        const id = prefix + String(i).padStart(2, '0');
-        out.push({ id, file: 'sounds/' + folder + '/' + id + '.mp3', name: name + i, event: ev, builtin: true });
-      }
-    });
-    return out;
-  }
-  function audioPickNext(pool, lastId) {
-    if (!pool || !pool.length) return null;
-    if (pool.length === 1) return pool[0];
-    let pick = pool[Math.floor(Math.random() * pool.length)];
-    if (pick.id === lastId) pick = pool[(pool.findIndex(s => s.id === pick.id) + 1) % pool.length];
-    return pick;
-  }
-  function audioMergeRegistry(base, uploads, overrides) {
-    const ov = overrides || {};
-    const out = (base || []).filter(s => s && s.id && s.file).map(s => ({ id: s.id, file: s.file, name: s.name || s.id, event: ((ov.event || {})[s.id]) || s.event || 'general', builtin: true }));
-    (uploads || []).forEach(u => { if (u && u.id && u.dataUrl) out.push({ id: u.id, file: u.dataUrl, name: u.name || u.id, event: u.event || 'general', upload: true }); });
-    return out;
-  }
-  function audioLibSize(uploads) {
-    try { return (uploads || []).reduce((n, u) => n + String(u.dataUrl || '').length, 0); } catch { return 0; }
-  }
-  function migrateAudioSettings() {
-    try {
-      if (state._audioMigrated) return;
-      state._audioMigrated = true;
-      if (state._memeOn === false && state._audioOn == null) state._audioOn = false;
-      if (state._memeVol != null && state._audioVol == null) state._audioVol = state._memeVol;
-      if (state._memeOff && !state._audioLib) state._audioLib = { off: { ...state._memeOff } };
-      if (Array.isArray(state._memeCustom) && state._memeCustom.length) {
-        const ups = Array.isArray(state.audioUploads) ? state.audioUploads : [];
-        state._memeCustom.forEach((c, i) => {
-          if (c && (c.url || c.file) && !ups.some(u => u.id === ('legacy_' + i))) ups.push({ id: 'legacy_' + i, name: c.name || ('صوت ' + (i + 1)), event: 'general', dataUrl: c.url || c.file });
-        });
-        state.audioUploads = ups;
-      }
-      delete state._memeOn; delete state._memeMode; delete state._memeVol; delete state._memeOff; delete state._memeCustom;
-      try { persist(); } catch {}
-    } catch {}
-  }
-  const AudioManager = {
-    _lib: [], _loaded: false, _loading: null, _el: null, _queue: [], _busyUntil: 0, _lastEv: {}, _lastId: {}, _missing: {}, _unlocked: false,
-    settings() {
-      return {
-        on: state._audioOn !== false,
-        fx: state._fxOn !== false,
-        vol: Math.min(0.9, Math.max(0, (state._audioVol == null ? 80 : state._audioVol) / 100))
-      };
-    },
-    uploads() { return state.audioUploads || []; },
-    overrides() { return state._audioLib || {}; },
-    registry() { return audioMergeRegistry(this._lib, this.uploads(), this.overrides()); },
-    poolFor(evKey, ignoreOff) {
-      const off = (this.overrides().off || {});
-      return this.registry().filter(x => x.event === evKey && !this._missing[x.id] && (ignoreOff || !off[x.id]));
-    },
-    loadLibrary() {
-      if (this._loaded) return Promise.resolve(true);
-      if (this._loading) return this._loading;
-      this._loading = (async () => {
-        try {
-          const r = await fetch(AUDIO_LIB_URL);
-          if (r && r.ok) { const j = await r.json(); if (j && Array.isArray(j.sounds)) this._lib = j.sounds; }
-        } catch {}
-        if (!this._lib.length) { try { this._lib = audioFallbackRegistry(); } catch {} }
-        this._loaded = true;
-        try { this.preload(); } catch {}
-        return true;
-      })();
-      return this._loading;
-    },
-    unlock() {
-      if (this._unlocked) return;
-      this._unlocked = true;
-      try {
-        const C = window.AudioContext || window.webkitAudioContext;
-        if (C) { const ctx = new C(); if (ctx.state === 'suspended' && ctx.resume) ctx.resume().catch(() => {}); setTimeout(() => { try { ctx.close(); } catch {} }, 800); }
-      } catch {}
-      try { this.preload(); } catch {}
-    },
-    preload() {
-      try {
-        const seen = {}, off = (this.overrides().off || {});
-        this.registry().forEach(x => {
-          if (!x.file || seen[x.event] || this._missing[x.id] || off[x.id] || String(x.file).slice(0, 5) === 'data:') return;
-          seen[x.event] = 1;
-          try { const a = new Audio(); a.preload = 'auto'; a.src = x.file; } catch {}
-        });
-      } catch {}
-    },
-    playEvent(ev, opts) {
-      opts = opts || {};
-      try { this.loadLibrary(); } catch {}
-      const s = this.settings();
-      if (!s.on) return;
-      if (!s.fx) return;
-      const now = Date.now();
-      if (!opts.force && (this._lastEv[ev] || 0) + 1800 > now) return;
-      this._lastEv[ev] = now;
-      const key = AUDIO_EVENTS[ev] || 'general';
-      let pool = this.poolFor(key, false);
-      if (!pool.length) pool = this.poolFor(key, true);
-      if (!pool.length) return;
-      const pick = audioPickNext(pool, this._lastId[ev]);
-      if (!pick) return;
-      this._lastId[ev] = pick.id;
-      this._play(pick, s, opts);
-    },
-    playId(id, force) {
-      try { this.loadLibrary(); } catch {}
-      const entry = this.registry().find(x => x.id === id);
-      if (!entry) return;
-      if (force) { const s = this.settings(); this.stop(); this._play(entry, { ...s, on: true }, { force: true }); return; }
-      const s = this.settings();
-      if (!s.on || (this.overrides().off || {})[id] || this._missing[id]) return;
-      this._play(entry, s, {});
-    },
-    preview(id) {
-      const entry = this.registry().find(x => x.id === id);
-      if (!entry) return;
-      const s = this.settings();
-      this.stop();
-      this._play(entry, { ...s, on: true }, { force: true });
-    },
-    stop() {
-      try { if (this._el) { try { this._el.pause(); } catch {} } } catch {}
-      this._el = null; this._queue = []; this._busyUntil = 0;
-    },
-    _next() {
-      const q = this._queue.shift();
-      if (!q) return;
-      const s = this.settings();
-      if (!s.on) return;
-      this._play(q.entry, s, { force: true });
-    },
-    _play(entry, s, opts) {
-      opts = opts || {};
-      if (this._el && !this._el.paused && !this._el.ended && !opts.force) {
-        if (this._queue.length < 2 && !this._queue.some(q => q.entry.id === entry.id)) this._queue.push({ entry, s });
-        return;
-      }
-      let a = null;
-      try {
-        a = new Audio();
-        a.preload = 'auto';
-        try { a.volume = Math.min(0.9, Math.max(0, s.vol == null ? 0.8 : s.vol)); } catch {}
-        a.src = entry.file;
-      } catch { this._missing[entry.id] = 1; return; }
-      try { if (this._el && this._el !== a) { try { this._el.pause(); } catch {} } } catch {}
-      this._el = a;
-      this._busyUntil = Date.now() + 4000;
-      try {
-        a.onended = () => { if (this._el === a) this._el = null; try { this._next(); } catch {} };
-        a.onerror = () => {
-          this._missing[entry.id] = 1;
-          if (this._el === a) this._el = null;
-          const tried = (opts._tried || []).concat(entry.id);
-          const alt = (this.registry() || []).find(x => x.event === entry.event && !tried.includes(x.id) && !this._missing[x.id] && !(this.overrides().off || {})[x.id]);
-          if (alt) { try { this._play(alt, s, { ...opts, _tried: tried }); } catch {} return; }
-          try { this._next(); } catch {}
-        };
-      } catch {}
-      try {
-        const pr = a.play();
-        if (pr && pr.catch) pr.catch(() => { if (this._el === a) this._el = null; try { this._next(); } catch {} });
-      } catch { if (this._el === a) this._el = null; }
-    },
-    async checkFiles() {
-      const out = {};
-      for (const x of this.registry()) {
-        if (!x.file) { out[x.id] = 'missing'; continue; }
-        if (String(x.file).slice(0, 5) === 'data:') { out[x.id] = 'ok'; continue; }
-        try {
-          const r = await fetch(x.file, { method: 'HEAD' });
-          out[x.id] = (r && r.ok) ? 'ok' : 'missing';
-        } catch { out[x.id] = 'unknown'; }
-        if (out[x.id] === 'missing') this._missing[x.id] = 1;
-        else if (out[x.id] === 'ok' && this._missing[x.id]) delete this._missing[x.id];
-      }
-      return out;
-    }
-  };
-  const MemeSound = {
-    playEvent(ev, opts) { try { AudioManager.playEvent(ev, opts); } catch {} },
-    playId(id, force) { try { AudioManager.playId(id, force); } catch {} }
-  };
-  try { document.addEventListener('pointerdown', () => { try { AudioManager.unlock(); } catch {} }, { once: true }); } catch {}
-  try { document.addEventListener('keydown', () => { try { AudioManager.unlock(); } catch {} }, { once: true }); } catch {}
-
-  /* =============================
-     VOICE INPUT (Web Speech API, no external libs)
-     Pipeline: Mic -> Speech-to-Text -> Clean -> Tokenize ->
-     Match AllowedWords -> Drop unknown -> Dedupe ->
-     Keep first-seen order -> Join with " و " -> Show -> Edit -> Submit
-     Golden rule: no word in site list = no word in output. Never guess.
-     ============================= */
-  function getAllowedWordsMap() {
-    const map = new Map();
-    const add = (display) => {
-      if (!display) return;
-      const t = String(display).trim();
-      if (!t) return;
-      const k = normalizeTerm(t);
-      if (!k) return;
-      if (!map.has(k)) map.set(k, t);
-    };
-    Object.keys(state.usageFreq || {}).sort((a, b) => (state.usageFreq[b] || 0) - (state.usageFreq[a] || 0)).forEach(k => add(findOriginalName(k) || k));
-    (state.orders || []).forEach(o => add(o.name));
-    Object.keys(CLASSIFIER_MAP).forEach(c => CLASSIFIER_MAP[c].forEach(add));
-    Object.keys(state.learnedMap || {}).forEach(k => add(findOriginalName(k) || k));
-    return map;
-  }
-  function cleanVoiceRaw(s) {
-    if (!s) return '';
-    return String(s)
-      .replace(/[ً-ٰٟ]/g, '')
-      .replace(/ـ/g, '')
-      .replace(/[.,،;؛:؟?؟!…‥¥"'"“”‘’´`«»()\[\]{}<>—–\-_/\\|@#$%^&*=+~]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-  function parseExistingVoiceItems(text) {
-    if (!text) return [];
-    const t = String(text).trim().replace(/(?:\s*(?:و|،|,)\s*)+$/g, '').trim();
-    if (!t) return [];
-    return t.split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').replace(/\s*و$/, '').trim()).filter(Boolean);
-  }
-  function extractAllowedItems(transcript, allowedMap) {
-    const cleaned = cleanVoiceRaw(transcript);
-    if (!cleaned || !allowedMap || !allowedMap.size) return [];
-    const tokens = cleaned.split(' ').filter(Boolean);
-    if (!tokens.length) return [];
-    let maxLen = 1;
-    allowedMap.forEach((_, k) => { const w = k.split(' ').length; if (w > maxLen) maxLen = w; });
-    maxLen = Math.min(maxLen, 5);
-    const out = []; const seen = new Set();
-    let i = 0;
-    while (i < tokens.length) {
-      let matched = null; let matchedLen = 0;
-      const top = Math.min(maxLen, tokens.length - i);
-      for (let len = top; len >= 1; len--) {
-        const phrase = tokens.slice(i, i + len).join(' ');
-        const k = normalizeTerm(phrase);
-        if (k && allowedMap.has(k) && !seen.has(k)) { matched = allowedMap.get(k); matchedLen = len; seen.add(k); break; }
-        if (k && allowedMap.has(k) && seen.has(k)) { matchedLen = len; matched = null; break; }
-      }
-      if (matched) out.push(matched);
-      i += (matchedLen || 1);
-    }
-    return out;
-  }
-  function processVoiceTranscript(rawTranscript, existingText, allowedMap) {
-    const map = allowedMap || getAllowedWordsMap();
-    const existingKeys = new Set(parseExistingVoiceItems(existingText).map(n => normalizeTerm(n)));
-    const items = extractAllowedItems(rawTranscript, map).filter(n => {
-      const k = normalizeTerm(n);
-      if (existingKeys.has(k)) return false;
-      existingKeys.add(k);
-      return true;
-    });
-    return { items, count: items.length, text: items.join(' و ') };
-  }
-  function buildVoiceFinalValue(baseText, newItems) {
-    if (!newItems || !newItems.length) return (baseText || '').trim().replace(/(?:\s*(?:و|،|,)\s*)+$/g, '').trim();
-    const joined = newItems.join(' و ');
-    const base = (baseText || '').trim();
-    if (!base) return joined;
-    const cleanBase = base.replace(/(?:\s*(?:و|،|,)\s*)+$/g, '').trim();
-    if (!cleanBase) return joined;
-    return cleanBase + ' و ' + joined;
-  }
-  const Voice = {
-    rec: null, on: false, _manual: false, lang: 'ar-EG',
-    supported() { return !!(window.SpeechRecognition || window.webkitSpeechRecognition); },
-    toggle(input, ui) {
-      if (this.on) { this.stop(); return; }
-      if (!this.supported()) { toast('المتصفح مش بيدعم الإدخال الصوتي — جرب متصفح كروم', 'error'); return; }
-      if (!document.contains(input)) return;
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const rec = new SR();
-      rec.lang = this.lang; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
-      let base = input.value ? input.value.replace(/\s+$/, '') : '';
-      let finalTxt = '';
-      const commit = (announce) => {
-        const r = processVoiceTranscript(finalTxt, base, getAllowedWordsMap());
-        input.value = buildVoiceFinalValue(base, r.items);
-        if (ui && ui.onText) ui.onText();
-        if (announce) {
-          if (r.count > 0) {
-            toast('تم التعرف على ' + r.count + ' كلمات', 'success');
-            if (ui && ui.onCommit) ui.onCommit(r.count, r.items, finalTxt);
-          } else if ((finalTxt || '').trim()) {
-            toast('لم يتم التعرف على كلمات موجودة في قائمة الموقع', 'warning');
-            if (ui && ui.onCommit) ui.onCommit(0, []);
-          }
-        }
-        return r;
-      };
-      rec.onresult = (ev) => {
-        let interim = '';
-        for (let i = ev.resultIndex; i < ev.results.length; i++) {
-          const t = ev.results[i][0].transcript;
-          if (ev.results[i].isFinal) finalTxt += t + ' ';
-          else interim += t;
-        }
-        const r = processVoiceTranscript(finalTxt, base, getAllowedWordsMap());
-        const preview = buildVoiceFinalValue(base, r.items);
-        input.value = interim.trim() ? (preview ? preview + ' ' + interim.trim() : interim.trim()) : preview;
-        if (ui && ui.onText) ui.onText();
-      };
-      rec.onerror = (ev) => {
-        const type = (ev && ev.error) || '';
-        this.on = false; this._manual = false;
-        if (type !== 'aborted') commit(false);
-        if (ui && ui.onState) ui.onState(false);
-        const msgs = {
-          'not-allowed': 'تعذر الوصول إلى الميكروفون. اسمح باستخدامه من إعدادات المتصفح.',
-          'service-not-allowed': 'تعذر الوصول إلى الميكروفون. اسمح باستخدامه من إعدادات المتصفح.',
-          'no-speech': 'مسمعتش صوت واضح — قرب من الميك وجرب تاني.',
-          'audio-capture': 'مفيش ميكروفون متاح على الجهاز.',
-          'network': 'التعرف الصوتي محتاج اتصال بالإنترنت.',
-          'language-not-supported': 'اللغة دي مش مدعومة على جهازك.'
-        };
-        if (type && type !== 'aborted') toast(msgs[type] || 'حصلت مشكلة في التعرف الصوتي، جرب تاني.', 'error');
-      };
-      rec.onend = () => {
-        const manual = this._manual; this._manual = false;
-        const r = commit(manual);
-        if (manual || !this.on || !document.contains(input)) { this.on = false; if (ui && ui.onState) ui.onState(false, r); return; }
-        base = input.value; finalTxt = '';
-        try { rec.start(); } catch { this.on = false; if (ui && ui.onState) ui.onState(false); }
-      };
-      this.rec = rec; this.on = true;
-      try { rec.start(); if (ui && ui.onState) ui.onState(true); }
-      catch { this.on = false; if (ui && ui.onState) ui.onState(false); toast('مقدرتش أشغّل الميكروفون، جرب تاني.', 'error'); }
-    },
-    stop() {
-      if (!this.on) return;
-      this._manual = true;
-      try { if (this.rec) this.rec.stop(); } catch { this.on = false; }
-    }
-  };
-  function stopVoice() { try { Voice.stop(); } catch {} }
-
-  /* =============================
-     LOCAL NOTIFICATIONS (تذكيرات كوميدية)
+     LOCAL NOTIFICATIONS (تذكيرات)
      ============================= */
   const NOTIF_ORDERS = [
-    'عندك {n} طلبات معلقة... البطل نايم ولا إيه؟ 😂',
-    'القايمة مستنياك يا معلم! {n} طلبات 🛒😂',
-    'الطلبات بتنادي عليك... رد عليها 😄📢',
-    '{n} طلبات لسه متجابوش... همتك يا بطل 💪😂'
+    'عندك {n} طلبات معلقة',
+    'القايمة مستنياك! {n} طلبات 🛒',
+    'الطلبات في انتظارك 📢',
+    '{n} طلبات لسه متجابوش'
   ];
   const NOTIF_EXP = [
-    'سجلت مصاريف النهارده؟ المحفظة عايزة تعترف 😂💸',
-    'قبل ما تنام... المصاريف اتسجلت ولا لسه؟ 😄📝',
-    'دقيقة واحدة وسجل مصاريفك... عشان التقرير ميزعلش 😂'
+    'سجلت مصاريف النهارده؟ 💸',
+    'قبل ما تنام... المصاريف اتسجلت ولا لسه؟ 📝',
+    'دقيقة واحدة وسجل مصاريفك'
   ];
   function notifStore() { try { return JSON.parse(localStorage.getItem('naqisna_notif') || '{}'); } catch { return {}; } }
   function notifSave(o) { try { localStorage.setItem('naqisna_notif', JSON.stringify(o)); } catch {} }
@@ -4539,15 +3750,6 @@
   function notifTimePassed(hhmm) { try { const p = String(hhmm || '00:00').split(':'); const h = Number(p[0]) || 0, m = Number(p[1]) || 0; const n = new Date(); return (n.getHours() * 60 + n.getMinutes()) >= (h * 60 + m); } catch { return false; } }
   function notifTick() {
     try {
-      if (db && state.home?.code) {
-        if (!sbUid) {
-          ensureSbSession().then(u => { if (u) { ensureMembership().then(() => attachCloud()); } }).catch(() => {});
-        } else {
-          ensureMembership().catch(() => {});
-        }
-      }
-    } catch {}
-    try {
       if (!state || !state.initialized) return;
       if (state._notifOn !== true) return;
       const st = notifStore(); const now = Date.now(); const tk = notifDayKey();
@@ -4567,7 +3769,7 @@
         st.dailyDay = tk; notifSave(st);
         const list = (state.expenses || []).filter(e => { try { return new Date(e.createdAt).toDateString() === new Date().toDateString() && (e.kind || 'expense') === 'expense'; } catch { return false; } });
         const t = list.reduce((a, e) => a + (Number(e.amount) || 0), 0);
-        notifFire('daily', '📊 التقرير اليومي', t > 0 ? `تقرير اليوم 😎: صرفت ${formatCurrency(t)} ج.م في ${list.length} عمليات... ربنا يعوض عليك 😂❤️` : 'تقرير اليوم: مصرفتش حاجة! معجزة تستحق الاحتفال 🎉😂');
+        notifFire('daily', '📊 التقرير اليومي', t > 0 ? `تقرير اليوم: صرفت ${formatCurrency(t)} ج.م في ${list.length} عمليات` : 'تقرير اليوم: مصرفتش حاجة');
       }
     } catch {}
   }
@@ -4647,12 +3849,12 @@
       toast('🧺 اتضاف "' + nm + '" للسلة ✓', 'success');
     };
   }
-  function openAddOrderModal() { MemeSound.playEvent('OPEN'); openOrderModal({ mode: 'add' }); }
+  function openAddOrderModal() { openOrderModal({ mode: 'add' }); }
   function openEditOrderModal(id) { const o = state.orders.find(x => x.id === id); if (o) openOrderModal({ mode: 'edit', order: o }); }
   function openOrderModal({ mode, order }) {
     const editing = mode === 'edit';
     const html = `<div class="modal-handle"></div>
-      <div class="m-hero"><span class="m-hero-ico">${svgIcon(editing ? 'pencil' : 'plus', 26)}</span><div class="m-hero-txt"><h2>${editing ? 'تعديل الطلب' : 'زوّد طلب'}</h2><p>${editing ? 'عدّل اسم الطلب وبياناته' : pickMsg(MSG.wifeGreeting)}</p></div></div>
+      <div class="m-hero"><span class="m-hero-ico">${svgIcon(editing ? 'pencil' : 'plus', 26)}</span><div class="m-hero-txt"><h2>${editing ? 'تعديل الطلب' : 'زوّد طلب'}</h2><p>${editing ? 'عدّل اسم الطلب وبياناته' : 'اكتب اسم الصنف وحدد الكمية'}</p></div></div>
       ${editing ? `<div class="field"><label>اسم الطلب *</label>
         <div class="ord-box"><textarea id="ordName" rows="2" placeholder="اكتب اسم الطلب" maxlength="200" autocomplete="off">${escapeHTML(order.name)}</textarea>
         <div class="suggest-drop hidden" id="ordSuggest"></div></div>
@@ -4662,7 +3864,6 @@
       <div class="field"><label>بحث في الأصناف</label>
         <div class="pick-search-row">
           <input type="text" id="pickSearch" class="pick-search" placeholder="دور على الصنف..." autocomplete="off" maxlength="40" />
-          <button class="mic-btn" id="ordVoice" aria-label="بحث صوتي" title="بحث صوتي">${svgIcon('mic', 20)}</button>
         </div>
       </div>
       <div class="field">
@@ -4804,40 +4005,11 @@
       if (qtyType === 'count' && !(qtyVal >= 1)) qtyVal = 1;
       renderQty();
     });
-    Voice.lang = 'ar-EG';
-    const vBtn = m.querySelector('#voiceBtn'); const vStatus = m.querySelector('#voiceStatus');
-    const voiceUI = () => ({
-      onText: () => {
-        if (editing) { qtyFor = null; updateSuggest(); renderQty(); return; }
-        const items = parseItems();
-        if (items.length) selectItem(items[0]);
-        else { qtyFor = null; renderQty(); }
-      },
-      onState: setVoiceUI,
-      onCommit: (count) => {
-        if (vStatus && count > 0) vStatus.textContent = 'تم التعرف على ' + count + ' كلمات';
-        if (editing) { qtyFor = null; updateSuggest(); renderQty(); return; }
-        const items = parseItems();
-        if (items.length) selectItem(items[0]);
-        else { qtyFor = null; renderQty(); }
-      }
-    });
-    const setVoiceUI = (on, info) => {
-      if (!vBtn) return;
-      vBtn.classList.toggle('recording', on);
-      vBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-      if (vStatus) {
-        if (on) vStatus.innerHTML = '<span class="live-dot"></span> 🎙️ جارٍ الاستماع...';
-        else if (info && info.count > 0) vStatus.textContent = 'تم التعرف على ' + info.count + ' كلمات';
-        else vStatus.textContent = 'اضغط الميك وتكلم';
-      }
-    };
-    if (vBtn) vBtn.onclick = () => Voice.toggle(nameInput, voiceUI());
     let pickedList = [], pickDept = null, newItemCat = null, pickedCat = null, pickedName = null;
     function syncPickedCompat() { pickedName = pickedList.length ? pickedList[0] : null; try { nameInput.value = pickedList.join('\n'); } catch {} pickedCat = pickedName ? classifyOrder(pickedName).categoryId : null; }
     function renderPick() {
       const box = m.querySelector('#pickBox'); if (!box) return;
-      if (!pickedList.length) { box.innerHTML = `<div class="help-text">اختار صنف من القائمة أو البحث أو الصوت — كل اختيار يتضاف فوق</div>`; return; }
+      if (!pickedList.length) { box.innerHTML = `<div class="help-text">اختار صنف من القائمة أو البحث — كل اختيار يتضاف فوق</div>`; return; }
       box.innerHTML = pickedList.map(nm => {
         const cid = classifyOrder(nm).categoryId; const cc = catColor(cid);
         return `<div class="rv-row"><span class="sug-ico" style="background:${cc}18;width:30px;height:30px;font-size:17px;">${productIcon(nm, cid)}</span><span class="rv-name">${escapeHTML(nm)}</span><button class="btn btn-sm" data-unpick="${escapeHTML(nm)}">✕</button></div>`;
@@ -4886,67 +4058,6 @@
       else selectItem(name);
     }
     let needCatFor = null;
-    let voiceUnknownQueue = [];
-    let voiceLiveSeen = new Set();
-    /* إدراج لحظي أثناء التسجيل: أي اسم يطابق نتائج البحث يُضاف فوق فورًا */
-    function voiceLiveAdd() {
-      const ps = m.querySelector('#pickSearch'); if (!ps) return;
-      let changed = false;
-      splitVoicePhrases(ps.value || '').forEach(ph => {
-        const k = normalizeTerm(ph);
-        if (!k || voiceLiveSeen.has(k)) return;
-        voiceLiveSeen.add(k);
-        if (pickedList.some(x => normalizeTerm(x) === k)) return;
-        const clean = stripVoiceFillers(ph) || ph;
-        const ck = normalizeTerm(clean);
-        if (!ck || pickedList.some(x => normalizeTerm(x) === ck)) return;
-        if (foundInCatalog(clean)) { pickedList.push(clean.trim()); changed = true; }
-      });
-      if (changed) { syncPickedCompat(); renderPick(); renderPickList(); evalCategoryFromName(); }
-    }
-    const VOICE_FILLERS = new Set(['لو','سمحت','من','فضلك','عايز','عايزه','عاوز','عاوزه','هات','هاتي','ضيف','ضيفي','اضف','محتاج','محتاجه','محتاجين','ناقص','ناقصنا','ايه','كمان','شويه','عندنا','دي','ده','اللي','عشان','كده','اذنك','في','علي','يا','اه','جب','خد','بقي','يعني','ممكن','عاوزين']);
-    function splitVoicePhrases(raw) {
-      return cleanVoiceRaw(raw).split(/\n+/).flatMap(line => line.split(/،|,| و /)).map(s => s.replace(/^و\s*/, '').trim()).filter(Boolean);
-    }
-    function stripVoiceFillers(phrase) {
-      return String(phrase || '').split(' ').filter(t => t && !VOICE_FILLERS.has(normalizeTerm(t))).join(' ').trim();
-    }
-    function handleVoiceCommit(items, raw) {
-      const ps = m.querySelector('#pickSearch');
-      const seen = new Set(pickedList.map(x => normalizeTerm(x)));
-      const matchedNorms = new Set((items || []).map(n => normalizeTerm(n)).filter(Boolean));
-      const isCovered = (k) => [...matchedNorms].some(mk => mk && (k.includes(mk) || mk.includes(k)));
-      let added = 0;
-      (items || []).forEach(nm => {
-        const t = String(nm || '').trim(); const k = normalizeTerm(t);
-        if (k && !seen.has(k)) { seen.add(k); pickedList.push(t); added++; }
-      });
-      const unknown = [];
-      splitVoicePhrases(raw || '').forEach(ph => {
-        const k = normalizeTerm(ph);
-        if (!k || seen.has(k) || isCovered(k)) return;
-        const clean = stripVoiceFillers(ph);
-        const ck = normalizeTerm(clean);
-        if (!ck || seen.has(ck) || isCovered(ck)) return;
-        if (foundInCatalog(clean)) { seen.add(ck); pickedList.push(clean); added++; }
-        else unknown.push(clean);
-      });
-      if (ps) ps.value = '';
-      voiceUnknownQueue = unknown.filter(u => u && !seen.has(normalizeTerm(u)));
-      syncPickedCompat(); qtyFor = null;
-      try { renderQty(); } catch {}
-      renderPick(); renderPickList(); evalCategoryFromName();
-      if (added) toast(added === 1 ? '🎙️ اتضاف الصنف فوق ✓' : `🎙️ اتضاف ${added} أصناف فوق ✓`, 'success');
-      if (voiceUnknownQueue.length) {
-        const w = voiceUnknownQueue.shift();
-        needCatFor = w; newItemCat = null;
-        if (ps) ps.value = w;
-        renderPickList();
-        toast(`"${w}" مش موجود — اختار تصنيفه عشان نحفظه عندك ✓`, 'info');
-      } else if (!added) {
-        toast('مسمعتش صنف واضح — قرب من الميك وجرب تاني 🎙️', 'warning');
-      }
-    }
     function foundInCatalog(nm) {
       const k = normalizeTerm(nm); if (!k) return false;
       const cats = getCatalog();
@@ -4990,13 +4101,6 @@
         syncPickedCompat(); qtyFor = null;
         renderPick(); renderPickDepts(); renderPickList();
         toast('اتحفظ الصنف واتضاف فوق ✓', 'success');
-        if (voiceUnknownQueue.length) {
-          const w2 = voiceUnknownQueue.shift();
-          needCatFor = w2; newItemCat = null;
-          const ps2 = m.querySelector('#pickSearch'); if (ps2) ps2.value = w2;
-          renderPickList();
-          toast(`"${w2}" — اختار تصنيفه كمان عشان نحفظه ✓`, 'info');
-        }
       };
     }
     function renderPickList() {
@@ -5057,21 +4161,6 @@
     m.querySelector('#cancelOrderBtn').onclick = () => closeModal(m);
 
 
-    const ordVoice = m.querySelector('#ordVoice');
-    if (ordVoice) ordVoice.onclick = () => {
-      const ps = m.querySelector('#pickSearch');
-      const target = ps || nameInput;
-      Voice.lang = 'ar-EG';
-      voiceLiveSeen = new Set();
-      Voice.toggle(target, {
-        onText: () => { if (ps) { voiceLiveAdd(); renderPickList(); } else voiceUI().onText(); },
-        onState: (on) => { ordVoice.classList.toggle('recording', !!on); try { setVoiceUI(on); } catch {} },
-        onCommit: (count, items, raw) => {
-          if (!editing && ps) { handleVoiceCommit(items || [], raw || ''); voiceLiveSeen = new Set(); }
-          else { if (ps) renderPickList(); try { voiceUI().onCommit(count); } catch {} }
-        }
-      });
-    };
     m.querySelector('#submitOrderBtn').onclick = () => {
       const notes = (m.querySelector('#ordNotes') || {}).value || '';
       const selList = m.querySelector('#ordListSel');
@@ -5082,7 +4171,7 @@
           const psv = ((m.querySelector('#pickSearch') || {}).value || '').trim();
           if (psv) items = [psv];
         }
-        if (!items.length) { toast('اختار صنف من القائمة أو البحث أو الصوت', 'warning'); return; }
+        if (!items.length) { toast('اختار صنف من القائمة أو البحث', 'warning'); return; }
         if (items.length === 1 && !foundInCatalog(items[0]) && !pendingOrderExists(items[0], lid2)) {
           needCatFor = items[0]; newItemCat = null;
           renderPickList();
@@ -5137,17 +4226,16 @@
       if (!(finalV > 0)) { fin.classList.add('error'); fin.focus(); toast('اكتب السعر يا حبيبي', 'warning'); return; }
       const boughtName = o.name;
       markPurchased(orderId, { originalPrice: finalV, finalPrice: finalV });
-      try { MemeSound.playEvent('TASK_COMPLETED', { force: true }); } catch {}
       closeModal(m); render();
       const left = (state.orders || []).filter(x => x.status !== 'purchased').length;
       if (!left) {
         const mm = openModal(`
-          <div class="party-hero"><span class="big">🏆🎉</span><h2>خلصنا التسوق يا أبطال!</h2><p>😂 ${boughtFunMsg()}</p><p style="margin-top:4px;">كل الطلبات اتشترت بنجاح... البيت مبسوط ❤️</p></div>
+          <div class="party-hero"><span class="big">🏆🎉</span><h2>خلصنا التسوق يا أبطال!</h2><p style="margin-top:4px;">كل الطلبات اتشترت بنجاح... البيت مبسوط ❤️</p></div>
           <div class="confetti-row"><span>🎉</span><span>🏆</span><span>🛒</span><span>😂</span><span>❤️</span></div>
           <div class="btn-group"><button class="btn btn-success" id="partyOk">أحلى عيلة 🎉❤️</button></div>`);
         mm.querySelector('#partyOk').onclick = () => closeModal(mm);
       } else {
-        toast(`"${boughtName}" اتشترى ✓ 😂 ${boughtFunMsg()}`, 'success');
+        toast(`"${boughtName}" اتشترى ✓`, 'success');
       }
     };
   }
@@ -5330,6 +4418,7 @@
           <div class="finm-field" style="--fin-accent:${FINANCE[finKind].color};"><label><i style="background:#FEF3C7;">✏️</i>ملاحظات</label><textarea id="expNotes" rows="1" placeholder="تفاصيل اختيارية...">${escapeHTML(e.notes || '')}</textarea></div>
         </div>
       </div>
+      <button class="tgl-row" id="expShareTgl"><span class="tgl"><b>${(e.shared === undefined ? shareExpensesOn() : e.shared === true) ? '☁️ مشترك مع البيت' : '🔒 خاص على جهازي'}</b><small>دوس للمشاركة أو الخصوصية</small></span><span class="sw ${(e.shared === undefined ? shareExpensesOn() : e.shared === true) ? 'on' : ''}"></span></button>
       <div class="btn-group"><button class="btn btn-primary finm-save-${finKind}" id="saveExpBtn">💾 حفظ التعديل</button><button class="btn btn-danger" id="delExpBtn">🗑️ حذف الحركة</button><button class="btn" id="cancelExpBtn">رجوع</button></div>`;
     const m = openModal(html);
     let openGid = null;
@@ -5396,6 +4485,20 @@
     paintKind(); renderFinCats(); setCatsOpen(false);
     const ct0 = m.querySelector('#catsToggle'); if (ct0) ct0.onclick = () => setCatsOpen(!catsOpen);
     m.querySelector('#cancelExpBtn').onclick = () => closeModal(m);
+    const esTgl = m.querySelector('#expShareTgl');
+    if (esTgl) esTgl.onclick = async () => {
+      const cur = (e.shared === undefined) ? shareExpensesOn() : (e.shared === true);
+      e.shared = !cur;
+      persist(); render();
+      const sw = esTgl.querySelector('.sw'); if (sw) sw.classList.toggle('on', e.shared === true);
+      const b = esTgl.querySelector('b'); if (b) b.textContent = e.shared === true ? '☁️ مشترك' : '🔒 خاص على جهازي';
+      try {
+        if (e.shared === true && state.home?.code && window.NaqisnaSupabase?.isConfigured()) {
+          await window.NaqisnaSupabase.upsertExpense(state.home.code, e);
+          toast('اتشارك مع البيت ☁️✓', 'success');
+        } else toast(e.shared === true ? 'مشترك ☁️' : 'بقى خاص 🔒', 'success');
+      } catch {}
+    };
     m.querySelector('#delExpBtn').onclick = () => {
       confirmDialog({ title: 'حذف الحركة؟', message: `"${e.title}" هتتحذف نهائياً.`, confirmText: 'حذف', cancelText: 'لا', danger: true }).then(ok => {
         if (!ok) return;
@@ -5414,15 +4517,27 @@
   function openOrderExpenseActions(expId) {
     const e = state.expenses.find(x => x.id === expId); if (!e) return;
     const o = e.sourceId ? state.orders.find(x => x.id === e.sourceId) : null;
+    const eShared = (e.shared === undefined ? shareExpensesOn() : e.shared === true);
     const m = openModal(`<div class="modal-handle"></div>
       <h2>مصروف "${escapeHTML(e.title)}"</h2>
       <p class="m-sub">🛒 جاي من طلب مشترى • ${formatCurrency(e.amount)} ج.م</p>
+      <button class="tgl-row" id="oaShareTgl"><span class="tgl"><b>${eShared ? '☁️ مشترك مع البيت' : '🔒 خاص على جهازي'}</b><small>دوس للمشاركة أو الخصوصية</small></span><span class="sw ${eShared ? 'on' : ''}"></span></button>
       <div class="btn-group">
         <button class="btn btn-danger" id="oaDelExp">🗑️ حذف المصروف فقط${o ? ' (والطلب يرجع معلق)' : ''}</button>
         ${o ? '<button class="btn btn-danger" id="oaDelBoth">❌ حذف الطلب والمصروف معًا</button>' : ''}
         <button class="btn" id="oaCancel">رجوع</button>
       </div>`);
     m.querySelector('#oaCancel').onclick = () => closeModal(m);
+    const oaTgl = m.querySelector('#oaShareTgl');
+    if (oaTgl) oaTgl.onclick = async () => {
+      const cur = (e.shared === undefined ? shareExpensesOn() : e.shared === true);
+      e.shared = !cur;
+      persist(); render();
+      const sw = oaTgl.querySelector('.sw'); if (sw) sw.classList.toggle('on', e.shared === true);
+      const b = oaTgl.querySelector('b'); if (b) b.textContent = e.shared === true ? '☁️ مشترك مع البيت' : '🔒 خاص على جهازي';
+      try { if (e.shared === true && state.home?.code && window.NaqisnaSupabase?.isConfigured()) await window.NaqisnaSupabase.upsertExpense(state.home.code, e); } catch {}
+      toast(e.shared === true ? 'اتشارك مع البيت ☁️✓' : 'بقى خاص 🔒', 'success');
+    };
     m.querySelector('#oaDelExp').onclick = () => {
       confirmDialog({ title: 'حذف المصروف؟', message: `"${e.title}" هيتمسح من المصروفات${o ? ' والطلب هيرجع معلق' : ''}.`, confirmText: 'حذف', cancelText: 'لا', danger: true }).then(ok => {
         if (!ok) return;
@@ -5439,56 +4554,11 @@
   }
 
   /* =============================
-     COUPLE ENGINE: role + whatsapp + classified comedy + ads + auto-WhatsApp
-     - husband sees: husband + couple | wife sees: wife + couple
-     - shared keys with admin.html: naqisna_comedy_messages / naqisna_audio_items / naqisna_ads / naqisna_users_list / naqisna_activities_log
+     COUPLE ENGINE: role + whatsapp + ads + auto-WhatsApp
+     - shared keys with admin.html: naqisna_ads / naqisna_users_list / naqisna_activities_log
      ============================= */
-  const COUPLE_SEED = [
-    { id: 'h_1', text: 'يا بطل المعارك.. متنساش تجيب الفكة معاك ومتقولش نسيتها! 😂', target: 'husband', audio_id: 'funny_01', is_active: true, usage_count: 0 },
-    { id: 'h_2', text: 'أنت دخلت عش الدبابير برغبتك، انزل هات الطلبات وافتكر: الزوج المطيع يعيش في ربيع! 🛒🏃‍♂️', target: 'husband', audio_id: 'funny_02', is_active: true, usage_count: 0 },
-    { id: 'h_3', text: 'ربنا يقويك على المشوار.. لو لقيت الطماطم غالية متفكرش ترجع بإيدك فاضية! 🍅😅', target: 'husband', audio_id: 'urgent_01', is_active: true, usage_count: 0 },
-    { id: 'h_4', text: 'رسالة من وراء الكواليس: هات الحاجات صح وإلا الغدا بكرة مكرونة بيضا مسلوقة! 🍝😆', target: 'husband', audio_id: 'failure_01', is_active: true, usage_count: 0 },
-    { id: 'h_5', text: 'يا رب تلاقي كل الأصناف من أول محل ومنقعدش نلف المحافظة! 🚗💨', target: 'husband', audio_id: 'surprise_01', is_active: true, usage_count: 0 },
-    { id: 'h_6', text: 'تذكر دائماً: ورقة الطلبات أطول من ليلة الشتاء.. استعن بالله وانزل! 📜💪', target: 'husband', audio_id: 'success_01', is_active: true, usage_count: 0 },
-    { id: 'w_1', text: 'تسلم إيدك يا ست الكل.. ربنا يعينه ويجيب القائمة كلها من غير ما يكلمك يسأل 50 مرة! 📞😂', target: 'wife', audio_id: 'funny_03', is_active: true, usage_count: 0 },
-    { id: 'w_2', text: 'الطلبات اتسجلت بنجاح.. جهزي بقى للإجابة على سؤال: هو البقدونس لونه إيه وشكله إيه؟ 🌿🤣', target: 'wife', audio_id: 'funny_04', is_active: true, usage_count: 0 },
-    { id: 'w_3', text: 'قائمة محترمة! يا رب يفتكر العيش السخن وينسى يرن يسألك الجبنة في أنهي رف 🧀🤭', target: 'wife', audio_id: 'surprise_02', is_active: true, usage_count: 0 },
-    { id: 'w_4', text: 'رسالة سيستم: لو جاب نص الطلبات صح اعتبريه إنجاز تاريخي وكافئيه! 🏆👏', target: 'wife', audio_id: 'success_02', is_active: true, usage_count: 0 },
-    { id: 'w_5', text: 'تم حفظ الطلبات.. اجهزي عشان هيجيب الملوخية ناشفة بدل خضرا وهيقولك هي دي بالظبط! 🥬😂', target: 'wife', audio_id: 'funny_05', is_active: true, usage_count: 0 },
-    { id: 'c_1', text: 'طلب البيت تم بحمد الله.. نتمنى تنتهي الرحلة بسلام وبدون مكالمات طوارئ في السوبرماركت! 🛒❤️', target: 'couple', audio_id: 'success_03', is_active: true, usage_count: 0 },
-    { id: 'c_2', text: 'البيت اللي فيه طلبات كتير.. فيه خير كتير وفيه زوج بيلف حولين نفسه! 🏠😄', target: 'couple', audio_id: 'funny_06', is_active: true, usage_count: 0 },
-    { id: 'c_3', text: 'التسوق الزوجي السعيد: قائمة واضحة، فلوس جاهزة، ونفس راضية! 🤝✨', target: 'couple', audio_id: 'new_message_01', is_active: true, usage_count: 0 },
-    { id: 'c_4', text: 'تم الانتهاء من كتابة الطلبات! المحفظة تبكي الآن في صمت ولكن الحب ينتصر! 💸❤️', target: 'couple', audio_id: 'failure_02', is_active: true, usage_count: 0 }
-  ];
   function lsGet(k, fb) { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : fb; } catch { return fb; } }
   function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-  function getComedyPool() {
-    let arr = lsGet('naqisna_comedy_messages', null);
-    if (!arr || !arr.length) { arr = COUPLE_SEED.slice(); lsSet('naqisna_comedy_messages', arr); }
-    return arr.filter(m => m && m.is_active !== false && m.text);
-  }
-  function comedyForRole(role) {
-    const pool = getComedyPool();
-    // strict classification: husband -> husband+couple | wife -> wife+couple | unknown -> couple only
-    const mine = pool.filter(m => role === 'husband' ? (m.target === 'husband' || m.target === 'couple') : role === 'wife' ? (m.target === 'wife' || m.target === 'couple') : (m.target === 'couple'));
-    return mine.length ? mine : pool.filter(m => m.target === 'couple');
-  }
-  function pickComedy(role) {
-    const pool = comedyForRole(role);
-    if (!pool.length) return null;
-    const lastId = lsGet('naqisna_last_joke', {}).__last || '';
-    let pick = pool[Math.floor(Math.random() * pool.length)];
-    if (pool.length > 1 && pick.id === lastId) pick = pool[(pool.findIndex(x => x.id === pick.id) + 1) % pool.length];
-    return pick;
-  }
-  function bumpJokeUsage(id) {
-    try {
-      const arr = lsGet('naqisna_comedy_messages', []);
-      const m = arr.find(x => x.id === id);
-      if (m) { m.usage_count = (m.usage_count || 0) + 1; lsSet('naqisna_comedy_messages', arr); }
-      if (db && m) { try { const { doc, setDoc } = window._fbModules || {}; if (doc && setDoc) setDoc(doc(db, 'comedy_messages', id), m, { merge: true }).catch(() => {}); } catch {} }
-    } catch {}
-  }
   function logActivity(entry) {
     try {
       const arr = lsGet('naqisna_activities_log', []);
@@ -5512,7 +4582,6 @@
       else list.push(rec);
       lsSet('naqisna_users_list', list);
       lsSet('naqisna_user', { id: rec.id, name: rec.name, role: rec.role, whatsapp: rec.whatsapp, joinedAt: rec.joinedAt });
-      if (db) { try { const { doc, setDoc } = window._fbModules || {}; if (doc && setDoc) setDoc(doc(db, 'users', rec.id), rec, { merge: true }).catch(() => {}); } catch {} }
     } catch {}
   }
   function getActiveAds() {
@@ -5527,54 +4596,173 @@
     return `<div class="ad-banner">${inner}${cap}</div>`;
   }
   function adsByPosition(pos) { return getActiveAds().filter(a => (a.position || 'top') === pos).map(adBannerHTML).join(''); }
-  function buildOrderWaText(joke) {
+  function buildOrderWaText() {
     const pend = (state.orders || []).filter(o => o.status === 'pending');
     const lines = pend.slice(0, 30).map((o, i) => `${i + 1}. ${o.name}${o.qty?.v ? ` (${o.qty.v} ${o.qty.u || ''})` : ''}`);
     const who = state.user?.role === 'wife' ? 'الزوجة 👩' : 'الزوج 👨';
-    return `🛒 *قائمة طلبات البيت (${state.home?.name || 'بيتنا'})*\n👤 بواسطة: ${state.user?.name || ''} (${who})\n━━━━━━━━━━\n${lines.length ? lines.join('\n') : 'لا توجد طلبات معلقة'}\n━━━━━━━━━━\n😂 ${joke?.text || ''}\n\nتم الإرسال من تطبيق ناقصنا إيه 🏠`;
+    return `🛒 *قائمة طلبات البيت (${state.home?.name || 'بيتنا'})*\n👤 بواسطة: ${state.user?.name || ''} (${who})\n━━━━━━━━━━\n${lines.length ? lines.join('\n') : 'لا توجد طلبات معلقة'}\n━━━━━━━━━━\n\nتم الإرسال من تطبيق ناقصنا إيه 🏠`;
   }
   function openFinishOrdersFlow() {
     const pend = (state.orders || []).filter(o => o.status === 'pending');
-    if (!pend.length) { toast('مفيش طلبات معلقة عشان ننهيها 😄', 'warning'); return; }
+    if (!pend.length) { toast('مفيش طلبات معلقة عشان ننهيها', 'warning'); return; }
     const role = state.user?.role || 'husband';
-    const joke = pickComedy(role);
-    if (joke) {
-      try { bumpJokeUsage(joke.id); } catch {}
-      try { logActivity({ user: (state.user?.name || '') + (role === 'wife' ? ' (الزوجة)' : ' (الزوج)'), type: 'order_complete', text: 'أنهى كتابة قائمة الطلبات 🛒' }); } catch {}
-      try { logActivity({ user: 'النظام', type: 'joke_served', text: 'عرض نكتة: ' + String(joke.text).slice(0, 40) + '... 😂' }); } catch {}
-      // play linked funny sound
-      try {
-        if (joke.audio_id) {
-          const lib = lsGet('naqisna_audio_items', []);
-          const au = lib.find(a => a.id === joke.audio_id);
-          if (au?.file) { const x = new Audio(); x.src = au.file; x.play().catch(() => {}); }
-          else MemeSound.playEvent('TASK_COMPLETED', { force: true });
-        } else MemeSound.playEvent('TASK_COMPLETED', { force: true });
-      } catch {}
-      try { syncUserToAdminDir(); } catch {}
-    }
-    const badge = !joke ? '' : joke.target === 'husband' ? '<span class="joke-badge husband">👨 رسالة للزوج فقط</span>' : joke.target === 'wife' ? '<span class="joke-badge wife">👩 رسالة للزوجة فقط</span>' : '<span class="joke-badge couple">💑 رسالة النظام للزوجين</span>';
+    try { logActivity({ user: (state.user?.name || '') + (role === 'wife' ? ' (الزوجة)' : ' (الزوج)'), type: 'order_complete', text: 'أنهى كتابة قائمة الطلبات 🛒' }); } catch {}
+    try { syncUserToAdminDir(); } catch {}
     const waNum = normalizeEgyptPhone(state.user?.whatsapp || '');
     const waIntl = waNum.startsWith('01') ? '2' + waNum : waNum;
-    const waUrl = `https://wa.me/${waIntl}?text=${encodeURIComponent(buildOrderWaText(joke))}`;
+    const waUrl = `https://wa.me/${waIntl}?text=${encodeURIComponent(buildOrderWaText())}`;
     const m = openModal(`
       <div class="modal-handle"></div>
       <div class="m-hero"><span class="m-hero-ico">📱</span><div class="m-hero-txt"><h2>القائمة جاهزة للإرسال</h2><p>${pend.length} طلبات • ابعتها واتساب في ضغطة واحدة</p></div></div>
-      <div class="joke-modal-card">
-        ${badge}
-        <div class="joke-text-box">${escapeHTML(joke?.text || 'القائمة جاهزة... ربنا يقوي قلبه 😂❤️')}</div>
-        <div class="help-text" style="margin-bottom:12px;">🔊 اشتغل صوت مضحك تلقائياً • الرسالة دي مخصصة لـ ${role === 'wife' ? 'الزوجة 👩' : 'الزوج 👨'} حسب اختيارك أول مرة</div>
-      </div>
       <div class="btn-group">
         <a class="btn btn-success" id="sendWaAuto" href="${waUrl}" target="_blank" rel="noopener">📱 إرسال فقط</a>
-        <button class="btn" id="jokeAgain">🎭 نكتة تانية على مقاسك</button>
-        <button class="btn btn-primary" id="jokeClose">تمام، قفل 😄</button>
+        <button class="btn btn-primary" id="finishClose">تمام، قفل</button>
       </div>`);
-    m.querySelector('#jokeClose').onclick = () => closeModal(m);
+    m.querySelector('#finishClose').onclick = () => closeModal(m);
     m.querySelector('#sendWaAuto').onclick = () => { toast('اتفتح واتساب بالرسالة التلقائية 📱', 'success'); };
-    m.querySelector('#jokeAgain').onclick = () => { closeModal(m); setTimeout(openFinishOrdersFlow, 150); };
   }
-  window.openFinishOrdersFlow = openFinishOrdersFlow;
+  function normRemoteOrder(ro) {
+    if (!ro) return null;
+    if (ro.categoryId !== undefined || ro.listId !== undefined || (ro.name && ro.list_id === undefined)) {
+      if (!ro.id || !ro.name) return null;
+      return ro;
+    }
+    if (!ro.id || !ro.name) return null;
+    return {
+      id: ro.id,
+      listId: ro.list_id || 'main',
+      name: ro.name,
+      qty: ro.qty,
+      unit: ro.unit,
+      categoryId: ro.category_id,
+      priority: ro.priority,
+      status: ro.status,
+      purchased: ro.status === 'purchased',
+      purchasedBy: ro.purchased_by,
+      purchasedAt: ro.purchased_at,
+      price: ro.price,
+      notes: ro.notes,
+      createdAt: ro.created_at
+    };
+  }
+  function normRemoteExpense(re) {
+    if (!re) return null;
+    if (re.categoryId !== undefined || re.title !== undefined || (re.amount !== undefined && re.category_id === undefined)) {
+      if (!re.id) return null;
+      return re;
+    }
+    if (!re.id) return null;
+    return {
+      id: re.id,
+      type: re.type,
+      amount: re.amount,
+      title: re.title,
+      categoryId: re.category_id,
+      date: re.date,
+      notes: re.notes,
+      paidBy: re.paid_by
+    };
+  }
+  function mergeRemoteList(localArr, remoteArr, normFn, remoteMs) {
+    const remoteMap = new Map();
+    (remoteArr || []).forEach(r => { const n = normFn(r); if (n && n.id) remoteMap.set(String(n.id), n); });
+    const merged = [];
+    // 1) كل عناصر الريموت موجودة (إضافة + تحديث + حذف المنفذ)
+    remoteMap.forEach(v => merged.push(v));
+    // 2) عناصر محلية غير موجودة في الريموت: نحتفظ بها فقط لو أجدد من سنابشوت الريموت (تعديل محلي لم يُرفع بعد)
+    (localArr || []).forEach(lo => {
+      if (!lo || !lo.id) return;
+      if (remoteMap.has(String(lo.id))) return;
+      const localTs = Number(lo.updatedAt) || Number(state.updatedAt) || 0;
+      if (localTs > Number(remoteMs || 0)) merged.push(lo);
+      // غير ذلك: اتمسح من الطرف الآخر → لا نرجّعه (حل مشكلة إحياء المحذوفات)
+    });
+    return merged;
+  }
+  function syncSig() {
+    try { return JSON.stringify([(state.orders || []).map(o => o.id + ':' + o.status + ':' + (o.updatedAt || '')), (state.expenses || []).map(e => e.id + ':' + e.amount), state.home && state.home.name]); } catch { return String(Date.now()); }
+  }
+  function applyRemoteData(remoteData) {
+    if (!remoteData) return false;
+    const rMs = Number(remoteData.updatedAtMs) || 0;
+    // تجاهل صدى الكتابة الخاصة بنا: نفس الطابع الزمني ونفس المحتوى
+    if (rMs && rMs <= Number(state.updatedAt || 0)) {
+      const rs = JSON.stringify([(remoteData.orders || []).map(o => (o.id || '') + ':' + (o.status || ''))]);
+      const ls = JSON.stringify([(state.orders || []).map(o => (o.id || '') + ':' + (o.status || ''))]);
+      if (rs === ls) return false;
+    }
+    const before = syncSig();
+    _syncLock = true;
+    try {
+      const hasRemoteContent = (remoteData.orders && remoteData.orders.length) || (remoteData.expenses && remoteData.expenses.length) || remoteData.name;
+      const localEmpty = !(state.orders && state.orders.length) && !(state.expenses && state.expenses.length);
+      if (localEmpty && hasRemoteContent) {
+        // جهاز جديد بينضم بكود موجود: استبدال كامل بدون دمج يمسح السحابة
+        state.orders = (remoteData.orders || []).map(normRemoteOrder).filter(Boolean);
+        if (shareExpensesOn()) state.expenses = (remoteData.expenses || []).map(normRemoteExpense).filter(Boolean);
+        if (Array.isArray(remoteData.orderLists)) state.orderLists = remoteData.orderLists;
+        if (remoteData.name && state.home) state.home.name = remoteData.name;
+        if (rMs) state.updatedAt = Math.max(Number(state.updatedAt) || 0, rMs);
+      } else {
+        state.orders = mergeRemoteList(state.orders, remoteData.orders, normRemoteOrder, rMs);
+        if (shareExpensesOn()) state.expenses = mergeRemoteList(state.expenses, remoteData.expenses, normRemoteExpense, rMs);
+        // وضع الخصوصية: المصروفات تفضل محلية ولا تُسحب من السحابة
+        if (Array.isArray(remoteData.orderLists) && remoteData.orderLists.length) {
+          const lm = new Map((state.orderLists || []).map(l => [String(l.id), l]));
+          remoteData.orderLists.forEach(rl => { if (rl && rl.id) lm.set(String(rl.id), rl); });
+          state.orderLists = Array.from(lm.values());
+        }
+        if (remoteData.name && state.home && !state.home.name) state.home.name = remoteData.name;
+      }
+      if (syncSig() === before) return false;
+      Storage.save(state);
+      try { if (state.home?.code) localStorage.setItem('baytna_home_' + state.home.code, JSON.stringify({ home: state.home, orders: state.orders, expenses: state.expenses, orderLists: state.orderLists, updatedAt: state.updatedAt })); } catch {}
+    } finally { _syncLock = false; }
+    return true;
+  }
+  let _syncSubscribed = null, _syncPoll = null;
+  async function initSupabaseSync() {
+    if (!window.NaqisnaSupabase || !window.NaqisnaSupabase.isConfigured() || !state.home?.code) return;
+    try {
+      const homeCode = state.home.code;
+      // ensure row exists
+      try { await window.NaqisnaSupabase.joinOrCreateHome(homeCode, state.home.name || 'بيتنا'); } catch {}
+      const remoteData = await window.NaqisnaSupabase.fetchHomeData(homeCode);
+      if (remoteData) {
+        applyRemoteData(remoteData);
+        // ادمج أي إضافات محلية لم تُرفع بعد ثم ارفع النسخة المدموجة مرة واحدة
+        try { await window.NaqisnaSupabase.pushFullState(homeCode, state); } catch {}
+        render();
+      } else {
+        // لا يوجد صف سحابي: ارفع الحالة المحلية الحالية (أول جهاز ينشئ البيت)
+        if ((state.orders && state.orders.length) || (state.expenses && state.expenses.length)) {
+          try { await window.NaqisnaSupabase.pushFullState(homeCode, state); } catch {}
+        }
+      }
+      if (_syncSubscribed === homeCode) return;
+      _syncSubscribed = homeCode;
+      window.NaqisnaSupabase.subscribeToHomeChanges(homeCode, async () => {
+        try {
+          const refreshed = await window.NaqisnaSupabase.fetchHomeData(homeCode);
+          if (refreshed && applyRemoteData(refreshed)) render();
+        } catch {}
+      });
+      // fallback polling لو Realtime مقفول في المشروع
+      if (_syncPoll) clearInterval(_syncPoll);
+      _syncPoll = setInterval(async () => {
+        try {
+          if (!state.home?.code || state.home.code !== homeCode) return;
+          if (document.hidden) return;
+          const r = await window.NaqisnaSupabase.fetchHomeData(homeCode);
+          if (r && Number(r.updatedAtMs || 0) > Number(state.updatedAt || 0)) {
+            if (applyRemoteData(r)) render();
+          }
+        } catch {}
+      }, 8000);
+    } catch (e) {
+      console.warn('Supabase sync init failed:', e);
+    }
+  }
 
   /* =============================
      INIT
@@ -5594,9 +4782,7 @@
     }
     if (state.currentTab === 'notifs') state.currentTab = 'orders';
     render();
-    (async () => { try { await ensureSbSession(); await ensureMembership(); } catch {} attachCloud(); })();
-    try { migrateAudioSettings(); } catch {}
-    try { AudioManager.loadLibrary(); } catch {}
+    initSupabaseSync();
     try { setInterval(notifTick, 60000); setTimeout(notifTick, 15000); } catch {}
     try {
       if ('serviceWorker' in navigator) {

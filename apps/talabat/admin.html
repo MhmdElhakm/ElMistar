@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
@@ -9,27 +9,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-  import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, where, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
-  import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyC8Gj1hufwwXrdO4zzQjPMeMg_KD3XSKDQ",
-    authDomain: "project-84ae3235-3633-44c1-819.firebaseapp.com",
-    projectId: "project-84ae3235-3633-44c1-819",
-    storageBucket: "project-84ae3235-3633-44c1-819.firebasestorage.app",
-    messagingSenderId: "1009475192148",
-    appId: "1:1009475192148:web:5031fa8ddcbca4c860b4c1",
-    measurementId: "G-97QYMTBRKS"
-  };
-
-  window._fbApp = initializeApp(firebaseConfig);
-  window._fbDb = getFirestore(window._fbApp);
-  window._fbAuth = getAuth(window._fbApp);
-  window._fbModules = { doc, getDoc, setDoc, collection, getDocs, query, where, deleteDoc, signInAnonymously };
-  window.dispatchEvent(new Event('firebase-ready'));
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>window.SUPABASE_URL="https://fijndjmcffqgganapgxv.supabase.co";window.SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpam5kam1jZmZxZ2dhbmFwZ3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NTk1NDEsImV4cCI6MjEwNTAzNTU0MX0.xiYCTrukNsx6S8R6erQ32zrad2XStAbr-GbNRhK3pDY";</script>
+<script src="supabase-client.js"></script>
 <style>
   :root {
     --bg: #0F172A;
@@ -176,7 +158,7 @@
   .badge-active { background: rgba(16, 185, 129, 0.18); color: #34D399; }
   .badge-inactive { background: rgba(239, 68, 68, 0.18); color: #F87171; }
 
-  /* Items Cards (Messages, Audios, Ads) */
+  /* Items Cards (Ads) */
   .item-card {
     background: rgba(30, 41, 59, 0.7); border: 1px solid var(--card-border);
     border-radius: var(--radius-sm); padding: 14px; margin-bottom: 10px;
@@ -211,18 +193,6 @@
     box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
   }
   .form-textarea { resize: vertical; min-height: 80px; }
-
-  /* Radio Pills Group */
-  .target-selector { display: flex; gap: 8px; }
-  .target-pill {
-    flex: 1; padding: 10px; border-radius: var(--radius-sm);
-    background: #0F172A; border: 1.5px solid var(--card-border);
-    text-align: center; cursor: pointer; font-weight: 800; font-size: 13px;
-    transition: all .15s;
-  }
-  .target-pill.selected-husband { border-color: var(--husband-color); background: rgba(59, 130, 246, 0.15); color: #93C5FD; }
-  .target-pill.selected-wife { border-color: var(--wife-color); background: rgba(236, 72, 153, 0.15); color: #F9A8D4; }
-  .target-pill.selected-couple { border-color: var(--couple-color); background: rgba(245, 158, 11, 0.15); color: #FDE68A; }
 
   /* Modal Backdrop */
   .modal-overlay {
@@ -303,7 +273,7 @@
       <div class="header-logo">🛒</div>
       <div class="header-titles">
         <h1>إدارة تطبيق "ناقصنا إيه"</h1>
-        <p>النسخة الخاصة بالأزواج والزوجات والرسائل الكوميدية</p>
+        <p>النسخة الخاصة بالأزواج والزوجات</p>
       </div>
     </div>
     <div class="header-actions">
@@ -316,8 +286,8 @@
   <nav class="tabs-nav">
     <button class="nav-tab active" data-tab="dashboard">📊 لوحة الإحصائيات</button>
     <button class="nav-tab" data-tab="users">👥 المستخدمين <span class="tab-badge" id="tabUsersBadge">0</span></button>
-    <button class="nav-tab" data-tab="messages">🎭 الرسائل الكوميدية <span class="tab-badge" id="tabMessagesBadge">0</span></button>
-    <button class="nav-tab" data-tab="audios">🎵 الصوتيات <span class="tab-badge" id="tabAudiosBadge">0</span></button>
+
+    
     <button class="nav-tab" data-tab="ads">📢 الإعلانات <span class="tab-badge" id="tabAdsBadge">0</span></button>
     <button class="nav-tab" data-tab="settings">⚙️ الإعدادات</button>
   </nav>
@@ -349,12 +319,6 @@
         <div class="stat-label">إجمالي الطلبات</div>
         <div class="stat-value" id="statTotalOrders">0</div>
         <div class="stat-meta">طلب تم تسجيله</div>
-      </div>
-      <div class="stat-card" style="--card-accent:#F59E0B;">
-        <div class="stat-icon">🎭</div>
-        <div class="stat-label">ظهور النكت الكوميدية</div>
-        <div class="stat-value" id="statTotalJokes">0</div>
-        <div class="stat-meta">مرة عند إنهاء الطلب</div>
       </div>
       <div class="stat-card" style="--card-accent:#06B6D4;">
         <div class="stat-icon">📢</div>
@@ -426,45 +390,6 @@
     </div>
   </section>
 
-  <!-- ── TAB 3: Comedy Messages Management ── -->
-  <section class="content-section" id="tab-messages">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><span>🎭</span> قاعدة بيانات الرسائل الكوميدية</div>
-        <button class="btn-primary" id="openAddMsgModalBtn">+ إضافة رسالة جديدة</button>
-      </div>
-
-      <div class="filter-bar">
-        <button class="btn-outline active" data-mfilter="all">الكل (<span id="countMsgAll">0</span>)</button>
-        <button class="btn-outline" data-mfilter="husband">👨 رسائل الزوج (<span id="countMsgHusband">0</span>)</button>
-        <button class="btn-outline" data-mfilter="wife">👩 رسائل الزوجة (<span id="countMsgWife">0</span>)</button>
-        <button class="btn-outline" data-mfilter="couple">💑 رسائل للزوجين (<span id="countMsgCouple">0</span>)</button>
-      </div>
-
-      <div id="messagesListContainer">
-        <!-- Populated by JS -->
-      </div>
-    </div>
-  </section>
-
-  <!-- ── TAB 4: Audio Library Management ── -->
-  <section class="content-section" id="tab-audios">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><span>🎵</span> إدارة الصوتيات والمؤثرات الكوميدية</div>
-        <button class="btn-primary" id="openAddAudioModalBtn">+ إضافة صوت جديد</button>
-      </div>
-
-      <p style="color:var(--text-sec); font-size:13px; margin-bottom:14px;">
-        هذه الأصوات مرتبطة بالرسائل الكوميدية ويتم تشغيلها تلقائياً عند إنهاء الطلبات لإضفاء جو من المرح والضحك.
-      </p>
-
-      <div id="audioListContainer">
-        <!-- Populated by JS -->
-      </div>
-    </div>
-  </section>
-
   <!-- ── TAB 5: Image Ads Management ── -->
   <section class="content-section" id="tab-ads">
     <div class="card">
@@ -498,62 +423,8 @@
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><span>🔄</span> إعادة تعيين البيانات الافتراضية</div>
-      </div>
-      <p style="color:var(--text-sec); font-size:13px; margin-bottom:12px;">
-        إذا كنت تريد استرجاع بنك النكت الكوميدية والصوتيات المضحكة الأصلية، يمكنك ضغط الزر بالأسفل.
-      </p>
-      <button class="btn-outline" id="resetSeedDataBtn" style="color:var(--couple-color); border-color:var(--couple-color);">
-        🔄 استرجاع باقة النكت الكوميدية الأصلية
-      </button>
-    </div>
   </section>
 
-</div>
-
-<!-- ── MODAL: Add/Edit Message ── -->
-<div class="modal-overlay" id="msgModal">
-  <div class="modal-box">
-    <h3 style="font-weight:900; margin-bottom:14px;" id="msgModalTitle">إضافة رسالة كوميدية جديدة</h3>
-    
-    <div class="form-group">
-      <label>نص الرسالة الكوميدية *</label>
-      <textarea id="msgInputText" class="form-textarea" placeholder="اكتب النكتة أو الملاحظة المرحة هنا..."></textarea>
-    </div>
-
-    <div class="form-group">
-      <label>نوع المستلم (تصنيف صارم) *</label>
-      <div class="target-selector">
-        <div class="target-pill selected-husband" data-target="husband">👨 للزوج فقط</div>
-        <div class="target-pill" data-target="wife">👩 للزوجة فقط</div>
-        <div class="target-pill" data-target="couple">💑 للزوجين معاً</div>
-      </div>
-      <input type="hidden" id="msgInputTarget" value="husband" />
-    </div>
-
-    <div class="form-group">
-      <label>المؤثر الصوتي المرتبط</label>
-      <select id="msgInputAudio" class="form-select">
-        <!-- Populated by JS -->
-      </select>
-    </div>
-
-    <div class="form-group" style="display:flex; align-items:center; justify-content:space-between;">
-      <label style="margin:0;">تفعيل الرسالة فوراً</label>
-      <label class="switch">
-        <input type="checkbox" id="msgInputActive" checked />
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <input type="hidden" id="msgEditId" value="" />
-    <div style="display:flex; gap:10px; margin-top:20px;">
-      <button class="btn-primary" id="saveMsgBtn" style="flex:1;">حفظ الرسالة</button>
-      <button class="btn-outline" id="closeMsgModalBtn">إلغاء</button>
-    </div>
-  </div>
 </div>
 
 <!-- ── MODAL: Add Ad (Image Only) ── -->
@@ -604,132 +475,22 @@
   </div>
 </div>
 
-<!-- ── MODAL: Add Sound ── -->
-<div class="modal-overlay" id="audioModal">
-  <div class="modal-box">
-    <h3 style="font-weight:900; margin-bottom:14px;">إضافة مؤثر صوتي جديد</h3>
-
-    <div class="form-group">
-      <label>اسم الصوت *</label>
-      <input type="text" id="audioNameInput" class="form-input" placeholder="مثلا: ضحكة عادل إمام" />
-    </div>
-
-    <div class="form-group">
-      <label>رابط أو مسار ملف الصوت *</label>
-      <input type="text" id="audioPathInput" class="form-input" placeholder="sounds/general/funny_01.mp3 أو رابط mp3" />
-    </div>
-
-    <div style="display:flex; gap:10px; margin-top:20px;">
-      <button class="btn-primary" id="saveAudioBtn" style="flex:1;">حفظ الصوت</button>
-      <button class="btn-outline" id="closeAudioModalBtn">إلغاء</button>
-    </div>
-  </div>
-</div>
-
 <script>
 (() => {
   'use strict';
 
-  /* =============================
-     FIREBASE INITIALIZATION
-     ============================= */
-  let db = null;
-  function waitForFirebase() {
-    return new Promise((resolve) => {
-      if (window._fbDb) { resolve(); return; }
-      window.addEventListener('firebase-ready', () => resolve(), { once: true });
-      setTimeout(resolve, 5000);
-    });
-  }
-  async function initFirebase() {
-    await waitForFirebase();
-    db = window._fbDb;
-  }
-  async function sbRows(table) {
-    await initFirebase();
-    if (!db) return null;
-    try {
-      const { collection, getDocs } = window._fbModules || {};
-      if (!collection || !getDocs) return null;
-      const snap = await getDocs(collection(db, table));
-      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    } catch {}
-    return null;
-  }
-  function sbUpsert(table, id, obj) {
-    if (!db) return;
-    try {
-      const { doc, setDoc } = window._fbModules || {};
-      if (doc && setDoc) setDoc(doc(db, table, id), obj, { merge: true }).catch(() => {});
-    } catch {}
-  }
-  function sbDelete(table, id) {
-    if (!db) return;
-    try {
-      const { doc, deleteDoc } = window._fbModules || {};
-      if (doc && deleteDoc) deleteDoc(doc(db, table, id)).catch(() => {});
-    } catch {}
-  }
-
-  /* =============================
-     DEFAULT SEED JOKES & SOUNDS
-     ============================= */
-  const SEED_MESSAGES = [
-    // 👨 Husband Jokes (Shown ONLY to Husband)
-    { id: 'h_1', text: 'يا بطل المعارك.. متنساش تجيب الفكة معاك ومتقولش نسيتها! 😂', target: 'husband', audio_id: 'funny_01', is_active: true, priority: 1, usage_count: 14 },
-    { id: 'h_2', text: 'أنت دخلت عش الدبابير برغبتك، انزل هات الطلبات وافتكر: الزوج المطيع يعيش في ربيع! 🛒🏃‍♂️', target: 'husband', audio_id: 'funny_02', is_active: true, priority: 1, usage_count: 9 },
-    { id: 'h_3', text: 'ربنا يقويك على المشوار.. لو لقيت الطماطم غالية متفكرش ترجع بإيدك فاضية! 🍅😅', target: 'husband', audio_id: 'urgent_01', is_active: true, priority: 1, usage_count: 6 },
-    { id: 'h_4', text: 'رسالة من وراء الكواليس: هات الحاجات صح وإلا الغدا بكرة مكرونة بيضا مسلوقة! 🍝😆', target: 'husband', audio_id: 'failure_01', is_active: true, priority: 1, usage_count: 11 },
-    { id: 'h_5', text: 'يا رب تلاقي كل الأصناف من أول محل ومنقعدش نلف المحافظة! 🚗💨', target: 'husband', audio_id: 'surprise_01', is_active: true, priority: 1, usage_count: 5 },
-    { id: 'h_6', text: 'تذكر دائماً: ورقة الطلبات أطول من ليلة الشتاء.. استعن بالله وانزل! 📜💪', target: 'husband', audio_id: 'success_01', is_active: true, priority: 1, usage_count: 8 },
-
-    // 👩 Wife Jokes (Shown ONLY to Wife)
-    { id: 'w_1', text: 'تسلم إيدك يا ست الكل.. ربنا يعينه ويجيب القائمة كلها من غير ما يكلمك يسأل 50 مرة! 📞😂', target: 'wife', audio_id: 'funny_03', is_active: true, priority: 1, usage_count: 18 },
-    { id: 'w_2', text: 'الطلبات اتسجلت بنجاح.. جهزي بقى للإجابة على سؤال: هو البقدونس لونه إيه وشكله إيه؟ 🌿🤣', target: 'wife', audio_id: 'funny_04', is_active: true, priority: 1, usage_count: 22 },
-    { id: 'w_3', text: 'قائمة محترمة! يا رب يفتكر العيش السخن وينسى يرن يسألك الجبنة في أنهي رف 🧀🤭', target: 'wife', audio_id: 'surprise_02', is_active: true, priority: 1, usage_count: 7 },
-    { id: 'w_4', text: 'رسالة سيستم: لو جاب نص الطلبات صح اعتبريه إنجاز تاريخي وكافئيه! 🏆👏', target: 'wife', audio_id: 'success_02', is_active: true, priority: 1, usage_count: 13 },
-    { id: 'w_5', text: 'تم حفظ الطلبات.. اجهزي عشان هيجيب الملوخية ناشفة بدل خضرا وهيقولك هي دي بالظبط! 🥬😂', target: 'wife', audio_id: 'funny_05', is_active: true, priority: 1, usage_count: 15 },
-
-    // 💑 Couple Jokes (System to both)
-    { id: 'c_1', text: 'طلب البيت تم بحمد الله.. نتمنى تنتهي الرحلة بسلام وبدون مكالمات طوارئ في السوبرماركت! 🛒❤️', target: 'couple', audio_id: 'success_03', is_active: true, priority: 1, usage_count: 30 },
-    { id: 'c_2', text: 'البيت اللي فيه طلبات كتير.. فيه خير كتير وفيه زوج بيلف حولين نفسه! 🏠😄', target: 'couple', audio_id: 'funny_06', is_active: true, priority: 1, usage_count: 17 },
-    { id: 'c_3', text: 'التسوق الزوجي السعيد: قائمة واضحة، فلوس جاهزة، ونفس راضية! 🤝✨', target: 'couple', audio_id: 'new_message_01', is_active: true, priority: 1, usage_count: 12 },
-    { id: 'c_4', text: 'تم الانتهاء من كتابة الطلبات! المحفظة تبكي الآن في صمت ولكن الحب ينتصر! 💸❤️', target: 'couple', audio_id: 'failure_02', is_active: true, priority: 1, usage_count: 25 }
-  ];
-
-  const SEED_AUDIOS = [
-    { id: 'funny_01', name: 'ضحكة مرحة 1', file: 'sounds/general/funny_01.mp3' },
-    { id: 'funny_02', name: 'ضحكة مرحة 2', file: 'sounds/general/funny_02.mp3' },
-    { id: 'funny_03', name: 'ضحكة مرحة 3', file: 'sounds/general/funny_03.mp3' },
-    { id: 'funny_04', name: 'ضحكة مرحة 4', file: 'sounds/general/funny_04.mp3' },
-    { id: 'funny_05', name: 'ضحكة مرحة 5', file: 'sounds/general/funny_05.mp3' },
-    { id: 'funny_06', name: 'ضحكة مرحة 6', file: 'sounds/general/funny_06.mp3' },
-    { id: 'success_01', name: 'نغمة إنجاز 1', file: 'sounds/success/success_01.mp3' },
-    { id: 'success_02', name: 'نغمة إنجاز 2', file: 'sounds/success/success_02.mp3' },
-    { id: 'success_03', name: 'نغمة إنجاز 3', file: 'sounds/success/success_03.mp3' },
-    { id: 'surprise_01', name: 'مفاجأة 1', file: 'sounds/surprise/surprise_01.mp3' },
-    { id: 'surprise_02', name: 'مفاجأة 2', file: 'sounds/surprise/surprise_02.mp3' },
-    { id: 'failure_01', name: 'مؤثر درامي كوميدي', file: 'sounds/failure/failure_01.mp3' },
-    { id: 'failure_02', name: 'مؤثر المحفظة تبكي', file: 'sounds/failure/failure_02.mp3' },
-    { id: 'urgent_01', name: 'تنبيه طارئ', file: 'sounds/urgent/urgent_01.mp3' },
-    { id: 'new_message_01', name: 'نغمة رسالة لطيفة', file: 'sounds/messages/new_message_01.mp3' }
-  ];
 
   /* =============================
      STATE
      ============================= */
   let state = {
     users: [],
-    messages: [],
-    audios: [],
     ads: [],
     activities: [],
     orders: [],
     currentTab: 'dashboard',
     userFilter: 'all',
-    msgFilter: 'all',
-    searchQuery: '',
-    audioPlayer: new Audio()
+    searchQuery: ''
   };
 
   /* =============================
@@ -783,23 +544,10 @@
   }
 
   async function loadAllData() {
-    // 1. Messages
-    let msgs = loadLocal('comedy_messages', null);
-    if (!msgs || !msgs.length) {
-      msgs = SEED_MESSAGES;
-      saveLocal('comedy_messages', msgs);
-    }
-    state.messages = msgs;
-
-    // 2. Audios
-    let audios = loadLocal('audio_items', null);
-    if (!audios || !audios.length) {
-      audios = SEED_AUDIOS;
-      saveLocal('audio_items', audios);
-    }
-    state.audios = audios;
-
-    // 3. Ads
+    try { localStorage.removeItem('naqisna_audio_items'); } catch {}
+    try { localStorage.removeItem('naqisna_comedy_messages'); } catch {}
+    try { localStorage.removeItem('naqisna_last_joke'); } catch {}
+    // 1. Ads
     state.ads = loadLocal('ads', [
       {
         id: 'ad_demo_1',
@@ -812,7 +560,7 @@
       }
     ]);
 
-    // 4. Users from Local & Supabase
+    // 2. Users from Local & Supabase
     let localUsers = loadLocal('users_list', []);
     // check current user in main app
     const appUser = loadLocal('user', null);
@@ -832,46 +580,19 @@
     }
     state.users = localUsers;
 
-    // 5. Activities & Orders
+    // 3. Activities & Orders
     state.orders = loadLocal('orders', []);
     state.activities = loadLocal('activities_log', [
       { id: 'act_1', user: 'أحمد (الزوج)', type: 'order_complete', text: 'أنهى كتابة قائمة طلبات البيت 🛒', time: Date.now() - 3600000 },
       { id: 'act_2', user: 'سارة (الزوجة)', type: 'order_new', text: 'أضافت 4 أصناف جديدة في قسم الخضار 🥦', time: Date.now() - 7200000 },
-      { id: 'act_3', user: 'النظام', type: 'joke_served', text: 'عرض نكتة الزوج: "يا بطل المعارك..." 😂', time: Date.now() - 10800000 }
+      { id: 'act_3', user: 'النظام', type: 'order_complete', text: 'تم إنشاء قائمة طلبات جديدة 🛒', time: Date.now() - 10800000 }
     ]);
 
-    // Try Supabase Sync
-    if (db) {
+    if (window.NaqisnaSupabase && window.NaqisnaSupabase.isConfigured()) {
       try {
-        const remoteMsgs = await sbRows('comedy_messages');
-        if (remoteMsgs && remoteMsgs.length) {
-          state.messages = remoteMsgs;
-          saveLocal('comedy_messages', state.messages);
-        } else if (remoteMsgs) {
-          // seed firebase
-          for (const m of state.messages) sbUpsert('comedy_messages', m.id, m);
-        }
-      } catch (e) { console.log('Remote msgs fetch:', e); }
-
-      try {
-        const remoteUsers = await sbRows('users');
-        if (remoteUsers && remoteUsers.length) {
-          // merge
-          const byId = new Map();
-          state.users.forEach(u => byId.set(u.id, u));
-          remoteUsers.forEach(u => byId.set(u.id, { ...byId.get(u.id), ...u }));
-          state.users = [...byId.values()];
-          saveLocal('users_list', state.users);
-        }
-      } catch (e) {}
-
-      try {
-        const remoteAds = await sbRows('ads');
-        if (remoteAds && remoteAds.length) {
-          state.ads = remoteAds;
-          saveLocal('ads', state.ads);
-        }
-      } catch (e) {}
+        const remoteAds = await window.NaqisnaSupabase.fetchAdminAds();
+        if (remoteAds && remoteAds.length) state.ads = remoteAds;
+      } catch (e) { console.warn('Supabase admin fetch warning:', e); }
     }
 
     renderAll();
@@ -884,15 +605,11 @@
     renderBadges();
     renderDashboard();
     renderUsers();
-    renderMessages();
-    renderAudios();
     renderAds();
   }
 
   function renderBadges() {
     document.getElementById('tabUsersBadge').textContent = state.users.length;
-    document.getElementById('tabMessagesBadge').textContent = state.messages.length;
-    document.getElementById('tabAudiosBadge').textContent = state.audios.length;
     document.getElementById('tabAdsBadge').textContent = state.ads.length;
   }
 
@@ -901,7 +618,6 @@
     const husbands = state.users.filter(u => u.role === 'husband').length;
     const wives = state.users.filter(u => u.role === 'wife').length;
     const totalOrders = state.orders.length || 18;
-    const totalJokes = state.messages.reduce((sum, m) => sum + (m.usage_count || 0), 0);
     const activeAds = state.ads.filter(a => a.is_active).length;
 
     document.getElementById('statTotalUsers').textContent = totalU || '—';
@@ -910,7 +626,6 @@
     document.getElementById('statHusbandsPct').textContent = totalU ? Math.round((husbands / totalU) * 100) + '% من الإجمالي' : '0%';
     document.getElementById('statWivesPct').textContent = totalU ? Math.round((wives / totalU) * 100) + '% من الإجمالي' : '0%';
     document.getElementById('statTotalOrders').textContent = totalOrders;
-    document.getElementById('statTotalJokes').textContent = totalJokes;
     document.getElementById('statActiveAds').textContent = activeAds;
 
     // Leaderboard
@@ -1003,107 +718,6 @@
     }).join('');
   }
 
-  function renderMessages() {
-    let list = [...state.messages];
-    if (state.msgFilter !== 'all') {
-      list = list.filter(m => m.target === state.msgFilter);
-    }
-
-    // counts
-    document.getElementById('countMsgAll').textContent = state.messages.length;
-    document.getElementById('countMsgHusband').textContent = state.messages.filter(m => m.target === 'husband').length;
-    document.getElementById('countMsgWife').textContent = state.messages.filter(m => m.target === 'wife').length;
-    document.getElementById('countMsgCouple').textContent = state.messages.filter(m => m.target === 'couple').length;
-
-    const container = document.getElementById('messagesListContainer');
-    if (!list.length) {
-      container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد رسائل في هذا القسم</div>`;
-      return;
-    }
-
-    container.innerHTML = list.map(m => {
-      const targetBadge = m.target === 'husband'
-        ? `<span class="badge badge-husband">👨 للزوج فقط</span>`
-        : m.target === 'wife'
-        ? `<span class="badge badge-wife">👩 للزوجة فقط</span>`
-        : `<span class="badge badge-couple">💑 للزوجين معاً</span>`;
-
-      const audioObj = state.audios.find(a => a.id === m.audio_id);
-      const audioName = audioObj ? audioObj.name : 'صوت تلقائي';
-
-      return `
-        <div class="item-card" data-msgid="${m.id}">
-          <div class="item-content">
-            <div class="item-meta">
-              ${targetBadge}
-              <span style="font-size:11.5px; color:var(--text-sec); display:inline-flex; align-items:center; gap:4px;">
-                🎵 ${escapeHTML(audioName)}
-              </span>
-              <span class="badge" style="background:rgba(255,255,255,0.06); color:var(--text-sec);">
-                👁️ استُخدمت ${m.usage_count || 0} مرة
-              </span>
-              ${m.is_active ? '<span class="badge badge-active">مفعلة</span>' : '<span class="badge badge-inactive">معطلة</span>'}
-            </div>
-            <div class="item-text">${escapeHTML(m.text)}</div>
-          </div>
-          <div class="item-actions">
-            ${audioObj ? `<button class="action-btn" data-playaudio="${audioObj.file}" title="معاينة الصوت">▶️</button>` : ''}
-            <button class="action-btn" data-editmsg="${m.id}" title="تعديل">✏️</button>
-            <button class="action-btn del" data-delmsg="${m.id}" title="حذف">🗑️</button>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    // bind action buttons
-    container.querySelectorAll('[data-playaudio]').forEach(btn => {
-      btn.onclick = () => playPreviewAudio(btn.dataset.playaudio);
-    });
-    container.querySelectorAll('[data-editmsg]').forEach(btn => {
-      btn.onclick = () => openEditMessageModal(btn.dataset.editmsg);
-    });
-    container.querySelectorAll('[data-delmsg]').forEach(btn => {
-      btn.onclick = () => deleteMessage(btn.dataset.delmsg);
-    });
-  }
-
-  function renderAudios() {
-    const container = document.getElementById('audioListContainer');
-    if (!state.audios.length) {
-      container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد صوتيات مسجلة</div>`;
-      return;
-    }
-
-    container.innerHTML = state.audios.map(a => {
-      return `
-        <div class="item-card">
-          <div class="item-content">
-            <div class="item-meta">
-              <span class="badge badge-active">🎵 مؤثر كوميدي</span>
-              <span style="font-size:11px; color:var(--text-muted); direction:ltr;">${escapeHTML(a.file)}</span>
-            </div>
-            <div style="font-size:14px; font-weight:800;">${escapeHTML(a.name)}</div>
-          </div>
-          <div class="item-actions">
-            <button class="action-btn" data-playaudio="${a.file}" style="width:40px; height:40px; font-size:16px;">▶️</button>
-            <button class="action-btn del" data-delaudio="${a.id}">🗑️</button>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    container.querySelectorAll('[data-playaudio]').forEach(btn => {
-      btn.onclick = () => playPreviewAudio(btn.dataset.playaudio);
-    });
-    container.querySelectorAll('[data-delaudio]').forEach(btn => {
-      btn.onclick = () => deleteAudio(btn.dataset.delaudio);
-    });
-
-    // Populate audio select dropdown in Message Modal
-    const select = document.getElementById('msgInputAudio');
-    select.innerHTML = `<option value="">-- بدون صوت مخصص --</option>` + state.audios.map(a => `<option value="${a.id}">${escapeHTML(a.name)}</option>`).join('');
-  }
-
   function renderAds() {
     const container = document.getElementById('adsListContainer');
     if (!state.ads.length) {
@@ -1141,149 +755,6 @@
     container.querySelectorAll('[data-delad]').forEach(btn => {
       btn.onclick = () => deleteAd(btn.dataset.delad);
     });
-  }
-
-  /* =============================
-     AUDIO PREVIEW
-     ============================= */
-  function playPreviewAudio(fileUrl) {
-    if (!fileUrl) return;
-    try {
-      state.audioPlayer.pause();
-      state.audioPlayer.currentTime = 0;
-      state.audioPlayer.src = fileUrl;
-      state.audioPlayer.play().catch(() => {});
-    } catch {}
-  }
-
-  /* =============================
-     MESSAGE MANAGEMENT
-     ============================= */
-  const msgModal = document.getElementById('msgModal');
-  document.getElementById('openAddMsgModalBtn').onclick = () => {
-    document.getElementById('msgModalTitle').textContent = 'إضافة رسالة كوميدية جديدة';
-    document.getElementById('msgEditId').value = '';
-    document.getElementById('msgInputText').value = '';
-    document.getElementById('msgInputTarget').value = 'husband';
-    document.getElementById('msgInputActive').checked = true;
-    updateTargetPills('husband');
-    msgModal.classList.add('open');
-  };
-  document.getElementById('closeMsgModalBtn').onclick = () => msgModal.classList.remove('open');
-
-  function updateTargetPills(target) {
-    document.querySelectorAll('.target-pill').forEach(p => {
-      p.className = 'target-pill';
-      if (p.dataset.target === target) {
-        p.classList.add('selected-' + target);
-      }
-    });
-    document.getElementById('msgInputTarget').value = target;
-  }
-  document.querySelectorAll('.target-pill').forEach(p => {
-    p.onclick = () => updateTargetPills(p.dataset.target);
-  });
-
-  document.getElementById('saveMsgBtn').onclick = async () => {
-    const text = (document.getElementById('msgInputText').value || '').trim();
-    if (!text) { alert('من فضلك اكتب نص الرسالة الكوميدية'); return; }
-    const target = document.getElementById('msgInputTarget').value;
-    const audioId = document.getElementById('msgInputAudio').value;
-    const isActive = document.getElementById('msgInputActive').checked;
-    const editId = document.getElementById('msgEditId').value;
-
-    if (editId) {
-      // Edit
-      const idx = state.messages.findIndex(m => m.id === editId);
-      if (idx >= 0) {
-        state.messages[idx].text = text;
-        state.messages[idx].target = target;
-        state.messages[idx].audio_id = audioId;
-        state.messages[idx].is_active = isActive;
-        state.messages[idx].updated_at = new Date().toISOString();
-        sbUpsert('comedy_messages', editId, state.messages[idx]);
-      }
-    } else {
-      // Add
-      const newMsg = {
-        id: 'msg_' + Math.random().toString(36).slice(2, 9),
-        text,
-        target,
-        audio_id: audioId,
-        is_active: isActive,
-        priority: 1,
-        usage_count: 0,
-        created_at: new Date().toISOString()
-      };
-      state.messages.unshift(newMsg);
-      sbUpsert('comedy_messages', newMsg.id, newMsg);
-    }
-
-    saveLocal('comedy_messages', state.messages);
-    msgModal.classList.remove('open');
-    renderMessages();
-    renderBadges();
-  };
-
-  function openEditMessageModal(id) {
-    const m = state.messages.find(x => x.id === id);
-    if (!m) return;
-    document.getElementById('msgModalTitle').textContent = 'تعديل الرسالة الكوميدية';
-    document.getElementById('msgEditId').value = m.id;
-    document.getElementById('msgInputText').value = m.text;
-    document.getElementById('msgInputAudio').value = m.audio_id || '';
-    document.getElementById('msgInputActive').checked = m.is_active !== false;
-    updateTargetPills(m.target || 'husband');
-    msgModal.classList.add('open');
-  }
-
-  function deleteMessage(id) {
-    if (!confirm('هل تريد حذف هذه الرسالة الكوميدية؟')) return;
-    state.messages = state.messages.filter(m => m.id !== id);
-    saveLocal('comedy_messages', state.messages);
-    sbDelete('comedy_messages', id);
-    renderMessages();
-    renderBadges();
-  }
-
-  /* =============================
-     AUDIO MANAGEMENT
-     ============================= */
-  const audioModal = document.getElementById('audioModal');
-  document.getElementById('openAddAudioModalBtn').onclick = () => {
-    document.getElementById('audioNameInput').value = '';
-    document.getElementById('audioPathInput').value = '';
-    audioModal.classList.add('open');
-  };
-  document.getElementById('closeAudioModalBtn').onclick = () => audioModal.classList.remove('open');
-
-  document.getElementById('saveAudioBtn').onclick = () => {
-    const name = (document.getElementById('audioNameInput').value || '').trim();
-    const file = (document.getElementById('audioPathInput').value || '').trim();
-    if (!name || !file) { alert('من فضلك أدخل اسم الصوت ورابطه'); return; }
-
-    const newAudio = {
-      id: 'aud_' + Math.random().toString(36).slice(2, 9),
-      name,
-      file,
-      created_at: new Date().toISOString()
-    };
-    state.audios.push(newAudio);
-    saveLocal('audio_items', state.audios);
-    sbUpsert('audio_items', newAudio.id, newAudio);
-
-    audioModal.classList.remove('open');
-    renderAudios();
-    renderBadges();
-  };
-
-  function deleteAudio(id) {
-    if (!confirm('هل تريد حذف هذا الصوت؟')) return;
-    state.audios = state.audios.filter(a => a.id !== id);
-    saveLocal('audio_items', state.audios);
-    sbDelete('audio_items', id);
-    renderAudios();
-    renderBadges();
   }
 
   /* =============================
@@ -1344,7 +815,6 @@
 
     state.ads.unshift(newAd);
     saveLocal('ads', state.ads);
-    sbUpsert('ads', newAd.id, newAd);
 
     adModal.classList.remove('open');
     renderAds();
@@ -1356,7 +826,6 @@
     if (!ad) return;
     ad.is_active = active;
     saveLocal('ads', state.ads);
-    sbUpsert('ads', id, ad);
     renderAds();
     renderDashboard();
   }
@@ -1365,7 +834,6 @@
     if (!confirm('حذف هذا الإعلان نهائياً؟')) return;
     state.ads = state.ads.filter(a => a.id !== id);
     saveLocal('ads', state.ads);
-    sbDelete('ads', id);
     renderAds();
     renderBadges();
   }
@@ -1395,16 +863,6 @@
   });
   document.getElementById('userSearchInput').oninput = () => renderUsers();
 
-  // Message filters
-  document.querySelectorAll('[data-mfilter]').forEach(btn => {
-    btn.onclick = () => {
-      document.querySelectorAll('[data-mfilter]').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      state.msgFilter = btn.dataset.mfilter;
-      renderMessages();
-    };
-  });
-
   // Settings: Change PIN
   document.getElementById('savePinBtn').onclick = () => {
     const newPin = (document.getElementById('newAdminPin').value || '').trim();
@@ -1412,20 +870,6 @@
     localStorage.setItem('naqisna_admin_pin', newPin);
     alert('تم تحديث رمز المرور السري بنجاح!');
     document.getElementById('newAdminPin').value = '';
-  };
-
-  // Settings: Reset Seed Data
-  document.getElementById('resetSeedDataBtn').onclick = () => {
-    if (!confirm('هل تريد استرجاع باقة النكت الكوميدية الأصلية؟')) return;
-    state.messages = [...SEED_MESSAGES];
-    state.audios = [...SEED_AUDIOS];
-    saveLocal('comedy_messages', state.messages);
-    saveLocal('audio_items', state.audios);
-    if (db) {
-      state.messages.forEach(m => sbUpsert('comedy_messages', m.id, m));
-    }
-    renderAll();
-    alert('تم استرجاع الباقة الكوميدية الأصلية بنجاح!');
   };
 
   document.getElementById('refreshActivityBtn').onclick = () => {
