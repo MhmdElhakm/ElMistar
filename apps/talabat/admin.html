@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <meta name="theme-color" content="#4C1D95" />
-<title>لوحة التحكم | ناقصنا إيه للأزواج والزوجات</title>
+<title>لوحة التحكم | ناقصنا إيه</title>
 <link rel="icon" type="image/png" href="icon-192.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -273,7 +273,7 @@
       <div class="header-logo">🛒</div>
       <div class="header-titles">
         <h1>إدارة تطبيق "ناقصنا إيه"</h1>
-        <p>النسخة الخاصة بالأزواج والزوجات</p>
+        <p>إدارة المستخدمين والطلبات</p>
       </div>
     </div>
     <div class="header-actions">
@@ -301,18 +301,6 @@
         <div class="stat-label">إجمالي المستخدمين</div>
         <div class="stat-value" id="statTotalUsers">0</div>
         <div class="stat-meta">مسجلين برقم WhatsApp</div>
-      </div>
-      <div class="stat-card" style="--card-accent:#3B82F6;">
-        <div class="stat-icon">👨</div>
-        <div class="stat-label">عدد الأزواج</div>
-        <div class="stat-value" id="statHusbands">0</div>
-        <div class="stat-meta" id="statHusbandsPct">0% من الإجمالي</div>
-      </div>
-      <div class="stat-card" style="--card-accent:#EC4899;">
-        <div class="stat-icon">👩</div>
-        <div class="stat-label">عدد الزوجات</div>
-        <div class="stat-value" id="statWives">0</div>
-        <div class="stat-meta" id="statWivesPct">0% من الإجمالي</div>
       </div>
       <div class="stat-card" style="--card-accent:#10B981;">
         <div class="stat-icon">🛒</div>
@@ -365,8 +353,6 @@
       <div class="filter-bar">
         <input type="text" id="userSearchInput" class="form-input" placeholder="🔍 ابحث بالاسم أو رقم الواتساب..." />
         <button class="btn-outline active" data-ufilter="all">الكل</button>
-        <button class="btn-outline" data-ufilter="husband">👨 أزواج</button>
-        <button class="btn-outline" data-ufilter="wife">👩 زوجات</button>
       </div>
 
       <div class="table-responsive">
@@ -568,8 +554,8 @@
       if (!localUsers.some(u => u.id === appUser.id)) {
         localUsers.push({
           id: appUser.id,
-          name: appUser.name || (appUser.role === 'husband' ? 'الزوج' : 'الزوجة'),
-          role: appUser.role || 'husband',
+          name: appUser.name || 'مستخدم',
+          role: 'member',
           whatsapp: appUser.whatsapp || '',
           ordersCount: (loadLocal('orders', [])).length,
           activitiesCount: 3,
@@ -583,8 +569,8 @@
     // 3. Activities & Orders
     state.orders = loadLocal('orders', []);
     state.activities = loadLocal('activities_log', [
-      { id: 'act_1', user: 'أحمد (الزوج)', type: 'order_complete', text: 'أنهى كتابة قائمة طلبات البيت 🛒', time: Date.now() - 3600000 },
-      { id: 'act_2', user: 'سارة (الزوجة)', type: 'order_new', text: 'أضافت 4 أصناف جديدة في قسم الخضار 🥦', time: Date.now() - 7200000 },
+      { id: 'act_1', user: 'أحمد', type: 'order_complete', text: 'أنهى كتابة قائمة طلبات البيت 🛒', time: Date.now() - 3600000 },
+      { id: 'act_2', user: 'سارة', type: 'order_new', text: 'أضافت 4 أصناف جديدة في قسم الخضار 🥦', time: Date.now() - 7200000 },
       { id: 'act_3', user: 'النظام', type: 'order_complete', text: 'تم إنشاء قائمة طلبات جديدة 🛒', time: Date.now() - 10800000 }
     ]);
 
@@ -615,16 +601,10 @@
 
   function renderDashboard() {
     const totalU = state.users.length;
-    const husbands = state.users.filter(u => u.role === 'husband').length;
-    const wives = state.users.filter(u => u.role === 'wife').length;
     const totalOrders = state.orders.length || 18;
     const activeAds = state.ads.filter(a => a.is_active).length;
 
     document.getElementById('statTotalUsers').textContent = totalU || '—';
-    document.getElementById('statHusbands').textContent = husbands;
-    document.getElementById('statWives').textContent = wives;
-    document.getElementById('statHusbandsPct').textContent = totalU ? Math.round((husbands / totalU) * 100) + '% من الإجمالي' : '0%';
-    document.getElementById('statWivesPct').textContent = totalU ? Math.round((wives / totalU) * 100) + '% من الإجمالي' : '0%';
     document.getElementById('statTotalOrders').textContent = totalOrders;
     document.getElementById('statActiveAds').textContent = activeAds;
 
@@ -636,16 +616,15 @@
     } else {
       lbContainer.innerHTML = sorted.slice(0, 5).map((u, i) => {
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`;
-        const isHusband = u.role === 'husband';
         const score = (u.ordersCount || 0) + (u.activitiesCount || 0);
         return `
           <div class="rank-item">
             <div class="rank-num">${medal}</div>
-            <div class="rank-avatar" style="background:${isHusband ? 'rgba(59,130,246,0.2)' : 'rgba(236,72,153,0.2)'};">
-              ${isHusband ? '👨' : '👩'}
+            <div class="rank-avatar" style="background:rgba(139,92,246,0.2);">
+              👤
             </div>
             <div class="rank-info">
-              <div class="rank-name">${escapeHTML(u.name || (isHusband ? 'زوج' : 'زوجة'))}</div>
+              <div class="rank-name">${escapeHTML(u.name || 'مستخدم')}</div>
               <div style="font-size:11px; color:var(--text-sec);">${u.whatsapp ? '📱 ' + escapeHTML(u.whatsapp) : 'بدون رقم'} • ${u.ordersCount || 0} طلبات</div>
             </div>
             <div class="rank-score">${score} <span style="font-size:10px; color:var(--text-sec);">نقطة</span></div>
@@ -672,9 +651,6 @@
 
   function renderUsers() {
     let list = [...state.users];
-    if (state.userFilter !== 'all') {
-      list = list.filter(u => u.role === state.userFilter);
-    }
     const q = (document.getElementById('userSearchInput').value || '').trim().toLowerCase();
     if (q) {
       list = list.filter(u => (u.name || '').toLowerCase().includes(q) || (u.whatsapp || '').includes(q));
@@ -688,20 +664,19 @@
     }
 
     tbody.innerHTML = list.map(u => {
-      const isHusband = u.role === 'husband';
       const cleanPhone = (u.whatsapp || '').replace(/[^0-9+]/g, '');
       const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}` : null;
       return `
         <tr>
           <td>
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:20px;">${isHusband ? '👨' : '👩'}</span>
-              <b>${escapeHTML(u.name || (isHusband ? 'الزوج' : 'الزوجة'))}</b>
+              <span style="font-size:20px;">👤</span>
+              <b>${escapeHTML(u.name || 'مستخدم')}</b>
             </div>
           </td>
           <td>
-            <span class="badge ${isHusband ? 'badge-husband' : 'badge-wife'}">
-              ${isHusband ? '👨 زوج' : '👩 زوجة'}
+            <span class="badge badge-active">
+              👤 عضو
             </span>
           </td>
           <td>
