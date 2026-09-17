@@ -71,6 +71,7 @@ window.NaqisnaSupabase = (function () {
       user: state.user ? { id: state.user.id, name: state.user.name, role: 'member', whatsapp: state.user.whatsapp } : null,
       deliveryWhatsapp: state.deliveryWhatsapp || (state.home && state.home.deliveryWhatsapp) || null,
       deliveryName: state.deliveryName || (state.home && state.home.deliveryName) || null,
+      partnerWhatsapp: state.partnerWhatsapp || (state.home && state.home.partnerWhatsapp) || null,
       orders: Array.isArray(state.orders) ? state.orders : [],
       expenses: Array.isArray(state.expenses) ? state.expenses : [],
       orderLists: Array.isArray(state.orderLists) ? state.orderLists : [],
@@ -143,6 +144,7 @@ window.NaqisnaSupabase = (function () {
         name: blob.name || null,
         deliveryWhatsapp: blob.deliveryWhatsapp || null,
         deliveryName: blob.deliveryName || null,
+        partnerWhatsapp: blob.partnerWhatsapp || null,
         user: blob.user || null,
         orders: Array.isArray(blob.orders) ? blob.orders : [],
         expenses: Array.isArray(blob.expenses) ? blob.expenses : [],
@@ -246,6 +248,7 @@ window.NaqisnaSupabase = (function () {
       snap.expenses = Array.isArray(remote.expenses) ? remote.expenses : [];
       if (!snap.deliveryWhatsapp && remote.deliveryWhatsapp) snap.deliveryWhatsapp = remote.deliveryWhatsapp;
       if (!snap.deliveryName && remote.deliveryName) snap.deliveryName = remote.deliveryName;
+      if (!snap.partnerWhatsapp && remote.partnerWhatsapp) snap.partnerWhatsapp = remote.partnerWhatsapp;
       await writeBlob(homeCode, snap);
     } catch (e) {
       console.error('Push orders-only error:', e);
