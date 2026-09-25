@@ -254,13 +254,13 @@
   <div class="auth-box">
     <div class="auth-icon">🛡️</div>
     <h2 style="font-weight:900; margin-bottom:6px;">لوحة تحكم الإدارة</h2>
-    <p style="color:var(--text-sec); font-size:13px; margin-bottom:22px;">أدخل رمز المرور السري للدخول إلى النظام</p>
+    <p style="color:var(--text-sec); font-size:13px; margin-bottom:22px;">اكتب رمز الدخول السري عشان تدخل</p>
     <div class="form-group">
-      <input type="password" id="adminPinInput" class="form-input" placeholder="رمز المرور (الافتراضي: 7788)" style="text-align:center; letter-spacing:4px; font-size:18px; font-weight:800;" maxlength="10" />
+      <input type="password" id="adminPinInput" class="form-input" placeholder="رمز الدخول (الافتراضي: 7788)" style="text-align:center; letter-spacing:4px; font-size:18px; font-weight:800;" maxlength="10" />
     </div>
-    <div id="authError" style="color:var(--danger); font-size:12px; font-weight:700; margin-bottom:12px; display:none;">رمز المرور غير صحيح!</div>
-    <button class="btn-primary" id="authSubmitBtn" style="width:100%; padding:14px;">تسجيل الدخول 🔐</button>
-    <div style="margin-top:14px;"><a href="index.html" style="color:var(--text-muted); text-decoration:none; font-size:12px;">← العودة للتطبيق الرئيسي</a></div>
+    <div id="authError" style="color:var(--danger); font-size:12px; font-weight:700; margin-bottom:12px; display:none;">رمز الدخول غلط!</div>
+    <button class="btn-primary" id="authSubmitBtn" style="width:100%; padding:14px;">ادخل 🔐</button>
+    <div style="margin-top:14px;"><a href="index.html" style="color:var(--text-muted); text-decoration:none; font-size:12px;">← ارجع للتطبيق الرئيسي</a></div>
   </div>
 </div>
 
@@ -273,18 +273,18 @@
       <div class="header-logo">🛒</div>
       <div class="header-titles">
         <h1>إدارة تطبيق "ناقصنا إيه"</h1>
-        <p>إدارة المستخدمين والطلبات</p>
+        <p>تابع المستخدمين والطلبات</p>
       </div>
     </div>
     <div class="header-actions">
-      <a href="index.html" class="btn-outline"><span>📱</span> معاينة التطبيق</a>
-      <button class="btn-outline" id="logoutBtn" title="تسجيل الخروج">🚪</button>
+      <a href="index.html" class="btn-outline"><span>📱</span> شوف التطبيق</a>
+      <button class="btn-outline" id="logoutBtn" title="اخرج">🚪</button>
     </div>
   </header>
 
   <!-- Navigation Tabs -->
   <nav class="tabs-nav">
-    <button class="nav-tab active" data-tab="dashboard">📊 لوحة الإحصائيات</button>
+    <button class="nav-tab active" data-tab="dashboard">📊 الإحصائيات</button>
     <button class="nav-tab" data-tab="users">👥 المستخدمين <span class="tab-badge" id="tabUsersBadge">0</span></button>
 
     
@@ -298,21 +298,21 @@
     <div class="stat-grid">
       <div class="stat-card" style="--card-accent:#8B5CF6;">
         <div class="stat-icon">👥</div>
-        <div class="stat-label">إجمالي المستخدمين</div>
+        <div class="stat-label">كل المستخدمين</div>
         <div class="stat-value" id="statTotalUsers">0</div>
         <div class="stat-meta">مسجلين برقم WhatsApp</div>
       </div>
       <div class="stat-card" style="--card-accent:#10B981;">
         <div class="stat-icon">🛒</div>
-        <div class="stat-label">إجمالي الطلبات</div>
+        <div class="stat-label">كل الطلبات</div>
         <div class="stat-value" id="statTotalOrders">0</div>
         <div class="stat-meta">طلب تم تسجيله</div>
       </div>
       <div class="stat-card" style="--card-accent:#06B6D4;">
         <div class="stat-icon">📢</div>
-        <div class="stat-label">الإعلانات النشطة</div>
+        <div class="stat-label">الإعلانات الشغالة</div>
         <div class="stat-value" id="statActiveAds">0</div>
-        <div class="stat-meta">ظاهرة للمستخدمين</div>
+        <div class="stat-meta">ظاهرة للناس</div>
       </div>
     </div>
 
@@ -320,20 +320,20 @@
       <!-- Most Active Leaderboard -->
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><span>🏆</span> المستخدمون الأكثر نشاطاً</div>
-          <span style="font-size:12px; color:var(--text-sec);">مرتب حسب الأنشطة والطلبات</span>
+          <div class="card-title"><span>🏆</span> الأنشط</div>
+          <span style="font-size:12px; color:var(--text-sec);">مترتبين حسب الأنشطة والطلبات</span>
         </div>
         <div id="leaderboardList">
           <!-- Populated by JS -->
-          <div style="text-align:center; padding:20px; color:var(--text-muted);">لا يوجد بيانات مستخدمين بعد</div>
+          <div style="text-align:center; padding:20px; color:var(--text-muted);">لسه مفيش بيانات ناس</div>
         </div>
       </div>
 
       <!-- Recent Live Activity -->
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><span>⚡</span> سجل النشاط المباشر</div>
-          <button class="btn-outline" style="padding:4px 10px; font-size:11px;" id="refreshActivityBtn">تحديث</button>
+          <div class="card-title"><span>⚡</span> النشاط أول بأول</div>
+          <button class="btn-outline" style="padding:4px 10px; font-size:11px;" id="refreshActivityBtn">حدّث</button>
         </div>
         <div id="activityFeedList">
           <!-- Populated by JS -->
@@ -346,12 +346,12 @@
   <section class="content-section" id="tab-users">
     <div class="card">
       <div class="card-header">
-        <div class="card-title"><span>👥</span> إدارة المستخدمين وأرقام WhatsApp</div>
-        <div style="font-size:12px; color:var(--text-sec);" id="usersCountLabel">0 مستخدم مسجل</div>
+          <div class="card-title"><span>👥</span> الناس وأرقام الواتساب</div>
+        <div style="font-size:12px; color:var(--text-sec);" id="usersCountLabel">لسه مفيش حد</div>
       </div>
       
       <div class="filter-bar">
-        <input type="text" id="userSearchInput" class="form-input" placeholder="🔍 ابحث بالاسم أو رقم الواتساب..." />
+        <input type="text" id="userSearchInput" class="form-input" placeholder="🔍 دوّر بالاسم أو رقم الواتساب..." />
         <button class="btn-outline active" data-ufilter="all">الكل</button>
       </div>
 
@@ -359,13 +359,13 @@
         <table>
           <thead>
             <tr>
-              <th>المستخدم</th>
+              <th>الاسم</th>
               <th>النوع</th>
-              <th>رقم WhatsApp</th>
+              <th>رقم الواتساب</th>
               <th>الطلبات</th>
               <th>النشاط</th>
-              <th>تاريخ التسجيل</th>
-              <th>الإجراءات</th>
+              <th>سجّل إمتى</th>
+              <th>تحكم</th>
             </tr>
           </thead>
           <tbody id="usersTableBody">
@@ -380,12 +380,12 @@
   <section class="content-section" id="tab-ads">
     <div class="card">
       <div class="card-header">
-        <div class="card-title"><span>📢</span> نظام الإعلانات المصورة (صورة فقط)</div>
-        <button class="btn-primary" id="openAddAdModalBtn">+ إضافة إعلان جديد</button>
+          <div class="card-title"><span>📢</span> الإعلانات (صورة بس)</div>
+          <button class="btn-primary" id="openAddAdModalBtn">+ ضيف إعلان جديد</button>
       </div>
 
       <p style="color:var(--text-sec); font-size:13px; margin-bottom:14px;">
-        يمكنك رفع صورة إعلان وتحديد مكان ظهوره في التطبيق (أعلى الصفحة، وسط الصفحة، أو أسفلها) وتفعيله أو تعطيله في أي وقت.
+        تقدر ترفع صورة إعلان وتختار هتظهر فين في التطبيق (فوق الصفحة، في النص، أو تحت) وتشغّله أو تطفيه في أي وقت.
       </p>
 
       <div id="adsListContainer">
@@ -398,14 +398,14 @@
   <section class="content-section" id="tab-settings">
     <div class="card">
       <div class="card-header">
-        <div class="card-title"><span>🔐</span> أمان لوحة التحكم</div>
+          <div class="card-title"><span>🔐</span> أمان اللوحة</div>
       </div>
       <div style="max-width:400px;">
         <div class="form-group">
-          <label>تغيير رمز المرور السري (Admin PIN)</label>
+          <label>غيّر رمز الدخول (Admin PIN)</label>
           <input type="password" id="newAdminPin" class="form-input" placeholder="الرمز الجديد..." maxlength="10" />
         </div>
-        <button class="btn-primary" id="savePinBtn">حفظ رمز المرور الجديد</button>
+          <button class="btn-primary" id="savePinBtn">احفظ الرمز الجديد</button>
       </div>
     </div>
 
@@ -416,15 +416,15 @@
 <!-- ── MODAL: Add Ad (Image Only) ── -->
 <div class="modal-overlay" id="adModal">
   <div class="modal-box">
-    <h3 style="font-weight:900; margin-bottom:14px;">إضافة إعلان مصور جديد</h3>
+      <h3 style="font-weight:900; margin-bottom:14px;">ضيف إعلان بالصورة</h3>
 
     <div class="form-group">
-      <label>عنوان الإعلان (لأغراض الإدارة)</label>
+      <label>عنوان الإعلان (ليك انت بس)</label>
       <input type="text" id="adTitleInput" class="form-input" placeholder="مثال: خصم كارفور الأسبوعي" />
     </div>
 
     <div class="form-group">
-      <label>صورة الإعلان (رفع صورة أو رابط مباشر) *</label>
+      <label>صورة الإعلان (ارفع صورة أو حط رابط) *</label>
       <input type="file" id="adFileInput" accept="image/*" class="form-input" style="padding:6px; margin-bottom:8px;" />
       <input type="url" id="adUrlInput" class="form-input" placeholder="أو الصق رابط الصورة مباشرة هنا https://..." />
       <div id="adImagePreviewBox" style="margin-top:10px; display:none; text-align:center;">
@@ -433,21 +433,21 @@
     </div>
 
     <div class="form-group">
-      <label>مكان ظهور الإعلان داخل التطبيق *</label>
+      <label>الإعلان هيظهر فين في التطبيق؟ *</label>
       <select id="adPositionInput" class="form-select">
-        <option value="top">🔝 أعلى الصفحة (تحت شريط العنوان)</option>
-        <option value="middle"> وسط الصفحة (بين الإحصائيات وقائمة الطلبات)</option>
-        <option value="bottom">🔻 أسفل الصفحة (فوق القائمة السفلية)</option>
+        <option value="top">🔝 فوق الصفحة (تحت شريط العنوان)</option>
+        <option value="middle"> في نص الصفحة (بين الإحصائيات وقايمة الطلبات)</option>
+        <option value="bottom">🔻 تحت الصفحة (فوق القايمة اللي تحت)</option>
       </select>
     </div>
 
     <div class="form-group">
-      <label>رابط التوجيه عند الضغط على الصورة (اختياري)</label>
+      <label>رابط يفتح لما حد يدوس على الصورة (اختياري)</label>
       <input type="url" id="adLinkInput" class="form-input" placeholder="https://..." />
     </div>
 
     <div class="form-group" style="display:flex; align-items:center; justify-content:space-between;">
-      <label style="margin:0;">تفعيل الإعلان للمستخدمين</label>
+      <label style="margin:0;">شغّل الإعلان للناس</label>
       <label class="switch">
         <input type="checkbox" id="adActiveInput" checked />
         <span class="slider"></span>
@@ -455,7 +455,7 @@
     </div>
 
     <div style="display:flex; gap:10px; margin-top:20px;">
-      <button class="btn-primary" id="saveAdBtn" style="flex:1;">حفظ وتفعيل الإعلان</button>
+      <button class="btn-primary" id="saveAdBtn" style="flex:1;">احفظ وشغّل الإعلان</button>
       <button class="btn-outline" id="closeAdModalBtn">إلغاء</button>
     </div>
   </div>
@@ -569,9 +569,9 @@
     // 3. Activities & Orders
     state.orders = loadLocal('orders', []);
     state.activities = loadLocal('activities_log', [
-      { id: 'act_1', user: 'أحمد', type: 'order_complete', text: 'أنهى كتابة قائمة طلبات البيت 🛒', time: Date.now() - 3600000 },
-      { id: 'act_2', user: 'سارة', type: 'order_new', text: 'أضافت 4 أصناف جديدة في قسم الخضار 🥦', time: Date.now() - 7200000 },
-      { id: 'act_3', user: 'النظام', type: 'order_complete', text: 'تم إنشاء قائمة طلبات جديدة 🛒', time: Date.now() - 10800000 }
+      { id: 'act_1', user: 'أحمد', type: 'order_complete', text: 'خلّص كتابة قايمة طلبات البيت 🛒', time: Date.now() - 3600000 },
+      { id: 'act_2', user: 'سارة', type: 'order_new', text: 'زوّدت 4 أصناف جديدة في قسم الخضار 🥦', time: Date.now() - 7200000 },
+      { id: 'act_3', user: 'النظام', type: 'order_complete', text: 'اتعملت قايمة طلبات جديدة 🛒', time: Date.now() - 10800000 }
     ]);
 
     if (window.NaqisnaSupabase && window.NaqisnaSupabase.isConfigured()) {
@@ -612,7 +612,7 @@
     const sorted = [...state.users].sort((a, b) => ((b.ordersCount || 0) + (b.activitiesCount || 0)) - ((a.ordersCount || 0) + (a.activitiesCount || 0)));
     const lbContainer = document.getElementById('leaderboardList');
     if (!sorted.length) {
-      lbContainer.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">لا يوجد مستخدمين مسجلين حتى الآن</div>`;
+      lbContainer.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">لسه مفيش ناس متسجلة</div>`;
     } else {
       lbContainer.innerHTML = sorted.slice(0, 5).map((u, i) => {
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`;
@@ -656,10 +656,10 @@
       list = list.filter(u => (u.name || '').toLowerCase().includes(q) || (u.whatsapp || '').includes(q));
     }
 
-    document.getElementById('usersCountLabel').textContent = `${list.length} من أصل ${state.users.length} مستخدم`;
+    document.getElementById('usersCountLabel').textContent = `${list.length} من أصل ${state.users.length}`;
     const tbody = document.getElementById('usersTableBody');
     if (!list.length) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">لا يوجد مستخدمين مطابقين للبحث</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">مفيش حد مطابق للبحث ده</td></tr>`;
       return;
     }
 
@@ -686,7 +686,7 @@
           <td><span class="badge badge-active">${(u.activitiesCount || 0) + (u.ordersCount || 0)} نشاط</span></td>
           <td style="color:var(--text-sec); font-size:12px;">${u.joinedAt ? new Date(u.joinedAt).toLocaleDateString('ar-EG') : '—'}</td>
           <td>
-            ${waLink ? `<a href="${waLink}" target="_blank" class="action-btn" title="مراسلة واتساب">💬</a>` : ''}
+            ${waLink ? `<a href="${waLink}" target="_blank" class="action-btn" title="ابعتله واتساب">💬</a>` : ''}
           </td>
         </tr>
       `;
@@ -696,29 +696,29 @@
   function renderAds() {
     const container = document.getElementById('adsListContainer');
     if (!state.ads.length) {
-      container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد إعلانات حالياً. اضغط "+ إضافة إعلان جديد" بالأعلى</div>`;
+      container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">لسه مفيش إعلانات. دوس "+ ضيف إعلان جديد" اللي فوق</div>`;
       return;
     }
 
     container.innerHTML = state.ads.map(ad => {
-      const posLabel = ad.position === 'top' ? '🔝 أعلى الصفحة' : ad.position === 'middle' ? ' وسط الصفحة' : '🔻 أسفل الصفحة';
+      const posLabel = ad.position === 'top' ? '🔝 فوق الصفحة' : ad.position === 'middle' ? ' في نص الصفحة' : '🔻 تحت الصفحة';
       return `
         <div class="item-card">
           <img src="${ad.image}" style="width:80px; height:54px; object-fit:cover; border-radius:8px; border:1px solid var(--card-border);" onerror="this.src='icon-192.png'" />
           <div class="item-content">
             <div class="item-meta">
               <span class="badge badge-couple">${posLabel}</span>
-              ${ad.is_active ? '<span class="badge badge-active">مفعل</span>' : '<span class="badge badge-inactive">معطل</span>'}
+              ${ad.is_active ? '<span class="badge badge-active">شغال</span>' : '<span class="badge badge-inactive">مطفي</span>'}
             </div>
             <div style="font-weight:800; font-size:13.5px;">${escapeHTML(ad.title || 'إعلان بدون عنوان')}</div>
             ${ad.link ? `<div style="font-size:11px; color:var(--accent); direction:ltr; text-align:right;">🔗 ${escapeHTML(ad.link)}</div>` : ''}
           </div>
           <div class="item-actions">
-            <label class="switch" title="تفعيل/تعطيل">
+            <label class="switch" title="شغّله / اطفيه">
               <input type="checkbox" data-togglead="${ad.id}" ${ad.is_active ? 'checked' : ''} />
               <span class="slider"></span>
             </label>
-            <button class="action-btn del" data-delad="${ad.id}" title="حذف">🗑️</button>
+            <button class="action-btn del" data-delad="${ad.id}" title="امسح">🗑️</button>
           </div>
         </div>
       `;
@@ -774,7 +774,7 @@
     const isActive = document.getElementById('adActiveInput').checked;
 
     if (!previewSrc || previewSrc.includes('javascript') || previewSrc.endsWith('#')) {
-      alert('من فضلك ارفع صورة الإعلان أو ضع رابطها');
+      alert('ارفع صورة الإعلان أو حط رابطها الأول');
       return;
     }
 
@@ -806,7 +806,7 @@
   }
 
   function deleteAd(id) {
-    if (!confirm('حذف هذا الإعلان نهائياً؟')) return;
+    if (!confirm('نمسح الإعلان ده خالص؟')) return;
     state.ads = state.ads.filter(a => a.id !== id);
     saveLocal('ads', state.ads);
     renderAds();
@@ -841,9 +841,9 @@
   // Settings: Change PIN
   document.getElementById('savePinBtn').onclick = () => {
     const newPin = (document.getElementById('newAdminPin').value || '').trim();
-    if (!newPin || newPin.length < 4) { alert('الرمز يجب أن يكون 4 أرقام أو حروف على الأقل'); return; }
+    if (!newPin || newPin.length < 4) { alert('الرمز لازم 4 حروف أو أرقام على الأقل'); return; }
     localStorage.setItem('naqisna_admin_pin', newPin);
-    alert('تم تحديث رمز المرور السري بنجاح!');
+    alert('الرمز الجديد اتحفظ تمام!');
     document.getElementById('newAdminPin').value = '';
   };
 
@@ -860,10 +860,10 @@
   function formatTimeAgo(time) {
     if (!time) return '';
     const diff = Math.floor((Date.now() - Number(time)) / 1000);
-    if (diff < 60) return 'الآن';
-    if (diff < 3600) return `منذ ${Math.floor(diff / 60)} دقيقة`;
-    if (diff < 86400) return `منذ ${Math.floor(diff / 3600)} ساعة`;
-    return `منذ ${Math.floor(diff / 86400)} يوم`;
+    if (diff < 60) return 'دلوقتي';
+    if (diff < 3600) return `من ${Math.floor(diff / 60)} دقيقة`;
+    if (diff < 86400) return `من ${Math.floor(diff / 3600)} ساعة`;
+    return `من ${Math.floor(diff / 86400)} يوم`;
   }
 
   function initAdmin() {

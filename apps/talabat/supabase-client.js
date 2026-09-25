@@ -255,6 +255,47 @@ window.NaqisnaSupabase = (function () {
     }
   }
 
+  // --- Per-section finance sharing: push only shared kinds, keep private kinds untouched ---
+  // shareMap: { expense: bool, income: bool, debt: bool }
+  // - Shared kinds: local list is authoritative for that slice (uploads + propagates local deletes)
+  // - Private kinds: remote items preserved, plus local items explicitly marked shared:true are upserted
+  async function pushFinPartial(homeCode, state, shareMap) {
+    if (!homeCode || !state) return;
+    try {
+      const remote = (await readBlob(homeCode)) || {};
+      if (!pushAllowed(state, remote)) return;
+      const kindOf = (e) => (e && e.kind) || 'expense';
+      const snap = blobSnapshot(homeCode, state);
+      const remoteExp = Array.isArray(remote.expenses) ? remote.expenses : [];
+      const localExp = Array.isArray(state.expenses) ? state.expenses : [];
+      const localById = new Map();
+      localExp.forEach(e => { if (e && e.id != null) localById.set(String(e.id), e); });
+      const out = [];
+      remoteExp.forEach(re => {
+        if (!re) return;
+        const k = kindOf(re);
+        const shared = shareMap && shareMap[k] === true;
+        if (!shared) { out.push(re); return; }
+        const le = localById.get(String(re.id));
+        if (le) out.push(le);
+        // else: deleted locally in a shared kind -> drop it (propagate delete)
+      });
+      const outIds = new Set(out.map(e => e && String(e.id)));
+      localExp.forEach(le => {
+        if (!le || le.id == null || outIds.has(String(le.id))) return;
+        const k = kindOf(le);
+        if ((shareMap && shareMap[k] === true) || le.shared === true) out.push(le);
+      });
+      snap.expenses = out;
+      if (!snap.deliveryWhatsapp && remote.deliveryWhatsapp) snap.deliveryWhatsapp = remote.deliveryWhatsapp;
+      if (!snap.deliveryName && remote.deliveryName) snap.deliveryName = remote.deliveryName;
+      if (!snap.partnerWhatsapp && remote.partnerWhatsapp) snap.partnerWhatsapp = remote.partnerWhatsapp;
+      await writeBlob(homeCode, snap);
+    } catch (e) {
+      console.error('Push fin-partial error:', e);
+    }
+  }
+
   // --- Realtime Subscription ---
   function subscribeToHomeChanges(homeCode, onChangeCallback) {
     const sb = getClient();
@@ -309,6 +350,7 @@ window.NaqisnaSupabase = (function () {
     deleteExpense,
     pushFullState,
     pushOrdersOnly,
+    pushFinPartial,
     subscribeToHomeChanges,
     fetchAdminAds
   };
