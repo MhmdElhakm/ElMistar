@@ -1,606 +1,339 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قارئ الكلمات الإنجليزية 🔊</title>
-    
-    <!-- Google Fonts for Arabic & English text -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary-color: #6C5CE7;
-            --primary-hover: #5A4BD1;
-            --primary-light: #F0EDFF;
-            --accent-color: #00CEC9;
-            --accent-hover: #00B5B2;
-            --clear-color: #FF7675;
-            --clear-hover: #D63031;
-            --clear-light: #FFEAEA;
-            --bg-gradient: linear-gradient(135deg, #A8C0FF 0%, #3F2B96 100%);
-            --card-bg: rgba(255, 255, 255, 0.96);
-            --text-dark: #2D3436;
-            --text-muted: #636E72;
-            --border-radius: 24px;
-            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.2);
-            --shadow-md: 0 10px 20px rgba(108, 92, 231, 0.15);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #74EBD5 0%, #9ACE6A 100%);
-            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                              radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                              radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            direction: rtl;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 520px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 35px 30px;
-            box-shadow: var(--shadow-lg);
-            backdrop-filter: blur(10px);
-            text-align: center;
-            border: 3px solid rgba(255, 255, 255, 0.8);
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-
-        /* Top decorative bar */
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 8px;
-            background: linear-gradient(90deg, #FF7675, #FDCB6E, #00CEC9, #6C5CE7);
-        }
-
-        .title-wrapper {
-            margin-bottom: 25px;
-        }
-
-        .app-title {
-            font-size: 2.1rem;
-            font-weight: 800;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 6px;
-        }
-
-        .speaker-icon {
-            display: inline-block;
-            transition: transform 0.3s ease;
-        }
-
-        .speaker-icon.speaking {
-            animation: pulse-speaker 0.6s infinite alternate;
-        }
-
-        @keyframes pulse-speaker {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.3) rotate(5deg); }
-        }
-
-        .app-subtitle {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        /* Alert / Message Notification Box */
-        .message-box {
-            display: none;
-            padding: 12px 16px;
-            border-radius: 14px;
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .message-box.warning {
-            background-color: #FFF3CD;
-            color: #856404;
-            border: 2px solid #FFEEBA;
-        }
-
-        .message-box.error {
-            background-color: #F8D7DA;
-            color: #721C24;
-            border: 2px solid #F5C6CB;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Input field area */
-        .input-group {
-            margin-bottom: 22px;
-            position: relative;
-        }
-
-        .word-input {
-            width: 100%;
-            padding: 18px 20px;
-            font-size: 2rem;
-            font-family: 'Fredoka', cursive, sans-serif;
-            font-weight: 600;
-            color: var(--text-dark);
-            background: #F8F9FA;
-            border: 3px solid #E2E8F0;
-            border-radius: 18px;
-            text-align: center;
-            direction: ltr; /* English word direction */
-            outline: none;
-            transition: all 0.25s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
-        }
-
-        .word-input:focus {
-            border-color: var(--primary-color);
-            background: #FFFFFF;
-            box-shadow: 0 0 0 5px rgba(108, 92, 231, 0.2), inset 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        .word-input::placeholder {
-            color: #A0AEC0;
-            font-size: 1.5rem;
-            font-weight: 500;
-        }
-
-        /* Speed controls */
-        .speed-container {
-            background: var(--primary-light);
-            border-radius: 16px;
-            padding: 12px 16px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .speed-label {
-            font-weight: 700;
-            color: var(--primary-color);
-            font-size: 1rem;
-        }
-
-        .speed-options {
-            display: flex;
-            gap: 10px;
-        }
-
-        .speed-btn {
-            background: white;
-            border: 2px solid transparent;
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .speed-btn.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
-        }
-
-        .speed-btn:hover:not(.active) {
-            background: #EBE6FF;
-        }
-
-        /* Action Buttons */
-        .buttons-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .btn-main {
-            width: 100%;
-            padding: 16px;
-            font-size: 1.3rem;
-            font-weight: 800;
-            border: none;
-            border-radius: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.2s ease;
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-read {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .btn-read:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(108, 92, 231, 0.35);
-        }
-
-        .btn-read:active {
-            transform: translateY(1px);
-        }
-
-        .secondary-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .btn-repeat {
-            background: var(--accent-color);
-            color: white;
-            padding: 14px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            border: none;
-            border-radius: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            box-shadow: 0 6px 15px rgba(0, 206, 201, 0.25);
-        }
-
-        .btn-repeat:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
-        }
-
-        .btn-clear {
-            background: var(--clear-light);
-            color: var(--clear-color);
-            padding: 14px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            border: 2px solid rgba(255, 118, 117, 0.3);
-            border-radius: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-clear:hover {
-            background: var(--clear-hover);
-            color: white;
-            border-color: var(--clear-hover);
-            transform: translateY(-2px);
-        }
-
-        /* Sound wave indicator animation */
-        .sound-wave {
-            display: none;
-            justify-content: center;
-            align-items: center;
-            gap: 4px;
-            height: 24px;
-            margin-top: 15px;
-        }
-
-        .sound-wave.active {
-            display: flex;
-        }
-
-        .bar {
-            width: 4px;
-            height: 100%;
-            background-color: var(--primary-color);
-            border-radius: 4px;
-            animation: wave 1s ease-in-out infinite;
-        }
-
-        .bar:nth-child(1) { animation-delay: 0.0s; }
-        .bar:nth-child(2) { animation-delay: 0.1s; }
-        .bar:nth-child(3) { animation-delay: 0.2s; }
-        .bar:nth-child(4) { animation-delay: 0.3s; }
-        .bar:nth-child(5) { animation-delay: 0.4s; }
-
-        @keyframes wave {
-            0%, 100% { height: 6px; }
-            50% { height: 22px; }
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 480px) {
-            .card {
-                padding: 25px 20px;
-            }
-            .app-title {
-                font-size: 1.7rem;
-            }
-            .word-input {
-                font-size: 1.7rem;
-                padding: 14px 15px;
-            }
-            .speed-container {
-                flex-direction: column;
-                gap: 10px;
-                align-items: center;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="theme-color" content="#1668dc">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="kalimaty">
+<title>kalimaty | منصة تعلم الإنجليزية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://text.pollinations.ai">
+<link rel="preconnect" href="https://api.dictionaryapi.dev">
+<link rel="preconnect" href="https://api.mymemory.translated.net">
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#eef2f7; --card:#ffffff; --ink:#0f1f38; --muted:#66788f; --line:#e3e9f2;
+  --primary:#1668dc; --primary-d:#0f4fb0; --accent:#00a48c; --amber:#b45309;
+  --amber-bg:#fef4e2; --green-bg:#e8f7ee; --blue-bg:#e8f1fd;
+  --shadow:0 10px 30px rgba(15,31,56,.08); --shadow-sm:0 4px 14px rgba(15,31,56,.07);
+  --r:20px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Alexandria',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:2;min-height:100vh}
+/* شريط علوي */
+.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.topbar-in{max-width:920px;margin:auto;padding:12px 18px;display:flex;align-items:center;gap:12px}
+.brand-img{width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;background:#fff;box-shadow:0 4px 12px rgba(15,31,56,.15)}
+.topbar h1{font-size:17px;font-weight:800;line-height:1.5}
+.topbar h1 small{display:block;font-size:12px;font-weight:400;color:var(--muted)}
+.net{margin-inline-start:auto;font-size:12px;font-weight:600;color:var(--muted);background:#f2f5f9;border:1px solid var(--line);padding:6px 14px;border-radius:99px;white-space:nowrap}
+.net.ok{color:#0b8a4b;border-color:#bfe6cf;background:var(--green-bg)}
+.wrap{max-width:920px;margin:auto;padding:0 18px 60px}
+/* البطل */
+.hero{margin-top:16px;background:linear-gradient(135deg,#0f2a52 0%,#174a9c 60%,#1668dc 100%);color:#fff;border-radius:24px;padding:28px 26px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.hero::after{content:"ABC";position:absolute;left:-10px;bottom:-28px;font-size:120px;font-weight:900;opacity:.08;letter-spacing:4px;direction:ltr}
+.hero-eyebrow{display:inline-block;font-size:12px;font-weight:600;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);padding:4px 14px;border-radius:99px;margin-bottom:12px}
+.hero h2{font-size:clamp(22px,4.5vw,30px);font-weight:800;line-height:1.7}
+.hero p{font-size:14.5px;font-weight:300;opacity:.9;margin-top:6px;max-width:560px}
+.hero-stats{display:flex;gap:8px;margin-top:18px;flex-wrap:nowrap}
+.hstat{flex:1 1 0;min-width:0;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:8px 4px;font-size:12px;font-weight:600;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hstat b{font-size:17px;font-weight:800}
+/* البحث */
+.search{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;margin-top:-4px;border:1px solid #fff;position:relative;z-index:2;transform:translateY(-22px)}
+.search label{font-size:13px;font-weight:700;color:var(--muted)}
+.bar{display:flex;gap:10px;margin-top:8px}
+.bar input{flex:1;min-width:0;border:2px solid var(--line);background:#f7f9fc;border-radius:14px;padding:13px 16px;font-size:18px;font-weight:600;font-family:inherit;text-align:left;direction:ltr;color:var(--ink);outline:none;transition:.15s}
+.bar input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 4px rgba(22,104,220,.12)}
+.btn{border:0;border-radius:14px;font-family:inherit;font-weight:700;cursor:pointer;transition:.15s;font-size:15px}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--primary);color:#fff;padding:13px 28px;box-shadow:0 5px 0 var(--primary-d)}
+.btn-p:active{box-shadow:none;transform:translateY(2px)}
+.search-hint{font-size:12.5px;color:var(--muted);margin-top:10px}
+/* تصنيفات */
+.sec-title{font-size:15px;font-weight:800;margin:6px 0 10px;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:"";width:5px;height:20px;border-radius:99px;background:var(--primary)}
+.panel{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow-sm);padding:16px 18px;margin-top:14px;border:1px solid #fff}
+/* النتيجة */
+#result{display:none;margin-top:14px}
+.word-hero{background:var(--card);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;border:1px solid #fff}
+.word-top{padding:26px 20px 20px;text-align:center;background:linear-gradient(180deg,#f2f6fd,#fff);position:relative}
+.fav-btn{position:absolute;top:14px;inset-inline-start:14px;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:#fff;font-size:21px;cursor:pointer;font-family:inherit;box-shadow:var(--shadow-sm);transition:.15s;line-height:1}
+.fav-btn:active{transform:scale(.9)}
+.fav-btn.on{border-color:#f5b942;background:#fff8e8}
+.src-badge{display:inline-block;font-size:12px;font-weight:700;color:var(--primary);background:var(--blue-bg);border-radius:99px;padding:4px 14px;margin-bottom:8px}
+.word-en{font-size:clamp(44px,9vw,64px);font-weight:900;line-height:1.3;direction:ltr;letter-spacing:1px}
+.word-ph{font-size:14px;color:var(--muted);direction:ltr;font-weight:400}
+.word-ar{ display:inline-block;margin-top:10px;font-size:22px;font-weight:800;background:var(--ink);color:#fff;border-radius:14px;padding:8px 26px}
+.actions{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--line)}
+.actions button{border:0;background:#fff;padding:13px 4px;font-family:inherit;font-size:13px;font-weight:700;color:#26374f;cursor:pointer;border-left:1px solid var(--line)}
+.actions button:last-child{border:0}
+.actions button:hover{background:#f4f7fc}
+.actions button span{font-size:19px;display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:18px;box-shadow:var(--shadow-sm);padding:16px 18px;border:1px solid #fff;border-right:5px solid var(--primary)}
+.card h4{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.card .big{font-size:21px;font-weight:800;line-height:1.9}
+.card.mean{border-color:#16a34a}.card.mean .big{color:#15803d}
+.card.pron{border-color:#f59e0b}
+.syls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;direction:ltr;justify-content:flex-start}
+.syl{background:#fff8e8;border:2px solid #f5b942;color:#7c4a03;border-radius:12px;padding:6px 18px;font-weight:800;font-size:19px;direction:ltr;cursor:pointer;font-family:inherit}
+.syl:hover{background:#fdf0d3}
+.letters{direction:ltr;text-align:center;background:#f2f5f9;border-radius:12px;padding:9px;margin-top:10px;font-weight:700;letter-spacing:4px;font-size:17px;color:#3b4c63}
+.tip{background:#fffdf4;border:1.5px solid #f5d78e;border-radius:16px;padding:14px 18px;margin-top:12px;font-size:14px;box-shadow:var(--shadow-sm)}
+.empty{background:var(--card);border-radius:22px;box-shadow:var(--shadow-sm);padding:36px 20px;text-align:center;margin-top:14px;border:1.5px dashed #c3cfdf}
+.empty .empty-ic{width:88px;height:88px;margin:0 auto;border-radius:28px;background:linear-gradient(135deg,#0f4fb0,#5b9bff);display:grid;place-items:center;color:#fff;font-weight:900;font-size:26px;direction:ltr;letter-spacing:2px;box-shadow:0 14px 28px rgba(22,104,220,.35);position:relative}
+.empty .empty-ic::after{content:"🔍";position:absolute;bottom:-12px;left:-12px;width:40px;height:40px;background:#fff;border-radius:50%;display:grid;place-items:center;font-size:20px;box-shadow:0 6px 14px rgba(15,31,56,.18)}
+.empty h3{font-size:17px;font-weight:800;margin-top:8px}
+.empty p{font-size:13.5px;color:var(--muted)}
+.hist-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.h{background:#f2f5f9;border:1px solid var(--line);border-radius:99px;padding:5px 14px;font-size:14px;font-weight:600;cursor:pointer;direction:ltr;font-family:inherit}
+.h:hover{border-color:var(--primary);color:var(--primary)}
+.link-btn{background:none;border:0;color:#dc2626;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.help ol{margin:8px 20px 0 0;font-size:14px;color:#33465e}
+footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:22px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:11px 24px;border-radius:99px;display:none;z-index:99;box-shadow:var(--shadow)}
+.sk{color:transparent!important;background:linear-gradient(90deg,#e6ecf3,#f6f9fc,#e6ecf3);background-size:200% 100%;animation:sh 1s infinite linear;border-radius:8px;user-select:none}
+@keyframes sh{to{background-position:-200% 0}}
+</style>
 </head>
 <body>
+<div class="topbar"><div class="topbar-in">
+  <img class="brand-img" src="icon.png" alt="kalimaty">
+  <h1 style="direction:ltr;text-align:right">kalimaty<small>منصة تعلّم الإنجليزية في البيت</small></h1>
+  <div class="net" id="netDot">فحص الاتصال…</div>
+</div></div>
 
-    <div class="container">
-        <div class="card">
-            
-            <!-- Header -->
-            <div class="title-wrapper">
-                <h1 class="app-title">
-                    <span class="speaker-icon" id="speakerIcon">🔊</span>
-                    <span>قارئ الكلمات الإنجليزية</span>
-                </h1>
-                <p class="app-subtitle">اكتب الكلمة الإنجليزية</p>
-            </div>
+<div class="wrap">
+  <div class="hero">
+    <span class="hero-eyebrow">✨ للأم المصرية — بدون تعقيد</span>
+    <h2>اكتبي الكلمة.. واحنا نعلّمها لابنك نطق ومعنى</h2>
+    <p>نطق إنجليزي بالصوت، تقسيم لمقاطع سهلة، معنى بالعربي، ونطق مكتوب بالعربي — كل ده في ثانية واحدة.</p>
+    <div class="hero-stats">
+      <div class="hstat">📚 <b id="hsTotal">0</b> كلمة اتذاكرت</div>
+      <div class="hstat">🔥 <b id="hsStreak">0 يوم</b> استمرارية</div>
+      <div class="hstat">🎯 <b id="hsToday">0</b> كلمات اليوم</div>
+    </div>
+  </div>
 
-            <!-- Warning / Notification Message -->
-            <div id="messageBox" class="message-box"></div>
+  <div class="search">
+    <label>🔍 اكتبي كلمة إنجليزية من الواجب</label>
+    <div class="bar">
+      <input id="wordInput" placeholder="مثال: apple" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" lang="en" inputmode="latin">
+      <button class="btn btn-p" onclick="searchWord(true)">بحث</button>
+    </div>
+    <div class="search-hint">اضغطي Enter للبحث السريع — الكلمات الأساسية تعمل بدون إنترنت.</div>
+  </div>
 
-            <!-- Input area -->
-            <div class="input-group">
-                <input 
-                    type="text" 
-                    id="wordInput" 
-                    class="word-input" 
-                    placeholder="elephant" 
-                    autocomplete="off"
-                    autofocus
-                    spellcheck="false"
-                >
-            </div>
+  <div class="empty" id="emptyState">
+    <div class="empty-ic">ABC</div>
+    <h3>ابدئي بأول كلمة</h3>
+    <p>اكتبي كلمة فوق ودوسي بحث — وهتظهر هنا البطاقات التعليمية</p>
+  </div>
 
-            <!-- Speed selector -->
-            <div class="speed-container">
-                <span class="speed-label">سرعة القراءة:</span>
-                <div class="speed-options">
-                    <button type="button" class="speed-btn" id="speedSlowBtn" data-rate="0.65">
-                        <span>🐢</span> بطيء
-                    </button>
-                    <button type="button" class="speed-btn active" id="speedNormalBtn" data-rate="1.0">
-                        <span>🙂</span> عادي
-                    </button>
-                </div>
-            </div>
-
-            <!-- Buttons Grid -->
-            <div class="buttons-grid">
-                <!-- Main Read Button -->
-                <button type="button" class="btn-main btn-read" id="readBtn">
-                    <span>🔊</span> اقرأ الكلمة
-                </button>
-
-                <!-- Secondary Buttons: Repeat & Clear -->
-                <div class="secondary-buttons">
-                    <button type="button" class="btn-repeat" id="repeatBtn">
-                        <span>🔁</span> إعادة القراءة
-                    </button>
-                    <button type="button" class="btn-clear" id="clearBtn">
-                        <span>🗑️</span> مسح
-                    </button>
-                </div>
-            </div>
-
-            <!-- Sound Wave Visualizer when speaking -->
-            <div class="sound-wave" id="soundWave">
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-            </div>
-
-        </div>
+  <div id="result">
+    <div class="word-hero">
+      <div class="word-top">
+        <button id="favBtn" class="fav-btn" onclick="toggleFav()" title="حفظ في المفضلة">🤍</button>
+        <div class="src-badge" id="wordBadge">كلمة مشهورة 🎉</div>
+        <div class="word-en" id="rWord">apple</div>
+        <div class="word-ph" id="rPhon">/ ˈæp.əl /</div>
+        <div><span class="word-ar" id="rPron">أَبِل</span></div>
+      </div>
+      <div class="actions">
+        <button onclick="speakCurrent(1)"><span>🔊</span>نطق</button>
+        <button onclick="speakCurrent(0.55)"><span>🐢</span>نطق بطيء</button>
+      </div>
     </div>
 
-    <script>
-        // DOM Elements
-        const wordInput = document.getElementById('wordInput');
-        const readBtn = document.getElementById('readBtn');
-        const repeatBtn = document.getElementById('repeatBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const speedSlowBtn = document.getElementById('speedSlowBtn');
-        const speedNormalBtn = document.getElementById('speedNormalBtn');
-        const messageBox = document.getElementById('messageBox');
-        const speakerIcon = document.getElementById('speakerIcon');
-        const soundWave = document.getElementById('soundWave');
+    <div class="grid2">
+      <div class="card mean"><h4>🇪🇬 المعنى بالعربي</h4><div class="big" id="rMeaning">تفاحة</div></div>
+      <div class="card pron" id="pronCard"><h4>🗣️ انطقيها كده بالعربي</h4><div class="big" id="rPron2">أَبِل</div></div>
+    </div>
 
-        // State variables
-        let currentRate = 1.0;
-        let selectedVoice = null;
-        let isSpeechSupported = 'speechSynthesis' in window;
+    <div class="card" style="margin-top:12px;border-color:#f59e0b">
+      <h4>✂️ التقسيم لمقاطع — اضغطي على كل مقطع لسماعه</h4>
+      <div class="syls" id="rSyl"></div>
+      <div class="letters" id="rLetters"></div>
+    </div>
 
-        // Initialize Speech Synthesis & Find Best English Voice
-        function initVoice() {
-            if (!isSpeechSupported) {
-                showMessage('عذرًا، متصفحك لا يدعم قراءة الكلمات صوتيًا. جرّب متصفحًا آخر.', 'error');
-                return;
-            }
+    <div class="tip" id="mamaTip"></div>
+  </div>
 
-            const voices = window.speechSynthesis.getVoices();
-            if (voices.length > 0) {
-                // Priority list for English voices
-                const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
-                
-                // Prefer Google, Samantha, Natural, US/UK voices
-                selectedVoice = englishVoices.find(v => v.lang === 'en-US' && (v.name.includes('Natural') || v.name.includes('Google'))) ||
-                                englishVoices.find(v => v.lang === 'en-US') ||
-                                englishVoices.find(v => v.lang === 'en-GB') ||
-                                englishVoices[0] ||
-                                null;
-            }
-        }
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="sec-title" style="margin:0">آخر الكلمات</div>
+      <button class="link-btn" onclick="clearHistory()">مسح الكل</button>
+    </div>
+    <div class="hist-list" id="history"></div>
+  </div>
 
-        // Voice list changed event (needed for Chrome/Android)
-        if (isSpeechSupported) {
-            window.speechSynthesis.onvoiceschanged = initVoice;
-            initVoice();
-        }
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="sec-title" style="margin:0">⭐ الكلمات المفضلة</div>
+      <button class="link-btn" onclick="clearFav()">مسح الكل</button>
+    </div>
+    <div class="hist-list" id="favList"></div>
+  </div>
 
-        // Display Alert Message
-        function showMessage(text, type = 'warning') {
-            messageBox.textContent = text;
-            messageBox.className = `message-box ${type}`;
-            messageBox.style.display = 'block';
-        }
+  <div class="panel help">
+    <div class="sec-title">طريقة المذاكرة الصح في 4 خطوات</div>
+    <ol>
+      <li>شغّلي <b>النطق</b> وخلي ابنك يقول وراه 3 مرات.</li>
+      <li>دوسي على كل <b>مقطع</b> وخليه يكرره لوحده.</li>
+      <li>اقرئي <b>المعنى بالعربي</b> وخليه يقول الكلمة ومعناها.</li>
+      <li>راجعي من <b>آخر الكلمات</b> قبل النوم لمدة 5 دقائق.</li>
+    </ol>
+  </div>
 
-        // Hide Alert Message
-        function hideMessage() {
-            messageBox.style.display = 'none';
-        }
+  <footer>صُنع بحب لكل أم مصرية 🇪🇬 — يعمل دون إنترنت للكلمات الأساسية</footer>
+</div>
+<div class="toast" id="toast"></div>
 
-        // Speech Function
-        function speakWord() {
-            hideMessage();
-
-            if (!isSpeechSupported) {
-                showMessage('عذرًا، متصفحك لا يدعم قراءة الكلمات صوتيًا. جرّب متصفحًا آخر.', 'error');
-                return;
-            }
-
-            const word = wordInput.value.trim();
-
-            // Error Check 1: Empty Input
-            if (!word) {
-                showMessage('من فضلك اكتب كلمة أولًا 😊', 'warning');
-                wordInput.focus();
-                return;
-            }
-
-            // Error Check 2: Non-English characters check (Must contain English letters)
-            // Allows basic English letters, spaces, hyphens, and apostrophes (e.g., ice-cream, don't)
-            const englishRegex = /^[a-zA-Z\s\-']+$/;
-            if (!englishRegex.test(word)) {
-                showMessage('من فضلك اكتب كلمة إنجليزية صحيحة', 'warning');
-                return;
-            }
-
-            // Stop any ongoing speech before starting a new one
-            window.speechSynthesis.cancel();
-
-            // Create Speech Utterance
-            const utterance = new SpeechSynthesisUtterance(word);
-            utterance.lang = 'en-US';
-            utterance.rate = currentRate;
-
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
-            }
-
-            // Visual feedback handlers
-            utterance.onstart = () => {
-                speakerIcon.classList.add('speaking');
-                soundWave.classList.add('active');
-            };
-
-            utterance.onend = () => {
-                speakerIcon.classList.remove('speaking');
-                soundWave.classList.remove('active');
-            };
-
-            utterance.onerror = (e) => {
-                speakerIcon.classList.remove('speaking');
-                soundWave.classList.remove('active');
-                console.error('Speech synthesis error:', e);
-            };
-
-            // Speak!
-            window.speechSynthesis.speak(utterance);
-        }
-
-        // Clear Function
-        function clearInput() {
-            wordInput.value = '';
-            hideMessage();
-            if (isSpeechSupported) {
-                window.speechSynthesis.cancel();
-            }
-            speakerIcon.classList.remove('speaking');
-            soundWave.classList.remove('active');
-            wordInput.focus();
-        }
-
-        // Speed Selection Logic
-        function setSpeed(rate, selectedBtn, otherBtn) {
-            currentRate = rate;
-            selectedBtn.classList.add('active');
-            otherBtn.classList.remove('active');
-        }
-
-        // Event Listeners
-        readBtn.addEventListener('click', speakWord);
-        repeatBtn.addEventListener('click', speakWord);
-        clearBtn.addEventListener('click', clearInput);
-
-        speedSlowBtn.addEventListener('click', () => {
-            setSpeed(parseFloat(speedSlowBtn.dataset.rate), speedSlowBtn, speedNormalBtn);
-        });
-
-        speedNormalBtn.addEventListener('click', () => {
-            setSpeed(parseFloat(speedNormalBtn.dataset.rate), speedNormalBtn, speedSlowBtn);
-        });
-
-        // Trigger speak on Enter key press
-        wordInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                speakWord();
-            }
-        });
-
-        // Hide message when user starts typing again
-        wordInput.addEventListener('input', () => {
-            if (messageBox.style.display === 'block') {
-                hideMessage();
-            }
-        });
-    </script>
+<script>
+const DICT={"cat":{ar:"قطة 🐱",pron:"كات",exEn:"The cat is cute.",exAr:"القطة جميلة."},"dog":{ar:"كلب 🐶",pron:"دوج",exEn:"The dog is barking.",exAr:"الكلب بيهووهو."},"bird":{ar:"عصفور 🐦",pron:"بيرد",exEn:"The bird can fly.",exAr:"العصفور يطير."},"fish":{ar:"سمكة 🐟",pron:"فِش",exEn:"The fish swims.",exAr:"السمكة تعوم."},"lion":{ar:"أسد 🦁",pron:"لايِن",exEn:"The lion is strong.",exAr:"الأسد قوي."},"apple":{ar:"تفاحة 🍎",pron:"أَبِل",exEn:"I eat an apple.",exAr:"أنا آكل تفاحة."},"banana":{ar:"موزة 🍌",pron:"بَنانا",exEn:"I like banana.",exAr:"أنا أحب الموز."},"milk":{ar:"لبن 🥛",pron:"مِلك",exEn:"Drink your milk.",exAr:"اشرب اللبن."},"bread":{ar:"خبز 🍞",pron:"بريد",exEn:"I eat bread.",exAr:"أنا آكل الخبز."},"egg":{ar:"بيضة 🥚",pron:"إج",exEn:"I eat an egg.",exAr:"أنا آكل بيضة."},"book":{ar:"كتاب 📖",pron:"بُك",exEn:"Open your book.",exAr:"افتح كتابك."},"pen":{ar:"قلم 🖊️",pron:"بِن",exEn:"This is my pen.",exAr:"هذا قلمي."},"pencil":{ar:"قلم رصاص ✏️",pron:"بِنسِل",exEn:"I have a pencil.",exAr:"عندي قلم رصاص."},"school":{ar:"مدرسة 🏫",pron:"سكول",exEn:"I go to school.",exAr:"أنا أذهب للمدرسة."},"teacher":{ar:"معلمة 👩‍🏫",pron:"تيتشر",exEn:"My teacher is kind.",exAr:"معلمتي طيبة."},"boy":{ar:"ولد 👦",pron:"بوي",exEn:"He is a good boy.",exAr:"هو ولد مهذب."},"girl":{ar:"بنت 👧",pron:"جيرل",exEn:"She is a smart girl.",exAr:"هي بنت ذكية."},"mother":{ar:"أم 👩",pron:"ماذَر",exEn:"My mother loves me.",exAr:"أمي تحبني."},"father":{ar:"أب 👨",pron:"فاذَر",exEn:"My father is kind.",exAr:"أبي طيب."},"brother":{ar:"أخ 👦",pron:"براذَر",exEn:"He is my brother.",exAr:"هو أخي."},"sister":{ar:"أخت 👧",pron:"سيستَر",exEn:"She is my sister.",exAr:"هي أختي."},"red":{ar:"أحمر 🔴",pron:"رِد",exEn:"The apple is red.",exAr:"التفاحة حمراء."},"blue":{ar:"أزرق 🔵",pron:"بلو",exEn:"The sky is blue.",exAr:"السماء زرقاء."},"green":{ar:"أخضر 🟢",pron:"جرين",exEn:"The tree is green.",exAr:"الشجرة خضراء."},"yellow":{ar:"أصفر 🟡",pron:"يِلو",exEn:"The sun is yellow.",exAr:"الشمس صفراء."},"one":{ar:"واحد 1️⃣",pron:"وَن",exEn:"I have one apple.",exAr:"عندي تفاحة واحدة."},"two":{ar:"اثنان 2️⃣",pron:"تو",exEn:"I have two books.",exAr:"عندي كتابان."},"three":{ar:"ثلاثة 3️⃣",pron:"ثري",exEn:"I am three years old.",exAr:"عمري ثلاث سنوات."},"water":{ar:"ماء 💧",pron:"ووتَر",exEn:"Drink water.",exAr:"اشرب الماء."},"sun":{ar:"شمس ☀️",pron:"صَن",exEn:"The sun is hot.",exAr:"الشمس حارة."},"moon":{ar:"قمر 🌙",pron:"مون",exEn:"The moon is beautiful.",exAr:"القمر جميل."},"star":{ar:"نجمة ⭐",pron:"ستار",exEn:"I see a star.",exAr:"أرى نجمة."},"house":{ar:"بيت 🏠",pron:"هاوس",exEn:"This is my house.",exAr:"هذا بيتي."},"door":{ar:"باب 🚪",pron:"دور",exEn:"Open the door.",exAr:"افتح الباب."},"car":{ar:"سيارة 🚗",pron:"كار",exEn:"Dad has a car.",exAr:"بابا عنده سيارة."},"ball":{ar:"كرة ⚽",pron:"بول",exEn:"I play with the ball.",exAr:"ألعب بالكرة."},"toy":{ar:"لعبة 🧸",pron:"توي",exEn:"I love my toy.",exAr:"أحب لعبتي."},"happy":{ar:"سعيد 😊",pron:"هابي",exEn:"I am happy.",exAr:"أنا سعيد."},"sad":{ar:"حزين 😢",pron:"ساد",exEn:"Don't be sad.",exAr:"لا تحزن."},"big":{ar:"كبير 🐘",pron:"بِج",exEn:"The elephant is big.",exAr:"الفيل كبير."},"small":{ar:"صغير 🐭",pron:"سمول",exEn:"The mouse is small.",exAr:"الفأر صغير."},"eat":{ar:"يأكل 🍽️",pron:"إيت",exEn:"I eat my food.",exAr:"آكل طعامي."},"drink":{ar:"يشرب 🥤",pron:"درينك",exEn:"I drink juice.",exAr:"أشرب العصير."},"play":{ar:"يلعب ⚽",pron:"بلاي",exEn:"Let's play together.",exAr:"هيا نلعب معًا."},"run":{ar:"يجري 🏃",pron:"رَن",exEn:"I can run fast.",exAr:"أستطيع الجري بسرعة."},"read":{ar:"يقرأ 📚",pron:"ريد",exEn:"I read a story.",exAr:"أقرأ قصة."},"write":{ar:"يكتب ✍️",pron:"رايت",exEn:"I write my name.",exAr:"أكتب اسمي."},"elephant":{ar:"فيل 🐘",pron:"إلِفانت",exEn:"The elephant is big.",exAr:"الفيل كبير."},"monkey":{ar:"قرد 🐵",pron:"مانكي",exEn:"The monkey is funny.",exAr:"القرد مضحك."},"orange":{ar:"برتقالة 🍊",pron:"أورينج",exEn:"I eat an orange.",exAr:"آكل برتقالة."},"cake":{ar:"كيكة 🍰",pron:"كيك",exEn:"I like cake.",exAr:"أحب الكيك."},"juice":{ar:"عصير 🧃",pron:"جوس",exEn:"I drink orange juice.",exAr:"أشرب عصير البرتقال."},"chair":{ar:"كرسي 🪑",pron:"تشير",exEn:"Sit on the chair.",exAr:"اجلس على الكرسي."},"table":{ar:"طاولة",pron:"تيبِل",exEn:"The book is on the table.",exAr:"الكتاب على الطاولة."},"window":{ar:"نافذة 🪟",pron:"ويندو",exEn:"Open the window.",exAr:"افتح النافذة."},"friend":{ar:"صديق 🧑‍🤝‍🧑",pron:"فريند",exEn:"He is my friend.",exAr:"هو صديقي."},"love":{ar:"يحب ❤️",pron:"لاف",exEn:"I love my mom.",exAr:"أحب أمي."},"beautiful":{ar:"جميل 🌸",pron:"بيوتيفُل",exEn:"The flower is beautiful.",exAr:"الزهرة جميلة."},"family":{ar:"عائلة 👨‍👩‍👧‍👦",pron:"فاميلي",exEn:"I love my family.",exAr:"أحب عائلتي."},"baby":{ar:"رضيع 👶",pron:"بيبي",exEn:"The baby is sleeping.",exAr:"الرضيع نائم."},"computer":{ar:"حاسوب 💻",pron:"كمبيوتر",exEn:"I learn on the computer.",exAr:"أتعلم على الحاسوب."},"chocolate":{ar:"شوكولاتة 🍫",pron:"تشوكليت",exEn:"I like chocolate.",exAr:"أحب الشوكولاتة."}};
+let current={word:"",exEn:""},MEM={};
+try{MEM=JSON.parse(localStorage.getItem('mCacheV4')||'{}')}catch(e){}
+let voiceEn=null,seq=0;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2000)}
+if('speechSynthesis' in window){const l=()=>{const v=speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith('en'));if(v)voiceEn=v};speechSynthesis.onvoiceschanged=l;l()}
+function rate(){return parseFloat(localStorage.getItem('rate')||0.9)}
+function speak(t,lang,r){if(!('speechSynthesis' in window)){toast("الجهاز لا يدعم الصوت");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=lang||'en-US';u.rate=r||rate();if(voiceEn&&u.lang.startsWith('en'))u.voice=voiceEn;speechSynthesis.speak(u)}
+function speakCurrent(r){if(current.word)speak(current.word,'en-US',r||rate())}
+function speakSyl(s){speak(s,'en-US',0.7)}
+function syllabify(w){w=w.toLowerCase().replace(/[^a-z]/g,'');if(!w)return[];if(w.length<=3)return[w];const V='aeiouy';let p=[],c='';for(let i=0;i<w.length;i++){c+=w[i];if(V.includes(w[i])&&w[i+1]&&!V.includes(w[i+1])&&w[i+2]&&V.includes(w[i+2])){p.push(c);c=''}}if(c)p.push(c);if(p.length===1){p=[];for(let i=0;i<w.length;i+=3)p.push(w.slice(i,i+3))}return p}
+function fetchDict(w,signal){return fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(w),{signal}).then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>{const e=j[0]||{};return{phon:e.phonetic||(e.phonetics||[]).find(p=>p.text)?.text||null,ex:(e.meanings||[])[0]?.definitions?.[0]?.example||null}}).catch(()=>({phon:null,ex:null}))}
+function fetchAr(t,signal){return fetch("https://api.mymemory.translated.net/get?q="+encodeURIComponent(t)+"&langpair=en|ar",{signal}).then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>{const x=j?.responseData?.translatedText;return(x&&!/MYMEMORY|LIMIT|INVALID/i.test(x))?x:null}).catch(()=>null)}
+async function fetchOnlineFast(w){
+  const c=new AbortController(),to=setTimeout(()=>c.abort(),3500);
+  try{const[d,m]=await Promise.all([fetchDict(w,c.signal),fetchAr(w,c.signal)]);return{phon:d.phon,exEn:d.ex,meaning:m}}
+  finally{clearTimeout(to)}
+}
+async function fetchAI(w,signal){
+  const p='You are an English teacher for Egyptian children. For the English word "'+w+'" reply with ONLY valid JSON, no markdown, no extra text: {"syllables":["car","pen","ter"],"arPron":"كاربنتر","meaning":"نجار 🪚","explain":"يعني الراجل اللي بيصنع الحاجات بالخشب","phon":"/ˈkɑːrpəntər/"} Rules: syllables must be the real spoken syllables in lowercase English letters only; arPron an accurate Egyptian-Arabic transliteration; meaning very short Arabic with one emoji; explain one simple line in Egyptian Arabic dialect; phon the IPA pronunciation or null.';
+  const r=await fetch("https://text.pollinations.ai/"+encodeURIComponent(p)+"?model=openai",{signal});
+  if(!r.ok)throw 0;
+  const t=await r.text(),m=t.match(/\{[\s\S]*\}/);
+  if(!m)throw 0;
+  const j=JSON.parse(m[0]);
+  if(!j||!j.meaning||!j.arPron)throw 0;
+  return j;
+}
+function fillSyl(w){
+  const box=document.getElementById('rSyl');box.innerHTML='';
+  syllabify(w).forEach(s=>{const b=document.createElement('button');b.className='syl';b.textContent=s;b.onclick=()=>speakSyl(s);box.appendChild(b)});
+  document.getElementById('rLetters').textContent=w.toUpperCase().split('').join(' · ');
+}
+function fillSylArr(arr){
+  const box=document.getElementById('rSyl');box.innerHTML='';
+  arr.forEach(s=>{const b=document.createElement('button');b.className='syl';b.textContent=s;b.onclick=()=>speakSyl(s);box.appendChild(b)});
+}
+function paint(meaning,pron,exEn,exAr,w,local,phon,scroll,extra){
+  current={word:w,exEn:exEn||""};syncFavBtn();
+  document.getElementById('emptyState').style.display='none';
+  const R=document.getElementById('result');R.style.display='block';
+  document.getElementById('rWord').textContent=w;
+  const ph=document.getElementById('rPhon');ph.classList.remove('sk');
+  ph.textContent=phon?"/ "+phon+" /":(local?"اضغطي زر النطق للاستماع 🔊":"🔊 اسمعي النطق بالصوت للنطق الصحيح");
+  const badge=document.getElementById('rPron'),pc=document.getElementById('pronCard'),p2=document.getElementById('rPron2');
+  if(pron){badge.style.display="";badge.style.direction="";badge.textContent=pron;pc.style.display="";p2.classList.remove('sk');p2.textContent=pron}
+  else{pc.style.display="none";if(phon){badge.style.display="";badge.style.direction="ltr";badge.textContent="/ "+phon+" /"}else{badge.style.display="none"}}
+  const m=document.getElementById('rMeaning');m.classList.remove('sk');m.textContent=meaning;
+  if(extra){const sm=document.createElement('div');sm.style.cssText="font-size:13.5px;font-weight:400;color:var(--muted)";sm.textContent=extra;m.appendChild(sm)}
+  document.getElementById('wordBadge').textContent=local?"كلمة أساسية للأطفال 🎉":"نتيجة من الإنترنت 🌐";
+  fillSyl(w);
+  document.getElementById('mamaTip').innerHTML="💡 <b>نصيحة سريعة:</b> خلي ابنك يصفّق 👏 مع كل مقطع وهو بينطقه، ثم يجمعهم معًا. التشجيع بكلمة «برافو يا بطل 🏆» يثبّت الحفظ أكثر من التكرار وحده.";
+  if(scroll!==false)R.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function paintPending(w,scroll){
+  current={word:w,exEn:""};syncFavBtn();
+  document.getElementById('emptyState').style.display='none';
+  const R=document.getElementById('result');R.style.display='block';
+  document.getElementById('rWord').textContent=w;
+  const ph=document.getElementById('rPhon');ph.textContent="…";ph.classList.add('sk');
+  const badge=document.getElementById('rPron');badge.style.display="";badge.style.direction="";badge.textContent="⏳";
+  document.getElementById('pronCard').style.display="none";
+  const m=document.getElementById('rMeaning');m.textContent="جارٍ البحث…";m.classList.add('sk');
+  document.getElementById('wordBadge').textContent="✨ الذكاء الاصطناعي بيجهز الشرح…";
+  fillSyl(w);
+  if(scroll!==false)R.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function searchWord(withVoice,count,scroll){
+  let w=document.getElementById('wordInput').value.trim().toLowerCase().split(/\s+/)[0].replace(/[^a-z]/g,'');
+  if(!w){toast("اكتبي كلمة إنجليزية أولًا ✍️");return}
+  document.getElementById('wordInput').value=w;
+  const my=++seq;
+  if(MEM[w]){const m=MEM[w];paint(m.meaning,m.pron,m.exEn,m.exAr,w,!!m.local,m.phon||null,scroll,m.explain||null);if(m.syl&&m.syl.length)fillSylArr(m.syl);if(m.src==='ai')document.getElementById('wordBadge').textContent="✨ شرح الذكاء الاصطناعي";if(count!==false)saveH(w);return}
+  const d=DICT[w];
+  if(d){paint(d.ar,d.pron,d.exEn,d.exAr,w,true,null,scroll);if(count!==false)saveH(w);if(withVoice!==false)setTimeout(()=>{if(my===seq)speak(w,'en-US',rate())},200);fetchDict(w).then(o=>{if(o.phon&&my===seq&&current.word===w)document.getElementById('rPhon').textContent="/ "+o.phon+" /"});return}
+  paintPending(w,scroll);
+  let painted=false,saved=false,voiced=false,fails=0;
+  const saveOnce=()=>{if(count!==false&&!saved){saved=true;saveH(w)}};
+  const voiceOnce=()=>{if(withVoice!==false&&!voiced){voiced=true;speak(w,'en-US',rate())}};
+  const cachePut=()=>{try{localStorage.setItem('mCacheV4',JSON.stringify(MEM))}catch(e){}};
+  const failOnce=()=>{if(my===seq&&++fails===2&&!painted)paint("لا يوجد اتصال حاليًا 🔴",null,"I say: "+w+".","",w,false,null,scroll)};
+  fetchOnlineFast(w).then(o=>{
+    if(my!==seq||painted)return;
+    painted=true;
+    const meaning=o.meaning?o.meaning+" 🌐":"لم نجد معنى دقيقًا — جرّبي كلمة أساسية 💛";
+    MEM[w]={meaning:meaning,pron:null,exEn:"",exAr:"",phon:o.phon||null,local:false};
+    cachePut();
+    paint(meaning,null,"","",w,false,o.phon||null,scroll);saveOnce();voiceOnce();
+  }).catch(failOnce);
+  const ac=new AbortController(),att=setTimeout(()=>ac.abort(),25000);
+  fetchAI(w,ac.signal).then(j=>{
+    clearTimeout(att);
+    if(my!==seq)return;
+    painted=true;
+    const syl=Array.isArray(j.syllables)?j.syllables.map(s=>String(s).toLowerCase().replace(/[^a-z]/g,'')).filter(Boolean):null;
+    const meaning=String(j.meaning),pron=String(j.arPron),phon=j.phon?String(j.phon):null,explain=j.explain?String(j.explain):null;
+    MEM[w]={meaning:meaning,pron:pron,exEn:"",exAr:"",phon:phon,local:false,src:'ai',syl:(syl&&syl.length)?syl:null,explain:explain};
+    cachePut();
+    paint(meaning,pron,"","",w,false,phon,scroll,explain);
+    if(syl&&syl.length)fillSylArr(syl);
+    document.getElementById('wordBadge').textContent="✨ شرح الذكاء الاصطناعي";
+    saveOnce();voiceOnce();
+  }).catch(()=>{clearTimeout(att);failOnce()});
+}
+function getH(){try{return JSON.parse(localStorage.getItem('mHistV3')||'[]')}catch(e){return[]}}
+function saveH(w){try{let h=[w,...getH().filter(x=>x!==w)].slice(0,30);localStorage.setItem('mHistV3',JSON.stringify(h));const t=new Date().toISOString().slice(0,10);let d={};try{d=JSON.parse(localStorage.getItem('mDaysV3')||'{}')}catch(e){}d[t]=(d[t]||0)+1;localStorage.setItem('mDaysV3',JSON.stringify(d));drawH()}catch(e){}}
+function streak(){try{const d=JSON.parse(localStorage.getItem('mDaysV3')||'{}');let s=0,day=new Date();if(!d[day.toISOString().slice(0,10)])day.setDate(day.getDate()-1);while(d[day.toISOString().slice(0,10)]){s++;day.setDate(day.getDate()-1)}return s}catch(e){return 0}}
+function drawH(){
+  const h=getH(),box=document.getElementById('history');
+  box.innerHTML=h.length?'':'<span style="font-size:13px;color:var(--muted)">لا توجد كلمات بعد — ابدئي البحث وستُحفظ هنا تلقائيًا</span>';
+  h.forEach(w=>{const s=document.createElement('button');s.className='h';s.textContent=w;s.onclick=()=>{document.getElementById('wordInput').value=w;searchWord(false)};box.appendChild(s)});
+  const t=new Date().toISOString().slice(0,10);let d={};try{d=JSON.parse(localStorage.getItem('mDaysV3')||'{}')}catch(e){}
+  document.getElementById('hsTotal').textContent=h.length;
+  document.getElementById('hsToday').textContent=d[t]||0;
+  document.getElementById('hsStreak').textContent=streak()+" يوم";
+}
+function clearHistory(){localStorage.removeItem('mHistV3');drawH()}
+function getFav(){try{return JSON.parse(localStorage.getItem('mFavV1')||'[]')}catch(e){return[]}}
+function isFav(w){return getFav().includes(w)}
+function toggleFav(w){w=w||current.word;if(!w)return;let f=getFav();f=f.includes(w)?f.filter(x=>x!==w):[w,...f].slice(0,50);try{localStorage.setItem('mFavV1',JSON.stringify(f))}catch(e){}syncFavBtn();drawFav();toast(f.includes(w)?"اتحفظت في المفضلة ⭐":"اتشالت من المفضلة")}
+function clearFav(){localStorage.removeItem('mFavV1');syncFavBtn();drawFav()}
+function syncFavBtn(){const b=document.getElementById('favBtn');if(!b)return;const on=current.word&&isFav(current.word);b.textContent=on?"❤️":"🤍";b.classList.toggle('on',!!on)}
+function drawFav(){const f=getFav(),box=document.getElementById('favList');if(!box)return;box.innerHTML=f.length?'':'<span style="font-size:13px;color:var(--muted)">دوسي 🤍 على أي كلمة عشان تحفظيها هنا — واضغطي على أي كلمة محفوظة لفتحها</span>';f.forEach(w=>{const s=document.createElement('button');s.className='h';s.textContent=w;s.onclick=()=>{document.getElementById('wordInput').value=w;searchWord(false)};box.appendChild(s)})}
+function net(){const e=document.getElementById('netDot');const on=navigator.onLine;e.textContent=on?"🟢 متصل":"🔴 دون اتصال";e.classList.toggle('ok',on)}
+window.addEventListener('online',net);window.addEventListener('offline',net);
+let deb=null;
+document.getElementById('wordInput').addEventListener('input',e=>{
+  const v=e.target.value;
+  if(/[\u0600-\u06FF]/.test(v))toast("مربع البحث للإنجليزي فقط 🇬🇧");
+  const clean=v.replace(/[^a-zA-Z]/g,'').toLowerCase();
+  if(clean!==v)e.target.value=clean;
+  clearTimeout(deb);deb=setTimeout(()=>{if(e.target.value.trim().length>=3)searchWord(false)},350)});
+document.getElementById('wordInput').addEventListener('keydown',e=>{if(e.key==='Enter')searchWord(true)});
+drawH();drawFav();net();
+try{const man={name:"kalimaty",short_name:"kalimaty",start_url:".",display:"standalone",dir:"rtl",lang:"ar",background_color:"#eef2f7",theme_color:"#1668dc",icons:[{src:"icon.png",sizes:"512x512",type:"image/png"}]};const ml=document.createElement('link');ml.rel='manifest';ml.href=URL.createObjectURL(new Blob([JSON.stringify(man)],{type:'application/json'}));document.head.appendChild(ml)}catch(e){}
+(function(){const h=getH();const w=h.length?h[0]:"apple";document.getElementById('wordInput').value=w;searchWord(false,false,false)})();
+</script>
 </body>
 </html>
