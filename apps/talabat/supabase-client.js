@@ -324,6 +324,34 @@ window.NaqisnaSupabase = (function () {
     }
   }
 
+  // --- Online Presence (active users counter, no DB table needed) ---
+  let presenceChannel = null;
+  function joinPresence(user, onSync) {
+    const sb = getClient();
+    if (!sb || !user) return null;
+    try {
+      if (presenceChannel) { try { presenceChannel.unsubscribe(); } catch {} presenceChannel = null; }
+      const key = String(user.id || user.whatsapp || ('guest-' + Math.random().toString(36).slice(2, 8)));
+      presenceChannel = sb.channel('naqisna-online', { config: { presence: { key } } });
+      presenceChannel.on('presence', { event: 'sync' }, () => {
+        try {
+          const st = presenceChannel.presenceState() || {};
+          const n = Object.keys(st).length;
+          if (typeof onSync === 'function') onSync(n);
+        } catch {}
+      });
+      presenceChannel.subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          try { await presenceChannel.track({ user: user.name || 'مستخدم', at: Date.now() }); } catch {}
+        }
+      });
+      return presenceChannel;
+    } catch (e) {
+      console.error('Presence join failed:', e);
+      return null;
+    }
+  }
+
   // --- Admin Helpers ---
   async function fetchAdminAds() {
     const sb = getClient();
@@ -352,6 +380,7 @@ window.NaqisnaSupabase = (function () {
     pushOrdersOnly,
     pushFinPartial,
     subscribeToHomeChanges,
+    joinPresence,
     fetchAdminAds
   };
 })();

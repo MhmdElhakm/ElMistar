@@ -643,6 +643,271 @@
   .rep-tile b { font-size: 14.5px; font-weight: 900; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .rep-tile b span { font-size: 10.5px; font-weight: 700; opacity: .65; }
   .rep-sec { font-size: 13px; font-weight: 900; color: var(--primary-dark); margin: 12px 2px 6px; display: flex; align-items: center; gap: 6px; }
+  /* ===== التقارير الشهرية والمقارنة + تجميع المصروفات ===== */
+  .rep-ctl { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 18px 10px; }
+  .rep-ctl select { flex: 1; min-width: 130px; padding: 11px 12px; border: 1.5px solid var(--border); border-radius: 14px; background: #fff; font-weight: 800; font-size: 13px; color: var(--text); }
+  .rep-ctl select:focus { outline: none; border-color: var(--primary); }
+  .month-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .month-table th { background: var(--bg); padding: 8px 6px; font-size: 11px; color: var(--text-sec); font-weight: 900; border-bottom: 1.5px solid var(--border); white-space: nowrap; }
+  .month-table td { padding: 9px 6px; border-bottom: 1px solid var(--border); font-weight: 800; text-align: center; white-space: nowrap; }
+  .month-table tr.cur td { background: var(--primary-light); }
+  /* ===== مقارنة الشهور — عرض احترافي ===== */
+  .cmp-list { display: flex; flex-direction: column; gap: 7px; }
+  .cmp-row { display: flex; align-items: center; gap: 10px; width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 14px; padding: 9px 12px; text-align: right; transition: transform .12s; }
+  .cmp-row:active { transform: scale(.98); }
+  .cmp-row.cur { background: var(--primary-light); border-color: var(--primary); box-shadow: 0 4px 12px rgba(28,176,246,.18); }
+  .cmp-name { min-width: 86px; max-width: 110px; font-size: 12px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cmp-row.cur .cmp-name { color: var(--primary-dark); }
+  .cmp-track { flex: 1; height: 10px; border-radius: 99px; background: #E8EEF3; overflow: hidden; }
+  .cmp-row.cur .cmp-track { background: rgba(255,255,255,.7); }
+  .cmp-fill { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg,#5ECBF5,#1CB0F6); transition: width .4s; }
+  .cmp-val { font-size: 13.5px; font-weight: 900; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .cmp-val small { font-size: 10px; font-weight: 700; color: var(--text-muted); }
+  .cmp-best { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .cb { display: flex; align-items: center; gap: 9px; border-radius: 15px; padding: 10px 12px; }
+  .cb i { width: 36px; height: 36px; border-radius: 12px; background: rgba(255,255,255,.85); display: flex; align-items: center; justify-content: center; font-size: 18px; font-style: normal; flex-shrink: 0; }
+  .cb b { display: block; font-size: 13px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+  .cb small { display: block; font-size: 11px; font-weight: 800; opacity: .75; }
+  .cb.hi { background: #FFEED3; color: #9A5B00; }
+  .cb.lo { background: #DCFCE7; color: #047857; }
+  .month-table { font-variant-numeric: tabular-nums; }
+  .month-table th { position: sticky; top: 0; }
+  .month-table tr.cur td:first-child { border-radius: 0 10px 10px 0; }
+  .month-table tr.cur td:last-child { border-radius: 10px 0 0 10px; }
+  .month-table tr:active td { background: var(--bg); }
+  .exp-grp { background: #fff; border: 1.5px solid var(--border); border-radius: 18px; margin: 0 18px 9px; overflow: hidden; box-shadow: var(--shadow-sm); }
+  .exp-grp-head { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px; text-align: right; }
+  .exp-grp-head:active { background: var(--bg); }
+  .exp-grp-ico { width: 42px; height: 42px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; }
+  .exp-grp-tx { flex: 1; min-width: 0; }
+  .exp-grp-tx b { display: block; font-size: 14px; font-weight: 900; }
+  .exp-grp-tx small { display: block; font-size: 11px; color: var(--text-sec); font-weight: 700; }
+  .exp-grp-total { font-size: 14px; font-weight: 900; white-space: nowrap; }
+  .exp-grp-chev { width: 28px; height: 28px; border-radius: 50%; background: var(--bg); color: var(--text-sec); font-weight: 900; display: flex; align-items: center; justify-content: center; transform: rotate(-90deg); transition: transform .25s; flex-shrink: 0; }
+  .exp-grp.open .exp-grp-chev { transform: rotate(90deg); background: var(--primary); color: #fff; }
+  .exp-grp-body { border-top: 1.5px dashed var(--border); padding: 8px; }
+  .exp-grp-body .exp-card { margin: 0 0 8px; }
+  .exp-grp-body .exp-card:last-child { margin-bottom: 0; }
+  /* ===== قوائم احترافية (شهر + بداية شهر) ===== */
+  .rep-picker-row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; margin: 0 0 4px; }
+  .rep-picker-btn { display: flex; align-items: center; gap: 8px; background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 11px 12px; font-size: 13px; font-weight: 900; color: var(--text); box-shadow: var(--shadow-sm); transition: border-color .15s, transform .15s; min-height: 52px; width: 100%; text-align: right; }
+  .rep-picker-btn:active { transform: scale(.97); }
+  .rep-picker-btn.open { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(28,176,246,.14); }
+  .rep-picker-btn .pk-ico { width: 36px; height: 36px; border-radius: 12px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .rep-picker-btn .pk-tx { flex: 1; min-width: 0; }
+  .rep-picker-btn .pk-tx b { display: block; font-size: 13px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rep-picker-btn .pk-tx small { display: block; font-size: 10.5px; font-weight: 800; color: var(--text-muted); }
+  .rep-picker-btn .pk-chev { width: 26px; height: 26px; border-radius: 50%; background: var(--bg); color: var(--primary); font-weight: 900; display: flex; align-items: center; justify-content: center; transform: rotate(-90deg); transition: transform .2s; flex-shrink: 0; }
+  .rep-picker-btn.open .pk-chev { transform: rotate(90deg); background: var(--primary); color: #fff; }
+  .rep-picker-panel { background: #fff; border: 1.5px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-lg); margin: 0 0 10px; overflow: hidden; animation: popIn .2s ease-out; }
+  .rep-picker-panel .pk-list { max-height: 240px; overflow-y: auto; padding: 6px; scrollbar-width: thin; }
+  .pk-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; border-radius: 13px; font-size: 13.5px; font-weight: 800; color: var(--text); text-align: right; }
+  .pk-item:active { background: var(--bg); }
+  .pk-item.sel { background: var(--primary-light); color: var(--primary-dark); }
+  .pk-item .pk-check { margin-right: auto; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 13px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pk-item .pk-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .pk-stepper { display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: 1.5px dashed var(--border); }
+  .pk-step { width: 44px; height: 44px; border-radius: 14px; background: var(--primary-light); color: var(--primary-dark); font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+  .pk-step:active { background: var(--primary); color: #fff; }
+  .pk-step-val { flex: 1; text-align: center; }
+  .pk-step-val b { display: block; font-size: 26px; font-weight: 900; color: var(--primary-dark); line-height: 1; }
+  .pk-step-val small { display: block; font-size: 11px; font-weight: 800; color: var(--text-sec); margin-top: 2px; }
+  .pk-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 12px; }
+  .pk-day { aspect-ratio: 1; border-radius: 12px; background: var(--bg); border: 1.5px solid transparent; font-size: 13px; font-weight: 900; color: var(--text); display: flex; align-items: center; justify-content: center; }
+  .pk-day:active { transform: scale(.92); }
+  .pk-day.sel { background: var(--grad); color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(28,176,246,.35); }
+  .pk-quick { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 12px 12px; }
+  .pk-quick button { padding: 7px 13px; border-radius: 999px; background: var(--bg); border: 1.5px solid var(--border); font-size: 12px; font-weight: 800; color: var(--text-sec); }
+  .pk-quick button.sel { background: var(--primary); border-color: var(--primary); color: #fff; }
+  /* ===== كارت الأذكار (صباح / مساء) ===== */
+  .azkar-card { margin: 0 18px 14px; border-radius: 24px; padding: 18px 16px 14px; position: relative; overflow: hidden; box-shadow: 0 16px 36px rgba(0,0,0,.18); animation: popIn .4s ease-out; border: 1px solid rgba(255,255,255,.35); }
+  .azkar-card.morning { background: linear-gradient(150deg,#FFF7E0 0%,#FFE9B8 35%,#BFE6FF 100%); color: #5B4A00; }
+  .azkar-card.evening { background: linear-gradient(150deg,#1E1B4B 0%,#312E81 55%,#0F172A 100%); color: #fff; }
+  .azkar-card::before, .azkar-card::after { content: ''; position: absolute; border-radius: 50%; pointer-events: none; }
+  .azkar-card.morning::before { width: 180px; height: 180px; left: -60px; top: -70px; background: radial-gradient(circle, rgba(255,255,255,.7), transparent 70%); }
+  .azkar-card.evening::before { width: 120px; height: 120px; left: 20px; top: -40px; background: radial-gradient(circle, #FEF9C3 0%, #FDE68A 35%, transparent 70%); box-shadow: 0 0 30px 8px rgba(253,230,138,.5); }
+  .azkar-card.evening::after { content: '✦ ✧ ⋆ ✦'; position: absolute; top: 12px; left: 14px; font-size: 13px; letter-spacing: 6px; color: rgba(255,255,255,.7); background: none; width: auto; height: auto; }
+  .az-top { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
+  .az-ico { width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 25px; flex-shrink: 0; background: rgba(255,255,255,.65); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 4px 10px rgba(0,0,0,.08); animation: heroFloat 3s ease-in-out infinite; }
+  .azkar-card.evening .az-ico { background: rgba(255,255,255,.14); }
+  .az-tx { flex: 1; min-width: 0; }
+  .az-tx b { display: block; font-size: 17px; font-weight: 900; }
+  .azkar-card.morning .az-tx b { color: #7C5E00; }
+  .az-tx small { display: block; font-size: 11.5px; font-weight: 800; opacity: .75; margin-top: 1px; }
+  .az-count-badge { background: rgba(255,255,255,.7); color: #7C5E00; font-size: 11.5px; font-weight: 900; padding: 5px 13px; border-radius: 999px; white-space: nowrap; }
+  .azkar-card.evening .az-count-badge { background: rgba(255,255,255,.16); color: #FDE68A; }
+  .az-body { position: relative; z-index: 1; background: rgba(255,255,255,.72); border-radius: 18px; padding: 14px; margin-top: 12px; box-shadow: inset 0 1px 0 rgba(255,255,255,.8); }
+  .azkar-card.evening .az-body { background: rgba(255,255,255,.1); }
+  .az-text { font-size: 15.5px; font-weight: 800; line-height: 2; text-align: center; color: var(--text); }
+  .azkar-card.evening .az-text { color: #fff; }
+  .az-virtue { font-size: 11.5px; font-weight: 700; color: var(--text-sec); text-align: center; margin-top: 6px; line-height: 1.8; }
+  .azkar-card.evening .az-virtue { color: rgba(255,255,255,.7); }
+  .az-repeat { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
+  .az-repeat .rep-num { min-width: 52px; height: 52px; border-radius: 50%; background: var(--grad); color: #fff; font-size: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 18px rgba(28,176,246,.4); }
+  .azkar-card.evening .rep-num { background: linear-gradient(135deg,#FBBF24,#D97706); box-shadow: 0 8px 18px rgba(251,191,36,.4); }
+  .az-progress { height: 8px; border-radius: 99px; background: rgba(0,0,0,.08); margin-top: 10px; overflow: hidden; }
+  .azkar-card.evening .az-progress { background: rgba(255,255,255,.15); }
+  .az-progress > span { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg,#F59E0B,#10B981); transition: width .3s; }
+  .az-actions { display: grid; grid-template-columns: 1fr 1.6fr 1fr; gap: 8px; margin-top: 12px; position: relative; z-index: 1; }
+  .az-actions button { border-radius: 14px; padding: 12px 4px; font-size: 13px; font-weight: 900; background: rgba(255,255,255,.75); color: var(--text); box-shadow: var(--shadow-sm); }
+  .az-actions button:active { transform: scale(.95); }
+  .az-actions .az-done { background: linear-gradient(135deg,#34D399,#059669); color: #fff; box-shadow: 0 8px 18px rgba(16,185,129,.4); }
+  .azkar-card.evening .az-actions button { background: rgba(255,255,255,.14); color: #fff; }
+  .azkar-card.evening .az-actions .az-done { background: linear-gradient(135deg,#FBBF24,#D97706); }
+  .az-done-all { position: relative; z-index: 1; text-align: center; padding: 8px 0 2px; font-weight: 900; font-size: 15px; }
+  /* ===== صفحة الأذكار بملء الشاشة — بنفس هوية التطبيق ===== */
+  .azkar-page { position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column; animation: fadeIn .22s ease-out; background: var(--bg); background-image: radial-gradient(600px 320px at 85% -60px, #D6EEFB 0%, transparent 60%), radial-gradient(500px 300px at 0% 0%, #FFEED3 0%, transparent 55%); color: var(--text); }
+  .azp-head { position: sticky; top: 0; z-index: 2; padding: 12px 14px 10px; }
+  .azp-top { display: flex; align-items: center; gap: 10px; max-width: 480px; margin: 0 auto; background: var(--card); border: 1.5px solid var(--border); border-inline-start: 5px solid var(--primary); border-radius: 20px; padding: 12px; box-shadow: var(--shadow-sm); }
+  .azkar-page.evening .azp-top { border-inline-start-color: #FF9600; }
+  .azp-ico { width: 42px; height: 42px; border-radius: 14px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.7); }
+  .azkar-page.evening .azp-ico { background: var(--pending-light); }
+  .azp-close { width: 38px; height: 38px; border-radius: 13px; background: var(--primary-light); color: var(--primary-dark); font-size: 15px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .azp-close:active { transform: scale(.9); background: var(--primary); color: #fff; }
+  .azp-title { flex: 1; min-width: 0; text-align: right; }
+  .azp-title b { display: block; font-size: 16px; font-weight: 900; }
+  .azp-title small { display: block; font-size: 11px; font-weight: 700; color: var(--text-sec); margin-top: 1px; }
+  .azp-reset { font-size: 11px; font-weight: 800; padding: 8px 13px; border-radius: 999px; background: #fff; border: 1.5px solid var(--border); color: var(--primary-dark); white-space: nowrap; box-shadow: var(--shadow-sm); }
+  .azp-reset:active { background: var(--primary-light); }
+  .azp-prog { max-width: 480px; margin: 8px auto 0; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 900; color: var(--primary-dark); background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 9px 12px; box-shadow: var(--shadow-sm); }
+  .azp-bar { flex: 1; height: 8px; border-radius: 99px; background: var(--bg); border: 1px solid var(--border); overflow: hidden; }
+  .azp-bar > span { display: block; height: 100%; border-radius: 99px; background: var(--grad); transition: width .3s; }
+  .azkar-page.evening .azp-bar > span { background: linear-gradient(135deg,#FFB020,#FF7A00); }
+  .azp-body { flex: 1; overflow-y: auto; padding: 10px 14px 26px; }
+  .azp-list { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 9px; }
+  .azp-item { border-radius: 20px; padding: 13px 14px; text-align: right; border: 1.5px solid var(--border); background: var(--card); box-shadow: var(--shadow-sm); transition: transform .12s; animation: secIn .45s cubic-bezier(.22,1,.36,1) both; }
+  .azp-item:active { transform: scale(.99); }
+  .azp-item.done { border-color: var(--success); background: var(--success-light); }
+  .azp-item-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .azp-num { width: 32px; height: 32px; border-radius: 11px; background: var(--primary-light); color: var(--primary-dark); font-size: 13px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .azp-item.done .azp-num { background: var(--success); color: #fff; }
+  .azp-need { margin-right: auto; display: inline-flex; align-items: center; font-size: 11px; font-weight: 800; padding: 4px 11px; border-radius: 999px; background: var(--primary-light); color: var(--primary-dark); white-space: nowrap; }
+  .azkar-page.evening .azp-need { background: var(--pending-light); color: #B7950B; }
+  .azp-item.done .azp-need { background: var(--success); color: #fff; }
+  .azp-text { font-size: 15px; font-weight: 800; line-height: 2; color: var(--text); }
+  .azp-meta { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding-top: 10px; border-top: 1.5px dashed var(--border); }
+  .azp-virtue { flex: 1; min-width: 0; font-size: 11.5px; font-weight: 700; color: var(--text-sec); line-height: 1.9; }
+  .azp-tap-pill { flex-shrink: 0; min-width: 54px; height: 42px; padding: 0 16px; border-radius: 999px; font-size: 17px; font-weight: 900; background: var(--grad); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 8px 18px rgba(28,176,246,.35); white-space: nowrap; }
+  .azkar-page.evening .azp-tap-pill { background: linear-gradient(135deg,#FFB020,#FF7A00); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 8px 18px rgba(255,122,0,.35); }
+  .azp-tap-pill:active { transform: scale(.94); }
+  .azp-item.done .azp-tap-pill { background: linear-gradient(135deg,#34D399,#10B981); box-shadow: 0 8px 18px rgba(16,185,129,.3); }
+  .azp-tap { margin-top: 10px; width: 100%; min-height: 50px; border-radius: 16px; padding: 12px; font-size: 14px; font-weight: 900; background: var(--grad); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 12px 26px rgba(28,176,246,.38); }
+  .azkar-page.evening .azp-tap { background: linear-gradient(135deg,#FFB020,#FF7A00); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 12px 26px rgba(255,122,0,.35); }
+  .azp-tap:active { transform: scale(.97); }
+  .azp-item.done .azp-tap { background: linear-gradient(135deg,#34D399,#10B981); box-shadow: 0 12px 26px rgba(16,185,129,.32); }
+  .azp-foot { max-width: 480px; margin: 10px auto 0; display: flex; gap: 8px; }
+  .azp-foot button { flex: 1; min-height: 50px; border-radius: 16px; font-size: 14px; font-weight: 900; background: #fff; color: var(--primary-dark); border: 1.5px solid rgba(28,176,246,.28); box-shadow: 0 4px 12px rgba(28,176,246,.08); }
+  /* ===== مهامي السريعة (ستايل TickTick احترافي) ===== */
+  .task-card { background: linear-gradient(180deg,#FFFFFF 0%,#F6FBFF 100%); border-radius: 22px; border: 1.5px solid rgba(28,176,246,.16); border-top: 4px solid var(--primary); box-shadow: 0 10px 26px rgba(28,176,246,.12); overflow: hidden; }
+  .task-head { display: flex; align-items: center; gap: 10px; padding: 13px 14px 11px; }
+  .task-head-ico { width: 42px; height: 42px; border-radius: 14px; background: var(--grad); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; box-shadow: 0 8px 18px rgba(28,176,246,.35), inset 0 1px 0 rgba(255,255,255,.4); }
+  .task-head-tx { flex: 1; min-width: 0; }
+  .task-head-tx b { display: block; font-size: 15.5px; font-weight: 900; }
+  .task-head-tx small { display: block; font-size: 11px; font-weight: 800; color: var(--text-sec); margin-top: 1px; }
+  .task-count { font-size: 11px; font-weight: 900; color: var(--primary-dark); background: var(--primary-light); border: 1px solid rgba(28,176,246,.25); padding: 5px 12px; border-radius: 999px; white-space: nowrap; }
+  .task-clear { font-size: 11px; font-weight: 900; color: var(--danger); background: var(--danger-light); border: 1px solid currentColor; padding: 6px 13px; border-radius: 999px; white-space: nowrap; }
+  .task-clear:active { transform: scale(.94); }
+  .task-add { display: flex; align-items: center; gap: 8px; padding: 0 14px 12px; }
+  .task-add input { flex: 1; min-width: 0; border: 1.5px solid var(--border); background: var(--bg); border-radius: 15px; padding: 13px 15px; font-weight: 800; font-size: 13.5px; color: var(--text); transition: border-color .15s, box-shadow .15s, background .15s; }
+  .task-add input:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(28,176,246,.14); }
+  .task-add input::placeholder { color: var(--text-muted); font-weight: 700; }
+  .task-addbtn { width: 50px; height: 50px; border-radius: 16px; background: var(--grad); color: #fff; font-size: 26px; font-weight: 900; line-height: 1; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 10px 22px rgba(28,176,246,.4), inset 0 1px 0 rgba(255,255,255,.4); transition: transform .12s; }
+  .task-addbtn:active { transform: scale(.9) rotate(90deg); }
+  .task-addbtn-sm { width: 40px; height: 40px; border-radius: 13px; font-size: 24px; box-shadow: 0 6px 14px rgba(28,176,246,.35), inset 0 1px 0 rgba(255,255,255,.4); }
+  .task-listbox { padding: 0 8px 6px; }
+  .task-row { display: flex; align-items: center; gap: 11px; padding: 11px 10px; border-radius: 15px; cursor: pointer; transition: background .12s; animation: popIn .25s ease-out; }
+  .task-row:active { background: var(--primary-light); }
+  .task-row + .task-row { margin-top: 2px; }
+  .task-check { width: 25px; height: 25px; border-radius: 50%; border: 2px solid #CBD5E1; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; color: #fff; transition: all .18s; background: #fff; }
+  .task-row.done .task-check { background: linear-gradient(135deg,#34D399,#059669); border-color: #059669; box-shadow: 0 4px 10px rgba(16,185,129,.35); animation: jhPop .35s ease-out; }
+  .task-row.done .task-check::after { content: '✓'; }
+  .task-title { flex: 1; min-width: 0; font-size: 14px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; }
+  .task-row.done .task-title { text-decoration: line-through; color: var(--text-muted); }
+  .task-del { width: 30px; height: 30px; border-radius: 10px; color: var(--text-muted); opacity: .55; font-size: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .task-del:active { background: var(--danger-light); color: var(--danger); opacity: 1; }
+  .task-div { display: flex; align-items: center; gap: 8px; padding: 8px 16px 2px; font-size: 11px; font-weight: 900; color: var(--text-muted); }
+  .task-div::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .task-empty { padding: 20px 16px 22px; text-align: center; }
+  .task-empty .te-ico { width: 56px; height: 56px; border-radius: 19px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 27px; margin: 0 auto 10px; animation: floaty 3s ease-in-out infinite; }
+  .task-empty b { display: block; font-size: 14px; font-weight: 900; }
+  .task-empty small { display: block; font-size: 12px; font-weight: 700; color: var(--text-sec); margin-top: 3px; }
+  /* ===== آية اليوم ===== */
+  .ayah-card { background: linear-gradient(180deg,#FFFFFF 0%,#F4FBF6 100%); border-radius: 22px; border: 1.5px solid rgba(16,185,129,.22); border-top: 4px solid #059669; box-shadow: 0 10px 26px rgba(16,185,129,.12); overflow: hidden; animation: popIn .4s ease-out; }
+  .ayah-head { display: flex; align-items: center; gap: 10px; padding: 13px 14px 4px; }
+  .ayah-head-ico { width: 42px; height: 42px; border-radius: 14px; background: linear-gradient(135deg,#34D399,#059669); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; box-shadow: 0 8px 18px rgba(16,185,129,.35), inset 0 1px 0 rgba(255,255,255,.4); }
+  .ayah-head-tx { flex: 1; min-width: 0; }
+  .ayah-head-tx b { display: block; font-size: 15.5px; font-weight: 900; }
+  .ayah-head-tx small { display: block; font-size: 11px; font-weight: 800; color: var(--text-sec); margin-top: 1px; }
+  .ayah-theme { font-size: 11px; font-weight: 900; background: #FEF3C7; color: #9A5B00; border: 1px solid #F5D48A; padding: 5px 12px; border-radius: 999px; white-space: nowrap; }
+  .ayah-nav { display: flex; align-items: center; gap: 6px; }
+  .ayah-navbtn { width: 32px; height: 32px; border-radius: 11px; background: var(--bg); border: 1.5px solid var(--border); color: var(--text-sec); font-weight: 900; font-size: 15px; display: flex; align-items: center; justify-content: center; }
+  .ayah-navbtn:active { background: var(--primary-light); color: var(--primary-dark); }
+  .ayah-text { margin: 8px 14px 0; background: #fff; border: 1.5px solid rgba(16,185,129,.16); border-radius: 18px; padding: 16px 14px 12px; text-align: center; font-size: 17px; font-weight: 800; line-height: 2.2; color: var(--text); }
+  .ayah-ref { display: inline-block; margin-top: 8px; font-size: 11.5px; font-weight: 900; color: #047857; background: #DCFCE7; padding: 4px 14px; border-radius: 999px; }
+  .ayah-live { margin: 10px 14px 0; background: var(--bg); border-radius: 15px; padding: 11px 13px; }
+  .ayah-live b { display: block; font-size: 12.5px; font-weight: 900; color: var(--primary-dark); margin-bottom: 3px; }
+  .ayah-live p { font-size: 13px; font-weight: 700; line-height: 1.9; color: var(--text); }
+  .ayah-live .q { margin-top: 7px; padding-top: 7px; border-top: 1.5px dashed var(--border); font-size: 13px; font-weight: 900; color: #047857; }
+  .ayah-foot { padding: 4px 14px 13px; font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-align: center; }
+  /* ===== عداد المستخدمين النشطين ===== */
+  .online-pill { margin: 0 18px 12px; background: linear-gradient(180deg,#FFFFFF 0%,#EFF9FE 100%); border: 1.5px solid rgba(28,176,246,.18); border-radius: 18px; padding: 11px 14px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm); animation: popIn .4s ease-out; }
+  .online-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--success); flex-shrink: 0; animation: onlinePulse 1.8s ease-out infinite; }
+  @keyframes onlinePulse { 0% { box-shadow: 0 0 0 0 rgba(16,185,129,.45); } 70% { box-shadow: 0 0 0 9px rgba(16,185,129,0); } 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); } }
+  .online-num { font-size: 22px; font-weight: 900; color: var(--success); line-height: 1; min-width: 30px; text-align: center; font-variant-numeric: tabular-nums; }
+  .online-tx { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 900; }
+  .online-tx small { display: block; font-size: 10.5px; font-weight: 700; color: var(--text-sec); margin-top: 1px; }
+  .live-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 900; color: var(--success); background: var(--success-light); padding: 4px 11px; border-radius: 999px; flex-shrink: 0; }
+  .live-tag i { width: 7px; height: 7px; border-radius: 50%; background: var(--success); animation: dotBlink 1.2s infinite; }
+  /* ===== صفحة مواقيت الصلاة — تصميم نظيف جديد ===== */
+  .prayer-page { position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column; animation: fadeIn .22s ease-out; background: #F5F8FB; color: #152B3C; }
+  .pr-head { position: sticky; top: 0; z-index: 2; padding: 14px 16px 6px; background: linear-gradient(180deg,#F5F8FB 85%,transparent); }
+  .pr-top { display: flex; align-items: center; gap: 10px; max-width: 480px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E6EDF3; border-radius: 999px; padding: 8px 8px 8px 14px; box-shadow: 0 8px 24px rgba(21,43,60,.08); }
+  .pr-close { width: 36px; height: 36px; border-radius: 50%; background: #F1F5F9; color: #64748B; font-size: 14px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform .15s; }
+  .pr-close:active { transform: scale(.88) rotate(90deg); background: #1CB0F6; color: #fff; }
+  .pr-title { flex: 1; min-width: 0; text-align: center; }
+  .pr-title b { display: block; font-size: 14.5px; font-weight: 900; color: #0F2A3D; letter-spacing: 0; }
+  .pr-title small { display: block; font-size: 10.5px; font-weight: 700; color: #8AA0B4; margin-top: 2px; }
+  .pr-locbtn { display: flex; align-items: center; gap: 5px; font-size: 13.5px; font-weight: 900; color: #0F2A3D; background: #EAF4FE; border: none; padding: 9px 15px; border-radius: 999px; flex-shrink: 0; }
+  .pr-locbtn:active { transform: scale(.95); }
+  .pr-locbtn i { color: #F43F5E; font-style: normal; }
+  .pr-govpanel { max-width: 480px; margin: 8px auto 0; background: #fff; border: 1px solid #E6EDF3; border-radius: 20px; box-shadow: 0 20px 50px rgba(21,43,60,.14); overflow: hidden; animation: popIn .2s ease-out; }
+  .pr-govpanel .pk-list { max-height: 260px; overflow-y: auto; padding: 6px; }
+  .pr-govpanel .pk-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; border-radius: 14px; font-size: 13.5px; font-weight: 800; color: #152B3C; text-align: right; }
+  .pr-govpanel .pk-item:active { background: #F1F8FD; }
+  .pr-govpanel .pk-item.sel { background: #EAF4FE; color: #0F8AC2; }
+  .pr-govpanel .pk-check { margin-right: auto; width: 24px; height: 24px; border-radius: 50%; background: #1CB0F6; color: #fff; font-size: 13px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+  .pr-body { flex: 1; overflow-y: auto; padding: 8px 16px 26px; }
+  .pr-list { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+  .pr-sun { background: #FFFFFF; border: 1px solid #E6EDF3; border-radius: 26px; padding: 12px 12px 4px; overflow: hidden; box-shadow: 0 12px 32px rgba(21,43,60,.09); animation: popIn .4s ease-out; }
+  .pr-sun svg { display: block; width: 100%; height: auto; border-radius: 18px; }
+  .pr-count { display: flex; gap: 10px; direction: ltr; justify-content: center; padding: 12px 10px 14px; }
+  .pr-count > span { flex: 1; max-width: 110px; background: #F6FAFD; border: 1px solid #E6EDF3; border-radius: 18px; padding: 10px 4px 8px; text-align: center; }
+  .pr-count b { display: block; font-size: 24px; font-weight: 900; color: #0F2A3D; font-variant-numeric: tabular-nums; line-height: 1; animation: prTick 1s ease-in-out infinite; }
+  .pr-count small { display: block; font-size: 10px; font-weight: 800; color: #8AA0B4; margin-top: 4px; letter-spacing: .3px; }
+  @keyframes prTick { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.06); opacity: .9; } }
+  .pr-nextline { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg,#19A7EC 0%,#0F8AC2 100%); border-radius: 20px; padding: 14px 16px; color: #fff; box-shadow: 0 14px 30px rgba(28,176,246,.35), inset 0 1px 0 rgba(255,255,255,.35); animation: popIn .35s ease-out; }
+  .pr-nextline .nx-bell { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg,#F5B301,#DD9900); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; box-shadow: 0 6px 14px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.5); animation: heroFloat 3s ease-in-out infinite; }
+  .pr-nextline .nx-tx { flex: 1; min-width: 0; text-align: right; font-size: 16px; font-weight: 900; }
+  .pr-nextline .nx-tx small { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 800; background: rgba(255,255,255,.22); padding: 3px 11px; border-radius: 999px; margin-top: 5px; }
+  .pr-item { display: flex; align-items: center; gap: 12px; background: #FFFFFF; border: 1px solid #E6EDF3; border-radius: 18px; padding: 12px 14px; box-shadow: 0 4px 14px rgba(21,43,60,.05); animation: secIn .45s cubic-bezier(.22,1,.36,1) both; position: relative; color: #152B3C; }
+  .pr-item.next { border: 1.5px solid #1CB0F6; background: #EAF4FE; box-shadow: 0 0 0 4px rgba(28,176,246,.10), 0 10px 24px rgba(28,176,246,.18); animation: prGlow 2.4s ease-in-out infinite, secIn .45s cubic-bezier(.22,1,.36,1) both; }
+  @keyframes prGlow { 0%,100% { box-shadow: 0 0 0 4px rgba(28,176,246,.12), 0 10px 24px rgba(28,176,246,.18); } 50% { box-shadow: 0 0 0 8px rgba(28,176,246,.03), 0 10px 24px rgba(28,176,246,.18); } }
+  .pr-item.passed { opacity: .5; }
+  .pr-bell { width: 42px; height: 42px; border-radius: 50%; background: #E9F7EF; color: #1FA97A; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .pr-bell.off { background: #F1F5F9; color: #B6C2CE; }
+  .pr-mid { flex: 1; min-width: 0; text-align: right; }
+  .pr-mid b { display: block; font-size: 15px; font-weight: 900; color: #152B3C; }
+  .pr-item.next .pr-mid b { color: #0B5E8A; }
+  .pr-mid small { display: block; font-size: 10.5px; font-weight: 700; color: #93A7B8; margin-top: 2px; }
+  .pr-item.next .pr-mid small { color: #0F8AC2; font-weight: 900; }
+  .pr-time { font-size: 19px; font-weight: 900; color: #0F2A3D; direction: ltr; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .pr-time small { font-size: 11px; font-weight: 800; color: #93A7B8; margin-right: 2px; }
+  .pr-item.next .pr-time { color: #0B5E8A; }
+  .pr-extra { display: flex; background: #FFFFFF; border: 1px solid #E6EDF3; border-radius: 18px; box-shadow: 0 4px 14px rgba(21,43,60,.05); overflow: hidden; }
+  .pr-extra > div { flex: 1; padding: 13px 8px; text-align: center; }
+  .pr-extra > div + div { border-right: 1px dashed #E0E8EF; }
+  .pr-extra small { display: block; font-size: 10.5px; font-weight: 800; color: #93A7B8; }
+  .pr-extra b { display: block; font-size: 17px; font-weight: 900; color: #0F2A3D; margin-top: 3px; direction: ltr; font-variant-numeric: tabular-nums; }
   .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
   .rstat { background: var(--bg); padding: 10px; border-radius: var(--radius-sm); }
   .rstat .rl { font-size: 11px; color: var(--text-sec); font-weight: 700; }
@@ -2139,6 +2404,103 @@
     for (const id of Object.keys(perCat)) { if (perCat[id] > topVal) { topVal = perCat[id]; topId = id; } }
     return { id: topId, total: topVal };
   }
+  /* ===== الشهور المالية: بداية شهر مخصصة + تقارير كل الشهور ===== */
+  function monthStartDay() { const v = Number(state._monthStartDay); if (v >= 1 && v <= 28) return v; return 1; }
+  function fiscalKeyOf(dateInput, startDay) {
+    try {
+      const sd = Number(startDay) || monthStartDay();
+      const d = new Date(dateInput);
+      if (isNaN(d)) return null;
+      let y = d.getFullYear(), m = d.getMonth();
+      if (d.getDate() < sd) { m--; if (m < 0) { m = 11; y--; } }
+      return y + '-' + String(m + 1).padStart(2, '0');
+    } catch { return null; }
+  }
+  function fiscalRangeOf(fiscalKey, startDay) {
+    try {
+      const sd = Number(startDay) || monthStartDay();
+      const parts = String(fiscalKey || '').split('-');
+      const y = Number(parts[0]), m = Number(parts[1]) - 1;
+      if (!y || m < 0 || m > 11) return null;
+      const from = new Date(y, m, sd, 0, 0, 0, 0);
+      const to = new Date(y, m + 1, sd, 0, 0, 0, 0);
+      return { from, to };
+    } catch { return null; }
+  }
+  function inFiscalMonth(createdAt, fiscalKey, startDay) {
+    try {
+      const r = fiscalRangeOf(fiscalKey, startDay);
+      if (!r) return false;
+      const d = new Date(createdAt);
+      return d >= r.from && d < r.to;
+    } catch { return false; }
+  }
+  function currentFiscalKey() { return fiscalKeyOf(new Date(), monthStartDay()); }
+  function selectedFiscalKey() {
+    const k = state._repMonth;
+    if (k && /^\d{4}-\d{2}$/.test(k)) return k;
+    return currentFiscalKey();
+  }
+  function availableFiscalMonths() {
+    const set = new Set();
+    try { (state.expenses || []).forEach(e => { const k = fiscalKeyOf(e.createdAt, monthStartDay()); if (k) set.add(k); }); } catch {}
+    const cur = currentFiscalKey();
+    if (cur) set.add(cur);
+    return [...set].sort().reverse();
+  }
+  function fiscalLabel(key) {
+    try {
+      const parts = String(key).split('-');
+      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+      const name = d.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' });
+      const sd = monthStartDay();
+      return sd > 1 ? (name + ' (من يوم ' + sd + ')') : name;
+    } catch { return String(key || ''); }
+  }
+  function sumInFiscalMonth(fiscalKey, kind) {
+    kind = kind || 'expense';
+    let total = 0, count = 0;
+    try { (state.expenses || []).forEach(e => { if (finKindOf(e) === kind && inFiscalMonth(e.createdAt, fiscalKey, monthStartDay())) { total += Number(e.amount) || 0; count++; } }); } catch {}
+    return { total, count };
+  }
+  function breakdownInFiscalMonth(fiscalKey, kind) {
+    kind = kind || 'expense';
+    const out = {};
+    try { (state.expenses || []).forEach(e => { if (finKindOf(e) === kind && inFiscalMonth(e.createdAt, fiscalKey, monthStartDay())) out[e.categoryId] = (out[e.categoryId] || 0) + (Number(e.amount) || 0); }); } catch {}
+    return out;
+  }
+  function topCatInFiscalMonth(fiscalKey, kind) {
+    const br = breakdownInFiscalMonth(fiscalKey, kind || 'expense');
+    let topId = null, topVal = 0;
+    for (const id of Object.keys(br)) if (br[id] > topVal) { topVal = br[id]; topId = id; }
+    return { id: topId, total: topVal };
+  }
+  function fiscalDailyBars(fiscalKey, kind) {
+    kind = kind || 'expense';
+    const r = fiscalRangeOf(fiscalKey, monthStartDay());
+    if (!r) return [];
+    const arr = [];
+    const cur = new Date(r.from);
+    while (cur < r.to) {
+      const key = cur.getFullYear() + '-' + String(cur.getMonth() + 1).padStart(2, '0') + '-' + String(cur.getDate()).padStart(2, '0');
+      const total = (state.expenses || []).filter(e => finKindOf(e) === kind && String((e.createdAt || '').slice(0, 10)) === key).reduce((s, e) => s + (Number(e.amount) || 0), 0);
+      arr.push({ key, total, label: cur.getDate() });
+      cur.setDate(cur.getDate() + 1);
+    }
+    return arr;
+  }
+  function expGroupOf(e) {
+    try {
+      const lk = finLookup(e.categoryId);
+      if (lk) return { id: 'fin:' + lk.root + ':' + lk.groupId, name: lk.group, color: lk.color || '#1CB0F6', icon: lk.icon || 'box' };
+    } catch {}
+    try {
+      const disp = finCatDisplay(e.categoryId);
+      if (disp) return { id: 'grp:' + disp.group, name: disp.group, color: catColor(e.categoryId) || '#1CB0F6', icon: getCategoryIcon(e.categoryId) || 'box' };
+    } catch {}
+    const cid = e.categoryId || 'uncategorized';
+    return { id: 'cat:' + cid, name: getCategoryName(cid), color: catColor(cid) || '#1CB0F6', icon: getCategoryIcon(cid) || 'box' };
+  }
   function last7DaysBars(kind) {
     kind = kind || 'expense';
     const days = []; const labels = ['أحد', 'إثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت']; const now = new Date();
@@ -2164,7 +2526,7 @@
   /* =============================
      ROUTER
      ============================= */
-  function setTab(tab) { state.currentTab = tab; state._expandedOrder = null; state._expDraft = null; state._expandedBasket = null; state._basketDraft = null; state._catBrowse = null; state._shopQuery = ''; persist(); render(); }
+  function setTab(tab) { state.currentTab = tab; state._expandedOrder = null; state._expDraft = null; state._expandedBasket = null; state._basketDraft = null; state._catBrowse = null; state._shopQuery = ''; state._repPickerOpen = null; state._expPickerOpen = false; persist(); render(); }
 
   /* =============================
      UI HELPERS
@@ -2485,6 +2847,624 @@
     }
   }
 
+  /* =============================
+     الأذكار: صباح ومساء — كارت ديناميكي + إشعارات + تحكم من الإعدادات
+     القاعدة: بعد 12 منتصف الليل => صباح | بعد 12 ظهراً => مساء (ساعة التبديل قابلة للتعديل)
+     ============================= */
+  const AZKAR = {
+    morning: [
+      { t: 'أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ: اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ، لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ، لَّهُ مَا فِي السَّمَوَاتِ وَمَا فِي الأَرْضِ، مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ، يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ، وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاءَ، وَسِعَ كُرْسِيُّهُ السَّمَوَاتِ وَالأَرْضَ، وَلاَ يَؤُودُهُ حِفْظُهُمَا، وَهُوَ الْعَلِيُّ الْعَظِيمُ (آية الكرسي)', c: 1, v: 'من قالها حين يصبح أُجير من الجن حتى يمسي' },
+      { t: 'بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ: ﴿قُلْ هُوَ اللَّهُ أَحَدٌ * اللَّهُ الصَّمَدُ * لَمْ يَلِدْ وَلَمْ يُولَدْ * وَلَمْ يَكُن لَّهُ كُفُواً أَحَدٌ﴾', c: 3, v: 'من قالها ثلاثاً حين يصبح كفته — تعدل ثلث القرآن' },
+      { t: 'بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ: ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ * مِن شَرِّ مَا خَلَقَ * وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ * وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ * وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ﴾', c: 3, v: 'تحفظ من كل سوء بإذن الله' },
+      { t: 'بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ: ﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ * مَلِكِ النَّاسِ * إِلَهِ النَّاسِ * مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ * الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ * مِنَ الْجِنَّةِ وَالنَّاسِ﴾', c: 3, v: 'حرز من الشيطان ووساوسه' },
+      { t: 'أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ', c: 1, v: 'سيد أذكار الصباح' },
+      { t: 'اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ', c: 1, v: 'توكل على الله في يومك' },
+      { t: 'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ (سيد الاستغفار)', c: 1, v: 'من قالها موقناً بها فمات من يومه دخل الجنة' },
+      { t: 'اللَّهُمَّ إِنِّي أَصْبَحْتُ أُشْهِدُكَ، وَأُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلاَئِكَتَكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ لَا إِلَهَ إِلاَّ أَنْتَ وَحْدَكَ لاَ شَرِيكَ لَكَ، وَأَنَّ مُحَمَّداً عَبْدُكَ وَرَسُولُكَ', c: 4, v: 'من قالها أربعاً أعتقه الله من النار' },
+      { t: 'اللَّهُمَّ مَا أَصْبَحَ بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لاَ شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ', c: 1, v: 'من قالها فقد أدى شكر يومه' },
+      { t: 'اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لاَ إِلَهَ إِلاَّ أَنْتَ. اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لاَ إِلَهَ إِلاَّ أَنْتَ', c: 3, v: 'عافية البدن والسمع والبصر' },
+      { t: 'حَسْبِيَ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ، عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ', c: 7, v: 'من قالها سبعاً كفاه الله ما أهمه' },
+      { t: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْفِي وَعَنْ يَمِينِي وَعَنْ شِمَالِي وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي', c: 1, v: 'جامع لخيري الدنيا والآخرة' },
+      { t: 'اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشَرَكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءاً أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ', c: 1, v: 'حرز من الشيطان وشر النفس' },
+      { t: 'بِسْمِ اللَّهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ', c: 3, v: 'لم تصبه فجأة بلاء حتى يمسي' },
+      { t: 'رَضِيتُ بِاللَّهِ رَبَّاً، وَبِالإِسْلاَمِ دِيناً، وَبِمُحَمَّدٍ ﷺ نَبِيّاً', c: 3, v: 'كان حقاً على الله أن يرضيه يوم القيامة' },
+      { t: 'يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِيَ كُلَّهُ، وَلاَ تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ', c: 1, v: 'استغاثة برحمة الله في كل شأنك' },
+      { t: 'أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ رَبِّ الْعَالَمِينَ، اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ هَذَا الْيَوْمِ: فَتْحَهُ وَنَصْرَهُ وَنُورَهُ وَبَرَكَتَهُ وَهُدَاهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِيهِ وَشَرِّ مَا بَعْدَهُ', c: 1, v: 'سؤال خير اليوم كله' },
+      { t: 'أَصْبَحْنَا عَلَى فِطْرَةِ الإِسْلاَمِ، وَعَلَى كَلِمَةِ الإِخْلاَصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ ﷺ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفاً مُسْلِماً وَمَا كَانَ مِنَ الْمُشْرِكِينَ', c: 1, v: 'تجديد العهد على الإسلام' },
+      { t: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', c: 100, v: 'حُطت خطاياه وإن كانت مثل زبد البحر' },
+      { t: 'لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ', c: 10, v: 'عشر مرات — أو مرة واحدة عند الكسل' },
+      { t: 'لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ', c: 100, v: 'مائة مرة — كانت له عدل عشر رقاب وكُتبت له مائة حسنة' },
+      { t: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ: عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ', c: 3, v: 'تثقل الميزان' },
+      { t: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْماً نَافِعاً، وَرِزْقاً طَيِّباً، وَعَمَلاً مُتَقَبَّلاً', c: 1, v: 'خير ما يُسأل في الصباح' },
+      { t: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ', c: 100, v: 'مائة مرة في اليوم — يغفر الذنوب' },
+      { t: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ', c: 10, v: 'من صلى عليّ عشراً أدركته شفاعتي' }
+    ],
+    evening: [
+      { t: 'أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ: اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ، لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ، لَّهُ مَا فِي السَّمَوَاتِ وَمَا فِي الأَرْضِ، مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ، يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ، وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاءَ، وَسِعَ كُرْسِيُّهُ السَّمَوَاتِ وَالأَرْضَ، وَلاَ يَؤُودُهُ حِفْظُهُمَا، وَهُوَ الْعَلِيُّ الْعَظِيمُ (آية الكرسي)', c: 1, v: 'من قالها حين يمسي أُجير من الجن حتى يصبح' },
+      { t: 'بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ: ﴿قُلْ هُوَ اللَّهُ أَحَدٌ * اللَّهُ الصَّمَدُ * لَمْ يَلِدْ وَلَمْ يُولَدْ * وَلَمْ يَكُن لَّهُ كُفُواً أَحَدٌ﴾', c: 3, v: 'تعدل ثلث القرآن' },
+      { t: 'بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ: ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ * مِن شَرِّ مَا خَلَقَ * وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ * وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ * وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ﴾', c: 3, v: 'تحفظ من كل سوء بإذن الله' },
+      { t: 'بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ: ﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ * مَلِكِ النَّاسِ * إِلَهِ النَّاسِ * مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ * الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ * مِنَ الْجِنَّةِ وَالنَّاسِ﴾', c: 3, v: 'حرز من الشيطان' },
+      { t: 'أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ', c: 1, v: 'سيد أذكار المساء' },
+      { t: 'اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ', c: 1, v: 'تفويض الأمر لله في ليلتك' },
+      { t: 'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ (سيد الاستغفار)', c: 1, v: 'من قالها موقناً بها فمات من ليلته دخل الجنة' },
+      { t: 'اللَّهُمَّ إِنِّي أَمْسَيْتُ أُشْهِدُكَ، وَأُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلاَئِكَتَكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ لَا إِلَهَ إِلاَّ أَنْتَ وَحْدَكَ لاَ شَرِيكَ لَكَ، وَأَنَّ مُحَمَّداً عَبْدُكَ وَرَسُولُكَ', c: 4, v: 'من قالها أربعاً أعتقه الله من النار' },
+      { t: 'اللَّهُمَّ مَا أَمْسَى بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لاَ شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ', c: 1, v: 'من قالها فقد أدى شكر ليلته' },
+      { t: 'اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لاَ إِلَهَ إِلاَّ أَنْتَ. اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لاَ إِلَهَ إِلاَّ أَنْتَ', c: 3, v: 'عافية البدن والسمع والبصر' },
+      { t: 'حَسْبِيَ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ، عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ', c: 7, v: 'من قالها سبعاً كفاه الله ما أهمه' },
+      { t: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْفِي وَعَنْ يَمِينِي وَعَنْ شِمَالِي وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي', c: 1, v: 'جامع لخيري الدنيا والآخرة' },
+      { t: 'اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشَرَكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءاً أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ', c: 1, v: 'حرز من الشيطان وشر النفس' },
+      { t: 'بِسْمِ اللَّهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ', c: 3, v: 'لم تصبه فجأة بلاء حتى يصبح' },
+      { t: 'رَضِيتُ بِاللَّهِ رَبَّاً، وَبِالإِسْلاَمِ دِيناً، وَبِمُحَمَّدٍ ﷺ نَبِيّاً', c: 3, v: 'كان حقاً على الله أن يرضيه يوم القيامة' },
+      { t: 'يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِيَ كُلَّهُ، وَلاَ تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ', c: 1, v: 'استغاثة برحمة الله' },
+      { t: 'أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ رَبِّ الْعَالَمِينَ، اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ هَذِهِ اللَّيْلَةِ: فَتْحَهَا وَنَصْرَهَا وَنُورَهَا وَبَرَكَتَهَا وَهُدَاهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِيهَا وَشَرِّ مَا بَعْدَهَا', c: 1, v: 'سؤال خير الليلة كلها' },
+      { t: 'أَمْسَيْنَا عَلَى فِطْرَةِ الإِسْلاَمِ، وَعَلَى كَلِمَةِ الإِخْلاَصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ ﷺ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفاً مُسْلِماً وَمَا كَانَ مِنَ الْمُشْرِكِينَ', c: 1, v: 'تجديد العهد على الإسلام' },
+      { t: 'أَعُوذُ بِكَلِمَاتِ اللهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ', c: 3, v: 'لم تضره حُمَة تلك الليلة' },
+      { t: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', c: 100, v: 'حُطت خطاياه وإن كانت مثل زبد البحر' },
+      { t: 'لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ', c: 10, v: 'عشر مرات' },
+      { t: 'لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ', c: 100, v: 'مائة مرة — عدل عشر رقاب ومائة حسنة' },
+      { t: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ: عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ', c: 3, v: 'تثقل الميزان' },
+      { t: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْماً نَافِعاً، وَرِزْقاً طَيِّباً، وَعَمَلاً مُتَقَبَّلاً', c: 1, v: 'خير ما يُسأل' },
+      { t: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ', c: 100, v: 'مائة مرة — يغفر الذنوب' },
+      { t: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ', c: 10, v: 'من صلى عليّ عشراً أدركته شفاعتي' }
+    ]
+  };
+  function azkarSwitchHour() { const v = Number(state._azkarSwitch); if (v >= 0 && v <= 23) return v; return 12; }
+  function azkarPeriod(now) {
+    const h = (now || new Date()).getHours();
+    return h < azkarSwitchHour() ? 'morning' : 'evening';
+  }
+  function azkarDayKey(d) { d = d || new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function azkarState() {
+    const p = azkarPeriod();
+    const key = azkarDayKey() + '-' + p;
+    if (!state._azkar || state._azkar.key !== key) state._azkar = { key, idx: 0, left: (AZKAR[p][0] || { c: 1 }).c };
+    if (state._azkar.idx == null) state._azkar.idx = 0;
+    return { period: p, key, list: AZKAR[p], st: state._azkar };
+  }
+  function azkarAdvance() {
+    const { period, list, st } = azkarState();
+    st.left = Number(st.left) || 1;
+    st.left--;
+    if (st.left <= 0) {
+      if (st.idx < list.length - 1) { st.idx++; st.left = list[st.idx].c; }
+      else { st.idx = list.length; st.left = 0; }
+    }
+    persist(); render();
+  }
+  /* تقدم كل ذكر لوحده لصفحة ملء الشاشة */
+  function azkarListState() {
+    const p = azkarPeriod();
+    const key = azkarDayKey() + '-' + p;
+    const list = AZKAR[p];
+    if (!state._azkarList || state._azkarList.key !== key || !Array.isArray(state._azkarList.left) || state._azkarList.left.length !== list.length) {
+      state._azkarList = { key, left: list.map(x => x.c) };
+    }
+    return { period: p, key, list, lefts: state._azkarList.left };
+  }
+  function openAzkarPage() {
+    if (state._azkarOff === true) { toast('كارت الأذكار مقفول من الإعدادات', 'info'); return; }
+    try { document.querySelector('.azkar-page')?.remove(); } catch {}
+    const { period, list } = azkarListState();
+    const isM = period === 'morning';
+    const ov = document.createElement('div');
+    ov.className = 'azkar-page ' + (isM ? 'morning' : 'evening');
+    ov.innerHTML = `<div class="azp-head"><div class="azp-top">
+        <span class="azp-ico">${isM ? '🌅' : '🌙'}</span>
+        <span class="azp-title"><b>${isM ? 'أذكار الصباح' : 'أذكار المساء'}</b><small>${isM ? 'من بعد منتصف الليل' : 'من بعد الظهر'} • اضغط على الذكر للتسبيح</small></span>
+        <button class="azp-close" id="azpClose">✕</button>
+      </div>
+    </div><div class="azp-body"><div class="azp-list" id="azpList"></div>
+      <div class="azp-foot"><button id="azpClose2">✔ إغلاق الصفحة</button></div>
+    </div>`;
+    document.body.appendChild(ov);
+    try { document.body.style.overflow = 'hidden'; } catch {}
+    const close = () => { try { const s = azkarListState(); state._azkarList.left = s.list.map(x => x.c); persist(); } catch {} ov.remove(); try { document.body.style.overflow = ''; } catch {} };
+    ov.querySelector('#azpClose').onclick = close;
+    ov.querySelector('#azpClose2').onclick = close;
+    paintAzkarPage(ov);
+  }
+  function paintAzkarPage(ov) {
+    const { period, list, lefts } = azkarListState();
+    const box = ov.querySelector('#azpList');
+    if (!box) return;
+    let doneN = 0;
+    box.innerHTML = list.map((z, i) => {
+      const left = Number(lefts[i]) || 0;
+      const done = left <= 0;
+      if (done) doneN++;
+      return `<div class="azp-item ${done ? 'done' : ''}">
+        <div class="azp-item-top"><span class="azp-num">${done ? '✓' : (i + 1)}</span></div>
+        <div class="azp-text">${escapeHTML(z.t)}</div>
+        <div class="azp-meta">${z.v ? `<span class="azp-virtue">${escapeHTML(z.v)}</span>` : '<span class="azp-virtue" style="visibility:hidden;">•</span>'}<button class="azp-tap-pill" data-aztap="${i}">${done ? '✓' : left}</button></div>
+      </div>`;
+    }).join('') + (doneN >= list.length ? `<div class="azp-item done" style="text-align:center;"><div class="azp-text">تقبّل الله منك — أتممت أذكار ${period === 'morning' ? 'الصباح' : 'المساء'}<br><small style="opacity:.6;">اللهم أعنا على ذكرك وشكرك وحسن عبادتك</small></div></div>` : '');
+    const pct = Math.round((doneN / list.length) * 100);
+    const cnt = ov.querySelector('#azpCount');
+    if (cnt) cnt.textContent = doneN + ' / ' + list.length;
+    const bar = ov.querySelector('#azpBar');
+    if (bar) bar.style.width = pct + '%';
+    box.querySelectorAll('[data-aztap]').forEach(b => b.onclick = (e) => {
+      e.stopPropagation();
+      const i = Number(b.dataset.aztap);
+      const s = azkarListState();
+      let v = Number(s.lefts[i]) || 0;
+      if (v <= 0) s.lefts[i] = s.list[i].c;
+      else s.lefts[i] = v - 1;
+      persist(); paintAzkarPage(ov);
+    });
+  }
+  function renderAzkarCard() {
+    if (state._azkarOff === true) return '';
+    if (state._azkarOpen !== true) return '';
+    const { period, list, st } = azkarState();
+    const isM = period === 'morning';
+    const total = list.length;
+    const doneAll = st.idx >= total;
+    const cur = doneAll ? null : list[st.idx];
+    const pct = doneAll ? 100 : Math.round(((st.idx) / total) * 100);
+    const title = isM ? 'أذكار الصباح ☀️' : 'أذكار المساء 🌙';
+    const sub = isM ? 'من بعد منتصف الليل حتى الظهر — ابدأ يومك بذكر الله' : 'من الظهر حتى الفجر — اختم يومك بذكر الله';
+    return `<div class="azkar-card ${isM ? 'morning' : 'evening'}">
+      <div class="az-top"><span class="az-ico">${isM ? '🌅' : '🌙'}</span>
+        <span class="az-tx"><b>${title}</b><small>${sub}</small></span>
+        <span class="az-count-badge">${doneAll ? 'خلصت ✓' : ('الذكر ' + (st.idx + 1) + ' من ' + total)}</span>
+      </div>
+      ${doneAll ? `<div class="az-body"><div class="az-text">🤲 تقبّل الله منك — خلصت أذكار ${isM ? 'الصباح' : 'المساء'} كلها ❤️<br><small style="font-size:12.5px;">اللهم أعنا على ذكرك وشكرك وحسن عبادتك</small></div></div>
+        <div class="az-actions"><button id="azkarPrev">‹ السابق</button><button class="az-done" id="azkarReset">🔄 إعادة من الأول</button><button id="azkarNext">التالي ›</button></div>`
+      : `<div class="az-body"><div class="az-text">${escapeHTML(cur.t)}</div>${cur.v ? `<div class="az-virtue">💎 ${escapeHTML(cur.v)}</div>` : ''}
+        <div class="az-repeat"><span style="font-size:12px;font-weight:900;opacity:.7;">متبقي</span><span class="rep-num" id="azkarTap">${st.left}</span><span style="font-size:12px;font-weight:900;opacity:.7;">مرة • دوس على الرقم</span></div>
+        <div class="az-progress"><span style="width:${pct}%;"></span></div></div>
+        <div class="az-actions"><button id="azkarPrev">‹ السابق</button><button class="az-done" id="azkarDone">✓ تم (${st.left})</button><button id="azkarNext">التالي ›</button></div>`}
+    </div>`;
+  }
+  /* =============================
+     مواقيت الصلاة حسب الموقع الجغرافي (Aladhan API) + عد تنازلي حي
+     ============================= */
+  const PRAYERS_META = [
+    { id: 'Fajr', name: 'الفجر', ico: '🌄' },
+    { id: 'Sunrise', name: 'الشروق', ico: '🌅' },
+    { id: 'Dhuhr', name: 'الظهر', ico: '☀️' },
+    { id: 'Asr', name: 'العصر', ico: '🌤️' },
+    { id: 'Maghrib', name: 'المغرب', ico: '🌇' },
+    { id: 'Isha', name: 'العشاء', ico: '🌙' }
+  ];
+  const PRAYER_GOVS = [
+    { id: 'cairo', name: 'القاهرة', lat: 30.0444, lng: 31.2357 },
+    { id: 'giza', name: 'الجيزة', lat: 30.0131, lng: 31.2089 },
+    { id: 'alex', name: 'الإسكندرية', lat: 31.2001, lng: 29.9187 },
+    { id: 'dakahlia', name: 'الدقهلية', lat: 31.0379, lng: 31.3815 },
+    { id: 'redsea', name: 'البحر الأحمر', lat: 27.2579, lng: 33.8116 },
+    { id: 'beheira', name: 'البحيرة', lat: 31.0341, lng: 30.4682 },
+    { id: 'fayoum', name: 'الفيوم', lat: 29.3084, lng: 30.8428 },
+    { id: 'gharbia', name: 'الغربية', lat: 30.7865, lng: 31.0004 },
+    { id: 'ismailia', name: 'الإسماعيلية', lat: 30.5965, lng: 32.2715 },
+    { id: 'monufia', name: 'المنوفية', lat: 30.5590, lng: 31.0101 },
+    { id: 'minya', name: 'المنيا', lat: 28.1099, lng: 30.7503 },
+    { id: 'qalyubia', name: 'القليوبية', lat: 30.4620, lng: 31.1848 },
+    { id: 'newvalley', name: 'الوادي الجديد', lat: 25.4500, lng: 30.5460 },
+    { id: 'suez', name: 'السويس', lat: 29.9668, lng: 32.5498 },
+    { id: 'aswan', name: 'أسوان', lat: 24.0889, lng: 32.8998 },
+    { id: 'asyut', name: 'أسيوط', lat: 27.1783, lng: 31.1859 },
+    { id: 'benisuef', name: 'بني سويف', lat: 29.0661, lng: 31.0990 },
+    { id: 'portsaid', name: 'بورسعيد', lat: 31.2653, lng: 32.3019 },
+    { id: 'damietta', name: 'دمياط', lat: 31.4165, lng: 31.8133 },
+    { id: 'sharkia', name: 'الشرقية', lat: 30.5877, lng: 31.5020 },
+    { id: 'sohag', name: 'سوهاج', lat: 26.5560, lng: 31.6948 },
+    { id: 'sinaiN', name: 'شمال سيناء', lat: 31.1313, lng: 33.7984 },
+    { id: 'sinaiS', name: 'جنوب سيناء', lat: 27.9828, lng: 34.3932 },
+    { id: 'kafr', name: 'كفر الشيخ', lat: 31.1141, lng: 30.9414 },
+    { id: 'matrouh', name: 'مطروح', lat: 31.3543, lng: 27.2373 },
+    { id: 'luxor', name: 'الأقصر', lat: 25.6872, lng: 32.6396 },
+    { id: 'qena', name: 'قنا', lat: 26.1642, lng: 32.7267 },
+    { id: 'gps', name: '📍 موقعي الحالي (GPS)', lat: null, lng: null }
+  ];
+  function prayerGov() {
+    try {
+      const id = state._prayerGov || 'cairo';
+      return PRAYER_GOVS.find(g => g.id === id) || PRAYER_GOVS[0];
+    } catch { return PRAYER_GOVS[0]; }
+  }
+  function prayerCache() { try { return JSON.parse(localStorage.getItem('naqisna_prayer') || 'null'); } catch { return null; } }
+  function prayerSaveCache(o) { try { localStorage.setItem('naqisna_prayer', JSON.stringify(o)); } catch {} }
+  function prayerTodayKey(d) { d = d || new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function prayerTimeToDate(tStr, base) {
+    try {
+      const m = String(tStr || '').match(/(\d{1,2}):(\d{2})/);
+      if (!m) return null;
+      const d = new Date(base || new Date());
+      d.setHours(Number(m[1]), Number(m[2]), 0, 0);
+      return d;
+    } catch { return null; }
+  }
+  function prayerNextInfo(timings) {
+    try {
+      const now = new Date();
+      for (const p of PRAYERS_META) {
+        const dt = prayerTimeToDate((timings || {})[p.id], now);
+        if (dt && dt > now) return { meta: p, at: dt, diff: dt - now };
+      }
+      const f = prayerTimeToDate((timings || {}).Fajr, now);
+      if (f) { f.setDate(f.getDate() + 1); return { meta: PRAYERS_META[0], at: f, diff: f - now, tomorrow: true }; }
+    } catch {}
+    return null;
+  }
+  function prayerFmtDiff(ms) {
+    ms = Math.max(0, Number(ms) || 0);
+    const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000), s = Math.floor((ms % 60000) / 1000);
+    return { h, m, s };
+  }
+  async function fetchPrayerTimes(forceLoc) {
+    const getPos = () => new Promise((res) => {
+      if (!navigator.geolocation) return res(null);
+      const to = setTimeout(() => res(null), 8000);
+      navigator.geolocation.getCurrentPosition(p => { clearTimeout(to); res(p); }, () => { clearTimeout(to); res(null); }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 3600000 });
+    });
+    const gov = prayerGov();
+    let lat = gov.lat ?? 30.0444, lng = gov.lng ?? 31.2357, place = gov.name || 'القاهرة';
+    try {
+      if (gov.id === 'gps') {
+        const pos = await getPos();
+        if (pos && pos.coords) { lat = pos.coords.latitude; lng = pos.coords.longitude; place = 'موقعي الحالي'; }
+        else {
+          const c = prayerCache();
+          if (c && c.lat && c.lng) { lat = c.lat; lng = c.lng; place = c.place || place; }
+          else { const d = PRAYER_GOVS[0]; lat = d.lat; lng = d.lng; place = d.name; }
+        }
+      }
+    } catch {}
+    const now = new Date();
+    const ds = String(now.getDate()).padStart(2, '0') + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + now.getFullYear();
+    const url = 'https://api.aladhan.com/v1/timings/' + ds + '?latitude=' + lat + '&longitude=' + lng + '&method=5';
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('net');
+    const j = await r.json();
+    const data = { timings: j?.data?.timings || null, hijri: j?.data?.date?.hijri || null, greg: j?.data?.date?.gregorian || null, lat, lng, place, govId: gov.id, day: prayerTodayKey(now) };
+    if (!data.timings || !data.timings.Fajr) throw new Error('empty');
+    prayerSaveCache(data);
+    return data;
+  }
+  function paintPrayerMini() {
+    try {
+      const t = document.getElementById('prayerMiniTxt');
+      const s = document.getElementById('prayerMiniSub');
+      if (!t || !s) return false;
+      const c = prayerCache();
+      const gid = prayerGov().id;
+      if (c && c.timings && c.day === prayerTodayKey() && (c.govId || 'cairo') === gid) {
+        const nx = prayerNextInfo(c.timings);
+        if (nx) {
+          const tm = String((c.timings[nx.meta.id] || '')).slice(0, 5);
+          t.textContent = nx.meta.ico + ' ' + nx.meta.name + ' ' + tm;
+          const cd = prayerFmtDiff(nx.diff);
+          const parts = [];
+          if (cd.h > 0) parts.push(cd.h + ' س');
+          parts.push(cd.m + ' د');
+          s.textContent = 'متبقي ' + parts.join(' و ');
+          return true;
+        }
+      }
+      t.textContent = 'مواقيت الصلاة • ' + prayerGov().name;
+      s.textContent = 'دوس للعرض 📍';
+      return false;
+    } catch { return false; }
+  }
+  function refreshPrayerMini() {
+    try { if (window._prayerMiniTimer) clearInterval(window._prayerMiniTimer); } catch {}
+    paintPrayerMini();
+    try {
+      window._prayerMiniTimer = setInterval(() => { if (!paintPrayerMini()) { try { clearInterval(window._prayerMiniTimer); } catch {} } }, 30000);
+    } catch {}
+    try {
+      const c = prayerCache();
+      if (c && c.day === prayerTodayKey() && c.timings) return;
+      fetchPrayerTimes(false).then(() => paintPrayerMini()).catch(() => {});
+    } catch {}
+  }
+  function prayerBellOn(id) { try { const m = state._prayerNotif || {}; return m[id] !== false; } catch { return true; } }
+  function prayerTo12h(tStr) {
+    try {
+      const m = String(tStr || '').match(/(\d{1,2}):(\d{2})/);
+      if (!m) return { t: String(tStr || ''), ap: '' };
+      let h = Number(m[1]) % 24;
+      const ap = h < 12 ? 'ص' : 'م';
+      let h12 = h % 12; if (h12 === 0) h12 = 12;
+      return { t: h12 + ':' + m[2], ap };
+    } catch { return { t: String(tStr || ''), ap: '' }; }
+  }
+  function prayerMin(tStr) { try { const m = String(tStr || '').match(/(\d{1,2}):(\d{2})/); return m ? (Number(m[1]) * 60 + Number(m[2])) : null; } catch { return null; } }
+  function prayerNightInfo(timings) {
+    try {
+      const mg = prayerMin(timings.Maghrib), fj = prayerMin(timings.Fajr);
+      if (mg == null || fj == null) return null;
+      let nightLen = (24 * 60 - mg) + fj;
+      const mid = (mg + nightLen / 2) % (24 * 60);
+      const last = (mg + (nightLen * 2 / 3)) % (24 * 60);
+      const fmt = (mins) => { mins = Math.round(mins) % (24 * 60); const h = Math.floor(mins / 60), m = mins % 60; return prayerTo12h(h + ':' + String(m).padStart(2, '0')); };
+      const apiMid = timings.Midnight ? prayerTo12h(timings.Midnight) : fmt(mid);
+      const apiLast = timings.Lastthird ? prayerTo12h(timings.Lastthird) : fmt(last);
+      return { midnight: apiMid, lastThird: apiLast };
+    } catch { return null; }
+  }
+  function prayerPhase(timings) {
+    try {
+      const now = new Date(); const m = now.getHours() * 60 + now.getMinutes();
+      const sr = prayerMin(timings.Sunrise), ss = prayerMin(timings.Maghrib), fj = prayerMin(timings.Fajr), is = prayerMin(timings.Isha);
+      if (sr != null && m >= sr - 30 && m < (sr ?? 0) + 45) return 'dawn';
+      if (fj != null && is != null && (m < fj - 30 || m >= is)) return 'night';
+      if (ss != null && is != null && m >= ss - 30 && m < is) return 'dusk';
+      return 'day';
+    } catch { return 'day'; }
+  }
+  function prayerSunSVG(timings, nx) {
+    try {
+      const P0 = { x: 18, y: 104 }, P1 = { x: 160, y: -6 }, P2 = { x: 302, y: 104 };
+      const pt = (t) => { const u = 1 - t; return { x: u * u * P0.x + 2 * u * t * P1.x + t * t * P2.x, y: u * u * P0.y + 2 * u * t * P1.y + t * t * P2.y }; };
+      const fjm = prayerMin(timings.Fajr), ism = prayerMin(timings.Isha);
+      const now = new Date(); const nowM = now.getHours() * 60 + now.getMinutes();
+      const span = (ism != null && fjm != null && ism > fjm) ? (ism - fjm) : 1080;
+      const frac = (mm) => { if (mm == null) return null; let t = (mm - fjm) / span; return Math.max(0, Math.min(1, t)); };
+      const phase = prayerPhase(timings);
+      const skies = {
+        day: ['#CFE8F8', '#E6F2FB', '#FDF6E3'],
+        dawn: ['#DCD8F0', '#F0D9D6', '#FDF0D3'],
+        dusk: ['#D3D9F0', '#EFD3DA', '#FBE7BE'],
+        night: ['#33455E', '#7C8DB0', '#D9CFB4']
+      };
+      const sk = skies[phase] || skies.day;
+      const isNight = phase === 'night';
+      const lineCol = '#8AA2B5';
+      let dots = '';
+      PRAYERS_META.forEach(p => {
+        const t = frac(prayerMin(timings[p.id]));
+        if (t == null) return;
+        const q = pt(t);
+        const isN = nx && nx.meta.id === p.id && !nx.tomorrow;
+        dots += `<circle cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" r="${isN ? 5.5 : 3}" fill="${isN ? '#1CB0F6' : '#E9A800'}" stroke="#fff" stroke-width="1.4"/>`;
+      });
+      let stars = '';
+      if (isNight) {
+        const seed = [[40, 25], [80, 15], [120, 30], [200, 18], [250, 32], [285, 20], [160, 12], [60, 45]];
+        stars = seed.map(s => `<circle cx="${s[0]}" cy="${s[1]}" r="1.2" fill="rgba(255,255,255,.7)"/>`).join('');
+      }
+      let sunT = 0;
+      if (fjm != null) sunT = Math.max(0, Math.min(1, (nowM - fjm) / span));
+      const sp = pt(sunT);
+      const body = isNight
+        ? `<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="11" fill="rgba(244,241,222,.5)"/><circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="6.5" fill="#F6F1DC" stroke="#fff" stroke-width="1.2"/>`
+        : `<circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="12" fill="rgba(233,168,0,.22)"/><circle cx="${sp.x.toFixed(1)}" cy="${sp.y.toFixed(1)}" r="7" fill="#E9A800" stroke="#fff" stroke-width="1.6"/>`;
+      return `<svg viewBox="0 0 320 128" preserveAspectRatio="xMidYMid meet">
+        <defs><linearGradient id="prsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sk[0]}"/><stop offset=".6" stop-color="${sk[1]}"/><stop offset="1" stop-color="${sk[2]}"/></linearGradient></defs>
+        <rect x="0" y="0" width="320" height="128" rx="16" fill="url(#prsky)"/>
+        ${stars}
+        <line x1="10" y1="104" x2="310" y2="104" stroke="${isNight ? 'rgba(255,255,255,.4)' : '#C3CFD8'}" stroke-width="1.5"/>
+        <path d="M18,104 Q160,-6 302,104" fill="none" stroke="${lineCol}" stroke-width="1.8" stroke-linecap="round"/>
+        ${dots}
+        ${body}
+      </svg>`;
+    } catch { return ''; }
+  }
+  function openPrayerPage() {
+    try { document.querySelector('.prayer-page')?.remove(); } catch {}
+    const ov = document.createElement('div');
+    ov.className = 'prayer-page';
+    let govOpen = false;
+    ov.innerHTML = `<div class="pr-head"><div class="pr-top">
+        <button class="pr-locbtn" id="prGovBtn"><i>📍</i><span id="prCity">...</span></button>
+        <span class="pr-title"><b id="prHijri">...</b><small id="prSub">...</small></span>
+        <button class="pr-close" id="prClose">✕</button>
+      </div><div id="prGovWrap"></div></div>
+      <div class="pr-body"><div class="pr-list" id="prList">
+        <div class="pr-item"><span class="pr-mid"><b>⏳ جاري جلب المواقيت...</b></span></div>
+      </div></div>`;
+    document.body.appendChild(ov);
+    try { document.body.style.overflow = 'hidden'; } catch {}
+    let timer = null;
+    const close = () => { try { if (timer) clearInterval(timer); } catch {} ov.remove(); try { document.body.style.overflow = ''; } catch {} };
+    ov.querySelector('#prClose').onclick = close;
+    const paint = (data, err) => {
+      const box = ov.querySelector('#prList');
+      if (!box || !ov.isConnected) return;
+      if (err || !data || !data.timings) {
+        const c = prayerCache();
+        if (c && c.timings) return paint(c, false);
+        box.innerHTML = `<div class="pr-item"><span class="pr-mid"><b>📡 تعذر الجلب</b><small>شغّل الإنترنت والموقع ودوس تحديث</small></span></div><div class="pr-refresh"><button id="prRetry">🔄 حاول تاني</button></div>`;
+        const rt = box.querySelector('#prRetry');
+        if (rt) rt.onclick = () => load(true);
+        return;
+      }
+      ov._prayerData = data;
+      const nx = prayerNextInfo(data.timings);
+      const hijri = data.hijri ? (data.hijri.day + ' ' + (data.hijri.month?.ar || '') + ' ' + data.hijri.year + 'هـ') : '';
+      const nowD = new Date();
+      const greg = nowD.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      const hj = ov.querySelector('#prHijri');
+      if (hj && hijri) hj.textContent = hijri;
+      const sub = ov.querySelector('#prSub');
+      if (sub) sub.textContent = greg;
+      const city = ov.querySelector('#prCity');
+      if (city) city.textContent = prayerGov().name;
+      const gw = ov.querySelector('#prGovWrap');
+      if (gw) {
+        const cur = prayerGov().id;
+        gw.innerHTML = govOpen ? `<div class="pr-govpanel"><div class="pk-list">${PRAYER_GOVS.map(g => `<button class="pk-item ${g.id === cur ? 'sel' : ''}" data-prgov="${g.id}"><span>📍 ${escapeHTML(g.name)}</span>${g.id === cur ? '<span class="pk-check">✓</span>' : ''}</button>`).join('')}</div></div>` : '';
+        gw.querySelectorAll('[data-prgov]').forEach(b => b.onclick = () => {
+          state._prayerGov = b.dataset.prgov;
+          persist(); govOpen = false;
+          toast('المحافظة: ' + prayerGov().name + ' ✓', 'success');
+          load(true);
+        });
+      }
+      const gb = ov.querySelector('#prGovBtn');
+      if (gb && !gb._wired) { gb._wired = true; gb.onclick = () => { govOpen = !govOpen; paint(ov._prayerData || data, false); }; }
+      const ni = PRAYERS_META.findIndex(p => nx && nx.meta.id === p.id && !nx.tomorrow);
+      const cd = nx ? prayerFmtDiff(nx.diff) : { h: 0, m: 0, s: 0 };
+      const night = prayerNightInfo(data.timings);
+      box.innerHTML = `
+        <div class="pr-sun">${prayerSunSVG(data.timings, nx)}
+          <div class="pr-count"><span><b id="prH">${String(cd.h).padStart(2, '0')}</b><small>ساعة</small></span><span><b id="prM">${String(cd.m).padStart(2, '0')}</b><small>دقيقة</small></span><span><b id="prS">${String(cd.s).padStart(2, '0')}</b><small>ثانية</small></span></div>
+        </div>
+        ${nx ? `<div class="pr-nextline"><span class="nx-tx">${escapeHTML(nx.meta.name)} ${prayerTo12h(data.timings[nx.meta.id]).t} ${prayerTo12h(data.timings[nx.meta.id]).ap}<small>الصلاة القادمة${nx.tomorrow ? ' (غداً)' : ''}</small></span><span class="nx-bell">🔔</span></div>` : ''}
+        ${PRAYERS_META.map((p, idx) => {
+          const raw = String((data.timings[p.id] || '')).slice(0, 5);
+          const f = prayerTo12h(raw);
+          const dt = prayerTimeToDate(data.timings[p.id], new Date());
+          const isNext = nx && nx.meta.id === p.id && !nx.tomorrow;
+          const passed = dt && dt < new Date() && !isNext;
+          let status = 'قادمة';
+          if (isNext) status = 'التالية';
+          else if (passed) status = (p.id === 'Fajr') ? 'مضت' : (p.id === 'Sunrise' ? 'انتهى وقت الفجر' : 'مضت');
+          const bell = prayerBellOn(p.id);
+          return `<div class="pr-item ${isNext ? 'next' : ''} ${passed ? 'passed' : ''}">
+            <span class="pr-mid"><b>${p.name}</b><small>${status}</small></span>
+            <span class="pr-time">${escapeHTML(f.t)}<small>${escapeHTML(f.ap)}</small></span>
+            <button class="pr-bell ${bell ? 'on' : 'off'}" data-prbell="${p.id}" title="تنبيه ${escapeHTML(p.name)}">${bell ? '🔔' : '🔕'}</button>
+          </div>`;
+        }).join('')}
+        ${night ? `<div class="pr-night"><div><small>منتصف الليل</small><b>${escapeHTML(night.midnight.t + ' ' + night.midnight.ap)}</b></div><div><small>الثلث الأخير</small><b>${escapeHTML(night.lastThird.t + ' ' + night.lastThird.ap)}</b></div></div>` : ''}`;
+      box.querySelectorAll('[data-prbell]').forEach(b => b.onclick = (e) => {
+        e.stopPropagation();
+        const id = b.dataset.prbell;
+        if (!state._prayerNotif) state._prayerNotif = {};
+        state._prayerNotif[id] = !prayerBellOn(id);
+        persist();
+        paint(ov._prayerData || data, false);
+        toast(state._prayerNotif[id] ? ('تنبيه ' + (PRAYERS_META.find(p => p.id === id)?.name || '') + ' اشتغل 🔔') : 'التنبيه اتقفل 🔕', 'success');
+      });
+      const rf = box.querySelector('#prRefresh');
+      if (rf) rf.onclick = () => load(true);
+      try { if (timer) clearInterval(timer); } catch {}
+      if (nx) timer = setInterval(() => {
+        if (!ov.isConnected) { try { clearInterval(timer); } catch {} return; }
+        const left = nx.at - new Date();
+        if (left <= 0) { paint(data, false); return; }
+        const c2 = prayerFmtDiff(left);
+        const hh = ov.querySelector('#prH'), mm = ov.querySelector('#prM'), ss = ov.querySelector('#prS');
+        if (hh) hh.textContent = String(c2.h).padStart(2, '0');
+        if (mm) mm.textContent = String(c2.m).padStart(2, '0');
+        if (ss) ss.textContent = String(c2.s).padStart(2, '0');
+      }, 1000);
+    };
+    const load = async (force) => {
+      const box = ov.querySelector('#prList');
+      try {
+        const gid = prayerGov().id;
+        if (!force) {
+          const c = prayerCache();
+          if (c && c.day === prayerTodayKey() && c.timings && (c.govId || 'cairo') === gid) { paint(c, false); }
+        }
+        const fresh = await fetchPrayerTimes(false);
+        paint(fresh, false);
+      } catch { paint(null, true); }
+    };
+    load(false);
+  }
+  /* =============================
+     آية اليوم — مختارة موضوعياً بالتناوب اليومي (ليست عشوائية)
+     كل آية: نصها + مرجعها + موضوعها + ربط عملي + سؤال "كيف أعيشها اليوم؟"
+     (الربط تأملي عام، دون تحميل الآية حكماً فقهياً غير مذكور فيها)
+     ============================= */
+  const AYAH_THEMES = { rizq: '💰 الرزق والكسب', home: '🏠 الأسرة والنفقة', charity: '🤲 الصدقة والعطاء', prayer: '🕌 الصلاة', dhikr: '📿 الذكر والدعاء', niyyah: '❤️ النية والإخلاص', work: '💼 العمل والأمانة', patience: '🌱 الصبر والشكر والتوكل', kin: '👨‍👩‍👧 صلة الرحم وحسن الخلق', night: '🌙 الليل ومحاسبة النفس', morning: '🌅 بداية اليوم' };
+  const AYAH_LIST = [
+    { t: 'وَمَا مِن دَابَّةٍ فِي الْأَرْضِ إِلَّا عَلَى اللَّهِ رِزْقُهَا', r: 'هود 6', th: 'rizq', f: 'رزقك مكتوب ومضمون من الله، فاشتغل بطمأنينة ولا تأكل حراماً بحجة الحاجة.', q: 'هل سعيي اليوم للرزق مطمئن أم قلق؟' },
+    { t: 'إِنَّ اللَّهَ هُوَ الرَّزَّاقُ ذُو الْقُوَّةِ الْمَتِينُ', r: 'الذاريات 58', th: 'rizq', f: 'الرزق بيد القوي المتين وحده، فلا تذل نفسك لمخلوق من أجل لقمة.', q: 'هل أطلب رزقي بعزة نفس اليوم؟' },
+    { t: 'وَأَن لَّيْسَ لِلْإِنسَانِ إِلَّا مَا سَعَىٰ', r: 'النجم 39', th: 'work', f: 'قيمة يومك في سعيك وإتقانك، في الشغل والبيت والعبادة.', q: 'ما الشيء الواحد الذي سأتقنه اليوم؟' },
+    { t: 'فَإِذَا قُضِيَتِ الصَّلَاةُ فَانتَشِرُوا فِي الْأَرْضِ وَابْتَغُوا مِن فَضْلِ اللَّهِ', r: 'الجمعة 10', th: 'work', f: 'الصلاة أولاً ثم انتشار للسعي — دين يجمع العبادة والعمل في يوم واحد.', q: 'هل صلاتي تنظم شغلي أم تعطله في ذهني؟' },
+    { t: 'وَقُلِ اعْمَلُوا فَسَيَرَى اللَّهُ عَمَلَكُمْ وَرَسُولُهُ وَالْمُؤْمِنُونَ', r: 'التوبة 105', th: 'work', f: 'اعمل كأن عملك يُرى — أمانة وإتقان حتى لو لم يرك أحد من الناس.', q: 'هل أتقنت عملاً اليوم لا يراه إلا الله؟' },
+    { t: 'وَعَلَى الْمَوْلُودِ لَهُ رِزْقُهُنَّ وَكِسْوَتُهُنَّ بِالْمَعْرُوفِ', r: 'البقرة 233', th: 'home', f: 'النفقة على أهل بيتك مسؤولية مذكورة في القرآن — بالمعروف لا إسراف ولا تقتير.', q: 'هل أديت نفقة أهلي اليوم بطيب نفس؟' },
+    { t: 'وَبِمَا أَنفَقُوا مِنْ أَمْوَالِهِمْ', r: 'النساء 34', th: 'home', f: 'من معاني القوامة الإنفاق وتحمل المسؤولية المالية عن البيت.', q: 'كيف أتحمل مسؤولية بيتي المالية اليوم؟' },
+    { t: 'وَوَصَّيْنَا الْإِنسَانَ بِوَالِدَيْهِ حَمَلَتْهُ أُمُّهُ وَهْنًا عَلَىٰ وَهْنٍ', r: 'لقمان 14', th: 'home', f: 'وصية مباشرة بالوالدين — اتصال أو زيارة أو نفقة تدخل في معناها العام.', q: 'ما الذي سأقدمه لوالديّ اليوم؟' },
+    { t: 'مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ', r: 'البقرة 261', th: 'charity', f: 'الصدقة استثمار مضاعف عند الله — ولو بالقليل.', q: 'ما صدقتي اليوم ولو بكلمة طيبة؟' },
+    { t: 'وَآتِ ذَا الْقُرْبَىٰ حَقَّهُ وَالْمِسْكِينَ وَابْنَ السَّبِيلِ وَلَا تُبَذِّرْ تَبْذِيرًا', r: 'الإسراء 26', th: 'charity', f: 'الآية تجمع العطاء للأقارب والمحتاجين مع النهي عن التبذير — عطاء متوازن.', q: 'هل أعطيت اليوم دون تبذير؟' },
+    { t: 'وَالَّذِينَ إِذَا أَنفَقُوا لَمْ يُسْرِفُوا وَلَمْ يَقْتُرُوا وَكَانَ بَيْنَ ذَٰلِكَ قَوَامًا', r: 'الفرقان 67', th: 'rizq', f: 'منهج المصروف اليومي في آية: لا إسراف ولا بخل — الوسط.', q: 'هل مصروفي اليوم كان قواماً؟' },
+    { t: 'وَكُلُوا وَاشْرَبُوا وَلَا تُسْرِفُوا إِنَّهُ لَا يُحِبُّ الْمُسْرِفِينَ', r: 'الأعراف 31', th: 'rizq', f: 'التمتع بالنعمة مباح، والإسراف مذموم — راجع مشتريات اليوم بهذا الميزان.', q: 'ما الشيء الزائد الذي سأستغني عنه؟' },
+    { t: 'وَأَقِيمُوا الصَّلَاةَ وَآتُوا الزَّكَاةَ', r: 'البقرة 110', th: 'prayer', f: 'أمران متلازمان في القرآن: حق الله وحق المال — صلاتك وزكاتك.', q: 'هل صلواتي اليوم في وقتها؟' },
+    { t: 'إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا', r: 'النساء 103', th: 'prayer', f: 'الصلاة موقوتة — تنظيم وقتك يبدأ من مواقيتها.', q: 'هل أضبط يومي على الصلاة أم العكس؟' },
+    { t: 'قَدْ أَفْلَحَ الْمُؤْمِنُونَ * الَّذِينَ هُمْ فِي صَلَاتِهِمْ خَاشِعُونَ', r: 'المؤمنون 1-2', th: 'prayer', f: 'الفلاح مرتبط بالخشوع — جودة الصلاة قبل عددها.', q: 'كيف أزيد خشوعي في صلاة اليوم؟' },
+    { t: 'إِنَّ الصَّلَاةَ تَنْهَىٰ عَنِ الْفَحْشَاءِ وَالْمُنكَرِ وَلَذِكْرُ اللَّهِ أَكْبَرُ', r: 'العنكبوت 45', th: 'prayer', f: 'أثر الصلاة يظهر في سلوكك بعدها — راقب نفسك اليوم.', q: 'هل منعتني صلاتي اليوم من خطأ؟' },
+    { t: 'فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ', r: 'البقرة 152', th: 'dhikr', f: 'وعد مباشر: ذكرك لله يقابله ذكر الله لك — وأذكار الصباح والمساء من معناها.', q: 'هل قلت أذكاري اليوم؟' },
+    { t: 'الَّذِينَ آمَنُوا وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ اللَّهِ أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ', r: 'الرعد 28', th: 'dhikr', f: 'علاج القلق اليومي مذكور هنا: طمأنينة القلب بالذكر.', q: 'عند قلقي اليوم هل أذكر الله أولاً؟' },
+    { t: 'فَقُلْتُ اسْتَغْفِرُوا رَبَّكُمْ إِنَّهُ كَانَ غَفَّارًا * يُرْسِلِ السَّمَاءَ عَلَيْكُم مِّدْرَارًا * وَيُمْدِدْكُم بِأَمْوَالٍ وَبَنِينَ', r: 'نوح 10-12', th: 'dhikr', f: 'الاستغفار مرتبط في الآية بسعة الرزق — باب يومي مفتوح.', q: 'هل استغفرت اليوم مائة مرة؟' },
+    { t: 'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ', r: 'البقرة 201', th: 'dhikr', f: 'دعاء جامع للدنيا والآخرة — ردده في يومك.', q: 'بماذا دعوت الله اليوم؟' },
+    { t: 'وَمَا أُمِرُوا إِلَّا لِيَعْبُدُوا اللَّهَ مُخْلِصِينَ لَهُ الدِّينَ', r: 'البينة 5', th: 'niyyah', f: 'الأصل في كل عبادة الإخلاص — راجع نيتك قبل عملك.', q: 'لمن أعمل اليوم: لله أم للناس؟' },
+    { t: 'قُلْ إِنَّ صَلَاتِي وَنُسُكِي وَمَحْيَايَ وَمَمَاتِي لِلَّهِ رَبِّ الْعَالَمِينَ', r: 'الأنعام 162', th: 'niyyah', f: 'اجعل يومك كله — شغلك وإنفاقك وبيتك — لله.', q: 'هل نويت بشغل اليوم وجه الله؟' },
+    { t: 'وَأَوْفُوا بِالْعَهْدِ إِنَّ الْعَهْدَ كَانَ مَسْئُولًا', r: 'الإسراء 34', th: 'work', f: 'وعدك ومواعيدك ومهامك عهود تُسأل عنها — أوفِ بها اليوم.', q: 'هل وفيت بوعودي ومهامي اليوم؟' },
+    { t: 'إِنَّ اللَّهَ يَأْمُرُكُمْ أَن تُؤَدُّوا الْأَمَانَاتِ إِلَىٰ أَهْلِهَا', r: 'النساء 58', th: 'work', f: 'كل مسؤولية عندك أمانة: مال، عمل، وقت، سر.', q: 'ما الأمانة التي سأؤديها اليوم؟' },
+    { t: 'وَيْلٌ لِّلْمُطَفِّفِينَ * الَّذِينَ إِذَا اكْتَالُوا عَلَى النَّاسِ يَسْتَوْفُونَ', r: 'المطففين 1-2', th: 'work', f: 'تحذير من الغش في الكيل والعمل — خذ حقك وأعطِ الحق كاملاً.', q: 'هل أنا عادل في تعاملاتي اليوم؟' },
+    { t: 'إِنَّ اللَّهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ', r: 'النحل 90', th: 'kin', f: 'العدل والإحسان قاعدة التعامل مع الجميع: أهلك وزملائك والناس.', q: 'مع من سأحسن اليوم؟' },
+    { t: 'وَقُولُوا لِلنَّاسِ حُسْنًا', r: 'البقرة 83', th: 'kin', f: 'الكلمة الطيبة عبادة يومية — في البيت قبل الشارع.', q: 'هل قلت اليوم كلمة حسنة لأهلي؟' },
+    { t: 'وَالَّذِينَ يَصِلُونَ مَا أَمَرَ اللَّهُ بِهِ أَن يُوصَلَ', r: 'الرعد 21', th: 'kin', f: 'صلة الرحم من صفات أولي الألباب في القرآن.', q: 'من من أرحامي سأتواصل معه اليوم؟' },
+    { t: 'وَالْكَاظِمِينَ الْغَيْظَ وَالْعَافِينَ عَنِ النَّاسِ وَاللَّهُ يُحِبُّ الْمُحْسِنِينَ', r: 'آل عمران 134', th: 'kin', f: 'كظم الغيظ والعفو صفة يحبها الله — تدرب عليها اليوم.', q: 'هل عفوت اليوم عمن أخطأ في حقي؟' },
+    { t: 'يَا أَيُّهَا الَّذِينَ آمَنُوا اصْبِرُوا وَصَابِرُوا وَرَابِطُوا وَاتَّقُوا اللَّهَ لَعَلَّكُمْ تُفْلِحُونَ', r: 'آل عمران 200', th: 'patience', f: 'الصبر والمصابرة طريق الفلاح — في الشغل والبيت والطاعة.', q: 'على ماذا سأصبر اليوم؟' },
+    { t: 'إِنَّمَا يُوَفَّى الصَّابِرُونَ أَجْرَهُم بِغَيْرِ حِسَابٍ', r: 'الزمر 10', th: 'patience', f: 'أجر الصبر بلا حساب — تذكرها عند ضغوط اليوم.', q: 'هل صبرت اليوم واحتسبت؟' },
+    { t: 'وَإِذْ تَأَذَّنَ رَبُّكُمْ لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ', r: 'إبراهيم 7', th: 'patience', f: 'الشكر سبب الزيادة — اشكر على رزقك وأهلك وصحتك.', q: 'ما ثلاث نعم أشكر الله عليها اليوم؟' },
+    { t: 'وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ', r: 'الطلاق 3', th: 'patience', f: 'التوكل: سعي بالأسباب مع اعتماد القلب على الله.', q: 'هل توكلت على الله في هم اليوم؟' },
+    { t: 'وَمِنَ اللَّيْلِ فَتَهَجَّدْ بِهِ نَافِلَةً لَّكَ', r: 'الإسراء 79', th: 'night', f: 'قيام الليل شرف المؤمن — ولو بركعتين قبل النوم.', q: 'هل سأصلي الليلة ولو ركعتين؟' },
+    { t: 'تَتَجَافَىٰ جُنُوبُهُمْ عَنِ الْمَضَاجِعِ يَدْعُونَ رَبَّهُمْ خَوْفًا وَطَمَعًا', r: 'السجدة 16', th: 'night', f: 'صفة عباد الله: دعاء في جوف الليل خوفاً وطمعاً.', q: 'بماذا سأدعو الله قبل نومي؟' },
+    { t: 'وَهُوَ الَّذِي جَعَلَ لَكُمُ اللَّيْلَ لِبَاسًا وَالنَّوْمَ سُبَاتًا وَجَعَلَ النَّهَارَ نُشُورًا', r: 'الفرقان 47', th: 'night', f: 'الليل للراحة والنهار للسعي — نم مبكراً واستيقظ لصلاة الفجر.', q: 'هل حاسبت نفسي قبل النوم اليوم؟' },
+    { t: 'وَجَعَلْنَا النَّهَارَ مَعَاشًا', r: 'النبأ 11', th: 'morning', f: 'النهار للمعاش والسعي — ابدأ يومك مبكراً بنية صالحة.', q: 'ما نيتي في بداية هذا اليوم؟' }
+  ];
+  function ayahDayIndex(offset) {
+    try {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), 0, 0);
+      const doy = Math.floor((now - start) / 864e5);
+      const n = AYAH_LIST.length;
+      return (((doy + (Number(offset) || 0)) % n) + n) % n;
+    } catch { return 0; }
+  }
+  function renderAyahSection() {
+    const off = Number(state._ayahOffset) || 0;
+    const v = AYAH_LIST[ayahDayIndex(off)];
+    const isToday = off === 0;
+    const dstr = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
+    return `<div class="category-group" id="ayahSection"><div class="ayah-card">
+      <div class="ayah-head">
+        <span class="ayah-head-ico">🕌</span>
+        <span class="ayah-head-tx"><b>آية اليوم</b><small>${escapeHTML(dstr)}${isToday ? '' : ' • تصفح'}</small></span>
+        <span class="ayah-theme">${escapeHTML(AYAH_THEMES[v.th] || v.th)}</span>
+      </div>
+      <div class="ayah-nav" style="padding:0 14px;">
+        <button class="ayah-navbtn" id="ayahPrev" title="السابق">‹</button>
+        <div style="flex:1;"></div>
+        ${isToday ? '' : '<button class="ayah-navbtn" id="ayahToday" title="اليوم" style="width:auto;padding:0 14px;font-size:12px;">اليوم</button>'}
+        <button class="ayah-navbtn" id="ayahNext" title="التالي">›</button>
+      </div>
+      <div class="ayah-text">﴿${escapeHTML(v.t)}﴾<br><span class="ayah-ref">سورة ${escapeHTML(v.r)}</span></div>
+      <div class="ayah-live"><b>💡 كيف أعيشها اليوم؟</b><p>${escapeHTML(v.f)}</p><div class="q">🤔 ${escapeHTML(v.q)}</div></div>
+      <div class="ayah-foot">آيات مختارة موضوعياً بالتناوب اليومي — والتدبر اجتهاد بشري لا يلزم الآية ما لم تقله</div>
+    </div></div>`;
+  }
+  /* =============================
+     مهامي السريعة — ستايل TickTick: إضافة سريعة + تعليم + مسح
+     ============================= */
+  function taskList() { if (!Array.isArray(state._tasks)) state._tasks = []; return state._tasks; }
+  function addTask(title) {
+    const t = String(title || '').trim().slice(0, 120);
+    if (!t) return null;
+    const it = { id: uid(), title: t, done: false, createdAt: nowISO() };
+    taskList().unshift(it); persist();
+    return it;
+  }
+  function toggleTask(id) { const t = taskList().find(x => x && x.id === id); if (t) { t.done = !t.done; persist(); } return t; }
+  function deleteTask(id) { state._tasks = taskList().filter(x => x && x.id !== id); persist(); }
+  function renderTasksSection() {
+    const all = taskList();
+    const open = all.filter(t => !t.done);
+    const doneT = all.filter(t => t.done);
+    const addOpen = state._taskAddOpen === true;
+    return `<div class="category-group" id="tasksSection"><div class="task-card">
+      <div class="task-head">
+        <span class="task-head-ico">📝</span>
+        <span class="task-head-tx"><b>مهامي</b><small>${open.length ? ('عندك ' + open.length + (open.length === 1 ? ' مهمة مستنياك 💪' : ' مهام مستنياك 💪')) : 'كله خلصان — عاش 🎉'}</small></span>
+        <button class="task-addbtn task-addbtn-sm" id="taskAddToggle" title="${addOpen ? 'إخفاء' : 'مهمة جديدة'}">${addOpen ? '−' : '+'}</button>
+      </div>
+      ${addOpen ? `<div class="task-add"><input id="taskAddInput" placeholder="اكتب مهمة ودوس + ... مثال: أذاكر ساعتين" maxlength="120" autocomplete="off" /><button class="task-addbtn" id="taskAddBtn" title="ضيف مهمة">+</button></div>` : ''}
+      ${!all.length ? `<div class="task-empty"><span class="te-ico">📋</span><b>لسه مفيش مهام</b><small>اكتب أول مهمة فوق ودوس + ⬆️</small></div>` : `<div class="task-listbox">`}
+      ${open.map(t => `<div class="task-row" data-tasktoggle="${t.id}"><span class="task-check"></span><span class="task-title">${escapeHTML(t.title)}</span><button class="task-del" data-taskdel="${t.id}" title="امسح">✕</button></div>`).join('')}
+      ${doneT.length ? `<div class="task-div">✓ مكتملة (${doneT.length})</div>` + doneT.map(t => `<div class="task-row done" data-tasktoggle="${t.id}"><span class="task-check"></span><span class="task-title">${escapeHTML(t.title)}</span><button class="task-del" data-taskdel="${t.id}" title="امسح">✕</button></div>`).join('') : ''}
+      ${all.length ? `</div>` : ''}
+    </div></div>`;
+  }
   function renderHome() {
     const { pending, done } = statsCounts();
     const today = sumExpensesInRange('day');
@@ -2542,22 +3522,21 @@
       </div>
       ${adsByPosition('top')}
 
-      <div class="streak-row">
-        <div class="streak-pill"><div class="streak-ico" style="background:#FEF3C7;color:#D97706;">${svgIcon('flame', 20)}</div><div><b>${streak} يوم</b><small>أيام ورا بعض</small></div></div>
-        <div class="streak-pill"><div class="streak-ico" style="background:#E1F3FD;color:#1CB0F6;">${svgIcon('star', 20)}</div><div><b>${level.pct}%</b><small>للمستوى اللي بعده</small></div></div>
-      </div>
-      <div class="badge-row">${achv.map(a => `<div class="achv ${a.ok ? '' : 'locked'}"><div class="achv-ico" style="background:${a.bg};color:${a.c};">${svgIcon(a.ic, 20)}</div><div><b>${a.t}</b><small>${a.s}</small></div></div>`).join('')}</div>
+      <div class="online-pill" id="onlinePill" style="display:none;"><span class="online-dot"></span><span class="online-num" id="onlineCount">1</span><span class="online-tx">مستخدم نشط الآن<small>بيستخدموا التطبيق دلوقتي</small></span><span class="live-tag"><i></i> مباشر</span></div>
 
       <div class="section"><div class="stats-row">
-        <div class="stat-card"><div class="stat-icon" style="background:#E1F3FD;color:#1CB0F6;">${svgIcon('cart', 20)}</div><div class="stat-label">مطلوب لسه</div><div class="stat-value">${pending}</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#DCFCE7;color:#059669;">${svgIcon('check', 20)}</div><div class="stat-label">اتشترى النهارده</div><div class="stat-value">${done}</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#FEF3C7;color:#D97706;">${svgIcon('wallet', 20)}</div><div class="stat-label">مصروف اليوم</div><div class="stat-value">${formatCurrency(today.total)}<span class="currency"> ج.م</span></div></div>
-        <div class="stat-card" id="shopCardBtn" style="cursor:pointer;"><div class="stat-icon" style="background:#FFEED3;color:#FF9600;">${svgIcon('basket', 20)}</div><div class="stat-label">تسوق المنتجات</div><div class="stat-value" style="font-size:14px;">${shopCount} صنف</div></div>
+        <div class="stat-card gate-prayer" data-prayer-times style="cursor:pointer;border-top-color:#1CB0F6 !important;"><div class="stat-icon" style="background:#E1F3FD;color:#0F8AC2;animation:heroFloat 3s ease-in-out infinite;">🕌</div><div class="stat-label">مواقيت الصلاة</div><div class="stat-value" id="prayerMiniTxt" style="font-size:16px;">...</div><div class="stat-label" id="prayerMiniSub" style="font-size:11px;">دوس للعرض 📍</div></div>
+        <div class="stat-card gate-azkar" data-azkar-toggle style="cursor:pointer;border-top-color:#10B981 !important;"><div class="stat-icon" style="background:#DCFCE7;color:#059669;">🤲</div><div class="stat-label">الأذكار</div><div class="stat-value" style="font-size:16px;">${azkarPeriod() === 'morning' ? 'أذكار الصباح ☀️' : 'أذكار المساء 🌙'}</div><div class="stat-label" style="font-size:11px;">دوس للعرض 📖</div></div>
+        <div class="stat-card gate-tasks" data-goto-tasks style="cursor:pointer;border-top-color:#FF9600 !important;"><div class="stat-icon" style="background:#FFEED3;color:#D97706;">📝</div><div class="stat-label">مهام اليوم</div><div class="stat-value">${taskList().filter(t => !t.done).length}<span class="currency"> معلقة</span></div><div class="stat-label" style="font-size:11px;">دوس للعرض ✓</div></div>
+        <div class="stat-card gate-ayah" data-goto-ayah style="cursor:pointer;border-top-color:#D97706 !important;"><div class="stat-icon" style="background:#FEF3C7;color:#9A5B00;">📖</div><div class="stat-label">آية اليوم</div><div class="stat-value" style="font-size:13.5px;">${escapeHTML(AYAH_THEMES[AYAH_LIST[ayahDayIndex(0)].th] || '')}</div><div class="stat-label" style="font-size:11px;">سورة ${escapeHTML(AYAH_LIST[ayahDayIndex(0)].r)}</div></div>
       </div></div>
 
       ${adsByPosition('middle')}
 
-      ${basketItems().length ? renderBasket() : `<div class="empty empty-soft"><div class="empty-icon">🧺</div><div class="empty-title">السلة فاضية</div><div class="empty-desc">جهّز أصنافك هنا الأول وبعدين أكّدها كطلبات</div><button class="btn btn-primary" id="basketHomeAdd">جهّز أول صنف</button></div>`}
+      ${renderTasksSection()}
+
+      ${renderAyahSection()}
+
       <div class="noura-card"><div class="noura-char photo-char"><img src="${(state.photos && state.photos.me) || adminAvatarPhoto()}" alt="" onerror="this.onerror=null;this.src='logo.png';" /></div><div class="noura-bubble"><div class="noura-msg">${heroMsg}</div><div class="noura-live">${speakWaves()}</div></div></div>
       ${adsByPosition('bottom')}
     </div>`;
@@ -2848,11 +3827,26 @@
     return `<div class="section"><div class="section-header"><h3>🔍 نتائج المنتجات (${res.length})</h3></div>
       ${res.map(r => catItemRow(r.item.key, r.item.ar, r.dept.name + ' › ' + r.sub.name)).join('')}</div>`;
   }
+  function renderShopBasket() {
+    return basketItems().length ? renderBasket() : `<div class="empty empty-soft"><div class="empty-icon">🧺</div><div class="empty-title">السلة فاضية</div><div class="empty-desc">جهّز أصنافك هنا الأول وبعدين أكّدها كطلبات</div><button class="btn btn-primary" id="basketHomeAdd">جهّز أول صنف</button></div>`;
+  }
+  function renderShopAchv() {
+    const { pending, done } = statsCounts();
+    const today = sumExpensesInRange('day');
+    const achv = [
+      { t: pending + (pending === 1 ? ' طلب' : ' طلبات'), s: 'مستنياك 🛒', ok: true, bg: '#E1F3FD', c: '#1CB0F6', ic: 'cart', tab: 'orders' },
+      { t: done + (done === 1 ? ' صنف' : ' أصناف'), s: 'اشتريت ✅', ok: done > 0, bg: '#DCFCE7', c: '#059669', ic: 'check', tab: 'orders' },
+      { t: formatCurrency(today.total) + ' ج.م', s: 'مصروفاتي 💸', ok: today.total > 0, bg: '#FEF3C7', c: '#D97706', ic: 'wallet', tab: 'expenses' }
+    ];
+    return `<div class="badge-row">${achv.map(a => `<div class="achv ${a.ok ? '' : 'locked'}" ${a.tab ? `data-gotab2="${a.tab}" style="cursor:pointer;"` : ''}><div class="achv-ico" style="background:${a.bg};color:${a.c};">${svgIcon(a.ic, 20)}</div><div><b>${a.t}</b><small>${a.s}</small></div></div>`).join('')}</div>`;
+  }
   function renderShop() {
     const q = (state._shopQuery || '').trim();
     return `<div class="page">
       <div class="topbar"><div class="greeting">تسوّق براحتك 🛍️</div></div>
       <div class="page-title">التسوق</div>
+      ${renderShopAchv()}
+      ${renderShopBasket()}
       <div class="search-bar"><div class="search-box"><input id="shopSearch" placeholder="دوّر على أي منتج..." value="${escapeHTML(state._shopQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div></div>
       <div class="section"><div class="help-text" style="margin:-2px 0 10px;">دوس <b>ضيف</b> والصنف يروح على السلة 🧺 للتجهيز قبل الإرسال</div></div>
       ${q.length >= 2 ? renderCatalogSearch(q) : state._catBrowse ? renderCatalogDept(state._catBrowse) : renderCatalogHome(true)}
@@ -2920,20 +3914,44 @@
     </div>`;
   }
 
+  function expCardHTML(e) {
+    const kind = finKindOf(e);
+    const kc = kind === 'income' ? '#059669' : kind === 'debt' ? '#D97706' : '#1CB0F6';
+    const klabel = kind === 'income' ? 'دخل' : kind === 'debt' ? 'ديون' : 'مصروف';
+    const cat = catById(e.categoryId);
+    const priv = !shareFinKind(kind) && e.shared !== true;
+    return `<div class="exp-card" data-expact="${e.id}" style="--kc:${kc};">
+      <div class="exp-ico" style="background:${cat.color}20;font-size:22px;">${expenseIcon(e)}</div>
+      <div class="exp-mid">
+        <div class="exp-top"><b>${escapeHTML(e.title)}</b><span class="exp-amt">${formatCurrency(e.amount)} <small>ج.م</small></span></div>
+        <div class="exp-sub"><span class="fin-pill" style="color:${kc};background:${kc}14;">${FINANCE[kind].emoji} ${klabel}</span><span>${getCategoryName(e.categoryId)}</span><i></i><span>${formatDateShort(new Date(e.createdAt))}</span>${e.sourceType === 'order' ? '<span>•</span><span>من طلب 🛒</span>' : ''}${priv ? '<span>•</span><span>🔒 خاص</span>' : ''}${e.shared === true && !shareFinKind(kind) ? '<span>•</span><span>☁️ مشترك</span>' : ''}</div>
+      </div>
+      <span class="exp-go">‹</span>
+    </div>`;
+  }
   function renderExpenses() {
-    const today = sumExpensesInRange('day'); const week = sumExpensesInRange('week'); const month = sumExpensesInRange('month');
-    const monthInc = sumExpensesInRange('month', 'income'); const monthDebt = sumExpensesInRange('month', 'debt');
     const fk = (state._expKind === 'income' || state._expKind === 'debt') ? state._expKind : 'expense';
-    const shown = state.expenses.filter(e => finKindOf(e) === fk);
+    const fkey = selectedFiscalKey();
+    const month = sumInFiscalMonth(fkey, 'expense');
+    const monthInc = sumInFiscalMonth(fkey, 'income');
+    const monthDebt = sumInFiscalMonth(fkey, 'debt');
+    const months = availableFiscalMonths();
+    const expMonthFilter = state._expMonth || 'all';
+    let shown = (state.expenses || []).filter(e => finKindOf(e) === fk);
+    if (expMonthFilter !== 'all') shown = shown.filter(e => inFiscalMonth(e.createdAt, expMonthFilter, monthStartDay()));
+    shown = [...shown].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const groupsMap = {};
+    shown.forEach(e => { const g = expGroupOf(e); if (!groupsMap[g.id]) groupsMap[g.id] = { meta: g, items: [], total: 0 }; groupsMap[g.id].items.push(e); groupsMap[g.id].total += Number(e.amount) || 0; });
+    const groups = Object.values(groupsMap).sort((a, b) => b.total - a.total);
+    const openGrp = state._expGrpOpen || null;
     const shareOn = shareFinKind('expense');
     return `<div class="page">
       <div class="topbar"><div class="greeting">تابع تقدمك</div></div>
       <div class="page-title">المصروفات</div>
       <div class="section hidden"><button class="tgl-row" id="tglShareExp" aria-label="مشاركة المصروفات"><span class="tgl"><b>${shareOn ? '☁️ المصروفات مشتركة' : '🔒 المصروفات محلية فقط'}</b><small>${shareOn ? 'تظهر عند الطرف الآخر تلقائياً' : 'محفوظة على جهازك — شاركها وقت ما تحب'}</small></span><span class="sw ${shareOn ? 'on' : ''}"></span></button></div>
-      ${assistantSay('مصروفاتك تحت السيطرة 💸 سجّل كل حركة أول بأول', null, 'متابعة المصروفات', 'me')}
 
       <div class="fin-hero">
-        <div class="fin-hero-head"><span>💼 ملخص الشهر</span><span class="fin-hero-month">${new Date().toLocaleDateString('ar-EG', { month: 'long' })}</span></div>
+        <div class="fin-hero-head"><span>💼 ملخص ${escapeHTML(fiscalLabel(fkey))}</span><span class="fin-hero-month">من يوم ${monthStartDay()}</span></div>
         <div class="fin-hero-net ${monthInc.total - month.total < 0 ? 'neg' : 'pos'}"><small>الصافي (دخل − مصروف)</small><b>${formatCurrency(monthInc.total - month.total)} ج.م</b></div>
         <div class="fin-hero-cols">
           <div><span class="fh-ico" style="background:#FFE4E6;">💸</span><span class="fh-tx"><b>${formatCurrency(month.total)}</b><small>مصروفات</small></span></div>
@@ -2949,33 +3967,51 @@
           <button class="${fk === 'income' ? 'active' : ''}" data-expkind="income">💰 دخل <span class="n">${state.expenses.filter(e => finKindOf(e) === 'income').length}</span></button>
           <button class="${fk === 'debt' ? 'active' : ''}" data-expkind="debt">🏦 ديون <span class="n">${state.expenses.filter(e => finKindOf(e) === 'debt').length}</span></button>
         </div>
+        <div style="margin-top:8px;">
+          <button class="rep-picker-btn ${(state._expPickerOpen) ? 'open' : ''}" id="expMonthBtn"><span class="pk-ico">🗂️</span><span class="pk-tx"><b>${expMonthFilter === 'all' ? 'كل الشهور' : escapeHTML(fiscalLabel(expMonthFilter))}</b><small>${shown.length} حركة • دوس للفلترة بالشهر</small></span><span class="pk-chev">‹</span></button>
+        </div>
+        ${(state._expPickerOpen) ? `<div class="rep-picker-panel" style="margin-top:8px;"><div class="pk-list">
+          <button class="pk-item ${expMonthFilter === 'all' ? 'sel' : ''}" data-pickexpmonth="all"><span class="pk-dot" style="background:${expMonthFilter === 'all' ? 'var(--primary)' : 'var(--border)'};"></span><span>🗂️ كل الشهور</span>${expMonthFilter === 'all' ? '<span class="pk-check">✓</span>' : ''}</button>
+          ${months.map(k => `<button class="pk-item ${expMonthFilter === k ? 'sel' : ''}" data-pickexpmonth="${k}"><span class="pk-dot" style="background:${expMonthFilter === k ? 'var(--primary)' : 'var(--border)'};"></span><span>📅 ${escapeHTML(fiscalLabel(k))}</span>${expMonthFilter === k ? '<span class="pk-check">✓</span>' : ''}</button>`).join('')}
+        </div></div>` : ''}
       </div></div>
 
       ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش حركات لسه</div><div class="empty-desc">لما تشتري أو تسجّل حركة هنسجلها هنا</div><button class="btn btn-primary" id="emptyAddExpense">سجّل حركة</button></div>` :
-        shown.length === 0 ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش حركات هنا</div><div class="empty-desc">جرّب فلتر تاني أو سجّل حركة جديدة</div></div>` :
-        shown.map(e => {
-          const kind = finKindOf(e);
-          const kc = kind === 'income' ? '#059669' : kind === 'debt' ? '#D97706' : '#1CB0F6';
-          const klabel = kind === 'income' ? 'دخل' : kind === 'debt' ? 'ديون' : 'مصروف';
-          const cat = catById(e.categoryId);
-          const priv = !shareFinKind(kind) && e.shared !== true;
-          return `<div class="exp-card" data-expact="${e.id}" style="--kc:${kc};">
-            <div class="exp-ico" style="background:${cat.color}20;font-size:22px;">${expenseIcon(e)}</div>
-            <div class="exp-mid">
-              <div class="exp-top"><b>${escapeHTML(e.title)}</b><span class="exp-amt">${formatCurrency(e.amount)} <small>ج.م</small></span></div>
-              <div class="exp-sub"><span class="fin-pill" style="color:${kc};background:${kc}14;">${FINANCE[kind].emoji} ${klabel}</span><span>${getCategoryName(e.categoryId)}</span><i></i><span>${formatDateShort(new Date(e.createdAt))}</span>${e.sourceType === 'order' ? '<span>•</span><span>من طلب 🛒</span>' : ''}${priv ? '<span>•</span><span>🔒 خاص</span>' : ''}${e.shared === true && !shareFinKind(kind) ? '<span>•</span><span>☁️ مشترك</span>' : ''}</div>
-            </div>
-            <span class="exp-go">‹</span>
+        shown.length === 0 ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش حركات هنا</div><div class="empty-desc">جرّب شهر أو فلتر تاني أو سجّل حركة جديدة</div></div>` :
+        groups.map(g => {
+          const open = openGrp === g.meta.id || groups.length === 1;
+          return `<div class="exp-grp ${open ? 'open' : ''}">
+            <button class="exp-grp-head" data-expgrp="${escapeHTML(g.meta.id)}">
+              <span class="exp-grp-ico" style="background:${g.meta.color}18;">${svgIcon(g.meta.icon || 'box', 20)}</span>
+              <span class="exp-grp-tx"><b>${escapeHTML(g.meta.name)}</b><small>${g.items.length} ${g.items.length === 1 ? 'حركة' : 'حركات'}</small></span>
+              <span class="exp-grp-total" style="color:${g.meta.color};">${formatCurrency(g.total)} ج.م</span>
+              <span class="exp-grp-chev">‹</span>
+            </button>
+            ${open ? `<div class="exp-grp-body">${g.items.map(e => expCardHTML(e)).join('')}</div>` : ''}
           </div>`;
         }).join('')}
     </div>`;
   }
 
   function renderReports() {
-    const day = sumExpensesInRange('day'); const week = sumExpensesInRange('week'); const month = sumExpensesInRange('month'); const all = sumExpensesInRange('all');
-    const dayCat = topCategoryInRange('day'); const weekCat = topCategoryInRange('week'); const monthCat = topCategoryInRange('month');
-    const weekDay = mostExpensiveDayWeek(); const monthDays = monthDayBars(); const weekDays = last7DaysBars();
-    const monthBreak = categoryBreakdown('month'); const totalMonth = Object.values(monthBreak).reduce((a, b) => a + b, 0);
+    const day = sumExpensesInRange('day'); const week = sumExpensesInRange('week'); const all = sumExpensesInRange('all');
+    const dayCat = topCategoryInRange('day'); const weekCat = topCategoryInRange('week');
+    const weekDay = mostExpensiveDayWeek(); const weekDays = last7DaysBars();
+    const fkey = selectedFiscalKey();
+    const months = availableFiscalMonths();
+    const sd = monthStartDay();
+    const fExp = sumInFiscalMonth(fkey, 'expense');
+    const fInc = sumInFiscalMonth(fkey, 'income');
+    const fDebt = sumInFiscalMonth(fkey, 'debt');
+    const fTop = topCatInFiscalMonth(fkey, 'expense');
+    const fDays = fiscalDailyBars(fkey, 'expense');
+    const fBreak = breakdownInFiscalMonth(fkey, 'expense');
+    const fTotal = Object.values(fBreak).reduce((a, b) => a + b, 0);
+    const cmp = months.map(k => {
+      const e = sumInFiscalMonth(k, 'expense'), i = sumInFiscalMonth(k, 'income'), d = sumInFiscalMonth(k, 'debt');
+      return { key: k, label: fiscalLabel(k), exp: e.total, expN: e.count, inc: i.total, debt: d.total, net: i.total - e.total };
+    });
+    const maxExp = Math.max(1, ...cmp.map(c => c.exp));
     return `<div class="page">
       <div class="topbar"><div class="greeting">لوحة الإنجازات</div></div>
       <div class="page-title">إحصائيات البيت</div>
@@ -2992,12 +4028,35 @@
         <div class="rep-tile" style="background:#FEF3C7;"><span class="t-ico">🗓️</span><span class="t-tx"><small>أكتر يوم صرف</small><b>${weekDay.total ? weekDay.label : '—'}<span>${weekDay.total ? ' (' + formatCurrency(weekDay.total) + ')' : ''}</span></b></span></div>
         <div class="rep-tile" style="background:#E0F2FE;"><span class="t-ico">🏷️</span><span class="t-tx"><small>أكتر قسم</small><b>${weekCat.id ? getCategoryName(weekCat.id) : '—'}</b></span></div>
       </div><div class="rep-sec">📊 المصاريف (آخر 7 أيام)</div>${renderBarChart(weekDays)}</div>
-      <div class="rep-card"><div class="rep-head"><span class="rep-ico" style="background:#E1F3FD;">🗓️</span><b>تقرير الشهر</b><small>${monthDays.filter(d => d.total > 0).length} يوم شرا</small></div><div class="rep-grid">
-        <div class="rep-tile" style="background:#E1F3FD;"><span class="t-ico">💼</span><span class="t-tx"><small>إجمالي الشهر</small><b>${formatCurrency(month.total)}<span> ج.م</span></b></span></div>
-        <div class="rep-tile" style="background:#DCFCE7;"><span class="t-ico">📉</span><span class="t-tx"><small>المتوسط في اليوم</small><b>${formatCurrency(monthDays.filter(d => d.total > 0).length ? month.total / monthDays.filter(d => d.total > 0).length : 0)}<span> ج.م</span></b></span></div>
-        <div class="rep-tile" style="background:#FFEED3;"><span class="t-ico">🏷️</span><span class="t-tx"><small>أكتر قسم</small><b>${monthCat.id ? getCategoryName(monthCat.id) : '—'}</b></span></div>
-        <div class="rep-tile" style="background:#E0F2FE;"><span class="t-ico">🛍️</span><span class="t-tx"><small>أيام الشرا</small><b>${monthDays.filter(d => d.total > 0).length}<span> يوم</span></b></span></div>
-      </div><div class="rep-sec">🍩 التوزيع على الأقسام</div>${renderDonut(monthBreak, totalMonth)}<div class="rep-sec">📊 المصاريف اليومية (الشهر)</div>${renderBarChartSparse(monthDays)}</div>
+      <div class="rep-card"><div class="rep-head"><span class="rep-ico" style="background:#E1F3FD;">🗓️</span><b>تقرير الشهر المالي</b><small>${fDays.filter(d => d.total > 0).length} يوم شرا</small></div>
+        <div class="rep-picker-row">
+          <button class="rep-picker-btn ${(state._repPickerOpen === 'month') ? 'open' : ''}" id="repMonthBtn"><span class="pk-ico">📅</span><span class="pk-tx"><b>${escapeHTML(fiscalLabel(fkey))}</b><small>${months.length} شهر متاح • دوس للتغيير</small></span><span class="pk-chev">‹</span></button>
+          <button class="rep-picker-btn ${(state._repPickerOpen === 'start') ? 'open' : ''}" id="repStartBtn"><span class="pk-ico" style="background:#FFEED3;">🗓️</span><span class="pk-tx"><b>بداية يوم ${sd}</b><small>حسب المرتب</small></span><span class="pk-chev">‹</span></button>
+        </div>
+        ${(state._repPickerOpen === 'month') ? `<div class="rep-picker-panel"><div class="pk-list">${months.map(k => { const s = sumInFiscalMonth(k, 'expense'); return `<button class="pk-item ${k === fkey ? 'sel' : ''}" data-pickmonth="${k}"><span class="pk-dot" style="background:${k === fkey ? 'var(--primary)' : 'var(--border)'};"></span><span>📅 ${escapeHTML(fiscalLabel(k))}<br><small style="color:var(--text-muted);font-size:11px;">${formatCurrency(s.total)} ج.م • ${s.count} عملية</small></span>${k === fkey ? '<span class="pk-check">✓</span>' : ''}</button>`; }).join('')}</div></div>` : ''}
+        ${(state._repPickerOpen === 'start') ? `<div class="rep-picker-panel">
+          <div class="pk-stepper"><button class="pk-step" id="startMinus">−</button><span class="pk-step-val"><b>يوم ${sd}</b><small>الشهر محسوب من يوم ${sd} للي بعده</small></span><button class="pk-step" id="startPlus">+</button></div>
+          <div class="pk-quick">${[1, 5, 10, 15, 20, 25].map(n => `<button class="${n === sd ? 'sel' : ''}" data-quickstart="${n}">يوم ${n}</button>`).join('')}</div>
+          <div class="pk-grid">${Array.from({length: 28}, (_, i) => i + 1).map(n => `<button class="pk-day ${n === sd ? 'sel' : ''}" data-pickstart="${n}">${n}</button>`).join('')}</div>
+        </div>` : ''}
+        <div class="help-text" style="margin-bottom:8px;">📅 الشهر محسوب من يوم ${sd} لليوم ${sd} اللي بعده — غيّر بداية الشهر حسب مرتبك</div>
+        <div class="rep-grid">
+          <div class="rep-tile" style="background:#E1F3FD;"><span class="t-ico">💸</span><span class="t-tx"><small>مصروفات ${escapeHTML(fiscalLabel(fkey))}</small><b>${formatCurrency(fExp.total)}<span> ج.م (${fExp.count})</span></b></span></div>
+          <div class="rep-tile" style="background:#DCFCE7;"><span class="t-ico">💰</span><span class="t-tx"><small>الدخل</small><b>${formatCurrency(fInc.total)}<span> ج.م</span></b></span></div>
+          <div class="rep-tile" style="background:#FEF3C7;"><span class="t-ico">🏦</span><span class="t-tx"><small>الديون</small><b>${formatCurrency(fDebt.total)}<span> ج.م</span></b></span></div>
+          <div class="rep-tile" style="background:${(fInc.total - fExp.total) < 0 ? '#FFE4E6' : '#DCFCE7'};"><span class="t-ico">${(fInc.total - fExp.total) < 0 ? '📉' : '📈'}</span><span class="t-tx"><small>الصافي</small><b>${formatCurrency(fInc.total - fExp.total)}<span> ج.م</span></b></span></div>
+        </div>
+        <div class="rep-sec">🏷️ أكتر قسم: ${fTop.id ? escapeHTML(getCategoryName(fTop.id)) + ' (' + formatCurrency(fTop.total) + ')' : '—'}</div>
+        <div class="rep-sec">🍩 التوزيع على الأقسام</div>${renderDonut(fBreak, fTotal)}<div class="rep-sec">📊 المصاريف اليومية (${escapeHTML(fiscalLabel(fkey))})</div>${renderBarChartSparse(fDays)}</div>
+      <div class="rep-card"><div class="rep-head"><span class="rep-ico" style="background:#EDE9FE;">⚖️</span><b>مقارنة كل الشهور</b><span class="fin-hero-month">${cmp.length} ${cmp.length === 1 ? 'شهر' : 'شهور'}</span></div>
+        <div class="rep-sec">📊 المصروفات شهرياً — دوس على الشهر لعرضه</div>
+        <div class="cmp-list">${cmp.map(c => { const w = Math.max(c.exp > 0 ? 6 : 0, (c.exp / maxExp) * 100); const isCur = c.key === fkey; return `<button class="cmp-row ${isCur ? 'cur' : ''}" data-repmonth="${c.key}"><span class="cmp-name">${escapeHTML(c.label.split('(')[0].trim())}</span><span class="cmp-track"><span class="cmp-fill" style="width:${w}%;${isCur ? 'background:linear-gradient(90deg,#F59E0B,#D97706);' : ''}"></span></span><span class="cmp-val">${formatCurrency(c.exp)}<small>ج.م</small></span></button>`; }).join('')}</div>
+        <div style="overflow-x:auto;margin-top:10px;"><table class="month-table">
+          <thead><tr><th>الشهر</th><th>💸 مصروف</th><th>💰 دخل</th><th>🏦 ديون</th><th>📊 الصافي</th><th>🔢 عمليات</th></tr></thead>
+          <tbody>${cmp.map(c => `<tr class="${c.key === fkey ? 'cur' : ''}" data-repmonth="${c.key}"><td><b>${escapeHTML(c.label)}</b></td><td>${formatCurrency(c.exp)}</td><td>${formatCurrency(c.inc)}</td><td>${formatCurrency(c.debt)}</td><td style="color:${c.net < 0 ? 'var(--danger)' : 'var(--success)'};">${formatCurrency(c.net)}</td><td>${c.expN}</td></tr>`).join('')}</tbody>
+        </table></div>
+        ${(() => { if (!cmp.length) return ''; const hi = cmp.reduce((a, b) => b.exp > a.exp ? b : a, cmp[0]); const lo = cmp.reduce((a, b) => b.exp < a.exp ? b : a, cmp[0]); return `<div class="cmp-best"><span class="cb hi"><i>🔥</i><span><b>${escapeHTML(hi.label.split('(')[0].trim())}</b><small>أعلى مصروف • ${formatCurrency(hi.exp)} ج.م</small></span></span><span class="cb lo"><i>🌱</i><span><b>${escapeHTML(lo.label.split('(')[0].trim())}</b><small>أقل مصروف • ${formatCurrency(lo.exp)} ج.م</small></span></span></div>`; })()}
+      </div>
       <div class="rep-hero">
         <div class="rep-hero-head">🏆 الخلاصة</div>
         <div class="rep-hero-net"><small>الإجمالي كله • ${all.count} عملية شرا</small><b>${formatCurrency(all.total)} ج.م</b></div>
@@ -3058,6 +4117,13 @@
         <div class="vol-row"><span>🕘</span><input type="time" id="notifExpTime" value="${state._notifExpTime || '21:00'}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:12px;font-weight:800;color:var(--text);background:var(--bg);" /><span class="vol-val">التذكير</span></div>
         <button class="tgl-row" id="tglNotifDaily"><span class="tgl"><b>التقرير اليومي</b><small>ملخص مصاريف النهاردة</small></span><span class="sw ${state._notifDaily !== false ? 'on' : ''}"></span></button>
         <div class="vol-row"><span>🕙</span><input type="time" id="notifDailyTime" value="${state._notifDailyTime || '22:00'}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:12px;font-weight:800;color:var(--text);background:var(--bg);" /><span class="vol-val">التقرير</span></div>
+        <div class="settings-title">🤲 الأذكار (صباح ومساء)</div>
+        <button class="tgl-row" id="tglAzkarCard"><span class="tgl"><b>إظهار كارت الأذكار</b><small>كارت الصباح والمساء في الرئيسية</small></span><span class="sw ${state._azkarOff === true ? '' : 'on'}"></span></button>
+        <button class="tgl-row" id="tglAzkarNotif"><span class="tgl"><b>إشعارات الأذكار</b><small>تنبيه في موعد الصباح والمساء</small></span><span class="sw ${state._azkarNotif !== false ? 'on' : ''}"></span></button>
+        <div class="vol-row"><span>🌅</span><input type="time" id="azkarMorningTime" value="${state._azkarMorningTime || '06:30'}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:12px;font-weight:800;color:var(--text);background:var(--bg);" /><span class="vol-val">الصباح</span></div>
+        <div class="vol-row"><span>🌙</span><input type="time" id="azkarEveningTime" value="${state._azkarEveningTime || '18:30'}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:12px;font-weight:800;color:var(--text);background:var(--bg);" /><span class="vol-val">المساء</span></div>
+        <div class="vol-row"><span>🔁</span><input type="number" id="azkarSwitchHour" min="0" max="23" value="${azkarSwitchHour()}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:12px;font-weight:800;color:var(--text);background:var(--bg);" /><span class="vol-val">ساعة التحويل</span></div>
+        <div style="padding:0 16px 6px;color:var(--text-sec);font-size:11px;font-weight:700;">⏰ الكارت بيظهر صباحاً من بعد منتصف الليل، ويتحول مساءً بعد الساعة المحددة (الافتراضي 12 الظهر)</div>
         <div class="snd-add-row"><button class="btn" id="notifTestBtn">🔔 جرّب تنبيه</button></div>
         </div>
       </div>
@@ -3239,10 +4305,31 @@
     const gl = document.querySelector('[data-gotab="orders"]'); if (gl) gl.onclick = (e) => { e.preventDefault(); setTab('orders'); };
     const fab = document.getElementById('fabBtn'); if (fab) fab.onclick = openAddOrderModal;
     const ha = document.getElementById('heroAddOrder'); if (ha) ha.onclick = openAddOrderModal;
-    const dc = document.getElementById('duoContinue'); if (dc) dc.onclick = () => { try { const el = document.querySelector('.streak-row, .badge-row, .section'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch {} openAddOrderModal(); };
+    const dc = document.getElementById('duoContinue'); if (dc) dc.onclick = () => { try { const el = document.getElementById('tasksSection') || document.querySelector('.streak-row, .badge-row, .section'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {} };
+    document.querySelectorAll('[data-azkar-toggle]').forEach(b => b.onclick = () => openAzkarPage());
+    document.querySelectorAll('[data-prayer-times]').forEach(b => b.onclick = () => openPrayerPage());
+    try { refreshPrayerMini(); } catch {}
+    document.querySelectorAll('[data-goto-tasks]').forEach(b => b.onclick = () => { try { const el = document.getElementById('tasksSection'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {} });
+    document.querySelectorAll('[data-goto-ayah]').forEach(b => b.onclick = () => { try { const el = document.getElementById('ayahSection'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {} });
+    const azD = document.getElementById('azkarDone'); if (azD) azD.onclick = () => azkarAdvance();
+    const azT = document.getElementById('azkarTap'); if (azT) azT.onclick = () => azkarAdvance();
+    const azN = document.getElementById('azkarNext'); if (azN) azN.onclick = () => { try { const s = azkarState(); if (s.st.idx < s.list.length - 1) { s.st.idx++; s.st.left = s.list[s.st.idx].c; persist(); render(); } } catch {} };
+    const azP = document.getElementById('azkarPrev'); if (azP) azP.onclick = () => { try { const s = azkarState(); if (s.st.idx > 0) { s.st.idx--; s.st.left = s.list[s.st.idx].c; persist(); render(); } } catch {} };
+    const azR = document.getElementById('azkarReset'); if (azR) azR.onclick = () => { try { const s = azkarState(); s.st.idx = 0; s.st.left = s.list[0].c; persist(); render(); } catch {} };
     document.querySelectorAll('[data-gotab2]').forEach(b => { b.onclick = () => setTab(b.dataset.gotab2); });
     const ea = document.getElementById('emptyAddOrder'); if (ea) ea.onclick = openAddOrderModal;
     const bha = document.getElementById('basketHomeAdd'); if (bha) bha.onclick = openAddOrderModal;
+    const taskTgl = document.getElementById('taskAddToggle'); if (taskTgl) taskTgl.onclick = () => { state._taskAddOpen = !(state._taskAddOpen === true); persist(); render(); requestAnimationFrame(() => { const n = document.getElementById('taskAddInput'); if (n) n.focus(); }); };
+    const ayP = document.getElementById('ayahPrev'); if (ayP) ayP.onclick = () => { state._ayahOffset = (Number(state._ayahOffset) || 0) - 1; render(); };
+    const ayN = document.getElementById('ayahNext'); if (ayN) ayN.onclick = () => { state._ayahOffset = (Number(state._ayahOffset) || 0) + 1; render(); };
+    const ayT = document.getElementById('ayahToday'); if (ayT) ayT.onclick = () => { state._ayahOffset = 0; render(); };
+    const taskDoAdd = () => { const inp = document.getElementById('taskAddInput'); if (!inp) return; const v = inp.value.trim(); if (!v) { inp.focus(); return; } addTask(v); state._taskAddOpen = false; render(); toast('اتضافت المهمة ✓', 'success'); };
+    const taskBtn = document.getElementById('taskAddBtn'); if (taskBtn) taskBtn.onclick = taskDoAdd;
+    const taskInp = document.getElementById('taskAddInput'); if (taskInp) taskInp.onkeydown = (e) => { if (e.key === 'Enter') taskDoAdd(); };
+    document.querySelectorAll('[data-tasktoggle]').forEach(row => row.onclick = (e) => { if (e.target.closest('[data-taskdel]')) return; toggleTask(row.dataset.tasktoggle); render(); });
+    document.querySelectorAll('[data-taskdel]').forEach(b => b.onclick = (e) => { e.stopPropagation(); deleteTask(b.dataset.taskdel); render(); toast('اتمسحت ✓', 'success'); });
+    const tcd = document.getElementById('taskClearDone'); if (tcd) tcd.onclick = (e) => { e.stopPropagation(); state._tasks = taskList().filter(t => !t.done); persist(); render(); };
+    const tcd2 = document.getElementById('taskClearDone2'); if (tcd2) tcd2.onclick = () => { state._tasks = taskList().filter(t => !t.done); persist(); render(); };
     const bam = document.getElementById('basketAddMore'); if (bam) bam.onclick = (e) => { e.stopPropagation(); openAddOrderModal(); };
     const ea2 = document.getElementById('emptyAddExpense'); if (ea2) ea2.onclick = openAddExpenseModal;
     document.querySelectorAll('.order-card').forEach(card => {
@@ -3282,6 +4369,18 @@
       } catch {}
     };
     document.querySelectorAll('[data-expkind]').forEach(b => b.onclick = () => { state._expKind = b.dataset.expkind; persist(); render(); });
+    const expMonthBtn = document.getElementById('expMonthBtn'); if (expMonthBtn) expMonthBtn.onclick = () => { state._expPickerOpen = !state._expPickerOpen; persist(); render(); };
+    document.querySelectorAll('[data-pickexpmonth]').forEach(b => b.onclick = () => { state._expMonth = b.dataset.pickexpmonth; state._expPickerOpen = false; persist(); render(); });
+    document.querySelectorAll('[data-expgrp]').forEach(b => b.onclick = () => { state._expGrpOpen = (state._expGrpOpen === b.dataset.expgrp) ? null : b.dataset.expgrp; persist(); render(); });
+    const repMonthBtn = document.getElementById('repMonthBtn'); if (repMonthBtn) repMonthBtn.onclick = () => { state._repPickerOpen = (state._repPickerOpen === 'month') ? null : 'month'; persist(); render(); };
+    const repStartBtn = document.getElementById('repStartBtn'); if (repStartBtn) repStartBtn.onclick = () => { state._repPickerOpen = (state._repPickerOpen === 'start') ? null : 'start'; persist(); render(); };
+    document.querySelectorAll('[data-pickmonth]').forEach(b => b.onclick = () => { state._repMonth = b.dataset.pickmonth; state._repPickerOpen = null; persist(); render(); });
+    const applyStartDay = (v) => { v = Number(v); if (v >= 1 && v <= 28) { state._monthStartDay = v; state._repMonth = fiscalKeyOf(new Date(), v); state._repPickerOpen = null; persist(); render(); toast('بداية الشهر بقت يوم ' + v + ' ✓', 'success'); } };
+    document.querySelectorAll('[data-pickstart]').forEach(b => b.onclick = () => applyStartDay(b.dataset.pickstart));
+    document.querySelectorAll('[data-quickstart]').forEach(b => b.onclick = () => applyStartDay(b.dataset.quickstart));
+    const stMinus = document.getElementById('startMinus'); if (stMinus) stMinus.onclick = () => { const c = monthStartDay(); applyStartDay(c <= 1 ? 28 : c - 1); };
+    const stPlus = document.getElementById('startPlus'); if (stPlus) stPlus.onclick = () => { const c = monthStartDay(); applyStartDay(c >= 28 ? 1 : c + 1); };
+    document.querySelectorAll('[data-repmonth]').forEach(el => el.onclick = () => { state._repMonth = el.dataset.repmonth; persist(); render(); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {} });
     document.querySelectorAll('[data-expact]').forEach(el => el.onclick = (e) => {
       if (e.target.closest('button, a, input, select, textarea')) return;
       const ex = state.expenses.find(x => x.id === el.dataset.expact); if (!ex) return;
@@ -3445,6 +4544,11 @@
     b('tglNotifDaily', () => { state._notifDaily = !(state._notifDaily !== false); persist(); render(); });
     const net = document.getElementById('notifExpTime'); if (net) net.onchange = () => { state._notifExpTime = net.value || '21:00'; persist(); };
     const ndt = document.getElementById('notifDailyTime'); if (ndt) ndt.onchange = () => { state._notifDailyTime = ndt.value || '22:00'; persist(); };
+    b('tglAzkarCard', () => { state._azkarOff = !(state._azkarOff === true); persist(); render(); toast(state._azkarOff === true ? 'كارت الأذكار اتقفل' : 'كارت الأذكار اشتغل 🤲', 'success'); });
+    b('tglAzkarNotif', () => { state._azkarNotif = !(state._azkarNotif !== false); persist(); render(); toast(state._azkarNotif !== false ? 'إشعارات الأذكار اشتغلت 🤲' : 'إشعارات الأذكار اتقفلت', 'success'); });
+    const azm = document.getElementById('azkarMorningTime'); if (azm) azm.onchange = () => { state._azkarMorningTime = azm.value || '06:30'; persist(); toast('موعد أذكار الصباح اتحفظ ☀️', 'success'); };
+    const aze = document.getElementById('azkarEveningTime'); if (aze) aze.onchange = () => { state._azkarEveningTime = aze.value || '18:30'; persist(); toast('موعد أذكار المساء اتحفظ 🌙', 'success'); };
+    const azs = document.getElementById('azkarSwitchHour'); if (azs) azs.onchange = () => { let v = Number(azs.value); if (isNaN(v)) v = 12; v = Math.max(0, Math.min(23, v)); state._azkarSwitch = v; persist(); render(); toast('الكارت هيتحول مساءً بعد الساعة ' + v + ' ✓', 'success'); };
     b('notifTestBtn', () => notifFire('test', '🔔 ناقصنا إيه', 'التنبيهات شغالة تمام! 😄🔔'));
     document.querySelectorAll('[data-hidecat]').forEach(btn => btn.onclick = () => {
       if (!state.hiddenCats) state.hiddenCats = [];
@@ -4169,6 +5273,24 @@
         const t = list.reduce((a, e) => a + (Number(e.amount) || 0), 0);
         notifFire('daily', '📊 التقرير اليومي', t > 0 ? `تقرير النهاردة: صرفت ${formatCurrency(t)} ج.م في ${list.length} عمليات` : 'تقرير النهاردة: مصرفتش حاجة');
       }
+      if (state._azkarNotif !== false) {
+        if (notifTimePassed(state._azkarMorningTime || '06:30') && st.azkarM !== tk) { st.azkarM = tk; notifSave(st); notifFire('azkar-m', '🌅 أذكار الصباح', 'ابدأ يومك بذكر الله — افتح كارت الأذكار ☀️🤲'); }
+        if (notifTimePassed(state._azkarEveningTime || '18:30') && st.azkarE !== tk) { st.azkarE = tk; notifSave(st); notifFire('azkar-e', '🌙 أذكار المساء', 'اختم يومك بذكر الله — افتح كارت الأذكار 🌙🤲'); }
+      }
+      try {
+        const pc = prayerCache();
+        if (pc && pc.timings && pc.day === prayerTodayKey()) {
+          const n = new Date();
+          const cur = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+          PRAYERS_META.forEach(p => {
+            if (p.id === 'Sunrise') return;
+            if (!prayerBellOn(p.id)) return;
+            const tt = String((pc.timings[p.id] || '')).slice(0, 5);
+            const key = 'pray_' + p.id + '_' + tk;
+            if (tt && tt === cur && !st[key]) { st[key] = 1; notifSave(st); notifFire('prayer-' + p.id, '🕌 حان وقت ' + p.name, 'تقبّل الله منا ومنكم 🤲'); }
+          });
+        }
+      } catch {}
     } catch {}
   }
 
@@ -4513,6 +5635,8 @@
         const nm = (nameEl.value || '').trim();
         if (!nm) { try { nameEl.focus(); } catch {} toast('اكتب اسم الصنف الأول', 'warning'); return; }
         if (!selCat) { toast('اختار التصنيف المناسب للصنف', 'warning'); return; }
+        const nk = normalizeTerm(nm);
+        if (pickedList.some(x => normalizeTerm(x) === nk) || basketExists(nm) || pendingOrderExists(nm, activeListId())) { toast('الصنف ده موجود قبل كده — متكررش ✓', 'info'); closeModal(pm); return; }
         saveNewCatalogItem(nm, selCat);
         try { newItemCat = selCat; } catch {}
         needCatFor = null;
@@ -4721,10 +5845,28 @@
             }
           }
         } else {
+          const lid = activeListId();
           matched.forEach(nm => {
             const k = normalizeTerm(nm);
             if (pickedList.some(x => normalizeTerm(x) === k)) { skipped++; return; }
+            if (basketExists(nm) || pendingOrderExists(nm, lid)) { skipped++; return; }
             pickedList.push(nm); added++;
+          });
+          /* فلترة المجهول + منع التكرار: استبعاد أي كلمة موجودة فعلاً في المختار/السلة/الطلبات */
+          const lateMatched = [];
+          unknown = unknown.filter(u => {
+            const k = normalizeTerm(u);
+            if (!k) return false;
+            if (seen.has(k)) { skipped++; return false; }
+            if (pickedList.some(x => normalizeTerm(x) === k)) { skipped++; return false; }
+            if (basketExists(u) || pendingOrderExists(u, lid)) { skipped++; return false; }
+            if (foundInCatalog(u)) { pushM(u); lateMatched.push(u); return false; }
+            return true;
+          });
+          lateMatched.forEach(nm => {
+            const k = normalizeTerm(nm);
+            if (pickedList.some(x => normalizeTerm(x) === k) || basketExists(nm) || pendingOrderExists(nm, lid)) { skipped++; return; }
+            pickedList.push(nm); added++; seen.add(k); matched.push(nm);
           });
           if (added) { syncPickedCompat(); qtyFor = null; renderQty(); renderPick(); renderPickDepts(); renderPickList(); updateSuggest(); evalCategoryFromName(); }
         }
@@ -4732,43 +5874,16 @@
         if (matched.length) html += `✅ اتعرف على <b>${matched.length} ${matched.length === 1 ? 'صنف' : 'أصناف'}</b>: <b>${matched.map(escapeHTML).join('، ')}</b>${added ? ` — اتضافوا مرة واحدة فوق (${added}) ✓` : ''}${skipped ? ` (تجاهلت ${skipped} مكرر)` : ''}<br>`;
         else html += '😕 مفيش ولا كلمة مطابقة للأصناف الموجودة في التطبيق.<br>';
         if (unknown.length) {
-          html += `🆕 كلمات جديدة مش موجودة (${unknown.length}): <div class="voice-unknown">` + unknown.map(u => `<span class="vu-tag">«${escapeHTML(u)}» <button type="button" data-vadd="${escapeHTML(u)}">➕ ضيفه يدوي</button></span>`).join('') + `</div><div class="help-text" style="margin-top:6px;">دوس على كل صنف "➕ ضيفه يدوي" عشان تختار تصنيفه ويتحفظ — أو احفظهم كلهم مرة واحدة:</div><button type="button" class="btn btn-primary btn-sm" id="voiceAddAllUnknown" style="margin-top:8px;min-height:42px;">➕ حفظ كل الجديد (${unknown.length}) مرة واحدة</button>`;
+          html += `🆕 كلمات جديدة مش موجودة (${unknown.length}): <div class="voice-unknown">` + unknown.map(u => `<span class="vu-tag">«${escapeHTML(u)}» <button type="button" data-vadd="${escapeHTML(u)}">➕ ضيفه يدوي</button></span>`).join('') + `</div><div class="help-text" style="margin-top:6px;">دوس "➕ ضيفه يدوي" على كل صنف لوحده عشان تختار تصنيفه ويتحفظ في التطبيق ✓</div>`;
         } else if (matched.length) {
           html += `<div class="help-text" style="margin-top:4px;">🎙️ سمع: "${escapeHTML(text)}" — دوس "ضيفه للسلة 🧺" عشان يتسجلوا كلهم مرة واحدة</div>`;
         }
+        if (skipped && !added && !unknown.length) html += `<div class="help-text" style="margin-top:4px;">⚠️ الأصناف دي موجودة قبل كده — متكررتش ✓</div>`;
         paintStatus(html, false);
         vBox.querySelectorAll('[data-vadd]').forEach(b => b.onclick = () => openAddNewItemPopup(b.dataset.vadd));
-        const addAllBtn = vBox.querySelector('#voiceAddAllUnknown');
-        if (addAllBtn) addAllBtn.onclick = () => openBulkAddUnknown(unknown);
-        if (!matched.length && !unknown.length) toast('جرّب تتكلم أوضح', 'warning');
-        else if (matched.length) toast(`🎙️ اتضاف ${matched.length} ${matched.length === 1 ? 'صنف' : 'أصناف'} من الصوت مرة واحدة ✓`, 'success');
-      }
-      /* حفظ مجموعة أصناف جديدة مرة واحدة: تصنيف واحد للكل ويتحفظوا في الكتالوج */
-      function openBulkAddUnknown(names) {
-        const list = (names || []).map(s => String(s || '').trim()).filter(Boolean).slice(0, 12);
-        if (!list.length) return;
-        const cats = getCatalog();
-        let selCat = (pickDept && validCatId(pickDept)) ? pickDept : null;
-        const pm = openModal(`<div class="modal-handle"></div>
-          <div class="addnew-pop">
-            <div class="addnew-pop-hero"><span class="addnew-pop-ico">✨</span><div><h3>حفظ ${list.length} ${list.length === 1 ? 'صنف جديد' : 'أصناف جديدة'} مرة واحدة</h3><p>${list.map(escapeHTML).join('، ')} — اختار تصنيفهم وهيتحفظوا ويتضافوا فوق</p></div></div>
-            <div class="addnew-pop-field"><label>🗂️ اختار التصنيف * (هيتطبق على الكل)</label><div class="addnew-pop-cats">${cats.map(d => `<button type="button" class="filter-chip ${selCat === d.id ? 'active' : ''}" data-banpcat="${d.id}">${d.emoji} ${escapeHTML(getCategoryName(d.id))}</button>`).join('')}</div></div>
-            <div class="addnew-pop-btns"><button class="btn" id="banpCancel">رجوع</button><button class="btn btn-primary" id="banpSave">+ احفظ الكل (${list.length}) ✓</button></div>
-          </div>`);
-        try { pm.style.zIndex = 300; } catch {}
-        pm.querySelectorAll('[data-banpcat]').forEach(b => b.onclick = () => { selCat = b.dataset.banpcat; pm.querySelectorAll('[data-banpcat]').forEach(x => x.classList.toggle('active', x.dataset.banpcat === selCat)); });
-        pm.querySelector('#banpCancel').onclick = () => closeModal(pm);
-        pm.querySelector('#banpSave').onclick = () => {
-          if (!selCat) { toast('اختار التصنيف المناسب', 'warning'); return; }
-          let n = 0;
-          list.forEach(nm => { if (saveNewCatalogItem(nm, selCat)) n++; if (!pickedList.some(x => normalizeTerm(x) === normalizeTerm(nm))) pickedList.push(nm); });
-          syncPickedCompat(); qtyFor = null;
-          try { renderPick(); renderPickDepts(); renderPickList(); refreshPickAddBtn(); } catch {}
-          try { updateSuggest(); evalCategoryFromName(); } catch {}
-          try { paintStatus(`✅ اتحفظ <b>${n} ${n === 1 ? 'صنف جديد' : 'أصناف جديدة'}</b> واتضافوا فوق مرة واحدة ✓<br><div class="help-text">دوس "ضيفه للسلة 🧺" عشان يتسجلوا كلهم</div>`, false); } catch {}
-          closeModal(pm);
-          toast(`اتحفظ ${n} أصناف جديدة واتضافوا ✓`, 'success');
-        };
+        if (!matched.length && !unknown.length) toast(skipped ? 'الصنف ده موجود قبل كده — متكررش ✓' : 'جرّب تتكلم أوضح', skipped ? 'info' : 'warning');
+        else if (matched.length && added) toast(`🎙️ اتضاف ${added} ${added === 1 ? 'صنف' : 'أصناف'} من الصوت مرة واحدة ✓${skipped ? ` (تجاهلت ${skipped} مكرر)` : ''}`, 'success');
+        else if (matched.length && !added) toast('الأصناف دي موجودة قبل كده — متكررتش ✓', 'info');
       }
       function stopRec() {
         listening = false;
@@ -5398,7 +6513,27 @@
     } finally { _syncLock = false; }
     return true;
   }
-  let _syncSubscribed = null, _syncPoll = null;
+  let _syncSubscribed = null, _syncPoll = null, _presenceJoined = false;
+  function updateOnlinePill(n) {
+    try {
+      const pill = document.getElementById('onlinePill');
+      const num = document.getElementById('onlineCount');
+      if (!pill || !num) return;
+      pill.style.display = '';
+      num.textContent = n;
+    } catch {}
+  }
+  let _presenceKey = null;
+  function initPresence() {
+    try {
+      if (!window.NaqisnaSupabase || !window.NaqisnaSupabase.isConfigured() || !window.NaqisnaSupabase.joinPresence) return;
+      if (!state.user || (!state.user.id && !state.user.whatsapp)) return;
+      const key = String(state.user.id || state.user.whatsapp);
+      if (_presenceJoined && _presenceKey === key) return;
+      _presenceKey = key; _presenceJoined = true;
+      window.NaqisnaSupabase.joinPresence(state.user, updateOnlinePill);
+    } catch {}
+  }
   async function initSupabaseSync() {
     if (!window.NaqisnaSupabase || !window.NaqisnaSupabase.isConfigured() || !state.home?.code) return;
     try {
@@ -5431,6 +6566,7 @@
           if (refreshed) { state._syncedOnce = true; if (applyRemoteData(refreshed)) render(); }
         } catch {}
       });
+      try { initPresence(); } catch {}
       // fallback polling لو Realtime مقفول في المشروع
       if (_syncPoll) clearInterval(_syncPoll);
       _syncPoll = setInterval(async () => {
@@ -5472,6 +6608,7 @@
     render();
     try { if (typeof _ensureExitGuard === 'function') _ensureExitGuard(); } catch {}
     initSupabaseSync();
+    try { initPresence(); } catch {}
     try { setInterval(notifTick, 60000); setTimeout(notifTick, 15000); } catch {}
     try {
       if ('serviceWorker' in navigator) {
