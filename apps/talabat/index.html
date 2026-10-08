@@ -4655,8 +4655,39 @@
         }
         return best;
       }
+      const VOICE_STOP = ['عايز', 'عايزه', 'اريد', 'محتاج', 'محتاجه', 'هات', 'جيب', 'ضيف', 'زود', 'اكتب', 'سجل', 'لو', 'سمحت', 'من', 'فضلك', 'كمان', 'وايضا', 'وأيضا', 'ثم', 'بعدين', 'شوية', 'علبة', 'علب'];
       function splitVoice(text) {
-        return String(text || '').split(/[\n،,؛;|]+/).flatMap(l => l.split(/\s+و\s+/)).map(s => s.replace(/^(و|ثم|كمان|وايضا|وأيضا)\s+/, '').trim()).filter(s => s.length >= 2);
+        return String(text || '').split(/[\n،,؛;|]+/).flatMap(l => l.split(/\s+و\s+/)).flatMap(l => l.split(/\s+(ثم|بعدين|كمان)\s+/)).map(s => s.replace(/^(و|ثم|كمان|وايضا|وأيضا|عايز|عايزه|هات|ضيف)\s+/, '').trim()).filter(s => s.length >= 2);
+      }
+      /* استخراج كل الأصناف المعروفة من جملة واحدة حتى لو من غير "و" : "طماطم بطاطس لبن" => 3 أصناف */
+      function extractAllMatches(fullText) {
+        const normFull = ' ' + normalizeTerm(fullText || '') + ' ';
+        const pool = allProductNames().map(n => ({ name: n, key: normalizeTerm(n) })).filter(x => x.key && x.key.length >= 2);
+        pool.sort((a, b) => b.key.length - a.key.length);
+        const found = [], usedRanges = [];
+        const overlaps = (s, e) => usedRanges.some(r => s < r[1] && e > r[0]);
+        pool.forEach(p => {
+          const needle = ' ' + p.key + ' ';
+          let idx = normFull.indexOf(needle);
+          if (idx >= 0 && !overlaps(idx, idx + needle.length)) { found.push(p.name); usedRanges.push([idx, idx + needle.length]); return; }
+          const parts = p.key.split(' ').filter(t => t.length >= 3);
+          if (parts.length === 1 && parts[0].length >= 3) {
+            const single = ' ' + parts[0] + ' ';
+            let i2 = normFull.indexOf(parts[0]);
+            if (i2 >= 0) {
+              const already = found.some(f => normalizeTerm(f) === p.key);
+              if (!already && !overlaps(Math.max(0, i2 - 1), i2 + parts[0].length + 1)) { found.push(p.name); usedRanges.push([Math.max(0, i2 - 1), i2 + parts[0].length + 1]); }
+            }
+          }
+        });
+        /* رتب حسب ظهورها في الجملة الأصلية */
+        found.sort((a, b) => normFull.indexOf(normalizeTerm(a)) - normFull.indexOf(normalizeTerm(b)));
+        return found;
+      }
+      function leftoverUnknown(fullText, matched) {
+        let rest = ' ' + String(fullText || '') + ' ';
+        matched.forEach(nm => { rest = rest.replace(nm, ' '); });
+        return rest.split(/[\n،,؛;|]+/).flatMap(l => l.split(/\s+و\s+/)).flatMap(l => l.split(/\s+/)).map(s => String(s || '').trim()).filter(s => s.length >= 2).map(s => cleanChunk(s)).filter(s => s && s.length >= 2 && !VOICE_STOP.includes(normalizeTerm(s)) && !QTY_WORDS.includes(normalizeTerm(s)) && !/^[0-9٠-٩]+$/.test(s)).filter((s, i, a) => a.findIndex(x => normalizeTerm(x) === normalizeTerm(s)) === i).slice(0, 12);
       }
       function paintStatus(html, isListening) {
         vBox.classList.remove('hidden');
@@ -4665,13 +4696,16 @@
       }
       function handleTranscript(text) {
         const parts = splitVoice(text);
-        if (!parts.length) { paintStatus('😕 مسمعتش حاجة واضحة — جرّب تتكلم تاني بوضوح', false); return; }
-        const matched = [], unknown = [], seen = new Set();
-        parts.forEach(p => {
-          const bm = bestMatchFor(p);
-          if (bm) { const k = normalizeTerm(bm); if (!seen.has(k)) { seen.add(k); matched.push(bm); } }
-          else { const c = cleanChunk(p) || p.trim(); if (c && !unknown.some(u => normalizeTerm(u) === normalizeTerm(c))) unknown.push(c); }
-        });
+        /* 1) مطابقة شاملة للجملة كلها (تدعم تعدد الأصناف بدون فواصل) + 2) مطابقة كل جزء لوحده */
+        const seen = new Set(), matched = [];
+        const pushM = (nm) => { if (!nm) return; const k = normalizeTerm(nm); if (k && !seen.has(k)) { seen.add(k); matched.push(nm); } };
+        try { extractAllMatches(text).forEach(pushM); } catch {}
+        parts.forEach(p => { try { pushM(bestMatchFor(p)); } catch {} });
+        let unknown = [];
+        try { unknown = leftoverUnknown(text, matched); } catch {}
+        /* لو مفيش مطابقات ولا مجهول: fallback للأجزاء الأصلية كمجهول */
+        if (!matched.length && !unknown.length && parts.length) unknown = parts.map(p => cleanChunk(p) || p.trim()).filter(Boolean).slice(0, 8);
+        if (!matched.length && !unknown.length) { paintStatus('😕 مسمعتش حاجة واضحة — جرّب تتكلم تاني بوضوح', false); return; }
         let added = 0, skipped = 0;
         if (editing) {
           if (matched.length) {
@@ -4695,17 +4729,46 @@
           if (added) { syncPickedCompat(); qtyFor = null; renderQty(); renderPick(); renderPickDepts(); renderPickList(); updateSuggest(); evalCategoryFromName(); }
         }
         let html = '';
-        if (matched.length) html += `✅ اتعرف على: <b>${matched.map(escapeHTML).join('، ')}</b>${added ? ` — اتضافوا فوق (${added})` : ''}${skipped ? ` (تجاهلت ${skipped} مكرر)` : ''}<br>`;
+        if (matched.length) html += `✅ اتعرف على <b>${matched.length} ${matched.length === 1 ? 'صنف' : 'أصناف'}</b>: <b>${matched.map(escapeHTML).join('، ')}</b>${added ? ` — اتضافوا مرة واحدة فوق (${added}) ✓` : ''}${skipped ? ` (تجاهلت ${skipped} مكرر)` : ''}<br>`;
         else html += '😕 مفيش ولا كلمة مطابقة للأصناف الموجودة في التطبيق.<br>';
         if (unknown.length) {
-          html += `🆕 كلمات جديدة مش موجودة: <div class="voice-unknown">` + unknown.map(u => `<span class="vu-tag">«${escapeHTML(u)}» <button type="button" data-vadd="${escapeHTML(u)}">➕ ضيفه يدوي</button></span>`).join('') + `</div><div class="help-text" style="margin-top:6px;">دوس "➕ ضيفه يدوي" عشان تختار تصنيفه ويتحفظ في التطبيق على طول ✓</div>`;
+          html += `🆕 كلمات جديدة مش موجودة (${unknown.length}): <div class="voice-unknown">` + unknown.map(u => `<span class="vu-tag">«${escapeHTML(u)}» <button type="button" data-vadd="${escapeHTML(u)}">➕ ضيفه يدوي</button></span>`).join('') + `</div><div class="help-text" style="margin-top:6px;">دوس على كل صنف "➕ ضيفه يدوي" عشان تختار تصنيفه ويتحفظ — أو احفظهم كلهم مرة واحدة:</div><button type="button" class="btn btn-primary btn-sm" id="voiceAddAllUnknown" style="margin-top:8px;min-height:42px;">➕ حفظ كل الجديد (${unknown.length}) مرة واحدة</button>`;
         } else if (matched.length) {
-          html += `<div class="help-text" style="margin-top:4px;">🎙️ سمع: "${escapeHTML(text)}"</div>`;
+          html += `<div class="help-text" style="margin-top:4px;">🎙️ سمع: "${escapeHTML(text)}" — دوس "ضيفه للسلة 🧺" عشان يتسجلوا كلهم مرة واحدة</div>`;
         }
         paintStatus(html, false);
         vBox.querySelectorAll('[data-vadd]').forEach(b => b.onclick = () => openAddNewItemPopup(b.dataset.vadd));
+        const addAllBtn = vBox.querySelector('#voiceAddAllUnknown');
+        if (addAllBtn) addAllBtn.onclick = () => openBulkAddUnknown(unknown);
         if (!matched.length && !unknown.length) toast('جرّب تتكلم أوضح', 'warning');
-        else if (matched.length) toast(`🎙️ اتضاف ${matched.length} صنف من الصوت ✓`, 'success');
+        else if (matched.length) toast(`🎙️ اتضاف ${matched.length} ${matched.length === 1 ? 'صنف' : 'أصناف'} من الصوت مرة واحدة ✓`, 'success');
+      }
+      /* حفظ مجموعة أصناف جديدة مرة واحدة: تصنيف واحد للكل ويتحفظوا في الكتالوج */
+      function openBulkAddUnknown(names) {
+        const list = (names || []).map(s => String(s || '').trim()).filter(Boolean).slice(0, 12);
+        if (!list.length) return;
+        const cats = getCatalog();
+        let selCat = (pickDept && validCatId(pickDept)) ? pickDept : null;
+        const pm = openModal(`<div class="modal-handle"></div>
+          <div class="addnew-pop">
+            <div class="addnew-pop-hero"><span class="addnew-pop-ico">✨</span><div><h3>حفظ ${list.length} ${list.length === 1 ? 'صنف جديد' : 'أصناف جديدة'} مرة واحدة</h3><p>${list.map(escapeHTML).join('، ')} — اختار تصنيفهم وهيتحفظوا ويتضافوا فوق</p></div></div>
+            <div class="addnew-pop-field"><label>🗂️ اختار التصنيف * (هيتطبق على الكل)</label><div class="addnew-pop-cats">${cats.map(d => `<button type="button" class="filter-chip ${selCat === d.id ? 'active' : ''}" data-banpcat="${d.id}">${d.emoji} ${escapeHTML(getCategoryName(d.id))}</button>`).join('')}</div></div>
+            <div class="addnew-pop-btns"><button class="btn" id="banpCancel">رجوع</button><button class="btn btn-primary" id="banpSave">+ احفظ الكل (${list.length}) ✓</button></div>
+          </div>`);
+        try { pm.style.zIndex = 300; } catch {}
+        pm.querySelectorAll('[data-banpcat]').forEach(b => b.onclick = () => { selCat = b.dataset.banpcat; pm.querySelectorAll('[data-banpcat]').forEach(x => x.classList.toggle('active', x.dataset.banpcat === selCat)); });
+        pm.querySelector('#banpCancel').onclick = () => closeModal(pm);
+        pm.querySelector('#banpSave').onclick = () => {
+          if (!selCat) { toast('اختار التصنيف المناسب', 'warning'); return; }
+          let n = 0;
+          list.forEach(nm => { if (saveNewCatalogItem(nm, selCat)) n++; if (!pickedList.some(x => normalizeTerm(x) === normalizeTerm(nm))) pickedList.push(nm); });
+          syncPickedCompat(); qtyFor = null;
+          try { renderPick(); renderPickDepts(); renderPickList(); refreshPickAddBtn(); } catch {}
+          try { updateSuggest(); evalCategoryFromName(); } catch {}
+          try { paintStatus(`✅ اتحفظ <b>${n} ${n === 1 ? 'صنف جديد' : 'أصناف جديدة'}</b> واتضافوا فوق مرة واحدة ✓<br><div class="help-text">دوس "ضيفه للسلة 🧺" عشان يتسجلوا كلهم</div>`, false); } catch {}
+          closeModal(pm);
+          toast(`اتحفظ ${n} أصناف جديدة واتضافوا ✓`, 'success');
+        };
       }
       function stopRec() {
         listening = false;
@@ -4719,8 +4782,8 @@
           rec = new SR();
           rec.lang = 'ar-EG';
           rec.interimResults = true;
-          rec.continuous = false;
-          rec.maxAlternatives = 1;
+          rec.continuous = true;
+          rec.maxAlternatives = 3;
           listening = true; finalTxt = '';
           vBtn.classList.add('listening');
           if (vTxt) vTxt.textContent = 'بسمعك... اتكلم 🎙️ (دوس تاني للإيقاف)';
