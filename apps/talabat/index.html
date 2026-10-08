@@ -125,6 +125,23 @@
   .pick-search-box.has-add-btn .pick-search-ico { display: none; }
   .pick-add-btn { position: absolute; left: 6px; top: 6px; bottom: 6px; display: inline-flex; align-items: center; gap: 4px; padding: 0 14px; border-radius: 10px; background: linear-gradient(135deg,#FFB020,#FF7A00); color: #fff; font-size: 12.5px; font-weight: 900; box-shadow: 0 6px 14px rgba(255,122,0,.35), inset 0 1px 0 rgba(255,255,255,.35); white-space: nowrap; animation: popIn .2s ease-out; }
   .pick-add-btn:active { transform: scale(.95); }
+  /* ===== الإدخال الصوتي بالعربية ===== */
+  .voice-bar { display: flex; gap: 8px; align-items: stretch; margin-bottom: 10px; }
+  .voice-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; border-radius: 15px; background: linear-gradient(135deg,#8B5CF6,#6D28D9); color: #fff; font-size: 14px; font-weight: 900; box-shadow: 0 8px 18px rgba(139,92,246,.35), inset 0 1px 0 rgba(255,255,255,.35); transition: transform .15s, filter .15s; padding: 10px 14px; }
+  .voice-btn:active { transform: scale(.97); }
+  .voice-btn.listening { background: linear-gradient(135deg,#F43F5E,#BE123C); animation: voicePulse 1.1s ease-in-out infinite; }
+  @keyframes voicePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,.45); } 50% { box-shadow: 0 0 0 10px rgba(244,63,94,0); } }
+  .voice-btn:disabled { opacity: .55; filter: grayscale(.4); }
+  .voice-btn .mic { font-size: 20px; }
+  .voice-status { background: var(--bg); border: 1.5px dashed var(--border); border-radius: 14px; padding: 10px 12px; font-size: 12.5px; font-weight: 800; color: var(--text-sec); line-height: 1.8; margin-bottom: 10px; animation: popIn .2s ease-out; }
+  .voice-status.listening { border-color: #F43F5E; background: #FFF1F2; color: #BE123C; }
+  .voice-status b { color: var(--text); }
+  .voice-unknown { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .voice-unknown .vu-tag { display: inline-flex; align-items: center; gap: 6px; background: #FFF7ED; border: 1.5px solid #FDBA74; color: #9A3412; padding: 6px 8px 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+  .voice-unknown .vu-tag button { background: linear-gradient(135deg,#FFB020,#FF7A00); color: #fff; font-size: 11px; font-weight: 900; padding: 4px 10px; border-radius: 999px; }
+  .pick-search.has-mic { padding-left: 52px; }
+  .mic-inline { position: absolute; left: 6px; top: 6px; bottom: 6px; width: 40px; border-radius: 10px; background: var(--primary-light); color: var(--primary-dark); font-size: 18px; display: flex; align-items: center; justify-content: center; }
+  .mic-inline.listening { background: #F43F5E; color: #fff; animation: voicePulse 1.1s ease-in-out infinite; }
   /* ===== نافذة منبثقة: ضيفه كصنف جديد ===== */
   .addnew-pop { text-align: right; }
   .addnew-pop-hero { background: linear-gradient(135deg,#FFB020 0%,#FF7A00 60%,#E07E00 100%); border-radius: 20px; padding: 14px; display: flex; gap: 11px; align-items: center; color: #fff; margin-bottom: 12px; position: relative; overflow: hidden; box-shadow: 0 12px 26px rgba(255,122,0,.3); }
@@ -4237,13 +4254,18 @@
     const html = `<div class="modal-handle"></div>
       <div class="m-hero" style="${editing ? '' : 'background:linear-gradient(135deg,#FFB020 0%,#FF9600 55%,#E07E00 100%);box-shadow:0 14px 30px rgba(255,150,0,.35);border-radius:18px;padding:13px 14px;'}"><span class="m-hero-ico" style="${editing ? '' : 'width:46px;height:46px;border-radius:14px;font-size:24px;'}">${editing ? svgIcon('pencil', 26) : '🧺'}</span><div class="m-hero-txt"><h2>${editing ? 'تعديل الطلب' : 'زوّد طلب 🧺'}</h2><p>${editing ? 'عدّل اسم الطلب وبياناته' : 'اختار صنفك من البحث وضيفه للسلة'}</p></div></div>
       ${editing ? `<div class="field"><label>اسم الطلب *</label>
-        <div class="ord-box"><textarea id="ordName" rows="2" placeholder="اكتب اسم الطلب" maxlength="200" autocomplete="off">${escapeHTML(order.name)}</textarea>
+        <div class="voice-bar"><button type="button" class="voice-btn" id="voiceOrderBtn"><span class="mic">🎙️</span><span id="voiceBtnTxt">اكتب بالصوت 🎤</span></button></div>
+        <div class="voice-status hidden" id="voiceStatus"></div>
+        <div class="ord-box"><textarea id="ordName" rows="2" placeholder="اكتب اسم الطلب أو دوس 🎙️ واتكلم بالعربي" maxlength="200" autocomplete="off">${escapeHTML(order.name)}</textarea>
         <div class="suggest-drop hidden" id="ordSuggest"></div></div>
+        <div class="help-text">🎙️ الصوت بيكتب بس الأصناف الموجودة في التطبيق — لو صنف جديد هيظهرلك زرار تضيفه يدوي ويتحفظ.</div>
       </div>` : `<div class="field pick-field"><label>🧺 اختار الصنف *</label>
-        <div class="pick-hint">اختار من القايمة أو ابحث — كل اختيار هيتضاف فوق</div>
+        <div class="pick-hint">اختار من القايمة أو ابحث أو اتكلم بالصوت 🎙️ — كل اختيار هيتضاف فوق</div>
+        <div class="voice-bar"><button type="button" class="voice-btn" id="voiceOrderBtn"><span class="mic">🎙️</span><span id="voiceBtnTxt">اكتب طلبك بالصوت 🎤</span></button></div>
+        <div class="voice-status hidden" id="voiceStatus"></div>
         <div id="pickBox"></div>
         <div class="pick-card">
-          <div class="pick-search-box" id="pickSearchBox"><span class="pick-search-ico">🔍</span><input type="text" id="pickSearch" class="pick-search" placeholder="دوّر على الصنف..." autocomplete="off" maxlength="40" /><button type="button" id="pickAddBtn" class="pick-add-btn hidden">➕ اضافة</button></div>
+          <div class="pick-search-box" id="pickSearchBox"><span class="pick-search-ico">🔍</span><input type="text" id="pickSearch" class="pick-search" placeholder="دوّر على الصنف أو اتكلم..." autocomplete="off" maxlength="40" /><button type="button" id="pickAddBtn" class="pick-add-btn hidden">➕ اضافة</button></div>
           <div id="pickDepts" class="filters-wrap pick-depts"></div>
           <div id="pickList" class="pick-list-card"></div>
         </div>
@@ -4572,6 +4594,167 @@
       const _ab = m.querySelector('#pickAddBtn');
       if (_ab) _ab.onclick = () => { const _q = ((m.querySelector('#pickSearch') || {}).value || '').trim(); if (_q) openAddNewItemPopup(_q); };
     }
+    /* ===== الإدخال الصوتي بالعربية: مطابقة الكتالوج فقط + إضافة يدوية للمجهول ===== */
+    (function initVoiceOrder() {
+      const vBtn = m.querySelector('#voiceOrderBtn');
+      const vTxt = m.querySelector('#voiceBtnTxt');
+      const vBox = m.querySelector('#voiceStatus');
+      if (!vBtn || !vBox) return;
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        vBtn.disabled = true;
+        if (vTxt) vTxt.textContent = 'الصوت مش مدعوم على المتصفح ده 😕';
+        vBtn.onclick = () => toast('المتصفح ده مش بيدعم الإدخال الصوتي — جرّب كروم على الموبايل', 'warning');
+        return;
+      }
+      let rec = null, listening = false, finalTxt = '';
+      const QTY_WORDS = ['كيلو', 'كيلوجرام', 'جرام', 'لتر', 'مللي', 'عدد', 'علبة', 'علب', 'كيس', 'اكياس', 'قطعة', 'قطع', 'زجاجة', 'ازازة', 'كرتونة', 'دستة', 'عبوة', 'واحد', 'واحدة', 'اتنين', 'اثنين', 'تلاتة', 'ثلاثة', 'اربعة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'تمانية', 'تسعة', 'عشرة', 'نص', 'ربع'];
+      function cleanChunk(s) {
+        let t = String(s || '').trim();
+        QTY_WORDS.forEach(w => { t = t.replace(new RegExp(w, 'g'), ' '); });
+        return t.replace(/[0-9٠-٩]+/g, ' ').replace(/\s+/g, ' ').trim();
+      }
+      function allProductNames() {
+        const map = new Map();
+        try {
+          getCatalog().forEach(d => (d.subs || []).forEach(s => (s.items || []).forEach(it => {
+            const n = String(it.ar || '').trim(); if (!n) return;
+            const k = normalizeTerm(n); if (!map.has(k)) map.set(k, n);
+          })));
+        } catch {}
+        try { Object.keys(state.usageFreq || {}).forEach(k => { const on = findOriginalName(k) || k; if (on && !map.has(normalizeTerm(on))) map.set(normalizeTerm(on), on); }); } catch {}
+        try { (state.orders || []).forEach(o => { if (o && o.name && !map.has(normalizeTerm(o.name))) map.set(normalizeTerm(o.name), o.name); }); } catch {}
+        try { Object.keys(state.learnedMap || {}).forEach(k => { const on = findOriginalName(k) || k; if (on && !map.has(normalizeTerm(on))) map.set(normalizeTerm(on), on); }); } catch {}
+        return [...map.values()];
+      }
+      function bestMatchFor(chunk) {
+        const raw = String(chunk || '').trim(); if (!raw) return null;
+        const cleaned = cleanChunk(raw);
+        const cands = [raw, cleaned].filter(Boolean);
+        for (const c of cands) { if (foundInCatalog(c)) return c; }
+        try {
+          const hits = searchCatalog(cleaned || raw, 5);
+          if (hits && hits.length) {
+            const cn = normalizeTerm(cleaned || raw);
+            const exact = hits.find(h => { const k = normalizeTerm(h.item.ar); return cn === k || cn.includes(k) || k.includes(cn); });
+            if (exact) return exact.item.ar;
+            return hits[0].item.ar;
+          }
+        } catch {}
+        const pool = allProductNames();
+        let best = null, bestLen = 0;
+        const cn = normalizeTerm(cleaned || raw);
+        if (!cn) return null;
+        const toks = cn.split(' ').filter(t => t.length >= 2);
+        for (const pn of pool) {
+          const pk = normalizeTerm(pn);
+          if (!pk) continue;
+          if (cn === pk) return pn;
+          if (cn.includes(pk) || pk.includes(cn)) { if (pk.length > bestLen) { best = pn; bestLen = pk.length; } continue; }
+          for (const t of toks) { if (t.length >= 3 && (pk === t || pk.includes(t) || t.includes(pk))) { if (Math.min(pk.length, t.length) > bestLen) { best = pn; bestLen = Math.min(pk.length, t.length); } } }
+        }
+        return best;
+      }
+      function splitVoice(text) {
+        return String(text || '').split(/[\n،,؛;|]+/).flatMap(l => l.split(/\s+و\s+/)).map(s => s.replace(/^(و|ثم|كمان|وايضا|وأيضا)\s+/, '').trim()).filter(s => s.length >= 2);
+      }
+      function paintStatus(html, isListening) {
+        vBox.classList.remove('hidden');
+        vBox.classList.toggle('listening', !!isListening);
+        vBox.innerHTML = html;
+      }
+      function handleTranscript(text) {
+        const parts = splitVoice(text);
+        if (!parts.length) { paintStatus('😕 مسمعتش حاجة واضحة — جرّب تتكلم تاني بوضوح', false); return; }
+        const matched = [], unknown = [], seen = new Set();
+        parts.forEach(p => {
+          const bm = bestMatchFor(p);
+          if (bm) { const k = normalizeTerm(bm); if (!seen.has(k)) { seen.add(k); matched.push(bm); } }
+          else { const c = cleanChunk(p) || p.trim(); if (c && !unknown.some(u => normalizeTerm(u) === normalizeTerm(c))) unknown.push(c); }
+        });
+        let added = 0, skipped = 0;
+        if (editing) {
+          if (matched.length) {
+            nameInput.value = matched[0];
+            try { nameInput.dispatchEvent(new Event('input')); } catch {}
+            showQtyFor(matched[0]);
+            updateSuggest(); evalCategoryFromName();
+            added = 1;
+            for (let i = 1; i < matched.length; i++) {
+              const nm = matched[i];
+              if (!pendingOrderExists(nm, activeListId()) && !basketExists(nm)) { addToBasket({ name: nm, notes: '', urgent: false, priority: 'medium', qty: null, categoryId: null }); added++; }
+              else skipped++;
+            }
+          }
+        } else {
+          matched.forEach(nm => {
+            const k = normalizeTerm(nm);
+            if (pickedList.some(x => normalizeTerm(x) === k)) { skipped++; return; }
+            pickedList.push(nm); added++;
+          });
+          if (added) { syncPickedCompat(); qtyFor = null; renderQty(); renderPick(); renderPickDepts(); renderPickList(); updateSuggest(); evalCategoryFromName(); }
+        }
+        let html = '';
+        if (matched.length) html += `✅ اتعرف على: <b>${matched.map(escapeHTML).join('، ')}</b>${added ? ` — اتضافوا فوق (${added})` : ''}${skipped ? ` (تجاهلت ${skipped} مكرر)` : ''}<br>`;
+        else html += '😕 مفيش ولا كلمة مطابقة للأصناف الموجودة في التطبيق.<br>';
+        if (unknown.length) {
+          html += `🆕 كلمات جديدة مش موجودة: <div class="voice-unknown">` + unknown.map(u => `<span class="vu-tag">«${escapeHTML(u)}» <button type="button" data-vadd="${escapeHTML(u)}">➕ ضيفه يدوي</button></span>`).join('') + `</div><div class="help-text" style="margin-top:6px;">دوس "➕ ضيفه يدوي" عشان تختار تصنيفه ويتحفظ في التطبيق على طول ✓</div>`;
+        } else if (matched.length) {
+          html += `<div class="help-text" style="margin-top:4px;">🎙️ سمع: "${escapeHTML(text)}"</div>`;
+        }
+        paintStatus(html, false);
+        vBox.querySelectorAll('[data-vadd]').forEach(b => b.onclick = () => openAddNewItemPopup(b.dataset.vadd));
+        if (!matched.length && !unknown.length) toast('جرّب تتكلم أوضح', 'warning');
+        else if (matched.length) toast(`🎙️ اتضاف ${matched.length} صنف من الصوت ✓`, 'success');
+      }
+      function stopRec() {
+        listening = false;
+        vBtn.classList.remove('listening');
+        if (vTxt) vTxt.textContent = editing ? 'اكتب بالصوت 🎤' : 'اكتب طلبك بالصوت 🎤';
+        try { if (rec) rec.stop(); } catch {}
+      }
+      vBtn.onclick = () => {
+        if (listening) { stopRec(); return; }
+        try {
+          rec = new SR();
+          rec.lang = 'ar-EG';
+          rec.interimResults = true;
+          rec.continuous = false;
+          rec.maxAlternatives = 1;
+          listening = true; finalTxt = '';
+          vBtn.classList.add('listening');
+          if (vTxt) vTxt.textContent = 'بسمعك... اتكلم 🎙️ (دوس تاني للإيقاف)';
+          paintStatus('🎙️ بسمعك دلوقتي... قول أصنافك بالعربي: <b>مثال: طماطم وبطاطس ولبن</b><br><span class="help-text">بيكتب بس الكلمات الموجودة في التطبيق — والجديد تقدر تضيفه يدوي ويتحفظ.</span>', true);
+          rec.onresult = (e) => {
+            let interim = '';
+            for (let i = e.resultIndex; i < e.results.length; i++) {
+              const tr = e.results[i][0].transcript;
+              if (e.results[i].isFinal) finalTxt += ' ' + tr;
+              else interim += tr;
+            }
+            const show = (finalTxt + ' ' + interim).trim();
+            if (show) paintStatus(`🎙️ بسمعك...<br>«<b>${escapeHTML(show)}</b>»`, true);
+          };
+          rec.onerror = (e) => {
+            const err = (e && e.error) || '';
+            if (err === 'not-allowed' || err === 'service-not-allowed') { paintStatus('🔇 المايك مقفول — اسمح للمتصفح بالمايك من إعدادات الموقع وجرب تاني', false); toast('المايك مقفول — اسمح بالوصول للمايك', 'error'); }
+            else if (err === 'no-speech') { paintStatus('😕 مسمعتش صوت — قرب من المايك واتكلم أوضح وجرب تاني', false); }
+            else if (err !== 'aborted') { paintStatus('⚠️ حصلت مشكلة في الصوت — جرب تاني', false); }
+            stopRec();
+          };
+          rec.onend = () => {
+            const t = finalTxt.trim();
+            listening = false;
+            vBtn.classList.remove('listening');
+            if (vTxt) vTxt.textContent = editing ? 'اكتب بالصوت 🎤' : 'اكتب طلبك بالصوت 🎤';
+            if (t) handleTranscript(t);
+            else if (vBox.classList.contains('listening')) paintStatus('😕 مسمعتش حاجة — دوس 🎙️ وجرب تاني', false);
+          };
+          try { rec.start(); } catch (err) { stopRec(); paintStatus('⚠️ مش قادر أشغّل المايك — جرب تاني', false); }
+          setTimeout(() => { if (listening) stopRec(); }, 15000);
+        } catch (err) { stopRec(); toast('تعذر تشغيل الإدخال الصوتي', 'error'); }
+      };
+    })();
     setTimeout(evalCategoryFromName, 50);
     if (editing && order.qty) { qtyFor = order.name; qtyType = order.qty.t === 'w' ? 'weight' : 'count'; qtyVal = order.qty.v || 1; qtyUnit = order.qty.u || 'قطعة'; renderQty(); }
     const urgBtn = m.querySelector('#urgToggle'); if (urgBtn) urgBtn.onclick = () => { newPrio = (newPrio === 'high') ? 'medium' : 'high'; paintUrg(); };
