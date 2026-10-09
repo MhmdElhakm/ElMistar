@@ -329,11 +329,13 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
 .wa-remind{background:#fef3c7;color:#d97706}
 .wa-absent{background:#f3e8ff;color:#a855f7}
 .wa-quick{background:#dcfce7;color:#16a34a}
+.wa-receipt{background:#cffafe;color:#0e7490}
 .wa-btn.sel{outline:3px solid currentColor}
 [data-theme="dark"] .wa-late{background:rgba(239,68,68,.15);color:#f87171}
 [data-theme="dark"] .wa-remind{background:rgba(245,158,11,.15);color:#fbbf24}
 [data-theme="dark"] .wa-absent{background:rgba(168,85,247,.15);color:#c084fc}
 [data-theme="dark"] .wa-quick{background:rgba(34,197,94,.15);color:#4ade80}
+[data-theme="dark"] .wa-receipt{background:rgba(6,182,212,.15);color:#22d3ee}
 .gm-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px}
 .gm-row:hover{background:var(--bg-elevated)}
 /* settings */
@@ -593,6 +595,21 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
   </div>
 </div>
 
+<!-- ===== FEE PAYMENT MODAL ===== -->
+<div class="overlay hidden" id="payModal">
+  <div class="sheet" style="max-width:460px">
+    <div class="sheet-head"><h3><i class='bx bx-wallet' style="color:#22c55e"></i> تحصيل رسوم الدرس</h3><button class="x" data-close="payModal">&times;</button></div>
+    <div class="sheet-body">
+      <div style="margin-bottom:4px;font-weight:900;font-size:15px" id="payName"></div>
+      <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px" id="payInfo"></div>
+      <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-money"></i> المبلغ المحصّل (ج.م) *</label><input type="number" id="payAmount" min="1" step="1" inputmode="numeric" placeholder="مثال: 100"></div>
+      <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-calendar"></i> عن شهر / بيان</label><input type="text" id="payMonth" maxlength="40" placeholder="مثال: شهر أكتوبر"></div>
+      <div class="inp" style="margin-bottom:8px"><label><i class="bx bxl-whatsapp" style="color:#25D366"></i> معاينة رسالة الإيصال لولي الأمر</label><textarea id="payMsg" rows="6"></textarea></div>
+      <div class="frm-btns" style="display:flex;margin-top:14px;gap:8px"><button class="btn btn-primary" id="paySaveWa" style="flex:1;justify-content:center"><i class="bx bxl-whatsapp"></i> حفظ + إرسال واتساب</button><button class="btn btn-outline" id="paySaveOnly" style="flex:1;justify-content:center"><i class="bx bx-save"></i> حفظ فقط</button></div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== ATTENDANCE SESSION MODAL ===== -->
 <div class="overlay hidden" id="attendModal">
   <div class="sheet" style="max-width:640px">
@@ -645,11 +662,12 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
       <div class="set-sec">
         <h4 id="waSecToggle" style="cursor:pointer;user-select:none"><i class="bx bxl-whatsapp" style="color:#25D366"></i> رسائل واتساب جاهزة ✏️ <span id="waSecChev" style="margin-right:auto;transition:transform .25s;display:inline-flex">‹</span></h4>
         <div id="waSecBody" class="hidden">
-        <p>خصّص نص كل رسالة — يُحفظ تلقائياً على هذا الجهاز. يمكنك استخدام: <b>{اسم_الطالب} {الصف} {اليوم} {الوقت} {المجموعة} {المبلغ_المتبقي} {عدد_الحصص}</b></p>
+        <p>خصّص نص كل رسالة — يُحفظ تلقائياً على هذا الجهاز. يمكنك استخدام: <b>{اسم_الطالب} {الصف} {اليوم} {الوقت} {المجموعة} {المبلغ_المتبقي} {عدد_الحصص} {المبلغ_المدفوع} {الشهر} {التاريخ}</b></p>
         <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-time"></i> 🕒 تأخر المدفوعات</label><textarea id="waLateInp" rows="3" placeholder="نص رسالة تأخر المدفوعات..."></textarea></div>
         <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-bell"></i> 🔔 تذكير بالحصة</label><textarea id="waRemindInp" rows="3" placeholder="نص رسالة تذكير بالحصة..."></textarea></div>
         <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-group"></i> 👥 تذكير بالغياب</label><textarea id="waAbsentInp" rows="3" placeholder="نص رسالة تذكير بالغياب..."></textarea></div>
         <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-message"></i> 💬 رسالة سريعة</label><textarea id="waQuickInp" rows="3" placeholder="نص الرسالة السريعة..."></textarea></div>
+        <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-receipt"></i> 🧾 إيصال تحصيل الرسوم</label><textarea id="waReceiptInp" rows="3" placeholder="نص رسالة إيصال تحصيل الرسوم..."></textarea></div>
         <div class="set-row">
           <button class="btn btn-ghost btn-sm" id="waResetBtn"><i class="bx bx-reset"></i> استعادة الافتراضي</button>
         </div>
@@ -868,7 +886,7 @@ function applyFilters(){
     card.innerHTML='<div class="s-top">'+avatarHtml(s)+'<div style="flex:1;min-width:0"><div class="s-name">'+esc(s.name||'—')+'</div><div class="s-phone">'+phoneHtml(s.phone||'',false)+'</div></div><input type="checkbox" data-sel="'+s.id+'" '+(selected.has(s.id)?'checked':'')+' style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer"></div>'
     +'<div class="badges"><span class="bdg grade">'+esc(gradeSafe(s.grade))+'</span>'+(grp?'<span class="bdg group">'+esc(grp.name)+'</span>':'<span class="bdg grade" style="opacity:.5">بدون مجموعة</span>')+'</div>'
     +'<div class="s-meta"><span><i class="bx bx-calendar"></i> '+esc(s.day||'—')+'</span><span><i class="bx bx-time"></i> '+esc(s.hour||'—')+'</span><span><i class="bx bx-wallet"></i> مدفوع: '+(s.paid||0)+'</span></div>'
-    +'<div class="s-actions"><button class="icon-btn" data-act="view" data-id="'+s.id+'" title="عرض"><i class="bx bx-show"></i></button><button class="icon-btn" data-act="edit" data-id="'+s.id+'" title="تعديل"><i class="bx bx-edit"></i></button><a class="icon-btn" style="color:#25D366;text-decoration:none" href="'+waLink(s.phone)+'" target="_blank" title="واتساب"><i class="bx bxl-whatsapp"></i></a><button class="icon-btn ok" data-act="attend" data-id="'+s.id+'" title="تسجيل حضور"><i class="bx bx-check"></i></button><button class="icon-btn danger" data-act="del" data-id="'+s.id+'" title="حذف"><i class="bx bx-trash"></i></button></div>';
+    +'<div class="s-actions"><button class="icon-btn" data-act="view" data-id="'+s.id+'" title="عرض"><i class="bx bx-show"></i></button><button class="icon-btn" data-act="edit" data-id="'+s.id+'" title="تعديل"><i class="bx bx-edit"></i></button><a class="icon-btn" style="color:#25D366;text-decoration:none" href="'+waLink(s.phone)+'" target="_blank" title="واتساب"><i class="bx bxl-whatsapp"></i></a><button class="icon-btn danger" data-act="del" data-id="'+s.id+'" title="حذف"><i class="bx bx-trash"></i></button></div>';
     g.appendChild(card);
   });
   /* table */
@@ -883,7 +901,7 @@ function applyFilters(){
 }
 function bindRowEvents(){
   document.querySelectorAll('[data-sel]').forEach(function(c){c.onchange=function(){if(c.checked)selected.add(c.dataset.sel);else selected.delete(c.dataset.sel);updateBulk();};});
-  document.querySelectorAll('[data-act]').forEach(function(b){b.onclick=function(){var id=b.dataset.id,a=b.dataset.act;var s=students.find(function(x){return x.id===id;});if(!s)return;if(a==='edit')openStudent(s);else if(a==='del')delStudent(s);else if(a==='view')showDetails(s);else if(a==='attend')addAttendance(s);};});
+  document.querySelectorAll('[data-act]').forEach(function(b){b.onclick=function(){var id=b.dataset.id,a=b.dataset.act;var s=students.find(function(x){return x.id===id;});if(!s)return;if(a==='edit')openStudent(s);else if(a==='del')delStudent(s);else if(a==='view')showDetails(s);};});
 }
 function updateBulk(){var n=selected.size;$('bulkCount').textContent=n;$('bulkBar').classList.toggle('show',n>0);}
 $('selAll').onchange=function(){var list=filteredStudents();if($('selAll').checked){list.forEach(function(s){selected.add(s.id);});}else{selected.clear();}applyFilters();updateBulk();};
@@ -984,6 +1002,56 @@ $('studentForm').onsubmit=function(e){
 };
 function delStudent(s){if(!confirm('حذف الطالب "'+(s.name||'')+'" نهائياً؟'))return;students=students.filter(function(x){return x.id!==s.id;});selected.delete(s.id);persistAndRender();updateBulk();toast('✅ تم حذف الطالب');}
 function addAttendance(s){var att=Array.isArray(s.attendance)?s.attendance.slice():[];att.push(Date.now());s.attendance=att;persistAndRender();toast('✅ تم تسجيل حضور '+s.name);}
+/* ===== تحصيل رسوم الدرس + إيصال واتساب لولي الأمر ===== */
+var _payStudent=null,_payReturnDetails=false;
+function defaultPayMonth(){var d=new Date();var months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];return 'شهر '+months[d.getMonth()];}
+function openPay(s,fromDetails){
+  if(!s)return;
+  _payStudent=s;_payReturnDetails=!!fromDetails;
+  var f=fin(s);
+  $('payName').textContent=s.name||'';
+  $('payInfo').textContent='المدفوع: '+(s.paid||0)+' ج.م • المستحق: '+f.due+' ج.م • المتبقي: '+f.rest+' ج.م';
+  $('payAmount').value=f.rest>0?f.rest:'';
+  $('payMonth').value=defaultPayMonth();
+  refreshPayMsg();
+  $('payModal').classList.remove('hidden');
+  setTimeout(function(){var a=$('payAmount');if(a)a.focus();},200);
+}
+function payPreviewData(){
+  var amt=parseInt(($('payAmount')||{}).value)||0;
+  var month=(($('payMonth')||{}).value||'').trim()||'—';
+  var s=_payStudent||{};
+  var tmp={};for(var k in s)tmp[k]=s[k];
+  tmp.paid=(parseInt(s.paid)||0)+amt;
+  return{amt:amt,month:month,tmp:tmp};
+}
+function refreshPayMsg(){
+  if(!_payStudent||!$('payMsg'))return;
+  var p=payPreviewData();
+  $('payMsg').value=fillWa(WA_T.receipt||WA_T_DEFAULT.receipt,p.tmp,{amount:p.amt,month:p.month});
+}
+function savePayment(sendWa){
+  var s=_payStudent;
+  if(!s){toast('اختر الطالب أولاً','error');return;}
+  var amt=parseInt(($('payAmount')||{}).value)||0;
+  if(amt<=0){toast('اكتب مبلغ صحيح أكبر من صفر','error');return;}
+  var month=(($('payMonth')||{}).value||'').trim()||defaultPayMonth();
+  var dateStr=new Date().toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric'});
+  s.paid=(parseInt(s.paid)||0)+amt;
+  if(!Array.isArray(s.payments))s.payments=[];
+  s.payments.push({amount:amt,month:month,date:Date.now()});
+  persistAndRender();
+  $('payModal').classList.add('hidden');
+  toast('✅ تم تسجيل '+amt+' ج.م لـ '+(s.name||''));
+  if(_payReturnDetails){_payReturnDetails=false;showDetails(s);}
+  if(sendWa){
+    var link=waLink(s.phone);
+    if(!link){toast('رقم الهاتف غير صالح — تم الحفظ بدون إرسال','error');return;}
+    var tmp={};for(var k in s)tmp[k]=s[k];
+    var msg=fillWa($('payMsg')&&$('payMsg').value?$('payMsg').value:(WA_T.receipt||WA_T_DEFAULT.receipt),tmp,{amount:amt,month:month,date:dateStr});
+    window.open(link+'?text='+encodeURIComponent(msg),'_blank');
+  }
+}
 function showDetails(s){
   var g=groupOf(s.groupId);var f=fin(s);
   var att=Array.isArray(s.attendance)?s.attendance:[];
@@ -1032,20 +1100,24 @@ var WA_T_DEFAULT={
   remind:'تذكير بموعد الحصة ⏰\nنذكركم بأن موعد حصة الطالب 👨‍🎓 {اسم_الطالب} ،بالـ{الصف} 🏫.\nسيكون يوم 🗓️ {اليوم} في تمام الساعة ⏳ {الوقت}\nنتطلع إلى حضوره في الموعد 🌟، ونتمنى له حصة دراسية موفقة 📚✨.\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓',
   absent:'إشعار غياب ⚠️\nنفيدكم بأن الطالب 👨‍🎓 {اسم_الطالب} بـ {الصف} 🏫.\nلم يحضر حصة ❌ {اليوم} في تمام الساعة ⏳ {الوقت}،\nنرجو متابعة سبب الغياب 🔍، ونتطلع إلى انتظام حضوره في الحصص القادمة 📚✨.\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓',
   late:'إشعار تلقائي 🔔: نود إبلاغكم بأن هناك مبلغ متأخر على الطالب ⚠️\nالطالب: 👨‍🎓 {اسم_الطالب}\nالصف: 🏫 {الصف}\nالمبلغ المستحق: 💵 {المبلغ_المتبقي}\nعدد الحصص: 📚 {عدد_الحصص}\nيرجى مراجعة المستحقات واستكمال السداد في أقرب وقت ⏳💳.\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓',
-  quick:'السلام عليكم 🌹\nرسالة بخصوص الطالب 👨‍🎓 {اسم_الطالب} ({الصف}) — برجاء التواصل للمتابعة 🙏\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓'
+  quick:'السلام عليكم 🌹\nرسالة بخصوص الطالب 👨‍🎓 {اسم_الطالب} ({الصف}) — برجاء التواصل للمتابعة 🙏\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓',
+  receipt:'إيصال تحصيل رسوم ✅\nتم بحمد الله تحصيل رسوم الدرس من الطالب 👨‍🎓 {اسم_الطالب} ({الصف}) 🏫\n💵 المبلغ المحصّل: {المبلغ_المدفوع} ج.م\n📅 عن شهر: {الشهر}\n🧾 إجمالي المدفوع: {المدفوع} ج.م\n📌 المتبقي: {المبلغ_المتبقي} ج.م\nشكراً لتعاونكم 🙏\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓'
 };
 var LS_WA='elmistar_wa_templates_v2';
-var WA_T={late:WA_T_DEFAULT.late,remind:WA_T_DEFAULT.remind,absent:WA_T_DEFAULT.absent,quick:WA_T_DEFAULT.quick};
-function loadWaTemplates(){try{var a=JSON.parse(localStorage.getItem(LS_WA)||'null');if(a&&typeof a==='object'){['late','remind','absent','quick'].forEach(function(k){if(a[k]&&typeof a[k]==='string'&&a[k].trim())WA_T[k]=a[k];});}}catch(e){}}
+var WA_T={late:WA_T_DEFAULT.late,remind:WA_T_DEFAULT.remind,absent:WA_T_DEFAULT.absent,quick:WA_T_DEFAULT.quick,receipt:WA_T_DEFAULT.receipt};
+function loadWaTemplates(){try{var a=JSON.parse(localStorage.getItem(LS_WA)||'null');if(a&&typeof a==='object'){['late','remind','absent','quick','receipt'].forEach(function(k){if(a[k]&&typeof a[k]==='string'&&a[k].trim())WA_T[k]=a[k];});}}catch(e){}}
 function saveWaTemplates(){try{localStorage.setItem(LS_WA,JSON.stringify(WA_T));}catch(e){}}
-function fillWaSettingsInputs(){try{if($('waLateInp'))$('waLateInp').value=WA_T.late||'';if($('waRemindInp'))$('waRemindInp').value=WA_T.remind||'';if($('waAbsentInp'))$('waAbsentInp').value=WA_T.absent||'';if($('waQuickInp'))$('waQuickInp').value=WA_T.quick||'';}catch(e){}}
+function fillWaSettingsInputs(){try{if($('waLateInp'))$('waLateInp').value=WA_T.late||'';if($('waRemindInp'))$('waRemindInp').value=WA_T.remind||'';if($('waAbsentInp'))$('waAbsentInp').value=WA_T.absent||'';if($('waQuickInp'))$('waQuickInp').value=WA_T.quick||'';if($('waReceiptInp'))$('waReceiptInp').value=WA_T.receipt||'';}catch(e){}}
 loadWaTemplates();
-function fillWa(t,s){
+function fillWa(t,s,extra){
   var g=groupOf(s.groupId);var f=fin(s);
   var debt=f.clear?'لا توجد مستحقات — الحساب خالص 🟢':(f.unpaid+' حصص متأخرة ('+f.rest+' ج.م)');
   var r=String(t||'');
   var grade=gradeSafe(s.grade), gname=g?g.name:'—', day=s.day||'—', time=s.hour||'—', name=s.name||'';
   var rest=(f.rest||0)+' ج.م', cnt=String(f.unpaid||0), paid=String(s.paid||0);
+  var ex=extra||{};
+  var payAmt=String(ex.amount!=null?ex.amount:0), month=ex.month||'—';
+  var dateStr=ex.date||new Date().toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric'});
   r=r.replace(/{اسم_الطالب}/g,name).replace(/{name}/g,name);
   r=r.replace(/{الصف}/g,grade).replace(/{grade}/g,grade);
   r=r.replace(/{اليوم}/g,day).replace(/{day}/g,day);
@@ -1054,6 +1126,9 @@ function fillWa(t,s){
   r=r.replace(/{المبلغ_المتبقي}/g,rest).replace(/{المبلغ}/g,rest).replace(/{debt}/g,debt);
   r=r.replace(/{عدد_الحصص}/g,cnt);
   r=r.replace(/{المدفوع}/g,paid);
+  r=r.replace(/{المبلغ_المدفوع}/g,payAmt);
+  r=r.replace(/{الشهر}/g,month);
+  r=r.replace(/{التاريخ}/g,dateStr);
   return r;
 }
 function sendWaMsg(s,type){
@@ -1375,7 +1450,8 @@ function fallbackCopyApps(t){try{var ta=document.createElement('textarea');ta.va
   var wr=$('waRemindInp');if(wr)wr.oninput=function(){WA_T.remind=wr.value;saveWaTemplates();};
   var wab=$('waAbsentInp');if(wab)wab.oninput=function(){WA_T.absent=wab.value;saveWaTemplates();};
   var wq=$('waQuickInp');if(wq)wq.oninput=function(){WA_T.quick=wq.value;saveWaTemplates();};
-  var wrst=$('waResetBtn');if(wrst)wrst.onclick=function(){WA_T={late:WA_T_DEFAULT.late,remind:WA_T_DEFAULT.remind,absent:WA_T_DEFAULT.absent,quick:WA_T_DEFAULT.quick};saveWaTemplates();fillWaSettingsInputs();toast('✅ تمت استعادة الرسائل الافتراضية');};
+  var wrp=$('waReceiptInp');if(wrp)wrp.oninput=function(){WA_T.receipt=wrp.value;saveWaTemplates();};
+  var wrst=$('waResetBtn');if(wrst)wrst.onclick=function(){WA_T={late:WA_T_DEFAULT.late,remind:WA_T_DEFAULT.remind,absent:WA_T_DEFAULT.absent,quick:WA_T_DEFAULT.quick,receipt:WA_T_DEFAULT.receipt};saveWaTemplates();fillWaSettingsInputs();toast('✅ تمت استعادة الرسائل الافتراضية');};
   var wt=$('waSecToggle');if(wt)wt.onclick=function(){var b=$('waSecBody');if(!b)return;b.classList.toggle('hidden');var c=$('waSecChev');if(c)c.style.transform=b.classList.contains('hidden')?'':'rotate(-90deg)';};
   var sht=$('sheetSecToggle');if(sht)sht.onclick=function(){var b=$('sheetSecBody');if(!b)return;b.classList.toggle('hidden');var c=$('sheetSecChev');if(c)c.style.transform=b.classList.contains('hidden')?'':'rotate(-90deg)';};
   var sv=$('sheetSaveBtn');if(sv)sv.onclick=function(){var v=(($('sheetUrlInp')||{}).value||'').trim();if(!v){toast('الصق الرابط أولاً','error');return;}if(!sheetMode(v)){toast('رابط غير معروف — الصق رابط شيت أو Web App','error');return;}sheetSetUrl(v);refreshSheetUI();toast('🔗 تم حفظ رابط الشيت');};
