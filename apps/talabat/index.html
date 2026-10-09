@@ -962,6 +962,10 @@
   .habit-addbtn { width: 50px; height: 50px; border-radius: 16px; background: linear-gradient(135deg,#FFB020,#FF7A00); color: #fff; font-size: 26px; font-weight: 900; line-height: 1; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 10px 22px rgba(255,122,0,.4), inset 0 1px 0 rgba(255,255,255,.4); transition: transform .12s; }
   .habit-addbtn:active { transform: scale(.9) rotate(90deg); }
   .habit-addbtn-sm { width: 40px; height: 40px; border-radius: 13px; font-size: 24px; box-shadow: 0 6px 14px rgba(255,122,0,.35), inset 0 1px 0 rgba(255,255,255,.4); }
+  .habit-icon-pick { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 14px 8px; }
+  .habit-icon-pick button { width: 38px; height: 38px; border-radius: 12px; background: var(--bg); border: 1.5px solid var(--border); font-size: 19px; display: flex; align-items: center; justify-content: center; transition: transform .12s, border-color .15s, background .15s; }
+  .habit-icon-pick button:active { transform: scale(.9); }
+  .habit-icon-pick button.sel { border-color: #FF9600; background: #FFF3E2; box-shadow: 0 0 0 3px rgba(255,150,0,.15); transform: scale(1.08); }
   .habit-foot { padding: 0 14px 13px; font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-align: center; }
   /* ===== أقسام قابلة للطي (المهام + العادات) — مخفية افتراضياً ===== */
   .stat-card.expandable { cursor: pointer; transition: transform .15s ease, box-shadow .25s ease, border-color .25s ease; user-select: none; -webkit-user-select: none; }
@@ -3610,6 +3614,7 @@
     { id: 'h_sleep', name: 'نوم بدري', icon: '🌙' }
   ];
   const REMOVED_HABIT_IDS = ['h_save', 'h_help'];
+  const HABIT_ICONS = ['⭐','🕌','📿','💧','🏃','📖','🌙','🏋️','🧘','🥗','📚','💻','🎨','🎵','🛌','☀️','🙏','💪','🚶','🧠','❤️','🏠','📝','🎯','🔥','🚭'];
   function habitStore() {
     if (!state._habits || typeof state._habits !== 'object') state._habits = { defs: null, log: {} };
     if (!state._habits.log || typeof state._habits.log !== 'object') state._habits.log = {};
@@ -3653,12 +3658,13 @@
     persist();
     return arr.includes(id);
   }
-  function addHabit(name) {
+  function addHabit(name, icon) {
     const t = String(name || '').trim().slice(0, 60);
     if (!t) return null;
+    const ic = HABIT_ICONS.includes(icon) ? icon : (HABIT_ICONS.includes(state._habitNewIcon) ? state._habitNewIcon : '⭐');
     const st = habitStore();
     const defs = habitDefs();
-    const it = { id: 'h_' + uid(), name: t, icon: '⭐', custom: true };
+    const it = { id: 'h_' + uid(), name: t, icon: ic, custom: true };
     defs.push(it);
     persist();
     return it;
@@ -3702,7 +3708,7 @@
       </div>
       ${mot ? `<div class="habit-mot${full ? ' done-all' : ''}">${escapeHTML(mot)}</div>` : ''}
       <div class="habit-bar${full ? ' done' : ''}"><div class="habit-bar-fill" style="width:${pct}%;"></div></div>
-      ${addOpen ? `<div class="habit-add" style="padding:10px 14px 4px;"><input id="habitAddInput" placeholder="اكتب عادة ودوس + ... مثال: أصحى بدري" maxlength="60" autocomplete="off" /><button class="habit-addbtn" id="habitAddBtn" title="ضيف عادة">+</button></div>` : ''}
+      ${addOpen ? `<div class="habit-add" style="padding:10px 14px 4px;"><input id="habitAddInput" placeholder="اكتب عادة ودوس + ... مثال: أصحى بدري" maxlength="60" autocomplete="off" /><button class="habit-addbtn" id="habitAddBtn" title="ضيف عادة">+</button></div><div class="habit-icon-pick">${HABIT_ICONS.map(ic => `<button type="button" data-habiticon="${ic}" class="${(state._habitNewIcon || '⭐') === ic ? 'sel' : ''}" title="${ic}">${ic}</button>`).join('')}</div>` : ''}
       <div class="habit-list">
         ${defs.map(h => {
           const isDone = habitDoneIds(key).includes(h.id);
@@ -3907,7 +3913,7 @@
           <div class="duo-tx">
             <div class="duo-hello" dir="auto">${greeting}، <span class="nm">${escapeHTML(userName)}!</span> 👋</div>
             <div class="duo-sub" dir="rtl" style="text-align:left;">${progress >= 100 ? 'خلصت كل مهام اليوم يا بطل 🎉' : (done > 0 ? `فاضل ${pending} ${pending === 1 ? 'مهمة' : pending === 2 ? 'مهمتين' : 'مهام'} وتقفل اليوم 💪` : 'طلب واحد يقربك من هدف بيتك ✨')}</div>
-            <button class="duo-btn" id="duoContinue"><span dir="rtl">تابع مستوي طلابك</span> <span style="font-size:16px;line-height:1;">→</span></button>
+            <button class="duo-btn" id="duoContinue"><span dir="rtl">تابع طلابك</span> <span style="font-size:16px;line-height:1;">→</span></button>
           </div>
           <div class="duo-art">
             <div class="duo-logo-wrap"><img src="logo.png" alt="ناقصنا إيه" /></div>
@@ -4828,8 +4834,9 @@
         });
       }
     } catch {}
-    const habitTgl = document.getElementById('habitAddToggle'); if (habitTgl) habitTgl.onclick = () => { state._habitAddOpen = !(state._habitAddOpen === true); persist(); render(); requestAnimationFrame(() => { const n = document.getElementById('habitAddInput'); if (n) n.focus(); }); };
-    const habitDoAdd = () => { const inp = document.getElementById('habitAddInput'); if (!inp) return; const v = inp.value.trim(); if (!v) { inp.focus(); return; } addHabit(v); state._habitAddOpen = false; render(); toast('اتضافت عادة جديدة 🌱 يلا ابدأ بيها', 'success'); };
+    const habitTgl = document.getElementById('habitAddToggle'); if (habitTgl) habitTgl.onclick = () => { state._habitAddOpen = !(state._habitAddOpen === true); if (state._habitAddOpen && !state._habitNewIcon) state._habitNewIcon = '⭐'; persist(); render(); requestAnimationFrame(() => { const n = document.getElementById('habitAddInput'); if (n) n.focus(); }); };
+    document.querySelectorAll('[data-habiticon]').forEach(b => b.onclick = (e) => { e.stopPropagation(); state._habitNewIcon = b.dataset.habiticon; persist(); document.querySelectorAll('[data-habiticon]').forEach(x => x.classList.toggle('sel', x === b)); });
+    const habitDoAdd = () => { const inp = document.getElementById('habitAddInput'); if (!inp) return; const v = inp.value.trim(); if (!v) { inp.focus(); return; } addHabit(v, state._habitNewIcon); state._habitAddOpen = false; state._habitNewIcon = '⭐'; render(); toast('اتضافت عادة جديدة 🌱 يلا ابدأ بيها', 'success'); };
     const habitBtn = document.getElementById('habitAddBtn'); if (habitBtn) habitBtn.onclick = habitDoAdd;
     const habitInp = document.getElementById('habitAddInput'); if (habitInp) habitInp.onkeydown = (e) => { if (e.key === 'Enter') habitDoAdd(); };
     document.querySelectorAll('[data-tasks-tab]').forEach(b => b.onclick = () => { state._tasksTab = b.dataset.tasksTab; persist(); render(); });
@@ -6485,14 +6492,11 @@
           if (vTxt) vTxt.textContent = 'بسمعك... اتكلم 🎙️ (دوس تاني للإيقاف)';
           paintStatus('🎙️ بسمعك دلوقتي... قول أصنافك بالعربي', true);
           rec.onresult = (e) => {
-            let interim = '';
             for (let i = e.resultIndex; i < e.results.length; i++) {
               const tr = e.results[i][0].transcript;
               if (e.results[i].isFinal) finalTxt += ' ' + tr;
-              else interim += tr;
             }
-            const show = (finalTxt + ' ' + interim).trim();
-            if (show) paintStatus(`🎙️ بسمعك...<br>«<b>${escapeHTML(show)}</b>»`, true);
+            // تم إخفاء عرض النص المسجل أثناء الاستماع — يتم تجميع النص فقط بدون عرضه
           };
           rec.onerror = (e) => {
             const err = (e && e.error) || '';

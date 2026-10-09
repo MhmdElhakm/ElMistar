@@ -627,12 +627,6 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
     <div class="sheet-head"><h3><i class='bx bx-cog'></i> <span>الإعدادات<span class="sub">التحكم الكامل في التطبيق والبيانات</span></span></h3><button class="x" type="button" data-close="settingsModal">&times;</button></div>
     <div class="sheet-body">
       <div class="set-sec">
-        <h4><i class="bx bx-hdd"></i> التخزين المحلي</h4>
-        <p>يعمل التطبيق بدون قاعدة بيانات — تُحفظ كل البيانات على هذا الجهاز فقط (LocalStorage).</p>
-        <div class="set-status"><span class="sync-dot on" id="syncDot"></span><span id="syncStatus">وضع محلي 📱</span><span style="margin-right:auto;color:var(--text-muted);font-size:11.5px" id="lastSync">آخر حفظ: —</span></div>
-        <div class="set-row"><button class="btn btn-primary btn-sm" id="syncNowBtn"><i class="bx bx-refresh"></i> تحديث العرض</button></div>
-      </div>
-      <div class="set-sec">
         <h4><i class="bx bx-download"></i> تصدير البيانات</h4>
         <p>حمّل نسخة احتياطية من كل الطلاب والمجموعات على جهازك.</p>
         <div class="set-row">
@@ -649,7 +643,21 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
         </div>
       </div>
       <div class="set-sec">
-        <h4><i class="bx bxl-google"></i> ربط جوجل شيت 🔗</h4>
+        <h4 id="waSecToggle" style="cursor:pointer;user-select:none"><i class="bx bxl-whatsapp" style="color:#25D366"></i> رسائل واتساب جاهزة ✏️ <span id="waSecChev" style="margin-right:auto;transition:transform .25s;display:inline-flex">‹</span></h4>
+        <div id="waSecBody" class="hidden">
+        <p>خصّص نص كل رسالة — يُحفظ تلقائياً على هذا الجهاز. يمكنك استخدام: <b>{اسم_الطالب} {الصف} {اليوم} {الوقت} {المجموعة} {المبلغ_المتبقي} {عدد_الحصص}</b></p>
+        <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-time"></i> 🕒 تأخر المدفوعات</label><textarea id="waLateInp" rows="3" placeholder="نص رسالة تأخر المدفوعات..."></textarea></div>
+        <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-bell"></i> 🔔 تذكير بالحصة</label><textarea id="waRemindInp" rows="3" placeholder="نص رسالة تذكير بالحصة..."></textarea></div>
+        <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-group"></i> 👥 تذكير بالغياب</label><textarea id="waAbsentInp" rows="3" placeholder="نص رسالة تذكير بالغياب..."></textarea></div>
+        <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-message"></i> 💬 رسالة سريعة</label><textarea id="waQuickInp" rows="3" placeholder="نص الرسالة السريعة..."></textarea></div>
+        <div class="set-row">
+          <button class="btn btn-ghost btn-sm" id="waResetBtn"><i class="bx bx-reset"></i> استعادة الافتراضي</button>
+        </div>
+        </div>
+      </div>
+      <div class="set-sec">
+        <h4 id="sheetSecToggle" style="cursor:pointer;user-select:none"><i class="bx bxl-google"></i> ربط جوجل شيت 🔗 <span id="sheetSecChev" style="margin-right:auto;transition:transform .25s;display:inline-flex">‹</span></h4>
+        <div id="sheetSecBody" class="hidden">
         <p>الصق رابط شيت جوجل للسحب منه، أو رابط Web App (من Apps Script) للمزامنة الكاملة رفع وسحب.</p>
         <input type="url" id="sheetUrlInp" class="sheet-link-inp" placeholder="https://docs.google.com/spreadsheets/d/…  أو  https://script.google.com/macros/…/exec" dir="ltr">
         <div class="set-row" style="margin-top:8px">
@@ -665,6 +673,7 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
           <button class="btn btn-ghost btn-sm" id="sheetTestBtn"><i class="bx bx-pulse"></i> اختبار الاتصال</button>
           <button class="btn btn-ghost btn-sm" id="sheetHelpBtn"><i class="bx bx-code-alt"></i> كود وخطوات الربط</button>
           <button class="btn btn-ghost btn-sm" id="sheetUnlinkBtn"><i class="bx bx-unlink"></i> إلغاء الربط</button>
+        </div>
         </div>
       </div>
       <div class="set-sec">
@@ -724,6 +733,17 @@ function writeAll(ss,name,arr){
   if(!arr.length){sh.appendRow(['empty']);return;}
   var keys=Object.keys(arr[0]);sh.appendRow(keys);
   arr.forEach(function(o){sh.appendRow(keys.map(function(k){var x=o[k];return (x&amp;&amp;typeof x==='object')?JSON.stringify(x):x;}));});
+  try{
+    var lastRow=sh.getLastRow(),lastCol=sh.getLastColumn();
+    sh.getRange(1,1,1,lastCol).setFontWeight('bold').setBackground('#1e293b').setFontColor('#ffffff');
+    sh.setFrozenRows(1);
+    var gi=keys.indexOf('الصف');if(gi&lt;0)gi=keys.indexOf('grade');
+    if(gi>=0&amp;&amp;lastRow>1){
+      var pal={'مرحلة الكي جي والتأسيس':'#FEF3C7','الصف الأول الابتدائي':'#DBEAFE','الصف الثاني الابتدائي':'#E9D5FF','الصف الثالث الابتدائي':'#CCFBF1','الصف الرابع الابتدائي':'#FFE4E6','الصف الخامس الابتدائي':'#DCFCE7','الصف السادس الابتدائي':'#FFEDD5'};
+      for(var r=2;r&lt;=lastRow;r++){var gv=String(sh.getRange(r,gi+1).getValue()||'').trim();var c=pal[gv]||'#F1F5F9';sh.getRange(r,1,1,lastCol).setBackground(c);}
+    }
+    for(var cc=1;cc&lt;=lastCol;cc++){try{sh.autoResizeColumn(cc);}catch(e){}}
+  }catch(e){}
 }</pre>
         <div class="set-row"><button class="btn btn-primary btn-sm" id="copyAppsCodeBtn"><i class="bx bx-copy"></i> نسخ الكود</button></div>
       </div>
@@ -970,7 +990,7 @@ function showDetails(s){
   var dots='';var total=Math.max(att.length,8);for(var i=0;i<total;i++){dots+='<div class="dot'+(i<att.length?' on':'')+'" title="حصة '+(i+1)+'">'+(i+1)+'</div>';}
   var rep=(s.report||'').trim()||'لا يوجد تقرير بعد —';
   window._detailsStudent=s;
-  $('detailsBody').innerHTML='<div class="d-head">'+avatarHtml(s,true)+'<div style="flex:1;min-width:0"><h3>'+esc(s.name||'')+'</h3><div class="ph">'+phoneHtml(s.phone||'',true)+'</div>'+'<div class="badges" style="margin:8px 0 0"><span class="bdg grade">'+esc(gradeSafe(s.grade))+'</span>'+(g?'<span class="bdg group">'+esc(g.name)+'</span>':'')+finBadge(s)+'</div><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">'+(s.profileImage?'<button class="btn btn-ghost btn-sm" id="dZoom"><i class="bx bx-expand"></i> عرض الصورة</button>':'')+'<button class="btn btn-outline btn-sm" id="dChangeImg"><i class="bx bx-image-add"></i> '+(s.profileImage?'تغيير الصورة':'إضافة صورة')+'</button></div></div></div>'
+  $('detailsBody').innerHTML='<div class="d-head">'+avatarHtml(s,true)+'<div style="flex:1;min-width:0"><h3>'+esc(s.name||'')+'</h3><div class="ph">'+phoneHtml(s.phone||'',true)+'</div>'+'<div class="badges" style="margin:8px 0 0"><span class="bdg grade">'+esc(gradeSafe(s.grade))+'</span>'+(g?'<span class="bdg group">'+esc(g.name)+'</span>':'')+finBadge(s)+'</div></div></div>'
   +'<div class="d-grid">'
   +'<div class="d-item"><div class="ic" style="background:rgba(139,92,246,.13);color:#8b5cf6"><i class="bx bx-layer"></i></div><div style="min-width:0"><small>المجموعة</small><b>'+esc(g?g.name:'بدون مجموعة')+'</b></div></div>'
   +'<div class="d-item"><div class="ic" style="background:rgba(59,130,246,.13);color:#3b82f6"><i class="bx bx-calendar"></i></div><div style="min-width:0"><small>الموعد</small><b>'+esc(((s.day||'—')+' '+(s.hour||'')).trim())+'</b></div></div>'
@@ -1007,17 +1027,34 @@ function showDetails(s){
   var nm=$('sName');if(nm)nm.addEventListener('input',function(){if(!$('sImg').value)setImgPrev('',nm.value);});
 })();
 
-/* قوالب رسائل الواتساب */
-var WA_T={
-  late:'السلام عليكم 🌹\nولي أمر الطالب {name}، نذكركم بوجود مستحقات متأخرة ({debt}). برجاء السداد في أقرب وقت 🙏\n— مستر محمد سعيد الحاكم',
-  remind:'🔔 تذكير بالحصة\nالطالب {name} — مجموعة {group}\nالموعد: {day} الساعة {time}\nالحضور قبل الموعد بـ 5 دقائق ⚠️',
-  absent:'👥 تذكير بالغياب\nتغيب الطالب {name} عن الحصة. برجاء الالتزام بالحضور والمتابعة 📚\n— مستر محمد سعيد الحاكم',
-  quick:'السلام عليكم 🌹\nرسالة بخصوص الطالب {name} (مجموعة {group}) — برجاء التواصل للمتابعة 🙏\n— مستر محمد سعيد الحاكم'
+/* قوالب رسائل الواتساب — قابلة للتخصيص من الإعدادات */
+var WA_T_DEFAULT={
+  remind:'تذكير بموعد الحصة ⏰\nنذكركم بأن موعد حصة الطالب 👨‍🎓 {اسم_الطالب} ،بالـ{الصف} 🏫.\nسيكون يوم 🗓️ {اليوم} في تمام الساعة ⏳ {الوقت}\nنتطلع إلى حضوره في الموعد 🌟، ونتمنى له حصة دراسية موفقة 📚✨.\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓',
+  absent:'إشعار غياب ⚠️\nنفيدكم بأن الطالب 👨‍🎓 {اسم_الطالب} بـ {الصف} 🏫.\nلم يحضر حصة ❌ {اليوم} في تمام الساعة ⏳ {الوقت}،\nنرجو متابعة سبب الغياب 🔍، ونتطلع إلى انتظام حضوره في الحصص القادمة 📚✨.\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓',
+  late:'إشعار تلقائي 🔔: نود إبلاغكم بأن هناك مبلغ متأخر على الطالب ⚠️\nالطالب: 👨‍🎓 {اسم_الطالب}\nالصف: 🏫 {الصف}\nالمبلغ المستحق: 💵 {المبلغ_المتبقي}\nعدد الحصص: 📚 {عدد_الحصص}\nيرجى مراجعة المستحقات واستكمال السداد في أقرب وقت ⏳💳.\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓',
+  quick:'السلام عليكم 🌹\nرسالة بخصوص الطالب 👨‍🎓 {اسم_الطالب} ({الصف}) — برجاء التواصل للمتابعة 🙏\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓'
 };
+var LS_WA='elmistar_wa_templates_v2';
+var WA_T={late:WA_T_DEFAULT.late,remind:WA_T_DEFAULT.remind,absent:WA_T_DEFAULT.absent,quick:WA_T_DEFAULT.quick};
+function loadWaTemplates(){try{var a=JSON.parse(localStorage.getItem(LS_WA)||'null');if(a&&typeof a==='object'){['late','remind','absent','quick'].forEach(function(k){if(a[k]&&typeof a[k]==='string'&&a[k].trim())WA_T[k]=a[k];});}}catch(e){}}
+function saveWaTemplates(){try{localStorage.setItem(LS_WA,JSON.stringify(WA_T));}catch(e){}}
+function fillWaSettingsInputs(){try{if($('waLateInp'))$('waLateInp').value=WA_T.late||'';if($('waRemindInp'))$('waRemindInp').value=WA_T.remind||'';if($('waAbsentInp'))$('waAbsentInp').value=WA_T.absent||'';if($('waQuickInp'))$('waQuickInp').value=WA_T.quick||'';}catch(e){}}
+loadWaTemplates();
 function fillWa(t,s){
   var g=groupOf(s.groupId);var f=fin(s);
   var debt=f.clear?'لا توجد مستحقات — الحساب خالص 🟢':(f.unpaid+' حصص متأخرة ('+f.rest+' ج.م)');
-  return t.replace(/{name}/g,s.name||'').replace(/{group}/g,g?g.name:'—').replace(/{day}/g,s.day||'—').replace(/{time}/g,s.hour||'—').replace(/{debt}/g,debt).replace(/{grade}/g,gradeSafe(s.grade));
+  var r=String(t||'');
+  var grade=gradeSafe(s.grade), gname=g?g.name:'—', day=s.day||'—', time=s.hour||'—', name=s.name||'';
+  var rest=(f.rest||0)+' ج.م', cnt=String(f.unpaid||0), paid=String(s.paid||0);
+  r=r.replace(/{اسم_الطالب}/g,name).replace(/{name}/g,name);
+  r=r.replace(/{الصف}/g,grade).replace(/{grade}/g,grade);
+  r=r.replace(/{اليوم}/g,day).replace(/{day}/g,day);
+  r=r.replace(/{الوقت}/g,time).replace(/{time}/g,time);
+  r=r.replace(/{المجموعة}/g,gname).replace(/{group}/g,gname);
+  r=r.replace(/{المبلغ_المتبقي}/g,rest).replace(/{المبلغ}/g,rest).replace(/{debt}/g,debt);
+  r=r.replace(/{عدد_الحصص}/g,cnt);
+  r=r.replace(/{المدفوع}/g,paid);
+  return r;
 }
 function sendWaMsg(s,type){
   var link=waLink(s.phone);
@@ -1276,7 +1313,14 @@ function sheetAppsPull(){
 function sheetAppsPush(silent){
   var u=sheetGetUrl();
   if(!u){if(!silent)toast('الصق الرابط أولاً','error');return Promise.resolve(false);}
-  var payload={action:'push',students:students.map(function(s){var c={};for(var k in s){if(k==='profileImage')continue;c[k]=s[k];}return c;}),groups:groups};
+  var cleanStudents=students.map(function(s){
+    var g=null;try{g=groupOf(s.groupId);}catch(e){g=null;}
+    var f=null;try{f=fin(s);}catch(e){f={count:0,clear:true,unpaid:0,rest:0};}
+    var st=f.clear?'خالص':('عليه '+f.unpaid+' حصص ('+f.rest+' ج)');
+    return {'الاسم':s.name||'','الهاتف':s.phone||'','الصف':gradeSafe(s.grade),'المجموعة':g?g.name:'','اليوم':s.day||'','الموعد':s.hour||'','الحصص':f.count,'المدفوع':s.paid||0,'الحالة':st};
+  });
+  var cleanGroups=groups.map(function(g){return {'المجموعة':g.name||'','اليوم':g.day||'','الموعد':g.time||''};});
+  var payload={action:'push',students:cleanStudents,groups:cleanGroups};
   if(!silent)sheetStatus('⏳ جارٍ الرفع للشيت…');
   return sheetFetchJson(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}).then(function(res){
     if(!res.ok){if(!silent)sheetStatus('❌ فشل الرفع — '+res.diag,'err');return false;}
@@ -1284,7 +1328,7 @@ function sheetAppsPush(silent){
     if(!d||!d.ok){if(!silent)sheetStatus('❌ الـ Web App رد بخطأ — تأكد أن الكود المنشور هو كود المزامنة','err');return false;}
     try{localStorage.setItem(LS_SHEET_T,stampNow());}catch(e){}
     refreshSheetUI();
-    if(!silent){sheetStatus('☁️ تم الرفع بنجاح — '+students.length+' طالب / '+groups.length+' مجموعة (تبويبا students و groups)','ok');toast('☁️ تم رفع البيانات للشيت');}
+    if(!silent){sheetStatus('☁️ تم الرفع بنجاح — '+students.length+' طالب بالأعمدة النظيفة (الاسم، الهاتف، الصف، المجموعة، اليوم، الموعد، الحصص، المدفوع، الحالة)','ok');toast('☁️ تم رفع الكشف النظيف للشيت');}
     return true;
   }).catch(function(){if(!silent)sheetStatus('❌ تعذّر الوصول للرابط — تحقق من الإنترنت والرابط','err');return false;});
 }
@@ -1326,7 +1370,14 @@ function sheetSyncNow(){
 }
 function fallbackCopyApps(t){try{var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(e){}}
 (function initSettings(){
-  var sb=$('settingsBtn');if(sb)sb.onclick=function(){$('settingsModal').classList.remove('hidden');updateSyncUI();refreshSheetUI();};
+  var sb=$('settingsBtn');if(sb)sb.onclick=function(){$('settingsModal').classList.remove('hidden');updateSyncUI();refreshSheetUI();fillWaSettingsInputs();};
+  var wl=$('waLateInp');if(wl)wl.oninput=function(){WA_T.late=wl.value;saveWaTemplates();};
+  var wr=$('waRemindInp');if(wr)wr.oninput=function(){WA_T.remind=wr.value;saveWaTemplates();};
+  var wab=$('waAbsentInp');if(wab)wab.oninput=function(){WA_T.absent=wab.value;saveWaTemplates();};
+  var wq=$('waQuickInp');if(wq)wq.oninput=function(){WA_T.quick=wq.value;saveWaTemplates();};
+  var wrst=$('waResetBtn');if(wrst)wrst.onclick=function(){WA_T={late:WA_T_DEFAULT.late,remind:WA_T_DEFAULT.remind,absent:WA_T_DEFAULT.absent,quick:WA_T_DEFAULT.quick};saveWaTemplates();fillWaSettingsInputs();toast('✅ تمت استعادة الرسائل الافتراضية');};
+  var wt=$('waSecToggle');if(wt)wt.onclick=function(){var b=$('waSecBody');if(!b)return;b.classList.toggle('hidden');var c=$('waSecChev');if(c)c.style.transform=b.classList.contains('hidden')?'':'rotate(-90deg)';};
+  var sht=$('sheetSecToggle');if(sht)sht.onclick=function(){var b=$('sheetSecBody');if(!b)return;b.classList.toggle('hidden');var c=$('sheetSecChev');if(c)c.style.transform=b.classList.contains('hidden')?'':'rotate(-90deg)';};
   var sv=$('sheetSaveBtn');if(sv)sv.onclick=function(){var v=(($('sheetUrlInp')||{}).value||'').trim();if(!v){toast('الصق الرابط أولاً','error');return;}if(!sheetMode(v)){toast('رابط غير معروف — الصق رابط شيت أو Web App','error');return;}sheetSetUrl(v);refreshSheetUI();toast('🔗 تم حفظ رابط الشيت');};
   var sy2=$('sheetSyncBtn');if(sy2)sy2.onclick=function(){sheetSyncNow();};
   var sp=$('sheetPullBtn');if(sp)sp.onclick=function(){var u=sheetGetUrl();if(!u){toast('الصق الرابط أولاً','error');return;}if(sheetMode(u)==='apps')sheetAppsPull();else if(sheetMode(u)==='sheet')sheetPullGviz();else toast('رابط غير معروف','error');};
@@ -1339,7 +1390,7 @@ function fallbackCopyApps(t){try{var ta=document.createElement('textarea');ta.va
   var ej=$('expJsonBtn');if(ej)ej.onclick=exportJSON;
   var ec=$('expCsvBtn');if(ec)ec.onclick=exportCSV;
   var im=$('impFileBtn');if(im)im.onchange=function(){importJSON(im.files&&im.files[0]);im.value='';};
-  var cc=$('clearCacheBtn');if(cc)cc.onclick=function(){if(!confirm('مسح كل البيانات المحلية (الطلاب + المجموعات + الثيم)؟ لا يمكن التراجع — صدّر نسخة أولاً.'))return;try{localStorage.removeItem(LS_S);localStorage.removeItem(LS_G);localStorage.removeItem('elmistar-theme');}catch(e){}toast('✅ تم المسح — سيتم التحديث');setTimeout(function(){location.reload();},800);};
+  var cc=$('clearCacheBtn');if(cc)cc.onclick=function(){if(!confirm('مسح كل البيانات المحلية (الطلاب + المجموعات + الثيم)؟ لا يمكن التراجع — صدّر نسخة أولاً.'))return;try{localStorage.removeItem(LS_S);localStorage.removeItem(LS_G);localStorage.removeItem(LS_WA);localStorage.removeItem('elmistar-theme');}catch(e){}toast('✅ تم المسح — سيتم التحديث');setTimeout(function(){location.reload();},800);};
   var ib=$('installBtn');
   if(ib)ib.onclick=function(){
     if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(c){if(c.outcome==='accepted')toast('🎉 جاري التثبيت...');deferredPrompt=null;});return;}
