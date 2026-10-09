@@ -2,7 +2,7 @@
  * Keeps PWA offline caching only.
  */
 
-const CACHE_NAME = 'naqisna-pwa-v14';
+const CACHE_NAME = 'naqisna-pwa-v15';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -36,7 +36,23 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
-  // Network-first for dynamic navigation, Cache-first for static assets
+  // صفحات HTML: الشبكة أولاً لضمان وصول التحديثات، والكاش احتياطي عند انقطاع النت
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const copy = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy)).catch(() => {});
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request).then((c) => c || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Cache-first for static assets
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request)

@@ -937,7 +937,6 @@
   .habit-bar { margin: 10px 14px 0; height: 12px; background: #FFF1DE; border-radius: 999px; overflow: hidden; position: relative; border: 1px solid rgba(255,150,0,.15); }
   .habit-bar-fill { height: 100%; background: linear-gradient(90deg,#FFB020,#FF7A00); border-radius: 999px; transition: width .45s cubic-bezier(.22,1,.36,1); box-shadow: 0 2px 8px rgba(255,122,0,.4); }
   .habit-bar.done .habit-bar-fill { background: linear-gradient(90deg,#34D399,#059669); box-shadow: 0 2px 8px rgba(16,185,129,.4); }
-  .habit-streak { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 8px 14px 0; font-size: 14.5px; font-weight: 900; color: #9A3412; background: linear-gradient(135deg,#FFF7ED,#FFFBEB); border: 1.5px solid rgba(255,150,0,.20); border-radius: 13px; padding: 9px 12px; line-height: 1.9; text-align: center; }
   .habit-list { padding: 10px 14px 6px; display: flex; flex-direction: column; gap: 8px; }
   .habit-row { display: flex; align-items: center; gap: 10px; background: #fff; border: 1.5px solid var(--border); border-radius: 15px; padding: 10px 12px; cursor: pointer; transition: transform .15s, border-color .18s, background .18s; user-select: none; -webkit-user-select: none; }
   .habit-row:active { transform: scale(.98); }
@@ -950,7 +949,7 @@
   .habit-row.done .habit-name { text-decoration: line-through; color: var(--text-muted); }
   .habit-del { width: 28px; height: 28px; border-radius: 9px; background: var(--bg); color: var(--text-muted); font-size: 13px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .habit-del:active { background: var(--danger-light); color: var(--danger); }
-  .habit-drag { width: 28px; height: 32px; border-radius: 9px; color: var(--text-muted); opacity: .55; font-size: 15px; font-weight: 900; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .habit-drag { width: 38px; height: 44px; margin: -8px -6px -8px 0; border-radius: 10px; color: var(--text-muted); opacity: .6; font-size: 17px; font-weight: 900; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
   .habit-drag:active { cursor: grabbing; opacity: 1; color: var(--primary-dark); background: var(--primary-light); }
   .habit-list.drag-active .habit-row { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
   .habit-row.dragging { opacity: .55; box-shadow: 0 14px 30px rgba(255,150,0,.28); border-color: #FF9600; transform: scale(1.02); z-index: 5; position: relative; }
@@ -1283,9 +1282,25 @@
   .toast.success { border-left: 4px solid var(--success); }
   .toast.error { border-left: 4px solid var(--danger); }
   .toast.warning { border-left: 4px solid var(--pending); }
+  .toast.info { border-left: 4px solid var(--primary); }
   .toast-icon { font-size: 16px; flex-shrink: 0; }
   @keyframes toastIn { from { transform: translateY(-16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   @keyframes toastOut { to { transform: translateY(-16px); opacity: 0; } }
+  /* ===== إشعارات احترافية داخل التطبيق ===== */
+  .notif-card { position: relative; display: flex; align-items: flex-start; gap: 11px; background: rgba(255,255,255,.98); border-radius: 18px; padding: 12px 14px 16px; box-shadow: 0 16px 40px rgba(15,138,194,.22), 0 2px 8px rgba(0,0,0,.07); border: 1px solid rgba(28,176,246,.20); overflow: hidden; animation: notifIn .38s cubic-bezier(.22,1,.36,1); pointer-events: auto; cursor: pointer; }
+  .notif-card::before { content: ''; position: absolute; inset-inline-start: 0; top: 0; bottom: 0; width: 5px; background: var(--grad); }
+  .notif-card.out { animation: notifOut .24s ease-in forwards; }
+  .notif-ico { width: 46px; height: 46px; border-radius: 15px; background: var(--grad); display: flex; align-items: center; justify-content: center; font-size: 23px; flex-shrink: 0; box-shadow: 0 8px 16px rgba(28,176,246,.35), inset 0 1px 0 rgba(255,255,255,.4); }
+  .notif-tx { flex: 1; min-width: 0; }
+  .notif-title { font-size: 14px; font-weight: 900; color: var(--text); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .notif-app { font-size: 10px; font-weight: 800; color: var(--primary-dark); background: var(--primary-light); border: 1px solid rgba(28,176,246,.25); padding: 1px 9px; border-radius: 999px; white-space: nowrap; }
+  .notif-body { font-size: 12.5px; font-weight: 700; color: var(--text-sec); margin-top: 3px; line-height: 1.9; }
+  .notif-time { font-size: 10px; font-weight: 700; color: var(--text-muted); margin-top: 4px; }
+  .notif-prog { position: absolute; bottom: 0; right: 0; left: 0; height: 3px; background: rgba(28,176,246,.14); }
+  .notif-prog i { display: block; height: 100%; width: 100%; background: var(--grad); border-radius: 99px; animation: notifProg 4.6s linear forwards; }
+  @keyframes notifIn { from { transform: translateY(-26px) scale(.95); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes notifOut { to { transform: translateY(-14px) scale(.97); opacity: 0; } }
+  @keyframes notifProg { from { width: 100%; } to { width: 0%; } }
   /* ===== ثبات الواجهة: بدون أنيميشن على مستوى الصفحة يسبب اهتزاز مع كل render ===== */
   .page { animation: none; }
   @keyframes pageUp { from { opacity: 1; transform: none; } to { opacity: 1; transform: none; } }
@@ -3628,24 +3643,6 @@
     const pct = Math.round((c / total) * 100);
     return { total, done: c, pct, left: total - c };
   }
-  function habitStreak() {
-    try {
-      const st = habitStore();
-      let s = 0;
-      const d = new Date();
-      // لو النهاردة لسه مخلصش ابدأ من امبارح عشان السلسلة متتكسرش ظلم
-      const t = habitStats(habitTodayKey(d));
-      if (!(t.total && t.done === t.total)) d.setDate(d.getDate() - 1);
-      while (true) {
-        const k = habitTodayKey(d);
-        const ss = habitStats(k);
-        if (ss.total && ss.done === ss.total) { s++; d.setDate(d.getDate() - 1); }
-        else break;
-        if (s > 365) break;
-      }
-      return s;
-    } catch { return 0; }
-  }
   function toggleHabit(id) {
     const st = habitStore();
     const k = habitTodayKey();
@@ -3682,23 +3679,6 @@
     Object.keys(map).forEach(id => next.push(map[id]));
     if (next.length) { st.defs = next; persist(); }
   }
-  const HABIT_STREAK_MSGS = [
-    '💡 الالتزام اليومي الصغير هو سر التغيير الكبير',
-    '🌱 خطوة صغيرة كل يوم تصنع فرقاً كبيراً مع الوقت',
-    '💪 الاستمرارية أهم من الكمال — كمّل ولا توقف',
-    '⭐ كل يوم تلتزم فيه بيقرّبك من هدفك خطوة',
-    '🔥 العادات الصغيرة نتائجها كبيرة للي يصبر عليها',
-    '🌟 ابدأ صغيراً وفكّر كبيراً — المهم تبدأ',
-    '💧 نقطة فوق نقطة تصنع نهراً.. وعادة فوق عادة تصنع نجاحاً'
-  ];
-  function habitStreakMsg() {
-    try {
-      const now = new Date();
-      const start = new Date(now.getFullYear(), 0, 0);
-      const doy = Math.floor((now - start) / 864e5);
-      return HABIT_STREAK_MSGS[doy % HABIT_STREAK_MSGS.length];
-    } catch { return HABIT_STREAK_MSGS[0]; }
-  }
   function habitMotivation(done, total, pct) {
     if (total && done === total) return 'وحش! قفلت كل عادات اليوم 🎉 انت قدها كل يوم 💪';
     if (pct < 50) return '';
@@ -3709,7 +3689,6 @@
     const defs = habitDefs();
     const key = habitTodayKey();
     const { total, done, pct, left } = habitStats(key);
-    const streak = habitStreak();
     const dstr = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
     const mot = habitMotivation(done, total, pct);
     const full = total && done === total;
@@ -3722,7 +3701,6 @@
         <button class="habit-addbtn habit-addbtn-sm" id="habitAddToggle" title="${addOpen ? 'إخفاء' : 'عادة جديدة'}">${addOpen ? '−' : '+'}</button>
       </div>
       ${mot ? `<div class="habit-mot${full ? ' done-all' : ''}">${escapeHTML(mot)}</div>` : ''}
-      <div class="habit-streak">${streak > 0 ? `🔥 سلسلة الالتزام: ${streak} ${streak === 1 ? 'يوم' : 'أيام'} ورا بعض — حافظ عليها!` : (full ? '🔥 يوم كامل! بداية سلسلة جديدة — بكرا كمّلها' : habitStreakMsg())}</div>
       <div class="habit-bar${full ? ' done' : ''}"><div class="habit-bar-fill" style="width:${pct}%;"></div></div>
       ${addOpen ? `<div class="habit-add" style="padding:10px 14px 4px;"><input id="habitAddInput" placeholder="اكتب عادة ودوس + ... مثال: أصحى بدري" maxlength="60" autocomplete="off" /><button class="habit-addbtn" id="habitAddBtn" title="ضيف عادة">+</button></div>` : ''}
       <div class="habit-list">
@@ -3929,7 +3907,7 @@
           <div class="duo-tx">
             <div class="duo-hello" dir="auto">${greeting}، <span class="nm">${escapeHTML(userName)}!</span> 👋</div>
             <div class="duo-sub" dir="rtl" style="text-align:left;">${progress >= 100 ? 'خلصت كل مهام اليوم يا بطل 🎉' : (done > 0 ? `فاضل ${pending} ${pending === 1 ? 'مهمة' : pending === 2 ? 'مهمتين' : 'مهام'} وتقفل اليوم 💪` : 'طلب واحد يقربك من هدف بيتك ✨')}</div>
-            <button class="duo-btn" id="duoContinue"><span dir="rtl">تابع مهامك</span> <span style="font-size:16px;line-height:1;">→</span></button>
+            <button class="duo-btn" id="duoContinue"><span dir="rtl">تابع مستوي طلابك</span> <span style="font-size:16px;line-height:1;">→</span></button>
           </div>
           <div class="duo-art">
             <div class="duo-logo-wrap"><img src="logo.png" alt="ناقصنا إيه" /></div>
@@ -4532,7 +4510,7 @@
         <div class="collapsible-body ${state._notifOpen ? '' : 'hidden'}">
         <div class="notif-group">
           <div class="notif-group-head"><span class="ngh-ico" style="background:#E1F3FD;">🔔</span><div><b>عام</b><small>التشغيل الأساسي للإشعارات</small></div></div>
-          <button class="tgl-row" id="tglNotif"><span class="tgl"><b>تشغيل التنبيهات</b><small>إشعارات أثناء استخدام التطبيق</small></span><span class="sw ${state._notifOn === true ? 'on' : ''}"></span></button>
+          <button class="tgl-row" id="tglNotif"><span class="tgl"><b>تشغيل التنبيهات</b><small>إشعارات أثناء استخدام التطبيق</small></span><span class="sw ${state._notifOn !== false ? 'on' : ''}"></span></button>
           <div class="snd-add-row"><button class="btn" id="notifTestBtn">🔔 جرّب تنبيه</button></div>
         </div>
         <div class="notif-group">
@@ -4742,7 +4720,7 @@
     const gl = document.querySelector('[data-gotab="orders"]'); if (gl) gl.onclick = (e) => { e.preventDefault(); setTab('orders'); };
     const fab = document.getElementById('fabBtn'); if (fab) fab.onclick = openAddOrderModal;
     const ha = document.getElementById('heroAddOrder'); if (ha) ha.onclick = openAddOrderModal;
-    const dc = document.getElementById('duoContinue'); if (dc) dc.onclick = () => { if (!state._showTasks) { state._showTasks = true; state._showHabits = false; persist(); render(); } requestAnimationFrame(() => setTimeout(() => { try { const el = document.getElementById('tasksWrap') || document.getElementById('tasksSection'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {} }, 60)); };
+    const dc = document.getElementById('duoContinue'); if (dc) dc.onclick = () => { try { window.location.href = 'st.html'; } catch {} };
     document.querySelectorAll('[data-azkar-toggle]').forEach(b => b.onclick = () => openAzkarPage());
     document.querySelectorAll('[data-prayer-times]').forEach(b => b.onclick = () => openPrayerPage());
     try { refreshPrayerMini(); } catch {}
@@ -4770,50 +4748,83 @@
       const list = document.querySelector('#habitsSection .habit-list');
       if (list && !list._habitDnD) {
         list._habitDnD = true;
-        let dragId = null, dragEl = null, moved = false;
+        let dragId = null, dragEl = null, dragging = false, sx = 0, sy = 0, origNext = null;
         const clearMarks = () => list.querySelectorAll('.drop-before,.drop-after').forEach(x => x.classList.remove('drop-before', 'drop-after'));
-        list.querySelectorAll('[data-habitdrag]').forEach(h => {
-          h.addEventListener('pointerdown', (e) => {
-            e.preventDefault();
-            try { h.setPointerCapture(e.pointerId); } catch {}
-            dragId = h.dataset.habitdrag;
-            dragEl = h.closest('.habit-row');
-            moved = false; window._habitDragMoved = false;
+        const cleanup = () => {
+          if (dragEl) dragEl.classList.remove('dragging');
+          list.classList.remove('drag-active');
+          clearMarks();
+        };
+        const onMove = (cx, cy) => {
+          if (!dragEl || !dragId) return;
+          if (!dragging) {
+            try { if (Math.hypot(cx - sx, cy - sy) < 10) return; } catch { return; }
+            dragging = true; window._habitDragMoved = true;
             if (dragEl) dragEl.classList.add('dragging');
             list.classList.add('drag-active');
-          });
-          h.addEventListener('pointermove', (e) => {
-            if (!dragEl || !dragId) return;
-            moved = true; window._habitDragMoved = true;
-            let t = null;
-            try {
-              const els = (document.elementsFromPoint || (() => [document.elementFromPoint(e.clientX, e.clientY)]))(e.clientX, e.clientY) || [];
-              for (const el of els) { if (el && el.closest) { const r = el.closest('.habit-row'); if (r && r !== dragEl) { t = r; break; } } }
-            } catch {}
-            clearMarks();
-            if (t && list.contains(t)) {
-              const r = t.getBoundingClientRect();
-              const after = (e.clientY - r.top) > (r.height / 2);
-              t.classList.add(after ? 'drop-after' : 'drop-before');
-              if (after) { if (t.nextSibling !== dragEl) list.insertBefore(dragEl, t.nextSibling); }
-              else { if (t !== dragEl) list.insertBefore(dragEl, t); }
-            }
-          });
-          const end = () => {
-            if (dragEl) dragEl.classList.remove('dragging');
-            list.classList.remove('drag-active');
-            clearMarks();
-            if (dragId && moved) {
+            try { if (navigator.vibrate) navigator.vibrate(15); } catch {}
+          }
+          let t = null;
+          try {
+            const els = (document.elementsFromPoint || (() => [document.elementFromPoint(cx, cy)]))(cx, cy) || [];
+            for (const el of els) { if (el && el.closest) { const r = el.closest('.habit-row'); if (r && r !== dragEl) { t = r; break; } } }
+          } catch {}
+          clearMarks();
+          if (t && list.contains(t)) {
+            const r = t.getBoundingClientRect();
+            const after = (cy - r.top) > (r.height / 2);
+            t.classList.add(after ? 'drop-after' : 'drop-before');
+            if (after) { if (t.nextSibling !== dragEl) list.insertBefore(dragEl, t.nextSibling); }
+            else { if (t !== dragEl) list.insertBefore(dragEl, t); }
+          }
+        };
+        const onUp = (cancelled) => {
+          if (!dragId && !dragEl) return;
+          const wasDragging = dragging;
+          const el = dragEl, id = dragId, nx = origNext;
+          dragId = null; dragEl = null; dragging = false; origNext = null;
+          cleanup();
+          if (wasDragging && el && id) {
+            if (cancelled) { try { list.insertBefore(el, nx); } catch {} }
+            else {
               const order = [...list.querySelectorAll('[data-habittoggle]')].map(x => x.dataset.habittoggle);
               reorderHabits(order);
               render();
               toast('اتحفظ الترتيب الجديد ✓', 'success');
             }
-            dragId = null; dragEl = null;
-            setTimeout(() => { if (!moved) window._habitDragMoved = false; }, 50);
-          };
-          h.addEventListener('pointerup', end);
-          h.addEventListener('pointercancel', end);
+          }
+          setTimeout(() => { window._habitDragMoved = false; }, 150);
+        };
+        list.querySelectorAll('[data-habitdrag]').forEach(h => {
+          h.addEventListener('pointerdown', (e) => {
+            if (e.button != null && e.button !== 0 && e.pointerType === 'mouse') return;
+            try { e.preventDefault(); } catch {}
+            try { h.setPointerCapture(e.pointerId); } catch {}
+            dragId = h.dataset.habitdrag;
+            dragEl = h.closest('.habit-row');
+            dragging = false; window._habitDragMoved = false;
+            sx = e.clientX; sy = e.clientY;
+            origNext = dragEl ? dragEl.nextSibling : null;
+            const wMove = (ev) => onMove(ev.clientX, ev.clientY);
+            const wUp = () => {
+              window.removeEventListener('pointermove', wMove);
+              window.removeEventListener('pointerup', wUp);
+              window.removeEventListener('pointercancel', wUp);
+              onUp(false);
+            };
+            const wCancel = () => {
+              window.removeEventListener('pointermove', wMove);
+              window.removeEventListener('pointerup', wUp);
+              window.removeEventListener('pointercancel', wUp);
+              onUp(true);
+            };
+            window.addEventListener('pointermove', wMove, { passive: true });
+            window.addEventListener('pointerup', wUp);
+            window.addEventListener('pointercancel', wCancel);
+          });
+          h.addEventListener('pointermove', (e) => { if (dragId) onMove(e.clientX, e.clientY); });
+          h.addEventListener('pointerup', () => onUp(false));
+          h.addEventListener('pointercancel', () => onUp(true));
         });
       }
     } catch {}
@@ -5044,10 +5055,10 @@
       try { if (shareFinKind(kind)) { await pushFinState(); try { initSupabaseSync(); } catch {} } } catch {}
     });
     b('tglNotif', () => {
-      const on = !(state._notifOn === true);
-      const apply = (v) => { state._notifOn = v; persist(); render(); toast(v ? 'التنبيهات اشتغلت 🔔' : 'التنبيهات اتقفلت', v ? 'success' : 'info'); };
+      const on = (state._notifOn === false);
+      const apply = (v) => { state._notifOn = v; persist(); render(); toast(v ? 'التنبيهات اشتغلت 🔔' : 'التنبيهات اتقفلت', v ? 'success' : 'info'); try { notifTick(); } catch {} };
       if (on && 'Notification' in window && Notification.permission === 'default') {
-        try { Notification.requestPermission().then(p => apply(p === 'granted')); } catch { apply(true); }
+        try { Notification.requestPermission().then(p => apply(p !== 'denied')).catch(() => apply(true)); } catch { apply(true); }
       } else apply(on);
     });
 
@@ -5062,7 +5073,14 @@
     const azm = document.getElementById('azkarMorningTime'); if (azm) azm.onchange = () => { state._azkarMorningTime = azm.value || '06:30'; persist(); toast('موعد أذكار الصباح اتحفظ ☀️', 'success'); };
     const aze = document.getElementById('azkarEveningTime'); if (aze) aze.onchange = () => { state._azkarEveningTime = aze.value || '18:30'; persist(); toast('موعد أذكار المساء اتحفظ 🌙', 'success'); };
     const azs = document.getElementById('azkarSwitchHour'); if (azs) azs.onchange = () => { let v = Number(azs.value); if (isNaN(v)) v = 12; v = Math.max(0, Math.min(23, v)); state._azkarSwitch = v; persist(); render(); toast('الكارت هيتحول مساءً بعد الساعة ' + v + ' ✓', 'success'); };
-    b('notifTestBtn', () => notifFire('test', '🔔 ناقصنا إيه', 'التنبيهات شغالة تمام! 😄🔔'));
+    b('notifTestBtn', async () => {
+      try {
+        if ('Notification' in window && Notification.permission === 'default') {
+          try { await Notification.requestPermission(); } catch {}
+        }
+      } catch {}
+      notifFire('test', '🔔 ناقصنا إيه', 'التنبيهات شغالة تمام! 😄🔔');
+    });
     document.querySelectorAll('[data-hidecat]').forEach(btn => btn.onclick = () => {
       if (!state.hiddenCats) state.hiddenCats = [];
       if (!state.hiddenCats.includes(btn.dataset.hidecat)) state.hiddenCats.push(btn.dataset.hidecat);
@@ -5748,25 +5766,57 @@
   ];
   function notifStore() { try { return JSON.parse(localStorage.getItem('naqisna_notif') || '{}'); } catch { return {}; } }
   function notifSave(o) { try { localStorage.setItem('naqisna_notif', JSON.stringify(o)); } catch {} }
+  const NOTIF_ICONS = { orders: '🛒', exp: '💸', daily: '📊', 'azkar-m': '🌅', 'azkar-e': '🌙', test: '🔔' };
+  function notifIcon(kind) {
+    try {
+      if (NOTIF_ICONS[kind]) return NOTIF_ICONS[kind];
+      const k = String(kind || '');
+      if (k.indexOf('prayer-') === 0) return '🕌';
+      if (k.indexOf('appt-') === 0) return '📅';
+    } catch {}
+    return '🔔';
+  }
+  function showAppNotif(kind, title, body) {
+    try {
+      const container = document.getElementById('toastContainer');
+      if (!container) { toast(title + ' — ' + body, 'info'); return; }
+      const el = document.createElement('div');
+      el.className = 'notif-card';
+      el.innerHTML = `<span class="notif-ico">${notifIcon(kind)}</span><div class="notif-tx"><div class="notif-title"><span>${escapeHTML(title)}</span><span class="notif-app">ناقصنا إيه</span></div><div class="notif-body">${escapeHTML(body)}</div><div class="notif-time">الآن • دوس للإغلاق</div></div><div class="notif-prog"><i></i></div>`;
+      let gone = false;
+      const kill = () => { if (gone) return; gone = true; el.classList.add('out'); setTimeout(() => el.remove(), 240); };
+      el.onclick = kill;
+      container.appendChild(el);
+      while (container.children.length > 3) container.firstChild.remove();
+      setTimeout(kill, 4600);
+    } catch { toast(title + ' — ' + body, 'info'); }
+  }
   function notifFire(kind, title, body) {
-    let shown = false;
-    if (state._notifOn === true) {
-      try {
-        if ('Notification' in window && Notification.permission === 'granted') {
-          const n = new Notification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png', tag: 'naqisna-' + kind });
-          n.onclick = () => { try { window.focus(); } catch {} try { n.close(); } catch {} };
-          shown = true;
-        }
-      } catch {}
-    }
-    if (!shown) toast(title + ' — ' + body, 'info');
+    // الإشعار الداخلي (toast) يشتغل دائماً إلا لو المستخدم قفل التنبيهات صراحةً.
+    // إشعار النظام يشتغل كإضافة لو الإذن ممنوح.
+    if (state && state._notifOn === false && kind !== 'test') return;
+    try {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          if (document.hidden && navigator.serviceWorker && navigator.serviceWorker.ready) {
+            navigator.serviceWorker.ready.then(reg => {
+              try { reg.showNotification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png', tag: 'naqisna-' + kind }); } catch {}
+            }).catch(() => {});
+          } else {
+            const n = new Notification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png', tag: 'naqisna-' + kind });
+            n.onclick = () => { try { window.focus(); } catch {} try { n.close(); } catch {} };
+          }
+        } catch {}
+      }
+    } catch {}
+    showAppNotif(kind, title, body);
   }
   function notifDayKey() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
   function notifTimePassed(hhmm) { try { const p = String(hhmm || '00:00').split(':'); const h = Number(p[0]) || 0, m = Number(p[1]) || 0; const n = new Date(); return (n.getHours() * 60 + n.getMinutes()) >= (h * 60 + m); } catch { return false; } }
   function notifTick() {
     try {
       if (!state || !state.initialized) return;
-      if (state._notifOn !== true) return;
+      if (state._notifOn === false) return;
       const st = notifStore(); const now = Date.now(); const tk = notifDayKey();
       const pend = (state.orders || []).filter(o => o && o.status !== 'purchased');
       if (state._notifOrders !== false && pend.length) {
@@ -5794,13 +5844,16 @@
         const pc = prayerCache();
         if (pc && pc.timings && pc.day === prayerTodayKey()) {
           const n = new Date();
-          const cur = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+          const curMin = n.getHours() * 60 + n.getMinutes();
           PRAYERS_META.forEach(p => {
             if (p.id === 'Sunrise') return;
             if (!prayerBellOn(p.id)) return;
             const tt = String((pc.timings[p.id] || '')).slice(0, 5);
+            if (!tt || tt.length < 4) return;
+            const pp = tt.split(':'); const ttMin = (Number(pp[0]) || 0) * 60 + (Number(pp[1]) || 0);
+            const diff = curMin - ttMin;
             const key = 'pray_' + p.id + '_' + tk;
-            if (tt && tt === cur && !st[key]) { st[key] = 1; notifSave(st); notifFire('prayer-' + p.id, '🕌 حان وقت ' + p.name, 'تقبّل الله منا ومنكم 🤲'); }
+            if (!st[key] && diff >= 0 && diff <= 2) { st[key] = 1; notifSave(st); notifFire('prayer-' + p.id, '🕌 حان وقت ' + p.name, 'تقبّل الله منا ومنكم 🤲'); }
           });
         }
       } catch {}
@@ -7137,7 +7190,7 @@
     try { if (typeof _ensureExitGuard === 'function') _ensureExitGuard(); } catch {}
     initSupabaseSync();
     try { initPresence(); } catch {}
-    try { setInterval(notifTick, 60000); setTimeout(notifTick, 15000); } catch {}
+    try { setInterval(notifTick, 30000); setTimeout(notifTick, 5000); try { document.addEventListener('visibilitychange', () => { if (!document.hidden) { try { notifTick(); } catch {} } }); } catch {} } catch {}
     try {
       if ('serviceWorker' in navigator) {
         const upd = () => { try { navigator.serviceWorker.ready.then(r => r.update().catch(() => {})).catch(() => {}); } catch {} };
