@@ -315,6 +315,13 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
 .sess-pill{min-width:36px;height:32px;padding:0 8px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;background:var(--bg-input);border:1.5px solid var(--border);color:var(--text-muted)}
 .sess-pill.on{background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#22c55e;color:#fff;box-shadow:0 3px 10px rgba(34,197,94,.35)}
 .att-mini{display:flex;gap:6px;flex-shrink:0}
+.att-step{display:flex;align-items:center;gap:2px;flex-shrink:0;background:var(--bg-input);border:1.5px solid var(--border);border-radius:12px;padding:2px}
+.att-step .icon-btn{width:30px;height:30px;font-size:17px}
+.att-step b{min-width:28px;text-align:center;font-size:15px;font-weight:900}
+.stat-ok{background:rgba(34,197,94,.13);color:#22c55e;font-size:12px;font-weight:800;padding:2px 11px;border-radius:12px}
+.stat-no{background:rgba(239,68,68,.12);color:#ef4444;font-size:12px;font-weight:800;padding:2px 11px;border-radius:12px}
+.dots .dot{cursor:pointer}
+.dots .dot.on:hover{outline:2px solid #ef4444;filter:brightness(1.1)}
 .att-foot{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
 .att-foot .btn{flex:1;justify-content:center;min-height:48px;border-radius:14px;font-size:14px}
 .btn-att-save{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;box-shadow:0 8px 22px rgba(59,130,246,.4)}
@@ -621,6 +628,7 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
       </div>
       <div class="att-bar">
         <span class="cnt" id="attCount">0 طالب</span>
+        <span class="stat-ok" id="attOk">0 حاضر</span><span class="stat-no" id="attNo">0 غائب</span>
         <label class="sess">تحديد الكل للحصة رقم
           <select id="attSession"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select>
         </label>
@@ -662,7 +670,7 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
       <div class="set-sec">
         <h4 id="waSecToggle" style="cursor:pointer;user-select:none"><i class="bx bxl-whatsapp" style="color:#25D366"></i> رسائل واتساب جاهزة ✏️ <span id="waSecChev" style="margin-right:auto;transition:transform .25s;display:inline-flex">‹</span></h4>
         <div id="waSecBody" class="hidden">
-        <p>خصّص نص كل رسالة — يُحفظ تلقائياً على هذا الجهاز. يمكنك استخدام: <b>{اسم_الطالب} {الصف} {اليوم} {الوقت} {المجموعة} {المبلغ_المتبقي} {عدد_الحصص} {المبلغ_المدفوع} {الشهر} {التاريخ}</b></p>
+        <p>خصّص نص كل رسالة — يُحفظ تلقائياً على هذا الجهاز. يمكنك استخدام: <b>{اسم_الطالب} {الصف} {اليوم} {الوقت} {المجموعة} {المبلغ_المتبقي} {عدد_الحصص} {الحصص_الحاضرة} {المبلغ_المدفوع} {الشهر} {التاريخ}</b></p>
         <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-time"></i> 🕒 تأخر المدفوعات</label><textarea id="waLateInp" rows="3" placeholder="نص رسالة تأخر المدفوعات..."></textarea></div>
         <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-bell"></i> 🔔 تذكير بالحصة</label><textarea id="waRemindInp" rows="3" placeholder="نص رسالة تذكير بالحصة..."></textarea></div>
         <div class="inp" style="margin-bottom:8px"><label><i class="bx bx-group"></i> 👥 تذكير بالغياب</label><textarea id="waAbsentInp" rows="3" placeholder="نص رسالة تذكير بالغياب..."></textarea></div>
@@ -808,6 +816,11 @@ function phoneHtml(p,big){if(!p)return '<span style="color:var(--text-muted)">�
 function gradeSafe(g){if(!g)return 'غير محدد';var t=String(g).trim();var m={"0":"مرحلة الكي جي والتأسيس","تأسيس":"مرحلة الكي جي والتأسيس","1":"الصف الأول الابتدائي","2":"الصف الثاني الابتدائي","3":"الصف الثالث الابتدائي","4":"الصف الرابع الابتدائي","5":"الصف الخامس الابتدائي","6":"الصف السادس الابتدائي"};return m[t]||t;}
 function fin(st){var att=st.attendance;var c=Array.isArray(att)?att.length:(parseInt(att)||0);var net=Math.max(0,(parseInt(st.paid)||0)-(parseInt(st.otherExpenses)||0));var due=dueForSessions(c);var sess=coveredSessions(net);var un=Math.max(0,c-sess);var rest=Math.max(0,due-net);return{count:c,paid:sess,unpaid:un,due:due,rest:rest,clear:un===0};}
 function finBadge(st){var f=fin(st);if(f.clear)return '<span class="bdg clear">خالص 🟢</span>';if(f.unpaid<=4)return '<span class="bdg late1">'+f.unpaid+' حصة 🟡</span>';if(f.unpaid<=7)return '<span class="bdg late2">'+f.unpaid+' حصة 🟠</span>';return '<span class="bdg late3">'+f.unpaid+' حصة 🔴</span>';}
+/* ===== نظام الشهور: كل شهر = 8 حصص، وعند الاكتمال يبدأ شهر جديد من الحصة 1 ===== */
+var MONTH_LEN=8;
+function attListOf(s){var a=s?s.attendance:null;if(Array.isArray(a))return a.slice().sort(function(x,y){return x-y;});var n=parseInt(a)||0,r=[];for(var i=0;i<n;i++)r.push(0);return r;}
+function attMonthInfo(s){var att=attListOf(s),done=[],cur=[];att.forEach(function(ts){cur.push(ts);if(cur.length>=MONTH_LEN){done.push(cur);cur=[];}});return{month:done.length+1,pos:cur.length,total:att.length,done:done,current:cur};}
+function fmtDay(ts){if(!ts)return '—';try{return new Date(ts).toLocaleDateString('ar-EG',{day:'numeric',month:'short'});}catch(e){return '—';}}
 function groupOf(id){return groups.find(function(g){return g.id===id;})||null;}
 
 /* theme */
@@ -886,7 +899,7 @@ function applyFilters(){
     card.innerHTML='<div class="s-top">'+avatarHtml(s)+'<div style="flex:1;min-width:0"><div class="s-name">'+esc(s.name||'—')+'</div><div class="s-phone">'+phoneHtml(s.phone||'',false)+'</div></div><input type="checkbox" data-sel="'+s.id+'" '+(selected.has(s.id)?'checked':'')+' style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer"></div>'
     +'<div class="badges"><span class="bdg grade">'+esc(gradeSafe(s.grade))+'</span>'+(grp?'<span class="bdg group">'+esc(grp.name)+'</span>':'<span class="bdg grade" style="opacity:.5">بدون مجموعة</span>')+'</div>'
     +'<div class="s-meta"><span><i class="bx bx-calendar"></i> '+esc(s.day||'—')+'</span><span><i class="bx bx-time"></i> '+esc(s.hour||'—')+'</span><span><i class="bx bx-wallet"></i> مدفوع: '+(s.paid||0)+'</span></div>'
-    +'<div class="s-actions"><button class="icon-btn" data-act="view" data-id="'+s.id+'" title="عرض"><i class="bx bx-show"></i></button><button class="icon-btn" data-act="edit" data-id="'+s.id+'" title="تعديل"><i class="bx bx-edit"></i></button><a class="icon-btn" style="color:#25D366;text-decoration:none" href="'+waLink(s.phone)+'" target="_blank" title="واتساب"><i class="bx bxl-whatsapp"></i></a><button class="icon-btn danger" data-act="del" data-id="'+s.id+'" title="حذف"><i class="bx bx-trash"></i></button></div>';
+    +'<div class="s-actions"><button class="icon-btn" data-act="view" data-id="'+s.id+'" title="عرض"><i class="bx bx-show"></i></button><button class="icon-btn" data-act="edit" data-id="'+s.id+'" title="تعديل"><i class="bx bx-edit"></i></button><a class="icon-btn" style="color:#25D366;text-decoration:none" href="'+waLink(s.phone)+'" target="_blank" title="واتساب"><i class="bx bxl-whatsapp"></i></a><button class="icon-btn" style="color:#22c55e" data-act="pay" data-id="'+s.id+'" title="تحصيل رسوم"><i class="bx bx-wallet"></i></button><button class="icon-btn danger" data-act="del" data-id="'+s.id+'" title="حذف"><i class="bx bx-trash"></i></button></div>';
     g.appendChild(card);
   });
   /* table */
@@ -901,7 +914,7 @@ function applyFilters(){
 }
 function bindRowEvents(){
   document.querySelectorAll('[data-sel]').forEach(function(c){c.onchange=function(){if(c.checked)selected.add(c.dataset.sel);else selected.delete(c.dataset.sel);updateBulk();};});
-  document.querySelectorAll('[data-act]').forEach(function(b){b.onclick=function(){var id=b.dataset.id,a=b.dataset.act;var s=students.find(function(x){return x.id===id;});if(!s)return;if(a==='edit')openStudent(s);else if(a==='del')delStudent(s);else if(a==='view')showDetails(s);};});
+  document.querySelectorAll('[data-act]').forEach(function(b){b.onclick=function(){var id=b.dataset.id,a=b.dataset.act;var s=students.find(function(x){return x.id===id;});if(!s)return;if(a==='edit')openStudent(s);else if(a==='del')delStudent(s);else if(a==='view')showDetails(s);else if(a==='pay')openPay(s,false);};});
 }
 function updateBulk(){var n=selected.size;$('bulkCount').textContent=n;$('bulkBar').classList.toggle('show',n>0);}
 $('selAll').onchange=function(){var list=filteredStudents();if($('selAll').checked){list.forEach(function(s){selected.add(s.id);});}else{selected.clear();}applyFilters();updateBulk();};
@@ -1052,34 +1065,49 @@ function savePayment(sendWa){
     window.open(link+'?text='+encodeURIComponent(msg),'_blank');
   }
 }
+(function initPayModal(){
+  var sw=$('paySaveWa');if(sw)sw.onclick=function(){savePayment(true);};
+  var so=$('paySaveOnly');if(so)so.onclick=function(){savePayment(false);};
+  var pa=$('payAmount');if(pa)pa.oninput=function(){refreshPayMsg();};
+  var pm=$('payMonth');if(pm)pm.oninput=function(){refreshPayMsg();};
+})();
 function showDetails(s){
   var g=groupOf(s.groupId);var f=fin(s);
   var att=Array.isArray(s.attendance)?s.attendance:[];
-  var dots='';var total=Math.max(att.length,8);for(var i=0;i<total;i++){dots+='<div class="dot'+(i<att.length?' on':'')+'" title="حصة '+(i+1)+'">'+(i+1)+'</div>';}
+  var mi=attMonthInfo(s),base=mi.total-mi.pos;
+  var dots='';for(var i=1;i<=MONTH_LEN;i++){var dt='';if(i<=mi.pos){dt=fmtDay(mi.current[i-1]);}dots+='<div class="dot'+(i<=mi.pos?' on':'')+'"'+(i<=mi.pos?' data-dotg="'+(base+i-1)+'" title="'+esc(dt)+' — اضغط لحذف الحصة"':' title="الحصة '+i+' من الشهر '+mi.month+'"')+'>'+i+'</div>';}
+  var histSec=mi.done.length?'<div class="d-sec"><div class="d-sec-title"><i class="bx bx-calendar-check"></i> الشهور المكتملة</div>'+mi.done.map(function(cyc,idx){return '<div class="d-item" style="margin-bottom:6px"><div class="ic" style="background:rgba(34,197,94,.13);color:#22c55e"><i class="bx bx-check-double"></i></div><div style="min-width:0"><small>من '+esc(fmtDay(cyc[0]))+' إلى '+esc(fmtDay(cyc[cyc.length-1]))+'</small><b>الشهر '+(idx+1)+' — 8/8 🎉</b></div></div>';}).join('')+'</div>':'';
   var rep=(s.report||'').trim()||'لا يوجد تقرير بعد —';
   window._detailsStudent=s;
+  var pays=Array.isArray(s.payments)?s.payments.slice(-5).reverse():[];
+  var paySec=pays.length?'<div class="d-sec"><div class="d-sec-title"><i class="bx bx-wallet"></i> سجل المدفوعات</div>'+pays.map(function(p){var dt='';try{dt=new Date(p.date).toLocaleDateString('ar-EG',{day:'numeric',month:'short'});}catch(e){}return '<div class="d-item" style="margin-bottom:6px"><div class="ic" style="background:rgba(34,197,94,.13);color:#22c55e"><i class="bx bx-check"></i></div><div style="min-width:0"><small>'+esc(p.month||'—')+(dt?' • '+esc(dt):'')+'</small><b>'+(parseInt(p.amount)||0)+' ج.م</b></div></div>';}).join('')+'</div>':'';
   $('detailsBody').innerHTML='<div class="d-head">'+avatarHtml(s,true)+'<div style="flex:1;min-width:0"><h3>'+esc(s.name||'')+'</h3><div class="ph">'+phoneHtml(s.phone||'',true)+'</div>'+'<div class="badges" style="margin:8px 0 0"><span class="bdg grade">'+esc(gradeSafe(s.grade))+'</span>'+(g?'<span class="bdg group">'+esc(g.name)+'</span>':'')+finBadge(s)+'</div></div></div>'
   +'<div class="d-grid">'
   +'<div class="d-item"><div class="ic" style="background:rgba(139,92,246,.13);color:#8b5cf6"><i class="bx bx-layer"></i></div><div style="min-width:0"><small>المجموعة</small><b>'+esc(g?g.name:'بدون مجموعة')+'</b></div></div>'
   +'<div class="d-item"><div class="ic" style="background:rgba(59,130,246,.13);color:#3b82f6"><i class="bx bx-calendar"></i></div><div style="min-width:0"><small>الموعد</small><b>'+esc(((s.day||'—')+' '+(s.hour||'')).trim())+'</b></div></div>'
-  +'<div class="d-item"><div class="ic" style="background:rgba(34,197,94,.13);color:#22c55e"><i class="bx bx-check-circle"></i></div><div><small>الحصص الحاضرة</small><b>'+f.count+' حصص</b></div></div>'
+  +'<div class="d-item"><div class="ic" style="background:rgba(34,197,94,.13);color:#22c55e"><i class="bx bx-check-circle"></i></div><div><small>الحصص الحاضرة (الإجمالي '+mi.total+')</small><b>الشهر '+mi.month+' — '+mi.pos+'/8</b></div><div style="margin-right:auto;display:flex;gap:6px"><button class="icon-btn" id="dSessMinus" title="إنقاص حصة">−</button><button class="icon-btn ok" id="dSessPlus" title="إضافة حصة">+</button></div></div>'
   +'<div class="d-item"><div class="ic" style="background:rgba(245,158,11,.14);color:#f59e0b"><i class="bx bx-wallet"></i></div><div><small>المدفوع</small><b>'+(s.paid||0)+' ج.م</b></div></div>'
   +'<div class="d-item"><div class="ic" style="background:rgba(139,92,246,.13);color:#8b5cf6"><i class="bx bx-calculator"></i></div><div><small>المستحق ('+f.count+' حصص)</small><b>'+f.due+' ج.م</b></div></div>'
   +'<div class="d-item"><div class="ic" style="background:rgba(239,68,68,.12);color:#ef4444"><i class="bx bx-error-circle"></i></div><div><small>المتبقي عليه</small><b>'+f.rest+' ج.م</b></div></div>'
   +'<div class="d-item"><div class="ic" style="background:rgba(6,182,212,.13);color:#06b6d4"><i class="bx bx-book"></i></div><div><small>إضافي / ملازم</small><b>'+(s.otherExpenses||0)+' ج.م</b></div></div>'
   +'<div class="d-item"><div class="ic" style="background:rgba(236,72,153,.13);color:#ec4899"><i class="bx bx-star"></i></div><div><small>المستوى</small><b>'+esc(s.level||'—')+'</b></div></div>'
   +'</div>'
+  +paySec
   +'<div class="d-sec"><div class="d-sec-title"><i class="bx bx-note"></i> تقرير المعلم</div><div class="d-report">'+esc(rep)+'</div></div>'
-  +'<div class="d-sec"><div class="d-sec-title"><i class="bx bx-history"></i> سجل الحضور <span style="margin-right:auto;background:var(--green-dim);color:var(--green);font-size:11.5px;padding:1px 10px;border-radius:12px">'+f.count+' / '+total+'</span></div><div class="dots">'+dots+'</div></div>'
+  +'<div class="d-sec"><div class="d-sec-title"><i class="bx bx-history"></i> سجل الحضور <span style="margin-right:auto;background:var(--green-dim);color:var(--green);font-size:11.5px;padding:1px 10px;border-radius:12px">الشهر '+mi.month+' ('+mi.pos+'/8)</span></div><div class="dots">'+dots+'</div></div>'+histSec
   +'<div class="d-sec"><div class="d-sec-title"><i class="bx bxl-whatsapp" style="color:#25D366"></i> رسائل واتساب جاهزة</div><div class="wa-grid" style="margin-top:0">'
   +'<button class="wa-btn wa-late" data-wa="late">🕒 تأخر المدفوعات</button>'
   +'<button class="wa-btn wa-remind" data-wa="remind">🔔 تذكير بالحصة</button>'
   +'<button class="wa-btn wa-absent" data-wa="absent">👥 تذكير بالغياب</button>'
   +'<button class="wa-btn wa-quick" data-wa="quick">💬 رسالة سريعة</button></div></div>'
-  +'<div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-primary btn-sm" id="dEdit" style="flex:1;justify-content:center"><i class="bx bx-edit"></i> تعديل</button><a class="btn btn-success btn-sm" style="flex:1;justify-content:center;text-decoration:none" href="'+waLink(s.phone)+'" target="_blank"><i class="bx bxl-whatsapp"></i> واتساب</a><button class="btn btn-ghost btn-sm" id="dAttend" style="flex:1;justify-content:center"><i class="bx bx-check"></i> حضور</button></div>';
+  +'<div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-primary btn-sm" id="dEdit" style="flex:1;justify-content:center"><i class="bx bx-edit"></i> تعديل</button><button class="btn btn-success btn-sm" id="dPay" style="flex:1;justify-content:center"><i class="bx bx-wallet"></i> تحصيل</button><a class="btn btn-success btn-sm" style="flex:1;justify-content:center;text-decoration:none" href="'+waLink(s.phone)+'" target="_blank"><i class="bx bxl-whatsapp"></i> واتساب</a><button class="btn btn-ghost btn-sm" id="dAttend" style="flex:1;justify-content:center"><i class="bx bx-check"></i> حضور</button></div>';
   $('detailsModal').classList.remove('hidden');
   $('dEdit').onclick=function(){$('detailsModal').classList.add('hidden');openStudent(s);};
+  $('dPay').onclick=function(){$('detailsModal').classList.add('hidden');openPay(s,true);};
   $('dAttend').onclick=function(){$('detailsModal').classList.add('hidden');addAttendance(s);};
+  var dsm=$('dSessMinus');if(dsm)dsm.onclick=function(){var arr=Array.isArray(s.attendance)?s.attendance.slice():[];if(!arr.length){toast('لا توجد حصص لإنقاصها','error');return;}arr.pop();s.attendance=arr;persistAndRender();showDetails(s);};
+  var dsp=$('dSessPlus');if(dsp)dsp.onclick=function(){var arr=Array.isArray(s.attendance)?s.attendance.slice():[];arr.push(Date.now());s.attendance=arr;persistAndRender();showDetails(s);toast('✅ تمت إضافة حصة لـ '+(s.name||''));};
+  document.querySelectorAll('#detailsBody [data-dotg]').forEach(function(d){d.onclick=function(){var gi=parseInt(d.dataset.dotg);var sorted=attListOf(s);if(isNaN(gi)||gi<0||gi>=sorted.length)return;if(!confirm('حذف هذه الحصة لـ '+(s.name||'')+'؟'))return;var val=sorted[gi];var arr=Array.isArray(s.attendance)?s.attendance.slice():[];var j=arr.indexOf(val);if(j<0&&arr.length)j=gi<arr.length?gi:arr.length-1;if(j>=0)arr.splice(j,1);s.attendance=arr;persistAndRender();showDetails(s);toast('🗑️ تم حذف الحصة');};});
   var dz=$('dZoom');if(dz)dz.onclick=function(){openImg(s.profileImage);};
   var dc=$('dChangeImg');if(dc)dc.onclick=function(){$('detailsModal').classList.add('hidden');openStudent(s);setTimeout(function(){var f=$('sImgFile');if(f)f.click();},250);};
   document.querySelectorAll('#detailsBody [data-wa]').forEach(function(b){b.onclick=function(){sendWaMsg(s,b.dataset.wa);};});
@@ -1101,7 +1129,7 @@ var WA_T_DEFAULT={
   absent:'إشعار غياب ⚠️\nنفيدكم بأن الطالب 👨‍🎓 {اسم_الطالب} بـ {الصف} 🏫.\nلم يحضر حصة ❌ {اليوم} في تمام الساعة ⏳ {الوقت}،\nنرجو متابعة سبب الغياب 🔍، ونتطلع إلى انتظام حضوره في الحصص القادمة 📚✨.\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓',
   late:'إشعار تلقائي 🔔: نود إبلاغكم بأن هناك مبلغ متأخر على الطالب ⚠️\nالطالب: 👨‍🎓 {اسم_الطالب}\nالصف: 🏫 {الصف}\nالمبلغ المستحق: 💵 {المبلغ_المتبقي}\nعدد الحصص: 📚 {عدد_الحصص}\nيرجى مراجعة المستحقات واستكمال السداد في أقرب وقت ⏳💳.\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓',
   quick:'السلام عليكم 🌹\nرسالة بخصوص الطالب 👨‍🎓 {اسم_الطالب} ({الصف}) — برجاء التواصل للمتابعة 🙏\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓',
-  receipt:'إيصال تحصيل رسوم ✅\nتم بحمد الله تحصيل رسوم الدرس من الطالب 👨‍🎓 {اسم_الطالب} ({الصف}) 🏫\n💵 المبلغ المحصّل: {المبلغ_المدفوع} ج.م\n📅 عن شهر: {الشهر}\n🧾 إجمالي المدفوع: {المدفوع} ج.م\n📌 المتبقي: {المبلغ_المتبقي} ج.م\nشكراً لتعاونكم 🙏\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓'
+  receipt:'إيصال تحصيل رسوم ✅\nتم بحمد الله تحصيل رسوم الدرس من الطالب 👨‍🎓 {اسم_الطالب} ({الصف}) 🏫\n💵 المبلغ المحصّل: {المبلغ_المدفوع} ج.م\n📅 عن شهر: {الشهر}\n📚 عدد الحصص الحاضرة: {الحصص_الحاضرة}\n🧾 إجمالي المدفوع: {المدفوع} ج.م\n📌 المتبقي: {المبلغ_المتبقي} ج.م\nشكراً لتعاونكم 🙏\n━━━━━━━━━━━━━━\nتم الإرسال تلقائيًا بواسطة 🤖\nمنصة المستر محمد سعيد الحاكم 🎓'
 };
 var LS_WA='elmistar_wa_templates_v2';
 var WA_T={late:WA_T_DEFAULT.late,remind:WA_T_DEFAULT.remind,absent:WA_T_DEFAULT.absent,quick:WA_T_DEFAULT.quick,receipt:WA_T_DEFAULT.receipt};
@@ -1114,7 +1142,7 @@ function fillWa(t,s,extra){
   var debt=f.clear?'لا توجد مستحقات — الحساب خالص 🟢':(f.unpaid+' حصص متأخرة ('+f.rest+' ج.م)');
   var r=String(t||'');
   var grade=gradeSafe(s.grade), gname=g?g.name:'—', day=s.day||'—', time=s.hour||'—', name=s.name||'';
-  var rest=(f.rest||0)+' ج.م', cnt=String(f.unpaid||0), paid=String(s.paid||0);
+  var rest=(f.rest||0)+' ج.م', cnt=String(f.unpaid||0), paid=String(s.paid||0), present=String(f.count||0);
   var ex=extra||{};
   var payAmt=String(ex.amount!=null?ex.amount:0), month=ex.month||'—';
   var dateStr=ex.date||new Date().toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric'});
@@ -1125,6 +1153,7 @@ function fillWa(t,s,extra){
   r=r.replace(/{المجموعة}/g,gname).replace(/{group}/g,gname);
   r=r.replace(/{المبلغ_المتبقي}/g,rest).replace(/{المبلغ}/g,rest).replace(/{debt}/g,debt);
   r=r.replace(/{عدد_الحصص}/g,cnt);
+  r=r.replace(/{الحصص_الحاضرة}/g,present).replace(/{الحصص}/g,present);
   r=r.replace(/{المدفوع}/g,paid);
   r=r.replace(/{المبلغ_المدفوع}/g,payAmt);
   r=r.replace(/{الشهر}/g,month);
@@ -1180,7 +1209,7 @@ function openAttend(groupId){
   $('attendModal').classList.remove('hidden');
 }
 function attStudents(){var gid=$('attGroup')?$('attGroup').value:'';return students.filter(function(s){return s.groupId===gid&&(s.isActivated===true||s.isActivated===undefined);}).sort(function(a,b){return (a.name||'').localeCompare(b.name||'','ar');});}
-function sessPills(s){var c=Array.isArray(s.attendance)?s.attendance.length:0;var total=Math.max(c,8);var h='';for(var i=1;i<=total&&i<=12;i++){h+='<span class="sess-pill'+(i<=c?' on':'')+'">'+i+'</span>';}return h;}
+function sessPills(s){var m=attMonthInfo(s);var h='';for(var i=1;i<=MONTH_LEN;i++){h+='<span class="sess-pill'+(i<=m.pos?' on':'')+'">'+i+'</span>';}return h;}
 function renderAttList(){
   var box=$('attList');if(!box)return;box.innerHTML='';
   var ms=attStudents();
@@ -1188,25 +1217,31 @@ function renderAttList(){
   if(!ms.length){box.innerHTML='<div class="empty"><i class="bx bx-group"></i><h3>لا يوجد طلاب</h3><p>اختر مجموعة أخرى أو أضف طلاباً للمجموعة</p></div>';return;}
   ms.forEach(function(s){
     var c=Array.isArray(s.attendance)?s.attendance.length:0;
+    var mi=attMonthInfo(s);
     var checked=attChecked[s.id]!==false;
     var row=document.createElement('div');row.className='att-row '+(checked?'present':'absent');
     var av=s.profileImage?'<div class="att-av"><img src="'+s.profileImage+'"></div>':'<div class="att-av">'+esc((s.name||'?').charAt(0))+'</div>';
     row.innerHTML='<input type="checkbox" class="ck" '+(checked?'checked':'')+' title="حاضر / غائب">'
     +av+'<div class="att-info"><div class="att-name">'+esc(s.name||'')+'</div>'
-    +'<div class="att-sub"><span class="ok">'+esc(gradeSafe(s.grade))+'</span><span>|</span><span>حضر '+c+' / 8 حصص</span></div>'
+    +'<div class="att-sub"><span class="ok">'+esc(gradeSafe(s.grade))+'</span><span>|</span><span>الشهر '+mi.month+' • حضر '+mi.pos+'/8</span></div>'
     +'<div class="att-status '+(checked?'':'abs')+'">'+(checked?'✓ مسجل للحصة':'✕ غائب عن الحصة')+'</div>'
     +'<div class="att-sess">'+sessPills(s)+'</div></div>'
+    +'<div class="att-step"><button class="icon-btn" data-step="-1" title="إنقاص حصة">−</button><b>'+mi.total+'</b><button class="icon-btn ok" data-step="1" title="إضافة حصة">+</button></div>'
     +'<div class="att-mini"><button class="icon-btn ok" title="تسجيل حضور سريع"><i class="bx bx-plus"></i></button><button class="icon-btn" title="تعديل الطالب"><i class="bx bx-edit"></i></button></div>';
     var ck=row.querySelector('.ck');
-    var setAtt=function(v){attChecked[s.id]=v;ck.checked=v;row.classList.toggle('present',v);row.classList.toggle('absent',!v);var st=row.querySelector('.att-status');if(st){st.textContent=v?'✓ مسجل للحصة':'✕ غائب عن الحصة';st.classList.toggle('abs',!v);}syncAttAll();};
+    var setAtt=function(v){attChecked[s.id]=v;ck.checked=v;row.classList.toggle('present',v);row.classList.toggle('absent',!v);var st=row.querySelector('.att-status');if(st){st.textContent=v?'✓ مسجل للحصة':'✕ غائب عن الحصة';st.classList.toggle('abs',!v);}syncAttAll();updateAttStats();};
+    row.querySelectorAll('[data-step]').forEach(function(sb){sb.onclick=function(e){if(e)e.stopPropagation();var d=parseInt(sb.dataset.step);var arr=Array.isArray(s.attendance)?s.attendance.slice():[];if(d>0){var dv=$('attDate')?$('attDate').value:'';var ts=dv?new Date(dv+'T12:00:00').getTime():Date.now();if(!ts)ts=Date.now();arr.push(ts);}else{if(!arr.length){toast('لا توجد حصص لإنقاصها','error');return;}arr.pop();}s.attendance=arr;persistAndRender();renderAttList();toast(d>0?'✅ تمت إضافة حصة لـ '+(s.name||''):'➖ تم إنقاص حصة من '+(s.name||''));};});
     ck.onchange=function(){setAtt(ck.checked);};
     row.onclick=function(e){if(e.target.closest('.att-mini')||e.target.closest('button')||e.target.closest('a'))return;setAtt(!(attChecked[s.id]!==false));};
-    row.querySelector('.att-mini').children[0].onclick=function(e){if(e)e.stopPropagation();var b=this;b.style.transform='scale(.85)';setTimeout(function(){b.style.transform='';},160);addAttendance(s);setAtt(true);var c=Array.isArray(s.attendance)?s.attendance.length:0;var pb=row.querySelector('.att-sess');if(pb)pb.innerHTML=sessPills(s);var sub=row.querySelector('.att-sub');if(sub){var sp=sub.querySelectorAll('span');if(sp.length>=3)sp[2].textContent='حضر '+c+' / 8 حصص';}};
+    row.querySelector('.att-mini').children[0].onclick=function(e){if(e)e.stopPropagation();var b=this;b.style.transform='scale(.85)';setTimeout(function(){b.style.transform='';},160);addAttendance(s);setAtt(true);renderAttList();};
     row.querySelector('.att-mini').children[1].onclick=function(){$('attendModal').classList.add('hidden');openStudent(s);};
     box.appendChild(row);
   });
+  updateAttStats();
 }
 function syncAttAll(){var ms=attStudents();var all=ms.length&&ms.every(function(s){return attChecked[s.id]!==false;});var al=$('attAll');if(al)al.checked=!!all;}
+function updateAttStats(){var ms=attStudents();var p=ms.filter(function(s){return attChecked[s.id]!==false;}).length;var ok=$('attOk'),no=$('attNo');if(ok)ok.textContent=p+' حاضر';if(no)no.textContent=(ms.length-p)+' غائب';}
+function attDayKey(ts){var d=new Date(ts);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
 if($('attGroup'))$('attGroup').onchange=function(){var ms=attStudents();attChecked={};ms.forEach(function(s){attChecked[s.id]=true;});var al=$('attAll');if(al)al.checked=true;renderAttList();};
 if($('attAll'))$('attAll').onchange=function(){var v=$('attAll').checked;attStudents().forEach(function(s){attChecked[s.id]=v;});renderAttList();};
 if($('attSave'))$('attSave').onclick=function(){
@@ -1216,9 +1251,9 @@ if($('attSave'))$('attSave').onclick=function(){
   if(!present.length){toast('حدد طالباً واحداً على الأقل','error');return;}
   if(!confirm('حفظ حضور '+present.length+' طالب بتاريخ '+(dv||'اليوم')+'؟'))return;
   var btn=$('attSave');btn.disabled=true;btn.textContent='جاري الحفظ...';
-  var n=0;
-  present.forEach(function(s){var att=Array.isArray(s.attendance)?s.attendance.slice():[];att.push(ts);s.attendance=att;n++;});
-  persistAndRender();renderAttList();btn.disabled=false;btn.textContent='حفظ كشف الحضور والغياب';toast('✅ تم حفظ حضور '+n+' طالب');
+  var n=0,skipped=0,dk=attDayKey(ts);
+  present.forEach(function(s){var att=Array.isArray(s.attendance)?s.attendance.slice():[];var dup=att.some(function(t){return attDayKey(t)===dk;});if(dup){skipped++;return;}att.push(ts);s.attendance=att;n++;});
+  persistAndRender();renderAttList();btn.disabled=false;btn.textContent='حفظ كشف الحضور والغياب';var closed=0;present.forEach(function(s){var mi=attMonthInfo(s);if(mi.total>0&&mi.pos===0)closed++;});toast('✅ تم حفظ حضور '+n+' طالب'+(skipped?' • تم تخطي '+skipped+' مسجل مسبقاً بنفس التاريخ':'')+(closed?' • 🎉 '+closed+' قفل الشهر وبدأ شهر جديد':''));
 };
 if($('attReset'))$('attReset').onclick=function(){
   var ms=attStudents();if(!ms.length)return;

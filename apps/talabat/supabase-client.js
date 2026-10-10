@@ -210,6 +210,20 @@ window.NaqisnaSupabase = (function () {
     }
   }
 
+  // --- Delete Home Permanently (single blob row) ---
+  async function deleteHome(homeCode) {
+    const sb = getClient();
+    if (!sb || !homeCode) return false;
+    try {
+      const { error } = await sb.from(BLOB_TABLE).delete().eq('code', homeCode);
+      if (error) { console.error('Supabase home delete failed:', error); return false; }
+      return true;
+    } catch (e) {
+      console.error('Supabase home delete error:', e);
+      return false;
+    }
+  }
+
   // Guard: never let a stale/empty device wipe shared cloud content.
   // Skips the write when local has no orders while the cloud does,
   // unless this device already completed its first pull-merge.
@@ -376,6 +390,7 @@ window.NaqisnaSupabase = (function () {
     deleteOrder,
     upsertExpense,
     deleteExpense,
+    deleteHome,
     pushFullState,
     pushOrdersOnly,
     pushFinPartial,
