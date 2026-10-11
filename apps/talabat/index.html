@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
@@ -519,6 +519,20 @@
   .bask-count:active { transform: scale(.94); }
   .bask-actions { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; padding: 10px 10px 4px; }
   .bask-actions .btn { width: 100%; margin: 0; min-height: 46px; font-size: 14px; }
+  /* سلة التجهيز — شكل احترافي */
+  .bask-head .category-card-count { display: inline-block; background: var(--primary-light); color: var(--primary-dark); font-weight: 900; font-size: 11.5px; padding: 3px 12px; border-radius: 999px; margin-top: 3px; }
+  .bask-list { display: flex; flex-direction: column; gap: 8px; padding: 10px 10px 12px; }
+  .bask-list .order-card { border-radius: 18px !important; border-inline-start: 4px solid var(--primary) !important; box-shadow: 0 4px 14px rgba(30,27,46,.07) !important; animation: apptIn .4s cubic-bezier(.22,1,.36,1) both; }
+  .bask-list .order-card:nth-child(2) { animation-delay: .05s; }
+  .bask-list .order-card:nth-child(3) { animation-delay: .1s; }
+  .bask-list .order-card:nth-child(4) { animation-delay: .15s; }
+  .bask-list .order-card:nth-child(n+5) { animation-delay: .2s; }
+  .bask-list .order-card:active { transform: scale(.98); }
+  .bask-list .category-card-icon { border-radius: 14px !important; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.8), 0 4px 10px rgba(30,27,46,.08) !important; }
+  .bask-list .badge-pending { background: linear-gradient(135deg,#FCD34D,#F59E0B); color: #fff; border: none; font-weight: 900; box-shadow: 0 3px 8px rgba(245,158,11,.35); }
+  .bask-actions #basketConfirm { background: linear-gradient(135deg,#34D399,#059669); border: none; border-radius: 15px; font-weight: 900; box-shadow: 0 10px 22px rgba(16,185,129,.35), inset 0 1px 0 rgba(255,255,255,.4); position: relative; overflow: hidden; }
+  .bask-actions #basketConfirm::after { content: ''; position: absolute; top: 0; bottom: 0; width: 60px; background: linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent); animation: apptShine 2.8s ease-in-out infinite; pointer-events: none; }
+  .bask-actions #basketClear { background: transparent; border: 1.5px dashed var(--border); color: var(--text-sec); border-radius: 15px; font-weight: 900; }
   .urg-toggle { display: flex; align-items: center; gap: 10px; background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 11px 13px; width: 100%; text-align: right; transition: all .18s; box-shadow: var(--shadow-sm); }
   .urg-toggle:active { transform: scale(.98); }
   .urg-toggle .u-ico { width: 38px; height: 38px; border-radius: 12px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
@@ -828,12 +842,9 @@
   @keyframes azpNumPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
   .azp-item.active .azp-tap-pill { animation: azpPillPulse 1.4s ease-in-out infinite; }
   @keyframes azpPillPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-  .azp-prog { height: 7px; border-radius: 99px; background: rgba(0,0,0,.08); margin-top: 10px; overflow: hidden; }
-  .azp-prog i { display: block; height: 100%; border-radius: 99px; background: var(--grad); transition: width .3s ease; }
-  .azkar-page.evening .azp-prog i { background: linear-gradient(90deg,#FFB020,#FF7A00); }
   .azp-item.tapped { animation: azpTapFlash .4s ease-out !important; }
   @keyframes azpTapFlash { 0% { transform: scale(.97); filter: brightness(1.12); } 100% { transform: scale(1); filter: none; } }
-  .azp-item-top { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; position: relative; min-height: 36px; }
+  .azp-item-top { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin-bottom: 8px; position: relative; min-height: 36px; }
   .azp-num { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); color: var(--primary-dark); font-size: 14px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(28,176,246,.25), inset 0 0 0 2px rgba(255,255,255,.7); }
   .azp-item-top .azp-need { position: absolute; inset-inline-end: 0; top: 50%; transform: translateY(-50%); margin: 0; }
   .azp-item.done .azp-num { background: var(--success); color: #fff; }
@@ -882,8 +893,8 @@
   .task-row.done .task-check { background: linear-gradient(135deg,#34D399,#059669); border-color: #059669; box-shadow: 0 4px 10px rgba(16,185,129,.35); animation: jhPop .35s ease-out; }
   .task-row.done .task-check::after { content: '✓'; }
   .task-title { flex: 1; min-width: 0; font-size: 14px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; }
-  .task-ico { width: 34px; height: 34px; border-radius: 12px; background: var(--tcbg, var(--primary-light)); color: var(--tc, var(--primary-dark)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.7); }
-  .task-ico svg { width: 19px; height: 19px; }
+  .task-ico { width: 38px; height: 38px; border-radius: 13px; background: linear-gradient(135deg, var(--tcbg, var(--primary-light)), #fff); color: var(--tc, var(--primary-dark)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.75), 0 3px 8px rgba(30,27,46,.08); }
+  .task-ico svg { width: 21px; height: 21px; }
   .task-row.done .task-ico { background: var(--bg); color: var(--text-muted); }
   .task-row.daily { background: var(--tcbg, #F2FAFE); }
   .task-tt { flex: 1; min-width: 0; }
@@ -925,6 +936,19 @@
   .appt-remwrap { position: relative; min-width: 0; }
   .appt-remwrap .rep-picker-btn { min-height: 48px; }
   .appt-rempanel { position: absolute; top: calc(100% + 6px); right: 0; left: 0; z-index: 60; margin: 0; }
+  .appt-type-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .appt-type-btn { display: flex; align-items: center; justify-content: center; gap: 6px; border: 1.5px solid var(--border); background: #fff; border-radius: 13px; padding: 10px 8px; font-weight: 900; font-size: 12.5px; color: var(--text-sec); min-height: 48px; }
+  .appt-type-btn.sel { border-color: var(--primary); background: var(--primary-light); color: var(--primary); box-shadow: 0 0 0 3px rgba(28,176,246,.14); }
+  .appt-days { display: flex; flex-wrap: wrap; gap: 6px; }
+  .appt-days::-webkit-scrollbar { display: none; }
+  .appt-day { border: 1.5px solid var(--border); background: #fff; border-radius: 999px; padding: 7px 10px; font-size: 11.5px; font-weight: 900; color: var(--text-sec); white-space: nowrap; }
+  .appt-day.sel { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(28,176,246,.3); }
+  .appt-times { display: flex; flex-direction: column; gap: 6px; }
+  .appt-time-row { display: flex; gap: 6px; align-items: center; }
+  .appt-time-row input { flex: 1; }
+  .appt-time-del { width: 42px; height: 42px; border-radius: 12px; border: 1.5px solid var(--danger); color: var(--danger); background: #fff; font-weight: 900; font-size: 16px; flex-shrink: 0; }
+  .appt-add-time { border: 1.5px dashed var(--primary); color: var(--primary); background: var(--primary-light); border-radius: 12px; padding: 9px; font-weight: 900; font-size: 12.5px; }
+  .appt-dayname { min-width: 88px; text-align: center; background: var(--primary-light); color: var(--primary); border-radius: 12px; padding: 10px 8px; font-weight: 900; font-size: 12.5px; flex-shrink: 0; }
   .appt-row { display: flex; flex-direction: column; gap: 0; padding: 12px; border-radius: 16px; cursor: pointer; background: #fff; border: 1.5px solid var(--border); border-inline-start: 4px solid var(--tc, #1CB0F6); box-shadow: 0 3px 10px rgba(30,27,46,.05); margin-bottom: 8px; animation: apptIn .45s cubic-bezier(.22,1,.36,1) both; transition: transform .15s, box-shadow .2s, background .15s; }
   .appt-row:active { transform: scale(.98); background: var(--tcbg, #F2FAFE); }
   .task-listbox .appt-row:nth-child(1) { animation-delay: .04s; } .task-listbox .appt-row:nth-child(2) { animation-delay: .09s; }
@@ -953,11 +977,13 @@
   .appt-row.overdue .appt-rem { color: var(--danger); background: #FFF5F6; }
   .appt-notes { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* تم حذف قسم العادات اليومية — بطاقتها تفتح ملف 1.html */
-  .icon-pick { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 14px 8px; }
-  .icon-pick button { width: 38px; height: 38px; border-radius: 12px; background: var(--bg); border: 1.5px solid var(--border); font-size: 19px; color: #B45309; display: flex; align-items: center; justify-content: center; transition: transform .12s, border-color .15s, background .15s; }
-  .icon-pick button svg { width: 20px; height: 20px; }
-  .icon-pick button:active { transform: scale(.9); }
-  .icon-pick button.sel { border-color: #FF9600; background: #FFF3E2; box-shadow: 0 0 0 3px rgba(255,150,0,.15); transform: scale(1.08); }
+  .icon-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 8px; padding: 0 14px 10px; }
+  .icon-pick button { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; border-radius: 15px; background: #fff; border: 1.5px solid var(--border); padding: 7px 2px 6px; transition: transform .12s, border-color .15s, box-shadow .15s; }
+  .icon-pick button .it-ic { width: 40px; height: 40px; border-radius: 13px; background: linear-gradient(135deg, var(--icbg, var(--primary-light)), #fff); color: var(--ic, var(--primary-dark)); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.8), 0 3px 8px rgba(30,27,46,.07); }
+  .icon-pick button .it-ic svg { width: 22px; height: 22px; }
+  .icon-pick button .it-lb { font-size: 9px; font-weight: 900; color: var(--text-sec); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .icon-pick button:active { transform: scale(.93); }
+  .icon-pick button.sel { border-color: var(--ic, #FF9600); background: var(--icbg, #FFF3E2); box-shadow: 0 0 0 3px var(--icbg, rgba(255,150,0,.15)), 0 8px 16px rgba(30,27,46,.10); transform: translateY(-2px); }
   /* ===== أقسام قابلة للطي (المهام + العادات) — مخفية افتراضياً ===== */
   .stat-card.expandable { cursor: pointer; transition: transform .15s ease, box-shadow .25s ease, border-color .25s ease; user-select: none; -webkit-user-select: none; }
   .stat-card.expandable:active { transform: scale(.95); }
@@ -1387,20 +1413,32 @@
   .achv { min-width: 0; background: #fff; border-radius: 20px; padding: 12px 8px; box-shadow: var(--shadow-sm); border: 1px solid rgba(28,176,246,.07); display: flex; gap: 8px; align-items: center; justify-content: center; text-align: center; }
   .achv.locked { opacity: .55; filter: grayscale(.4); }
   .achv-ico { width: 42px; height: 42px; border-radius: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
+  /* تبويبات التسوق: segmented control + حركة دخول عند التنقل */
+  .badge-row.shop-tabs { background: var(--bg); border: 1.5px solid var(--border); border-radius: 22px; padding: 5px; gap: 5px; }
+  .shop-tabs .achv { border-radius: 17px; border: 1.5px solid transparent !important; border-top: 1.5px solid transparent !important; box-shadow: none !important; background: transparent; padding: 10px 6px; transition: background .2s, box-shadow .2s, transform .12s, border-color .2s; }
+  .shop-tabs .achv:active { transform: scale(.94); }
+  .shop-tabs .achv.tab-active { background: #fff; border-color: rgba(28,176,246,.25) !important; box-shadow: 0 6px 16px rgba(30,27,46,.12) !important; transform: translateY(-1px); }
+  .shop-tabs .achv-ico { width: 38px; height: 38px; }
+  .shop-tab-body.anim > * { animation: tabFadeUp .32s cubic-bezier(.22,1,.36,1) both; }
+  .shop-tab-body.anim > *:nth-child(2) { animation-delay: .05s; }
+  .shop-tab-body.anim > *:nth-child(3) { animation-delay: .1s; }
+  .shop-tab-body.anim > *:nth-child(n+4) { animation-delay: .15s; }
+  @keyframes tabFadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   .achv b { font-size: 12px; display: block; }
   .achv small { font-size: 10.5px; color: var(--text-sec); font-weight: 700; }
   /* ===== بطاقات البوابات الأربع (صلاة/أذكار/مهام/عادات) — تصميم احترافي ===== */
   .gate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .gate-card { position: relative; overflow: hidden; border-radius: 22px; padding: 14px 12px 12px; background: #fff; border: 1.5px solid rgba(28,176,246,.12); box-shadow: 0 8px 22px rgba(28,176,246,.10); cursor: pointer; text-align: right; transition: transform .15s ease, box-shadow .2s ease; }
-  .gate-card:active { transform: scale(.96); }
-  .gate-card::before { content: ''; position: absolute; top: 0; right: 0; left: 0; height: 4px; background: var(--gc, var(--primary)); }
-  .gate-card .gc-ico { width: 44px; height: 44px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; background: var(--gc-soft, var(--primary-light)); color: var(--gc, var(--primary-dark)); margin-bottom: 8px; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.7); }
-  .gate-card .gc-label { display: block; font-size: 12px; font-weight: 800; color: var(--text-sec); }
-  .gate-card .gc-value { display: block; font-size: 19px; font-weight: 900; margin-top: 2px; font-variant-numeric: tabular-nums; line-height: 1.4; }
-  .gate-card .gc-value small { font-size: 11px; font-weight: 700; color: var(--text-muted); }
-  .gate-card .gc-sub { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-top: 3px; }
-  .gate-card .gc-bar { height: 6px; border-radius: 99px; background: var(--bg); margin-top: 8px; overflow: hidden; }
-  .gate-card .gc-bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--gc, var(--primary)), var(--gc2, var(--gc, var(--primary)))); transition: width .4s ease; }
+  .gate-card { position: relative; overflow: hidden; border-radius: 24px; padding: 16px 13px 13px; background: linear-gradient(165deg, #fff 30%, var(--gc-soft, var(--primary-light))); border: 1.5px solid rgba(28,176,246,.14); box-shadow: 0 10px 26px rgba(28,176,246,.12); cursor: pointer; text-align: right; transition: transform .15s ease, box-shadow .2s ease; }
+  .gate-card:active { transform: scale(.95); }
+  .gate-card::before { content: ''; position: absolute; top: 0; right: 0; left: 0; height: 5px; background: linear-gradient(90deg, var(--gc, var(--primary)), var(--gc2, var(--gc, var(--primary)))); }
+  .gate-card::after { content: ''; position: absolute; width: 110px; height: 110px; border-radius: 50%; background: var(--gc, var(--primary)); opacity: .08; left: -38px; bottom: -48px; pointer-events: none; }
+  .gate-card .gc-ico { width: 50px; height: 50px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-size: 25px; flex-shrink: 0; background: linear-gradient(135deg, var(--gc-soft, var(--primary-light)), #fff); color: var(--gc, var(--primary-dark)); margin-bottom: 9px; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.8), 0 6px 14px rgba(30,27,46,.10); position: relative; z-index: 1; }
+  .gate-card .gc-label { display: block; font-size: 15px; font-weight: 900; color: var(--text); position: relative; z-index: 1; line-height: 1.6; }
+  .gate-card .gc-value { display: block; font-size: 30px; font-weight: 900; margin-top: 4px; font-variant-numeric: tabular-nums; line-height: 1.4; color: var(--gc, var(--primary-dark)); position: relative; z-index: 1; text-shadow: 0 2px 10px rgba(30,27,46,.08); }
+  .gate-card .gc-value small { font-size: 13px; font-weight: 800; color: var(--text-sec); }
+  .gate-card .gc-sub { display: flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 800; color: var(--text-sec); margin-top: 5px; position: relative; z-index: 1; line-height: 1.7; }
+  .gate-card .gc-bar { height: 7px; border-radius: 99px; background: rgba(255,255,255,.75); margin-top: 9px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(30,27,46,.10); position: relative; z-index: 1; }
+  .gate-card .gc-bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--gc, var(--primary)), var(--gc2, var(--gc, var(--primary)))); transition: width .4s ease; box-shadow: 0 0 8px var(--gc, var(--primary)); }
   .gate-card.gate-prayer { background: linear-gradient(150deg, #252D52 0%, #10142B 100%); border-color: rgba(255,255,255,.09); box-shadow: 0 12px 28px rgba(16,20,43,.45); color: #fff; --gc: #FBBF24; }
   .gate-card.gate-prayer .gc-label { color: rgba(255,255,255,.65); }
   .gate-card.gate-prayer .gc-value small { color: rgba(255,255,255,.55); }
@@ -2601,9 +2639,9 @@
           <button class="filter-chip ${qt === 'weight' ? 'active' : ''}" data-bqtype="weight" data-id="${it.id}">وزن</button>
         </div>
         ${qt === 'count' ? `<div class="exp-row"><button class="btn btn-secondary btn-sm" data-bqminus="${it.id}">−</button><b style="min-width:30px;text-align:center;">${d.qtyVal ?? 1}</b><button class="btn btn-secondary btn-sm" data-bqplus="${it.id}">+</button><select class="rv-select" data-bqunit="${it.id}">${selC}</select></div>` : ''}
-        ${qt === 'weight' ? `<div class="exp-row"><input type="number" class="qty-num" data-bqvalw="${it.id}" value="${d.qtyVal ?? ''}" placeholder="0" min="0"><select class="rv-select" data-bqunitw="${it.id}">${selW}</select></div>` : ''}
+        ${qt === 'weight' ? `<div class="exp-row"><input type="number" class="qty-num" data-bqvalw="${it.id}" value="${d.qtyVal ?? ''}" min="0"><select class="rv-select" data-bqunitw="${it.id}">${selW}</select></div>` : ''}
         <div class="exp-row"><span class="lbl">صورة</span>${d.photo ? `<img src="${d.photo}" style="width:46px;height:46px;border-radius:12px;object-fit:cover;flex-shrink:0;" /><button class="btn btn-sm btn-danger" data-bqrmphoto="${it.id}">امسح</button>` : `<label class="btn btn-secondary btn-sm" style="cursor:pointer;">📷 ضيف صورة المنتج<input type="file" accept="image/*" data-bqphoto="${it.id}" class="hidden" /></label>`}</div>
-        <div class="exp-row"><span class="lbl">ملحوظة</span><input class="exp-notes" data-bqnotes="${it.id}" value="${escapeHTML(d.notes || '')}" placeholder="اكتب ملحوظة لو حابب..."></div>
+        <div class="exp-row"><span class="lbl">ملحوظة</span><input class="exp-notes" data-bqnotes="${it.id}" value="${escapeHTML(d.notes || '')}"></div>
         <div class="exp-row"><button class="btn btn-primary btn-sm" data-bqsave="${it.id}">احفظ التعديل</button><button class="btn btn-success btn-sm" data-bqconfirm="${it.id}">✓ أكّد</button><button class="btn btn-danger btn-sm" data-bqdel="${it.id}">امسح الصنف</button></div>
       </div>`;
     }
@@ -2625,10 +2663,10 @@
       <div class="category-card-header bask-head">
         <div class="category-card-icon bask-ico">🧺</div>
         <div class="category-card-info"><div class="category-card-name">سلة التجهيز</div><div class="category-card-count">${items.length} صنف • دوس على الصنف للتعديل</div></div>
-        <button class="bask-count" id="basketAddMore" title="ضيف صنف جديد للسلة">ضيف</button>
+        <button class="bask-count" id="basketAddMore" title="ضيف صنف جديد للسلة">+ ضيف</button>
       </div>
-      <div class="bask-actions"><button class="btn btn-success" id="basketConfirm">✅ أكّد الكل</button><button class="btn" id="basketClear">فضّيها</button></div>
-      <div class="category-card-orders">${items.map(it => renderBasketCard(it)).join('')}</div>
+      <div class="bask-actions"><button class="btn btn-success" id="basketConfirm">✅ أكّد الكل (${items.length})</button><button class="btn" id="basketClear">فضّيها</button></div>
+      <div class="category-card-orders bask-list">${items.map(it => renderBasketCard(it)).join('')}</div>
     </div></div>`;
   }
   function markPurchased(orderId, { originalPrice, finalPrice }) {
@@ -2849,6 +2887,14 @@
   }
   /* ===== أصوات إنجاز خفيفة (WebAudio — بدون ملفات) ===== */
   let _fxCtx = null;
+  /* صوت إتمام المهام والمواعيد: ملف audio/note.mp3 */
+  function playNoteSound() {
+    try {
+      if (state && state._fxOff === true) return;
+      const snd = new Audio(encodeURI('audio/note.mp3'));
+      snd.play().catch(() => {});
+    } catch (_) {}
+  }
   function fxSound(kind) {
     try {
       if (state && state._fxOff === true) return;
@@ -2924,7 +2970,7 @@
       const html = `<div class="confirm-dialog">
         <div class="confirm-icon" style="background:var(--primary-light);color:var(--primary);;">${svgIcon('pencil', 26)}</div>
         <h3>${title}</h3><p>${message || ''}</p>
-        <div class="field" style="margin:0 0 4px;"><input type="text" id="promptInput" maxlength="40" value="${escapeHTML(initial || '')}" placeholder="اكتب هنا..." /></div>
+        <div class="field" style="margin:0 0 4px;"><input type="text" id="promptInput" maxlength="40" value="${escapeHTML(initial || '')}" /></div>
         <div class="confirm-buttons">
           <button class="btn" id="cancelBtn">${cancelText || 'رجوع'}</button>
           <button class="btn btn-primary" id="okBtn">${confirmText || 'تمام'}</button>
@@ -3046,7 +3092,8 @@
   /* الدخول مباشر بدون أي شاشة ترحيب وبدون بيت تلقائي: البيت يتعمل يدوياً من الإعدادات فقط */
   function autoInitUser() {
     let changed = false;
-    if (!state.user) { state.user = { id: uid(), name: 'فرد من العيلة', role: 'member', whatsapp: '', joinedAt: nowISO() }; changed = true; }
+    if (!state.user) { state.user = { id: uid(), name: 'المستر', role: 'member', whatsapp: '', joinedAt: nowISO() }; changed = true; }
+    else if (state.user.name === 'فرد من العيلة') { state.user.name = 'المستر'; changed = true; }
     if (!state.initialized) { state.initialized = true; changed = true; }
     state._onboardingStep = null;
     if (!state.currentTab) { state.currentTab = 'home'; changed = true; }
@@ -3126,7 +3173,7 @@
       <p class="form-subtitle">اكتب كود البيت اللي عندك</p>
       <div class="field">
         <label>كود البيت</label>
-        <input type="text" id="joinCodeInput" placeholder="مثال: HOME-4827" style="text-transform:uppercase; letter-spacing:2px;" />
+        <input type="text" id="joinCodeInput" style="text-transform:uppercase; letter-spacing:2px;" />
         <div class="help-text">اكتب الكود زي ما هو بالظبط</div>
       </div>
       <div id="joinError" class="error-text hidden">الكود غلط أو البيت مش موجود 😅</div>
@@ -3140,11 +3187,11 @@
       <p class="form-subtitle">أول مرة تدخل؟ اكتب بياناتك</p>
       <div class="field">
         <label>اسمك</label>
-        <input type="text" id="userNameInput" placeholder="مثال: محمد، سارة" maxlength="20" value="${escapeHTML(state.user?.name || '')}" />
+        <input type="text" id="userNameInput" maxlength="20" value="${escapeHTML(state.user?.name || '')}" />
       </div>
       <div class="field">
         <label>📱 رقم واتساب الخاص بيك *</label>
-        <input type="tel" id="userWaInput" class="wa-field" placeholder="01xxxxxxxxx" maxlength="15" inputmode="tel" value="${escapeHTML(state.user?.whatsapp || '')}" dir="ltr" />
+        <input type="tel" id="userWaInput" class="wa-field" maxlength="15" inputmode="tel" value="${escapeHTML(state.user?.whatsapp || '')}" dir="ltr" />
         <div class="help-text">هيوصلك عليه رسالة واتساب تلقائية أول ما تخلص كتابة الطلبات ✅</div>
         <div id="waError" class="error-text hidden">اكتب رقم واتساب مظبوط (11 رقم بيبدأ بـ 01) 📱</div>
       </div>
@@ -3169,7 +3216,6 @@
     const tabs = [
       { id: 'home', label: 'الرئيسية', icon: 'home' },
       { id: 'shop', label: 'التسوق', icon: 'basket' },
-      { id: 'orders', label: 'الطلبات', icon: 'cart' },
       { id: 'expenses', label: 'المصروفات', icon: 'wallet' },
       { id: 'reports', label: 'التقارير', icon: 'chart' },
       { id: 'settings', label: 'الإعدادات', icon: 'gear' }
@@ -3347,7 +3393,6 @@
         <div class="azp-item-top"><span class="azp-num">${done ? '✓' : (i + 1)}</span>${started ? `<span class="azp-need">باقي ${left} من ${total}</span>` : ''}</div>
         <div class="azp-text">${escapeHTML(z.t)}</div>
         <div class="azp-meta">${z.v ? `<span class="azp-virtue">${escapeHTML(z.v)}</span>` : '<span class="azp-virtue" style="visibility:hidden;">•</span>'}${(!done && Number(z.c) > 10) ? `<button class="azp-skip" data-azskip="${i}" title="احسبه كأنك قلته بره التطبيق">⏭ تخطي</button>` : ''}<button class="azp-tap-pill" data-aztap="${i}">${done ? '✓' : left}</button></div>
-        ${started ? `<div class="azp-prog"><i style="width:${pct}%"></i></div>` : ''}
       </div>`;
     }).join('') + (doneN >= list.length ? `<div class="azp-item done" style="text-align:center;"><div class="azp-text">تقبّل الله منك — أتممت أذكار ${period === 'morning' ? 'الصباح' : 'المساء'}<br><small style="opacity:.6;">اللهم أعنا على ذكرك وشكرك وحسن عبادتك</small></div></div>` : '');
     const pct = Math.round((doneN / list.length) * 100);
@@ -3829,18 +3874,65 @@
     return h % TASK_COLORS.length;
   }
   function taskColor(id) { return TASK_COLORS[taskColorIdx(id)]; }
-  /* مهام يومية تتجدد تلقائياً كل يوم + أيام الالتزام */
+  /* مهام يومية تتجدد تلقائياً كل يوم + مهام أيام محددة (تظهر في أيامها فقط وتتجدد أسبوعياً) + أيام الالتزام */
+  function taskDays(t) {
+    try {
+      if (!t || !Array.isArray(t.days)) return [];
+      return t.days.map(Number).filter(d => d >= 0 && d <= 6).filter((v, i, a) => a.indexOf(v) === i);
+    } catch { return []; }
+  }
+  function taskHasDays(t) { return taskDays(t).length > 0; }
+  function taskVisibleToday(t, dayNum) {
+    try {
+      const ds = taskDays(t);
+      if (!ds.length) return true;
+      const d = (dayNum != null) ? dayNum : new Date().getDay();
+      return ds.includes(d);
+    } catch { return true; }
+  }
+  function taskDaysLabel(t) {
+    try {
+      const ds = taskDays(t);
+      if (!ds.length) return '';
+      if (ds.length >= 7) return 'كل يوم';
+      const name = (v) => {
+        try { if (typeof apptDayName === 'function') return apptDayName(v); } catch {}
+        return ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'][v] || '';
+      };
+      const order = [6, 0, 1, 2, 3, 4, 5];
+      return ds.slice().sort((a, b) => order.indexOf(a) - order.indexOf(b)).map(name).filter(Boolean).join(' • ');
+    } catch { return ''; }
+  }
   function renewDailyTasks() {
     const today = todayKey();
+    const todayNum = new Date().getDay();
     let changed = false;
     taskList().forEach(t => {
-      if (!t || !t.daily) return;
-      if (t.day === today) return;
-      if (!t.hist || typeof t.hist !== 'object') t.hist = {};
-      if (t.day) t.hist[t.day] = !!t.done;
-      t.done = false; t.day = today; changed = true;
-      const keys = Object.keys(t.hist).sort();
-      while (keys.length > 30) delete t.hist[keys.shift()];
+      if (!t) return;
+      const ds = taskDays(t);
+      if (t.daily) {
+        if (t.day === today) return;
+        if (!t.hist || typeof t.hist !== 'object') t.hist = {};
+        if (t.day) t.hist[t.day] = !!t.done;
+        // المهمة اليومية المجدولة لأيام محددة: تتجدد فقط في أيامها، وتستخبى في غيرها
+        if (ds.length && !ds.includes(todayNum)) { t.day = today; changed = true; }
+        else { t.done = false; t.day = today; changed = true; }
+        const keys = Object.keys(t.hist).sort();
+        while (keys.length > 30) delete t.hist[keys.shift()];
+        return;
+      }
+      // مهمة عادية مجدولة لأيام محددة: تظهر في أيامها فقط وتتجدد (تتفك) مع كل يوم مجدول
+      if (ds.length) {
+        if (!t.hist || typeof t.hist !== 'object') t.hist = {};
+        if (t.day !== today) {
+          if (t.day) t.hist[t.day] = !!t.done;
+          if (ds.includes(todayNum)) t.done = false;
+          t.day = today;
+          const keys = Object.keys(t.hist).sort();
+          while (keys.length > 30) delete t.hist[keys.shift()];
+          changed = true;
+        }
+      }
     });
     if (changed) persist();
   }
@@ -3858,12 +3950,15 @@
     }
     return streak;
   }
-  function addTask(title, icon, daily) {
+  function addTask(title, icon, daily, days) {
     const t = String(title || '').trim().slice(0, 120);
     if (!t) return null;
     const validIcon = (ic) => (typeof ic === 'string') && !!ICONS[ic];
     const it = { id: uid(), title: t, done: false, createdAt: nowISO(), icon: validIcon(icon) ? icon : (validIcon(state._taskNewIcon) ? state._taskNewIcon : 'star') };
-    if (daily) { it.daily = true; it.day = todayKey(); it.hist = {}; }
+    let ds = [];
+    try { if (Array.isArray(days)) ds = days.map(Number).filter(d => d >= 0 && d <= 6).filter((v, i, a) => a.indexOf(v) === i); } catch {}
+    if (ds.length) { it.days = ds; it.day = todayKey(); it.hist = {}; }
+    if (daily) { it.daily = true; it.day = todayKey(); it.hist = it.hist || {}; }
     taskList().unshift(it); persist();
     return it;
   }
@@ -3881,15 +3976,128 @@
     { v: 1440, t: 'قبلها بيوم' }
   ];
   function apptRemindLabel(v) { const r = APPT_REMINDERS.find(x => x.v === Number(v)); return r ? r.t : 'تنبيه'; }
+  const APPT_DAYS = [
+    { v: 6, t: 'السبت' }, { v: 0, t: 'الأحد' }, { v: 1, t: 'الاثنين' }, { v: 2, t: 'الثلاثاء' },
+    { v: 3, t: 'الأربعاء' }, { v: 4, t: 'الخميس' }, { v: 5, t: 'الجمعة' }
+  ];
+  function apptDayName(v) { const d = APPT_DAYS.find(x => x.v === Number(v)); return d ? d.t : ''; }
+  function apptIsWeekly(a) { return !!(a && a.repeat === 'weekly' && Array.isArray(a.days) && a.days.length); }
+  function apptTimes(a) {
+    try {
+      if (a && Array.isArray(a.times) && a.times.length) return a.times.filter(t => /^\d{2}:\d{2}$/.test(t || '')).slice(0, 5);
+      if (a && a.time && /^\d{2}:\d{2}$/.test(a.time)) return [a.time];
+    } catch {}
+    return [];
+  }
+  // وقت مخصص لكل يوم (الجديد) — وإلا نرجع للوقت المشترك القديم
+  function apptDayTimes(a) {
+    try {
+      if (a && a.dayTimes && typeof a.dayTimes === 'object') {
+        const out = {};
+        Object.keys(a.dayTimes).forEach(k => {
+          const t = a.dayTimes[k];
+          if (/^\d{2}:\d{2}$/.test(t || '')) out[String(Number(k))] = t;
+        });
+        return out;
+      }
+    } catch {}
+    return {};
+  }
+  function apptTimeForDay(a, dayNum) {
+    const dt = apptDayTimes(a);
+    if (dt[String(dayNum)]) return dt[String(dayNum)];
+    const ts = apptTimes(a);
+    return ts.length ? ts[0] : null;
+  }
+  function apptDaysLabel(a) {
+    try {
+      if (!apptIsWeekly(a)) return '';
+      const ds = (a.days || []).map(Number);
+      if (ds.length >= 7) return 'كل يوم';
+      return ds.map(apptDayName).filter(Boolean).join(' • ');
+    } catch { return ''; }
+  }
   function apptList() { if (!Array.isArray(state._appts)) state._appts = []; return state._appts; }
-  function apptDateTime(a) {
+  // كل مواعيد الأسبوع القادم (للحساب والتنبيه) — حد أقصى 8 أيام قدام
+  function apptOccurrences(a, daysAhead) {
+    daysAhead = daysAhead == null ? 8 : daysAhead;
+    const out = [];
+    try {
+      if (!a || a.done) return out;
+      const times = apptTimes(a);
+      if (!times.length && !Object.keys(apptDayTimes(a)).length) return out;
+      if (!apptIsWeekly(a)) {
+        const dt = apptDateTimeOnce(a);
+        if (dt) out.push(dt);
+        return out;
+      }
+      const daySet = {};
+      (a.days || []).forEach(d => { daySet[Number(d)] = 1; });
+      const dtMap = apptDayTimes(a);
+      const perDay = Object.keys(dtMap).length > 0;
+      const shared = apptTimes(a);
+      if (!perDay && !shared.length) return out;
+      const now = new Date();
+      const pushTm = (d, tm) => {
+        try {
+          const p = String(tm).split(':');
+          const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate(), Number(p[0]) || 0, Number(p[1]) || 0, 0, 0);
+          if (dt >= new Date(now.getTime() - 60000)) out.push(dt);
+        } catch {}
+      };
+      for (let i = 0; i < daysAhead; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i, 0, 0, 0, 0);
+        if (!daySet[d.getDay()]) continue;
+        if (perDay) {
+          const tm = dtMap[String(d.getDay())] || shared[0];
+          if (!tm) continue;
+          pushTm(d, tm);
+        } else {
+          shared.forEach(tm => pushTm(d, tm));
+        }
+      }
+    } catch {}
+    out.sort((x, y) => x - y);
+    return out;
+  }
+  function apptDateTimeOnce(a) {
     try {
       if (!a || !a.date || !a.time) return null;
       const d = new Date(a.date + 'T' + a.time + ':00');
       return isNaN(d) ? null : d;
     } catch { return null; }
   }
+  function apptNextOccurrence(a, from) {
+    try {
+      if (!a) return null;
+      if (!apptIsWeekly(a)) return apptDateTimeOnce(a);
+      const occ = apptOccurrences(a, 10);
+      const f = from ? new Date(from).getTime() : Date.now() - 60000;
+      for (const dt of occ) { if (dt.getTime() >= f) return dt; }
+      return occ.length ? occ[occ.length - 1] : null;
+    } catch { return null; }
+  }
+  function apptDateTime(a) {
+    try {
+      if (!a) return null;
+      if (apptIsWeekly(a)) return apptNextOccurrence(a);
+      return apptDateTimeOnce(a);
+    } catch { return null; }
+  }
   function apptFmtDateTime(a) {
+    try {
+      // للأسبوعي: اليوم وأقرب موعد قادم فقط
+      if (apptIsWeekly(a)) {
+        const nx = apptNextOccurrence(a);
+        if (nx) {
+          const ds = nx.toLocaleDateString('ar-EG', { weekday: 'long' });
+          const tp = prayerTo12h(String(nx.getHours()).padStart(2, '0') + ':' + String(nx.getMinutes()).padStart(2, '0'));
+          return { ds, ts: tp.t + ' ' + tp.ap };
+        }
+        const t12 = (t) => { try { const tp = prayerTo12h(t); return tp.t + ' ' + tp.ap; } catch { return t; } };
+        return { ds: '🔁 ' + apptDaysLabel(a), ts: apptTimes(a).map(t12).join(' • ') || '' };
+      }
+    } catch {}
     const dt = apptDateTime(a);
     if (!dt) return '';
     const ds = dt.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -3901,7 +4109,10 @@
     if (!dt) return '';
     if (a.done) return 'تم ✓';
     const diff = dt - new Date();
-    if (diff <= 0) return 'فات الموعد ⏰';
+    if (diff <= 0) {
+      if (apptIsWeekly(a)) return 'دلوقتي حالاً 🔔';
+      return 'فات الموعد ⏰';
+    }
     const m = Math.floor(diff / 60000), h = Math.floor(m / 60), d = Math.floor(h / 24);
     if (m < 1) return 'دلوقتي حالاً 🔔';
     if (m < 60) return 'بعد ' + m + (m === 1 ? ' دقيقة' : m === 2 ? ' دقيقتين' : ' دقائق');
@@ -3910,13 +4121,38 @@
     if (d === 2) return 'بعد بكرة';
     return 'بعد ' + d + ' أيام';
   }
-  function apptIsOverdue(a) { const dt = apptDateTime(a); return !!(dt && !a.done && dt <= new Date()); }
+  function apptIsOverdue(a) { if (apptIsWeekly(a)) return false; const dt = apptDateTime(a); return !!(dt && !a.done && dt <= new Date()); }
   function addAppt(o) {
     const title = String((o && o.title) || '').trim().slice(0, 120);
-    if (!title || !(o && o.date && o.time)) return null;
-    const dt = apptDateTime({ date: o.date, time: o.time });
+    if (!title) return null;
+    const repeat = (o && o.repeat === 'weekly') ? 'weekly' : 'once';
+    const remind = Number((o && o.remind) || 0) || 0;
+    const notes = String((o && o.notes) || '').trim().slice(0, 200);
+    if (repeat === 'weekly') {
+      let days = Array.isArray(o.days) ? o.days.map(Number).filter(d => d >= 0 && d <= 6) : [];
+      days = days.filter((v, i) => days.indexOf(v) === i);
+      let dayTimes = {};
+      try {
+        if (o.dayTimes && typeof o.dayTimes === 'object') {
+          Object.keys(o.dayTimes).forEach(k => {
+            const dk = Number(k), tv = o.dayTimes[k];
+            if (days.includes(dk) && /^\d{2}:\d{2}$/.test(tv || '')) dayTimes[dk] = tv;
+          });
+        }
+      } catch {}
+      let times = Object.keys(dayTimes).map(k => dayTimes[k]).filter((v, i, a) => a.indexOf(v) === i);
+      if (!times.length && Array.isArray(o.times)) times = o.times.filter(t => /^\d{2}:\d{2}$/.test(t || '')).filter((v, i, a) => a.indexOf(v) === i);
+      times = times.slice(0, 7);
+      if (!days.length || !times.length) return null;
+      const it = { id: uid(), title, repeat: 'weekly', days, dayTimes, times, time: times[0], date: '', remind, notes, done: false, createdAt: nowISO() };
+      if (!apptNextOccurrence(it)) return 'past';
+      apptList().push(it); persist();
+      return it;
+    }
+    if (!(o && o.date && o.time)) return null;
+    const dt = apptDateTimeOnce({ date: o.date, time: o.time });
     if (!dt || dt <= new Date()) return 'past';
-    const it = { id: uid(), title, date: o.date, time: o.time, remind: Number(o.remind) || 0, notes: String((o && o.notes) || '').trim().slice(0, 200), done: false, createdAt: nowISO() };
+    const it = { id: uid(), title, repeat: 'once', date: o.date, time: o.time, times: [o.time], days: [], remind, notes, done: false, createdAt: nowISO() };
     apptList().push(it); persist();
     return it;
   }
@@ -3925,9 +4161,12 @@
   function localDateStr(d) { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function tasksTab() { return state._tasksTab === 'appts' ? 'appts' : 'tasks'; }
   function renderTasksSection() {
-    const all = taskList();
+    const todayNum = new Date().getDay();
+    const visibleTasks = taskList().filter(t => taskVisibleToday(t, todayNum));
+    const all = visibleTasks;
     const open = all.filter(t => !t.done);
     const doneT = all.filter(t => t.done);
+    const hiddenScheduled = taskList().length - visibleTasks.length;
     const tab = tasksTab();
     const appts = apptList();
     const openAp = appts.filter(a => !a.done);
@@ -3944,12 +4183,19 @@
     const doneAp = appts.filter(a => a.done).length;
     const apPct = appts.length ? Math.round((doneAp / appts.length) * 100) : 0;
     const nextAp = appts.filter(a => !a.done && apptDateTime(a) && apptDateTime(a) > new Date()).sort((a, b) => apptDateTime(a) - apptDateTime(b))[0];
+    const apRep = state._apptRepeat === 'weekly' ? 'weekly' : 'once';
+    const apDays = Array.isArray(state._apptDays) ? state._apptDays.map(Number) : [];
+    const taskNewDays = Array.isArray(state._taskNewDays) ? state._taskNewDays.map(Number) : [];
+    const taskDayNames = ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+    const taskDayVals = [6, 0, 1, 2, 3, 4, 5];
+    const taskNewDaysLabel = !taskNewDays.length ? 'تظهر كل يوم' : (taskNewDays.length >= 7 ? 'كل يوم' : taskNewDays.slice().sort((a, b) => taskDayVals.indexOf(a) - taskDayVals.indexOf(b)).map(v => taskDayNames[taskDayVals.indexOf(v)]).join(' • '));
+    const apDaysLabel = !apDays.length ? 'اختار أيام الدرس' : (apDays.length >= 7 ? 'كل يوم' : apDays.slice().sort((a, b) => taskDayVals.indexOf(a) - taskDayVals.indexOf(b)).map(v => taskDayNames[taskDayVals.indexOf(v)]).join(' • '));
     const tasksHTML = `
-      ${addOpen ? `<div class="task-add"><input id="taskAddInput" placeholder="اكتب مهمة ودوس + ... مثال: أذاكر ساعتين" maxlength="120" autocomplete="off" /><button class="task-addbtn" id="taskAddBtn" title="ضيف مهمة">+</button></div><div style="padding:0 14px 8px;"><button type="button" class="filter-chip ${state._taskNewDaily ? 'active' : ''}" id="taskDailyTgl" style="margin:0;">مهمة يومية تتجدد كل يوم</button></div><div class="icon-pick">${ICON_PACK.map(o => `<button type="button" data-taskicon="${o.id}" class="${normalizePackIcon(state._taskNewIcon || 'star') === o.id ? 'sel' : ''}" title="${o.label}">${svgIcon(o.id, 20)}</button>`).join('')}</div>` : ''}
-      ${!all.length ? `<div class="task-empty"><span class="te-ico">📋</span><b>لسه مفيش مهام</b></div>` : `<div class="task-listbox">`}
+      ${addOpen ? `<div class="task-add"><input id="taskAddInput" placeholder="مهمة جديدة... مثلا: مراجعة الدروس" maxlength="120" autocomplete="off" value="${escapeHTML(state._taskNewTitle || '')}" /><button class="task-addbtn" id="taskAddBtn" title="ضيف مهمة">+</button></div><div style="padding:0 14px 8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;"><button type="button" class="filter-chip ${state._taskNewDaily ? 'active' : ''}" id="taskDailyTgl" style="margin:0;">مهمة يومية تتجدد كل يوم</button></div><div style="padding:0 14px 8px;"><div class="appt-remwrap"><button type="button" class="rep-picker-btn ${state._taskDaysOpen ? 'open' : ''}" id="taskDaysBtn"><span class="pk-ico">📅</span><span class="pk-tx"><b>${escapeHTML(taskNewDaysLabel)}</b><small>${taskNewDays.length ? taskNewDays.length + (taskNewDays.length === 1 ? ' يوم محدد' : ' أيام محددة') : 'دوس لاختيار الأيام'}</small></span><span class="pk-chev">‹</span></button>${state._taskDaysOpen ? `<div class="rep-picker-panel appt-rempanel"><div class="pk-list"><div class="appt-days">${taskDayNames.map((n, i) => { const v = taskDayVals[i]; return `<button type="button" class="appt-day ${taskNewDays.includes(v) ? 'sel' : ''}" data-taskday="${v}">${n}</button>`; }).join('')}</div></div></div>` : ''}</div></div><div class="icon-pick">${ICON_PACK.map((o, oi) => { const cc = TASK_COLORS[oi % TASK_COLORS.length]; return `<button type="button" data-taskicon="${o.id}" class="${normalizePackIcon(state._taskNewIcon || 'star') === o.id ? 'sel' : ''}" style="--ic:${cc.c};--icbg:${cc.bg};" title="${o.label}"><span class="it-ic">${svgIcon(o.id, 22)}</span><span class="it-lb">${o.label}</span></button>`; }).join('')}</div>` : ''}
+      ${!all.length ? (hiddenScheduled > 0 ? `<div class="task-empty"><span class="te-ico">📅</span><b>مفيش مهام النهاردة</b><small>عندك ${hiddenScheduled} ${hiddenScheduled === 1 ? 'مهمة مجدولة' : 'مهام مجدولة'} لأيام تانية — هتظهر في يومها ✓</small></div>` : `<div class="task-empty"><span class="te-ico">📋</span><b>لسه مفيش مهام</b></div>`) : `<div class="task-listbox">`}
       ${(() => {
         let pi = -1;
-        const rowHTML = (t, isDone) => { let i = taskColorIdx(t.id); if (i === pi) i = (i + 1) % TASK_COLORS.length; pi = i; const tc = TASK_COLORS[i]; const st = t.daily ? taskStreak(t) : null; const sw = st === 1 ? 'يوم' : st === 2 ? 'يومين' : 'أيام'; return `<div class="task-row${isDone ? ' done' : ''}${t.daily ? ' daily' : ''}" data-tasktoggle="${t.id}" style="--tc:${tc.c};--tcbg:${tc.bg};"><span class="task-check"></span><span class="task-ico">${packIconHTML(t.icon || 'star', 19)}</span><span class="task-tt"><span class="task-title">${escapeHTML(t.title)}</span>${st !== null ? `<span class="task-sub">🔥 ${st} ${sw} التزام</span>` : ''}</span><button class="task-del" data-taskdel="${t.id}" title="امسح">✕</button></div>`; };
+        const rowHTML = (t, isDone) => { let i = taskColorIdx(t.id); if (i === pi) i = (i + 1) % TASK_COLORS.length; pi = i; const tc = TASK_COLORS[i]; const st = t.daily ? taskStreak(t) : null; const sw = st === 1 ? 'يوم' : st === 2 ? 'يومين' : 'أيام'; const dl = taskHasDays(t) ? taskDaysLabel(t) : ''; return `<div class="task-row${isDone ? ' done' : ''}${t.daily ? ' daily' : ''}" data-tasktoggle="${t.id}" style="--tc:${tc.c};--tcbg:${tc.bg};"><span class="task-check"></span><span class="task-ico">${packIconHTML(t.icon || 'star', 19)}</span><span class="task-tt"><span class="task-title">${escapeHTML(t.title)}</span>${st !== null ? `<span class="task-sub">🔥 ${st} ${sw} التزام</span>` : ''}${dl ? `<span class="task-sub">📅 ${escapeHTML(dl)}</span>` : ''}</span><button class="task-del" data-taskdel="${t.id}" title="امسح">✕</button></div>`; };
         return open.map(t => rowHTML(t, false)).join('')
           + (doneT.length ? `<div class="task-div">✓ مكتملة (${doneT.length})</div>` + doneT.map(t => rowHTML(t, true)).join('') : '');
       })()}
@@ -3958,9 +4204,15 @@
     const apptsHTML = `
       ${nextAp ? `<div class="appt-next">📅 أقرب موعد: <b>${escapeHTML(nextAp.title)}</b><span class="appt-next-in">${escapeHTML(apptRemainTxt(nextAp))}</span></div>` : ''}
       ${apAddOpen ? `<div class="appt-add">
-        <input id="apptTitle" placeholder="اسم الموعد... مثال: دكتور الأسنان" maxlength="120" autocomplete="off" />
-        <div class="appt-add-row"><input id="apptDate" type="date" value="${localDateStr()}" /><input id="apptTime" type="time" /></div>
-        <div class="appt-add-row3"><div class="appt-remwrap"><button type="button" class="rep-picker-btn ${(state._apptRemOpen) ? 'open' : ''}" id="apptRemindBtn"><span class="pk-ico">⏰</span><span class="pk-tx"><b>${escapeHTML(apptRemindLabel(apRemV))}</b><small>التنبيه قبل الموعد</small></span><span class="pk-chev">‹</span></button>${(state._apptRemOpen) ? `<div class="rep-picker-panel appt-rempanel"><div class="pk-list">${APPT_REMINDERS.map(r => `<button type="button" class="pk-item ${r.v === apRemV ? 'sel' : ''}" data-apptrem="${r.v}"><span class="pk-dot" style="background:${r.v === apRemV ? 'var(--primary)' : 'var(--border)'};"></span><span>${escapeHTML(r.t)}</span>${r.v === apRemV ? '<span class="pk-check">✓</span>' : ''}</button>`).join('')}</div></div>` : ''}</div><input id="apptNotes" placeholder="ملاحظة (اختياري)" maxlength="200" autocomplete="off" /></div>
+        <input id="apptTitle" placeholder="عنوان الموعد... مثلا: حصة القرآن" maxlength="120" autocomplete="off" value="${escapeHTML(state._apptTitle || '')}" />
+        <div class="appt-type-row"><button type="button" class="appt-type-btn ${apRep === 'once' ? 'sel' : ''}" data-appttype="once">📅 مرة واحدة</button><button type="button" class="appt-type-btn ${apRep === 'weekly' ? 'sel' : ''}" data-appttype="weekly">🔁 ثابت أسبوعي</button></div>
+        ${apRep === 'once'
+          ? `<div class="appt-add-row"><input id="apptDate" type="date" value="${escapeHTML(state._apptDate || localDateStr())}" /><input id="apptTime" type="time" value="${escapeHTML(state._apptTime || '')}" /></div>`
+          : `<div><div style="font-size:12px;font-weight:900;color:var(--text-sec);margin-bottom:6px;">اختار أيام الدرس (مثال: يومين في الأسبوع)</div><div class="appt-remwrap"><button type="button" class="rep-picker-btn ${state._apptDaysOpen ? 'open' : ''}" id="apptDaysBtn"><span class="pk-ico">📅</span><span class="pk-tx"><b>${escapeHTML(apDaysLabel)}</b><small>${apDays.length ? apDays.length + (apDays.length === 1 ? ' يوم محدد' : ' أيام محددة') : 'دوس لاختيار الأيام'}</small></span><span class="pk-chev">‹</span></button>${state._apptDaysOpen ? `<div class="rep-picker-panel appt-rempanel"><div class="pk-list"><div class="appt-days">${APPT_DAYS.map(d => `<button type="button" class="appt-day ${apDays.includes(d.v) ? 'sel' : ''}" data-apptday="${d.v}">${d.t}</button>`).join('')}</div></div></div>` : ''}</div></div>
+          <div class="appt-times"><div style="font-size:12px;font-weight:900;color:var(--text-sec);">مواعيد الحصص — وقت مناسب لكل يوم</div>
+            ${apDays.length ? APPT_DAYS.filter(d => apDays.includes(d.v)).map(d => `<div class="appt-time-row"><span class="appt-dayname">${d.t}</span><input class="appt-daytime" data-day="${d.v}" type="time" value="${escapeHTML(((state._apptDayTimes || {})[d.v]) || '')}" /></div>`).join('') : `<div style="font-size:11.5px;font-weight:800;color:var(--text-muted);">اختار الأيام من القائمة فوق الأول ⬆️</div>`}
+          </div>`}
+        <div class="appt-add-row3"><div class="appt-remwrap"><button type="button" class="rep-picker-btn ${(state._apptRemOpen) ? 'open' : ''}" id="apptRemindBtn"><span class="pk-ico">⏰</span><span class="pk-tx"><b>${escapeHTML(apptRemindLabel(apRemV))}</b><small>التنبيه قبل الموعد</small></span><span class="pk-chev">‹</span></button>${(state._apptRemOpen) ? `<div class="rep-picker-panel appt-rempanel"><div class="pk-list">${APPT_REMINDERS.map(r => `<button type="button" class="pk-item ${r.v === apRemV ? 'sel' : ''}" data-apptrem="${r.v}"><span class="pk-dot" style="background:${r.v === apRemV ? 'var(--primary)' : 'var(--border)'};"></span><span>${escapeHTML(r.t)}</span>${r.v === apRemV ? '<span class="pk-check">✓</span>' : ''}</button>`).join('')}</div></div>` : ''}</div><input id="apptNotes" placeholder="تفاصيل إضافية لو حابب" maxlength="200" autocomplete="off" value="${escapeHTML(state._apptNotes || '')}" /></div>
         <button class="appt-add-btn" id="apptAddBtn">+ احفظ الموعد 📅</button>
       </div>` : ''}
       ${!appts.length ? `<div class="task-empty"><span class="te-ico">📅</span><b>لسه مفيش مواعيد</b><small>دوس + وضيف أول موعد مهم ⬆️</small></div>` : `<div class="task-listbox">`}
@@ -3972,7 +4224,7 @@
           const isNx = nextAp && nextAp.id === a.id;
           let i = taskColorIdx(a.id); if (i === pi) i = (i + 1) % TASK_COLORS.length; pi = i;
           const tc = TASK_COLORS[i];
-          return `<div class="appt-row${a.done ? ' done' : ''}${od ? ' overdue' : ''}${isNx ? ' is-next' : ''}" data-appttoggle="${a.id}" style="--tc:${tc.c};--tcbg:${tc.bg};"><div class="appt-top"><span class="task-check"></span><span class="appt-title">${escapeHTML(a.title)}</span><button class="task-del" data-apptdel="${a.id}" title="امسح">✕</button></div><div class="appt-chips"><span class="appt-date">📅 ${escapeHTML(f.ds)}</span><span class="appt-time">🕐 ${escapeHTML(f.ts)}</span><span class="appt-rmd">🎁 ${escapeHTML(apptRemindLabel(a.remind))}</span>${isNx && !a.done ? `<span class="appt-next-tag">⚡ الأقرب</span>` : ''}<span class="appt-rem"><i></i>${escapeHTML(apptRemainTxt(a))}</span></div>${a.notes ? `<span class="appt-notes">📝 ${escapeHTML(a.notes)}</span>` : ''}</div>`;
+          return `<div class="appt-row${a.done ? ' done' : ''}${od ? ' overdue' : ''}${isNx ? ' is-next' : ''}" data-appttoggle="${a.id}" style="--tc:${tc.c};--tcbg:${tc.bg};"><div class="appt-top"><span class="task-check"></span><span class="appt-title">${escapeHTML(a.title)}</span><button class="task-del" data-apptdel="${a.id}" title="امسح">✕</button></div><div class="appt-chips"><span class="appt-date">📅 ${escapeHTML(f.ds)}</span><span class="appt-time">🕐 ${escapeHTML(f.ts)}</span></div></div>`;
         }).join('');
       })()}
       ${appts.length ? `</div>` : ''}`;
@@ -4048,7 +4300,7 @@
     const level = getLevel();
     const totalTasks = pending + done;
     const progress = totalTasks ? Math.round((done / totalTasks) * 100) : 0;
-    const tList = taskList();
+    const tList = taskList().filter(t => taskVisibleToday(t));
     const tOpen = tList.filter(t => !t.done).length;
     const tPct = tList.length ? Math.round(((tList.length - tOpen) / tList.length) * 100) : 0;
     const achv = [
@@ -4059,11 +4311,6 @@
 
     const roleTag = '';
     return `<div class="page">
-      ${!state.home?.code ? `<div style="margin:14px 16px 0;background:linear-gradient(135deg,#FFF7ED,#FFFBEB);border:1.5px dashed #F59E0B;border-radius:18px;padding:14px;text-align:center;">
-        <div style="font-size:15px;font-weight:900;">🏠 انت مش في بيت لسه</div>
-        <div style="font-size:12.5px;font-weight:700;color:var(--text-sec);margin:4px 0 10px;">اعمل بيت جديد أو ادخل بيت موجود من الإعدادات</div>
-        <button class="btn btn-primary btn-sm" id="noHomeGoSettings" style="min-height:46px;">روح الإعدادات ⚙️</button>
-      </div>` : ''}
       <div class="duo-hero" dir="ltr">
         <div class="duo-cloud c1"></div>
         <div class="duo-main">
@@ -4083,7 +4330,7 @@
         <div class="gate-card gate-prayer" data-prayer-times><span class="gc-ico">${tpS.ico}</span><span class="gc-label">مواقيت الصلاة</span><span class="gc-value" id="prayerMiniTxt" style="font-size:16px;">...</span><span class="gc-sub" id="prayerMiniSub">دوس للعرض 📍</span></div>
         <div class="gate-card gate-azkar" data-azkar-toggle style="--gc:#D97706;--gc-soft:#FEF3C7;"><span class="gc-ico">🤲</span><span class="gc-label">الأذكار</span><span class="gc-value" style="font-size:16px;">${azP === 'morning' ? 'أذكار الصباح ☀️' : 'أذكار المساء 🌙'}</span><span class="gc-sub">دوس للعرض 📖</span></div>
         <div class="gate-card gate-tasks" data-goto-tasks style="--gc:#1CB0F6;--gc-soft:#E1F3FD;"><span class="gc-ico">📝</span><span class="gc-label">مهام اليوم</span><span class="gc-value">${tOpen}<small> معلقة</small></span><span class="gc-bar"><i style="width:${tPct}%;"></i></span><span class="gc-sub">القسم بالأسفل — دوس للانتقال</span></div>
-        <div class="gate-card gate-habits" id="habitsGateCard" style="--gc:#0284C7;--gc-soft:#E0F2FE;"><span class="gc-ico">🏒</span><span class="gc-label">تحدي الهوكي 🏆</span><span class="gc-value" style="font-size:14.5px;line-height:1.9;">العب مع صديقك لعبة الهوكي الاحترافية</span><span class="gc-sub">دوس للعب ⛸️</span></div>
+        <div class="gate-card gate-habits" id="habitsGateCard" style="--gc:#0284C7;--gc-soft:#E0F2FE;"><span class="gc-ico">🏒</span><span class="gc-label">تحدي الهوكي 🏆</span><span class="gc-sub">دوس للعب ⛸️</span></div>
       </div></div>
 
       ${adsByPosition('middle')}
@@ -4130,9 +4377,9 @@
           <button class="filter-chip ${qt === 'weight' ? 'active' : ''}" data-expqtype="weight" data-id="${o.id}">وزن</button>
         </div>
         ${qt === 'count' ? `<div class="exp-row"><button class="btn btn-secondary btn-sm" data-expqminus="${o.id}">−</button><b style="min-width:30px;text-align:center;">${d.qtyVal ?? 1}</b><button class="btn btn-secondary btn-sm" data-expqplus="${o.id}">+</button><select class="rv-select" data-expunit="${o.id}">${selC}</select></div>` : ''}
-        ${qt === 'weight' ? `<div class="exp-row"><input type="number" class="qty-num" data-expvalw="${o.id}" value="${d.qtyVal ?? ''}" placeholder="0" min="0"><select class="rv-select" data-expunitw="${o.id}">${selW}</select></div>` : ''}
+        ${qt === 'weight' ? `<div class="exp-row"><input type="number" class="qty-num" data-expvalw="${o.id}" value="${d.qtyVal ?? ''}" min="0"><select class="rv-select" data-expunitw="${o.id}">${selW}</select></div>` : ''}
         <div class="exp-row"><span class="lbl">صورة</span>${d.photo ? `<img src="${d.photo}" style="width:46px;height:46px;border-radius:12px;object-fit:cover;flex-shrink:0;" /><button class="btn btn-sm btn-danger" data-exprmphoto="${o.id}">امسح</button>` : `<label class="btn btn-secondary btn-sm" style="cursor:pointer;">📷 ضيف صورة المنتج<input type="file" accept="image/*" data-expphoto="${o.id}" class="hidden" /></label>`}</div>
-        <div class="exp-row"><span class="lbl">ملحوظة</span><input class="exp-notes" data-expnotes="${o.id}" value="${escapeHTML(d.notes || '')}" placeholder="اكتب ملاحظة اختيارية..."></div>
+        <div class="exp-row"><span class="lbl">ملحوظة</span><input class="exp-notes" data-expnotes="${o.id}" value="${escapeHTML(d.notes || '')}"></div>
         <div class="exp-row"><button class="btn btn-primary btn-sm" data-expsave="${o.id}">احفظ التعديل</button><button class="btn btn-success btn-sm" data-expbuy="${o.id}">✓ اتشترى</button><button class="btn btn-danger btn-sm" data-expdel="${o.id}">امسح الصنف</button></div>
       </div>`;
     }
@@ -4383,27 +4630,65 @@
   function renderShopBasket() {
     return basketItems().length ? renderBasket() : `<div class="empty empty-soft"><div class="empty-icon">🧺</div><div class="empty-title">السلة فاضية والعربية واقفة 😂</div><div class="empty-desc">ارمي فيها أول صنف ويلا نتحرك 🛒</div><button class="btn btn-primary" id="basketHomeAdd">جهّز أول صنف</button></div>`;
   }
+  let _lastShopTab = null;
   function renderShopAchv() {
-    const { pending, done } = statsCounts();
-    const today = sumExpensesInRange('day');
-    const achv = [
-      { t: pending + (pending === 1 ? ' طلب' : ' طلبات'), s: 'مستنياك 🛒', ok: true, bg: '#E1F3FD', c: '#1CB0F6', ic: 'cart', tab: 'orders' },
-      { t: done + (done === 1 ? ' صنف' : ' أصناف'), s: 'اشتريت ✅', ok: done > 0, bg: '#DCFCE7', c: '#059669', ic: 'check', tab: 'orders' },
-      { t: formatCurrency(today.total) + ' ج.م', s: 'مصروفاتي 💸', ok: today.total > 0, bg: '#FEF3C7', c: '#D97706', ic: 'wallet', tab: 'expenses' }
+    const tab = state._shopTab || 'cats';
+    const { pending } = statsCounts();
+    const bc = basketItems().length;
+    const cc = getCatalog().reduce((a, d) => a + catDeptCount(d), 0);
+    const tabs = [
+      { id: 'cats', t: cc + ' صنف', s: 'التسوق 🛍️', bg: '#E1F3FD', c: '#1CB0F6', ic: 'basket' },
+      { id: 'basket', t: bc + (bc === 1 ? ' صنف' : ' أصناف'), s: 'السلة 🧺', bg: '#FEF3C7', c: '#D97706', ic: 'cart' },
+      { id: 'orders', t: pending + (pending === 1 ? ' طلب' : ' طلبات'), s: 'الطلبات 🛒', bg: '#DCFCE7', c: '#059669', ic: 'check' }
     ];
-    return `<div class="badge-row">${achv.map(a => `<div class="achv ${a.ok ? '' : 'locked'}" ${a.tab ? `data-gotab2="${a.tab}" style="cursor:pointer;"` : ''}><div class="achv-ico" style="background:${a.bg};color:${a.c};">${svgIcon(a.ic, 20)}</div><div><b>${a.t}</b><small>${a.s}</small></div></div>`).join('')}</div>`;
+    return `<div class="badge-row shop-tabs">${tabs.map(a => `<div class="achv ${tab === a.id ? 'tab-active' : ''}" data-shoptab="${a.id}" style="cursor:pointer;${tab === a.id ? `border-color:${a.c};box-shadow:0 0 0 3px ${a.bg};` : ''}"><div class="achv-ico" style="background:${a.bg};color:${a.c};">${svgIcon(a.ic, 20)}</div><div><b>${a.t}</b><small>${a.s}</small></div></div>`).join('')}</div>`;
+  }
+  /* قائمة الطلبات المجمّعة — تُستخدم في تبويب الطلبات داخل التسوق وفي صفحة الطلبات */
+  function ordersGroupsHTML(pendList, doneList) {
+    const cats = allCats();
+    const grouped = {}; for (const c of cats) grouped[c.id] = [];
+    for (const o of pendList) { if (!grouped[o.categoryId]) grouped[o.categoryId] = []; grouped[o.categoryId].push(o); }
+    for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => (((b.priority === 'high' || b.urgent) ? 1 : 0) - ((a.priority === 'high' || a.urgent) ? 1 : 0)));
+    return [...cats, ...Object.keys(grouped).filter(id => grouped[id].length && !cats.some(c => c.id === id)).map(id => ({ id }))].map(cat => {
+      const arr = grouped[cat.id] || []; if (!arr.length) return '';
+      const cc = catColor(cat.id);
+      return `<div class="category-group"><div class="category-card">
+        <div class="category-card-header" style="background:${cc}12;">
+          <div class="category-card-icon" style="background:${cc}20;color:${cc};">${svgIcon(getCategoryIcon(cat.id), 20)}</div>
+          <div class="category-card-info"><div class="category-card-name">${getCategoryName(cat.id)}</div><div class="category-card-count" style="color:${cc};">${arr.length} طلب${arr.length > 1 ? 'ات' : ''}</div></div>
+          <div class="category-card-badge" style="background:${cc}20;color:${cc};border-color:${cc};">${arr.length} مطلوب</div>
+        </div>
+        <div class="category-card-orders">${arr.map(o => renderOrderCard(o)).join('')}</div>
+      </div></div>`;
+    }).join('')
+    + (doneList.length ? `<div class="category-group"><div class="category-card">
+      <div class="category-card-header" style="background:var(--success-light);">
+        <div class="category-card-icon" style="background:#fff;">✅</div>
+        <div class="category-card-info"><div class="category-card-name">اتشترى النهاردة</div><div class="category-card-count" style="color:var(--success);">${doneList.length} صنف</div></div>
+      </div>
+      <div class="category-card-orders">${doneList.map(o => renderOrderCard(o)).join('')}</div>
+    </div></div>` : '');
+  }
+  function renderOrdersCompact() {
+    const list = (state.orders || []).filter(o => !(o.status === 'purchased' && o.purchase && !isSameDay(o.purchase.purchasedAt)));
+    if (!list.length) return renderEmptyOrders();
+    return ordersGroupsHTML(list.filter(o => o.status !== 'purchased'), list.filter(o => o.status === 'purchased'));
   }
   function renderShop() {
+    const tab = state._shopTab || 'cats';
+    const tabAnim = (_lastShopTab !== tab) ? ' anim' : '';
+    _lastShopTab = tab;
     const q = (state._shopQuery || '').trim();
     return `<div class="page">
       <div class="topbar"><div class="greeting">تسوّق براحتك 🛍️</div></div>
       <div class="page-title">التسوق</div>
       ${nouraCardHTML(SHOP_FUNNY_MSGS)}
       ${renderShopAchv()}
-      ${renderShopBasket()}
-      <div class="search-bar"><div class="search-box"><input id="shopSearch" placeholder="دوّر على أي منتج..." value="${escapeHTML(state._shopQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div></div>
-      <div class="section"><div class="help-text" style="margin:-2px 0 10px;">دوس <b>ضيف</b> والصنف هيتحشر في السلة 🧺 غصب عنه 😂</div></div>
-      ${q.length >= 2 ? renderCatalogSearch(q) : state._catBrowse ? renderCatalogDept(state._catBrowse) : renderCatalogHome(true)}
+      <div class="shop-tab-body${tabAnim}">
+      ${tab === 'basket' ? renderShopBasket() : tab === 'orders' ? renderOrdersCompact() : `
+      <div class="search-bar"><div class="search-box"><input id="shopSearch" placeholder="دوّر على أي حاجة في السوق..." value="${escapeHTML(state._shopQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div></div>
+      ${q.length >= 2 ? renderCatalogSearch(q) : state._catBrowse ? renderCatalogDept(state._catBrowse) : renderCatalogHome(true)}`}
+      </div>
     </div>`;
   }
   function renderItemResults(q) {
@@ -4425,12 +4710,8 @@
     if (orderFilter === 'pending') list = list.filter(o => o.status === 'pending');
     else if (orderFilter === 'done') list = list.filter(o => o.status === 'purchased');
     if (categoryFilter !== 'all') list = list.filter(o => o.categoryId === categoryFilter);
-    const cats = allCats();
     const pendList = list.filter(o => o.status !== 'purchased');
     const doneList = list.filter(o => o.status === 'purchased');
-    const grouped = {}; for (const c of cats) grouped[c.id] = [];
-    for (const o of pendList) { if (!grouped[o.categoryId]) grouped[o.categoryId] = []; grouped[o.categoryId].push(o); }
-    for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => (((b.priority === 'high' || b.urgent) ? 1 : 0) - ((a.priority === 'high' || a.urgent) ? 1 : 0)));
 
     const pendAll = (state.orders || []).filter(o => o.status === 'pending').length;
     return `<div class="page">
@@ -4441,31 +4722,13 @@
 
       ${adsByPosition('middle')}
 
-      <div class="search-bar"><div class="search-box"><input id="orderSearch" placeholder="دور على الصنف..." value="${escapeHTML(searchQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div></div>
+      <div class="search-bar"><div class="search-box"><input id="orderSearch" placeholder="دوّر في طلباتك..." value="${escapeHTML(searchQuery || '')}" autocomplete="off" /><span class="sicon">🔍</span></div></div>
 
       ${renderItemResults(searchQuery)}
 
       ${pendList.length ? `<div class="section"><button class="btn btn-success" id="remindPartnerBtn">الحقنا يا نجم.. الطلبات مستنياك (${pendList.length})</button></div>` : ''}
 
-      ${list.length === 0 ? renderEmptyOrders() : [...cats, ...Object.keys(grouped).filter(id => grouped[id].length && !cats.some(c => c.id === id)).map(id => ({ id }))].map(cat => {
-        const arr = grouped[cat.id] || []; if (!arr.length) return '';
-        const cc = catColor(cat.id);
-        return `<div class="category-group"><div class="category-card">
-          <div class="category-card-header" style="background:${cc}12;">
-            <div class="category-card-icon" style="background:${cc}20;color:${cc};">${svgIcon(getCategoryIcon(cat.id), 20)}</div>
-            <div class="category-card-info"><div class="category-card-name">${getCategoryName(cat.id)}</div><div class="category-card-count" style="color:${cc};">${arr.length} طلب${arr.length > 1 ? 'ات' : ''}</div></div>
-            <div class="category-card-badge" style="background:${cc}20;color:${cc};border-color:${cc};">${arr.length} مطلوب</div>
-          </div>
-          <div class="category-card-orders">${arr.map(o => renderOrderCard(o)).join('')}</div>
-        </div></div>`;
-      }).join('')}
-      ${doneList.length ? `<div class="category-group"><div class="category-card">
-        <div class="category-card-header" style="background:var(--success-light);">
-          <div class="category-card-icon" style="background:#fff;">✅</div>
-          <div class="category-card-info"><div class="category-card-name">اتشترى النهاردة</div><div class="category-card-count" style="color:var(--success);">${doneList.length} صنف</div></div>
-        </div>
-        <div class="category-card-orders">${doneList.map(o => renderOrderCard(o)).join('')}</div>
-      </div></div>` : ''}
+      ${list.length === 0 ? renderEmptyOrders() : ordersGroupsHTML(pendList, doneList)}
       ${adsByPosition('bottom')}
     </div>`;
   }
@@ -4653,7 +4916,7 @@
         <div class="settings-item"><div class="si-icon" style="background:#E1F3FD;color:#1CB0F6;">${svgIcon('home', 18)}</div><div class="si-body"><div class="si-label">اسمك</div></div><button class="si-action" id="editUserBtn">تعديل</button></div>
         <div class="settings-item"><div class="si-icon" style="background:#DCFCE7;color:#059669;">📱</div><div class="si-body"><div class="si-label">رقم الواتساب</div></div><button class="si-action" id="editWaBtn">تعديل</button></div>
         <div class="settings-item"><div class="si-icon" style="background:#FFEED3;color:#FF9600;">👨‍👩‍👧</div><div class="si-body"><div class="si-label">رقم واتساب الطرف الآخر</div></div><button class="si-action" id="editPartnerWaBtn">تعديل</button></div>
-        <div class="settings-item"><div class="si-icon" style="background:#FEF3C7;color:#D97706;">${svgIcon('check', 18)}</div><div class="si-body"><div class="si-label">كود البيت</div></div><span class="code-display inline">${escapeHTML(state.home?.code || '')}</span><button class="icon-copy-btn" id="copyHomeCode" aria-label="نسخ الكود">${svgIcon('copy', 18)}</button></div>
+        ${state.home?.code ? `<div class="settings-item"><div class="si-icon" style="background:#FEF3C7;color:#D97706;">${svgIcon('check', 18)}</div><div class="si-body"><div class="si-label">كود البيت</div></div><span class="code-display inline">${escapeHTML(state.home?.code || '')}</span><button class="icon-copy-btn" id="copyHomeCode" aria-label="نسخ الكود">${svgIcon('copy', 18)}</button></div>` : ''}
         <div style="padding:2px 16px 6px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <button class="btn btn-primary btn-sm" id="newHomeBtn" style="min-height:48px;" ${state.home?.code ? 'disabled' : ''}>🏠 بيت جديد</button>
           <button class="btn btn-secondary btn-sm" id="joinHomeBtn" style="min-height:48px;">🔗 بيت موجود</button>
@@ -4743,7 +5006,6 @@
           <input type="file" id="importBackupFile" accept="application/json,.json" class="hidden" />
         </div>
         <div class="help-text" style="padding:0 16px 8px;">نسخة JSON بكل بياناتك بتتحمل على جهازك • الاستيراد يستبدل البيانات الحالية</div>
-        <div class="settings-item" id="clearAllBtn" style="cursor:pointer;"><div class="si-icon" style="background:var(--danger-light);color:var(--danger)">!</div><div class="si-body"><div class="si-label" style="color:var(--danger)">مسح كل حاجة</div><div class="si-value">هيمسح البيت والطلبات والمصروفات كلها</div></div><div class="si-action" style="color:var(--danger)">→</div></div>
         <div class="settings-item" id="deleteHomeBtn" style="cursor:pointer;"><div class="si-icon" style="background:var(--danger-light);color:var(--danger)">🗑️</div><div class="si-body"><div class="si-label" style="color:var(--danger)">حذف البيت نهائياً</div><div class="si-value">من جهازك ومن قاعدة البيانات — مفيش رجعة</div></div><div class="si-action" style="color:var(--danger)">→</div></div>
         <div style="padding:8px 16px 0;"><button class="collapsible-head sub" id="learnedHead"><span class="ch-texts"><b>الكلمات اللي اتعلمناها (${learnedEntries.length})</b><small>دوس عشان تشوف</small></span><span class="chev ${state._learnedOpen ? 'open' : ''}">‹</span></button></div>
         <div class="collapsible-body ${state._learnedOpen ? '' : 'hidden'}">
@@ -4899,7 +5161,7 @@
   }
   function openJoinHomeModal() {
     const m = openModal(`<div class="modal-handle"></div><h2>ادخل بيت موجود 🔗</h2><p class="m-sub">اكتب كود البيت اللي عندك — بياناتك الحالية هتتبدل ببياناته</p>
-      <div class="field"><label>كود البيت</label><input type="text" id="joinCodeInput2" placeholder="مثال: HOME-4827" style="text-transform:uppercase; letter-spacing:2px;" /></div>
+      <div class="field"><label>كود البيت</label><input type="text" id="joinCodeInput2" style="text-transform:uppercase; letter-spacing:2px;" /></div>
       <div id="joinError2" class="error-text hidden">الكود غلط أو البيت مش موجود 😅</div>
       <div class="btn-group"><button class="btn btn-primary" id="submitJoin2">ادخل البيت</button></div>`);
     const inp = m.querySelector('#joinCodeInput2'), err = m.querySelector('#joinError2'), btn = m.querySelector('#submitJoin2');
@@ -4963,7 +5225,6 @@
     const fab = document.getElementById('fabBtn'); if (fab) fab.onclick = openAddOrderModal;
     const ha = document.getElementById('heroAddOrder'); if (ha) ha.onclick = openAddOrderModal;
     const dc = document.getElementById('duoContinue'); if (dc) dc.onclick = () => { try { window.location.href = 'st.html'; } catch {} };
-    const nh = document.getElementById('noHomeGoSettings'); if (nh) nh.onclick = () => setTab('settings');
     document.querySelectorAll('[data-azkar-toggle]').forEach(b => b.onclick = () => openAzkarPage());
     document.querySelectorAll('[data-prayer-times]').forEach(b => b.onclick = () => openPrayerPage());
     try { refreshPrayerMini(); } catch {}
@@ -4986,29 +5247,109 @@
     const bha = document.getElementById('basketHomeAdd'); if (bha) bha.onclick = openAddOrderModal;
     const taskTgl = document.getElementById('taskAddToggle'); if (taskTgl) taskTgl.onclick = () => { if (tasksTab() === 'appts') { state._apptAddOpen = !(state._apptAddOpen === true); persist(); render(); requestAnimationFrame(() => { const n = document.getElementById('apptTitle'); if (n) n.focus(); }); } else { state._taskAddOpen = !(state._taskAddOpen === true); if (state._taskAddOpen && !state._taskNewIcon) state._taskNewIcon = PACK_DEFAULT_ICON; persist(); render(); requestAnimationFrame(() => { const n = document.getElementById('taskAddInput'); if (n) n.focus(); }); } };
     /* تم حذف ربط العادات اليومية — البطاقة تفتح ملف 1.html */
-    document.querySelectorAll('[data-tasks-tab]').forEach(b => b.onclick = () => { state._tasksTab = b.dataset.tasksTab; persist(); render(); });
+    document.querySelectorAll('[data-tasks-tab]').forEach(b => b.onclick = () => { state._tasksTab = b.dataset.tasksTab; state._apptAddOpen = false; state._taskAddOpen = false; persist(); render(); });
+    // حفظ مسودات فورم المهام والمواعيد قبل أي إعادة رسم — عشان الكتابة متضيعش
+    function stashTaskDraft() { try { const i = document.getElementById('taskAddInput'); if (i) state._taskNewTitle = i.value; } catch {} }
+    function stashApptDraft() {
+      try {
+        const g = (id) => { const el = document.getElementById(id); return el ? el.value : null; };
+        const t = g('apptTitle'); if (t != null) state._apptTitle = t;
+        const d = g('apptDate'); if (d != null) state._apptDate = d;
+        const tm = g('apptTime'); if (tm != null) state._apptTime = tm;
+        const n = g('apptNotes'); if (n != null) state._apptNotes = n;
+        const dtInputs = document.querySelectorAll('.appt-daytime');
+        if (dtInputs.length) {
+          const o = {};
+          dtInputs.forEach(x => { try { const dk = Number(x.dataset.day); if (x && x.value && /^\d{2}:\d{2}$/.test(x.value)) o[dk] = x.value; } catch {} });
+          state._apptDayTimes = o;
+        }
+      } catch {}
+    }
+    function clearApptDraft() { state._apptTitle = ''; state._apptDate = ''; state._apptTime = ''; state._apptNotes = ''; state._apptDayTimes = {}; state._apptDays = []; state._apptRepeat = 'once'; state._apptDaysOpen = false; state._apptRemOpen = false; }
     const apDoAdd = () => {
       const ti = document.getElementById('apptTitle'), da = document.getElementById('apptDate'), tm = document.getElementById('apptTime'), nt = document.getElementById('apptNotes');
       const v = (ti && ti.value.trim()) || '';
       if (!v) { if (ti) ti.focus(); toast('اكتب اسم الموعد الأول', 'warning'); return; }
-      if (!da || !da.value || !tm || !tm.value) { toast('اختار تاريخ ووقت الموعد 📅', 'warning'); return; }
-      const r = addAppt({ title: v, date: da.value, time: tm.value, remind: state._apptRemind != null ? Number(state._apptRemind) : 30, notes: nt ? nt.value : '' });
+      const rep = state._apptRepeat === 'weekly' ? 'weekly' : 'once';
+      const remind = state._apptRemind != null ? Number(state._apptRemind) : 30;
+      const notes = nt ? nt.value : '';
+      let r = null;
+      if (rep === 'weekly') {
+        const days = Array.isArray(state._apptDays) ? state._apptDays.map(Number) : [];
+        if (!days.length) { toast('اختار يوم واحد على الأقل 📅', 'warning'); return; }
+        const dayTimes = {};
+        document.querySelectorAll('.appt-daytime').forEach(inp => { try { const dk = Number(inp.dataset.day); if (inp && inp.value && days.includes(dk)) dayTimes[dk] = inp.value; } catch {} });
+        try {
+          const draft = state._apptDayTimes || {};
+          Object.keys(draft).forEach(k => {
+            const dk = Number(k);
+            if (days.includes(dk) && !dayTimes[dk] && /^\d{2}:\d{2}$/.test(draft[k] || '')) dayTimes[dk] = draft[k];
+          });
+        } catch {}
+        const missing = days.filter(d => !dayTimes[d]);
+        if (missing.length) { toast('اختار وقت يوم ' + missing.map(d => apptDayName(d)).filter(Boolean).join(' و') + ' ⏰', 'warning'); return; }
+        r = addAppt({ title: v, repeat: 'weekly', days, dayTimes, remind, notes });
+      } else {
+        if (!da || !da.value || !tm || !tm.value) { toast('اختار تاريخ ووقت الموعد 📅', 'warning'); return; }
+        r = addAppt({ title: v, repeat: 'once', date: da.value, time: tm.value, remind, notes });
+      }
       if (r === 'past') { toast('اختار وقت في المستقبل ⏰', 'warning'); return; }
       if (!r) { toast('مقدرتش أحفظ الموعد', 'error'); return; }
-      state._apptAddOpen = false; render(); toast('اتحفظ الموعد 📅 وهيوصلك تنبيه ⏰', 'success');
+      state._apptAddOpen = false; clearApptDraft();
+      render(); toast(r.repeat === 'weekly' ? 'اتحفظ الدرس الثابت 🔁 وهيوصلك تنبيه كل حصة ⏰' : 'اتحفظ الموعد 📅 وهيوصلك تنبيه ⏰', 'success');
     };
     const apBtn = document.getElementById('apptAddBtn'); if (apBtn) apBtn.onclick = apDoAdd;
-    const arb = document.getElementById('apptRemindBtn'); if (arb) arb.onclick = (e) => { e.stopPropagation(); state._apptRemOpen = !state._apptRemOpen; persist(); render(); };
-    document.querySelectorAll('[data-apptrem]').forEach(b => b.onclick = (e) => { e.stopPropagation(); state._apptRemind = Number(b.dataset.apptrem); state._apptRemOpen = false; persist(); render(); requestAnimationFrame(() => { const n = document.getElementById('apptTitle'); if (n) n.focus(); }); });
-    document.querySelectorAll('[data-appttoggle]').forEach(row => row.onclick = (e) => { if (e.target.closest('[data-apptdel]')) return; const a = toggleAppt(row.dataset.appttoggle); if (a && a.done) fxSound('done'); render(); if (a && a.done) toast('موعد اتعمل ✓ عاش!', 'success'); });
-    document.querySelectorAll('[data-apptdel]').forEach(b => b.onclick = (e) => { e.stopPropagation(); deleteAppt(b.dataset.apptdel); render(); toast('اتمسح الموعد ✓', 'success'); });
-    const taskDoAdd = () => { const inp = document.getElementById('taskAddInput'); if (!inp) return; const v = inp.value.trim(); if (!v) { inp.focus(); return; } const it = addTask(v, state._taskNewIcon, state._taskNewDaily); state._taskAddOpen = false; state._taskNewIcon = PACK_DEFAULT_ICON; state._taskNewDaily = false; render(); toast(it && it.daily ? 'اتضافت مهمة يومية' : 'اتضافت المهمة ✓', 'success'); };
-    document.querySelectorAll('[data-taskicon]').forEach(b => b.onclick = (e) => { e.stopPropagation(); state._taskNewIcon = b.dataset.taskicon; persist(); document.querySelectorAll('[data-taskicon]').forEach(x => x.classList.toggle('sel', x === b)); });
+    const arb = document.getElementById('apptRemindBtn'); if (arb) arb.onclick = (e) => { e.stopPropagation(); stashApptDraft(); state._apptRemOpen = !state._apptRemOpen; state._apptDaysOpen = false; persist(); render(); };
+    const adb = document.getElementById('apptDaysBtn'); if (adb) adb.onclick = (e) => { e.stopPropagation(); stashApptDraft(); state._apptDaysOpen = !state._apptDaysOpen; state._apptRemOpen = false; persist(); render(); };
+    document.querySelectorAll('[data-apptrem]').forEach(b => b.onclick = (e) => { e.stopPropagation(); stashApptDraft(); state._apptRemind = Number(b.dataset.apptrem); state._apptRemOpen = false; persist(); render(); requestAnimationFrame(() => { const n = document.getElementById('apptTitle'); if (n) n.focus(); }); });
+    document.querySelectorAll('[data-appttype]').forEach(b => b.onclick = (e) => { e.stopPropagation(); stashApptDraft(); state._apptRepeat = b.dataset.appttype === 'weekly' ? 'weekly' : 'once'; persist(); render(); });
+    document.querySelectorAll('[data-apptday]').forEach(b => b.onclick = (e) => {
+      e.stopPropagation();
+      stashApptDraft();
+      const d = Number(b.dataset.apptday);
+      if (!Array.isArray(state._apptDays)) state._apptDays = [];
+      if (state._apptDays.map(Number).includes(d)) state._apptDays = state._apptDays.map(Number).filter(x => x !== d);
+      else { state._apptDays.push(d); if (state._apptDays.length > 7) state._apptDays = state._apptDays.slice(0, 7); }
+      persist(); render();
+    });
+    document.querySelectorAll('.appt-daytime').forEach(inp => inp.onchange = () => {
+      try {
+        if (!state._apptDayTimes || typeof state._apptDayTimes !== 'object') state._apptDayTimes = {};
+        const dk = Number(inp.dataset.day);
+        if (inp.value && /^\d{2}:\d{2}$/.test(inp.value)) state._apptDayTimes[dk] = inp.value;
+        else delete state._apptDayTimes[dk];
+        persist();
+      } catch {}
+    });
+    document.querySelectorAll('[data-appttoggle]').forEach(row => row.onclick = (e) => { if (e.target.closest('[data-apptdel]')) return; const a = toggleAppt(row.dataset.appttoggle); if (a && a.done) playNoteSound(); render(); if (a && a.done) toast('موعد اتعمل ✓ عاش!', 'success'); });
+    document.querySelectorAll('[data-apptdel]').forEach(b => b.onclick = (e) => {
+      e.stopPropagation();
+      const id = b.dataset.apptdel;
+      const a = apptList().find(x => x && x.id === id);
+      confirmDialog({ title: 'نمسح الموعد؟', message: a ? `«${escapeHTML(a.title || 'موعد')}» هيتمسح نهائياً ومش هيرجع.` : 'الموعد هيتمسح نهائياً ومش هيرجع.', confirmText: 'امسح', cancelText: 'لأ، خليه', danger: true }).then(ok => { if (ok) { deleteAppt(id); render(); toast('اتمسح الموعد ✓', 'success'); } });
+    });
+    const taskDoAdd = () => { const inp = document.getElementById('taskAddInput'); if (!inp) return; const v = inp.value.trim(); if (!v) { inp.focus(); return; } const tdays = Array.isArray(state._taskNewDays) ? state._taskNewDays.map(Number) : []; const it = addTask(v, state._taskNewIcon, state._taskNewDaily, tdays); state._taskAddOpen = false; state._taskNewIcon = PACK_DEFAULT_ICON; state._taskNewDaily = false; state._taskNewDays = []; state._taskNewTitle = ''; state._taskDaysOpen = false; render(); const tmsg = (it && it.days && it.days.length) ? 'اتضافت مهمة لأيامك المحددة 📅' : (it && it.daily ? 'اتضافت مهمة يومية' : 'اتضافت المهمة ✓'); toast(tmsg, 'success'); };
+    document.querySelectorAll('[data-taskicon]').forEach(b => b.onclick = (e) => { e.stopPropagation(); stashTaskDraft(); state._taskNewIcon = b.dataset.taskicon; persist(); document.querySelectorAll('[data-taskicon]').forEach(x => x.classList.toggle('sel', x === b)); });
     const taskDailyTgl = document.getElementById('taskDailyTgl'); if (taskDailyTgl) taskDailyTgl.onclick = (e) => { e.stopPropagation(); state._taskNewDaily = !state._taskNewDaily; persist(); taskDailyTgl.classList.toggle('active', !!state._taskNewDaily); };
+    const taskDaysBtn = document.getElementById('taskDaysBtn'); if (taskDaysBtn) taskDaysBtn.onclick = (e) => { e.stopPropagation(); stashTaskDraft(); state._taskDaysOpen = !state._taskDaysOpen; persist(); render(); };
+    document.querySelectorAll('[data-taskday]').forEach(b => b.onclick = (e) => {
+      e.stopPropagation();
+      stashTaskDraft();
+      const d = Number(b.dataset.taskday);
+      if (!Array.isArray(state._taskNewDays)) state._taskNewDays = [];
+      if (state._taskNewDays.map(Number).includes(d)) state._taskNewDays = state._taskNewDays.map(Number).filter(x => x !== d);
+      else { state._taskNewDays.push(d); if (state._taskNewDays.length > 7) state._taskNewDays = state._taskNewDays.slice(0, 7); }
+      persist(); render();
+    });
     const taskBtn = document.getElementById('taskAddBtn'); if (taskBtn) taskBtn.onclick = taskDoAdd;
     const taskInp = document.getElementById('taskAddInput'); if (taskInp) taskInp.onkeydown = (e) => { if (e.key === 'Enter') taskDoAdd(); };
-    document.querySelectorAll('[data-tasktoggle]').forEach(row => row.onclick = (e) => { if (e.target.closest('[data-taskdel]')) return; const _t = toggleTask(row.dataset.tasktoggle); if (_t && _t.done) fxSound('done'); render(); });
-    document.querySelectorAll('[data-taskdel]').forEach(b => b.onclick = (e) => { e.stopPropagation(); deleteTask(b.dataset.taskdel); render(); toast('اتمسحت ✓', 'success'); });
+    document.querySelectorAll('[data-tasktoggle]').forEach(row => row.onclick = (e) => { if (e.target.closest('[data-taskdel]')) return; const _t = toggleTask(row.dataset.tasktoggle); if (_t && _t.done) playNoteSound(); render(); });
+    document.querySelectorAll('[data-taskdel]').forEach(b => b.onclick = (e) => {
+      e.stopPropagation();
+      const id = b.dataset.taskdel;
+      const t = taskList().find(x => x && x.id === id);
+      confirmDialog({ title: 'نمسح المهمة؟', message: t ? `«${escapeHTML(t.title || 'مهمة')}» هتتمسح نهائياً ومش هترجع.` : 'المهمة هتتمسح نهائياً ومش هترجع.', confirmText: 'امسح', cancelText: 'لأ، خليها', danger: true }).then(ok => { if (ok) { deleteTask(id); render(); toast('اتمسحت ✓', 'success'); } });
+    });
     const tcd = document.getElementById('taskClearDone'); if (tcd) tcd.onclick = (e) => { e.stopPropagation(); state._tasks = taskList().filter(t => !t.done); persist(); render(); };
     const tcd2 = document.getElementById('taskClearDone2'); if (tcd2) tcd2.onclick = () => { state._tasks = taskList().filter(t => !t.done); persist(); render(); };
     const bam = document.getElementById('basketAddMore'); if (bam) bam.onclick = (e) => { e.stopPropagation(); openAddOrderModal(); };
@@ -5081,6 +5422,7 @@
     const saf = document.getElementById('shopAddFirst'); if (saf) saf.onclick = () => openAddOrderModal();
     const shb = document.getElementById('shopCloseBtn'); if (shb) shb.onclick = () => { state._shopOpen = false; state._catBrowse = null; render(); };
     const cbb = document.getElementById('catBackBtn'); if (cbb) cbb.onclick = () => { state._catBrowse = null; state._shopQuery = ''; persist(); render(); try { window.scrollTo(0, 0); } catch (_) {} };
+    document.querySelectorAll('[data-shoptab]').forEach(b => b.onclick = () => { state._shopTab = b.dataset.shoptab; persist(); render(); try { window.scrollTo(0, 0); } catch (_) {} });
     document.querySelectorAll('[data-addcat]').forEach(b => b.onclick = () => { try { quickAddCatalogItem(decodeURIComponent(b.dataset.addcat)); } catch {} });
     document.querySelectorAll('[data-expqtype]').forEach(b => b.onclick = () => {
       const d = state._expDraft || (state._expDraft = {});
@@ -5229,8 +5571,9 @@
     });
     b('tglNotif', () => {
       const on = (state._notifOn === false);
-      const apply = (v) => { state._notifOn = v; persist(); render(); toast(v ? 'التنبيهات اشتغلت 🔔' : 'التنبيهات اتقفلت', v ? 'success' : 'info'); try { notifTick(); } catch {} };
-      if (on && 'Notification' in window && Notification.permission === 'default') {
+      const apply = (v) => { state._notifOn = v; persist(); render(); toast(v ? 'التنبيهات اشتغلت 🔔' : 'التنبيهات اتقفلت', v ? 'success' : 'info'); try { notifTick(); } catch {} try { if (v) notifFire('test', '🔔 ناقصنا إيه', 'التنبيهات شغالة تمام! 😄🔔'); } catch {} };
+      const isNative = !!(window.BaytnaBridge && window.BaytnaBridge.showLocalNotification);
+      if (on && !isNative && 'Notification' in window && Notification.permission === 'default') {
         try { Notification.requestPermission().then(p => apply(p !== 'denied')).catch(() => apply(true)); } catch { apply(true); }
       } else apply(on);
     });
@@ -5281,7 +5624,7 @@
     function buildBackupObject() {
       const data = {};
       Object.keys(state).forEach(k => { data[k] = state[k]; });
-      ['_forceTop', '_expandedOrder', '_expDraft', '_expandedBasket', '_basketDraft', '_catBrowse', '_shopQuery', '_shopOpen', '_repPickerOpen', '_expPickerOpen', '_expGrpOpen', '_pendingCode', '_pendingName', '_pendingCloud', '_isJoining', '_taskAddOpen', '_apptAddOpen', '_habitAddOpen', '_habitNewIcon', '_showTasks', '_showHabits', '_syncedOnce', 'searchQuery', 'orderFilter', 'categoryFilter'].forEach(k => { delete data[k]; });
+      ['_forceTop', '_expandedOrder', '_expDraft', '_expandedBasket', '_basketDraft', '_catBrowse', '_shopQuery', '_shopOpen', '_repPickerOpen', '_expPickerOpen', '_expGrpOpen', '_pendingCode', '_pendingName', '_pendingCloud', '_isJoining', '_taskAddOpen', '_taskNewDays', '_taskNewTitle', '_taskDaysOpen', '_apptAddOpen', '_apptRepeat', '_apptDays', '_apptDaysOpen', '_apptDayTimes', '_apptExtraTimes', '_apptRemOpen', '_apptTitle', '_apptDate', '_apptTime', '_apptNotes', '_habitAddOpen', '_habitNewIcon', '_showTasks', '_showHabits', '_syncedOnce', 'searchQuery', 'orderFilter', 'categoryFilter'].forEach(k => { delete data[k]; });
       data.app = 'naqisna'; data.backupV = 1; data.exportedAt = nowISO();
       return data;
     }
@@ -5298,10 +5641,10 @@
       } catch { toast('تعذر إنشاء النسخة', 'error'); }
     }
     function applyBackupData(data) {
-      const skip = ['app', 'backupV', 'exportedAt', '_forceTop', '_expandedOrder', '_expDraft', '_expandedBasket', '_basketDraft', '_catBrowse', '_shopQuery', '_shopOpen', '_repPickerOpen', '_expPickerOpen', '_expGrpOpen', '_pendingCode', '_pendingName', '_pendingCloud', '_isJoining', '_taskAddOpen', '_apptAddOpen', '_habitAddOpen', '_habitNewIcon', '_showTasks', '_showHabits', '_syncedOnce', 'searchQuery', 'orderFilter', 'categoryFilter'];
+      const skip = ['app', 'backupV', 'exportedAt', '_forceTop', '_expandedOrder', '_expDraft', '_expandedBasket', '_basketDraft', '_catBrowse', '_shopQuery', '_shopOpen', '_repPickerOpen', '_expPickerOpen', '_expGrpOpen', '_pendingCode', '_pendingName', '_pendingCloud', '_isJoining', '_taskAddOpen', '_taskNewDays', '_taskNewTitle', '_taskDaysOpen', '_apptAddOpen', '_apptRepeat', '_apptDays', '_apptDaysOpen', '_apptDayTimes', '_apptExtraTimes', '_apptRemOpen', '_apptTitle', '_apptDate', '_apptTime', '_apptNotes', '_habitAddOpen', '_habitNewIcon', '_showTasks', '_showHabits', '_syncedOnce', 'searchQuery', 'orderFilter', 'categoryFilter'];
       Object.keys(data).forEach(k => { if (!skip.includes(k)) state[k] = data[k]; });
       if (!state.home) state.home = { code: genHomeCode(), name: 'بيتنا', createdAt: nowISO() };
-      if (!state.user) state.user = { id: uid(), name: 'فرد من العيلة', role: 'member', whatsapp: '', joinedAt: nowISO() };
+      if (!state.user) state.user = { id: uid(), name: 'المستر', role: 'member', whatsapp: '', joinedAt: nowISO() };
       if (!Array.isArray(state.orders)) state.orders = [];
       if (!Array.isArray(state.expenses)) state.expenses = [];
       state.initialized = true; state.currentTab = 'settings'; state._forceTop = true; state._dataOpen = true;
@@ -5329,8 +5672,6 @@
     if (expBackupBtn) expBackupBtn.onclick = () => downloadBackup();
     const impBackupInp = document.getElementById('importBackupFile');
     if (impBackupInp) impBackupInp.onchange = () => { importBackupFile(impBackupInp.files && impBackupInp.files[0]); impBackupInp.value = ''; };
-    const clearAll = document.getElementById('clearAllBtn');
-    if (clearAll) clearAll.onclick = () => { confirmDialog({ title: 'نمسح كل حاجة؟', message: 'هيمسح البيت والطلبات والمصروفات كلها. ومفيش رجعة!', confirmText: 'مسح كل حاجة', cancelText: 'لأ، خليه', danger: true }).then(ok => { if (ok) { Storage.clear(); state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, categoryColors: {}, categoryNames: {}, productIcons: {}, customCats: [], hiddenCats: [], photos: { me: '' }, catalogCustom: null, _shareExpenses: false, _shareFin: { expense: true, income: false, debt: true }, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: 'welcome' }; toast('كله اتمسح', 'warning'); render(); } }); };
     /* حذف البيت نهائياً: من الجهاز + قاعدة البيانات */
     async function deleteHomeForever(code) {
       let cloudOk = false, cloudTried = false;
@@ -5466,7 +5807,7 @@
     const html = `<div class="modal-handle"></div><h2>${escapeHTML(g.name)}</h2><p class="m-sub">${FINANCE[root].emoji} ${FINANCE[root].label} • ${g.items.length} بند</p>
       <div style="padding:0 0 8px;color:var(--text-sec);font-size:11px;font-weight:700;">💡 دوس على الأيقونة عشان تغيرها</div>
       ${g.items.map(it => `<div class="rv-row"><button class="color-item-icon" data-finitemicon="${it.key}" title="تغيير الأيقونة" style="background:${FINANCE[root].color}18;">${finItemIcon(it.key, it.name)}</button><span class="rv-name">${escapeHTML(it.name)}${it.custom ? ' <span class="custom-tag">مخصص</span>' : ''}${it.hidden ? ' <span class="custom-tag">مستخبي</span>' : ''}</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn btn-sm" data-finrn="${it.key}">تسمية</button>${it.custom ? `<button class="btn btn-sm btn-danger" data-findl="${it.key}">امسح</button>` : `<button class="btn btn-sm" data-finhide="${it.key}">${it.hidden ? 'اظهره' : 'اخفيه'}</button>`}</span></div>`).join('') || '<div class="help-text">مفيش بنود لسه — ضيف أول بند</div>'}
-      <div class="field" style="margin-top:10px;"><label>ضيف بند</label><input type="text" id="finAr" placeholder="اسم البند *" maxlength="40" /></div>
+      <div class="field" style="margin-top:10px;"><label>ضيف بند</label><input type="text" id="finAr" maxlength="40" /></div>
       <div class="btn-group"><button class="btn btn-primary" id="finAdd">+ ضيف البند</button><button class="btn" id="finBack2">رجوع</button></div>`;
     const m = openModal(html);
     m.querySelector('#finBack2').onclick = () => { closeModal(m); openFinManager(); };
@@ -5531,7 +5872,7 @@
     const total = cats.reduce((a, d) => a + catDeptCount(d), 0);
     const cc = catCustom();
     const html = `<div class="modal-handle"></div><h2>إدارة الكتالوج</h2><p class="m-sub">${total} صنف في ${cats.length} قسم</p>
-      <div class="field"><label>بحث عن منتج</label><input type="text" id="cmSearch" placeholder="اكتب اسم المنتج..." autocomplete="off" /></div>
+      <div class="field"><label>بحث عن منتج</label><input type="text" id="cmSearch" placeholder="اكتب اسم صنف..." autocomplete="off" /></div>
       <div id="cmResults"></div>
       <div id="cmDepts">${cats.length ? cats.map(d => `<div class="rv-row"><span class="rv-name">${d.emoji} ${escapeHTML(getCategoryName(d.id))} <small style="color:var(--text-muted);">(${catDeptCount(d)})</small>${d.custom ? ' <span class="custom-tag">مخصص</span>' : ''}${d.hidden ? ' <span class="custom-tag">مستخبي</span>' : ''}</span><button class="btn btn-sm" data-cmopen="${d.id}">الأقسام</button>${d.custom ? `<button class="btn btn-sm btn-danger" data-cmdeld="${d.id}">امسح</button>` : `<button class="btn btn-sm" data-cmhided="${d.id}">${d.hidden ? 'اظهره' : 'اخفيه'}</button>`}</div>`).join('') : '<div class="help-text" style="margin-bottom:8px;">مفيش تصنيفات لسه — ابدأ من زرار + قسم جديد</div>'}</div>
       <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="cmAddDept">+ قسم جديد</button><button class="btn" id="cmBack">رجوع</button></div>`;
@@ -5565,8 +5906,8 @@
   }
   function openCatalogAddDept() {
     const html = `<div class="modal-handle"></div><h2>قسم جديد</h2><p class="m-sub">القسم هيظهر جوه الطلبات</p>
-      <div class="field"><label>اسم القسم *</label><input type="text" id="cadName" placeholder="مثال: حلويات شرقية" maxlength="30" /></div>
-      <div class="field"><label>أيقونة (إيموجي)</label><input type="text" id="cadEmoji" placeholder="🍬" maxlength="8" /></div>
+      <div class="field"><label>اسم القسم *</label><input type="text" id="cadName" maxlength="30" /></div>
+      <div class="field"><label>أيقونة (إيموجي)</label><input type="text" id="cadEmoji" maxlength="8" /></div>
       <div class="btn-group"><button class="btn btn-primary" id="cadSave">ضيف</button><button class="btn" id="cadBack">رجوع</button></div>`;
     const m = openModal(html);
     m.querySelector('#cadBack').onclick = () => { closeModal(m); openCatalogManager(); };
@@ -5605,7 +5946,7 @@
   }
   function openCatalogAddSub(deptId) {
     const html = `<div class="modal-handle"></div><h2>قسم فرعي جديد</h2>
-      <div class="field"><label>اسم القسم الفرعي *</label><input type="text" id="casName" placeholder="مثال: الجبن" maxlength="30" /></div>
+      <div class="field"><label>اسم القسم الفرعي *</label><input type="text" id="casName" maxlength="30" /></div>
       <div class="btn-group"><button class="btn btn-primary" id="casSave">ضيف</button><button class="btn" id="casBack">رجوع</button></div>`;
     const m = openModal(html);
     m.querySelector('#casBack').onclick = () => { closeModal(m); openCatalogSubs(deptId); };
@@ -5628,9 +5969,9 @@
     if (!d || !s) { openCatalogManager(); return; }
     const html = `<div class="modal-handle"></div><h2>${escapeHTML(subName)}</h2><p class="m-sub">${escapeHTML(getCategoryName(d.id))} • ${s.items.length} منتج</p>
       ${s.items.map(it => `<div class="rv-row"><span class="rv-name">${escapeHTML(it.ar)}${it.custom ? ' <span class="custom-tag">مخصص</span>' : ''}${it.hidden ? ' <span class="custom-tag">مستخبي</span>' : ''}</span><span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn btn-sm" data-ciup="${encodeURIComponent(it.key)}">↑</button><button class="btn btn-sm" data-cidown="${encodeURIComponent(it.key)}">↓</button><button class="btn btn-sm" data-cirn="${encodeURIComponent(it.key)}">تعديل</button><button class="btn btn-sm" data-cimv="${encodeURIComponent(it.key)}">نقل</button><button class="btn btn-sm" data-cimgo="${encodeURIComponent(it.key)}">ادمج</button>${it.custom ? `<button class="btn btn-sm btn-danger" data-cidel="${encodeURIComponent(it.key)}">امسح</button>` : `<button class="btn btn-sm ${it.hidden ? '' : 'btn-danger'}" data-cihide="${encodeURIComponent(it.key)}">${it.hidden ? 'اظهره' : 'اخفيه'}</button>`}</span></div>`).join('') || '<div class="help-text">مفيش منتجات لسه — ضيف أول منتج</div>'}
-      <div class="field" style="margin-top:10px;"><label>ضيف منتج</label><input type="text" id="ciAr" placeholder="اسم المنتج *" maxlength="40" /></div>
+      <div class="field" style="margin-top:10px;"><label>ضيف منتج</label><input type="text" id="ciAr" maxlength="40" /></div>
       <div class="btn-group"><button class="btn btn-primary" id="ciAdd">+ ضيف المنتج</button></div>
-      <div class="field" style="margin-top:6px;"><label>ضيف كذا منتج مرة واحدة (كل منتج في سطر)</label><textarea id="ciBulk" rows="3" placeholder="جبنة رومي&#10;زيتون أسود"></textarea></div>
+      <div class="field" style="margin-top:6px;"><label>ضيف كذا منتج مرة واحدة (كل منتج في سطر)</label><textarea id="ciBulk" rows="3"></textarea></div>
       <div class="btn-group"><button class="btn" id="ciBulkAdd">ضيفهم</button><button class="btn" id="ciBack">رجوع</button></div>`;
     const m = openModal(html);
     const back = () => { closeModal(m); openCatalogSubs(deptId); };
@@ -5798,7 +6139,7 @@
     let icon = 'star', color = '#1CB0F6';
     const palette = ['#1CB0F6', '#FF9600', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#F43F5E', '#F97316'];
     const html = `<div class="modal-handle"></div><h2>قسم جديد</h2><p class="m-sub">اختار اسم وأيقونة ولون للقسم</p>
-      <div class="field"><label>اسم القسم *</label><input type="text" id="newCatName" placeholder="مثلا: حلويات" maxlength="25" /></div>
+      <div class="field"><label>اسم القسم *</label><input type="text" id="newCatName" maxlength="25" /></div>
       <div class="field"><label>الأيقونة</label><div class="icon-grid">${CAT_ICON_CHOICES.map(ic => `<button class="icon-opt ${ic.id === icon ? 'selected' : ''}" data-pickicon="${ic.id}"><span style="color:${color};">${svgIcon(ic.id, 24)}</span><small>${ic.label}</small></button>`).join('')}</div></div>
       <div class="field"><label>اللون</label><div class="color-swatches">${palette.map(c => `<button class="swatch ${c === color ? 'selected' : ''}" data-pickcolor="${c}" style="background:${c};"></button>`).join('')}</div></div>
       <div class="btn-group"><button class="btn btn-primary" id="saveCatBtn">ضيف القسم</button><button class="btn" id="cancelCatBtn">رجوع</button></div>`;
@@ -5835,7 +6176,7 @@
   function openProductIcons() {
     const list = collectProducts();
     const html = `<div class="modal-handle"></div><div class="m-hero-txt"><h2>🖼️ أيقونات المنتجات</h2><p class="m-sub">الأيقونة على حسب اسم المنتج • دوس على أي منتج عشان تغيرها • اللي ظاهر: الاسم + الكمية + الملحوظة</p>
-      <div class="field"><label>بحث</label><input type="text" id="piSearch" placeholder="دور على منتج..." autocomplete="off" /></div>
+      <div class="field"><label>بحث</label><input type="text" id="piSearch" placeholder="دوّر باسم المنتج..." autocomplete="off" /></div>
       <div id="piList">${list.map(p => { const cc = catColor(p.cat); return `<div class="rv-row" data-piname="${escapeHTML(p.name)}"><button class="color-item-icon" data-picon="${escapeHTML(p.name)}" style="background:${cc}18;font-size:20px;" title="تغيير الأيقونة">${productIcon(p.name, p.cat)}</button><span class="rv-name">${escapeHTML(p.name)}<br><small style="color:var(--text-muted);font-weight:700;">${escapeHTML(getCategoryName(p.cat))} • 📍 ${escapeHTML(catLocation(p.cat))}</small></span><span class="sug-cat">${escapeHTML(getCategoryName(p.cat))}</span></div>`; }).join('') || '<div class="help-text">مفيش منتجات لسه — ضيف طلبات وهتظهر هنا</div>'}</div>
       <div class="btn-group" style="margin-top:8px;"><button class="btn" id="piBack">رجوع</button></div>`;
     const m = openModal(html);
@@ -5879,7 +6220,7 @@
 
   function openEditTextModal({ title, label, value, placeholder, max, onSave }) {
     const html = `<div class="modal-handle"></div><h2>${title}</h2><p class="m-sub">اكتب القيمة الجديدة</p>
-      <div class="field"><label>${label}</label><input type="text" id="editTextInp" placeholder="${placeholder || ''}" maxlength="${max || 40}" value="${escapeHTML(value || '')}" /></div>
+      <div class="field"><label>${label}</label><input type="text" id="editTextInp" maxlength="${max || 40}" value="${escapeHTML(value || '')}" /></div>
       <div class="btn-group"><button class="btn btn-primary" id="saveTextBtn">احفظ</button><button class="btn" id="cancelTextBtn">رجوع</button></div>`;
     const m = openModal(html);
     m.querySelector('#cancelTextBtn').onclick = () => closeModal(m);
@@ -5887,7 +6228,7 @@
   }
   function openProfileModal() {
     const m = openModal(`<div class="modal-handle"></div><h2>رقم الواتساب 📱</h2><p class="m-sub">هيوصلك عليه إشعارات الطلبات</p>
-      <div class="field"><label>📱 رقم الواتساب الخاص بيك</label><input type="tel" id="pmWa" class="wa-field" dir="ltr" value="${escapeHTML(state.user?.whatsapp || '')}" placeholder="01xxxxxxxxx" maxlength="15" inputmode="tel" /></div>
+      <div class="field"><label>📱 رقم الواتساب الخاص بيك</label><input type="tel" id="pmWa" class="wa-field" dir="ltr" value="${escapeHTML(state.user?.whatsapp || '')}" maxlength="15" inputmode="tel" /></div>
       <div class="btn-group"><button class="btn btn-primary" id="pmSave">احفظ الرقم ✅</button><button class="btn" id="pmCancel">رجوع</button></div>`);
     m.querySelector('#pmCancel').onclick = () => closeModal(m);
     m.querySelector('#pmSave').onclick = () => {
@@ -5909,8 +6250,8 @@
   function openDeliveryModal() {
     const d = getDeliveryInfo();
     const m = openModal(`<div class="modal-handle"></div><h2>الديليفري 🚴</h2><p class="m-sub">سجل رقمه وابعتله الطلبات واتساب</p>
-      <div class="field"><label>🚴 اسم الديليفري</label><input type="text" id="dlName" value="${escapeHTML(d.name)}" placeholder="مثال: أحمد الديليفري" maxlength="20" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg);font-weight:800;" /></div>
-      <div class="field"><label>📱 رقم الواتساب</label><input type="tel" id="dlWa" dir="ltr" value="${escapeHTML(d.phone)}" placeholder="01xxxxxxxxx" maxlength="15" inputmode="tel" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg);font-weight:800;" /></div>
+      <div class="field"><label>🚴 اسم الديليفري</label><input type="text" id="dlName" value="${escapeHTML(d.name)}" maxlength="20" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg);font-weight:800;" /></div>
+      <div class="field"><label>📱 رقم الواتساب</label><input type="tel" id="dlWa" dir="ltr" value="${escapeHTML(d.phone)}" maxlength="15" inputmode="tel" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg);font-weight:800;" /></div>
       <div class="btn-group"><button class="btn btn-primary" id="dlSave">احفظ ✅</button><button class="btn" id="dlCancel">رجوع</button></div>`);
     m.querySelector('#dlCancel').onclick = () => closeModal(m);
     m.querySelector('#dlSave').onclick = () => {
@@ -5949,7 +6290,7 @@
   function openPartnerModal() {
     const p = getPartnerInfo();
     const m = openModal(`<div class="modal-handle"></div><h2>الطرف الآخر 👨‍👩‍👧</h2><p class="m-sub">هيوصله طلبات السلة واتساب لما تأكد الكل</p>
-      <div class="field"><label>📱 رقم واتساب الطرف الآخر</label><input type="tel" id="ptWa" dir="ltr" value="${escapeHTML(p.phone)}" placeholder="01xxxxxxxxx" maxlength="15" inputmode="tel" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg);font-weight:800;" /></div>
+      <div class="field"><label>📱 رقم واتساب الطرف الآخر</label><input type="tel" id="ptWa" dir="ltr" value="${escapeHTML(p.phone)}" maxlength="15" inputmode="tel" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--bg);font-weight:800;" /></div>
       <div class="btn-group"><button class="btn btn-primary" id="ptSave">احفظ ✅</button><button class="btn" id="ptCancel">رجوع</button></div>`);
     m.querySelector('#ptCancel').onclick = () => closeModal(m);
     m.querySelector('#ptSave').onclick = () => {
@@ -6053,18 +6394,31 @@
   }
   function notifFire(kind, title, body) {
     // الإشعار الداخلي (toast) يشتغل دائماً إلا لو المستخدم قفل التنبيهات صراحةً.
-    // إشعار النظام يشتغل كإضافة لو الإذن ممنوح.
+    // إشعار النظام: 1) جسر الأندرويد 2) Web Notification للمتصفح.
     if (state && state._notifOn === false && kind !== 'test') return;
+    // 1) تطبيق الأندرويد (WebView لا يدعم Notification API — لازم الجسر الأصلي)
+    try {
+      if (window.BaytnaBridge && typeof window.BaytnaBridge.showLocalNotification === 'function') {
+        try { window.BaytnaBridge.showLocalNotification(String(title || 'تنبيه'), String(body || '')); } catch {}
+      }
+    } catch {}
+    // 2) المتصفح / PWA
     try {
       if ('Notification' in window && Notification.permission === 'granted') {
         try {
-          if (document.hidden && navigator.serviceWorker && navigator.serviceWorker.ready) {
-            navigator.serviceWorker.ready.then(reg => {
-              try { reg.showNotification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png', tag: 'naqisna-' + kind }); } catch {}
-            }).catch(() => {});
+          var opts = { body: body, icon: 'icon-192.png', badge: 'icon-192.png', tag: 'naqisna-' + kind, vibrate: [200, 100, 200], requireInteraction: false };
+          if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+            try {
+              navigator.serviceWorker.ready.then(function(reg) {
+                try {
+                  if (reg && typeof reg.showNotification === 'function') reg.showNotification(title, opts);
+                  else { var n = new Notification(title, opts); n.onclick = function() { try { window.focus(); } catch (e) {} try { n.close(); } catch (e2) {} }; }
+                } catch (e) { try { var n2 = new Notification(title, opts); } catch (e2) {} }
+              }).catch(function() { try { var n3 = new Notification(title, opts); } catch (e) {} });
+            } catch (e) { var n4 = new Notification(title, opts); }
           } else {
-            const n = new Notification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png', tag: 'naqisna-' + kind });
-            n.onclick = () => { try { window.focus(); } catch {} try { n.close(); } catch {} };
+            var n = new Notification(title, opts);
+            n.onclick = function() { try { window.focus(); } catch (e) {} try { n.close(); } catch (e2) {} };
           }
         } catch {}
       }
@@ -6121,17 +6475,26 @@
         if (state._notifAppt !== false) {
           const list = apptList().filter(a => a && !a.done);
           for (const a of list) {
-            const dt = apptDateTime(a);
-            if (!dt) continue;
-            const ts = dt.getTime();
-            const key = 'appt_' + a.id + '_' + ts;
-            if (st[key]) continue;
-            const at = ts - (Number(a.remind) || 0) * 60000;
-            if (now >= at && now - ts < 6 * 3600 * 1000) {
-              st[key] = 1; notifSave(st);
-              const when = ts <= now ? 'فات موعده — ' + apptRemainTxt(a) : 'يبدأ ' + apptRemainTxt(a);
-              notifFire('appt-' + a.id, '📅 تذكير بموعد: ' + (a.title || 'موعد هام'), when);
-            }
+            try {
+              const weekly = apptIsWeekly(a);
+              const occs = weekly ? apptOccurrences(a, 3) : (apptDateTime(a) ? [apptDateTime(a)] : []);
+              for (const dt of occs) {
+                if (!dt) continue;
+                const ts = dt.getTime();
+                const key = 'appt_' + a.id + '_' + ts;
+                if (st[key]) continue;
+                const at = ts - (Number(a.remind) || 0) * 60000;
+                if (now >= at && now - ts < 6 * 3600 * 1000) {
+                  st[key] = 1; notifSave(st);
+                  let when;
+                  try {
+                    const tp = prayerTo12h(String(dt.getHours()).padStart(2, '0') + ':' + String(dt.getMinutes()).padStart(2, '0'));
+                    when = (weekly ? 'حصة ' : '') + dt.toLocaleDateString('ar-EG', { weekday: 'long' }) + ' الساعة ' + tp.t + ' ' + tp.ap + ' — ' + apptRemainTxt(a);
+                  } catch { when = apptRemainTxt(a); }
+                  notifFire('appt-' + a.id, '📅 تذكير ' + (weekly ? 'بالدرس: ' : 'بموعد: ') + (a.title || 'موعد هام'), when);
+                }
+              }
+            } catch {}
           }
         }
       } catch {}
@@ -6164,10 +6527,10 @@
     let qType = 'none', qVal = 1, qUnit = 'قطعة';
     const m = openModal(`<div class="modal-handle"></div>
       <div class="m-hero"><span class="m-hero-ico">${svgIcon('plus', 26)}</span><div class="m-hero-txt"><h2>➕ ضيف صنف جديد</h2><p>اكتب الاسم واختار التصنيف الرئيسي وضيفه لطلبك</p></div></div>
-      <div class="field"><label>اسم الصنف *</label><input type="text" id="qaName" value="${escapeHTML(qName)}" maxlength="40" placeholder="مثال: مربى توت" /></div>
+      <div class="field"><label>اسم الصنف *</label><input type="text" id="qaName" placeholder="اسم الصنف... مثلا: عسل نحل" value="${escapeHTML(qName)}" maxlength="40" /></div>
       <div class="field"><label>التصنيف الرئيسي *</label><div class="fin-cats" id="qaDepts"></div></div>
       <div class="field"><label>الكمية والوحدة</label><div id="qaQty"></div></div>
-      <div class="field"><label>ملحوظة (اختياري)</label><textarea id="qaNotes" rows="2" placeholder="اكتب ملحوظة لو حابب..."></textarea></div>
+      <div class="field"><label>ملحوظة (اختياري)</label><textarea id="qaNotes" placeholder="أي تفاصيل زيادة" rows="2"></textarea></div>
       <div class="btn-group"><button class="btn btn-primary" id="qaSave">+ ضيفه للطلب</button><button class="btn" id="qaCancel">رجوع</button></div>`);
     function rqDepts() {
       const box = m.querySelector('#qaDepts'); if (!box) return;
@@ -6222,7 +6585,7 @@
       ${editing ? `<div class="field"><label>اسم الطلب *</label>
         <div class="voice-bar"><button type="button" class="voice-btn" id="voiceOrderBtn"><span class="mic">🎙️</span><span id="voiceBtnTxt">اكتب بالصوت 🎤</span></button></div>
         <div class="voice-status hidden" id="voiceStatus"></div>
-        <div class="ord-box"><textarea id="ordName" rows="2" placeholder="اكتب اسم الطلب أو دوس 🎙️ واتكلم بالعربي" maxlength="200" autocomplete="off">${escapeHTML(order.name)}</textarea>
+        <div class="ord-box"><textarea id="ordName" rows="2" maxlength="200" autocomplete="off">${escapeHTML(order.name)}</textarea>
         <div class="suggest-drop hidden" id="ordSuggest"></div></div>
         <div class="help-text">🎙️ الصوت بيكتب بس الأصناف الموجودة في التطبيق — لو صنف جديد هيظهرلك زرار تضيفه يدوي ويتحفظ.</div>
       </div>` : `<div class="field pick-field"><label>🧺 اختار الصنف *</label>
@@ -6230,7 +6593,7 @@
         <div class="voice-status hidden" id="voiceStatus"></div>
         <div id="pickBox"></div>
         <div class="pick-card">
-          <div class="pick-search-box" id="pickSearchBox"><span class="pick-search-ico">🔍</span><input type="text" id="pickSearch" class="pick-search" placeholder="دوّر على الصنف أو اتكلم..." autocomplete="off" maxlength="40" /><button type="button" id="pickAddBtn" class="pick-add-btn hidden">➕ اضافة</button></div>
+          <div class="pick-search-box" id="pickSearchBox"><span class="pick-search-ico">🔍</span><input type="text" id="pickSearch" class="pick-search" placeholder="اكتب اسم الصنف..." autocomplete="off" maxlength="40" /><button type="button" id="pickAddBtn" class="pick-add-btn hidden">➕ اضافة</button></div>
           <div id="pickDepts" class="filters-wrap pick-depts"></div>
           <div id="pickList" class="pick-list-card"></div>
         </div>
@@ -6246,7 +6609,7 @@
           <div id="qtyControls"></div>
         </div>
       </div>` : ''}
-      ${editing ? `<div class="field"><label>ملحوظة (اختياري)</label><textarea id="ordNotes" rows="2" placeholder="مثلا: نوع معين — كبير — غير حار">${escapeHTML(order.notes || '')}</textarea></div>` : ''}
+      ${editing ? `<div class="field"><label>ملحوظة (اختياري)</label><textarea id="ordNotes" rows="2">${escapeHTML(order.notes || '')}</textarea></div>` : ''}
       ${editing
         ? `<div class="field"><label>هيتضاف لقايمة</label><select id="ordListSel" class="rv-select">${orderLists().map(l => `<option value="${l.id}" ${l.id === activeListId() ? 'selected' : ''}>${escapeHTML(l.name)}</option>`).join('')}</select></div>` : ''}
       <div id="pharmacyNote" class="pharm-note hidden">⚠️ ده قسم صيدلية بس. التطبيق لا بيشخّص ولا بينصح بأي حاجة طبية.</div>
@@ -6273,7 +6636,7 @@
         m.querySelector('#qPlus').onclick = () => { qtyVal = Math.min(99, qtyVal + 1); renderQty(); };
         m.querySelector('#qUnitSel').onchange = (e) => { qtyUnit = e.target.value; };
       } else if (qtyType === 'weight') {
-        c.innerHTML = `<div style="display:flex;gap:8px;"><input type="number" class="qty-num" id="qValW" min="0" step="0.25" value="${qtyVal}" placeholder="مثال: 2" /><select class="rv-select" id="qUnitW" style="max-width:110px;">${QTY_WEIGHT_UNITS.map(u => `<option ${u === qtyUnit ? 'selected' : ''}>${u}</option>`).join('')}</select></div>`;
+        c.innerHTML = `<div style="display:flex;gap:8px;"><input type="number" class="qty-num" id="qValW" min="0" step="0.25" value="${qtyVal}" /><select class="rv-select" id="qUnitW" style="max-width:110px;">${QTY_WEIGHT_UNITS.map(u => `<option ${u === qtyUnit ? 'selected' : ''}>${u}</option>`).join('')}</select></div>`;
         m.querySelector('#qValW').oninput = (e) => { qtyVal = parseFloat(e.target.value) || 0; };
         m.querySelector('#qUnitW').onchange = (e) => { qtyUnit = e.target.value; };
       } else { c.innerHTML = `<div class="help-text">هتتضاف من غير تحديد كمية</div>`; }
@@ -6464,7 +6827,7 @@
       const pm = openModal(`<div class="modal-handle"></div>
         <div class="addnew-pop">
           <div class="addnew-pop-hero"><span class="addnew-pop-ico">✨</span><div><h3>ضيفه كصنف جديد</h3><p>"${escapeHTML(initName)}" مش موجود — اختار تصنيفه واحفظه</p></div></div>
-          <div class="addnew-pop-field"><label>✏️ اسم الصنف</label><input id="anpName" value="${escapeHTML(initName)}" maxlength="40" placeholder="اسم الصنف" /></div>
+          <div class="addnew-pop-field"><label>✏️ اسم الصنف</label><input id="anpName" value="${escapeHTML(initName)}" maxlength="40" /></div>
           <div class="addnew-pop-field" style="flex:1;min-height:0;display:flex;flex-direction:column;"><label>🗂️ اختار التصنيف *</label><div class="addnew-pop-cats">${cats.map(d => `<button type="button" class="filter-chip ${selCat === d.id ? 'active' : ''}" data-anpcat="${d.id}">${d.emoji} ${escapeHTML(getCategoryName(d.id))}</button>`).join('') || '<span class="help-text">مفيش تصنيفات لسه</span>'}</div></div>
           <div class="addnew-pop-btns"><button class="btn" id="anpCancel">رجوع</button><button class="btn btn-primary" id="anpSave">+ احفظ الصنف ✓</button></div>
         </div>`, { classes: 'modal-full-addnew' });
@@ -6840,7 +7203,7 @@
         </div>
       </div>
       <div class="finm-body">
-        <div class="finm-field" style="--fin-accent:#10B981;"><label><i style="background:#DCFCE7;">💵</i>سعر الشراء *</label><div class="amount-wrap"><input type="number" id="finalPrice" min="0" step="0.01" placeholder="مثلا: 25.50" inputmode="decimal" /><span class="amount-cur">ج.م</span></div><div class="help-text">💸 هيتسجل تلقائياً في المصروفات</div></div>
+        <div class="finm-field" style="--fin-accent:#10B981;"><label><i style="background:#DCFCE7;">💵</i>سعر الشراء *</label><div class="amount-wrap"><input type="number" id="finalPrice" min="0" step="0.01" inputmode="decimal" /><span class="amount-cur">ج.م</span></div><div class="help-text">💸 هيتسجل تلقائياً في المصروفات</div></div>
       </div>
       <div class="btn-group"><button class="btn btn-success" id="confirmBuy">✓ أكّد الشراء</button><button class="btn" id="cancelBuy">رجوع</button></div>`;
     const m = openModal(html); const fin = m.querySelector('#finalPrice');
@@ -6882,12 +7245,12 @@
         <button class="finm-kind" data-finkind="debt"><span class="k-ico">🏦</span><b>🏦 ديون</b><small>التزامات</small></button>
       </div>
       <div class="finm-body" id="finmBody">
-        <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><label><i style="background:#FFE4E6;">📝</i>الاسم *</label><input type="text" id="expTitle" placeholder="مثلا: فاتورة كهرباء" maxlength="50" /></div>
+        <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><label><i style="background:#FFE4E6;">📝</i>الاسم *</label><input type="text" id="expTitle" placeholder="اسم المصروف... مثلا: خضار الأسبوع" maxlength="50" /></div>
         <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><button type="button" id="catsToggle" style="display:flex;align-items:center;gap:8px;width:100%;text-align:right;"><i style="background:#E1F3FD;width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;font-style:normal;">🗂️</i><b style="font-size:13px;font-weight:900;flex:1;">التصنيف <small id="catsToggleSub" style="display:block;font-size:11px;color:var(--text-muted);font-weight:700;">دوس عشان تشوف وتختار</small></b><span class="fcat-chev" id="catsToggleChev" style="width:28px;height:28px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;transform:rotate(-90deg);transition:transform .25s;font-weight:900;">‹</span></button><div id="finCats" class="hidden" style="margin-top:10px;"></div></div>
-        <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><label><i style="background:#DCFCE7;">💵</i>المبلغ *</label><div class="amount-wrap"><input type="number" id="expAmount" min="0" step="0.01" placeholder="0" /><span class="amount-cur">ج.م</span></div></div>
+        <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><label><i style="background:#DCFCE7;">💵</i>المبلغ *</label><div class="amount-wrap"><input type="number" id="expAmount" placeholder="اكتب المبلغ" min="0" step="0.01" /><span class="amount-cur">ج.م</span></div></div>
         <div class="row-2">
           <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><label><i style="background:#E0F2FE;">📅</i>التاريخ</label><input type="date" id="expDate" value="${todayKey()}" /></div>
-          <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><label><i style="background:#FEF3C7;">✏️</i>ملاحظات</label><textarea id="expNotes" rows="1" placeholder="تفاصيل اختيارية..."></textarea></div>
+          <div class="finm-field" style="--fin-accent:${FINANCE.expense.color};"><label><i style="background:#FEF3C7;">✏️</i>ملاحظات</label><textarea id="expNotes" placeholder="ملاحظة سريعة" rows="1"></textarea></div>
         </div>
       </div>
       <div class="btn-group"><button class="btn btn-primary finm-save-expense" id="saveExpBtn">💾 احفظ الحركة</button><button class="btn" id="cancelExpBtn">رجوع</button></div>`;
@@ -7043,7 +7406,7 @@
         <div class="finm-field" style="--fin-accent:${FINANCE[finKind].color};"><label><i style="background:#DCFCE7;">💵</i>المبلغ *</label><div class="amount-wrap"><input type="number" id="expAmount" min="0" step="0.01" value="${e.amount}" /><span class="amount-cur">ج.م</span></div></div>
         <div class="row-2">
           <div class="finm-field" style="--fin-accent:${FINANCE[finKind].color};"><label><i style="background:#E0F2FE;">📅</i>التاريخ</label><input type="date" id="expDate" value="${String(e.createdAt || '').slice(0, 10) || todayKey()}" /></div>
-          <div class="finm-field" style="--fin-accent:${FINANCE[finKind].color};"><label><i style="background:#FEF3C7;">✏️</i>ملاحظات</label><textarea id="expNotes" rows="1" placeholder="تفاصيل اختيارية...">${escapeHTML(e.notes || '')}</textarea></div>
+          <div class="finm-field" style="--fin-accent:${FINANCE[finKind].color};"><label><i style="background:#FEF3C7;">✏️</i>ملاحظات</label><textarea id="expNotes" rows="1">${escapeHTML(e.notes || '')}</textarea></div>
         </div>
       </div>
       <button class="tgl-row" id="expShareTgl"><span class="tgl"><b>${(e.shared === undefined ? shareFinKind(finKindOf(e)) : e.shared === true) ? '☁️ مشترك مع البيت' : '🔒 خاص على جهازي'}</b><small>دوس للمشاركة أو الخصوصية</small></span><span class="sw ${(e.shared === undefined ? shareFinKind(finKindOf(e)) : e.shared === true) ? 'on' : ''}"></span></button>
@@ -7480,7 +7843,7 @@
 })();
 </script>
 <script>
-if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
+if ('serviceWorker' in navigator) { window.addEventListener('load', function () { try { if (location.protocol === 'http:' || location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) {} }); }
 </script>
 </body>
 </html>

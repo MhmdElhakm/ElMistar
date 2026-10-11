@@ -1,8 +1,8 @@
-/* sw-cache.js — Offline Service Worker (no notifications).
- * Keeps PWA offline caching only.
+/* sw-cache.js — Offline Service Worker + System Notifications.
+ * PWA offline caching + عرض إشعارات النظام والتعامل مع الضغط عليها.
  */
 
-const CACHE_NAME = 'naqisna-pwa-v15';
+const CACHE_NAME = 'naqisna-pwa-v16';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -74,4 +74,35 @@ self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting().catch(() => {});
   }
+});
+
+// الضغط على إشعار النظام يفتح التطبيق (كان ناقصاً — بدونه الضغط لا يفعل شيئاً).
+self.addEventListener('notificationclick', (event) => {
+  try { event.notification.close(); } catch (e) {}
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (var i = 0; i < list.length; i++) {
+        try { list[i].focus(); return; } catch (e) {}
+      }
+      try { return clients.openWindow('./index.html'); } catch (e) {}
+    }).catch(() => {})
+  );
+});
+
+self.addEventListener('notificationclose', () => {});
+
+self.addEventListener('push', (event) => {
+  var title = 'ناقصنا إيه 🔔';
+  var opts = { body: 'عندك تحديث جديد', icon: './icon-192.png', badge: './icon-192.png', tag: 'naqisna-push' };
+  try {
+    if (event.data) {
+      try {
+        var d = event.data.json();
+        if (d.title) title = d.title;
+        if (d.body) opts.body = d.body;
+        if (d.tag) opts.tag = d.tag;
+      } catch (e) { try { opts.body = event.data.text(); } catch (e2) {} }
+    }
+  } catch (e) {}
+  event.waitUntil(self.registration.showNotification(title, opts).catch(() => {}));
 });
