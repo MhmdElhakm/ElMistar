@@ -4918,21 +4918,18 @@
           <button class="btn btn-primary btn-sm" id="newHomeBtn" style="min-height:48px;" ${state.home?.code ? 'disabled' : ''}>🏠 بيت جديد</button>
           <button class="btn btn-secondary btn-sm" id="joinHomeBtn" style="min-height:48px;">🔗 بيت موجود</button>
         </div>
-        <div class="help-text" style="padding:0 16px 8px;">${state.home?.code ? 'الدخول لبيت موجود يستبدل بياناتك ببياناته' : 'البيت الجديد بكود جديد وبياناتك تفضل زي ما هي • الدخول لبيت موجود يستبدل بياناتك ببياناته'}</div>
         <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🚴</div><div class="si-body"><div class="si-label">${escapeHTML(state.deliveryName || state.home?.deliveryName || 'ديليفري')}</div><div class="si-value">بيانات الدليفري بتاعك</div></div><button class="si-action" id="editDeliveryBtn">تعديل</button></div>
         <div style="padding:0 16px 14px;"><button class="btn btn-success" id="sendDeliveryBtn">💬 ابعت الطلبات واتساب للديليفري</button></div>
         <div class="online-pill" id="onlinePill" style="display:none;margin:0 16px 14px;"><span class="online-dot"></span><span class="online-num" id="onlineCount">1</span><span class="online-tx">مستخدم نشط الآن<small>بيستخدموا التطبيق دلوقتي</small></span><span class="live-tag"><i></i> مباشر</span></div>
         </div>
       </div>
       <div class="settings-card"><div class="settings-title">التطبيق</div>
-        <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label">ناقصنا إيه</div><div class="si-value">ثبّته على شاشة موبايلك عشان يفتح أسرع ويشتغل من غير نت</div></div></div>
-        <div style="padding:0 16px 14px;"><button class="btn btn-primary" id="installAppBtn">ثبّت التطبيق على الموبايل</button></div>
+        <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span>ناقصنا إيه</span><button class="btn btn-primary btn-sm" id="installAppBtn" style="width:auto;min-height:30px;padding:5px 12px;font-size:11.5px;border-radius:999px;flex-shrink:0;white-space:nowrap;">📲 ثبّت التطبيق</button></div></div></div>
       </div>
-      <div class="settings-card"><button class="collapsible-head" id="catCustomHead"><span class="ch-icon">${svgIcon('sparkle', 22)}</span><span class="ch-texts"><b>الأقسام والمنتجات</b><small>${allCats().length} قسم • ${getCatalog().reduce((a, d) => a + catDeptCount(d), 0)} صنف • ${finCounts().it} بند مالي • دوس عشان تشوف</small></span><span class="chev ${state._catOpen ? 'open' : ''}">‹</span></button>
+      <div class="settings-card"><button class="collapsible-head" id="catCustomHead"><span class="ch-icon">${svgIcon('sparkle', 22)}</span><span class="ch-texts"><b>الأقسام والمنتجات</b></span><span class="chev ${state._catOpen ? 'open' : ''}">‹</span></button>
         <div class="collapsible-body ${state._catOpen ? '' : 'hidden'}">
-        <div style="padding:8px 16px 0;"><button class="collapsible-head sub" id="catsTuneHead"><span class="ch-texts"><b>تظبيط الأقسام (${allCats().length})</b><small>الأيقونة واللون والاسم • دوس عشان تشوف</small></span><span class="chev ${state._catsTuneOpen ? 'open' : ''}">‹</span></button></div>
+        <div style="padding:8px 16px 0;"><button class="collapsible-head sub" id="catsTuneHead"><span class="ch-texts"><b>تظبيط الأقسام (${allCats().length})</b></span><span class="chev ${state._catsTuneOpen ? 'open' : ''}">‹</span></button></div>
         <div class="collapsible-body ${state._catsTuneOpen ? '' : 'hidden'}">
-        <div style="padding:6px 16px 2px;color:var(--text-sec);font-size:11px;font-weight:600;">دوس على القسم عشان تديره • الأيقونة واللون والاسم</div>
         <div style="padding:2px 0 4px;">${allCats().map(cat => {
           const currentColor = catColor(cat.id);
           const custom = isCustomCat(cat.id);

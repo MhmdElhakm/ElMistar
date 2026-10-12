@@ -703,6 +703,32 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
         </div>
       </div>
       <div class="set-sec">
+        <h4 id="fbSecToggle" style="cursor:pointer;user-select:none"><i class="bx bxs-hot" style="color:#FF8A00"></i> ربط فايربيز Firestore 🔥 <span id="fbSecChev" style="margin-right:auto;transition:transform .25s;display:inline-flex">‹</span></h4>
+        <div id="fbSecBody" class="hidden">
+        <p>الصق إعدادات Firebase ثم احفظ — بعدها تقدر ترفع بياناتك وتعدّلها وتتسحب على أي جهاز. (تُحفظ الإعدادات على جهازك فقط)</p>
+        <div class="inp" style="margin-bottom:8px"><label>API Key</label><input id="fbApiKey" class="sheet-link-inp" dir="ltr" placeholder="AIza..." autocomplete="off"></div>
+        <div class="inp" style="margin-bottom:8px"><label>Auth Domain</label><input id="fbAuthDomain" class="sheet-link-inp" dir="ltr" placeholder="xxx.firebaseapp.com" autocomplete="off"></div>
+        <div class="inp" style="margin-bottom:8px"><label>Project ID</label><input id="fbProjectId" class="sheet-link-inp" dir="ltr" placeholder="xxx" autocomplete="off"></div>
+        <div class="inp" style="margin-bottom:8px"><label>Storage Bucket</label><input id="fbBucket" class="sheet-link-inp" dir="ltr" placeholder="xxx.appspot.com" autocomplete="off"></div>
+        <div class="inp" style="margin-bottom:8px"><label>Messaging Sender ID</label><input id="fbSenderId" class="sheet-link-inp" dir="ltr" placeholder="123..." autocomplete="off"></div>
+        <div class="inp" style="margin-bottom:8px"><label>App ID</label><input id="fbAppId" class="sheet-link-inp" dir="ltr" placeholder="1:123:web:..." autocomplete="off"></div>
+        <div class="set-row" style="margin-top:8px">
+          <button class="btn btn-primary btn-sm" id="fbSaveBtn"><i class="bx bx-save"></i> حفظ إعدادات Firebase</button>
+          <button class="btn btn-outline btn-sm" id="fbTestBtn"><i class="bx bx-pulse"></i> اختبار الاتصال</button>
+        </div>
+        <div class="set-row" style="margin-top:8px">
+          <button class="btn btn-outline btn-sm" id="fbPullBtn"><i class="bx bx-download"></i> سحب من السحابة</button>
+          <button class="btn btn-outline btn-sm" id="fbPushBtn"><i class="bx bx-upload"></i> رفع للسحابة</button>
+          <button class="btn btn-outline btn-sm" id="fbSyncBtn"><i class="bx bx-refresh"></i> مزامنة الآن</button>
+        </div>
+        <div class="sheet-link-status" id="fbStatus">غير مربوط — الصق الإعدادات بالأعلى</div>
+        <label style="display:flex;gap:8px;align-items:center;font-size:12.5px;font-weight:800;color:var(--text-secondary);margin-top:8px;cursor:pointer"><input type="checkbox" id="fbAuto" style="width:17px;height:17px;accent-color:var(--accent)"> مزامنة تلقائية (رفع تلقائي عند التعديل + استقبال لحظي)</label>
+        <div class="set-row" style="margin-top:8px">
+          <button class="btn btn-ghost btn-sm" id="fbUnlinkBtn"><i class="bx bx-unlink"></i> فك ربط قاعدة البيانات</button>
+        </div>
+        </div>
+      </div>
+      <div class="set-sec">
         <h4><i class="bx bx-mobile-alt"></i> تثبيت التطبيق على الهاتف 📱</h4>
         <p>ثبّت التطبيق كأيقونة على الشاشة الرئيسية للوصول السريع ويعمل بملء الشاشة.</p>
         <div class="set-row"><button class="btn btn-success btn-sm" id="installBtn"><i class="bx bx-download"></i> تثبيت التطبيق</button></div>
@@ -802,7 +828,7 @@ var students=[],groups=[],viewMode='grid',selected=new Set(),finCache={};
 /* ===== تخزين محلي (بدون قاعدة بيانات) ===== */
 var LS_S='elmistar_students_v1',LS_G='elmistar_groups_v1';
 function uid(p){return (p||'id')+'_'+Date.now().toString(36)+'_'+Math.floor(Math.random()*1e6).toString(36);}
-function saveLocal(){try{localStorage.setItem(LS_S,JSON.stringify(students));}catch(e){}try{localStorage.setItem(LS_G,JSON.stringify(groups));}catch(e){}try{var L=$('lastSync');if(L)L.textContent='آخر حفظ: '+stampNow();}catch(e){}}
+function saveLocal(){try{localStorage.setItem(LS_S,JSON.stringify(students));}catch(e){}try{localStorage.setItem(LS_G,JSON.stringify(groups));}catch(e){}try{var L=$('lastSync');if(L)L.textContent='آخر حفظ: '+stampNow();}catch(e){}try{fbScheduleAutoPush();}catch(e){}}
 function loadLocal(){try{var a=JSON.parse(localStorage.getItem(LS_S)||'[]');students=Array.isArray(a)?a:[];}catch(e){students=[];}try{var b=JSON.parse(localStorage.getItem(LS_G)||'[]');groups=Array.isArray(b)?b:[];}catch(e){groups=[];}}
 function persistAndRender(){saveLocal();try{applyFilters();}catch(e){}try{renderGroups();}catch(e){}}
 
@@ -1286,8 +1312,9 @@ window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();def
 function stampNow(){try{return new Date().toLocaleString('ar-EG',{dateStyle:'medium',timeStyle:'short'});}catch(e){return new Date().toLocaleString();}}
 function updateSyncUI(){
   var d=$('syncDot'),s=$('syncStatus');
-  if(d)d.className='sync-dot on';
-  if(s)s.textContent='وضع محلي 📱 — بدون قاعدة بيانات';
+  var c=null;try{c=fbGetCfg();}catch(e){}
+  if(d)d.className='sync-dot '+(c?'on':'off');
+  if(s)s.textContent=c?('☁️ مربوط Firebase ('+c.projectId+')'):'وضع محلي 📱 — بدون قاعدة بيانات';
 }
 function doSync(silent){
   try{applyFilters();renderGroups();}catch(e){}
@@ -1478,9 +1505,123 @@ function sheetSyncNow(){
   else if(m==='sheet'){sheetPullGviz();}
   else{toast('رابط غير معروف — الصق رابط شيت أو Web App','error');}
 }
+/* ===== ربط فايربيز Firestore: حفظ / سحب / رفع / لحظي ===== */
+var LS_FB='elmistar_firebase_cfg',LS_FB_T='elmistar_firebase_last',LS_FB_AUTO='elmistar_firebase_auto';
+var fbUnsub=null,fbSelfPushAt=0,fbAutoTimer=null;
+function fbGetCfg(){try{var c=JSON.parse(localStorage.getItem(LS_FB)||'null');if(c&&c.apiKey&&c.projectId)return c;}catch(e){}return null;}
+function fbSetCfg(c){try{if(c)localStorage.setItem(LS_FB,JSON.stringify(c));else localStorage.removeItem(LS_FB);}catch(e){}}
+function fbIsAuto(){try{return localStorage.getItem(LS_FB_AUTO)==='1';}catch(e){return false;}}
+function fbSetAuto(v){try{localStorage.setItem(LS_FB_AUTO,v?'1':'0');}catch(e){}}
+function fbStatus(msg,cls){var s=$('fbStatus');if(!s)return;s.className='sheet-link-status'+(cls?' '+cls:'');s.innerHTML=msg;}
+function fbFillInputs(){var c=fbGetCfg()||{};var m={fbApiKey:c.apiKey||'',fbAuthDomain:c.authDomain||'',fbProjectId:c.projectId||'',fbBucket:c.storageBucket||'',fbSenderId:c.messagingSenderId||'',fbAppId:c.appId||''};for(var k in m){var el=$(k);if(el&&document.activeElement!==el)el.value=m[k];}var au=$('fbAuto');if(au)au.checked=fbIsAuto();}
+function refreshFbUI(){
+  fbFillInputs();
+  var c=fbGetCfg();
+  var last='';try{last=localStorage.getItem(LS_FB_T)||'';}catch(e){}
+  if(!c){fbStatus('غير مربوط — الصق الإعدادات بالأعلى');return;}
+  fbStatus('🔥 مربوط بمشروع: '+esc(c.projectId)+(last?'<br>آخر مزامنة: '+esc(last):''),'ok');
+}
+function fbEnsureSdk(cb,err){
+  if(window.firebase&&window.firebase.firestore){cb();return;}
+  function load(src,next){var s=document.createElement('script');s.src=src;s.onload=next;s.onerror=function(){toast('تعذّر تحميل مكتبة Firebase','error');if(err)err();};document.head.appendChild(s);}
+  load('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js',function(){
+    load('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js',cb);
+  });
+}
+function fbDb(){
+  var c=fbGetCfg();if(!c)return null;
+  try{
+    var cfg={apiKey:c.apiKey,authDomain:c.authDomain,projectId:c.projectId,storageBucket:c.storageBucket,messagingSenderId:c.messagingSenderId,appId:c.appId};
+    var app=null;
+    if(!window.firebase.apps.length){app=window.firebase.initializeApp(cfg);}
+    else{
+      app=window.firebase.app();
+      try{if(app.options.projectId!==c.projectId){window.firebase.deleteApp(app).then(function(){fbDb();});return null;}}catch(e){app=window.firebase.app();}
+    }
+    return app.firestore();
+  }catch(e){return null;}
+}
+function fbDocRef(db){return db.collection('elmistar').doc('main');}
+function fbErrMsg(e){var c=e&&e.code?String(e.code):'';if(c.indexOf('permission-denied')>=0)return 'permission-denied — القواعد قافلة. افتح Firestore ← Rules والصق: allow read, write: if true; ثم Publish';if(c.indexOf('unavailable')>=0)return 'غير متاح — تحقق من الإنترنت وتفعيل Firestore';if(c.indexOf('not-found')>=0)return 'قاعدة البيانات غير موجودة — أنشئ Firestore Database أولاً';return c?c:'راجع القواعد والإنترنت';}
+function fbTestConn(){
+  var c=fbGetCfg();if(!c){toast('احفظ إعدادات Firebase أولاً','error');return;}
+  fbStatus('⏳ اختبار الاتصال…');
+  fbEnsureSdk(function(){
+    var db=fbDb();if(!db){fbStatus('❌ تعذّر تهيئة Firebase — راجع الإعدادات','err');return;}
+    fbDocRef(db).get().then(function(){fbStatus('✅ الاتصال سليم — Firestore يرد بنجاح','ok');toast('✅ Firebase متصل');}).catch(function(e){fbStatus('❌ فشل الاتصال — '+esc(fbErrMsg(e)),'err');});
+  });
+}
+function fbPush(silent){
+  var c=fbGetCfg();if(!c){if(!silent)toast('اربط Firebase أولاً','error');return Promise.resolve(false);}
+  return new Promise(function(res){
+    fbEnsureSdk(function(){
+      var db=fbDb();if(!db){if(!silent)fbStatus('❌ تعذّر تهيئة Firebase','err');res(false);return;}
+      if(!silent)fbStatus('⏳ جارٍ الرفع للسحابة…');
+      fbSelfPushAt=Date.now();
+      fbDocRef(db).set({students:students,groups:groups,updatedAt:Date.now(),app:'EduSmart',version:1},{merge:false}).then(function(){
+        try{localStorage.setItem(LS_FB_T,stampNow());}catch(e){}
+        refreshFbUI();updateSyncUI();
+        if(!silent){fbStatus('☁️ تم الرفع — '+students.length+' طالب / '+groups.length+' مجموعة','ok');toast('☁️ تم الرفع للسحابة');}
+        res(true);
+      }).catch(function(e){if(!silent){fbStatus('❌ فشل الرفع — '+esc(fbErrMsg(e)),'err');toast('فشل الرفع','error');}res(false);});
+    },function(){res(false);});
+  });
+}
+function fbPull(){
+  var c=fbGetCfg();if(!c){toast('اربط Firebase أولاً','error');return;}
+  fbStatus('⏳ جارٍ السحب من السحابة…');
+  fbEnsureSdk(function(){
+    var db=fbDb();if(!db){fbStatus('❌ تعذّر تهيئة Firebase','err');return;}
+    fbDocRef(db).get().then(function(doc){
+      if(!doc.exists){fbStatus('⚠️ لا توجد بيانات سحابية بعد — ارفع أولاً','');return;}
+      var d=doc.data()||{};
+      if(!confirm('سحب '+(d.students||[]).length+' طالب و '+(d.groups||[]).length+' مجموعة من السحابة؟ (سيستبدل الحالي)'))return;
+      students=Array.isArray(d.students)?d.students:[];
+      groups=Array.isArray(d.groups)?d.groups:[];
+      persistAndRender();
+      try{localStorage.setItem(LS_FB_T,stampNow());}catch(e){}
+      refreshFbUI();updateSyncUI();
+      fbStatus('✅ تم السحب — '+students.length+' طالب / '+groups.length+' مجموعة','ok');
+      toast('✅ تم السحب من السحابة');
+    }).catch(function(e){fbStatus('❌ فشل السحب — '+esc(fbErrMsg(e)),'err');});
+  });
+}
+function fbSyncNow(){
+  var c=fbGetCfg();if(!c){toast('اربط Firebase أولاً','error');return;}
+  fbPush(true).then(function(){try{localStorage.setItem(LS_FB_T,stampNow());}catch(e){}refreshFbUI();updateSyncUI();toast('🔄 تمت المزامنة — '+students.length+' طالب / '+groups.length+' مجموعة');});
+}
+function fbSubscribe(){
+  try{if(fbUnsub){fbUnsub();fbUnsub=null;}}catch(e){}
+  var c=fbGetCfg();if(!c||!fbIsAuto())return;
+  fbEnsureSdk(function(){
+    var db=fbDb();if(!db)return;
+    try{
+      fbUnsub=fbDocRef(db).onSnapshot(function(doc){
+        if(!doc.exists)return;
+        if(Date.now()-fbSelfPushAt<3000)return;
+        var d=doc.data()||{};
+        var cs=JSON.stringify(d.students||[]),ls=JSON.stringify(students);
+        var cg=JSON.stringify(d.groups||[]),lg=JSON.stringify(groups);
+        if(cs===ls&&cg===lg)return;
+        students=Array.isArray(d.students)?d.students:students;
+        groups=Array.isArray(d.groups)?d.groups:groups;
+        saveLocalSilent();try{applyFilters();renderGroups();}catch(e){}
+        try{localStorage.setItem(LS_FB_T,stampNow());}catch(e){}
+        refreshFbUI();updateSyncUI();
+        toast('🔄 وصل تحديث من السحابة');
+      });
+    }catch(e){}
+  });
+}
+function saveLocalSilent(){try{localStorage.setItem(LS_S,JSON.stringify(students));}catch(e){}try{localStorage.setItem(LS_G,JSON.stringify(groups));}catch(e){}}
+function fbScheduleAutoPush(){
+  if(!fbGetCfg()||!fbIsAuto())return;
+  clearTimeout(fbAutoTimer);
+  fbAutoTimer=setTimeout(function(){fbPush(true);},1200);
+}
 function fallbackCopyApps(t){try{var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(e){}}
 (function initSettings(){
-  var sb=$('settingsBtn');if(sb)sb.onclick=function(){$('settingsModal').classList.remove('hidden');updateSyncUI();refreshSheetUI();fillWaSettingsInputs();};
+  var sb=$('settingsBtn');if(sb)sb.onclick=function(){$('settingsModal').classList.remove('hidden');updateSyncUI();refreshSheetUI();try{refreshFbUI();}catch(e){}fillWaSettingsInputs();};
   var wl=$('waLateInp');if(wl)wl.oninput=function(){WA_T.late=wl.value;saveWaTemplates();};
   var wr=$('waRemindInp');if(wr)wr.oninput=function(){WA_T.remind=wr.value;saveWaTemplates();};
   var wab=$('waAbsentInp');if(wab)wab.oninput=function(){WA_T.absent=wab.value;saveWaTemplates();};
@@ -1496,6 +1637,18 @@ function fallbackCopyApps(t){try{var ta=document.createElement('textarea');ta.va
   var st=$('sheetTestBtn');if(st)st.onclick=function(){sheetTestConn();};
   var sh=$('sheetHelpBtn');if(sh)sh.onclick=function(){$('sheetHelpModal').classList.remove('hidden');};
   var su2=$('sheetUnlinkBtn');if(su2)su2.onclick=function(){sheetSetUrl('');refreshSheetUI();toast('تم إلغاء الربط');};
+  var fbt=$('fbSecToggle');if(fbt)fbt.onclick=function(){var b=$('fbSecBody');if(!b)return;b.classList.toggle('hidden');var c=$('fbSecChev');if(c)c.style.transform=b.classList.contains('hidden')?'':'rotate(-90deg)';};
+  var fbs=$('fbSaveBtn');if(fbs)fbs.onclick=function(){
+    var c={apiKey:(($('fbApiKey')||{}).value||'').trim(),authDomain:(($('fbAuthDomain')||{}).value||'').trim(),projectId:(($('fbProjectId')||{}).value||'').trim(),storageBucket:(($('fbBucket')||{}).value||'').trim(),messagingSenderId:(($('fbSenderId')||{}).value||'').trim(),appId:(($('fbAppId')||{}).value||'').trim()};
+    if(!c.apiKey||!c.projectId||!c.appId){toast('اكتب API Key و Project ID و App ID على الأقل','error');return;}
+    fbSetCfg(c);refreshFbUI();updateSyncUI();fbSubscribe();toast('🔥 تم حفظ إعدادات Firebase');
+  };
+  var fbt2=$('fbTestBtn');if(fbt2)fbt2.onclick=function(){fbTestConn();};
+  var fbpull=$('fbPullBtn');if(fbpull)fbpull.onclick=function(){fbPull();};
+  var fbpush=$('fbPushBtn');if(fbpush)fbpush.onclick=function(){fbPush(false);};
+  var fbsync=$('fbSyncBtn');if(fbsync)fbsync.onclick=function(){fbSyncNow();};
+  var fbun=$('fbUnlinkBtn');if(fbun)fbun.onclick=function(){try{if(fbUnsub){fbUnsub();fbUnsub=null;}}catch(e){}fbSetCfg(null);refreshFbUI();updateSyncUI();toast('تم فك ربط قاعدة البيانات');};
+  var fbau=$('fbAuto');if(fbau)fbau.onchange=function(){fbSetAuto(fbau.checked);fbSubscribe();toast(fbau.checked?'✅ المزامنة التلقائية شغالة':'⏸️ المزامنة التلقائية متوقفة');};
   var cpb=$('copyAppsCodeBtn');if(cpb)cpb.onclick=function(){var t=$('appsScriptCode').textContent;function ok(){toast('📋 اتنسخ الكود');}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,function(){fallbackCopyApps(t);ok();});}else{fallbackCopyApps(t);ok();}};
   var sy=$('syncNowBtn');if(sy)sy.onclick=function(){doSync(false);};
   var ej=$('expJsonBtn');if(ej)ej.onclick=exportJSON;
@@ -1522,7 +1675,7 @@ function fallbackCopyApps(t){try{var ta=document.createElement('textarea');ta.va
 document.querySelectorAll('[data-close]').forEach(function(b){b.onclick=function(){$(b.dataset.close).classList.add('hidden');};});
 document.querySelectorAll('.overlay').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)o.classList.add('hidden');});});
 
-/* boot — وضع محلي بدون قاعدة بيانات */
+/* boot — محلي + Firebase إن وُجد */
 var booted=false;
 function boot(){
   if(booted)return;booted=true;
@@ -1532,7 +1685,7 @@ function boot(){
   setTimeout(function(){pl.classList.add('hide');},12000);
   loadLocal();
   try{localStorage.removeItem('elmistar_price');}catch(e){}
-  fillGroupFilter();fillStudentGroups();applyFilters();renderGroups();updateSyncUI();try{refreshSheetUI();}catch(e){}
+  fillGroupFilter();fillStudentGroups();applyFilters();renderGroups();updateSyncUI();try{refreshSheetUI();}catch(e){}try{refreshFbUI();fbSubscribe();}catch(e){}
   pl.classList.add('hide');
 }
 })();
