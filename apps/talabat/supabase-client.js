@@ -310,19 +310,6 @@ window.NaqisnaSupabase = (function () {
     }
   }
 
-  // --- Cloud diagnostics: is the table reachable? ---
-  async function diagnoseCloud() {
-    const sb = getClient();
-    if (!sb) return { ok: false, reason: 'no-client' };
-    try {
-      const { error } = await sb.from(BLOB_TABLE).select('code').limit(1);
-      if (error) return { ok: false, reason: 'db', detail: String((error && error.message) || error).slice(0, 160) };
-      return { ok: true };
-    } catch (e) {
-      return { ok: false, reason: 'net' };
-    }
-  }
-
   // --- Realtime Subscription ---
   function subscribeToHomeChanges(homeCode, onChangeCallback) {
     const sb = getClient();
@@ -399,7 +386,6 @@ window.NaqisnaSupabase = (function () {
     getClient,
     joinOrCreateHome,
     fetchHomeData,
-    diagnoseCloud,
     upsertOrder,
     deleteOrder,
     upsertExpense,

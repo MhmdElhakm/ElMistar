@@ -2,7 +2,7 @@
  * PWA offline caching only (no notifications).
  */
 
-const CACHE_NAME = 'naqisna-pwa-v21';
+const CACHE_NAME = 'naqisna-pwa-v17';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -35,11 +35,6 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-
-  // ملف الـ APK: تحميل مباشر دائماً ولا يُخزّن في الكاش (حجمه كبير)
-  try {
-    if (String(event.request.url || '').toLowerCase().split('?')[0].endsWith('.apk')) return;
-  } catch {}
 
   // صفحات HTML: الشبكة أولاً لضمان وصول التحديثات، والكاش احتياطي عند انقطاع النت
   if (event.request.mode === 'navigate') {

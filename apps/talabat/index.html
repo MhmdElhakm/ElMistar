@@ -19,7 +19,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>window.SUPABASE_URL="https://dicnuwzxolqdtribhdnb.supabase.co";window.SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpY251d3p4b2xxZHRyaWJoZG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1Njg2OTMsImV4cCI6MjEwNTE0NDY5M30.ye-Bm9drZt4xoq-jKKI3koVV_vTa3HRYvz6dOPvLylc";</script>
 <script src="supabase-client.js"></script>
-<script src="notify-bridge.js"></script>
 <style>
   :root {
     --bg: #F4FAFE;
@@ -1658,91 +1657,6 @@
     .wb-blob { filter: blur(40px); opacity: .4; }
     .duo-art svg { filter: drop-shadow(0 6px 8px rgba(30,60,90,.15)); }
   }
-  /* ===== Fullscreen Notifications — pro Islamic style ===== */
-.fs-notif-backdrop{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;background:radial-gradient(600px 400px at 50% -80px,rgba(28,176,246,.25),transparent 60%),rgba(12,10,28,.82);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);animation:fsFadeIn .3s ease-out}
-@keyframes fsFadeIn{from{opacity:0}to{opacity:1}}
-.fs-notif-card{width:100%;max-width:430px;max-height:92dvh;overflow-y:auto;background:linear-gradient(180deg,#FFFFFF 0%,#F6FBFF 100%);border-radius:34px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.4) inset;animation:fsPop .55s cubic-bezier(.22,1.35,.36,1) both;text-align:center;position:relative}
-@keyframes fsPop{0%{transform:scale(.85) translateY(40px);opacity:0}60%{transform:scale(1.02) translateY(-4px);opacity:1}100%{transform:scale(1) translateY(0);opacity:1}}
-.fs-notif-top{position:relative;padding:34px 22px 22px;color:#fff;overflow:hidden}
-.fs-notif-top.kind-prayer{background:linear-gradient(150deg,#0B3D2E 0%,#146B4A 45%,#1FA36B 75%,#0B3D2E 100%)}
-.fs-notif-top.kind-order{background:linear-gradient(150deg,#0F8AC2,#1CB0F6 55%,#38BDF8)}
-.fs-notif-top.kind-appt{background:linear-gradient(150deg,#6D28D9,#8B5CF6 55%,#A78BFA)}
-.fs-notif-top.kind-azkar{background:linear-gradient(150deg,#0F766E,#14B8A6 55%,#5EEAD4)}
-.fs-notif-top.kind-daily{background:linear-gradient(150deg,#1E1B4B,#4338CA 55%,#818CF8)}
-.fs-notif-top.kind-test{background:linear-gradient(150deg,#9A3412,#F59E0B 55%,#FBBF24)}
-.fs-notif-top::before{content:'';position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);top:-110px;left:-80px;pointer-events:none}
-.fs-notif-top::after{content:'۝';position:absolute;font-size:150px;opacity:.08;left:12px;bottom:-38px;pointer-events:none;font-family:inherit}
-.fs-rings{position:relative;width:124px;height:124px;margin:0 auto 12px}
-.fs-rings i{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(255,255,255,.45);animation:fsRing 2.2s ease-out infinite}
-.fs-rings i:nth-child(2){animation-delay:.55s}.fs-rings i:nth-child(3){animation-delay:1.1s}
-@keyframes fsRing{0%{transform:scale(.72);opacity:1}100%{transform:scale(1.25);opacity:0}}
-.fs-ico{position:absolute;inset:18px;border-radius:50%;background:rgba(255,255,255,.2);box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 12px 30px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:52px;animation:fsBob 2.6s ease-in-out infinite}
-@keyframes fsBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-.fs-kicker{display:inline-block;font-size:11.5px;font-weight:900;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.35);padding:4px 16px;border-radius:999px;margin-bottom:8px;letter-spacing:.2px}
-.fs-title{font-size:30px;font-weight:900;line-height:1.4;margin:2px 0;position:relative;z-index:1;text-shadow:0 2px 12px rgba(0,0,0,.2)}
-.fs-sub{font-size:14px;font-weight:700;opacity:.94;position:relative;z-index:1}
-.fs-time{font-size:44px;font-weight:900;letter-spacing:1px;margin:4px 0 0;position:relative;z-index:1;font-variant-numeric:tabular-nums;text-shadow:0 3px 16px rgba(0,0,0,.25)}
-.fs-time small{font-size:15px;font-weight:800;opacity:.85}
-.fs-body{padding:20px 22px 8px}
-.fs-verse{background:linear-gradient(180deg,#FFFBEB,#FFF7ED);border:1.5px solid #FDE68A;border-radius:18px;padding:12px 14px;font-size:13.5px;font-weight:800;color:#92400E;line-height:1.9;margin-bottom:12px}
-.fs-info-row{display:flex;gap:8px;margin-bottom:12px}
-.fs-info{flex:1;background:var(--bg,#F4FAFE);border:1.5px solid var(--border,#D8ECF7);border-radius:16px;padding:10px 8px}
-.fs-info b{display:block;font-size:15px;font-weight:900}
-.fs-info small{display:block;font-size:11px;font-weight:800;color:var(--text-sec,#5B6B7C);margin-top:1px}
-.fs-actions{padding:6px 20px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:9px}
-.fs-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;border-radius:18px;font-size:16px;font-weight:900;transition:transform .15s}
-.fs-btn:active{transform:scale(.97)}
-.fs-btn.primary{background:linear-gradient(135deg,#1CB0F6,#0F8AC2);color:#fff;box-shadow:0 12px 26px rgba(28,176,246,.4),inset 0 1px 0 rgba(255,255,255,.4)}
-.fs-btn.prayer{background:linear-gradient(135deg,#10B981,#047857);color:#fff;box-shadow:0 12px 26px rgba(16,185,129,.4),inset 0 1px 0 rgba(255,255,255,.4)}
-.fs-btn.ghost{background:#fff;border:1.5px solid var(--border,#D8ECF7);color:var(--text,#1E1B2E)}
-.fs-btn.link{background:none;color:var(--text-muted,#9AA9B8);min-height:40px;font-size:13px}
-.fs-eq{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:26px;margin:10px 0 2px}
-.fs-eq i{width:5px;border-radius:4px;background:rgba(255,255,255,.9);animation:fsEq 1s ease-in-out infinite}
-.fs-eq i:nth-child(1){height:60%}.fs-eq i:nth-child(2){height:100%;animation-delay:.15s}.fs-eq i:nth-child(3){height:45%;animation-delay:.3s}.fs-eq i:nth-child(4){height:80%;animation-delay:.45s}.fs-eq i:nth-child(5){height:55%;animation-delay:.6s}
-@keyframes fsEq{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
-.fs-eq.paused i{animation-play-state:paused;opacity:.5}
-@media (min-width:481px){.fs-notif-card{border-radius:30px}}
-@media (prefers-reduced-motion:reduce){.fs-notif-card,.fs-rings i,.fs-ico{animation:none!important}}
-/* ===== Notification settings extras ===== */
-.muezzin-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 6px}
-.muezzin-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:6px;align-items:stretch;transition:all .18s;position:relative}
-.muezzin-card.active{border-color:var(--primary);background:var(--primary-light);box-shadow:0 8px 18px rgba(28,176,246,.22)}
-.muezzin-card b{font-size:12.5px;font-weight:900;display:flex;align-items:center;gap:6px}
-.muezzin-card small{font-size:10.5px;font-weight:700;color:var(--text-sec)}
-.muezzin-card .mz-row{display:flex;gap:6px}
-.muezzin-card .mz-play{flex:1;min-height:38px;border-radius:11px;background:#fff;border:1.5px solid var(--border);font-size:12px;font-weight:900;color:var(--primary-dark)}
-.muezzin-card.active .mz-play{background:#fff}
-.muezzin-card .mz-pick{flex:1;min-height:38px;border-radius:11px;background:var(--bg);font-size:12px;font-weight:900;color:var(--text-sec)}
-.muezzin-card.active .mz-pick{background:var(--primary);color:#fff}
-.prayer-chips{display:flex;flex-wrap:wrap;gap:8px;padding:2px 14px 10px}
-.prayer-chip{flex:1 1 30%;min-width:96px;display:flex;align-items:center;justify-content:space-between;gap:6px;background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:9px 11px;font-size:12.5px;font-weight:900}
-.prayer-chip.on{border-color:var(--primary);background:var(--primary-light)}
-.prayer-chip .sw{width:38px;height:23px}
-.prayer-chip .sw::after{width:17px;height:17px}
-.prayer-chip .sw.on::after{transform:translateX(-15px)}
-.time-row{display:flex;align-items:center;gap:10px;padding:9px 16px}
-.time-row label{flex:1;font-size:12.5px;font-weight:800;color:var(--text-sec)}
-.time-row input[type="time"]{border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;font-weight:900;background:#fff;color:var(--text);font-size:14px}
-.notif-status-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-inline-end:6px}
-
-  
-  /* ===== Prayer page: per-prayer azan toggles ===== */
-  .pr-notifbar{display:flex;gap:8px;margin:10px 0 4px}
-  .pr-nb-main{flex:1.4;display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border-radius:15px;font-size:13.5px;font-weight:900;background:#F1F8FD;border:1.5px solid var(--border);color:var(--text);transition:all .18s}
-  .pr-nb-main.on{background:linear-gradient(135deg,#10B981,#047857);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(16,185,129,.32)}
-  .pr-nb-main:active{transform:scale(.96)}
-  .pr-nb-mz{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;border-radius:15px;font-size:12.5px;font-weight:900;background:#FFFBEB;border:1.5px solid #FDE68A;color:#92400E}
-  .pr-nb-mz:active{transform:scale(.96)}
-  .pr-nb-test{width:48px;min-height:48px;border-radius:15px;background:var(--primary-light);font-size:19px;flex-shrink:0}
-  .pr-nb-test:active{transform:scale(.9)}
-  .pr-item.next{background:#F0F9FF;border-radius:14px;border-bottom-color:transparent;box-shadow:inset 0 0 0 1.5px rgba(28,176,246,.35)}
-  .pr-item.next .pr-mid b{color:#0F8AC2}
-  .pr-next-tag{font-size:10px;font-weight:900;background:var(--grad,linear-gradient(135deg,#38BDF8,#0F8AC2));color:#fff;padding:2px 10px;border-radius:999px;margin-right:6px;white-space:nowrap}
-  .pr-bell{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:#F1F5F9;transition:all .18s;border:1.5px solid transparent}
-  .pr-bell:active{transform:scale(.88)}
-  .pr-bell.on{background:#DCFCE7;border-color:#86EFAC;box-shadow:0 4px 12px rgba(16,185,129,.25)}
-  .pr-bell.off{background:#F1F5F9;opacity:.55;filter:grayscale(.6)}
-
   </style>
 </head>
 <body>
@@ -2429,7 +2343,7 @@
     state.categoryIcons = {};
     return true;
   }
-  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} try { localStorage.removeItem('naqisna_audio_items'); } catch {} try { localStorage.removeItem('naqisna_comedy_messages'); } catch {} try { localStorage.removeItem('naqisna_last_joke'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); delete state.notifs; delete state.notifPrefs; delete state._notifOn; delete state._notifOrders; delete state._notifExp; delete state._notifExpTime; delete state._notifDaily; delete state._notifDailyTime; delete state._notifAppt; delete state._azkarNotif; delete state._azkarMorningTime; delete state._azkarEveningTime; delete state._prayerNotif; delete state._azkarOff; delete state._fxOff; delete state._notifSound; delete state._soundOn; delete state._audioOn; delete state._audioVol; delete state._fxOn; delete state._audioLib; delete state.audioUploads; delete state._audioMigrated; delete state._memeOn; delete state._memeMode; delete state._memeVol; delete state._memeOff; delete state._memeCustom; delete state._habits; delete state._habitAddOpen; delete state._habitNewIcon; delete state._showHabits; delete state._expandedOrder; delete state._expDraft; delete state._expandedBasket; delete state._basketDraft; delete state._syncedOnce; try { if (!state.photos) state.photos = { me: '' }; if (!state.photos.me && (state.photos.mom || state.photos.dad)) state.photos.me = state.photos.mom || state.photos.dad; delete state.photos.mom; delete state.photos.dad; } catch {} state._accountOpen = false; state._catOpen = false; state._notifOpen = false; state._catsTuneOpen = false; state._learnedOpen = false; state._dataOpen = false; wipeCatalogOnce(); migrateCats(); migrateOrderLists(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
+  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} try { localStorage.removeItem('naqisna_audio_items'); } catch {} try { localStorage.removeItem('naqisna_comedy_messages'); } catch {} try { localStorage.removeItem('naqisna_last_joke'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); delete state.notifs; delete state.notifPrefs; delete state._notifOn; delete state._notifOrders; delete state._notifExp; delete state._notifExpTime; delete state._notifDaily; delete state._notifDailyTime; delete state._notifAppt; delete state._azkarNotif; delete state._azkarMorningTime; delete state._azkarEveningTime; delete state._prayerNotif; delete state._azkarOff; delete state._fxOff; delete state._notifSound; delete state._soundOn; delete state._audioOn; delete state._audioVol; delete state._fxOn; delete state._audioLib; delete state.audioUploads; delete state._audioMigrated; delete state._memeOn; delete state._memeMode; delete state._memeVol; delete state._memeOff; delete state._memeCustom; delete state._habits; delete state._habitAddOpen; delete state._habitNewIcon; delete state._showHabits; delete state._expandedOrder; delete state._expDraft; delete state._expandedBasket; delete state._basketDraft; delete state._syncedOnce; try { if (!state.photos) state.photos = { me: '' }; if (!state.photos.me && (state.photos.mom || state.photos.dad)) state.photos.me = state.photos.mom || state.photos.dad; delete state.photos.mom; delete state.photos.dad; } catch {} state._accountOpen = false; state._catOpen = false; state._catsTuneOpen = false; state._learnedOpen = false; state._dataOpen = false; wipeCatalogOnce(); migrateCats(); migrateOrderLists(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
   function catDeptById(id) {
     if (CATEGORIES[id]) return CATEGORIES[id];
     const ad = ((state.catalogCustom || {}).addedDepts || []).find(x => x.id === id);
@@ -3867,54 +3781,16 @@
           <div class="pr-left">الوقت المتبقي</div>
           <div class="pr-date">${escapeHTML(heroDate)} , ${escapeHTML(data.place || prayerGov().name)}</div>
         </div>
-        <div class="pr-notifbar">
-          <button class="pr-nb-main ${(() => { try { return getNotif().prayer && getNotif().master ? 'on' : ''; } catch { return ''; } })()}" id="prAzanMaster">${(() => { try { const nn = getNotif(); return (nn.prayer && nn.master) ? '🕌 الأذان شغال' : '🔕 الأذان مطفي'; } catch { return '🔔 الأذان'; } })()}</button>
-          <button class="pr-nb-mz" id="prMzBtn">🎤 ${(() => { try { return muezzinById(getNotif().muezzin).name; } catch { return 'المؤذن'; } })()} • تغيير</button>
-          <button class="pr-nb-test" id="prTestBtn" title="تجربة صوت الأذان">🔊</button>
-        </div>
         ${PRAYERS_META.map((p, idx) => {
           const raw = String((data.timings[p.id] || '')).slice(0, 5);
           const f = prayerTo12h(raw);
-          let bellOn = true, isNext = false;
-          try { bellOn = !!(getNotif().prayers[p.id] && getNotif().prayer && getNotif().master); } catch {}
-          try { isNext = !!(nx && nx.meta && nx.meta.id === p.id); } catch {}
-          const isSun = p.id === 'Sunrise';
-          return `<div class="pr-item ${isNext ? 'next' : ''}">
-            <button class="pr-bell ${bellOn ? 'on' : 'off'}" data-prbell="${p.id}" title="${isSun ? 'تنبيه الشروق' : 'تفعيل الأذان لصلاة ' + p.name}">${bellOn ? (isSun ? '🔔' : '🕌') : '🔕'}</button>
-            <span class="pr-mid"><b>${p.name}${isNext ? '<span class="pr-next-tag">القادمة</span>' : ''}</b></span>
+          return `<div class="pr-item">
+            <span class="pr-mid"><b>${p.name}</b></span>
             <span class="pr-time">${escapeHTML(f.t)}<small>${escapeHTML(f.ap)}</small></span>
           </div>`;
         }).join('')}`;
       const rf = box.querySelector('#prRefresh');
       if (rf) rf.onclick = () => load(true);
-      try {
-        box.querySelectorAll('[data-prbell]').forEach((bbtn) => {
-          bbtn.onclick = (e) => { try { e.stopPropagation(); } catch {} const pid = bbtn.dataset.prbell; try {
-            const nn = getNotif(); nn.prayers[pid] = !nn.prayers[pid];
-            if (nn.prayers[pid]) { nn.prayer = true; nn.master = true; ensureNotifPerm(); }
-            saveNotif(); try { fxSound('tap'); } catch {}
-            const arN = {Fajr:'الفجر',Sunrise:'الشروق',Dhuhr:'الظهر',Asr:'العصر',Maghrib:'المغرب',Isha:'العشاء'}[pid]||pid; toast(nn.prayers[pid] ? ('🕌 أذان ' + arN + ' اشتغل') : ('اتقفل تنبيه ' + arN + ' 🔕'), nn.prayers[pid] ? 'success' : 'info');
-            paint(ov._prayerData || data, false);
-          } catch {} };
-        });
-        const mBtn = box.querySelector('#prAzanMaster');
-        if (mBtn) mBtn.onclick = () => { try {
-          const nn = getNotif(); const will = !(nn.prayer && nn.master);
-          nn.prayer = will; nn.master = will; if (will) ensureNotifPerm(); saveNotif();
-          try { fxSound('tap'); } catch {}
-          toast(will ? '🕌 الأذان اشتغل لكل الصلوات' : '🔕 الأذان اتقفل', will ? 'success' : 'info');
-          paint(ov._prayerData || data, false);
-        } catch {} };
-        const mzB = box.querySelector('#prMzBtn');
-        if (mzB) mzB.onclick = () => { try {
-          try { if (timer) clearInterval(timer); } catch {} ov.remove();
-          try { document.body.style.overflow = ''; } catch {}
-          state.currentTab = 'settings'; state._notifOpen = true; state._forceTop = true; persist(); render();
-          setTimeout(() => { try { previewMuezzin(getNotif().muezzin); } catch {} }, 600);
-        } catch {} };
-        const tB = box.querySelector('#prTestBtn');
-        if (tB) tB.onclick = () => { try { ensureNotifPerm(); testFullscreen('prayer'); } catch {} };
-      } catch {}
       try { if (timer) clearInterval(timer); } catch {}
       if (nx) timer = setInterval(() => {
         if (!ov.isConnected) { try { clearInterval(timer); } catch {} return; }
@@ -5026,595 +4902,6 @@
     return `<div class="barchart" style="height:110px;">${sampled.map(d => { const h = (d.total / max) * 100; return `<div class="bar-item"><div class="bar-fill" style="height:${Math.max(h, 2)}%"></div><div class="bar-label">${d.label}</div></div>`; }).join('')}</div>`;
   }
 
-  /* ===== Pro Fullscreen Notifications + Muezzin control (injected) ===== */
-const MUEZZINS = [
-  { id: 'mishary', name: 'مشاري راشد', desc: 'صوت خاشع ومشهور', url: 'https://www.islamcan.com/audio/adhan/azan1.mp3' },
-  { id: 'haram', name: 'الحرم المكي', desc: 'علي أحمد ملا', url: 'https://www.islamcan.com/audio/adhan/azan2.mp3' },
-  { id: 'nabawi', name: 'المسجد النبوي', desc: 'أذان المدينة', url: 'https://www.islamcan.com/audio/adhan/azan3.mp3' },
-  { id: 'nafees', name: 'أحمد النفيس', desc: 'صوت عذب وهادئ', url: 'https://www.islamcan.com/audio/adhan/azan6.mp3' },
-  { id: 'qazzabri', name: 'عمر القزابري', desc: 'صوت مغربي مميز', url: 'https://www.islamcan.com/audio/adhan/azan7.mp3' },
-  { id: 'short', name: 'تنبيه قصير', desc: 'بدون أذان كامل', url: 'audio/note.mp3' }
-];
-const NOTIF_DEFAULT = {
-  master: true, fullscreen: true, sound: true, volume: 0.9, vibrate: true,
-  prayer: true, prayers: { Fajr: true, Sunrise: false, Dhuhr: true, Asr: true, Maghrib: true, Isha: true },
-  muezzin: 'mishary', customAzan: '',
-  orders: true, appts: true, tasks: true,
-  azkarMorning: true, azkarMorningTime: '06:30', azkarEvening: true, azkarEveningTime: '17:30',
-  daily: false, dailyTime: '21:00',
-  quiet: false, quietFrom: '22:00', quietTo: '06:00'
-};
-function getNotif() {
-  try {
-    const raw = state._notif && typeof state._notif === 'object' ? state._notif : {};
-    const merged = Object.assign({}, NOTIF_DEFAULT, raw);
-    merged.prayers = Object.assign({}, NOTIF_DEFAULT.prayers, raw.prayers || {});
-    if (!MUEZZINS.some(m => m.id === merged.muezzin)) merged.muezzin = 'mishary';
-    merged.volume = Math.min(1, Math.max(0, Number(merged.volume ?? 0.9) || 0.9));
-    state._notif = merged;
-    return merged;
-  } catch { return Object.assign({}, NOTIF_DEFAULT, { prayers: Object.assign({}, NOTIF_DEFAULT.prayers) }); }
-}
-function saveNotif() { try { persist(); } catch {} try { syncNativePrefs(); } catch {} }
-function syncNativePrefs() {
-  try {
-    if (!window.AppNotify || typeof window.AppNotify.isNative !== 'function' || !window.AppNotify.isNative()) return;
-    if (typeof window.AppNotify.syncPrefs !== 'function') return;
-    const n = getNotif();
-    const toMin = (t) => { const m = String(t || '').match(/(\d{1,2}):(\d{2})/); return m ? (Number(m[1]) * 60 + Number(m[2])) : -1; };
-    window.AppNotify.syncPrefs({
-      prayers: { Fajr: !!n.prayers.Fajr, Dhuhr: !!n.prayers.Dhuhr, Asr: !!n.prayers.Asr, Maghrib: !!n.prayers.Maghrib, Isha: !!n.prayers.Isha },
-      cats: {
-        cat_prayer: !!(n.master && n.prayer),
-        cat_azkar: !!(n.master && (n.azkarMorning || n.azkarEvening)),
-        cat_tasks: !!(n.master && n.tasks),
-        cat_appts: !!(n.master && n.appts),
-        cat_orders: !!(n.master && n.orders)
-      },
-      adhanMode: !n.sound ? 'notify' : (n.muezzin === 'short' ? 'short' : 'full'),
-      quiet: n.quiet ? [toMin(n.quietFrom), toMin(n.quietTo)] : [-1, -1]
-    });
-  } catch {}
-}
-function muezzinById(id) {
-  try {
-    const n = getNotif();
-    if (id === 'custom' && n.customAzan) return { id: 'custom', name: 'أذاني الخاص', desc: 'ملف مرفوع', url: n.customAzan };
-    return MUEZZINS.find(m => m.id === id) || MUEZZINS[0];
-  } catch { return MUEZZINS[0]; }
-}
-function muezzinUrl() {
-  try {
-    const n = getNotif();
-    if (n.muezzin === 'custom' && n.customAzan) return n.customAzan;
-    const m = MUEZZINS.find(x => x.id === n.muezzin);
-    return (m && m.url) || MUEZZINS[0].url;
-  } catch { return MUEZZINS[0].url; }
-}
-function notifInQuiet() {
-  try {
-    const n = getNotif();
-    if (!n.quiet) return false;
-    const toMin = (t) => { const m = String(t || '').match(/(\d{1,2}):(\d{2})/); return m ? (Number(m[1]) * 60 + Number(m[2])) : null; };
-    const now = new Date(); const cur = now.getHours() * 60 + now.getMinutes();
-    const f = toMin(n.quietFrom), t = toMin(n.quietTo);
-    if (f == null || t == null) return false;
-    if (f === t) return false;
-    if (f < t) return cur >= f && cur < t;
-    return cur >= f || cur < t;
-  } catch { return false; }
-}
-function notifPermState() {
-  try {
-    if (window.AppNotify && typeof window.AppNotify.isNative === 'function' && window.AppNotify.isNative()) return 'native';
-    if (!('Notification' in window)) return 'unsupported';
-    return Notification.permission || 'default';
-  } catch { return 'unsupported'; }
-}
-function ensureNotifPerm() {
-  try {
-    if (window.AppNotify && typeof window.AppNotify.requestPermission === 'function') {
-      try { const r = window.AppNotify.requestPermission(); if (r && r.then) r.then(() => { try { render(); } catch {} }); } catch {}
-    }
-    if ('Notification' in window && Notification.permission === 'default') {
-      try { Notification.requestPermission().then(() => { try { render(); } catch {} }).catch(() => {}); } catch {}
-    }
-  } catch {}
-}
-function stopNotifSound() {
-  try { if (window._fsAudio) { try { window._fsAudio.pause(); } catch {} try { window._fsAudio.src = ''; } catch {} window._fsAudio = null; } } catch {}
-  try { if (window._mzPreview) { try { window._mzPreview.pause(); } catch {} window._mzPreview = null; } } catch {}
-}
-function playNotifSound(url, vol) {
-  try {
-    stopNotifSound();
-    const n = getNotif();
-    if (!n.sound) return null;
-    if (notifInQuiet()) return null;
-    const a = new Audio(encodeURI(url));
-    a.volume = Math.min(1, Math.max(0, Number(vol ?? n.volume ?? 0.9)));
-    a.preload = 'auto';
-    a.play().catch(() => {
-      try {
-        const fb = new Audio(encodeURI('audio/note.mp3'));
-        fb.volume = a.volume; fb.play().catch(() => {});
-        window._fsAudio = fb;
-      } catch {}
-    });
-    window._fsAudio = a;
-    try { if (n.vibrate && navigator.vibrate) navigator.vibrate([250, 120, 250]); } catch {}
-    return a;
-  } catch { return null; }
-}
-function previewMuezzin(id) {
-  try {
-    const m = id === 'custom' ? { url: getNotif().customAzan } : MUEZZINS.find(x => x.id === id);
-    if (!m || !m.url) { toast('مفيش صوت للمعاينة', 'warning'); return; }
-    try { if (window._mzPreview) { try { window._mzPreview.pause(); } catch {} } } catch {}
-    const a = new Audio(encodeURI(m.url));
-    a.volume = getNotif().volume;
-    a.play().then(() => toast('اسمع صوت المؤذن 🔊', 'info')).catch(() => toast('تعذر تشغيل الصوت — اتأكد من النت', 'error'));
-    window._mzPreview = a;
-    setTimeout(() => { try { a.pause(); } catch {} }, 20000);
-  } catch {}
-}
-function firedKey(k) { return 'naqisna_notif_fired_v1'; }
-function wasFired(key) {
-  try { const o = JSON.parse(localStorage.getItem(firedKey()) || '{}'); return !!o[key]; } catch { return false; }
-}
-function markFired(key) {
-  try {
-    const o = JSON.parse(localStorage.getItem(firedKey()) || '{}');
-    o[key] = Date.now();
-    const keys = Object.keys(o);
-    if (keys.length > 120) keys.slice(0, keys.length - 120).forEach(k => delete o[k]);
-    localStorage.setItem(firedKey(), JSON.stringify(o));
-  } catch {}
-}
-function todayStr(d) { d = d || new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
-function showFullscreenNotif(o) {
-  try {
-    o = o || {};
-    const n = getNotif();
-    document.querySelectorAll('.fs-notif-backdrop').forEach(el => el.remove());
-    stopNotifSound();
-    const kind = o.kind || 'general';
-    const kindLabel = { prayer: '🕌 أذان الصلاة', order: '🛒 طلب جديد', appt: '⏰ تذكير بموعد', azkar: '📿 الأذكار', daily: '📊 ملخص اليوم', test: '🔔 تجربة الإشعار' }[kind] || '🔔 إشعار';
-    const ico = o.icon || ({ prayer: '🕌', order: '🛒', appt: '⏰', azkar: '📿', daily: '📊', test: '🔔' }[kind] || '🔔');
-    const title = o.title || 'إشعار';
-    const sub = o.subtitle || '';
-    const body = o.body || '';
-    const timeBig = o.timeBig || '';
-    const verse = kind === 'prayer' ? (o.verse || 'حَيَّ عَلَى الصَّلَاةِ • حَيَّ عَلَى الْفَلَاحِ') : '';
-    const bd = document.createElement('div');
-    bd.className = 'fs-notif-backdrop';
-    bd.innerHTML = '<div class="fs-notif-card" role="alertdialog" aria-live="assertive">'
-      + '<div class="fs-notif-top kind-' + kind + '">'
-      + '<div class="fs-rings"><i></i><i></i><i></i><div class="fs-ico">' + ico + '</div></div>'
-      + '<span class="fs-kicker">' + kindLabel + '</span>'
-      + '<div class="fs-title">' + title + '</div>'
-      + (sub ? '<div class="fs-sub">' + sub + '</div>' : '')
-      + (timeBig ? '<div class="fs-time">' + timeBig + '</div>' : '')
-      + '<div class="fs-eq" id="fsEq"><i></i><i></i><i></i><i></i><i></i></div>'
-      + '</div>'
-      + '<div class="fs-body">'
-      + (verse ? '<div class="fs-verse">🕌 ' + verse + '</div>' : '')
-      + (body ? '<div style="font-size:14px;font-weight:800;line-height:1.9;margin-bottom:12px;">' + body + '</div>' : '')
-      + ((o.info1 || o.info2) ? '<div class="fs-info-row">'
-        + (o.info1 ? '<div class="fs-info"><b>' + o.info1 + '</b><small>' + (o.info1sub || '') + '</small></div>' : '')
-        + (o.info2 ? '<div class="fs-info"><b>' + o.info2 + '</b><small>' + (o.info2sub || '') + '</small></div>' : '')
-        + '</div>' : '')
-      + '</div>'
-      + '<div class="fs-actions">'
-      + '<button class="fs-btn ' + (kind === 'prayer' ? 'prayer' : 'primary') + '" id="fsOk">' + (o.okText || (kind === 'prayer' ? '🕌 تمام — ربنا يتقبل' : 'تمام ✓')) + '</button>'
-      + (o.snooze ? '<button class="fs-btn ghost" id="fsSnooze">⏰ تأجيل 5 دقائق</button>' : '')
-      + '<button class="fs-btn link" id="fsSettings">الإعدادات ⚙️</button>'
-      + '</div></div>';
-    document.body.appendChild(bd);
-    const close = () => { try { stopNotifSound(); } catch {} try { bd.remove(); } catch {} };
-    const okBtn = bd.querySelector('#fsOk');
-    if (okBtn) okBtn.onclick = () => { try { fxSound('tap'); } catch {} close(); if (typeof o.onOk === 'function') { try { o.onOk(); } catch {} } };
-    const snBtn = bd.querySelector('#fsSnooze');
-    if (snBtn && o.snooze) snBtn.onclick = () => {
-      close();
-      toast('هنفكرك بعد 5 دقائق ⏰', 'info');
-      setTimeout(() => { try { showFullscreenNotif(Object.assign({}, o, { snooze: false })); } catch {} }, 5 * 60 * 1000);
-    };
-    const stBtn = bd.querySelector('#fsSettings');
-    if (stBtn) stBtn.onclick = () => {
-      close();
-      try { state.currentTab = 'settings'; state._notifOpen = true; state._forceTop = true; persist(); render(); } catch {}
-    };
-    bd.addEventListener('click', (e) => { if (e.target === bd) close(); });
-    try {
-      const eq = bd.querySelector('#fsEq');
-      const audio = (o.soundUrl && n.sound) ? playNotifSound(o.soundUrl, n.volume) : null;
-      if (!audio && eq) eq.classList.add('paused');
-      if (audio) {
-        audio.onended = () => { try { if (eq) eq.classList.add('paused'); } catch {} };
-        audio.onerror = () => { try { if (eq) eq.classList.add('paused'); } catch {} };
-      }
-    } catch {}
-    try {
-      if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
-        try { new Notification(title, { body: String(sub || body || '').slice(0, 120), icon: 'icon-192.png', tag: 'naqisna-' + kind }); } catch {}
-      }
-    } catch {}
-    try {
-      if (window.AppNotify && typeof window.AppNotify.nativeShow === 'function') {
-        try { window.AppNotify.nativeShow(title, (sub ? sub + ' — ' : '') + String(body || '').slice(0, 120), kind); } catch {}
-      }
-    } catch {}
-    const autoMs = kind === 'prayer' ? 120000 : 45000;
-    setTimeout(() => { try { if (bd.isConnected) { stopNotifSound(); bd.remove(); } } catch {} }, autoMs);
-    return true;
-  } catch { return false; }
-}
-function testFullscreen(kind) {
-  try {
-    kind = kind || 'prayer';
-    const n = getNotif();
-    if (kind === 'prayer') {
-      showFullscreenNotif({
-        kind: 'prayer', icon: '🕌', title: 'حان وقت صلاة المغرب',
-        subtitle: 'القاهرة • تجربة', timeBig: '6:30 <small>م</small>',
-        body: 'دي تجربة لشكل الإشعار بملء الشاشة — الصوت اللي اخترته هيشتغل هنا 🔊',
-        info1: muezzinById(n.muezzin).name, info1sub: 'صوت المؤذن', info2: Math.round(n.volume * 100) + '%', info2sub: 'مستوى الصوت',
-        soundUrl: muezzinUrl(), snooze: true, okText: '🕌 تمام — ربنا يتقبل'
-      });
-    } else if (kind === 'order') {
-      showFullscreenNotif({
-        kind: 'order', icon: '🛒', title: 'طلب جديد وصل! 🛒',
-        subtitle: 'تجربة', body: 'لبن • عيش • بيض — من الطرف الآخر',
-        soundUrl: 'audio/note.mp3', snooze: false
-      });
-    } else {
-      showFullscreenNotif({
-        kind: 'test', icon: '🔔', title: 'الإشعارات شغالة تمام ✅',
-        subtitle: 'تجربة', body: 'كده الإشعارات بملء الشاشة والصوت شغالين. تحكم في كل حاجة من هنا.',
-        soundUrl: 'audio/note.mp3', snooze: false
-      });
-    }
-  } catch {}
-}
-function checkPrayerNotif() {
-  try {
-    const n = getNotif();
-    if (!n.master || !n.prayer) return;
-    try { if (window.AppNotify && typeof window.AppNotify.isNative === 'function' && window.AppNotify.isNative()) return; } catch {}
-    let cache = null;
-    try { cache = JSON.parse(localStorage.getItem('naqisna_prayer') || 'null'); } catch { cache = null; }
-    if (!cache || !cache.timings) return;
-    const now = new Date();
-    const tkey = todayStr(now);
-    const toDate = (hhmm) => {
-      try {
-        const m = String(hhmm || '').match(/(\d{1,2}):(\d{2})/);
-        if (!m) return null;
-        const d = new Date(now); d.setHours(Number(m[1]), Number(m[2]), 0, 0);
-        return d;
-      } catch { return null; }
-    };
-    const names = { Fajr: 'الفجر', Sunrise: 'الشروق', Dhuhr: 'الظهر', Asr: 'العصر', Maghrib: 'المغرب', Isha: 'العشاء' };
-    const icons = { Fajr: '🌄', Sunrise: '🌅', Dhuhr: '☀️', Asr: '🌤️', Maghrib: '🌇', Isha: '🌙' };
-    ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].forEach((pid) => {
-      try {
-        if (!n.prayers[pid]) return;
-        const dt = toDate(cache.timings[pid]);
-        if (!dt) return;
-        const diff = now - dt;
-        if (diff < 0 || diff > 90000) return;
-        const key = 'prayer_' + pid + '_' + tkey;
-        if (wasFired(key)) return;
-        markFired(key);
-        const t12 = (() => { try { return prayerTo12h(String(cache.timings[pid]).slice(0, 5)); } catch { return { t: String(cache.timings[pid]).slice(0, 5), ap: '' }; } })();
-        const place = cache.place || '';
-        if (n.fullscreen) {
-          showFullscreenNotif({
-            kind: 'prayer', icon: icons[pid] || '🕌',
-            title: 'حان وقت صلاة ' + (names[pid] || pid),
-            subtitle: place ? place + ' • ' + tkey : tkey,
-            timeBig: t12.t + ' <small>' + (t12.ap || '') + '</small>',
-            body: pid === 'Fajr' ? 'الصلاة خير من النوم 🤲' : 'حي على الصلاة — تقبل الله منا ومنكم 🤲',
-            info1: muezzinById(n.muezzin).name, info1sub: 'صوت المؤذن',
-            info2: place || 'مواقيت اليوم', info2sub: 'المكان',
-            soundUrl: pid === 'Sunrise' ? 'audio/note.mp3' : muezzinUrl(),
-            snooze: true, okText: '🕌 تمام — ربنا يتقبل'
-          });
-        } else {
-          try { playNotifSound(pid === 'Sunrise' ? 'audio/note.mp3' : muezzinUrl(), n.volume); } catch {}
-          toast('🕌 حان وقت صلاة ' + (names[pid] || pid) + ' — ' + t12.t + ' ' + (t12.ap || ''), 'success');
-        }
-      } catch {}
-    });
-  } catch {}
-}
-function checkApptNotif() {
-  try {
-    const n = getNotif();
-    if (!n.master || !n.appts) return;
-    const list = Array.isArray(state._appts) ? state._appts : [];
-    const now = Date.now();
-    list.forEach((a) => {
-      try {
-        if (!a || a.done) return;
-        let dt = null;
-        try { dt = apptDateTime(a); } catch { dt = null; }
-        if (!dt) return;
-        const ts = dt.getTime ? dt.getTime() : Number(dt);
-        if (!ts) return;
-        const remindMs = (Number(a.remind) || 0) * 60000;
-        const fireAt = ts - remindMs;
-        if (now < fireAt || now - fireAt > 90000) return;
-        const key = 'appt_' + String(a.id) + '_' + String(ts);
-        if (wasFired(key)) return;
-        markFired(key);
-        const body = (a.title || 'موعد هام') + (a.notes ? ' • ' + String(a.notes).slice(0, 60) : '');
-        if (n.fullscreen) {
-          showFullscreenNotif({ kind: 'appt', icon: '⏰', title: 'تذكير بموعد ⏰', subtitle: 'دلوقتي حالاً', body: body, soundUrl: 'audio/note.mp3', snooze: true });
-        } else {
-          try { playNotifSound('audio/note.mp3', n.volume); } catch {}
-          toast('⏰ ' + body, 'info');
-        }
-      } catch {}
-    });
-  } catch {}
-}
-function checkAzkarDailyNotif() {
-  try {
-    const n = getNotif();
-    if (!n.master) return;
-    const now = new Date();
-    const hm = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-    const tk = todayStr(now);
-    const fireOnce = (key, title, sub, body, kind, ico) => {
-      if (wasFired(key)) return;
-      markFired(key);
-      if (n.fullscreen) showFullscreenNotif({ kind: kind, icon: ico, title: title, subtitle: sub, body: body, soundUrl: 'audio/note.mp3', snooze: false });
-      else { try { playNotifSound('audio/note.mp3', n.volume); } catch {} toast(title, 'info'); }
-    };
-    if (n.azkarMorning && hm === String(n.azkarMorningTime || '06:30').slice(0, 5)) fireOnce('azkar_m_' + tk, 'أذكار الصباح 📿', 'وقت الأذكار', 'ابدأ يومك بذكر الله — صباح الخير ☀️', 'azkar', '📿');
-    if (n.azkarEvening && hm === String(n.azkarEveningTime || '17:30').slice(0, 5)) fireOnce('azkar_e_' + tk, 'أذكار المساء 📿', 'وقت الأذكار', 'امسِ بذكر الله — مساء الخير 🌙', 'azkar', '📿');
-    if (n.daily && hm === String(n.dailyTime || '21:00').slice(0, 5)) {
-      const pend = (state.orders || []).filter(o => o && o.status !== 'purchased').length;
-      fireOnce('daily_' + tk, 'ملخص اليوم 📊', 'تقرير سريع', pend ? ('عندك ' + pend + ' طلبات لسه متعلقة 🛒 — بص عليهم قبل ما تنام') : 'خلصت كل طلباتك النهارده — عاش! 🎉', 'daily', '📊');
-    }
-  } catch {}
-}
-function checkOrdersNotif() {
-  try {
-    const n = getNotif();
-    if (!n.master || !n.orders) return;
-    const orders = Array.isArray(state.orders) ? state.orders : [];
-    let known = {};
-    try { known = JSON.parse(localStorage.getItem('naqisna_notif_known_orders') || '{}'); } catch { known = {}; }
-    const first = !localStorage.getItem('naqisna_notif_known_orders');
-    const fresh = {};
-    let myName = '';
-    try { myName = (state.user && state.user.name) || ''; } catch {}
-    orders.forEach((o) => {
-      try {
-        if (!o || o.status === 'purchased') return;
-        const key = o.id || ('n:' + String(o.name || ''));
-        if (!key || key === 'n:') return;
-        fresh[key] = 1;
-        if (!known[key] && !first) {
-          const byMe = myName && o.createdBy && o.createdBy === myName;
-          if (!byMe) {
-            const fk = 'order_' + key;
-            if (!wasFired(fk)) {
-              markFired(fk);
-              const nm = String(o.name || 'طلب جديد').slice(0, 80);
-              if (n.fullscreen && !document.hidden) {
-                showFullscreenNotif({ kind: 'order', icon: '🛒', title: 'طلب جديد وصل! 🛒', subtitle: o.createdBy ? ('من ' + String(o.createdBy).slice(0, 30)) : '', body: nm, soundUrl: 'audio/note.mp3', snooze: false });
-              } else {
-                try { playNotifSound('audio/note.mp3', n.volume); } catch {}
-                try { toast('🛒 طلب جديد: ' + nm, 'success'); } catch {}
-              }
-            }
-          }
-        }
-      } catch {}
-    });
-    try {
-      let keys = Object.keys(fresh);
-      let out = fresh;
-      if (keys.length > 300) out = keys.slice(-300).reduce((m, k) => (m[k] = 1, m), {});
-      localStorage.setItem('naqisna_notif_known_orders', JSON.stringify(out));
-    } catch {}
-  } catch {}
-}
-function checkAllNotifs() {
-  try { checkPrayerNotif(); } catch {}
-  try { checkApptNotif(); } catch {}
-  try { checkAzkarDailyNotif(); } catch {}
-  try { checkOrdersNotif(); } catch {}
-  try {
-    if (window.AppNotify && typeof window.AppNotify.syncAll === 'function') {
-      try { window.AppNotify.syncAll(); } catch {}
-    }
-  } catch {}
-}
-function initNotifEngine() {
-  try {
-    if (window._notifEngineOn) return;
-    window._notifEngineOn = true;
-    try { getNotif(); } catch {}
-    try { syncNativePrefs(); } catch {}
-    setTimeout(() => { try { checkAllNotifs(); } catch {} }, 6000);
-    setInterval(() => { try { checkAllNotifs(); } catch {} }, 30000);
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) { try { checkAllNotifs(); } catch {} } });
-    try {
-      const unlock = () => {
-        try {
-          const AC = window.AudioContext || window.webkitAudioContext;
-          if (AC && !window._fxCtx) { try { window._fxCtx = new AC(); } catch {} }
-          if (window._fxCtx && window._fxCtx.state === 'suspended') { try { window._fxCtx.resume().catch(() => {}); } catch {} }
-        } catch {}
-      };
-      document.addEventListener('pointerdown', unlock, { passive: true });
-    } catch {}
-  } catch {}
-}
-/* ===== Settings card: full notification control ===== */
-function renderNotifCard() {
-  try {
-    const n = getNotif();
-    const perm = notifPermState();
-    const permLabel = perm === 'granted' ? 'مفعّلة ✅' : perm === 'native' ? 'وضع التطبيق الأصلي 📱' : perm === 'denied' ? 'محظورة ❌ — فعّلها من إعدادات المتصفح' : perm === 'unsupported' ? 'غير مدعومة في المتصفح' : 'تحتاج تفعيل ⚠️';
-    const dotColor = perm === 'granted' || perm === 'native' ? '#10B981' : perm === 'denied' ? '#F43F5E' : '#F59E0B';
-    const statusTxt = !n.master ? 'مطفية حالياً' : (n.prayer ? 'الصلاة شغالة 🕌' : 'الصلاة مطفية') + ' • ' + muezzinById(n.muezzin).name;
-    const sw = (on) => '<span class="sw ' + (on ? 'on' : '') + '"></span>';
-    const tgl = (key, title, sub) => '<button class="tgl-row" data-ntoggle="' + key + '"><span class="tgl"><b>' + title + '</b><small>' + sub + '</small></span>' + sw(!!n[key]) + '</button>';
-    const prayerChips = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((pid) => {
-      const nm = { Fajr: '🌄 الفجر', Dhuhr: '☀️ الظهر', Asr: '🌤️ العصر', Maghrib: '🌇 المغرب', Isha: '🌙 العشاء' }[pid];
-      return '<button class="prayer-chip ' + (n.prayers[pid] ? 'on' : '') + '" data-prayer="' + pid + '"><span>' + nm + '</span>' + sw(!!n.prayers[pid]) + '</button>';
-    }).join('');
-    const mzCards = MUEZZINS.map((m) => {
-      const active = n.muezzin === m.id;
-      return '<div class="muezzin-card ' + (active ? 'active' : '') + '"><b>' + (active ? '✅ ' : '') + m.name + '</b><small>' + m.desc + '</small><div class="mz-row"><button class="mz-play" data-mzplay="' + m.id + '">🔊 اسمع</button><button class="mz-pick" data-dup="' + m.id + '" data-mzpick="' + m.id + '">' + (active ? 'مختار ✓' : 'اختار') + '</button></div></div>';
-    }).join('')
-      + '<div class="muezzin-card ' + (n.muezzin === 'custom' ? 'active' : '') + '"><b>' + (n.muezzin === 'custom' ? '✅ ' : '') + 'أذاني الخاص 🎤</b><small>' + (n.customAzan ? 'ملف مرفوع ✓' : 'ارفع ملف أذان MP3') + '</small><div class="mz-row">'
-      + (n.customAzan ? '<button class="mz-play" data-mzplay="custom">🔊 اسمع</button>' : '')
-      + '<label class="mz-play" style="display:flex;align-items:center;justify-content:center;cursor:pointer;">📁 ارفع<input type="file" id="customAzanInput" accept="audio/*" class="hidden" /></label>'
-      + (n.customAzan ? '<button class="mz-pick" data-mzpick="custom">' + (n.muezzin === 'custom' ? 'مختار ✓' : 'اختار') + '</button>' : '')
-      + '</div></div>';
-    return '<div class="settings-card"><button class="collapsible-head" id="notifHead"><span class="ch-icon">🔔</span><span class="ch-texts"><b>الإشعارات والأصوات</b><small>' + statusTxt + ' • دوس عشان تتحكم</small></span><span class="chev ' + (state._notifOpen ? 'open' : '') + '">‹</span></button>'
-      + '<div class="collapsible-body ' + (state._notifOpen ? '' : 'hidden') + '">'
-      + '<div class="notif-group"><div class="notif-group-head"><span class="ngh-ico" style="background:#E1F3FD;">🔔</span><div><b>التحكم العام</b><small>مفتاح رئيسي + شكل العرض والصوت</small></div></div>'
-      + tgl('master', 'تشغيل الإشعارات', 'اقفلها توقف كل التنبيهات والأذان')
-      + tgl('fullscreen', 'عرض بملء الشاشة', 'إشعار كبير احترافي بدل التنبيه الصغير')
-      + tgl('sound', 'تشغيل الصوت', 'صوت الأذان والتنبيهات')
-      + '<div class="vol-row"><span style="font-size:12.5px;font-weight:900;">🔊 الصوت</span><input type="range" id="notifVol" min="0" max="100" value="' + Math.round(n.volume * 100) + '" /><span class="vol-val" id="notifVolVal">' + Math.round(n.volume * 100) + '%</span></div>'
-      + '<div class="snd-add-row"><div class="btn-row"><button class="btn btn-sm btn-primary" id="testFsPrayer">🕌 تجربة الأذان</button><button class="btn btn-sm" id="testFsOrder">🛒 تجربة طلب</button><button class="btn btn-sm" id="testFsSimple">🔔 تجربة عادية</button></div></div>'
-      + '<div class="grp-note"><span class="notif-status-dot" style="background:' + dotColor + '"></span>حالة إذن النظام: ' + permLabel + ' <button class="si-action" id="notifPermBtn" style="color:var(--primary);font-weight:900;font-size:12px;">تفعيل الإذن</button></div>'
-      + '</div>'
-      + '<div class="notif-group"><div class="notif-group-head"><span class="ngh-ico" style="background:#DCFCE7;">🕌</span><div><b>أذان الصلوات</b><small>اختار الصلوات وصوت المؤذن</small></div></div>'
-      + tgl('prayer', 'تنبيه الصلوات', 'إشعار بملء الشاشة وقت كل أذان')
-      + '<div class="prayer-chips">' + prayerChips + '</div>'
-      + '<div class="settings-title">🎤 صوت المؤذن — دوس اسمع واختار</div>'
-      + '<div class="muezzin-grid">' + mzCards + '</div>'
-      + '<div class="grp-note">الصوت بيشتغل وقت الأذان بالظبط حسب مواقيت محافظتك. لو النت ضعيف هنشغل تنبيه بديل تلقائياً.</div>'
-      + '</div>'
-      + '<div class="notif-group"><div class="notif-group-head"><span class="ngh-ico" style="background:#FFEED3;">🛒</span><div><b>الطلبات والمواعيد</b><small>تنبيهات البيت والمهام</small></div></div>'
-      + tgl('orders', 'إشعار الطلبات الجديدة', 'لما الطرف الآخر يضيف طلب')
-      + tgl('appts', 'تذكير المواعيد', 'تنبيه قبل الموعد حسب التذكير المظبوط')
-      + tgl('tasks', 'تذكير المهام', 'مهام البيت اليومية')
-      + '</div>'
-      + '<div class="notif-group"><div class="notif-group-head"><span class="ngh-ico" style="background:#CCFBF1;">📿</span><div><b>الأذكار والملخص</b><small>ورد يومي هادئ</small></div></div>'
-      + tgl('azkarMorning', 'أذكار الصباح', 'تنبيه هادئ كل يوم')
-      + '<div class="time-row"><label>وقت أذكار الصباح</label><input type="time" id="azkarMTime" value="' + String(n.azkarMorningTime || '06:30').slice(0, 5) + '" /></div>'
-      + tgl('azkarEvening', 'أذكار المساء', 'تنبيه هادئ كل يوم')
-      + '<div class="time-row"><label>وقت أذكار المساء</label><input type="time" id="azkarETime" value="' + String(n.azkarEveningTime || '17:30').slice(0, 5) + '" /></div>'
-      + tgl('daily', 'ملخص اليوم', 'عدد الطلبات المتعلقة قبل النوم')
-      + '<div class="time-row"><label>وقت الملخص اليومي</label><input type="time" id="dailyTime" value="' + String(n.dailyTime || '21:00').slice(0, 5) + '" /></div>'
-      + '</div>'
-      + '<div class="notif-group"><div class="notif-group-head"><span class="ngh-ico" style="background:#E0E7FF;">🌙</span><div><b>الهدوء والنظام</b><small>منع الإزعاج بالليل</small></div></div>'
-      + tgl('quiet', 'الوضع الهادئ بالليل', 'يكتم الصوت في وقت النوم')
-      + '<div class="time-row"><label>من</label><input type="time" id="quietFrom" value="' + String(n.quietFrom || '22:00').slice(0, 5) + '" /><label style="flex:0;">إلى</label><input type="time" id="quietTo" value="' + String(n.quietTo || '06:00').slice(0, 5) + '" /></div>'
-      + tgl('vibrate', 'الاهتزاز', 'اهتزاز الموبايل مع الإشعار')
-      + '<div class="grp-note">الوضع الهادئ يكتم الصوت فقط — الإشعار هيظهر صامت. الإشعارات تحتاج أن يكون التطبيق مفتوحاً أو مثبتاً (PWA) للعمل في الخلفية.</div>'
-      + '</div>'
-      + '</div></div>';
-  } catch (e) { return ''; }
-}
-function bindNotifSettings() {
-  try {
-    const head = document.getElementById('notifHead');
-    if (head) head.onclick = () => {
-      const will = !state._notifOpen;
-      ['_accountOpen', '_catOpen', '_learnedOpen', '_dataOpen'].forEach(k => state[k] = false);
-      state._notifOpen = will;
-      persist(); render();
-      requestAnimationFrame(() => { const h = document.getElementById('notifHead'); if (h && will) h.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
-    };
-    document.querySelectorAll('[data-ntoggle]').forEach((btn) => {
-      btn.onclick = () => {
-        const k = btn.dataset.ntoggle;
-        const n = getNotif();
-        n[k] = !n[k];
-        if (k === 'master' && n.master) ensureNotifPerm();
-        saveNotif(); render();
-        const labels = { master: n.master ? 'الإشعارات اشتغلت 🔔' : 'الإشعارات اتقفلت 🔕', fullscreen: n.fullscreen ? 'العرض بملء الشاشة اشتغل ✅' : 'هنستخدم التنبيه العادي', sound: n.sound ? 'الصوت اشتغل 🔊' : 'الصوت اتكتم 🔇', prayer: n.prayer ? 'تنبيه الصلوات اشتغل 🕌' : 'تنبيه الصلوات اتقفل' };
-        if (labels[k]) toast(labels[k], 'success');
-        if (k === 'sound' && n.sound) { try { playNotifSound('audio/note.mp3', n.volume); } catch {} }
-      };
-    });
-    document.querySelectorAll('[data-prayer]').forEach((btn) => {
-      btn.onclick = () => {
-        const n = getNotif();
-        const pid = btn.dataset.prayer;
-        n.prayers[pid] = !n.prayers[pid];
-        if (n.prayers[pid]) n.prayer = true;
-        saveNotif(); render();
-      };
-    });
-    document.querySelectorAll('[data-mzplay]').forEach((btn) => {
-      btn.onclick = (e) => { try { e.stopPropagation(); } catch {} previewMuezzin(btn.dataset.mzplay); };
-    });
-    document.querySelectorAll('[data-mzpick]').forEach((btn) => {
-      btn.onclick = (e) => {
-        try { e.stopPropagation(); } catch {}
-        const n = getNotif();
-        n.muezzin = btn.dataset.mzpick;
-        if (n.muezzin === 'custom' && !n.customAzan) { toast('ارفع ملف الأذان الأول 📁', 'warning'); return; }
-        saveNotif(); render();
-        toast('صوت المؤذن: ' + muezzinById(n.muezzin).name + ' ✅', 'success');
-      };
-    });
-    const vol = document.getElementById('notifVol');
-    if (vol) {
-      vol.addEventListener('input', () => {
-        const v = document.getElementById('notifVolVal');
-        if (v) v.textContent = vol.value + '%';
-      });
-      vol.addEventListener('change', () => {
-        const n = getNotif();
-        n.volume = Number(vol.value) / 100;
-        saveNotif();
-        try { playNotifSound('audio/note.mp3', n.volume); } catch {}
-      });
-    }
-    const bindTime = (id, key) => {
-      const el = document.getElementById(id);
-      if (el) el.onchange = () => { const n = getNotif(); n[key] = el.value; saveNotif(); toast('الوقت اتحفظ ⏰', 'success'); };
-    };
-    bindTime('azkarMTime', 'azkarMorningTime');
-    bindTime('azkarETime', 'azkarEveningTime');
-    bindTime('dailyTime', 'dailyTime');
-    bindTime('quietFrom', 'quietFrom');
-    bindTime('quietTo', 'quietTo');
-    const tp = document.getElementById('testFsPrayer'); if (tp) tp.onclick = () => testFullscreen('prayer');
-    const to2 = document.getElementById('testFsOrder'); if (to2) to2.onclick = () => testFullscreen('order');
-    const ts = document.getElementById('testFsSimple'); if (ts) ts.onclick = () => testFullscreen('test');
-    const pb = document.getElementById('notifPermBtn'); if (pb) pb.onclick = () => { ensureNotifPerm(); toast('اطلبنا إذن الإشعارات — وافق من المتصفح 🔔', 'info'); setTimeout(() => { try { render(); } catch {} }, 1500); };
-    const cu = document.getElementById('customAzanInput');
-    if (cu) cu.onchange = (e) => {
-      const f = e.target.files && e.target.files[0];
-      if (!f) return;
-      if (f.size > 4 * 1024 * 1024) { toast('الملف كبير — اختار ملف أقل من 4MB', 'error'); return; }
-      const r = new FileReader();
-      r.onload = (ev) => {
-        try {
-          const n = getNotif();
-          n.customAzan = String(ev.target.result);
-          n.muezzin = 'custom';
-          try { localStorage.setItem('naqisna_custom_azan', n.customAzan); } catch {}
-          saveNotif(); render();
-          toast('أذانك الخاص اتحفظ 🎤✅', 'success');
-        } catch { toast('تعذر حفظ الملف', 'error'); }
-      };
-      r.readAsDataURL(f);
-    };
-    try {
-      if (!getNotif().customAzan) {
-        const saved = localStorage.getItem('naqisna_custom_azan');
-        if (saved) getNotif().customAzan = saved;
-      }
-    } catch {}
-  } catch {}
-}
-
   function renderSettings() {
     const learnedEntries = Object.entries(state.learnedMap || {}); const totalSavings = sumExpensesInRange('all').savings;
     return `<div class="page">
@@ -5631,17 +4918,15 @@ function bindNotifSettings() {
           <button class="btn btn-primary btn-sm" id="newHomeBtn" style="min-height:48px;" ${state.home?.code ? 'disabled' : ''}>🏠 بيت جديد</button>
           <button class="btn btn-secondary btn-sm" id="joinHomeBtn" style="min-height:48px;">🔗 بيت موجود</button>
         </div>
-        <div class="help-text" style="padding:0 16px 8px;">${state.home?.code ? ('الدخول لبيت موجود يستبدل بياناتك ببياناته' + (state._syncedOnce ? ' • ☁️ مربوط بالسحابة' : ' • ⏳ لسه مرفوعش — افتح التطبيق بالإنترنت')) : 'البيت الجديد بكود جديد وبياناتك تفضل زي ما هي • الدخول لبيت موجود يستبدل بياناتك ببياناته'}</div>
+        <div class="help-text" style="padding:0 16px 8px;">${state.home?.code ? 'الدخول لبيت موجود يستبدل بياناتك ببياناته' : 'البيت الجديد بكود جديد وبياناتك تفضل زي ما هي • الدخول لبيت موجود يستبدل بياناتك ببياناته'}</div>
         <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🚴</div><div class="si-body"><div class="si-label">${escapeHTML(state.deliveryName || state.home?.deliveryName || 'ديليفري')}</div><div class="si-value">بيانات الدليفري بتاعك</div></div><button class="si-action" id="editDeliveryBtn">تعديل</button></div>
         <div style="padding:0 16px 14px;"><button class="btn btn-success" id="sendDeliveryBtn">💬 ابعت الطلبات واتساب للديليفري</button></div>
         <div class="online-pill" id="onlinePill" style="display:none;margin:0 16px 14px;"><span class="online-dot"></span><span class="online-num" id="onlineCount">1</span><span class="online-tx">مستخدم نشط الآن<small>بيستخدموا التطبيق دلوقتي</small></span><span class="live-tag"><i></i> مباشر</span></div>
         </div>
       </div>
-      ${renderNotifCard()}
       <div class="settings-card"><div class="settings-title">التطبيق</div>
         <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label">ناقصنا إيه</div><div class="si-value">ثبّته على شاشة موبايلك عشان يفتح أسرع ويشتغل من غير نت</div></div></div>
-        <div style="padding:0 16px 8px;"><button class="btn btn-primary" id="installAppBtn">ثبّت التطبيق على الموبايل</button></div>
-        ${(window.AppNotify && typeof window.AppNotify.isNative === 'function' && window.AppNotify.isNative() ? '' : '<div style="padding:0 16px 6px;"><a class="btn btn-secondary" href="Apk/app.apk" download="naqisna-app.apk" style="text-decoration:none;">⬇️ تحميل نسخة APK مباشرة</a></div><div class="help-text" style="padding:0 16px 14px;">ملف التثبيت المباشر (حوالي 7MB) — حمّله من هنا وافتحه عشان تثبت التطبيق، ولو ظهر تحذير اختار تثبيت على أي حال</div>')}
+        <div style="padding:0 16px 14px;"><button class="btn btn-primary" id="installAppBtn">ثبّت التطبيق على الموبايل</button></div>
       </div>
       <div class="settings-card"><button class="collapsible-head" id="catCustomHead"><span class="ch-icon">${svgIcon('sparkle', 22)}</span><span class="ch-texts"><b>الأقسام والمنتجات</b><small>${allCats().length} قسم • ${getCatalog().reduce((a, d) => a + catDeptCount(d), 0)} صنف • ${finCounts().it} بند مالي • دوس عشان تشوف</small></span><span class="chev ${state._catOpen ? 'open' : ''}">‹</span></button>
         <div class="collapsible-body ${state._catOpen ? '' : 'hidden'}">
@@ -5704,7 +4989,7 @@ function bindNotifSettings() {
     b('copyCodeBtn', () => { const code = document.getElementById('codeDisplay').textContent; copyToClipboard(code).then(ok => toast(ok ? 'اتنسخ ✓' : 'مقدرش أنسخ', ok ? 'success' : 'error')); });
     b('submitJoin', async () => {
       const inp = document.getElementById('joinCodeInput'); const err = document.getElementById('joinError');
-      const showErr = (msg) => { if (msg) err.textContent = msg; err.classList.remove('hidden'); inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'), 1500); };
+      const showErr = () => { err.classList.remove('hidden'); inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'), 1500); };
       // تحويل الأرقام العربية والهندية إلى أرقام إنجليزية
       let rawVal = inp.value.trim().replace(/[٠-٩]/g, d => d.charCodeAt(0) - 0x0660).replace(/[۰-۹]/g, d => d.charCodeAt(0) - 0x06f0);
       let code = rawVal.toUpperCase();
@@ -5729,21 +5014,29 @@ function bindNotifSettings() {
         }
       } catch {}
       // اسحب بيانات البيت من السحابة - يقبل حتى البيت الفاضي الموجود في Supabase
-      err.classList.add('hidden');
-      if (typeof navigator !== 'undefined' && navigator.onLine === false) { showErr(joinErrText('offline')); return; }
-      inp.disabled = true;
-      { const btnEl = document.getElementById('submitJoin'); if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'بدوّر على البيت...'; } }
-      { const res = await fetchHomeTimeout(code, 20000);
-        inp.disabled = false;
-        { const btnEl = document.getElementById('submitJoin'); if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'ادخل البيت'; } }
-        if (res && res.status === 'ok') {
-          acceptJoin(remoteToSaved(code, res.data));
-          return;
+      try {
+        if (window.NaqisnaSupabase && window.NaqisnaSupabase.isConfigured()) {
+          inp.disabled = true;
+          const btnEl = document.getElementById('submitJoin'); if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'بدوّر على البيت...'; }
+          const remoteData = await window.NaqisnaSupabase.fetchHomeData(code);
+          inp.disabled = false;
+          if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'ادخل البيت'; }
+          if (remoteData !== null) {
+            // البيت موجود في Supabase (حتى لو فاضي)
+            acceptJoin({
+              home: { code, name: remoteData.name || 'بيتنا', createdAt: nowISO() },
+              orders: (remoteData.orders || []).map(normRemoteOrder).filter(Boolean),
+              expenses: (remoteData.expenses || []).map(normRemoteExpense).filter(Boolean),
+              orderLists: remoteData.orderLists || [],
+              user: remoteData.user || null,
+              updatedAt: Number(remoteData.updatedAtMs) || Date.now()
+            });
+            return;
+          }
         }
-        console.warn('Supabase join status:', res && res.status);
-        showErr(joinErrText(res && res.status));
-        return;
-      }
+      } catch (e) { console.warn('Supabase join error:', e); try { inp.disabled = false; const btnEl = document.getElementById('submitJoin'); if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'ادخل البيت'; } } catch {} }
+      // الكود صحيح لكن البيت مش موجود
+      showErr();
     });
     b('submitUsername', () => {
       const inp = document.getElementById('userNameInput'); const name = (inp.value || '').trim();
@@ -5791,42 +5084,6 @@ function bindNotifSettings() {
     if (!/^HOME-\d{4,}$/.test(v)) v = 'HOME-' + v.replace(/[^0-9]/g, '');
     return /^HOME-\d{4,}$/.test(v) ? v : '';
   }
-  async function fetchHomeTimeout(code, ms) {
-    ms = ms || 20000;
-    try {
-      if (!window.NaqisnaSupabase || !window.NaqisnaSupabase.isConfigured()) return { status: 'noconfig' };
-      if (typeof navigator !== 'undefined' && navigator.onLine === false) return { status: 'offline' };
-      const p = window.NaqisnaSupabase.fetchHomeData(code);
-      const to = new Promise((res) => setTimeout(() => res({ __timeout: true }), ms));
-      const r = await Promise.race([p, to]);
-      if (r && r.__timeout) return { status: 'timeout' };
-      if (!r) return { status: 'notfound' };
-      return { status: 'ok', data: r };
-    } catch { return { status: 'error' }; }
-  }
-  async function ensureHomeRow(code) {
-    try {
-      if (!window.NaqisnaSupabase || !window.NaqisnaSupabase.isConfigured()) return false;
-      const r = await window.NaqisnaSupabase.joinOrCreateHome(code, (state.home && state.home.name) || '\u0628\u064a\u062a\u0646\u0627');
-      return !!r;
-    } catch { return false; }
-  }
-  function remoteToSaved(code, remoteData) {
-    return {
-      home: { code, name: (remoteData && remoteData.name) || '\u0628\u064a\u062a\u0646\u0627', createdAt: nowISO() },
-      orders: ((remoteData && remoteData.orders) || []).map(normRemoteOrder).filter(Boolean),
-      expenses: ((remoteData && remoteData.expenses) || []).map(normRemoteExpense).filter(Boolean),
-      orderLists: (remoteData && remoteData.orderLists) || [],
-      user: (remoteData && remoteData.user) || null,
-      updatedAt: Number((remoteData && remoteData.updatedAtMs) || Date.now())
-    };
-  }
-  function joinErrText(st) {
-    if (st === 'offline') return '\uD83D\uDCF6 \u0645\u0641\u064a\u0634 \u0625\u0646\u062a\u0631\u0646\u062a — \u0648\u0635\u0644 \u0627\u0644\u0646\u062a \u0648\u062d\u0627\u0648\u0644 \u062a\u0627\u0646\u064a';
-    if (st === 'noconfig') return '\u26A0\uFE0F \u062a\u0639\u0630\u0631 \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0627\u0644\u0633\u062d\u0627\u0628\u0629 — \u062d\u062f\u0651\u062b \u0627\u0644\u0635\u0641\u062d\u0629 \u0648\u062d\u0627\u0648\u0644 \u062a\u0627\u0646\u064a';
-    if (st === 'timeout') return '\u23F3 \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0637\u064a\u0621 — \u062d\u0627\u0648\u0644 \u062a\u0627\u0646\u064a';
-    return '\u0627\u0644\u0643\u0648\u062f \u063a\u0644\u0637 \u0623\u0648 \u0627\u0644\u0628\u064a\u062a \u0645\u0634 \u0645\u0648\u062c\u0648\u062f \uD83D\uDE05 — \u0627\u062a\u0623\u0643\u062f \u0627\u0644\u0643\u0648\u062f \u0648\u0627\u062a\u0623\u0643\u062f \u0627\u0644\u0637\u0631\u0641 \u0627\u0644\u062a\u0627\u0646\u064a \u0641\u062a\u062d \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0628\u0627\u0644\u0646\u062a';
-  }
   async function findHomeByCode(code) {
     try {
       const raw = localStorage.getItem('baytna_home_' + code);
@@ -5868,31 +5125,14 @@ function bindNotifSettings() {
       <div id="joinError2" class="error-text hidden">الكود غلط أو البيت مش موجود 😅</div>
       <div class="btn-group"><button class="btn btn-primary" id="submitJoin2">ادخل البيت</button></div>`);
     const inp = m.querySelector('#joinCodeInput2'), err = m.querySelector('#joinError2'), btn = m.querySelector('#submitJoin2');
-    const showErr = (msg) => { if (msg) err.textContent = msg; err.classList.remove('hidden'); inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'), 1500); };
+    const showErr = () => { err.classList.remove('hidden'); inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'), 1500); };
     btn.onclick = async () => {
       const code = normalizeHomeCode(inp.value);
-      if (!code) { showErr('اكتب الكود بشكل صحيح — مثال: HOME-1234'); return; }
+      if (!code) { showErr(); return; }
       if (state.home && state.home.code && code === state.home.code) { closeModal(m); toast('انت أصلاً في البيت ده 🏠', 'info'); return; }
-      err.classList.add('hidden');
-      try {
-        const raw0 = localStorage.getItem('baytna_home_' + code);
-        if (raw0) { const s0 = JSON.parse(raw0); if (s0 && s0.home) {
-          closeModal(m);
-          confirmDialog({ title: 'لقيت البيت! 🎉', message: `بيت "${s0.home.name || ''}" — تدخله؟ بياناتك الحالية هتتبدل ببياناته.`, confirmText: 'أيوه، ادخل', cancelText: 'إلغاء' }).then(ok => {
-            if (!ok) return;
-            applyJoinedHome(s0);
-            toast(`أهلا بيك في بيتك الجديد! 🎉`, 'success');
-          });
-          return;
-        } }
-      } catch {}
-      if (typeof navigator !== 'undefined' && navigator.onLine === false) { showErr(joinErrText('offline')); return; }
       btn.disabled = true; btn.textContent = 'بدوّر على البيت...'; inp.disabled = true;
-      const res = await fetchHomeTimeout(code, 20000);
-      btn.disabled = false; btn.textContent = 'ادخل البيت'; inp.disabled = false;
-      if (!res || res.status !== 'ok') { showErr(joinErrText(res && res.status)); return; }
-      const remote = remoteToSaved(code, res.data);
-      if (!remote || !remote.home) { showErr(joinErrText('notfound')); return; }
+      const remote = await findHomeByCode(code);
+      if (!remote || !remote.home) { btn.disabled = false; btn.textContent = 'ادخل البيت'; inp.disabled = false; showErr(); return; }
       closeModal(m);
       confirmDialog({ title: 'لقيت البيت! 🎉', message: `بيت "${remote.home.name || ''}" — تدخله؟ بياناتك الحالية هتتبدل ببياناته.`, confirmText: 'أيوه، ادخل', cancelText: 'إلغاء' }).then(ok => {
         if (!ok) return;
@@ -6170,7 +5410,6 @@ function bindNotifSettings() {
     document.querySelectorAll('[data-expsave]').forEach(b => b.onclick = () => saveExpandedOrder(b.dataset.expsave));
     document.querySelectorAll('[data-expbuy]').forEach(b => b.onclick = () => { const id = b.dataset.expbuy; if (saveExpandedOrder(id, true)) openPurchaseModal(id); });
     bindSettings();
-    try { bindNotifSettings(); } catch {}
   }
 
   function showContextMenu(e, orderId) {
@@ -6225,30 +5464,14 @@ function bindNotifSettings() {
     b('copyHomeCode', () => { if (!state.home?.code) { toast('مفيش بيت لسه — اعمل بيت جديد الأول 🏠', 'info'); return; } copyToClipboard(state.home.code).then(ok => toast(ok ? 'الكود اتنسخ' : 'مقدرش أنسخ', ok ? 'success' : 'error')); });
     b('newHomeBtn', () => {
       if (state.home?.code) { toast('عندك بيت بالفعل 🏠', 'info'); return; }
-      confirmDialog({ title: 'بيت جديد؟', message: 'هنعمل بيت جديد بكود جديد، وبياناتك وقوائمك هتفضل زي ما هي.', confirmText: 'اعمل بيت جديد', cancelText: 'إلغاء' }).then(async (ok) => {
+      confirmDialog({ title: 'بيت جديد؟', message: 'هنعمل بيت جديد بكود جديد، وبياناتك وقوائمك هتفضل زي ما هي.', confirmText: 'اعمل بيت جديد', cancelText: 'إلغاء' }).then(ok => {
         if (!ok) return;
-        toast('بنجهز البيت... ⏳', 'info');
-        let code = genHomeCode();
-        for (let t = 0; t < 6; t++) {
-          const chk = await fetchHomeTimeout(code, 9000);
-          if (!chk || chk.status !== 'ok') break;
-          code = genHomeCode();
-        }
-        state.home = { code, name: 'بيتنا', createdAt: nowISO() };
+        state.home = { code: genHomeCode(), name: 'بيتنا', createdAt: nowISO() };
         state._pendingCloud = null; state._isJoining = false; state._pendingCode = null; state._pendingName = null;
         persist();
+        try { initSupabaseSync(); } catch {}
         render();
-        const created = await ensureHomeRow(code);
-        if (created) {
-          state._syncedOnce = true;
-          persist();
-          try { initSupabaseSync(); } catch {}
-          render();
-          toast('البيت الجديد اتعمل! الكود: ' + code + ' ☁️', 'success');
-        } else {
-          toast('اتعمل محليا — افتح التطبيق بالإنترنت عشان الكود يشتغل على الأجهزة التانية ⚠️', 'warning');
-          try { initSupabaseSync(); } catch {}
-        }
+        toast('البيت الجديد اتعمل! الكود: ' + state.home.code, 'success');
       });
     });
     b('joinHomeBtn', () => { openJoinHomeModal(); });
@@ -8358,7 +7581,6 @@ function bindNotifSettings() {
     state._expandedOrder = null; state._expDraft = null;
     state._expandedBasket = null; state._basketDraft = null;
     render();
-    try { initNotifEngine(); } catch {}
     try { if (typeof _ensureExitGuard === 'function') _ensureExitGuard(); } catch {}
     initSupabaseSync();
     try { initPresence(); } catch {}
