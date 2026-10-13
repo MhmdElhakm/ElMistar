@@ -72,6 +72,17 @@
   input, select, textarea { font-family: inherit; font-size: 15px; font-weight: 600; }
   .hidden { display: none !important; }
 
+  /* شاشة تحميل احترافية عند فتح التطبيق */
+  #preloader { position: fixed; inset: 0; z-index: 99999; background: radial-gradient(600px 420px at 50% 18%, #E1F3FD, #F4FAFE 72%); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; transition: opacity .5s, visibility .5s; }
+  #preloader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+  .pl-logo { width: 96px; height: 96px; }
+  .pl-logo img { width: 100%; height: 100%; border-radius: 26px; object-fit: cover; background: #fff; box-shadow: 0 8px 22px rgba(28,176,246,.25); }
+  .pl-name { font-weight: 900; font-size: 24px; color: var(--primary-dark); }
+  .pl-sub { font-weight: 700; font-size: 13px; color: var(--text-sec); }
+  .pl-bar { width: 180px; height: 6px; border-radius: 99px; background: #D8ECF7; overflow: hidden; }
+  .pl-bar i { display: block; height: 100%; width: 40%; border-radius: 99px; background: var(--grad); animation: plSlide 1.2s ease-in-out infinite; }
+  @keyframes plSlide { 0% { transform: translateX(260%); } 100% { transform: translateX(-360%); } }
+
   .app {
     max-width: 480px;
     margin: 0 auto;
@@ -491,7 +502,6 @@
   .category-card-info { flex: 1; }
   .category-card-name { font-size: 15px; font-weight: 800; }
   .category-card-count { font-size: 12px; font-weight: 700; opacity: .7; }
-  .category-card-badge { padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; flex-shrink: 0; }
   .category-card-orders { padding: 4px 10px 10px; }
 
   .order-card {
@@ -516,7 +526,7 @@
   .bask-head { background: linear-gradient(135deg, #E1F3FD, #FFF6E8 60%, #EFF6FF) !important; border-bottom: 1.5px dashed var(--primary); }
   .bask-ico { width: 46px !important; height: 46px !important; font-size: 24px !important; background: #fff !important; box-shadow: var(--shadow-sm); }
   .bask-count { min-width: 76px; height: 38px; padding: 0 18px; border-radius: 999px; background: var(--grad); color: #fff; font-size: 14px; font-weight: 900; line-height: 1; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 6px 14px rgba(28,176,246,.3); cursor: pointer; transition: transform .15s; white-space: nowrap; }
-  .bask-count:active { transform: scale(.94); }
+  .bask-count:active { transform: scale(.97); }
   .bask-actions { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; padding: 10px 10px 4px; }
   .bask-actions .btn { width: 100%; margin: 0; min-height: 46px; font-size: 14px; }
   /* سلة التجهيز — شكل احترافي */
@@ -1085,6 +1095,8 @@
   .si-label { font-weight: 800; font-size: 13px; margin-bottom: 1px; }
   .si-value { font-size: 12px; color: var(--text-sec); word-break: break-word; }
   .si-action { color: var(--text-muted); font-size: 16px; flex-shrink: 0; }
+.si-wa { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg,#25D366,#128C7E); color: #fff; font-size: 17px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(18,140,126,.3); transition: transform .12s; }
+.si-wa:active { transform: scale(.9); }
   .code-display { background: var(--primary-light); color: var(--primary-dark); padding: 5px 10px; border-radius: 8px; font-family: monospace; font-weight: 800; letter-spacing: 1px; font-size: 13px; display: inline-block; margin-bottom: 4px; }
   .code-display.inline { margin-bottom: 0; white-space: nowrap; }
   .icon-copy-btn { width: 40px; height: 40px; border-radius: 13px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform .15s, background .15s; }
@@ -1525,7 +1537,35 @@
   .category-card-icon svg { width: 24px !important; height: 24px !important; }
   .category-card-name { font-size: 16.5px !important; font-weight: 900 !important; }
   .category-card-count { font-size: 12.5px !important; font-weight: 800 !important; opacity: 1 !important; }
-  .category-card-badge { padding: 6px 14px !important; font-size: 12.5px !important; box-shadow: inset 0 0 0 1.5px currentColor; }
+  .cat-cnt { min-width: 38px; height: 38px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; flex-shrink: 0; }
+  /* ===== نافذة التأكيد الجماعي — بنفس تنسيق قسم المهام ===== */
+  .bulk-trow { align-items: center; }
+  .bulk-trow .task-ico { overflow: hidden; }
+  .bulk-trow .task-ico img { width: 100%; height: 100%; object-fit: cover; }
+  .bulk-price-inline { position: relative; flex-shrink: 0; width: 118px; }
+  .bulk-price-inline input { width: 100%; padding: 9px 8px 9px 38px; border: 1.5px solid var(--border); border-radius: 12px; background: var(--bg); font-family: inherit; font-weight: 800; font-size: 13px; color: var(--text); text-align: left; transition: border-color .15s, box-shadow .15s, background .15s; }
+  .bulk-price-inline input:focus { outline: none; border-color: var(--tc, var(--primary)); background: #fff; box-shadow: 0 0 0 3px var(--tcbg, rgba(28,176,246,.14)); }
+  .bulk-price-inline input.error { border-color: var(--danger) !important; background: var(--danger-light); }
+  .bulk-price-inline input::-webkit-outer-spin-button, .bulk-price-inline input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .bulk-price-inline input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+  .bulk-cur { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 800; color: var(--text-muted); pointer-events: none; }
+  .bulk-foot { position: sticky; bottom: -24px; margin: 4px -18px -24px; padding: 12px 18px 18px; background: linear-gradient(180deg, rgba(244,250,254,0), var(--bg) 32%); }
+  .bulk-sum { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 10px 14px; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+  .bulk-sum .t { font-size: 12.5px; font-weight: 800; color: var(--text-sec); }
+  .bulk-sum .t small { display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; margin-top: 1px; }
+  .bulk-sum b { font-size: 20px; font-weight: 900; color: var(--success); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bulk-sum b small { font-size: 11px; font-weight: 700; }
+  .bulk-go { position: relative; overflow: hidden; }
+  .bulk-go::after { content: ''; position: absolute; top: 0; bottom: 0; width: 60px; background: linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent); animation: apptShine 2.8s ease-in-out infinite; pointer-events: none; }
+  .bulk-foot .btn-group { flex-direction: row; gap: 8px; }
+  .bulk-foot .btn-group .btn { width: auto; min-height: 46px; font-size: 13.5px; padding: 10px 8px; }
+  #bulkConfirmBuy { flex: 1.6; }
+  #bulkCancelBuy { flex: 1; }
+  .wa-row { display: flex; gap: 8px; }
+  .wa-row .btn { width: auto; min-height: 44px; font-size: 12.5px; padding: 10px 6px; margin: 0; }
+  .wa-row [data-sendwaorders] { flex: 1.3; }
+  .wa-row [data-catconfirm] { flex: 1; }
+  .wa-row [data-senddelivery] { flex: 1; }
   .category-card-orders { padding: 8px 12px 12px !important; display: flex; flex-direction: column; gap: 8px; }
   .order-card { background: #fff !important; border: 1.5px solid var(--border) !important; border-radius: 16px !important; padding: 13px 14px !important; margin: 0 !important; box-shadow: 0 3px 10px rgba(30,27,46,.06) !important; }
   .order-card .category-card-icon { width: 44px !important; height: 44px !important; }
@@ -1660,6 +1700,7 @@
   </style>
 </head>
 <body>
+<div id="preloader"><div class="pl-logo"><img src="icon-192.png" alt="ناقصنا إيه"></div><div class="pl-name">ناقصنا إيه</div><div class="pl-sub">مشتريات البيت الذكية 🛒</div><div class="pl-bar"><i></i></div></div>
 <div class="app" id="app"></div>
 <div class="toast-container" id="toastContainer"></div>
 
@@ -2582,6 +2623,12 @@
     state._basket = []; persist();
     return { added, skipped };
   }
+  /* نفس وظيفة زر «أكّد الكل» بتاع السلة — تُستخدم في السلة وفي زر القسم الشامل */
+  function handleConfirmBasket() {
+    const r = confirmBasket(); render();
+    if (r.added.length) { try { const snd = new Audio(encodeURI('audio/np money.mp3')); snd.play().catch(() => {}); } catch (e) { console.warn(e); } toast(`🧺 اتأكدت السلة: ${r.added.length} طلب ✓` + (r.skipped ? ` (عدّينا ${r.skipped} متكرر)` : ''), 'success'); try { sendPartnerWa(r.added); } catch (e) { console.warn(e); } }
+    else toast('السلة فاضية أو كلها موجودة قبل كده', 'warning');
+  }
   function toggleBasketExpand(id) {
     if (state._expandedBasket === id) { state._expandedBasket = null; state._basketDraft = null; }
     else {
@@ -2644,10 +2691,10 @@
     return `<div class="category-group"><div class="category-card" style="border:1.5px dashed var(--primary);">
       <div class="category-card-header bask-head">
         <div class="category-card-icon bask-ico">🧺</div>
-        <div class="category-card-info"><div class="category-card-name">سلة التجهيز</div><div class="category-card-count">${items.length} صنف • دوس على الصنف للتعديل</div></div>
+        <div class="category-card-info"><div class="category-card-name">سلة الطلبات</div><div class="category-card-count">${items.length} صنف • دوس على الصنف للتعديل</div></div>
         <button class="bask-count" id="basketAddMore" title="ضيف صنف جديد للسلة">+ ضيف</button>
       </div>
-      <div class="bask-actions"><button class="btn btn-success" id="basketConfirm">✅ أكّد الكل (${items.length})</button><button class="btn" id="basketClear">فضّيها</button></div>
+      <div class="bask-actions"><button class="btn btn-success" id="basketConfirm">تأكيد جميع الطلبات</button><button class="btn" id="basketClear">فضّيها</button></div>
       <div class="category-card-orders bask-list">${items.map(it => renderBasketCard(it)).join('')}</div>
     </div></div>`;
   }
@@ -4646,14 +4693,16 @@
     const grouped = {}; for (const c of cats) grouped[c.id] = [];
     for (const o of pendList) { if (!grouped[o.categoryId]) grouped[o.categoryId] = []; grouped[o.categoryId].push(o); }
     for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => (((b.priority === 'high' || b.urgent) ? 1 : 0) - ((a.priority === 'high' || a.urgent) ? 1 : 0)));
-    return [...cats, ...Object.keys(grouped).filter(id => grouped[id].length && !cats.some(c => c.id === id)).map(id => ({ id }))].map(cat => {
+    const totalPend = (pendList || []).length;
+    const allBtn = `<div class="category-group"><div class="wa-row"><button class="btn btn-primary" data-sendwaorders style="margin:0;" title="ابعت كل الطلبات المعلقة واتساب للطرف الآخر">💬 ابعت الطلبات واهرب 🏃😂 (${totalPend})</button><button class="btn btn-success" data-catconfirm="all" style="margin:0;" title="تأكيد كل الطلبات المعلقة">✓ تأكيد</button><button class="btn btn-success" data-senddelivery style="margin:0;" title="ابعت الطلبات واتساب للدليفري">🛵 دليفري</button></div></div>`;
+    return allBtn + [...cats, ...Object.keys(grouped).filter(id => grouped[id].length && !cats.some(c => c.id === id)).map(id => ({ id }))].map(cat => {
       const arr = grouped[cat.id] || []; if (!arr.length) return '';
       const cc = catColor(cat.id);
       return `<div class="category-group"><div class="category-card">
-        <div class="category-card-header" style="background:${cc}12;">
-          <div class="category-card-icon" style="background:${cc}20;color:${cc};">${svgIcon(getCategoryIcon(cat.id), 20)}</div>
+        <div class="category-card-header" style="background:linear-gradient(135deg,${cc}16,#fff 75%);">
+          <div class="category-card-icon" style="background:${cc}20;color:${cc};box-shadow:inset 0 0 0 1.5px ${cc}66, 0 4px 10px rgba(0,0,0,.08);">${svgIcon(getCategoryIcon(cat.id), 22)}</div>
           <div class="category-card-info"><div class="category-card-name">${getCategoryName(cat.id)}</div><div class="category-card-count" style="color:${cc};">${arr.length} طلب${arr.length > 1 ? 'ات' : ''}</div></div>
-          <div class="category-card-badge" style="background:${cc}20;color:${cc};border-color:${cc};">${arr.length} مطلوب</div>
+          <span class="cat-cnt" style="background:${cc}1c;color:${cc};box-shadow:inset 0 0 0 1.5px ${cc}66;">${arr.length}</span>
         </div>
         <div class="category-card-orders">${arr.map(o => renderOrderCard(o)).join('')}</div>
       </div></div>`;
@@ -4918,8 +4967,7 @@
           <button class="btn btn-primary btn-sm" id="newHomeBtn" style="min-height:48px;" ${state.home?.code ? 'disabled' : ''}>🏠 بيت جديد</button>
           <button class="btn btn-secondary btn-sm" id="joinHomeBtn" style="min-height:48px;">🔗 بيت موجود</button>
         </div>
-        <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🚴</div><div class="si-body"><div class="si-label">${escapeHTML(state.deliveryName || state.home?.deliveryName || 'ديليفري')}</div><div class="si-value">بيانات الدليفري بتاعك</div></div><button class="si-action" id="editDeliveryBtn">تعديل</button></div>
-        <div style="padding:0 16px 14px;"><button class="btn btn-success" id="sendDeliveryBtn">💬 ابعت الطلبات واتساب للديليفري</button></div>
+        <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🚴</div><div class="si-body"><div class="si-label">${escapeHTML(state.deliveryName || state.home?.deliveryName || 'ديليفري')}</div><div class="si-value">بيانات الدليفري بتاعك</div></div><button class="si-wa" id="sendDeliveryBtn" title="ابعت الطلبات واتساب للدليفري">💬</button><button class="si-action" id="editDeliveryBtn">تعديل</button></div>
         <div class="online-pill" id="onlinePill" style="display:none;margin:0 16px 14px;"><span class="online-dot"></span><span class="online-num" id="onlineCount">1</span><span class="online-tx">مستخدم نشط الآن<small>بيستخدموا التطبيق دلوقتي</small></span><span class="live-tag"><i></i> مباشر</span></div>
         </div>
       </div>
@@ -5142,7 +5190,13 @@
   function bindMain() {
     try { syncUserToAdminDir(); } catch {}
 
-    const bc = document.getElementById('basketConfirm'); if (bc) bc.onclick = () => { const r = confirmBasket(); render(); if (r.added.length) { try { const snd = new Audio(encodeURI('audio/np money.mp3')); snd.play().catch(() => {}); } catch (e) { console.warn(e); } toast(`🧺 اتأكدت السلة: ${r.added.length} طلب ✓` + (r.skipped ? ` (عدّينا ${r.skipped} متكرر)` : ''), 'success'); try { sendPartnerWa(r.added); } catch (e) { console.warn(e); } } else toast('السلة فاضية أو كلها موجودة قبل كده', 'warning'); };
+    const bc = document.getElementById('basketConfirm'); if (bc) bc.onclick = handleConfirmBasket;
+    document.querySelectorAll('[data-sendwaorders]').forEach(b => b.onclick = () => {
+      const pend = (state.orders || []).filter(o => o && o.status === 'pending');
+      if (!pend.length) { toast('مفيش طلبات معلقة للواتساب ✓', 'info'); return; }
+      try { const snd = new Audio(encodeURI('audio/np money.mp3')); snd.play().catch(() => {}); } catch (e) { console.warn(e); }
+      try { sendPartnerWa(pend); } catch (e) { console.warn(e); }
+    });
     const bcl = document.getElementById('basketClear'); if (bcl) bcl.onclick = () => { confirmDialog({ title: 'نفضّي السلة؟', message: 'كل الأصناف المتجهزة هتتمسح من السلة.', confirmText: 'فضّيها', cancelText: 'لأ' }).then(ok => { if (ok) { clearBasket(); render(); toast('السلة اتفضّت ✓', 'success'); } }); };
     document.querySelectorAll('[data-bexp]').forEach(el => el.onclick = (e) => { if (e.target.closest('button, input, select, textarea, a')) return; toggleBasketExpand(el.dataset.bexp); });
     document.querySelectorAll('[data-bqtype]').forEach(b => b.onclick = () => {
@@ -5406,6 +5460,8 @@
     document.querySelectorAll('[data-bzoomphoto]').forEach(im => im.onclick = (e) => { e.stopPropagation(); openPhotoViewer(im.dataset.bzoomphoto); });
     document.querySelectorAll('[data-expsave]').forEach(b => b.onclick = () => saveExpandedOrder(b.dataset.expsave));
     document.querySelectorAll('[data-expbuy]').forEach(b => b.onclick = () => { const id = b.dataset.expbuy; if (saveExpandedOrder(id, true)) openPurchaseModal(id); });
+    document.querySelectorAll('[data-catconfirm]').forEach(b => b.onclick = (e) => { if (e) e.stopPropagation(); openBulkPurchaseModal(b.dataset.catconfirm); });
+    document.querySelectorAll('[data-senddelivery]').forEach(b => b.onclick = (e) => { if (e) e.stopPropagation(); try { sendDeliveryWa(); } catch (err) { console.warn(err); } });
     bindSettings();
   }
 
@@ -5424,7 +5480,6 @@
     let items = '';
     if (!purchased) items += `<button class="context-menu-item buy" data-ctx-buy="${orderId}"><span class="ctx-icon" style="color:var(--success);">${svgIcon('check', 18)}</span><span>جبتها يا بطل</span></button>`;
     if (!purchased) items += `<button class="context-menu-item urg ${isUrg ? 'is-on' : ''}" data-ctx-urg="${orderId}"><span class="ctx-icon">🔥</span><span>${isUrg ? 'ألغي الضروري' : 'خليها ضروري'}</span></button>`;
-    items += `<button class="context-menu-item edit" data-ctx-edit="${orderId}"><span class="ctx-icon" style="color:var(--primary);">${svgIcon('pencil', 18)}</span><span>تعديل</span></button>`;
     items += `<div class="context-menu-sep"></div><button class="context-menu-item delete" data-ctx-del="${orderId}"><span class="ctx-icon">${svgIcon('trash', 18)}</span><span>خلاص بلاش دي</span></button>`;
     menu.innerHTML = items;
     document.body.appendChild(back);
@@ -5448,8 +5503,6 @@
     };
     menu.querySelector('[data-ctx-urg]')?.addEventListener('click', act(urgFn));
     menu.querySelector('[data-ctx-urg]')?.addEventListener('touchend', act(urgFn));
-    menu.querySelector('[data-ctx-edit]')?.addEventListener('click', act(() => openEditOrderModal(orderId)));
-    menu.querySelector('[data-ctx-edit]')?.addEventListener('touchend', act(() => openEditOrderModal(orderId)));
     menu.querySelector('[data-ctx-del]')?.addEventListener('click', act(() => handleDeleteOrder(orderId)));
     menu.querySelector('[data-ctx-del]')?.addEventListener('touchend', act(() => handleDeleteOrder(orderId)));
   }
@@ -6355,19 +6408,11 @@
       toast('🧺 اتضاف "' + nm + '" للسلة ✓', 'success');
     };
   }
-  function openAddOrderModal() { openOrderModal({ mode: 'add' }); }
-  function openEditOrderModal(id) { const o = state.orders.find(x => x.id === id); if (o) openOrderModal({ mode: 'edit', order: o }); }
-  function openOrderModal({ mode, order }) {
-    const editing = mode === 'edit';
+  function openAddOrderModal() { openOrderModal(); }
+  function openOrderModal() {
     const html = `<div class="modal-handle"></div>
-      <div class="m-hero" style="${editing ? '' : 'background:linear-gradient(135deg,#FFB020 0%,#FF9600 55%,#E07E00 100%);box-shadow:0 14px 30px rgba(255,150,0,.35);border-radius:18px;padding:13px 14px;'}"><span class="m-hero-ico" style="${editing ? '' : 'width:46px;height:46px;border-radius:14px;font-size:24px;'}">${editing ? svgIcon('pencil', 26) : '🧺'}</span><div class="m-hero-txt"><h2>${editing ? 'تعديل الطلب' : 'زوّد طلب 🧺'}</h2><p>${editing ? 'عدّل اسم الطلب وبياناته' : 'اختار صنفك من البحث وضيفه للسلة'}</p></div></div>
-      ${editing ? `<div class="field"><label>اسم الطلب *</label>
-        <div class="voice-bar"><button type="button" class="voice-btn" id="voiceOrderBtn"><span class="mic">🎙️</span><span id="voiceBtnTxt">اكتب بالصوت 🎤</span></button></div>
-        <div class="voice-status hidden" id="voiceStatus"></div>
-        <div class="ord-box"><textarea id="ordName" rows="2" maxlength="200" autocomplete="off">${escapeHTML(order.name)}</textarea>
-        <div class="suggest-drop hidden" id="ordSuggest"></div></div>
-        <div class="help-text">🎙️ الصوت بيكتب بس الأصناف الموجودة في التطبيق — لو صنف جديد هيظهرلك زرار تضيفه يدوي ويتحفظ.</div>
-      </div>` : `<div class="field pick-field"><label>🧺 اختار الصنف *</label>
+      <div class="m-hero" style="background:linear-gradient(135deg,#FFB020 0%,#FF9600 55%,#E07E00 100%);box-shadow:0 14px 30px rgba(255,150,0,.35);border-radius:18px;padding:13px 14px;"><span class="m-hero-ico" style="width:46px;height:46px;border-radius:14px;font-size:24px;">🧺</span><div class="m-hero-txt"><h2>زوّد طلب 🧺</h2><p>اختار صنفك من البحث وضيفه للسلة</p></div></div>
+      <div class="field pick-field"><label>🧺 اختار الصنف *</label>
         <div class="voice-bar"><button type="button" class="voice-btn" id="voiceOrderBtn"><span class="mic">🎙️</span><span id="voiceBtnTxt">اكتب طلبك بالصوت 🎤</span></button></div>
         <div class="voice-status hidden" id="voiceStatus"></div>
         <div id="pickBox"></div>
@@ -6377,22 +6422,9 @@
           <div id="pickList" class="pick-list-card"></div>
         </div>
       </div>
-      <textarea id="ordName" class="hidden" maxlength="200" autocomplete="off"></textarea>`}
-      ${editing ? `<div id="qtyBox" class="hidden">
-        <div class="field" style="margin-bottom:8px;"><label>الكمية (اختياري) — <span id="qtyForName"></span></label>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
-            <button class="filter-chip" data-qtype="none">من غير تحديد</button>
-            <button class="filter-chip" data-qtype="count">عدد</button>
-            <button class="filter-chip" data-qtype="weight">وزن</button>
-          </div>
-          <div id="qtyControls"></div>
-        </div>
-      </div>` : ''}
-      ${editing ? `<div class="field"><label>ملحوظة (اختياري)</label><textarea id="ordNotes" rows="2">${escapeHTML(order.notes || '')}</textarea></div>` : ''}
-      ${editing
-        ? `<div class="field"><label>هيتضاف لقايمة</label><select id="ordListSel" class="rv-select">${orderLists().map(l => `<option value="${l.id}" ${l.id === activeListId() ? 'selected' : ''}>${escapeHTML(l.name)}</option>`).join('')}</select></div>` : ''}
+      <textarea id="ordName" class="hidden" maxlength="200" autocomplete="off"></textarea>
       <div id="pharmacyNote" class="pharm-note hidden">⚠️ ده قسم صيدلية بس. التطبيق لا بيشخّص ولا بينصح بأي حاجة طبية.</div>
-      <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="submitOrderBtn">${editing ? 'احفظ التعديل' : 'ضيفه للسلة 🧺'}</button></div>`;
+      <div class="btn-group" style="margin-top:8px;"><button class="btn btn-primary" id="submitOrderBtn">ضيفه للسلة 🧺</button></div>`;
     const m = openModal(html);
     const nameInput = m.querySelector('#ordName');
     const pharmNote = m.querySelector('#pharmacyNote'); const submitBtn = m.querySelector('#submitOrderBtn');
@@ -6400,7 +6432,7 @@
     let pqMenuOpen = false;
     function fmtVal(v) { const r = Math.round(Number(v) * 100) / 100; return Number.isInteger(r) ? String(r) : String(r); }
     function pqStep() { if (qtyType !== 'weight') return 1; return (qtyUnit === 'جرام' || qtyUnit === 'مل') ? 50 : 0.5; }
-    let newPrio = (editing && order && (order.priority === 'high' || order.urgent)) ? 'high' : 'medium';
+    let newPrio = 'medium';
     function paintUrg() { const t = m.querySelector('#urgToggle'); if (t) t.classList.toggle('on', newPrio === 'high'); }
     function renderQty() {
       const box = m.querySelector('#qtyBox'); if (!box) return;
@@ -6444,8 +6476,7 @@
     }
     function evalCategoryFromName() {
       let cid = null;
-      if (editing && order) cid = (nameInput.value.trim() ? classifyOrder(nameInput.value.trim()).categoryId : order.categoryId);
-      else if (pickedName) cid = classifyOrder(pickedName).categoryId;
+      if (pickedName) cid = classifyOrder(pickedName).categoryId;
       if (pharmNote) pharmNote.classList.toggle('hidden', cid !== 'pharmacy');
     }
     const suggestBox = m.querySelector('#ordSuggest');
@@ -6488,8 +6519,7 @@
       suggestBox.querySelectorAll('[data-sug]').forEach(ch => ch.onclick = (e) => { e.preventDefault(); applySuggest(ch.dataset.sug); });
     }
     function applySuggest(word) {
-      if (editing) { nameInput.value = word; }
-      else {
+      {
         const v = nameInput.value;
         const idx = Math.max(v.lastIndexOf('\n'), v.lastIndexOf('،'), v.lastIndexOf(','));
         let head = idx >= 0 ? v.slice(0, idx + 1) : '';
@@ -6696,7 +6726,7 @@
       const paf = list.querySelector('#pickAddFirst');
       if (paf) paf.onclick = () => { const si2 = m.querySelector('#pickSearch'); if (si2) si2.focus(); toast('اكتب اسم الصنف (حرفين على الأقل) وبعدين اختار تصنيفه وضيفه', 'info'); };
     }
-    if (!editing) {
+    {
       renderPick(); renderPickDepts(); renderPickList(); refreshPickAddBtn();
       const _si = m.querySelector('#pickSearch');
       if (_si) _si.oninput = renderPickList;
@@ -6816,20 +6846,7 @@
         if (!matched.length && !unknown.length && parts.length) unknown = parts.map(p => cleanChunk(p) || p.trim()).filter(Boolean).slice(0, 8);
         if (!matched.length && !unknown.length) { paintStatus('😕 مسمعتش حاجة واضحة — جرّب تتكلم تاني بوضوح', false); return; }
         let added = 0, skipped = 0;
-        if (editing) {
-          if (matched.length) {
-            nameInput.value = matched[0];
-            try { nameInput.dispatchEvent(new Event('input')); } catch {}
-            showQtyFor(matched[0]);
-            updateSuggest(); evalCategoryFromName();
-            added = 1;
-            for (let i = 1; i < matched.length; i++) {
-              const nm = matched[i];
-              if (!pendingOrderExists(nm, activeListId()) && !basketExists(nm)) { addToBasket({ name: nm, notes: '', urgent: false, priority: 'medium', qty: null, categoryId: null }); added++; }
-              else skipped++;
-            }
-          }
-        } else {
+        {
           const lid = activeListId();
           matched.forEach(nm => {
             const k = normalizeTerm(nm);
@@ -6871,7 +6888,7 @@
       function stopRec() {
         listening = false;
         vBtn.classList.remove('listening');
-        if (vTxt) vTxt.textContent = editing ? 'اكتب بالصوت 🎤' : 'اكتب طلبك بالصوت 🎤';
+        if (vTxt) vTxt.textContent = 'اكتب طلبك بالصوت 🎤';
         try { if (rec) rec.stop(); } catch {}
       }
       vBtn.onclick = () => {
@@ -6904,7 +6921,7 @@
             const t = finalTxt.trim();
             listening = false;
             vBtn.classList.remove('listening');
-            if (vTxt) vTxt.textContent = editing ? 'اكتب بالصوت 🎤' : 'اكتب طلبك بالصوت 🎤';
+            if (vTxt) vTxt.textContent = 'اكتب طلبك بالصوت 🎤';
             if (t) handleTranscript(t);
             else if (vBox.classList.contains('listening')) paintStatus('😕 مسمعتش حاجة — دوس 🎙️ وجرب تاني', false);
           };
@@ -6914,16 +6931,14 @@
       };
     })();
     setTimeout(evalCategoryFromName, 50);
-    if (editing && order.qty) { qtyFor = order.name; qtyType = order.qty.t === 'w' ? 'weight' : 'count'; qtyVal = order.qty.v || 1; qtyUnit = order.qty.u || 'قطعة'; renderQty(); }
     const urgBtn = m.querySelector('#urgToggle'); if (urgBtn) urgBtn.onclick = () => { newPrio = (newPrio === 'high') ? 'medium' : 'high'; paintUrg(); };
     const cancelBtn = m.querySelector('#cancelOrderBtn'); if (cancelBtn) cancelBtn.onclick = () => closeModal(m);
 
 
     m.querySelector('#submitOrderBtn').onclick = () => {
-      const notes = (m.querySelector('#ordNotes') || {}).value || '';
-      const selList = m.querySelector('#ordListSel');
-      const lid2 = (selList && selList.value) || activeListId();
-      if (!editing) {
+      const notes = '';
+      const lid2 = activeListId();
+      {
         let items = pickedList.length ? [...pickedList] : parseItems();
         if (!items.length) {
           const psv = ((m.querySelector('#pickSearch') || {}).value || '').trim();
@@ -6946,14 +6961,7 @@
         if (!added.length) { toast(skipped ? 'الصنف ده موجود قبل كده في القايمة دي أو في السلة' : 'اكتب اسم صنف مظبوط', 'warning'); return; }
         toast((added.length === 1 ? '🧺 اتضاف الصنف للسلة ✓' : `🧺 اتضاف ${added.length} أصناف للسلة ✓`) + (skipped ? ` (تجاهلت ${skipped} مكرر)` : ''), 'success');
         closeModal(m); render();
-        confirmDialog({ title: 'اتضاف ✓', message: 'تضيف صنف تاني في نفس القايمة؟', confirmText: 'أيوه ضيف', cancelText: 'خلاص' }).then(ok => { if (ok) { state._activeList = lid2; persist(); openOrderModal({ mode: 'add' }); } });
-      } else {
-        const raw = nameInput.value.trim();
-        if (!raw) { nameInput.classList.add('error'); nameInput.focus(); return; }
-        nameInput.classList.remove('error');
-        updateOrder(order.id, { name: raw, notes, qty: (qtyFor && normalizeTerm(raw) === normalizeTerm(qtyFor)) ? readQtyValue() : null, listId: lid2, priority: newPrio });
-        toast('اتعدل ✓', 'success');
-        closeModal(m); render();
+        confirmDialog({ title: 'اتضاف ✓', message: 'تضيف صنف تاني في نفس القايمة؟', confirmText: 'أيوه ضيف', cancelText: 'خلاص' }).then(ok => { if (ok) { state._activeList = lid2; persist(); openOrderModal(); } });
       }
     };
   }
@@ -7008,6 +7016,79 @@
     m.querySelector('#confirmBuy').onclick = doConfirm;
     fin.onkeydown = (ev) => { if (ev.key === 'Enter') doConfirm(); };
     fin.oninput = () => fin.classList.remove('error');
+  }
+
+  /* تأكيد كل طلبات قسم واحد مرة واحدة — نفس فكرة زر «أكّد الكل» بتاع السلة */
+  function openBulkPurchaseModal(catId) {
+    const pend = (state.orders || []).filter(o => o && o.status !== 'purchased');
+    if (!pend.length) { toast('مفيش طلبات معلقة ✓', 'info'); return; }
+    const catOrder = {}; try { allCats().forEach((c, i) => { catOrder[c.id] = i; }); } catch {}
+    pend.sort((a, b) => ((catOrder[a.categoryId] ?? 999) - (catOrder[b.categoryId] ?? 999)));
+    const counts = {}; pend.forEach(o => { counts[o.categoryId] = (counts[o.categoryId] || 0) + 1; });
+    let lastCat = null;
+    const rows = pend.map((o) => {
+      const qtyTxt = fmtQty(o.qty);
+      const oc = catColor(o.categoryId);
+      const head = (o.categoryId !== lastCat) ? `<div class="task-div">🗂️ ${escapeHTML(getCategoryName(o.categoryId))} (${counts[o.categoryId]})</div>` : '';
+      lastCat = o.categoryId;
+      return head + `<div class="task-row bulk-trow" style="--tc:${oc};--tcbg:${oc}20;">
+        <span class="task-check"></span>
+        <span class="task-ico">${o.photo ? `<img src="${o.photo}" />` : productIcon(o.name, o.categoryId)}</span>
+        <span class="task-tt"><span class="task-title">${escapeHTML(o.name)}</span><span class="task-sub">📍 ${escapeHTML(o.purchaseLocation || catLocation(o.categoryId))}${qtyTxt ? ` • ${escapeHTML(qtyTxt)}` : ''}</span></span>
+        <div class="bulk-price-inline"><input type="number" data-bulkprice="${o.id}" min="0" step="0.01" inputmode="decimal" placeholder="السعر" /><span class="bulk-cur">ج.م</span></div>
+      </div>`;
+    }).join('');
+    const html = `<div class="modal-handle"></div>
+      <div class="task-head"><span class="task-head-ico">🧺</span><span class="task-head-tx"><b>تأكيد ${pend.length} ${pend.length === 1 ? 'طلب' : 'طلبات'} — كل الأقسام</b></span><span class="task-count">${pend.length} أصناف</span></div>
+      <div class="task-listbox">${rows}</div>
+      <div class="bulk-foot">
+        <div class="bulk-sum"><span class="t">💰 المجموع الكلي<small id="bulkCnt">0 من ${pend.length} مسعّر</small></span><b><span id="bulkTotal">0</span> <small>ج.م</small></b></div>
+        <div class="btn-group"><button class="btn btn-primary bulk-go" id="bulkConfirmBuy">✓ أكّد الكل (${pend.length})</button><button class="btn" id="bulkCancelBuy">رجوع</button></div>
+      </div>`;
+    const m = openModal(html);
+    const totalEl = m.querySelector('#bulkTotal');
+    const cntEl = m.querySelector('#bulkCnt');
+    const goBtn = m.querySelector('#bulkConfirmBuy');
+    const baseGoTx = `✓ أكّد الكل (${pend.length})`;
+    const refreshBulk = () => {
+      let t = 0, c = 0;
+      pend.forEach(o => {
+        const inp = m.querySelector(`[data-bulkprice="${o.id}"]`);
+        const v = inp ? Number(inp.value) : 0;
+        const ok = v > 0;
+        if (ok) { t += v; c++; }
+        const row = inp ? inp.closest('.task-row') : null;
+        if (row) row.classList.toggle('done', ok);
+      });
+      const tR = Math.round(t * 100) / 100;
+      if (totalEl) totalEl.textContent = String(tR);
+      if (cntEl) cntEl.textContent = `${c} من ${pend.length} مسعّر`;
+      if (goBtn) goBtn.textContent = tR > 0 ? `✓ أكّد الكل • ${tR} ج.م` : baseGoTx;
+    };
+    m.querySelectorAll('[data-bulkprice]').forEach(inp => { inp.oninput = () => { inp.classList.remove('error'); refreshBulk(); }; });
+    m.querySelector('#bulkCancelBuy').onclick = () => closeModal(m);
+    m.querySelector('#bulkConfirmBuy').onclick = () => {
+      const items = [];
+      for (const o of pend) {
+        const inp = m.querySelector(`[data-bulkprice="${o.id}"]`);
+        const v = inp ? Number(inp.value) : 0;
+        if (!(v > 0)) { if (inp) { inp.classList.add('error'); inp.focus(); } toast('اكتب سعر كل الأصناف يا حبيبي', 'warning'); return; }
+        items.push({ o, v });
+      }
+      items.forEach(({ o, v }) => markPurchased(o.id, { originalPrice: v, finalPrice: v }));
+      closeModal(m); render();
+      try { const snd = new Audio(encodeURI('audio/np money.mp3')); snd.play().catch(() => {}); } catch (e) { console.warn(e); }
+      const left = (state.orders || []).filter(x => x && x.status !== 'purchased').length;
+      if (!left) {
+        const mm = openModal(`
+          <div class="party-hero"><span class="big">🏆🎉</span><h2>خلصنا التسوق يا أبطال!</h2><p style="margin-top:4px;">كل الطلبات اتشترت وكله تمام... البيت مبسوط ❤️</p></div>
+          <div class="confetti-row"><span>🎉</span><span>🏆</span><span>🛒</span><span>😂</span><span>❤️</span></div>
+          <div class="btn-group"><button class="btn btn-success" id="partyOk">أحلى عيلة 🎉❤️</button></div>`);
+        mm.querySelector('#partyOk').onclick = () => closeModal(mm);
+      } else {
+        toast(`✅ اتأكدت ${items.length} ${items.length === 1 ? 'طلب' : 'طلبات'} من «كل الأقسام» ✓`, 'success');
+      }
+    };
   }
 
   function openAddExpenseModal() {
@@ -7578,6 +7659,7 @@
     state._expandedOrder = null; state._expDraft = null;
     state._expandedBasket = null; state._basketDraft = null;
     render();
+    setTimeout(() => { try { document.getElementById('preloader').classList.add('hide'); } catch {} }, 900);
     try { if (typeof _ensureExitGuard === 'function') _ensureExitGuard(); } catch {}
     initSupabaseSync();
     try { initPresence(); } catch {}
@@ -7618,6 +7700,7 @@
     } catch {}
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  setTimeout(() => { try { document.getElementById('preloader').classList.add('hide'); } catch {} }, 5000);
 })();
 </script>
 <script>
