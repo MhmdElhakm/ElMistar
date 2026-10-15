@@ -1555,6 +1555,8 @@
   .bulk-sum .t small { display: block; font-size: 11px; color: var(--text-muted); font-weight: 700; margin-top: 1px; }
   .bulk-sum b { font-size: 20px; font-weight: 900; color: var(--success); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .bulk-sum b small { font-size: 11px; font-weight: 700; }
+  .bulk-watoggle { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 800; color: var(--text-sec); background: #fff; border: 1.5px solid var(--border); border-radius: 12px; padding: 9px 12px; margin-bottom: 10px; cursor: pointer; }
+  .bulk-watoggle input { width: 18px; height: 18px; accent-color: var(--success); flex-shrink: 0; }
   .bulk-go { position: relative; overflow: hidden; }
   .bulk-go::after { content: ''; position: absolute; top: 0; bottom: 0; width: 60px; background: linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent); animation: apptShine 2.8s ease-in-out infinite; pointer-events: none; }
   .bulk-foot .btn-group { flex-direction: row; gap: 8px; }
@@ -1563,9 +1565,8 @@
   #bulkCancelBuy { flex: 1; }
   .wa-row { display: flex; gap: 8px; }
   .wa-row .btn { width: auto; min-height: 44px; font-size: 12.5px; padding: 10px 6px; margin: 0; }
-  .wa-row [data-sendwaorders] { flex: 1.3; }
+  .wa-row [data-sendwaorders] { flex: 2; }
   .wa-row [data-catconfirm] { flex: 1; }
-  .wa-row [data-senddelivery] { flex: 1; }
   .category-card-orders { padding: 8px 12px 12px !important; display: flex; flex-direction: column; gap: 8px; }
   .order-card { background: #fff !important; border: 1.5px solid var(--border) !important; border-radius: 16px !important; padding: 13px 14px !important; margin: 0 !important; box-shadow: 0 3px 10px rgba(30,27,46,.06) !important; }
   .order-card .category-card-icon { width: 44px !important; height: 44px !important; }
@@ -1945,9 +1946,6 @@
       img.src = rd.result;
     };
     rd.readAsDataURL(file);
-  }
-  function emptySVG() {
-    return '<svg viewBox="0 0 120 96" width="120" height="96"><ellipse cx="60" cy="88" rx="30" ry="5" fill="#E1F3FD"/><rect x="28" y="28" width="64" height="50" rx="16" fill="#fff" stroke="#E1F3FD" stroke-width="3"/><path d="M44 52h32M44 61h20" stroke="#DDD6FE" stroke-width="5" stroke-linecap="round"/><circle cx="86" cy="30" r="14" fill="#1CB0F6"/><path d="M80 30l4 4 7-8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="22" r="5" fill="#FFEED3"/><circle cx="98" cy="60" r="6" fill="#E0F2FE"/></svg>';
   }
   function calcStreak() {
     try {
@@ -4388,7 +4386,6 @@
 
   function renderEmptyOrders() {
     return `<div class="empty">
-      <div class="empty-icon">${emptySVG()}</div>
 <div class="empty-title">القايمة فاضية والتلاجة بتعيط 😂</div>
         <div class="empty-desc">دوس + وانقذ الموقف قبل ما حد يجوع 😂</div>
         <button class="btn btn-primary" id="emptyAddOrder">ضيف طلب</button>
@@ -4694,7 +4691,7 @@
     for (const o of pendList) { if (!grouped[o.categoryId]) grouped[o.categoryId] = []; grouped[o.categoryId].push(o); }
     for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => (((b.priority === 'high' || b.urgent) ? 1 : 0) - ((a.priority === 'high' || a.urgent) ? 1 : 0)));
     const totalPend = (pendList || []).length;
-    const allBtn = `<div class="category-group"><div class="wa-row"><button class="btn btn-primary" data-sendwaorders style="margin:0;" title="ابعت كل الطلبات المعلقة واتساب للطرف الآخر">💬 ابعت الطلبات واهرب 🏃😂 (${totalPend})</button><button class="btn btn-success" data-catconfirm="all" style="margin:0;" title="تأكيد كل الطلبات المعلقة">✓ تأكيد</button><button class="btn btn-success" data-senddelivery style="margin:0;" title="ابعت الطلبات واتساب للدليفري">🛵 دليفري</button></div></div>`;
+    const allBtn = `<div class="category-group"><div class="wa-row"><button class="btn btn-primary" data-sendwaorders style="margin:0;" title="ابعت كل الطلبات المعلقة واتساب للطرف الآخر">💬 ارسال الطلبات الى الطرف الاخر</button><button class="btn btn-success" data-catconfirm="all" style="margin:0;" title="تأكيد شراء كل الطلبات المعلقة">✓ تأكيد الشراء</button></div></div>`;
     return allBtn + [...cats, ...Object.keys(grouped).filter(id => grouped[id].length && !cats.some(c => c.id === id)).map(id => ({ id }))].map(cat => {
       const arr = grouped[cat.id] || []; if (!arr.length) return '';
       const cc = catColor(cat.id);
@@ -4841,8 +4838,8 @@
         </div></div>` : ''}
       </div></div>
 
-      ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش حركات لسه</div><div class="empty-desc">لما تشتري أو تسجّل حركة هنسجلها هنا</div><button class="btn btn-primary" id="emptyAddExpense">سجّل حركة</button></div>` :
-        shown.length === 0 ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش حركات هنا</div><div class="empty-desc">جرّب شهر أو فلتر تاني أو سجّل حركة جديدة</div></div>` :
+      ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-title">مفيش حركات لسه</div><div class="empty-desc">لما تشتري أو تسجّل حركة هنسجلها هنا</div><button class="btn btn-primary" id="emptyAddExpense">سجّل حركة</button></div>` :
+        shown.length === 0 ? `<div class="empty"><div class="empty-title">مفيش حركات هنا</div><div class="empty-desc">جرّب شهر أو فلتر تاني أو سجّل حركة جديدة</div></div>` :
         groups.map(g => {
           const open = openGrp === g.meta.id;
           return `<div class="exp-grp ${open ? 'open' : ''}">
@@ -4880,7 +4877,7 @@
     return `<div class="page">
       <div class="topbar"><div class="greeting">لوحة الإنجازات</div></div>
       <div class="page-title">إحصائيات البيت</div>
-      ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-icon">${emptySVG()}</div><div class="empty-title">مفيش بيانات كفاية</div><div class="empty-desc">اشتري طلبات أو ضيف مصاريف وهتظهرلك الإحصائيات</div></div>` : `
+      ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-title">مفيش بيانات كفاية</div><div class="empty-desc">اشتري طلبات أو ضيف مصاريف وهتظهرلك الإحصائيات</div></div>` : `
       <div class="rep-card"><div class="rep-head"><span class="rep-ico" style="background:#E0F2FE;">📅</span><b>تقرير النهاردة</b><small>${day.count} مشتريات</small></div><div class="rep-grid">
         <div class="rep-tile" style="background:#E1F3FD;"><span class="t-ico">🛒</span><span class="t-tx"><small>عدد المشتريات</small><b>${day.count}</b></span></div>
         <div class="rep-tile" style="background:#DCFCE7;"><span class="t-ico">💸</span><span class="t-tx"><small>إجمالي النهاردة</small><b>${formatCurrency(day.total)}<span> ج.م</span></b></span></div>
@@ -4967,9 +4964,11 @@
           <button class="btn btn-primary btn-sm" id="newHomeBtn" style="min-height:48px;" ${state.home?.code ? 'disabled' : ''}>🏠 بيت جديد</button>
           <button class="btn btn-secondary btn-sm" id="joinHomeBtn" style="min-height:48px;">🔗 بيت موجود</button>
         </div>
-        <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🚴</div><div class="si-body"><div class="si-label">${escapeHTML(state.deliveryName || state.home?.deliveryName || 'ديليفري')}</div><div class="si-value">بيانات الدليفري بتاعك</div></div><button class="si-wa" id="sendDeliveryBtn" title="ابعت الطلبات واتساب للدليفري">💬</button><button class="si-action" id="editDeliveryBtn">تعديل</button></div>
         <div class="online-pill" id="onlinePill" style="display:none;margin:0 16px 14px;"><span class="online-dot"></span><span class="online-num" id="onlineCount">1</span><span class="online-tx">مستخدم نشط الآن<small>بيستخدموا التطبيق دلوقتي</small></span><span class="live-tag"><i></i> مباشر</span></div>
         </div>
+      </div>
+      <div class="settings-card"><div class="settings-title">الدليفري 🛵</div>
+        <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🚴</div><div class="si-body"><div class="si-label">${escapeHTML(state.deliveryName || state.home?.deliveryName || 'ديليفري')}</div><div class="si-value">بيانات الدليفري بتاعك</div></div><button class="si-wa" id="sendDeliveryBtn" title="ابعت الطلبات واتساب للدليفري">💬</button><button class="si-action" id="editDeliveryBtn">تعديل</button></div>
       </div>
       <div class="settings-card"><div class="settings-title">التطبيق</div>
         <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span>ناقصنا إيه</span><button class="btn btn-primary btn-sm" id="installAppBtn" style="width:auto;min-height:30px;padding:5px 12px;font-size:11.5px;border-radius:999px;flex-shrink:0;white-space:nowrap;">📲 ثبّت التطبيق</button></div></div></div>
@@ -5461,7 +5460,6 @@
     document.querySelectorAll('[data-expsave]').forEach(b => b.onclick = () => saveExpandedOrder(b.dataset.expsave));
     document.querySelectorAll('[data-expbuy]').forEach(b => b.onclick = () => { const id = b.dataset.expbuy; if (saveExpandedOrder(id, true)) openPurchaseModal(id); });
     document.querySelectorAll('[data-catconfirm]').forEach(b => b.onclick = (e) => { if (e) e.stopPropagation(); openBulkPurchaseModal(b.dataset.catconfirm); });
-    document.querySelectorAll('[data-senddelivery]').forEach(b => b.onclick = (e) => { if (e) e.stopPropagation(); try { sendDeliveryWa(); } catch (err) { console.warn(err); } });
     bindSettings();
   }
 
@@ -6301,7 +6299,13 @@
     '🤲 قال ﷺ: «خيركم خيركم لأهله» — وتجهيز طلباتهم من الخير ده ❤️',
     '🤲 قال ﷺ: «إنك لن تنفق نفقة تبتغي بها وجه الله إلا أُجرت عليها» 🌙',
     '🤲 النفقة على أهل بيتك صدقة تؤجر عليها… ربنا يتقبل ويبارك 🤍',
-    '🤲 قال تعالى: ﴿لِيُنفِقْ ذُو سَعَةٍ مِّن سَعَتِهِ﴾ — وسّع على أهلك يوسّع الله عليك 🌙'
+    '🤲 قال تعالى: ﴿لِيُنفِقْ ذُو سَعَةٍ مِّن سَعَتِهِ﴾ — وسّع على أهلك يوسّع الله عليك 🌙',
+    '🤲 ربنا يوسّع رزقنا ويبارك في بيتنا',
+    '❤️ يا حبيبتي ادعيلي ربنا يوسّعها علينا.. دعوتك هي البركة كلها 🤲',
+    '🤲 اللهم ارزقنا رزقاً حلالاً طيباً وبارك لنا فيه.. ادعيلي يا وش الخير ❤️',
+    '😂 القايمة دي محتاجة دعوة حلوة منك.. ادعيلي ربنا يفتحها علينا 🤲❤️',
+    '🤲 يا رب وسّع علينا وخلّي بيتنا عمران بالخير.. وانتِ يا حبيبتي متبطليش دعا ليا ❤️',
+    '❤️ كل طلب في القايمة دي وراه دعوة منك.. ربنا يتقبل ويوسّع رزقنا 🤲'
   ];
   function buildPartnerWaMessage(items) {
     const list = (items && items.length ? items : []).slice(0, 40);
@@ -7019,6 +7023,35 @@
   }
 
   /* تأكيد كل طلبات قسم واحد مرة واحدة — نفس فكرة زر «أكّد الكل» بتاع السلة */
+  /* رسالة واتساب للطرف الآخر بما تم شراؤه — محتوى كوميدي رومانسي مختلف كل مرة */
+  const BOUGHT_OPENERS = [
+    'خلّصت الطلبات يا ست الكل 😂❤️ بس بالراحة عليا شوية.. الجيب مش بنك مركزي 🏦😅',
+    'جبت كل حاجة في القايمة يا حبيبتي 🛒❤️ ربنا يوسّع رزقنا ونفضل مغطيين كل احتياجاتكم 🤲',
+    'المهمة تمت بنجاح يا قمر 😎❤️ وكل ده عشان أشوف ضحكتك.. بس القايمة الجاية حنينة شوية والنبي 😂',
+    'رجعت من السوق منتصر 🏆❤️ كل اللي بعمله ده عشان سعادتكم.. ربنا يخليكي ليا وميحرمنيش من طلباتك 😂❤️',
+    'اشتريت كل حاجة يا روحي ❤️ ادعيلي ربنا يوسّعها علينا وأفضل دايماً عند حسن ظنك 🤲❤️',
+    'القايمة خلصت يا ست البيت 👑 حبك هو اللي مخليني ألف السوق كله وأنا مبسوط 😂❤️'
+  ];
+  const BOUGHT_CLOSERS = [
+    'ربنا يخليكي ليا يا أغلى حاجة في حياتي ❤️',
+    'بحبك.. وكل تعب يهون عشانكم 🤍',
+    '🤲 ربنا يوسّع رزقنا ويبارك في بيتنا',
+    'القايمة الجاية بالراحة يا حبيبتي 😂❤️'
+  ];
+  function sendBoughtWa(items, showPrices) {
+    const p = getPartnerInfo();
+    if (!p.phone || !isValidEgyptPhone(p.phone)) { openPartnerModal(); toast('سجّل رقم الطرف الآخر الأول 📱', 'warning'); return false; }
+    if (!items || !items.length) return false;
+    let oi = Math.floor(Math.random() * BOUGHT_OPENERS.length);
+    try { if (oi === Number(state._boughtLast)) oi = (oi + 1) % BOUGHT_OPENERS.length; state._boughtLast = oi; persist(); } catch {}
+    const opener = BOUGHT_OPENERS[oi];
+    const closer = BOUGHT_CLOSERS[Math.floor(Math.random() * BOUGHT_CLOSERS.length)];
+    const lines = items.map((it, i) => `${i + 1}. ${it.o.name}${showPrices ? ` — ${it.v} ج.م` : ''}`);
+    const total = items.reduce((a, it) => a + Number(it.v), 0);
+    const msg = `${opener}\n\n🛒 اللي اتشترى ✅:\n${lines.join('\n')}` + (showPrices ? `\n\n💰 المجموع: ${Math.round(total * 100) / 100} ج.م` : '') + `\n\n${closer}`;
+    try { window.open(`https://wa.me/${toWaIntl(p.phone)}?text=${encodeURIComponent(msg)}`, '_blank'); toast('اتفتح واتساب للطرف الآخر 💬', 'success'); } catch {}
+    return true;
+  }
   function openBulkPurchaseModal(catId) {
     const pend = (state.orders || []).filter(o => o && o.status !== 'purchased');
     if (!pend.length) { toast('مفيش طلبات معلقة ✓', 'info'); return; }
@@ -7043,6 +7076,7 @@
       <div class="task-listbox">${rows}</div>
       <div class="bulk-foot">
         <div class="bulk-sum"><span class="t">💰 المجموع الكلي<small id="bulkCnt">0 من ${pend.length} مسعّر</small></span><b><span id="bulkTotal">0</span> <small>ج.م</small></b></div>
+        <label class="bulk-watoggle"><input type="checkbox" id="bulkShowPrices" checked> 💰 إظهار أسعار المشتريات للطرف الآخر في رسالة الواتساب</label>
         <div class="btn-group"><button class="btn btn-primary bulk-go" id="bulkConfirmBuy">✓ أكّد الكل (${pend.length})</button><button class="btn" id="bulkCancelBuy">رجوع</button></div>
       </div>`;
     const m = openModal(html);
@@ -7072,12 +7106,15 @@
       for (const o of pend) {
         const inp = m.querySelector(`[data-bulkprice="${o.id}"]`);
         const v = inp ? Number(inp.value) : 0;
-        if (!(v > 0)) { if (inp) { inp.classList.add('error'); inp.focus(); } toast('اكتب سعر كل الأصناف يا حبيبي', 'warning'); return; }
-        items.push({ o, v });
+        if (inp) inp.classList.remove('error');
+        if (v > 0) items.push({ o, v });
       }
+      if (!items.length) { toast('اكتب سعر صنف واحد على الأقل ✓', 'warning'); return; }
       items.forEach(({ o, v }) => markPurchased(o.id, { originalPrice: v, finalPrice: v }));
+      const showP = m.querySelector('#bulkShowPrices') ? m.querySelector('#bulkShowPrices').checked : true;
       closeModal(m); render();
       try { const snd = new Audio(encodeURI('audio/np money.mp3')); snd.play().catch(() => {}); } catch (e) { console.warn(e); }
+      try { sendBoughtWa(items, showP); } catch (e) { console.warn(e); }
       const left = (state.orders || []).filter(x => x && x.status !== 'purchased').length;
       if (!left) {
         const mm = openModal(`
