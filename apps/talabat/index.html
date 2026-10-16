@@ -1460,6 +1460,7 @@
   .tsb-mic svg { width: 23px; height: 23px; }
   .tsb-mic:active { transform: scale(.9); }
   .tsb-mic.on { background: linear-gradient(135deg,#FBBF24,#D97706); border-color: #D97706; color: #fff; animation: tsbPulse 1.2s ease-in-out infinite; }
+  .tsb-mic.speaking { background: linear-gradient(135deg,#34D399,#059669); border-color: #059669; color: #fff; transform: scale(1.1); }
   @keyframes tsbPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(217,119,6,.45); } 50% { box-shadow: 0 0 0 8px rgba(217,119,6,0); } }
   .tsb-hint { display: block; font-size: 10.5px; font-weight: 800; color: var(--text-muted); margin-top: 6px; position: relative; z-index: 1; }
   .gate-card.expandable.open { box-shadow: 0 10px 26px rgba(28,176,246,.22); border-color: rgba(28,176,246,.4); }
@@ -3373,34 +3374,17 @@
       { t: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْماً نَافِعاً، وَرِزْقاً طَيِّباً، وَعَمَلاً مُتَقَبَّلاً', c: 1, v: 'خير ما يُسأل' },
       { t: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ', c: 100, v: 'مائة مرة — يغفر الذنوب' },
       { t: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ', c: 10, v: 'من صلى عليّ عشراً أدركته شفاعتي' }
-    ],
-    sleep: [
-      { t: 'يَجْمَعُ كَفَّيْهِ ثُمَّ يَنْفُثُ فِيهِمَا فَيَقْرَأُ: بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ ﴿قُلْ هُوَ اللَّهُ أَحَدٌ * اللَّهُ الصَّمَدُ * لَمْ يَلِدْ وَلَمْ يُولَدْ * وَلَمْ يَكُن لَّهُ كُفُواً أَحَدٌ﴾ وبِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ * مِن شَرِّ مَا خَلَقَ * وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ * وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ * وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ﴾ وبِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ ﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ * مَلِكِ النَّاسِ * إِلَهِ النَّاسِ * مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ * الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ * مِنَ الْجِنَّةِ وَالنَّاسِ﴾ ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ يَبْدَأُ بِهِمَا عَلَى رَأْسِهِ وَوَجْهِهِ وَمَا أَقْبَلَ مِنْ جَسَدِهِ', c: 3, v: 'ثلاث مرات قبل النوم' },
-      { t: 'أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ: اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ، لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ، لَّهُ مَا فِي السَّمَوَاتِ وَمَا فِي الأَرْضِ، مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ، يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ، وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاءَ، وَسِعَ كُرْسِيُّهُ السَّمَوَاتِ وَالأَرْضَ، وَلاَ يَؤُودُهُ حِفْظُهُمَا، وَهُوَ الْعَلِيُّ الْعَظِيمُ (آية الكرسي)', c: 1, v: 'لا يزال عليك من الله حافظ ولا يقربك شيطان حتى تصبح' },
-      { t: 'آمَنَ الرَّسُولُ بِمَا أُنزِلَ إِلَيْهِ مِن رَّبِّهِ وَالْمُؤْمِنُونَ، كُلٌّ آمَنَ بِاللَّهِ وَمَلآئِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ، لاَ نُفَرِّقُ بَيْنَ أَحَدٍ مِّن رُّسُلِهِ، وَقَالُواْ سَمِعْنَا وَأَطَعْنَا، غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ. لاَ يُكَلِّفُ اللَّهُ نَفْساً إِلاَّ وُسْعَهَا، لَهَا مَا كَسَبَتْ وَعَلَيْهَا مَا اكْتَسَبَتْ، رَبَّنَا لاَ تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا، رَبَّنَا وَلاَ تَحْمِلْ عَلَيْنَا إِصْراً كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِن قَبْلِنَا، رَبَّنَا وَلاَ تُحَمِّلْنَا مَا لاَ طَاقَةَ لَنَا بِهِ، وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَآ، أَنتَ مَوْلاَنَا فَانصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ (خواتيم البقرة)', c: 1, v: 'من قرأهما في ليلة كفتاه' },
-      { t: 'بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِن أَمْسَكْتَ نَفْسِي فارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا، بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ', c: 1, v: 'دعاء وضع الجنب' },
-      { t: 'اللَّهُمَّ إِنَّكَ خَلَقْتَ نَفْسِي وَأَنْتَ تَوَفَّاهَا، لَكَ مَمَاتُهَا وَمَحْياهَا، إِنْ أَحْيَيْتَهَا فَاحْفَظْهَا، وَإِنْ أَمَتَّهَا فَاغْفِرْ لَهَا. اللَّهُمَّ إِنِّي أَسْأَلُكَ العَافِيَةَ', c: 1, v: 'سؤال العافية في النوم واليقظة' },
-      { t: 'اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ', c: 3, v: 'ثلاث مرات' },
-      { t: 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا', c: 1, v: 'دعاء النوم المختصر' },
-      { t: 'سُبْحَانَ اللَّهِ (ثلاثاً وثلاثين) وَالْحَمْدُ لِلَّهِ (ثلاثاً وثلاثين) وَاللَّهُ أَكْبَرُ (أربعاً وثلاثين)', c: 1, v: 'تسبيح فاطمة — خير لك من خادم. تسبح 33 وتحمد 33 وتكبر 34' },
-      { t: 'اللَّهُمَّ رَبَّ السَّمَوَاتِ السَّبْعِ وَرَبَّ الأَرْضِ، وَرَبَّ الْعَرْشِ الْعَظِيمِ، رَبَّنَا وَرَبَّ كُلِّ شَيْءٍ، فَالِقَ الْحَبِّ وَالنَّوَى، وَمُنْزِلَ التَّوْرَاةِ وَالْإِنْجِيلِ وَالْفُرْقَانِ، أَعُوذُ بِكَ مِنْ شَرِّ كُلِّ شَيْءٍ أَنْتَ آخِذٌ بِنَاصِيَتِهِ. اللَّهُمَّ أَنْتَ الأَوَّلُ فَلَيْسَ قَبْلَكَ شَيْءٌ، وَأَنْتَ الآخِرُ فَلَيسَ بَعْدَكَ شَيْءٌ، وَأَنْتَ الظَّاهِرُ فَلَيْسَ فَوْقَكَ شَيْءٌ، وَأَنْتَ الْبَاطِنُ فَلَيْسَ دُونَكَ شَيْءٌ، اقْضِ عَنَّا الدَّيْنَ وَأَغْنِنَا مِنَ الْفَقْرِ', c: 1, v: 'قضاء الدين والغنى من الفقر' },
-      { t: 'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا، وَكَفَانَا وَآوَانَا، فَكَمْ مِمَّنْ لاَ كَافِيَ لَهُ وَلاَ مُؤْوِيَ', c: 1, v: 'حمد من آواه الله' },
-      { t: 'اللَّهُمَّ عَالِمَ الغَيْبِ وَالشَّهَادَةِ فَاطِرَ السَّمَوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطانِ وَشَرَكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءاً أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ', c: 1, v: 'حرز من الشيطان وشر النفس' },
-      { t: 'يَقْرَأُ ﴿الم﴾ تَنْزِيلَ السَّجْدَةِ وَتَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ (سورتي السجدة والملك)', c: 1, v: 'كان النبي ﷺ لا ينام حتى يقرأهما' },
-      { t: 'اللَّهُمَّ أَسْلَمْتُ نَفْسِي إِلَيْكَ، وَفَوَّضْتُ أَمْرِي إِلَيْكَ، وَوَجَّهْتُ وَجْهِي إِلَيْكَ، وَأَلْجَأْتُ ظَهْرِي إِلَيْكَ، رَغْبَةً وَرَهْبَةً إِلَيْكَ، لاَ مَلْجَأَ وَلاَ مَنْجَا مِنْكَ إِلاَّ إِلَيْكَ، آمَنْتُ بِكِتَابِكَ الَّذِي أَنْزَلْتَ وَبِنَبِيِّكَ الَّذِي أَرْسَلْتَ', c: 1, v: 'من قالها ثم مات من ليلته مات على الفطرة' }
     ]
   };
-  /* فترات الأذكار: نوم 20-4 | صباح 4-12 | مساء 12-20 */
+  /* فترات الأذكار: صباح 12 منتصف الليل - 12 ظهراً | مساء 12 ظهراً - 12 منتصف الليل */
   function azkarPeriod(now) {
     const h = (now || new Date()).getHours();
-    if (h >= 20 || h < 4) return 'sleep';
-    if (h >= 4 && h < 12) return 'morning';
+    if (h >= 0 && h < 12) return 'morning';
     return 'evening';
   }
   function azkarPeriodMeta(p) {
-    if (p === 'sleep') return { title: 'أذكار النوم 🌙', short: 'أذكار النوم 🌙', sub: 'من 8 مساءً حتى 4 فجراً — نوم هادئ في حفظ الله', ico: '😴', cls: 'evening' };
-    if (p === 'morning') return { title: 'أذكار الصباح ☀️', short: 'أذكار الصباح ☀️', sub: 'من 4 فجراً حتى 12 ظهراً — ابدأ يومك بذكر الله', ico: '🌅', cls: 'morning' };
-    return { title: 'أذكار المساء 🌙', short: 'أذكار المساء 🌙', sub: 'من 12 ظهراً حتى 8 مساءً — اختم يومك بذكر الله', ico: '🌇', cls: 'evening' };
+    if (p === 'morning') return { title: 'أذكار الصباح ☀️', short: 'أذكار الصباح ☀️', sub: 'من 12 منتصف الليل حتى 12 ظهراً — ابدأ يومك بذكر الله', ico: '🌅', cls: 'morning' };
+    return { title: 'أذكار المساء 🌙', short: 'أذكار المساء 🌙', sub: 'من 12 ظهراً حتى 12 منتصف الليل — اختم يومك بذكر الله', ico: '🌇', cls: 'evening' };
   }
   /* فترة اليوم لتلوين الكروت حسب الوقت: صباح / نهار / مساء / ليل */
   function dayPhase(now) {
@@ -3462,7 +3446,7 @@
     ov.className = 'azkar-page ' + meta.cls;
     ov.innerHTML = `<div class="azp-head"><div class="azp-top">
         <span class="azp-ico">${meta.ico}</span>
-        <span class="azp-title"><b>${meta.title}</b><small>${meta.sub} • اضغط على الذكر للتسبيح</small></span>
+        <span class="azp-title"><b>${meta.title}</b></span>
         <button class="azp-close" id="azpClose">✕</button>
       </div>
     </div><div class="azp-body"><div class="azp-list" id="azpList"></div>
@@ -3813,29 +3797,61 @@
     } catch {} return false;
   }
   function tsbBump(n) { try { const s = tsbLoad(); s.c += (n || 1); tsbSave(s); paintTsb(); } catch {} }
-  /* كلمات مميزة لكل ذكر لعدّ التكرارات داخل الجملة الواحدة */
-  const TSB_KEYS = [
-    ['سبحان'],
-    ['الحمد'],
-    ['اكبر'],
-    ['اله'],
-    ['استغفر'],
-    ['محمد', 'النبي', 'صلي', 'صلى']
-  ];
-  function tsbNorm(s) { return String(s || '').replace(/[ً-ٰٟ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه'); }
-  function tsbCountRep(txt, idx) {
-    const t = tsbNorm(txt);
-    const keys = TSB_KEYS[idx] || [];
-    let best = 0;
-    keys.forEach(k => {
-      const kk = tsbNorm(k);
-      let n = 0, p = 0;
-      while ((p = t.indexOf(kk, p)) !== -1) { n++; p += kk.length; }
-      if (n > best) best = n;
-    });
-    return best;
+  /* عدّاد صوتي يعمل بدون إنترنت: رصد طاقة الصوت لحظيًا (VAD محلي بالكامل) */
+  let tsbStream = null, tsbCtx = null, tsbAn = null, tsbTimer = null, tsbWant = false;
+  let tsbFloor = 0.02, tsbCalibrating = false, tsbSpeaking = false, tsbSpeakStart = 0, tsbLastAbove = 0, tsbLastCountAt = 0, tsbCounted = true, tsbCoolUntil = 0;
+  function tsbRms(b) { let s = 0; for (let i = 0; i < b.length; i++) s += b[i] * b[i]; return Math.sqrt(s / b.length); }
+  function tsbVadStop() {
+    try { if (tsbTimer) clearInterval(tsbTimer); } catch {}
+    tsbTimer = null;
+    try { if (tsbStream) tsbStream.getTracks().forEach(t => { try { t.stop(); } catch {} }); } catch {}
+    tsbStream = null;
+    try { if (tsbCtx) tsbCtx.close(); } catch {}
+    tsbCtx = null; tsbAn = null; tsbSpeaking = false; tsbCalibrating = false;
   }
-  let tsbRec = null, tsbWant = false;
+  async function tsbVadStart(mic, hint) {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { tsbWant = false; mic.classList.remove('on'); if (hint) hint.textContent = 'متصفحك لا يدعم الميكروفون — دوس للعد'; return; }
+    try { tsbVadStop(); } catch {}
+    let stream = null;
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { tsbWant = false; mic.classList.remove('on'); if (hint) hint.textContent = 'تعذّر الميكروفون — اسمح بالوصول ثم حاول مجددًا'; return; }
+    if (!tsbWant) { try { stream.getTracks().forEach(t => { try { t.stop(); } catch {} }); } catch {} mic.classList.remove('on'); return; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { tsbWant = false; mic.classList.remove('on'); return; }
+    let ctx = null;
+    try { ctx = new AC(); if (ctx.state === 'suspended') await ctx.resume(); }
+    catch (e) { tsbWant = false; mic.classList.remove('on'); return; }
+    const src = ctx.createMediaStreamSource(stream);
+    const an = ctx.createAnalyser(); an.fftSize = 1024;
+    src.connect(an);
+    tsbStream = stream; tsbCtx = ctx; tsbAn = an;
+    const buf = new Float32Array(an.fftSize);
+    const cal = [];
+    tsbFloor = 0.02; tsbCalibrating = true; tsbSpeaking = false; tsbCounted = true; tsbCoolUntil = 0;
+    setTimeout(() => { tsbCalibrating = false; }, 800);
+    if (hint) hint.textContent = '🎙 يعمل بدون إنترنت — كرر الذكر بوقفات قصيرة';
+    try { if (tsbTimer) clearInterval(tsbTimer); } catch {}
+    tsbTimer = setInterval(() => {
+      if (!tsbWant || !tsbAn) return;
+      tsbAn.getFloatTimeDomainData(buf);
+      const r = tsbRms(buf), now = performance.now();
+      if (tsbCalibrating) { cal.push(r); if (cal.length >= 12) { const s = cal.slice().sort((a, b) => a - b); tsbFloor = Math.max(0.015, s[Math.floor(s.length / 2)] * 1.3); } return; }
+      if (now < tsbCoolUntil) return;
+      const thr = Math.max(tsbFloor * 3, 0.025);
+      if (r > thr) {
+        if (!tsbSpeaking) { tsbSpeaking = true; tsbSpeakStart = now; tsbLastCountAt = now; tsbCounted = false; mic.classList.add('speaking'); }
+        tsbLastAbove = now;
+        if (now - tsbLastCountAt >= 1400) { tsbLastCountAt = now; tsbCounted = true; tsbBump(1); if (hint) hint.textContent = '✅ أحسنت — واصل 🎙'; }
+      } else if (tsbSpeaking) {
+        if (now - tsbSpeakStart >= 220 && now - tsbLastAbove >= 350) {
+          tsbSpeaking = false; mic.classList.remove('speaking');
+          if (!tsbCounted) tsbBump(1);
+          if (hint) hint.textContent = '✅ أحسنت — واصل 🎙';
+          tsbCoolUntil = now + 250;
+        }
+      }
+    }, 50);
+  }
   function tsbWire() {
     try {
       const tap = document.getElementById('tsbTap');
@@ -3846,41 +3862,12 @@
       const hint = document.getElementById('tsbHint');
       if (mic && !mic._wired) {
         mic._wired = true;
-        const startRec = () => {
-          const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-          if (!SR) { if (hint) hint.textContent = 'متصفحك لا يدعم الصوت — دوس للعد'; tsbWant = false; return; }
-          try {
-            tsbRec = new SR(); tsbRec.lang = 'ar-EG'; tsbRec.continuous = true; tsbRec.interimResults = false;
-            tsbRec.onstart = () => { mic.classList.add('on'); if (hint) hint.textContent = '🎙 استمع... كرر الذكر بصوتك دون توقف'; };
-            /* إن فصل المتصفح تلقائيًا نعيد التشغيل طالما المستخدم لم يضغط إيقاف */
-            tsbRec.onend = () => {
-              mic.classList.remove('on');
-              if (tsbWant) { if (hint) hint.textContent = '🎙 استمع... كرر الذكر بصوتك دون توقف'; try { setTimeout(() => { if (tsbWant && tsbRec) { try { tsbRec.start(); } catch {} } }, 250); } catch {} }
-              else if (hint) hint.textContent = 'دوس للعد • أو بالصوت';
-            };
-            tsbRec.onerror = (ev) => {
-              const err = (ev && ev.error) || '';
-              if (err === 'not-allowed' || err === 'audio-capture' || err === 'service-not-allowed') { tsbWant = false; mic.classList.remove('on'); if (hint) hint.textContent = 'تعذّر الميكروفون — اسمح بالوصول ثم حاول مجددًا'; try { tsbRec.stop(); } catch {} }
-            };
-            tsbRec.onresult = (ev) => {
-              let txt = '';
-              for (let i = ev.resultIndex; i < ev.results.length; i++) if (ev.results[i].isFinal) txt += ' ' + ev.results[i][0].transcript;
-              txt = txt.trim();
-              if (!txt) return;
-              const s = tsbLoad();
-              let n = tsbCountRep(txt, s.i);
-              if (n <= 0) n = 1;
-              tsbBump(n);
-              if (hint) hint.textContent = '✅ +' + n + ' — واصل التكرار 🎙';
-            };
-            tsbRec.start();
-          } catch { tsbWant = false; }
-        };
         mic.onclick = (e) => {
           try { e.stopPropagation(); } catch {}
-          if (tsbWant) { tsbWant = false; try { tsbRec.stop(); } catch {} return; }
+          if (tsbWant) { tsbWant = false; tsbVadStop(); mic.classList.remove('on'); mic.classList.remove('speaking'); if (hint) hint.textContent = 'دوس للعد • أو بالصوت'; return; }
           tsbWant = true;
-          startRec();
+          mic.classList.add('on');
+          tsbVadStart(mic, hint);
         };
       }
       paintTsb();
