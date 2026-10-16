@@ -1444,6 +1444,24 @@
   .gate-card.gate-prayer .gc-sub { color: rgba(255,255,255,.55); }
   .gate-card.gate-prayer .gc-ico { background: rgba(255,255,255,.12); color: #FDE68A; }
   .gate-card.gate-prayer .gc-bar { background: rgba(255,255,255,.14); }
+  /* ===== كارت السبحة الإلكترونية (مكان جرعة شفاء) ===== */
+  .gate-card.gate-tasbih { cursor: default; }
+  .gate-card.gate-tasbih:active { transform: none; }
+  .tsb-dhikr { display: block; font-size: 15px; font-weight: 900; margin-top: 4px; color: var(--gc, var(--primary-dark)); position: relative; z-index: 1; line-height: 1.7; cursor: pointer; }
+  .tsb-dhikr small { display: block; font-size: 10.5px; font-weight: 800; color: var(--text-sec); }
+  .tsb-mot { display: block; font-size: 11.5px; font-weight: 800; color: var(--text-sec); margin-top: 5px; position: relative; z-index: 1; line-height: 1.8; min-height: 40px; }
+  .tsb-mot b { color: var(--gc, var(--primary-dark)); }
+  .tsb-row { display: flex; align-items: center; gap: 8px; margin-top: 9px; position: relative; z-index: 1; }
+  .tsb-tap { flex: 1; min-height: 52px; border-radius: 16px; border: none; background: linear-gradient(135deg,#38BDF8 0%,#0F8AC2 100%); color: #fff; display: flex; align-items: center; justify-content: center; gap: 9px; box-shadow: inset 0 1px 0 rgba(255,255,255,.4), inset 0 -2px 0 rgba(0,0,0,.12), 0 10px 22px rgba(15,138,194,.38); transition: transform .12s; }
+  .tsb-tap:active { transform: scale(.96); }
+  .tsb-tap svg { width: 21px; height: 21px; opacity: .95; flex-shrink: 0; }
+  .tsb-num { font-size: 23px; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; min-width: 30px; text-align: center; }
+  .tsb-mic { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(160deg,#FFFFFF,#EAF4FB); border: 1.5px solid var(--border); color: var(--primary-dark); flex-shrink: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 14px rgba(30,27,46,.12), inset 0 0 0 1.5px rgba(255,255,255,.9); transition: transform .12s; }
+  .tsb-mic svg { width: 23px; height: 23px; }
+  .tsb-mic:active { transform: scale(.9); }
+  .tsb-mic.on { background: linear-gradient(135deg,#FBBF24,#D97706); border-color: #D97706; color: #fff; animation: tsbPulse 1.2s ease-in-out infinite; }
+  @keyframes tsbPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(217,119,6,.45); } 50% { box-shadow: 0 0 0 8px rgba(217,119,6,0); } }
+  .tsb-hint { display: block; font-size: 10.5px; font-weight: 800; color: var(--text-muted); margin-top: 6px; position: relative; z-index: 1; }
   .gate-card.expandable.open { box-shadow: 0 10px 26px rgba(28,176,246,.22); border-color: rgba(28,176,246,.4); }
   /* ===== تثبيت الواجهة ضد الرعشة: إيقاف أنيميشن الدخول بعد أول رسم لكل تبويب ===== */
   .app.fx-off .task-row, .app.fx-off .appt-row, .app.fx-off .task-check, .app.fx-off .task-row.done .task-check,
@@ -3355,12 +3373,34 @@
       { t: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْماً نَافِعاً، وَرِزْقاً طَيِّباً، وَعَمَلاً مُتَقَبَّلاً', c: 1, v: 'خير ما يُسأل' },
       { t: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ', c: 100, v: 'مائة مرة — يغفر الذنوب' },
       { t: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ', c: 10, v: 'من صلى عليّ عشراً أدركته شفاعتي' }
+    ],
+    sleep: [
+      { t: 'يَجْمَعُ كَفَّيْهِ ثُمَّ يَنْفُثُ فِيهِمَا فَيَقْرَأُ: بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ ﴿قُلْ هُوَ اللَّهُ أَحَدٌ * اللَّهُ الصَّمَدُ * لَمْ يَلِدْ وَلَمْ يُولَدْ * وَلَمْ يَكُن لَّهُ كُفُواً أَحَدٌ﴾ وبِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ * مِن شَرِّ مَا خَلَقَ * وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ * وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ * وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ﴾ وبِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ ﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ * مَلِكِ النَّاسِ * إِلَهِ النَّاسِ * مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ * الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ * مِنَ الْجِنَّةِ وَالنَّاسِ﴾ ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ يَبْدَأُ بِهِمَا عَلَى رَأْسِهِ وَوَجْهِهِ وَمَا أَقْبَلَ مِنْ جَسَدِهِ', c: 3, v: 'ثلاث مرات قبل النوم' },
+      { t: 'أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ: اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ، لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ، لَّهُ مَا فِي السَّمَوَاتِ وَمَا فِي الأَرْضِ، مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ، يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ، وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاءَ، وَسِعَ كُرْسِيُّهُ السَّمَوَاتِ وَالأَرْضَ، وَلاَ يَؤُودُهُ حِفْظُهُمَا، وَهُوَ الْعَلِيُّ الْعَظِيمُ (آية الكرسي)', c: 1, v: 'لا يزال عليك من الله حافظ ولا يقربك شيطان حتى تصبح' },
+      { t: 'آمَنَ الرَّسُولُ بِمَا أُنزِلَ إِلَيْهِ مِن رَّبِّهِ وَالْمُؤْمِنُونَ، كُلٌّ آمَنَ بِاللَّهِ وَمَلآئِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ، لاَ نُفَرِّقُ بَيْنَ أَحَدٍ مِّن رُّسُلِهِ، وَقَالُواْ سَمِعْنَا وَأَطَعْنَا، غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ. لاَ يُكَلِّفُ اللَّهُ نَفْساً إِلاَّ وُسْعَهَا، لَهَا مَا كَسَبَتْ وَعَلَيْهَا مَا اكْتَسَبَتْ، رَبَّنَا لاَ تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا، رَبَّنَا وَلاَ تَحْمِلْ عَلَيْنَا إِصْراً كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِن قَبْلِنَا، رَبَّنَا وَلاَ تُحَمِّلْنَا مَا لاَ طَاقَةَ لَنَا بِهِ، وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَآ، أَنتَ مَوْلاَنَا فَانصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ (خواتيم البقرة)', c: 1, v: 'من قرأهما في ليلة كفتاه' },
+      { t: 'بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِن أَمْسَكْتَ نَفْسِي فارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا، بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ', c: 1, v: 'دعاء وضع الجنب' },
+      { t: 'اللَّهُمَّ إِنَّكَ خَلَقْتَ نَفْسِي وَأَنْتَ تَوَفَّاهَا، لَكَ مَمَاتُهَا وَمَحْياهَا، إِنْ أَحْيَيْتَهَا فَاحْفَظْهَا، وَإِنْ أَمَتَّهَا فَاغْفِرْ لَهَا. اللَّهُمَّ إِنِّي أَسْأَلُكَ العَافِيَةَ', c: 1, v: 'سؤال العافية في النوم واليقظة' },
+      { t: 'اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ', c: 3, v: 'ثلاث مرات' },
+      { t: 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا', c: 1, v: 'دعاء النوم المختصر' },
+      { t: 'سُبْحَانَ اللَّهِ (ثلاثاً وثلاثين) وَالْحَمْدُ لِلَّهِ (ثلاثاً وثلاثين) وَاللَّهُ أَكْبَرُ (أربعاً وثلاثين)', c: 1, v: 'تسبيح فاطمة — خير لك من خادم. تسبح 33 وتحمد 33 وتكبر 34' },
+      { t: 'اللَّهُمَّ رَبَّ السَّمَوَاتِ السَّبْعِ وَرَبَّ الأَرْضِ، وَرَبَّ الْعَرْشِ الْعَظِيمِ، رَبَّنَا وَرَبَّ كُلِّ شَيْءٍ، فَالِقَ الْحَبِّ وَالنَّوَى، وَمُنْزِلَ التَّوْرَاةِ وَالْإِنْجِيلِ وَالْفُرْقَانِ، أَعُوذُ بِكَ مِنْ شَرِّ كُلِّ شَيْءٍ أَنْتَ آخِذٌ بِنَاصِيَتِهِ. اللَّهُمَّ أَنْتَ الأَوَّلُ فَلَيْسَ قَبْلَكَ شَيْءٌ، وَأَنْتَ الآخِرُ فَلَيسَ بَعْدَكَ شَيْءٌ، وَأَنْتَ الظَّاهِرُ فَلَيْسَ فَوْقَكَ شَيْءٌ، وَأَنْتَ الْبَاطِنُ فَلَيْسَ دُونَكَ شَيْءٌ، اقْضِ عَنَّا الدَّيْنَ وَأَغْنِنَا مِنَ الْفَقْرِ', c: 1, v: 'قضاء الدين والغنى من الفقر' },
+      { t: 'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا، وَكَفَانَا وَآوَانَا، فَكَمْ مِمَّنْ لاَ كَافِيَ لَهُ وَلاَ مُؤْوِيَ', c: 1, v: 'حمد من آواه الله' },
+      { t: 'اللَّهُمَّ عَالِمَ الغَيْبِ وَالشَّهَادَةِ فَاطِرَ السَّمَوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطانِ وَشَرَكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءاً أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ', c: 1, v: 'حرز من الشيطان وشر النفس' },
+      { t: 'يَقْرَأُ ﴿الم﴾ تَنْزِيلَ السَّجْدَةِ وَتَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ (سورتي السجدة والملك)', c: 1, v: 'كان النبي ﷺ لا ينام حتى يقرأهما' },
+      { t: 'اللَّهُمَّ أَسْلَمْتُ نَفْسِي إِلَيْكَ، وَفَوَّضْتُ أَمْرِي إِلَيْكَ، وَوَجَّهْتُ وَجْهِي إِلَيْكَ، وَأَلْجَأْتُ ظَهْرِي إِلَيْكَ، رَغْبَةً وَرَهْبَةً إِلَيْكَ، لاَ مَلْجَأَ وَلاَ مَنْجَا مِنْكَ إِلاَّ إِلَيْكَ، آمَنْتُ بِكِتَابِكَ الَّذِي أَنْزَلْتَ وَبِنَبِيِّكَ الَّذِي أَرْسَلْتَ', c: 1, v: 'من قالها ثم مات من ليلته مات على الفطرة' }
     ]
   };
-  function azkarSwitchHour() { const v = Number(state._azkarSwitch); if (v >= 0 && v <= 23) return v; return 12; }
+  /* فترات الأذكار: نوم 20-4 | صباح 4-12 | مساء 12-20 */
   function azkarPeriod(now) {
     const h = (now || new Date()).getHours();
-    return h < azkarSwitchHour() ? 'morning' : 'evening';
+    if (h >= 20 || h < 4) return 'sleep';
+    if (h >= 4 && h < 12) return 'morning';
+    return 'evening';
+  }
+  function azkarPeriodMeta(p) {
+    if (p === 'sleep') return { title: 'أذكار النوم 🌙', short: 'أذكار النوم 🌙', sub: 'من 8 مساءً حتى 4 فجراً — نوم هادئ في حفظ الله', ico: '😴', cls: 'evening' };
+    if (p === 'morning') return { title: 'أذكار الصباح ☀️', short: 'أذكار الصباح ☀️', sub: 'من 4 فجراً حتى 12 ظهراً — ابدأ يومك بذكر الله', ico: '🌅', cls: 'morning' };
+    return { title: 'أذكار المساء 🌙', short: 'أذكار المساء 🌙', sub: 'من 12 ظهراً حتى 8 مساءً — اختم يومك بذكر الله', ico: '🌇', cls: 'evening' };
   }
   /* فترة اليوم لتلوين الكروت حسب الوقت: صباح / نهار / مساء / ليل */
   function dayPhase(now) {
@@ -3380,9 +3420,10 @@
   function azkarState() {
     const p = azkarPeriod();
     const key = azkarDayKey() + '-' + p;
-    if (!state._azkar || state._azkar.key !== key) state._azkar = { key, idx: 0, left: (AZKAR[p][0] || { c: 1 }).c };
+    const list = AZKAR[p] || AZKAR.morning;
+    if (!state._azkar || state._azkar.key !== key) state._azkar = { key, idx: 0, left: (list[0] || { c: 1 }).c };
     if (state._azkar.idx == null) state._azkar.idx = 0;
-    return { period: p, key, list: AZKAR[p], st: state._azkar };
+    return { period: p, key, list, st: state._azkar };
   }
   function azkarAdvance() {
     const { period, list, st } = azkarState();
@@ -3407,7 +3448,7 @@
   function azkarListState() {
     const p = azkarPeriod();
     const key = azkarDayKey() + '-' + p;
-    const list = AZKAR[p];
+    const list = AZKAR[p] || AZKAR.morning;
     if (!state._azkarList || state._azkarList.key !== key || !Array.isArray(state._azkarList.left) || state._azkarList.left.length !== list.length) {
       state._azkarList = { key, left: list.map(x => x.c) };
     }
@@ -3416,12 +3457,12 @@
   function openAzkarPage() {
     try { document.querySelector('.azkar-page')?.remove(); } catch {}
     const { period, list } = azkarListState();
-    const isM = period === 'morning';
+    const meta = azkarPeriodMeta(period);
     const ov = document.createElement('div');
-    ov.className = 'azkar-page ' + (isM ? 'morning' : 'evening');
+    ov.className = 'azkar-page ' + meta.cls;
     ov.innerHTML = `<div class="azp-head"><div class="azp-top">
-        <span class="azp-ico">${isM ? '🌅' : '🌙'}</span>
-        <span class="azp-title"><b>${isM ? 'أذكار الصباح' : 'أذكار المساء'}</b><small>${isM ? 'من بعد منتصف الليل' : 'من بعد الظهر'} • اضغط على الذكر للتسبيح</small></span>
+        <span class="azp-ico">${meta.ico}</span>
+        <span class="azp-title"><b>${meta.title}</b><small>${meta.sub} • اضغط على الذكر للتسبيح</small></span>
         <button class="azp-close" id="azpClose">✕</button>
       </div>
     </div><div class="azp-body"><div class="azp-list" id="azpList"></div>
@@ -3454,7 +3495,7 @@
         <div class="azp-text">${escapeHTML(z.t)}</div>
         <div class="azp-meta">${z.v ? `<span class="azp-virtue">${escapeHTML(z.v)}</span>` : '<span class="azp-virtue" style="visibility:hidden;">•</span>'}${(!done && Number(z.c) > 10) ? `<button class="azp-skip" data-azskip="${i}" title="احسبه كأنك قلته بره التطبيق">⏭ تخطي</button>` : ''}<button class="azp-tap-pill" data-aztap="${i}">${done ? '✓' : left}</button></div>
       </div>`;
-    }).join('') + (doneN >= list.length ? `<div class="azp-item done" style="text-align:center;"><div class="azp-text">تقبّل الله منك — أتممت أذكار ${period === 'morning' ? 'الصباح' : 'المساء'}<br><small style="opacity:.6;">اللهم أعنا على ذكرك وشكرك وحسن عبادتك</small></div></div>` : '');
+    }).join('') + (doneN >= list.length ? `<div class="azp-item done" style="text-align:center;"><div class="azp-text">تقبّل الله منك — أتممت ${escapeHTML((azkarPeriodMeta(period) || {}).title || 'الأذكار')}<br><small style="opacity:.6;">اللهم أعنا على ذكرك وشكرك وحسن عبادتك</small></div></div>` : '');
     const pct = Math.round((doneN / list.length) * 100);
     const cnt = ov.querySelector('#azpCount');
     if (cnt) cnt.textContent = doneN + ' / ' + list.length;
@@ -3483,19 +3524,19 @@
   function renderAzkarCard() {
     if (state._azkarOpen !== true) return '';
     const { period, list, st } = azkarState();
-    const isM = period === 'morning';
+    const meta = azkarPeriodMeta(period);
     const total = list.length;
     const doneAll = st.idx >= total;
     const cur = doneAll ? null : list[st.idx];
     const pct = doneAll ? 100 : Math.round(((st.idx) / total) * 100);
-    const title = isM ? 'أذكار الصباح ☀️' : 'أذكار المساء 🌙';
-    const sub = isM ? 'من بعد منتصف الليل حتى الظهر — ابدأ يومك بذكر الله' : 'من الظهر حتى الفجر — اختم يومك بذكر الله';
-    return `<div class="azkar-card ${isM ? 'morning' : 'evening'}">
-      <div class="az-top"><span class="az-ico">${isM ? '🌅' : '🌙'}</span>
+    const title = meta.title;
+    const sub = meta.sub;
+    return `<div class="azkar-card ${meta.cls}">
+      <div class="az-top"><span class="az-ico">${meta.ico}</span>
         <span class="az-tx"><b>${title}</b><small>${sub}</small></span>
         <span class="az-count-badge">${doneAll ? 'خلصت ✓' : ('الذكر ' + (st.idx + 1) + ' من ' + total)}</span>
       </div>
-      ${doneAll ? `<div class="az-body"><div class="az-text">🤲 تقبّل الله منك — خلصت أذكار ${isM ? 'الصباح' : 'المساء'} كلها ❤️<br><small style="font-size:12.5px;">اللهم أعنا على ذكرك وشكرك وحسن عبادتك</small></div></div>
+      ${doneAll ? `<div class="az-body"><div class="az-text">🤲 تقبّل الله منك — خلصت ${escapeHTML(meta.title)} كلها ❤️<br><small style="font-size:12.5px;">اللهم أعنا على ذكرك وشكرك وحسن عبادتك</small></div></div>
         <div class="az-actions"><button id="azkarPrev">‹ السابق</button><button class="az-done" id="azkarReset">🔄 إعادة من الأول</button><button id="azkarNext">التالي ›</button></div>`
       : `<div class="az-body"><div class="az-text">${escapeHTML(cur.t)}</div>${cur.v ? `<div class="az-virtue">💎 ${escapeHTML(cur.v)}</div>` : ''}
         <div class="az-repeat"><span style="font-size:12px;font-weight:900;opacity:.7;">متبقي</span><span class="rep-num" id="azkarTap">${st.left}</span><span style="font-size:12px;font-weight:900;opacity:.7;">مرة • دوس على الرقم</span></div>
@@ -3747,6 +3788,59 @@
         if (!paintHealthMini(healthMiniCache())) paintHealthMini({ day: eatTodayKey(), remedy: { name: 'جُرْعَةُ شِفَاء', emoji: '🌿' }, cheer: healthCheer(doy2) });
       } catch {}
     }
+  }
+  /* ===== كارت السبحة الإلكترونية (مكان جرعة شفاء) ===== */
+  const TSB_PH = ['سُبْحَانَ الله', 'الْحَمْدُ لله', 'اللهُ أَكْبَر', 'لَا إِلَهَ إِلَّا الله', 'أَسْتَغْفِرُ الله', 'اللَّهُمَّ صَلِّ عَلَى مُحَمَّد'];
+  const TSB_MOT = [
+    ['🌿 تنزيه الله يملأ الميزان — سبّح', '✨ كل تسبيحة نخلة في الجنة', '💧 سبحان الله وبحمده تحط الخطايا', '🔥 واصل — الملائكة تسبح معك'],
+    ['🌸 بالحمد تدوم النعم — احمد', '💪 الحمد لله تملأ الميزان', '☀️ من حمد الله رضي عنه', '❤️ احمد بقلبك قبل لسانك'],
+    ['👑 الله أكبر من كل هم — كبّر', '🚀 تكبيرك يصغّر كل خوف', '🛡️ الله أكبر مما يشغلك', '🌙 كبّر وارتقِ درجة'],
+    ['🤍 أفضل الذكر — هلّل', '🔑 كلمة التوحيد مفتاح الجنة', '🌟 جدّد إيمانك مع كل مرة', '💎 خير ما قاله النبيون'],
+    ['🤲 الاستغفار يفتح الأبواب — استغفر', '🌧️ من لزم الاستغفار فُرّج همّه', '🧹 استغفر تُمحَ ذنوبك', '📈 زد استغفارك يزد رزقك'],
+    ['🕋 صلاة واحدة بعشر — صلِّ على النبي ﷺ', '💡 عشر صلوات تُدركك بها الشفاعة', '🌹 الصلاة عليه تفرّج الكروب', '✉️ صلاتك تبلغه ويرد السلام']];
+  function tsbLoad() { try { const s = JSON.parse(localStorage.getItem('naqisna_tsb') || 'null'); if (s && typeof s.i === 'number' && typeof s.c === 'number') return { i: s.i % TSB_PH.length, c: s.c }; } catch {} return { i: 0, c: 0 }; }
+  function tsbSave(s) { try { localStorage.setItem('naqisna_tsb', JSON.stringify(s)); } catch {} }
+  function paintTsb() {
+    try {
+      const s = tsbLoad();
+      const d = document.getElementById('tsbDhikr');
+      const t = document.getElementById('tsbTapNum') || document.getElementById('tsbTap');
+      const mo = document.getElementById('tsbMot');
+      if (d) d.innerHTML = escapeHTML(TSB_PH[s.i]) + '<small>دوس لتغيير الذكر 👆</small>';
+      if (t) t.textContent = s.c;
+      if (mo) { const L = TSB_MOT[s.i] || TSB_MOT[0]; mo.innerHTML = L[Math.floor(s.c / 3) % L.length]; }
+      return true;
+    } catch {} return false;
+  }
+  function tsbBump(n) { try { const s = tsbLoad(); s.c += (n || 1); tsbSave(s); paintTsb(); } catch {} }
+  let tsbRec = null, tsbListening = false;
+  function tsbWire() {
+    try {
+      const tap = document.getElementById('tsbTap');
+      if (tap && !tap._wired) { tap._wired = true; tap.onclick = (e) => { try { e.stopPropagation(); } catch {} tsbBump(1); }; }
+      const dh = document.getElementById('tsbDhikr');
+      if (dh && !dh._wired) { dh._wired = true; dh.onclick = (e) => { try { e.stopPropagation(); } catch {} try { const s = tsbLoad(); s.i = (s.i + 1) % TSB_PH.length; s.c = 0; tsbSave(s); paintTsb(); } catch {} }; }
+      const mic = document.getElementById('tsbMic');
+      const hint = document.getElementById('tsbHint');
+      if (mic && !mic._wired) {
+        mic._wired = true;
+        mic.onclick = (e) => {
+          try { e.stopPropagation(); } catch {}
+          const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+          if (!SR) { if (hint) hint.textContent = 'متصفحك لا يدعم الصوت — دوس للعد'; return; }
+          if (tsbListening && tsbRec) { try { tsbRec.stop(); } catch {} return; }
+          try {
+            tsbRec = new SR(); tsbRec.lang = 'ar-EG'; tsbRec.continuous = true; tsbRec.interimResults = false;
+            tsbRec.onstart = () => { tsbListening = true; mic.classList.add('on'); if (hint) hint.textContent = '🎙 استمع... كرر الذكر بصوتك'; };
+            tsbRec.onend = () => { tsbListening = false; mic.classList.remove('on'); if (hint) hint.textContent = 'دوس للعد • أو 🎤 بالصوت'; };
+            tsbRec.onerror = () => { try { tsbRec.stop(); } catch {} };
+            tsbRec.onresult = (ev) => { let n = 0; for (let i = ev.resultIndex; i < ev.results.length; i++) if (ev.results[i].isFinal) n++; if (n > 0) tsbBump(n); };
+            tsbRec.start();
+          } catch {}
+        };
+      }
+      paintTsb();
+    } catch {}
   }
   function prayerTo12h(tStr) {
     try {
@@ -4475,8 +4569,8 @@
 
       <div class="section"><div class="gate-grid">
         <div class="gate-card gate-prayer" data-prayer-times><span class="gc-ico">${tpS.ico}</span><span class="gc-label">مواقيت الصلاة</span><span class="gc-value" id="prayerMiniTxt" style="font-size:16px;">...</span><span class="gc-sub" id="prayerMiniSub">دوس للعرض 📍</span></div>
-        <div class="gate-card gate-azkar" data-azkar-toggle style="--gc:#D97706;--gc-soft:#FEF3C7;"><span class="gc-ico">🤲</span><span class="gc-label">الأذكار</span><span class="gc-value" style="font-size:16px;">${azP === 'morning' ? 'أذكار الصباح ☀️' : 'أذكار المساء 🌙'}</span><span class="gc-sub">دوس للعرض 📖</span></div>
-        <div class="gate-card gate-health" id="healthGateCard" style="--gc:#047857;--gc-soft:#D1FAE5;"><span class="gc-ico">🌿</span><span class="gc-label">جُرْعَةُ شِفَاء 🍯</span><span class="gc-value" id="healthMiniTxt" style="font-size:16px;">...</span><span class="gc-sub" id="healthMiniSub">دوس للفتح 🌼</span></div>
+        <div class="gate-card gate-azkar" data-azkar-toggle style="--gc:#D97706;--gc-soft:#FEF3C7;"><span class="gc-ico">🤲</span><span class="gc-label">الأذكار</span><span class="gc-value" style="font-size:16px;">${azkarPeriodMeta(azP).short}</span><span class="gc-sub">دوس للعرض 📖</span></div>
+        <div class="gate-card gate-tasbih" id="tsbGateCard" style="--gc:#7C3AED;--gc-soft:#EDE9FE;"><span class="gc-ico">📿</span><span class="gc-label">السبحة الإلكترونية 📿</span><span class="tsb-dhikr" id="tsbDhikr" title="دوس لتغيير الذكر">سُبْحَانَ الله<small>دوس لتغيير الذكر 👆</small></span><span class="tsb-mot" id="tsbMot">💪 ابدأ الآن — كل تسبيحة تقرّبك خطوة</span><div class="tsb-row"><button class="tsb-tap" id="tsbTap" title="دوس للعد"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5V6a1.8 1.8 0 0 1 3.6 0v5.5"/><path d="M12.6 11a1.8 1.8 0 0 1 3.6.5v2.3a6.5 6.5 0 0 1-6.5 6.5h-.4a6.5 6.5 0 0 1-5.2-2.6l-1.9-2.6a1.7 1.7 0 0 1 2.7-2L7 14.6V9.5a1.8 1.8 0 0 1 3.6 0"/></svg><span class="tsb-num" id="tsbTapNum">0</span></button><button class="tsb-mic" id="tsbMic" title="العد بالصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><line x1="12" y1="17.5" x2="12" y2="21.5"/><line x1="8.5" y1="21.5" x2="15.5" y2="21.5"/></svg></button></div><span class="tsb-hint" id="tsbHint">دوس للعد • أو بالصوت</span></div>
         <div class="gate-card gate-eat" id="eatGateCard" style="--gc:#1CB0F6;--gc-soft:#E1F3FD;"><span class="gc-ico">🥗</span><span class="gc-label">طبق اليوم 🍽️</span><span class="gc-value" id="eatMiniTxt" style="font-size:16px;">...</span><span class="gc-sub" id="eatMiniSub">دوس للفتح 🍎</span></div>
       </div></div>
 
@@ -5346,8 +5440,7 @@
     document.querySelectorAll('[data-goto-tasks]').forEach(b => b.onclick = () => { requestAnimationFrame(() => setTimeout(() => { try { const el = document.getElementById('tasksWrap') || document.getElementById('tasksSection'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {} }, 60)); });
     const egc = document.getElementById('eatGateCard'); if (egc) egc.onclick = () => { try { window.location.href = 'eat.html'; } catch {} };
     try { refreshEatMini(); } catch {}
-    const hgc = document.getElementById('healthGateCard'); if (hgc) hgc.onclick = () => { try { window.location.href = 'health.html'; } catch {} };
-    try { refreshHealthMini(); } catch {}
+    try { tsbWire(); } catch {}
     const azD = document.getElementById('azkarDone'); if (azD) azD.onclick = () => azkarAdvance();
     const azT = document.getElementById('azkarTap'); if (azT) azT.onclick = () => azkarAdvance();
     const azS = document.getElementById('azkarSkip'); if (azS) azS.onclick = () => azkarSkipOutside();
