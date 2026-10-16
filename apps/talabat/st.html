@@ -377,6 +377,13 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
 [data-theme="dark"] .sheet-link-status.ok{color:#4ade80}
 [data-theme="dark"] .sheet-link-status.err{color:#f87171}
 .code-box{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:12px;font-size:11px;line-height:1.8;overflow:auto;max-height:260px;direction:ltr;text-align:left;font-family:Consolas,monospace;white-space:pre;margin:8px 0}
+/* ===== بيانات المعلم (بورتفوليو) ===== */
+.t-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.t-grid .full{grid-column:1/-1}
+@media(max-width:480px){.t-grid{grid-template-columns:1fr}}
+.t-photo-row{display:flex;gap:12px;align-items:center;background:var(--bg-input);border:1.5px dashed var(--border);border-radius:16px;padding:10px 12px;margin-bottom:8px}
+.t-photo-row .img-prev{width:64px;height:64px;font-size:26px;border-radius:50%}
+.t-photo-hint{font-size:11.5px;color:var(--text-muted);font-weight:700;line-height:1.9}
 /* toast */
 /* ===== نافذة الطالب — الحصص والمدفوعات مثل القائمة ===== */
 .em-sec{background:var(--bg-input);border:1.5px solid var(--border);border-radius:16px;padding:12px;margin-bottom:10px;grid-column:1/-1}
@@ -790,30 +797,43 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
         </div>
         </div>
       </div>
-      <div class="set-sec">
-        <h4><i class="bx bx-link-alt" style="color:var(--accent)"></i> رابط أولياء الأمور 🔗</h4>
-        <input type="text" id="parentSlugInp" class="sheet-link-inp" placeholder="معرّف الصفحة (إنجليزي): مثال: ahmed-math" dir="ltr" maxlength="40" autocomplete="off">
-        <div class="set-row" style="margin-top:8px">
-          <button class="btn btn-success btn-sm" id="parentLinkPublishBtn"><i class="bx bx-rocket"></i> نشر الصفحة</button>
-          <button class="btn btn-primary btn-sm" id="parentLinkCopyBtn"><i class="bx bx-copy"></i> نسخ الرابط</button>
-          <button class="btn btn-outline btn-sm" id="parentLinkOpenBtn"><i class="bx bx-window-open"></i> معاينة</button>
-        </div>
-        <div class="sheet-link-status" id="parentLinkStatus">غير مربوط — اربط فايربيز أو جوجل شيت أولاً</div>
-      </div>
-      <div class="set-sec">
-        <h4><i class="bx bx-id-card" style="color:var(--accent)"></i> هوية المعلم 🎓</h4>
-        <p>اسمك وشعارك وألوانك تظهر لأولياء الأمور في صفحة الدخول الخاصة بك.</p>
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px">
-          <div class="img-prev" id="tLogoPrev" style="width:64px;height:64px;font-size:26px">؟</div>
-          <div style="flex:1;display:flex;gap:8px;flex-wrap:wrap">
-            <label for="tLogoFile" class="btn btn-outline btn-sm" style="cursor:pointer"><i class="bx bx-image-add"></i> شعار</label>
-            <input type="file" id="tLogoFile" accept="image/*" style="display:none">
-            <button class="btn btn-ghost btn-sm" id="tLogoClear" title="إزالة الشعار"><i class="bx bx-trash"></i></button>
+      <div class="set-sec" id="teacherSec">
+        <h4 id="teacherSecToggle" style="cursor:pointer;user-select:none"><i class="bx bx-id-card" style="color:var(--accent)"></i> بيانات المعلم الشخصية 🎓 <span id="teacherSecChev" style="margin-right:auto;transition:transform .25s;display:inline-flex">‹</span></h4>
+        <div id="teacherSecBody" class="hidden">
+        <p>الاسم والصورة والتعريف الذي يظهر في الصفحة الرئيسية — لا يظهر هذا القسم إلا بعد الربط بجوجل شيت أو فايربيز.</p>
+        <div id="teacherLocked" class="sheet-link-status">🔒 اربط جوجل شيت أو فايربيز أولاً لإظهار بيانات المعلم</div>
+        <div id="teacherForm" style="display:none">
+          <div class="t-photo-row">
+            <div class="img-prev" id="tPhotoPrev"><img src="logo.png" alt="شعار التطبيق"></div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+                <label for="tPhotoFile" class="btn btn-outline btn-sm" style="cursor:pointer"><i class="bx bx-image-add"></i> صورة المعلم</label>
+                <input type="file" id="tPhotoFile" accept="image/*" style="display:none">
+                <button class="btn btn-ghost btn-sm" id="tPhotoClear" title="إزالة الصورة"><i class="bx bx-trash"></i></button>
+              </div>
+              <div class="t-photo-hint">اسحب صورة أو اضغط للاختيار — تظهر في البورتفوليو</div>
+            </div>
+          </div>
+          <div class="t-grid">
+            <div class="inp"><label>الاسم بالعربي <span class="req">*</span></label><input id="tFirstName" placeholder="مثال: محمد سعيد" maxlength="30" autocomplete="off"></div>
+            <div class="inp"><label>اللقب بالعربي</label><input id="tLastName" placeholder="مثال: الحاكم" maxlength="30" autocomplete="off"></div>
+            <div class="inp full"><label>الاسم بالإنجليزي</label><input id="tEnName" placeholder="Muhamad Said El-Hakem" dir="ltr" maxlength="50" autocomplete="off" style="text-align:left"></div>
+            <div class="inp"><label>المسمى الوظيفي</label><input id="tTitle" placeholder="معلم اللغة الإنجليزية" maxlength="50" autocomplete="off"></div>
+            <div class="inp"><label>سنوات الخبرة</label><input id="tExp" inputmode="numeric" placeholder="15+" maxlength="10" autocomplete="off"></div>
+            <div class="inp full"><label>التعريف / التخصص</label><input id="tSpecialty" placeholder="متخصص في تأسيس اللغة الإنجليزية للأطفال" maxlength="120" autocomplete="off"></div>
+            <div class="inp full"><label>اقتباس / مقولة مميزة</label><textarea id="tQuote" rows="3" placeholder="مثال: تعلم اللغة يجب أن يكون تجربة ممتعة..." maxlength="500"></textarea></div>
+            <div class="inp"><label>رقم الواتساب (للتواصل)</label><input id="tWhatsapp" inputmode="tel" placeholder="01125908425" dir="ltr" maxlength="15" autocomplete="off" style="text-align:left"></div>
+            <div class="inp"><label>رابط فيسبوك (اختياري)</label><input id="tFacebook" dir="ltr" placeholder="https://www.facebook.com/..." maxlength="200" autocomplete="off" style="text-align:left"></div>
+            <div class="inp full"><label>يوزر نيم المعلم (إنجليزي، لرابط البورتفوليو) <span class="req">*</span></label><input id="tUsername" dir="ltr" placeholder="mohamed-english" maxlength="30" autocomplete="off" style="text-align:left"></div>
+          </div>
+          <div class="sheet-link-status" id="teacherLinkStatus" style="margin-top:8px">—</div>
+          <div class="set-row" style="margin-top:8px">
+            <button class="btn btn-primary btn-sm" id="tSaveBtn"><i class="bx bx-save"></i> حفظ بيانات المعلم</button>
+            <button class="btn btn-outline btn-sm" id="tCopyLinkBtn"><i class="bx bx-copy"></i> نسخ الرابط المختصر</button>
+            <button class="btn btn-success btn-sm" id="tOpenLinkBtn"><i class="bx bx-window-open"></i> معاينة البورتفوليو</button>
           </div>
         </div>
-        <div class="inp" style="margin-bottom:8px"><label>اسم المعلم</label><input id="tNameInp" placeholder="مثال: مستر أحمد" maxlength="40" autocomplete="off"></div>
-        <div class="inp" style="margin-bottom:8px"><label>اسم الأكاديمية / السنتر (اختياري)</label><input id="tAcademyInp" placeholder="مثال: سنتر النجاح" maxlength="40" autocomplete="off"></div>
-        <div class="inp"><label>لون الصفحة</label><div class="colors" id="tColors"></div></div>
+        </div>
       </div>
       <div class="set-sec">
         <h4><i class="bx bx-mobile-alt"></i> تثبيت التطبيق على الهاتف 📱</h4>
@@ -840,11 +860,11 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
       <div class="set-sec">
         <h4><i class="bx bx-refresh"></i> مزامنة كاملة (رفع + سحب)</h4>
         <p>1- من الشيت: الإضافات ← Apps Script ← امسح كل شيء والصق الكود التالي ← نشر ← "نشر كتطبيق ويب" مع: التنفيذ باسمك (Me) + الوصول "أي شخص" (Anyone) — بدونهما يطلب الرابط تسجيل دخول ويفشل.<br>2- الصق رابط الـ Web App (المنتهي بـ /exec) في الإعدادات ثم "اختبار الاتصال" ثم "مزامنة الآن".<br>⚠️ بعد أي تعديل في الكود: نشر ← إدارة عمليات النشر ← تعديل ← اختر "إصدار جديد" ← نشر (وإلا يظل الكود القديم يعمل).</p>
-        <pre class="code-box" id="appsScriptCode">var SHEET_STUDENTS='students',SHEET_GROUPS='groups';
+        <pre class="code-box" id="appsScriptCode">var SHEET_STUDENTS='students',SHEET_GROUPS='groups',SHEET_TEACHER='teacher';
 function doGet(e){
   var a=(e&amp;&amp;e.parameter&amp;&amp;e.parameter.action)||'pull';
   var ss=SpreadsheetApp.getActiveSpreadsheet();
-  if(a==='pull')return json({ok:true,students:readAll(ss,SHEET_STUDENTS),groups:readAll(ss,SHEET_GROUPS)});
+  if(a==='pull')return json({ok:true,students:readAll(ss,SHEET_STUDENTS),groups:readAll(ss,SHEET_GROUPS),teacher:readTeacher(ss)});
   return json({ok:false,error:'unknown action'});
 }
 function doPost(e){
@@ -853,9 +873,28 @@ function doPost(e){
   if(d.action==='push'){
     if(d.students)writeAll(ss,SHEET_STUDENTS,d.students);
     if(d.groups)writeAll(ss,SHEET_GROUPS,d.groups);
+    if(d.teacher)writeTeacher(ss,d.teacher);
     return json({ok:true,saved:(d.students||[]).length});
   }
   return json({ok:false});
+}
+function readTeacher(ss){
+  try{
+    var sh=ss.getSheetByName(SHEET_TEACHER);if(!sh)return null;
+    var v=sh.getDataRange().getValues();if(v.length&lt;2)return null;
+    var h=v[0].map(String),o={};
+    for(var j=0;j&lt;h.length;j++)o[h[j]]=v[1][j];
+    return o;
+  }catch(e){return null;}
+}
+function writeTeacher(ss,t){
+  try{
+    var sh=ss.getSheetByName(SHEET_TEACHER)||ss.insertSheet(SHEET_TEACHER);
+    sh.clear();var keys=Object.keys(t||{});
+    if(!keys.length){sh.appendRow(['empty']);return;}
+    sh.appendRow(keys);
+    sh.appendRow(keys.map(function(k){var x=t[k];return (x&amp;&amp;typeof x==='object')?JSON.stringify(x):x;}));
+  }catch(e){}
 }
 function json(o){return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);}
 function readAll(ss,name){
@@ -1601,6 +1640,7 @@ function sheetAppsPull(){
     var d=res.data;
     if(!d||!d.ok){sheetStatus('❌ الـ Web App رد بخطأ — تأكد أن الكود المنشور هو كود المزامنة','err');return;}
     (d.groups||[]).forEach(function(g){if(g&&g.name)sheetEnsureGroup(g.name);});
+    try{if(d.teacher&&typeof d.teacher==='object'&&(d.teacher.username||d.teacher.firstName)){saveTeacherLocal({firstName:d.teacher.firstName||'',lastName:d.teacher.lastName||'',enName:d.teacher.enName||'',title:d.teacher.title||'',exp:d.teacher.exp||'',specialty:d.teacher.specialty||'',quote:d.teacher.quote||'',whatsapp:String(d.teacher.whatsapp||'').replace(/\D/g,''),facebook:d.teacher.facebook||'',username:cleanUsername(d.teacher.username||''),photo:d.teacher.photo||''});try{refreshTeacherSec();}catch(e){}}}catch(e){}
     sheetMergeRows(d.students||[],'الـ Web App');
   }).catch(function(){sheetStatus('❌ تعذّر الوصول للرابط — تحقق من الإنترنت والرابط','err');});
 }
@@ -1614,7 +1654,7 @@ function sheetAppsPush(silent){
     return {'الاسم':s.name||'','الهاتف':s.phone||'','الصف':gradeSafe(s.grade),'المجموعة':g?g.name:'','اليوم':s.day||'','الموعد':s.hour||'','الحصص':f.count,'المدفوع':s.paid||0,'الحالة':st};
   });
   var cleanGroups=groups.map(function(g){return {'المجموعة':g.name||'','اليوم':g.day||'','الموعد':g.time||''};});
-  var payload={action:'push',students:cleanStudents,groups:cleanGroups};
+  var payload={action:'push',students:cleanStudents,groups:cleanGroups,teacher:getTeacher()};
   if(!silent)sheetStatus('⏳ جارٍ الرفع للشيت…');
   return sheetFetchJson(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}).then(function(res){
     if(!res.ok){if(!silent)sheetStatus('❌ فشل الرفع — '+res.diag,'err');return false;}
@@ -1715,7 +1755,9 @@ function fbPush(silent){
       var db=fbDb();if(!db){if(!silent)fbStatus('❌ تعذّر تهيئة Firebase','err');res(false);return;}
       if(!silent)fbStatus('⏳ جارٍ الرفع للسحابة…');
       fbSelfPushAt=Date.now();
-      fbDocRef(db).set({students:students,groups:groups,teacher:getTeacherProfile(),updatedAt:Date.now(),app:'EduSmart',version:1},{merge:false}).then(function(){
+      var _tt=getTeacher();
+      fbDocRef(db).set({students:students,groups:groups,teacher:_tt,updatedAt:Date.now(),app:'EduSmart',version:2},{merge:false}).then(function(){
+        try{if(_tt&&_tt.username)db.collection('teachers').doc(_tt.username).set({profile:_tt,updatedAt:Date.now(),app:'EduSmart',version:2},{merge:true});}catch(e){}
         try{localStorage.setItem(LS_FB_T,stampNow());}catch(e){}
         refreshFbUI();updateSyncUI();
         if(!silent){fbStatus('☁️ تم الرفع — '+students.length+' طالب / '+groups.length+' مجموعة','ok');toast('☁️ تم الرفع للسحابة');}
@@ -1737,7 +1779,7 @@ function fbPull(){
       if(!ok)return;
       students=Array.isArray(d.students)?d.students:[];
       groups=Array.isArray(d.groups)?d.groups:[];
-      try{var tp=d.teacher||null;if(tp&&(tp.name||tp.logo)){var cur=getTeacherProfile();if(!cur.name&&!cur.logo)saveTeacherProfile({name:tp.name||'',academy:tp.academy||'',c1:tp.c1||TPAIRS[0][0],c2:tp.c2||TPAIRS[0][1],logo:tp.logo||''});}}catch(e){}
+      try{if(d.teacher&&typeof d.teacher==='object'&&(d.teacher.username||d.teacher.firstName)){saveTeacherLocal({firstName:d.teacher.firstName||'',lastName:d.teacher.lastName||'',enName:d.teacher.enName||'',title:d.teacher.title||'',exp:d.teacher.exp||'',specialty:d.teacher.specialty||'',quote:d.teacher.quote||'',whatsapp:d.teacher.whatsapp||'',facebook:d.teacher.facebook||'',username:cleanUsername(d.teacher.username||''),photo:d.teacher.photo||''});}}catch(e){}
       persistAndRender();
       try{localStorage.setItem(LS_FB_T,stampNow());}catch(e){}
       refreshFbUI();updateSyncUI();
@@ -1763,9 +1805,11 @@ function fbSubscribe(){
         var d=doc.data()||{};
         var cs=JSON.stringify(d.students||[]),ls=JSON.stringify(students);
         var cg=JSON.stringify(d.groups||[]),lg=JSON.stringify(groups);
-        if(cs===ls&&cg===lg)return;
+        var ct=JSON.stringify(d.teacher||null),lt=JSON.stringify(getTeacher());
+        if(cs===ls&&cg===lg&&ct===lt)return;
         students=Array.isArray(d.students)?d.students:students;
         groups=Array.isArray(d.groups)?d.groups:groups;
+        try{if(d.teacher&&d.teacher.username)saveTeacherLocal(d.teacher);}catch(e){}
         saveLocalSilent();try{applyFilters();renderGroups();renderHome();}catch(e){}
         try{localStorage.setItem(LS_FB_T,stampNow());}catch(e){}
         refreshFbUI();updateSyncUI();
@@ -1781,12 +1825,42 @@ function fbScheduleAutoPush(){
   fbAutoTimer=setTimeout(function(){fbPush(true);},1200);
 }
 function fallbackCopyApps(t){try{var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(e){}}
+/* ===== بيانات المعلم (بورتفوليو) — تظهر فقط عند الربط ===== */
+var LS_T2='elmistar_teacher_v2';
+function getTeacher(){try{var p=JSON.parse(localStorage.getItem(LS_T2)||'null');if(p&&typeof p==='object')return{firstName:p.firstName||'',lastName:p.lastName||'',enName:p.enName||'',title:p.title||'',exp:p.exp||'',specialty:p.specialty||'',quote:p.quote||'',whatsapp:String(p.whatsapp||'').replace(/\D/g,''),facebook:p.facebook||'',username:String(p.username||'').trim().toLowerCase(),photo:p.photo||''};}catch(e){}return{firstName:'',lastName:'',enName:'',title:'',exp:'',specialty:'',quote:'',whatsapp:'',facebook:'',username:'',photo:''};}
+function saveTeacherLocal(p){try{localStorage.setItem(LS_T2,JSON.stringify(p||{}));}catch(e){}}
+function cleanUsername(s){return String(s||'').trim().toLowerCase().replace(/[^a-z0-9-_]/g,'');}
+function isCloudLinked(){try{if(fbGetCfg())return true;}catch(e){}try{var u=sheetGetUrl();if(u&&sheetMode(u))return true;}catch(e){}return false;}
+function teacherBase(){try{var h=location.href.split('#')[0];var i=h.indexOf('?');if(i>=0)h=h.slice(0,i);return h.replace(/st\.html?$/,'')+'teacher.html';}catch(e){return 'teacher.html';}}
+function teacherSourceParam(){try{var c=fbGetCfg();if(c&&c.apiKey&&c.projectId)return 'f='+encodeURIComponent(c.projectId+'.'+c.apiKey);}catch(e){}try{var u=sheetGetUrl();if(u&&sheetMode(u)==='apps')return 'a='+encodeURIComponent(u);if(u){var id=sheetIdOf(u);if(id)return 's='+encodeURIComponent(id);}}catch(e){}return '';}
+function buildTeacherLink(){var t=getTeacher();if(!t.username||!isCloudLinked())return '';return teacherBase()+'?'+teacherSourceParam()+'&u='+encodeURIComponent(t.username);}
+function buildTeacherShortLink(){var t=getTeacher();if(!t.username||!isCloudLinked())return '';return teacherBase()+'?u='+encodeURIComponent(t.username);}
+function buildTeacherPathLink(){var t=getTeacher();if(!t.username||!isCloudLinked())return '';return teacherBase()+'/'+encodeURIComponent(t.username);}
+var LS_REG='elmistar_teacher_registry';
+function saveTeacherRegistry(){try{var t=getTeacher();if(!t.username)return;var src=teacherSourceParam();if(!src)return;var reg={};try{reg=JSON.parse(localStorage.getItem(LS_REG)||'{}')||{};}catch(e){reg={};}var e={};src.split('&').forEach(function(kv){var i=kv.indexOf('=');if(i>0)e[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1));});reg[t.username]=e;try{localStorage.setItem(LS_REG,JSON.stringify(reg));}catch(e){}}catch(e){}}
+function downloadTeachersJson(){try{var reg={};try{reg=JSON.parse(localStorage.getItem(LS_REG)||'{}')||{};}catch(e){reg={};}var t=getTeacher();if(t.username){var src=teacherSourceParam();if(src){var e={};src.split('&').forEach(function(kv){var i=kv.indexOf('=');if(i>0)e[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1));});reg[t.username]=e;}}var out={teachers:reg};var blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='teachers.json';document.body.appendChild(a);a.click();setTimeout(function(){try{URL.revokeObjectURL(a.href);}catch(e){}try{a.remove();}catch(e){}},500);toast('📥 اتحمّل ملف teachers.json — ارفعه بجانب teacher.html في الاستضافة');}catch(e){toast('تعذر إنشاء الملف','error');}}
+function fillTeacherForm(){var t=getTeacher();var m={tFirstName:t.firstName,tLastName:t.lastName,tEnName:t.enName,tTitle:t.title,tExp:t.exp,tSpecialty:t.specialty,tQuote:t.quote,tWhatsapp:t.whatsapp,tFacebook:t.facebook,tUsername:t.username};for(var k in m){var el=$(k);if(el&&document.activeElement!==el)el.value=m[k];}var pv=$('tPhotoPrev');if(pv){if(t.photo)pv.innerHTML='<img src="'+t.photo+'">';else pv.innerHTML='<img src="logo.png" alt="شعار التطبيق">';}}
+function refreshTeacherSec(){var linked=isCloudLinked();var lock=$('teacherLocked'),form=$('teacherForm');if(lock)lock.style.display=linked?'none':'';if(form)form.style.display=linked?'':'none';if(!linked)return;fillTeacherForm();var st=$('teacherLinkStatus');if(!st)return;var t=getTeacher();if(!t.username){st.className='sheet-link-status';st.textContent='اكتب يوزر نيم إنجليزي (3 حروف على الأقل) ثم احفظ.';}else{st.className='sheet-link-status';st.style.display='none';}}
+function pushTeacherToFb(silentDone){try{var t=getTeacher();if(!t.username)return;if(!fbGetCfg())return;fbEnsureSdk(function(){var db=fbDb();if(!db)return;try{db.collection('teachers').doc(t.username).set({profile:t,updatedAt:Date.now(),app:'EduSmart',version:2},{merge:true});}catch(e){}try{db.collection('elmistar').doc('main').set({teacher:t},{merge:true});}catch(e){}});}catch(e){}}
 (function initSettings(){
-  var sb=$('settingsBtn');if(sb)sb.onclick=function(){$('settingsModal').classList.remove('hidden');updateSyncUI();refreshSheetUI();try{refreshFbUI();}catch(e){}fillWaSettingsInputs();try{refreshParentLinkUI();}catch(e){}try{fillTeacherUI();}catch(e){}};
-  var tni=$('tNameInp');if(tni)tni.oninput=function(){var p=getTeacherProfile();p.name=tni.value;saveTeacherProfile(p);};
-  var tai=$('tAcademyInp');if(tai)tai.oninput=function(){var p=getTeacherProfile();p.academy=tai.value;saveTeacherProfile(p);};
-  var tlf=$('tLogoFile');if(tlf)tlf.onchange=function(){var file=tlf.files&&tlf.files[0];if(!file)return;compressImage(file,function(url){var p=getTeacherProfile();p.logo=url||'';saveTeacherProfile(p);fillTeacherUI();toast('✅ تم حفظ الشعار');});tlf.value='';};
-  var tlc=$('tLogoClear');if(tlc)tlc.onclick=function(){var p=getTeacherProfile();p.logo='';saveTeacherProfile(p);fillTeacherUI();};
+  var sb=$('settingsBtn');if(sb)sb.onclick=function(){$('settingsModal').classList.remove('hidden');updateSyncUI();refreshSheetUI();try{refreshFbUI();}catch(e){}fillWaSettingsInputs();try{refreshTeacherSec();}catch(e){}};
+  var tPhotoFile=$('tPhotoFile');if(tPhotoFile)tPhotoFile.onchange=function(){var file=tPhotoFile.files&&tPhotoFile.files[0];if(!file)return;compressImage(file,function(url){var p=getTeacher();p.photo=url||'';saveTeacherLocal(p);fillTeacherForm();toast('✅ تم تجهيز الصورة — اضغط حفظ');});tPhotoFile.value='';};
+  var tPhotoClear=$('tPhotoClear');if(tPhotoClear)tPhotoClear.onclick=function(){var p=getTeacher();p.photo='';saveTeacherLocal(p);fillTeacherForm();};
+  var tSaveBtn=$('tSaveBtn');if(tSaveBtn)tSaveBtn.onclick=function(){
+    if(!isCloudLinked()){toast('اربط جوجل شيت أو فايربيز أولاً','error');return;}
+    var u=cleanUsername(($('tUsername')||{}).value||'');
+    if(u.length<3){toast('اكتب يوزر نيم إنجليزي من 3 حروف على الأقل','error');return;}
+    var fn=(($('tFirstName')||{}).value||'').trim();
+    if(!fn){toast('اكتب الاسم بالعربي أولاً','error');return;}
+    var p={firstName:fn,lastName:(($('tLastName')||{}).value||'').trim(),enName:(($('tEnName')||{}).value||'').trim(),title:(($('tTitle')||{}).value||'').trim(),exp:(($('tExp')||{}).value||'').trim(),specialty:(($('tSpecialty')||{}).value||'').trim(),quote:(($('tQuote')||{}).value||'').trim(),whatsapp:String(($('tWhatsapp')||{}).value||'').replace(/\D/g,''),facebook:(($('tFacebook')||{}).value||'').trim(),username:u,photo:getTeacher().photo||''};
+    if($('tUsername'))$('tUsername').value=u;
+    saveTeacherLocal(p);saveTeacherRegistry();refreshTeacherSec();toast('✅ تم حفظ بيانات المعلم');
+    try{pushTeacherToFb();}catch(e){}
+    try{var su=sheetGetUrl();if(su&&sheetMode(su)==='apps')sheetAppsPush(true);}catch(e){}
+  };
+  var tCopyBtn=$('tCopyLinkBtn');if(tCopyBtn)tCopyBtn.onclick=function(){var link=buildTeacherShortLink()||buildTeacherLink();if(!link){toast('احفظ بيانات المعلم واليوزر نيم أولاً','error');return;}function ok(){toast('📋 اتنسخ الرابط المختصر');}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(link).then(ok,function(){fallbackCopyApps(link);ok();});}else{fallbackCopyApps(link);ok();}};
+  var tOpenBtn=$('tOpenLinkBtn');if(tOpenBtn)tOpenBtn.onclick=function(){var link=buildTeacherShortLink()||buildTeacherLink();if(!link){toast('احفظ بيانات المعلم واليوزر نيم أولاً','error');return;}window.open(link,'_blank');};
+  var tSecT=$('teacherSecToggle');if(tSecT)tSecT.onclick=function(){var b=$('teacherSecBody');if(!b)return;b.classList.toggle('hidden');var c=$('teacherSecChev');if(c)c.style.transform=b.classList.contains('hidden')?'':'rotate(-90deg)';};
   var wl=$('waLateInp');if(wl)wl.oninput=function(){WA_T.late=wl.value;saveWaTemplates();};
   var wr=$('waRemindInp');if(wr)wr.oninput=function(){WA_T.remind=wr.value;saveWaTemplates();};
   var wab=$('waAbsentInp');if(wab)wab.oninput=function(){WA_T.absent=wab.value;saveWaTemplates();};
@@ -1795,122 +1869,24 @@ function fallbackCopyApps(t){try{var ta=document.createElement('textarea');ta.va
   var wrst=$('waResetBtn');if(wrst)wrst.onclick=function(){WA_T={late:WA_T_DEFAULT.late,remind:WA_T_DEFAULT.remind,absent:WA_T_DEFAULT.absent,quick:WA_T_DEFAULT.quick,receipt:WA_T_DEFAULT.receipt};saveWaTemplates();fillWaSettingsInputs();toast('✅ تمت استعادة الرسائل الافتراضية');};
   var wt=$('waSecToggle');if(wt)wt.onclick=function(){var b=$('waSecBody');if(!b)return;b.classList.toggle('hidden');var c=$('waSecChev');if(c)c.style.transform=b.classList.contains('hidden')?'':'rotate(-90deg)';};
   var sht=$('sheetSecToggle');if(sht)sht.onclick=function(){var b=$('sheetSecBody');if(!b)return;b.classList.toggle('hidden');var c=$('sheetSecChev');if(c)c.style.transform=b.classList.contains('hidden')?'':'rotate(-90deg)';};
-  var sv=$('sheetSaveBtn');if(sv)sv.onclick=function(){var v=(($('sheetUrlInp')||{}).value||'').trim();if(!v){toast('الصق الرابط أولاً','error');return;}if(!sheetMode(v)){toast('رابط غير معروف — الصق رابط شيت أو Web App','error');return;}sheetSetUrl(v);refreshSheetUI();try{refreshParentLinkUI();}catch(e){}toast('🔗 تم حفظ رابط الشيت');};
+  var sv=$('sheetSaveBtn');if(sv)sv.onclick=function(){var v=(($('sheetUrlInp')||{}).value||'').trim();if(!v){toast('الصق الرابط أولاً','error');return;}if(!sheetMode(v)){toast('رابط غير معروف — الصق رابط شيت أو Web App','error');return;}sheetSetUrl(v);refreshSheetUI();try{refreshTeacherSec();}catch(e){}toast('🔗 تم حفظ رابط الشيت');};
   var sy2=$('sheetSyncBtn');if(sy2)sy2.onclick=function(){sheetSyncNow();};
   var sp=$('sheetPullBtn');if(sp)sp.onclick=function(){var u=sheetGetUrl();if(!u){toast('الصق الرابط أولاً','error');return;}if(sheetMode(u)==='apps')sheetAppsPull();else if(sheetMode(u)==='sheet')sheetPullGviz();else toast('رابط غير معروف','error');};
   var sp2=$('sheetPushBtn');if(sp2)sp2.onclick=function(){var u=sheetGetUrl();if(!u){toast('الصق الرابط أولاً','error');return;}if(sheetMode(u)==='apps')sheetAppsPush(false);else{toast('الرفع يحتاج Web App — شوف خطوات الربط','error');$('sheetHelpModal').classList.remove('hidden');}};
   var st=$('sheetTestBtn');if(st)st.onclick=function(){sheetTestConn();};
   var sh=$('sheetHelpBtn');if(sh)sh.onclick=function(){$('sheetHelpModal').classList.remove('hidden');};
-  var su2=$('sheetUnlinkBtn');if(su2)su2.onclick=function(){sheetSetUrl('');refreshSheetUI();try{refreshParentLinkUI();}catch(e){}toast('تم إلغاء الربط');};
+  var su2=$('sheetUnlinkBtn');if(su2)su2.onclick=function(){sheetSetUrl('');refreshSheetUI();try{refreshTeacherSec();}catch(e){}toast('تم إلغاء الربط');};
   var fbt=$('fbSecToggle');if(fbt)fbt.onclick=function(){var b=$('fbSecBody');if(!b)return;b.classList.toggle('hidden');var c=$('fbSecChev');if(c)c.style.transform=b.classList.contains('hidden')?'':'rotate(-90deg)';};
   var fbs=$('fbSaveBtn');if(fbs)fbs.onclick=function(){
     var c={apiKey:(($('fbApiKey')||{}).value||'').trim(),authDomain:(($('fbAuthDomain')||{}).value||'').trim(),projectId:(($('fbProjectId')||{}).value||'').trim(),storageBucket:(($('fbBucket')||{}).value||'').trim(),messagingSenderId:(($('fbSenderId')||{}).value||'').trim(),appId:(($('fbAppId')||{}).value||'').trim()};
     if(!c.apiKey||!c.projectId||!c.appId){toast('اكتب API Key و Project ID و App ID على الأقل','error');return;}
-    fbSetCfg(c);refreshFbUI();updateSyncUI();fbSubscribe();try{refreshParentLinkUI();}catch(e){}toast('🔥 تم حفظ إعدادات Firebase');
+    fbSetCfg(c);refreshFbUI();updateSyncUI();fbSubscribe();try{refreshTeacherSec();}catch(e){}toast('🔥 تم حفظ إعدادات Firebase');
   };
-  /* ===== هوية المعلم لصفحة أولياء الأمور ===== */
-  var LS_TP='elmistar_teacher_profile';
-  var TPAIRS=[['#2563eb','#7c3aed'],['#059669','#34d399'],['#7c3aed','#ec4899'],['#ea580c','#f59e0b'],['#0284c7','#22d3ee'],['#db2777','#f472b6']];
-  function getTeacherProfile(){try{var p=JSON.parse(localStorage.getItem(LS_TP)||'null');if(p&&typeof p==='object')return{name:p.name||'',academy:p.academy||'',c1:p.c1||TPAIRS[0][0],c2:p.c2||TPAIRS[0][1],logo:p.logo||''};}catch(e){}return{name:'',academy:'',c1:TPAIRS[0][0],c2:TPAIRS[0][1],logo:''};}
-  function saveTeacherProfile(p){try{localStorage.setItem(LS_TP,JSON.stringify(p||{}));}catch(e){}}
-  function fillTeacherUI(){
-    var p=getTeacherProfile();
-    var n=$('tNameInp');if(n&&document.activeElement!==n)n.value=p.name;
-    var a=$('tAcademyInp');if(a&&document.activeElement!==a)a.value=p.academy;
-    var pv=$('tLogoPrev');if(pv){if(p.logo)pv.innerHTML='<img src="'+p.logo+'">';else pv.textContent='؟';}
-    var box=$('tColors');
-    if(box){box.innerHTML=TPAIRS.map(function(pr,i){var on=(p.c1===pr[0]&&p.c2===pr[1]);return '<div class="color'+(on?' active':'')+'" data-tc="'+i+'" style="background:linear-gradient(135deg,'+pr[0]+','+pr[1]+')"></div>';}).join('');
-    box.querySelectorAll('.color').forEach(function(el){el.onclick=function(){var pr=TPAIRS[parseInt(el.dataset.tc)];var pp=getTeacherProfile();pp.c1=pr[0];pp.c2=pr[1];saveTeacherProfile(pp);fillTeacherUI();};});}
-  }
-  function teacherLinkParams(){var p=getTeacherProfile();var s='';if(p.name)s+='&tn='+encodeURIComponent(p.name);if(p.academy)s+='&ta='+encodeURIComponent(p.academy);if(p.c1)s+='&tc='+encodeURIComponent(p.c1)+'&t2='+encodeURIComponent(p.c2);return s;}
-  /* ===== رابط أولياء الأمور: يُبنى على وسيلة الربط الحالية ===== */
-  function parentLinkBase(){try{var h=location.href.split('#')[0];var i=h.indexOf('?');if(i>=0)h=h.slice(0,i);return h.replace(/st\.html?$/,'')+'parent.html';}catch(e){return 'parent.html';}}
-  function parentLinkBuild(){
-    var c=null;try{c=fbGetCfg();}catch(e){}
-    if(c&&c.apiKey&&c.projectId)return{url:parentLinkBase()+'?f='+c.projectId+'.'+c.apiKey,src:'🔥 فايربيز Firestore'};
-    var u='';try{u=sheetGetUrl();}catch(e){}
-    if(u&&sheetMode(u)==='apps')return{url:parentLinkBase()+'?a='+encodeURIComponent(u)+teacherLinkParams(),src:'☁️ Web App'};
-    if(u){var id=sheetIdOf(u);if(id)return{url:parentLinkBase()+'?s='+id+teacherLinkParams(),src:'📄 جوجل شيت'};}
-    return{url:'',src:''};
-  }
-  var LS_SLUG='elmistar_parent_slug',LS_PLINK='elmistar_parent_published';
-  function parentSlugGet(){try{return (localStorage.getItem(LS_SLUG)||'').trim().toLowerCase();}catch(e){return '';}}
-  function parentSlugSet(s){try{if(s)localStorage.setItem(LS_SLUG,s);else localStorage.removeItem(LS_SLUG);}catch(e){}}
-  function parentPubGet(){try{return localStorage.getItem(LS_PLINK)||'';}catch(e){return '';}}
-  function parentPubSet(u){try{if(u)localStorage.setItem(LS_PLINK,u);else localStorage.removeItem(LS_PLINK);}catch(e){}}
-  function refreshParentLinkUI(){
-    var st=$('parentLinkStatus');if(!st)return;
-    var si=$('parentSlugInp');if(si&&document.activeElement!==si)si.value=parentSlugGet();
-    var pub=parentPubGet();
-    st.style.display='';
-    if(pub){st.className='sheet-link-status ok';st.innerHTML='🚀 صفحتك منشورة: <b dir="ltr">'+esc(pub)+'</b>';if(isFileProto())st.innerHTML+='<br>⚠️ تنبيه: أنت تفتح التطبيق كملف محلي — تأكد أن الرابط المنشور يبدأ بـ https ليعمل على أجهزة أخرى.';return;}
-    var r=parentLinkBuild();
-    if(r.url){st.style.display='none';}
-    else{st.className='sheet-link-status';st.textContent='غير مربوط — اربط فايربيز أو جوجل شيت أولاً';}
-  }
   var fbt2=$('fbTestBtn');if(fbt2)fbt2.onclick=function(){fbTestConn();};
   var fbpull=$('fbPullBtn');if(fbpull)fbpull.onclick=function(){fbPull();};
   var fbpush=$('fbPushBtn');if(fbpush)fbpush.onclick=function(){fbPush(false);};
   var fbsync=$('fbSyncBtn');if(fbsync)fbsync.onclick=function(){fbSyncNow();};
-  var fbun=$('fbUnlinkBtn');if(fbun)fbun.onclick=function(){try{if(fbUnsub){fbUnsub();fbUnsub=null;}}catch(e){}fbSetCfg(null);refreshFbUI();updateSyncUI();try{refreshParentLinkUI();}catch(e){}toast('تم فك ربط قاعدة البيانات');};
-  var plCopy=$('parentLinkCopyBtn');if(plCopy)plCopy.onclick=function(){var v=parentPubGet();if(!v){v=parentLinkBuild().url;if(!v){toast('انشر الصفحة أولاً بالمعرف','error');return;}}function ok(){toast('📋 اتنسخ رابط الصفحة');}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(v).then(ok,function(){fallbackCopyApps(v);ok();});}else{fallbackCopyApps(v);ok();}};
-  /* ===== اختصار الروابط: عدة مزودات بالتسلسل حتى ينجح أحدها ===== */
-  function isFileProto(){try{return location.protocol==='file:';}catch(e){return false;}}
-  function netProbe(cb){var done=false;function fin(v){if(done)return;done=true;cb(v);}var to=setTimeout(function(){fin(false);},8000);try{fetch('https://connectivitycheck.gstatic.com/generate_204',{mode:'no-cors',cache:'no-store'}).then(function(){clearTimeout(to);fin(true);},function(){clearTimeout(to);fin(false);});}catch(e){clearTimeout(to);fin(false);}}
-  function fetchTimeout(url,opts,ms){return new Promise(function(res,rej){var to=setTimeout(function(){rej(new Error('timeout'));},ms||12000);try{fetch(url,opts).then(function(r){clearTimeout(to);res(r);},function(e){clearTimeout(to);rej(e);});}catch(e){clearTimeout(to);rej(e);}});}
-  function shortenProviders(longUrl,slug){
-    var list=[];
-    if(slug)list.push(function(done){
-      fetchTimeout('https://is.gd/create.php?format=simple&url='+encodeURIComponent(longUrl)+'&shorturl='+encodeURIComponent(slug)).then(function(r){return r.text();}).then(function(t){t=String(t||'').trim();done(/^https?:\/\/is\.gd\//i.test(t)?t:null);}).catch(function(){done(null);});
-    });
-    list.push(function(done){
-      fetchTimeout('https://gotiny.cc/api',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input:longUrl})}).then(function(r){return r.json();}).then(function(j){var c=(j&&j[0]&&j[0].code)||(j&&j.code);done(c?('https://gotiny.cc/'+c):null);}).catch(function(){done(null);});
-    });
-    list.push(function(done){
-      fetchTimeout('https://cleanuri.com/api/v1/shorten',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'url='+encodeURIComponent(longUrl)}).then(function(r){return r.json();}).then(function(j){done(j&&j.result_url?j.result_url:null);}).catch(function(){done(null);});
-    });
-    if(!slug)list.push(function(done){
-      fetchTimeout('https://is.gd/create.php?format=simple&url='+encodeURIComponent(longUrl)).then(function(r){return r.text();}).then(function(t){t=String(t||'').trim();done(/^https?:\/\/is\.gd\//i.test(t)?t:null);}).catch(function(){done(null);});
-    });
-    return list;
-  }
-  function shortenUrl(longUrl,slug,cb){
-    var list=shortenProviders(longUrl,slug),finished=false,fallback=null,pending=list.length;
-    if(!pending){cb(null);return;}
-    var timer=setTimeout(function(){finish();},15000);
-    function finish(){if(finished)return;finished=true;clearTimeout(timer);cb(fallback);}
-    list.forEach(function(fn){
-      try{fn(function(short){
-        if(finished)return;
-        if(!short){if(--pending<=0)finish();return;}
-        if(slug&&short.toLowerCase().indexOf(String(slug).toLowerCase())>=0){finished=true;clearTimeout(timer);cb(short);return;}
-        if(!fallback)fallback=short;
-        if(--pending<=0)finish();
-      });}catch(e){if(--pending<=0)finish();}
-    });
-  }
-  var plOpen=$('parentLinkOpenBtn');if(plOpen)plOpen.onclick=function(){var v=parentPubGet();if(!v){toast('انشر الصفحة أولاً بالمعرف','error');return;}window.open(v,'_blank');};
-  var plPub=$('parentLinkPublishBtn');if(plPub)plPub.onclick=function(){
-    var slug=(($('parentSlugInp')||{}).value||'').trim().toLowerCase().replace(/[^a-z0-9-_]/g,'');
-    if(slug.length<3){toast('اختار معرّف من 3 حروف/أرقام على الأقل (إنجليزي)','error');return;}
-    var full=parentLinkBuild().url;if(!full){toast('لا يوجد رابط — اربط أولاً','error');return;}
-    if($('parentSlugInp'))$('parentSlugInp').value=slug;
-    toast('⏳ جاري نشر الرابط...');
-    shortenUrl(full,slug,function(short){
-      if(short){parentSlugSet(slug);parentPubSet(short);refreshParentLinkUI();toast('🚀 اتنشرت الصفحة بنجاح');}
-      else{
-        netProbe(function(online){
-          var detail;
-          if(!online)detail='لا يوجد اتصال بالإنترنت — تحقق من الاتصال ثم أعد المحاولة.';
-          else if(isFileProto())detail='خدمات الاختصار لا تقبل روابط file:// — ارفع مجلد التطبيق كاملاً على استضافة مجانية برابط https (مثال: Netlify Drop أو GitHub Pages) ثم افتح التطبيق من الرابط الجديد وأعد النشر.';
-          else{detail='خدمات الاختصار محظورة هنا — اتنسخ الرابط الكامل بدلاً منه:';try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(full);}catch(e){}}
-          var st=$('parentLinkStatus');
-          if(st){st.className='sheet-link-status err';st.innerHTML='تعذر النشر المختصر — '+detail+((!online||isFileProto())?'':'<br><b dir="ltr" style="word-break:break-all">'+esc(full)+'</b>');}
-          toast('تعذر النشر المختصر','error');
-        });
-      }
-    });
-  };
+  var fbun=$('fbUnlinkBtn');if(fbun)fbun.onclick=function(){try{if(fbUnsub){fbUnsub();fbUnsub=null;}}catch(e){}fbSetCfg(null);refreshFbUI();updateSyncUI();try{refreshTeacherSec();}catch(e){}toast('تم فك ربط قاعدة البيانات');};
   var fbau=$('fbAuto');if(fbau)fbau.onchange=function(){fbSetAuto(fbau.checked);fbSubscribe();toast(fbau.checked?'✅ المزامنة التلقائية شغالة':'⏸️ المزامنة التلقائية متوقفة');};
   var cpb=$('copyAppsCodeBtn');if(cpb)cpb.onclick=function(){var t=$('appsScriptCode').textContent;function ok(){toast('📋 اتنسخ الكود');}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,function(){fallbackCopyApps(t);ok();});}else{fallbackCopyApps(t);ok();}};
   var sy=$('syncNowBtn');if(sy)sy.onclick=function(){doSync(false);};

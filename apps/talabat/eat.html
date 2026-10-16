@@ -1,0 +1,855 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body data-sec="health">
+<title>طيبات اليوم</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&family=Cairo:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: phone-style app column (max 520px) on a sky-blue ground; big white section cards with a blue arc on top, pastel task-style rows with a colored edge, fixed bottom tab bar; sub-tabs inside each section; green accent for the balanced-meals section */
+:root{
+  --bg1:#E4F3FE; --bg2:#F5FAFE; --warm:#FDEBD0;
+  --surface:#FFFFFF; --fg:#16283B; --muted:#71859A; --line:#DCEAF6;
+  --blue:#1DAEF6; --blue-d:#0E8CCF; --blue-soft:#DCF0FD; --blue-line:#C6E5F8; --on-blue:#FFFFFF;
+  --y-bg:#FFF2C6; --y-line:#FBE3A0; --y-acc:#F5A00B;
+  --b-bg:#DDEEFC; --b-line:#C4E0F7; --b-acc:#1DA6F2;
+  --p-bg:#FDE5F1; --p-line:#F8CBE2; --p-acc:#EC4899;
+  --m-bg:#D2F8EC; --m-line:#ADEBD6; --m-acc:#14B8A6;
+  --ok:#0C8A6A; --warn:#B06F06; --no:#C23779;
+  --shadow:0 14px 34px -18px rgba(29,120,190,.45);
+  --font-display:"Baloo Bhaijaan 2","Cairo",system-ui,sans-serif;
+  --font-body:"Cairo","Baloo Bhaijaan 2",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg1:#0B1723; --bg2:#0F1D2C; --warm:#2B2213;
+    --surface:#162536; --fg:#E6F0FA; --muted:#93A6BA; --line:#24384C;
+    --blue:#3BB8F8; --blue-d:#1DA0E6; --blue-soft:#1B3A52; --blue-line:#25475F; --on-blue:#06243A;
+    --y-bg:#3A3118; --y-line:#554622; --y-acc:#F7B83A;
+    --b-bg:#17344C; --b-line:#224A68; --b-acc:#4DB8F8;
+    --p-bg:#3C2236; --p-line:#58304F; --p-acc:#F472B6;
+    --m-bg:#143B36; --m-line:#1D544C; --m-acc:#2DD4BF;
+    --ok:#4FD1A8; --warn:#F7B83A; --no:#F58BBA;
+    --shadow:0 14px 34px -18px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg1:#0B1723; --bg2:#0F1D2C; --warm:#2B2213;
+  --surface:#162536; --fg:#E6F0FA; --muted:#93A6BA; --line:#24384C;
+  --blue:#3BB8F8; --blue-d:#1DA0E6; --blue-soft:#1B3A52; --blue-line:#25475F; --on-blue:#06243A;
+  --y-bg:#3A3118; --y-line:#554622; --y-acc:#F7B83A;
+  --b-bg:#17344C; --b-line:#224A68; --b-acc:#4DB8F8;
+  --p-bg:#3C2236; --p-line:#58304F; --p-acc:#F472B6;
+  --m-bg:#143B36; --m-line:#1D544C; --m-acc:#2DD4BF;
+  --ok:#4FD1A8; --warn:#F7B83A; --no:#F58BBA;
+  --shadow:0 14px 34px -18px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background-color:var(--bg2);
+  background-image:radial-gradient(60% 28% at 0% 16%,var(--warm),transparent 72%),linear-gradient(180deg,var(--bg1),var(--bg2));
+  background-attachment:fixed;
+  color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.6;direction:rtl;
+}
+button{font-family:inherit;color:inherit}
+h1,h2,h3,h4,p{margin:0}
+.app{max-width:520px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 128px}
+.head{display:flex;flex-direction:column;padding-block:6px 14px}
+.date{color:var(--muted);font-weight:600;font-size:.88rem}
+h1{font-family:var(--font-display);font-weight:800;font-size:2rem;line-height:1.3;color:var(--blue)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.panel[hidden]{display:none}
+.stack{display:flex;flex-direction:column;gap:16px}
+
+/* big white cards */
+.bigcard{background:var(--surface);border-top:5px solid var(--blue);border-radius:34px;box-shadow:var(--shadow);padding:18px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.hrow{display:flex;align-items:center;gap:14px}
+.hico{width:56px;height:56px;border-radius:20px;background:linear-gradient(145deg,var(--blue-soft),var(--surface));border:1.5px solid var(--blue-line);display:grid;place-items:center;font-size:1.7rem;flex:none}
+.htxt{flex:1;min-width:0}
+.htxt h2{font-family:var(--font-display);font-weight:800;font-size:1.45rem;line-height:1.3}
+.htxt p{color:var(--muted);font-size:.9rem;font-weight:500}
+.plus{width:56px;height:56px;border-radius:20px;border:0;background:linear-gradient(145deg,var(--blue),var(--blue-d));color:var(--on-blue);display:grid;place-items:center;cursor:pointer;flex:none;box-shadow:0 10px 20px -10px var(--blue)}
+.plus svg{width:26px;height:26px}
+.mini-label{font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:-8px}
+
+/* pill tabs */
+.pilltabs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ptab{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:1rem;padding:11px 8px;border-radius:22px;background:var(--surface);border:1.5px solid var(--line);color:var(--fg);cursor:pointer;min-width:0}
+.ptab .bd{min-width:30px;height:30px;padding:0 6px;border-radius:999px;background:var(--line);color:var(--muted);display:grid;place-items:center;font-size:.95rem;font-weight:700}
+.ptab[aria-pressed="true"]{background:var(--blue);color:var(--on-blue);border-color:var(--blue);box-shadow:0 10px 20px -10px var(--blue)}
+.ptab[aria-pressed="true"] .bd{background:rgba(255,255,255,.3);color:inherit}
+.pilltabs.p3{grid-template-columns:repeat(3,1fr)}
+.pilltabs.p3 .ptab{flex-direction:column;gap:2px;padding:9px 6px;font-size:.95rem;line-height:1.35}
+.ptab small{font-size:.74rem;font-weight:600;opacity:.85}
+#food-filters .ptab:last-child:nth-child(odd){grid-column:1/-1}
+
+/* pastel task rows */
+.t-y{--tint:var(--y-bg);--tl:var(--y-line);--acc:var(--y-acc)}
+.t-b{--tint:var(--b-bg);--tl:var(--b-line);--acc:var(--b-acc)}
+.t-p{--tint:var(--p-bg);--tl:var(--p-line);--acc:var(--p-acc)}
+.t-m{--tint:var(--m-bg);--tl:var(--m-line);--acc:var(--m-acc)}
+.list{display:flex;flex-direction:column;gap:12px}
+.task{background:var(--tint);border:1.5px solid var(--tl);border-inline-start:6px solid var(--acc);border-radius:26px;padding:12px 12px;display:flex;flex-direction:column;min-width:0}
+.task-row{display:flex;align-items:center;gap:12px}
+.chk{width:32px;height:32px;border-radius:50%;border:3px solid var(--acc);background:transparent;cursor:pointer;flex:none;display:grid;place-items:center;padding:0;font-size:1rem;font-weight:800;line-height:1}
+.chk[aria-pressed="true"]{background:var(--acc)}
+.chk[aria-pressed="true"]::after{content:"✓";color:#fff}
+.ico{width:52px;height:52px;border-radius:18px;background:var(--surface);color:var(--acc);display:grid;place-items:center;flex:none;box-shadow:0 6px 14px -8px rgba(20,60,100,.35);font-size:1.6rem}
+.ico svg{width:26px;height:26px}
+.task-main{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;text-align:start;background:none;border:0;padding:0;cursor:pointer}
+.task-main.static{cursor:default}
+.task-t{font-family:var(--font-display);font-weight:700;font-size:1.12rem;line-height:1.4}
+.task-s{color:var(--muted);font-size:.84rem;font-weight:600}
+.x{width:38px;height:38px;border-radius:50%;border:0;background:transparent;color:var(--muted);cursor:pointer;display:grid;place-items:center;flex:none}
+.x svg{width:22px;height:22px}
+.task.done .task-t{text-decoration:line-through;opacity:.6}
+.task.done .ico{opacity:.7}
+
+/* recipe panel */
+.recipe{background:var(--surface);border-radius:22px;padding:14px;margin-top:12px;display:grid;gap:14px}
+.recipe[hidden]{display:none}
+.recipe h4{margin:0 0 8px;font-family:var(--font-display);font-size:1rem;color:var(--blue)}
+.ing{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.ing li{background:var(--blue-soft);border-radius:999px;padding:1px 12px;font-size:.9rem;font-weight:500}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s;display:grid;gap:10px}
+.steps li{counter-increment:s;position:relative;padding-inline-start:38px;font-size:.95rem}
+.steps li::before{content:counter(s);position:absolute;inset-inline-start:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--blue);color:var(--on-blue);display:grid;place-items:center;font-weight:700;font-size:.85rem}
+.rnote{font-size:.85rem;color:var(--fg);background:var(--y-bg);border-radius:14px;padding:8px 12px;font-weight:500}
+
+/* stat tiles */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tile{position:relative;overflow:hidden;background:linear-gradient(160deg,var(--blue-soft),var(--surface));border:1.5px solid var(--blue-line);border-radius:32px;padding:16px 18px;min-height:112px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;isolation:isolate}
+.tile::after{content:"";position:absolute;inset-inline-end:-26px;bottom:-34px;width:120px;height:120px;border-radius:50%;background:var(--blue-soft);z-index:-1}
+.tile-n{font-family:var(--font-display);font-weight:800;font-size:2.3rem;line-height:1.1;color:var(--blue)}
+.tile-l{color:var(--muted);font-weight:600;font-size:.88rem}
+
+/* notice + tip bubble */
+.notice{background:var(--y-bg);border:1.5px solid var(--y-line);border-radius:24px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start;font-size:.86rem;font-weight:500}
+.notice .em{font-size:1.4rem;line-height:1.3}
+.notice-fold{background:var(--y-bg);border:1.5px solid var(--y-line);border-radius:24px;padding:0 16px}
+.notice-fold>.notice{background:none;border:none;border-radius:0;padding:0 0 12px}
+.notice-sum{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:800;font-size:.92rem;padding:12px 0;color:var(--fg)}
+.notice-sum::-webkit-details-marker{display:none}
+.notice-sum::after{content:"‹";margin-right:auto;font-size:1.2rem;font-weight:900;color:var(--y-acc);transition:transform .25s;line-height:1}
+.notice-fold[open] .notice-sum::after{transform:rotate(-90deg)}
+.tipbar{display:flex;align-items:center;gap:14px}
+.mascot{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE27A,#FFC21F);border:5px solid var(--surface);box-shadow:var(--shadow);display:grid;place-items:center;font-size:2.6rem;flex:none}
+.bubble{flex:1;min-width:0;background:var(--surface);border-radius:28px;padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;cursor:pointer}
+.bubble p{font-family:var(--font-display);font-weight:600;font-size:1.05rem;line-height:1.55;min-height:3.3em}
+.dots{display:flex;gap:6px;align-items:center}
+.dots i{width:8px;height:8px;border-radius:99px;background:var(--blue-line);display:block}
+.dots i.on{width:22px;background:var(--blue)}
+
+/* foods */
+.search{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--blue-line);border-radius:999px;padding:4px 16px}
+.search svg{width:22px;height:22px;color:var(--blue);flex:none}
+.search input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-weight:500;color:var(--fg);padding:8px 0}
+.search input:focus-visible{outline:none}
+.search:focus-within{outline:3px solid var(--blue);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding-top:10px}
+.chip{background:var(--surface);border:1.5px solid currentColor;border-radius:999px;padding:0 12px;font-size:.9rem;font-weight:700}
+.chip.ok{color:var(--ok)}.chip.warn{color:var(--warn)}.chip.no{color:var(--no);text-decoration:line-through;text-decoration-thickness:1.5px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;font-weight:600;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:6px;background:currentColor}
+.legend .l-ok{color:var(--ok)}.legend .l-warn{color:var(--warn)}.legend .l-no{color:var(--no)}
+.legend .l-cheap::before{display:none}
+.empty{color:var(--muted);text-align:center;padding:18px 0;font-weight:600}
+
+/* plan */
+.meals{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.mrow{background:var(--surface);border-radius:20px;padding:8px 10px}
+.mrow-btn{width:100%;display:flex;align-items:center;gap:12px;background:none;border:0;padding:0;cursor:pointer;text-align:start}
+.mi{width:40px;height:40px;border-radius:14px;background:var(--tint);color:var(--acc);display:grid;place-items:center;flex:none}
+.mi svg{width:22px;height:22px}
+.mrow-btn>span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column}
+.mrow-btn small{color:var(--muted);font-weight:700;font-size:.76rem}
+.mrow-btn b{font-family:var(--font-display);font-weight:700;font-size:1rem;line-height:1.4}
+.chev{width:22px;height:22px;color:var(--muted);flex:none;transition:transform .2s}
+.mrow-btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.mrow .recipe{background:var(--bg2);margin-top:8px}
+.guide-note{font-size:.88rem;font-weight:500;color:var(--muted)}
+
+/* rules */
+.rule p{font-size:.92rem;font-weight:500;padding-top:8px}
+.rhythm{display:grid}
+.rhythm div{display:grid;grid-template-columns:3rem 1fr;gap:12px;padding-block:12px;border-top:1.5px dashed var(--line);align-items:start}
+.rhythm div:first-child{border-top:0}
+.rhythm .e{font-size:1.8rem;line-height:1.2;text-align:center}
+.rhythm b{font-family:var(--font-display);color:var(--blue);font-weight:700;display:block}
+.rhythm span{font-size:.92rem;font-weight:500}
+.src{display:flex;flex-direction:column;gap:6px;font-size:.88rem;font-weight:600}
+.src a{color:var(--blue-d)}
+:root[data-theme="dark"] .src a{color:var(--blue)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .src a{color:var(--blue)}}
+
+/* sub tabs inside each section */
+.subtabs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 14px;scrollbar-width:none}
+.subtabs::-webkit-scrollbar{display:none}
+.stab{flex:1 0 auto;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:.95rem;padding:9px 16px;border-radius:999px;background:var(--surface);border:1.5px solid var(--line);color:var(--muted);cursor:pointer;white-space:nowrap}
+.stab[aria-selected="true"]{background:var(--blue);border-color:var(--blue);color:var(--on-blue);box-shadow:0 10px 20px -12px var(--blue)}
+
+/* green accent for the balanced-meals section (token names keep "blue") */
+body[data-sec="health"]{--blue:#15854F;--blue-d:#0F6B3E;--blue-soft:#DDF4E7;--blue-line:#C0E8D1;--on-blue:#FFFFFF}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) body[data-sec="health"]{--blue:#4ADE80;--blue-d:#22C55E;--blue-soft:#183A2A;--blue-line:#24533B;--on-blue:#052E16}}
+:root[data-theme="dark"] body[data-sec="health"]{--blue:#4ADE80;--blue-d:#22C55E;--blue-soft:#183A2A;--blue-line:#24533B;--on-blue:#052E16}
+
+/* nutrition facts and plate guide */
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mgrid div{background:var(--blue-soft);border-radius:16px;padding:8px 4px;text-align:center;display:flex;flex-direction:column;line-height:1.35;min-width:0}
+.mgrid b{font-family:var(--font-display);font-weight:800;font-size:1.1rem;color:var(--blue)}
+.mgrid span{font-size:.72rem;color:var(--muted);font-weight:600}
+.plate-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center}
+.plate{width:176px;height:176px;border-radius:50%;flex:none;border:10px solid var(--surface);box-shadow:0 0 0 2px var(--blue-line),var(--shadow);background:conic-gradient(from 0deg,#34B36B 0 50%,#F5A00B 50% 75%,#EC6C8E 75% 100%)}
+.plate-key{display:grid;gap:12px;flex:1;min-width:200px}
+.plate-key>div{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;font-weight:500}
+.plate-key i{width:14px;height:14px;border-radius:50%;flex:none;margin-top:7px}
+.plate-key b{display:block;font-family:var(--font-display);font-weight:700}
+
+/* light / dark toggle */
+.head-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.themebtn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--blue-line);background:var(--surface);color:var(--blue);display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 18px -10px var(--blue);padding:0}
+.themebtn svg{width:22px;height:22px}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;z-index:10;pointer-events:none}
+.nav-in{pointer-events:auto;width:100%;max-width:520px;background:var(--surface);border-radius:32px 32px 0 0;box-shadow:0 -10px 30px -16px rgba(29,120,190,.5);display:grid;grid-template-columns:repeat(2,1fr);gap:4px;padding-top:12px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+.nb{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;cursor:pointer;color:var(--muted);font-weight:700;font-size:.82rem;padding:0;min-width:0}
+.nb .ni{width:58px;height:34px;border-radius:17px;display:grid;place-items:center}
+.nb svg{width:25px;height:25px}
+.nb[aria-selected="true"]{color:var(--blue)}
+.nb[aria-selected="true"] .ni{background:var(--blue-soft)}
+.nb .bar{width:30px;height:4px;border-radius:4px;background:transparent}
+.nb[aria-selected="true"] .bar{background:var(--blue)}
+@media (prefers-reduced-motion:reduce){.chev{transition:none}}
+</style>
+
+<div class="app" dir="rtl" lang="ar">
+  <header class="head">
+    <div class="head-top"><span class="date" id="today-date"></span><button type="button" class="themebtn" id="theme-btn" aria-label="تبديل الوضع الليلي والنهاري"></button></div>
+    <h1 id="app-h1">وجبات صحية متوازنة</h1>
+  </header>
+
+  <main>
+  <div class="group" id="g-tay" hidden>
+    <div class="subtabs" role="tablist" aria-label="أقسام نظام الطيبات" data-g="tay">
+      <button type="button" class="stab" role="tab" id="s-today" data-sub="today" aria-selected="true">🍽️ اليوم</button>
+      <button type="button" class="stab" role="tab" id="s-foods" data-sub="foods" aria-selected="false">🥗 الأطعمة</button>
+      <button type="button" class="stab" role="tab" id="s-plan" data-sub="plan" aria-selected="false">📅 الأسبوع</button>
+      <button type="button" class="stab" role="tab" id="s-rules" data-sub="rules" aria-selected="false">📖 المبادئ</button>
+    </div>
+
+    <section class="panel stack" id="p-today" role="tabpanel" aria-labelledby="s-today">
+      <details class="notice-fold"><summary class="notice-sum">📖 دليل النظام وتنبيه مهم — اضغط للعرض</summary><div class="notice"><span class="em">⚕️</span><span>دليل معلوماتي عن نظام الطيبات المنسوب للدكتور ضياء العوضي، وتختلف المصادر في بعض التفاصيل. النظام يمنع البقوليات والألبان السائلة والدواجن والبيض ولا يحظى بإجماع طبي، فاستشر طبيبك قبل الالتزام به.</span></div></details>
+
+      <div class="tiles">
+        <div class="tile"><span class="tile-n" id="stat-done">0/3</span><span class="tile-l">وجبات تم تناولها</span></div>
+        <div class="tile"><span class="tile-n" id="stat-type"></span><span class="tile-l">نوع اليوم</span></div>
+      </div>
+
+      <div class="bigcard">
+        <div class="hrow">
+          <span class="hico" aria-hidden="true">🍽️</span>
+          <div class="htxt"><h2>وجبات اليوم</h2><p id="today-sub"></p></div>
+          <button type="button" class="plus" id="swap-all" aria-label="غيّر كل الوجبات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14-4M4 5v4h4M4 13a8 8 0 0 0 14 4M20 19v-4h-4"/></svg></button>
+        </div>
+        <div class="pilltabs" role="group" aria-label="نوع اليوم">
+          <button type="button" class="ptab" data-dt="c" aria-pressed="false"><span class="bd" aria-hidden="true">🍚</span>نشويات</button>
+          <button type="button" class="ptab" data-dt="p" aria-pressed="false"><span class="bd" aria-hidden="true">🥩</span>بروتين</button>
+        </div>
+        <div class="mini-label">الميزانية</div>
+        <div class="pilltabs p3" role="group" aria-label="الميزانية">
+          <button type="button" class="ptab" data-tbud="1" aria-pressed="false">اقتصادي<small>الأرخص</small></button>
+          <button type="button" class="ptab" data-tbud="2" aria-pressed="true">متوسط<small>معظم الأيام</small></button>
+          <button type="button" class="ptab" data-tbud="3" aria-pressed="false">مفتوح<small>بلا قيود</small></button>
+        </div>
+        <div class="list" id="today-slots"></div>
+      </div>
+
+      <div class="tipbar">
+        <div class="mascot" aria-hidden="true">🍚</div>
+        <div class="bubble" id="tip-bubble"><p id="tip-text"></p><div class="dots" id="tip-dots"></div></div>
+      </div>
+    </section>
+
+    <section class="panel stack" id="p-foods" role="tabpanel" aria-labelledby="s-foods" hidden>
+      <div class="bigcard">
+        <div class="hrow">
+          <span class="hico" aria-hidden="true">🥗</span>
+          <div class="htxt"><h2>الأطعمة</h2><p>ابحث عن طعام أو صفِّ بالحالة</p></div>
+        </div>
+        <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="food-q" type="search" placeholder="هل هذا مسموح؟ مثل: كوسا" aria-label="ابحث عن طعام"></label>
+        <div class="pilltabs" role="group" aria-label="تصفية الحالة" id="food-filters"></div>
+        <div class="legend"><span class="l-ok">مسموح</span><span class="l-warn">خلاف بين المصادر</span><span class="l-no">ممنوع</span></div>
+      </div>
+      <div class="list" id="food-list"></div>
+    </section>
+
+    <section class="panel stack" id="p-plan" role="tabpanel" aria-labelledby="s-plan" hidden>
+      <div class="bigcard">
+        <div class="hrow">
+          <span class="hico" aria-hidden="true">📅</span>
+          <div class="htxt"><h2>النظام الأسبوعي</h2><p>أسبوعان يتناوبان حتى يكون البروتين يوماً بعد يوم</p></div>
+        </div>
+        <div class="pilltabs" role="group" aria-label="الأسبوع">
+          <button type="button" class="ptab" data-w="0" aria-pressed="true">الأسبوع الأول</button>
+          <button type="button" class="ptab" data-w="1" aria-pressed="false">الأسبوع الثاني</button>
+        </div>
+        <div class="mini-label">الميزانية</div>
+        <div class="pilltabs p3" role="group" aria-label="الميزانية">
+          <button type="button" class="ptab" data-tbud="1" aria-pressed="false">اقتصادي<small>الأرخص</small></button>
+          <button type="button" class="ptab" data-tbud="2" aria-pressed="true">متوسط<small>معظم الأيام</small></button>
+          <button type="button" class="ptab" data-tbud="3" aria-pressed="false">مفتوح<small>بلا قيود</small></button>
+        </div>
+        <p class="guide-note">في يوم البروتين حصة واحدة في الغداء، والفطور والعشاء خفيفان. كرر الأسبوعين بالتناوب، واكتفِ بوجبتين إن لم تجُع. الأطباق تتغير حسب الميزانية التي تختارها.</p>
+      </div>
+      <div class="list" id="plan-days"></div>
+      <div class="bigcard">
+        <div class="hrow"><span class="hico" aria-hidden="true">🧮</span><div class="htxt"><h2>تدبير الأسبوع</h2><p>كيف توفّر دون أن تخرج عن النظام</p></div></div>
+        <div class="list">
+          <article class="task t-y"><div class="task-row"><span class="ico" aria-hidden="true">🍚</span><div class="task-main static"><h3 class="task-t">اطبخ الأرز والخضار لوجبتين</h3><span class="task-s">وبرّد الباقي بسرعة وسخّنه جيداً. أما البروتين فاطهه طازجاً في يومه.</span></div></div></article>
+          <article class="task t-b"><div class="task-row"><span class="ico" aria-hidden="true">🛒</span><div class="task-main static"><h3 class="task-t">اشترِ الأساسيات بالكيلو</h3><span class="task-s">الأرز والبطاطس والبطاطا من أرخص مصادر الشبع في النظام، وتتحمل التخزين في مكان جاف وبارد.</span></div></div></article>
+          <article class="task t-p"><div class="task-row"><span class="ico" aria-hidden="true">🥬</span><div class="task-main static"><h3 class="task-t">اختر الخضار الموسمية</h3><span class="task-s">الكوسا والباذنجان والبامية والقلقاس والقرنبيط أرخص وأطعم في موسمها، والمجمد بديل خارج الموسم.</span></div></div></article>
+          <article class="task t-m"><div class="task-row"><span class="ico" aria-hidden="true">🔥</span><div class="task-main static"><h3 class="task-t">وفّر الغاز والوقت</h3><span class="task-s">قدر الضغط للكوارع واللحم، وصينية واحدة في الفرن تجمع الخضار والبطاطس.</span></div></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel stack" id="p-rules" role="tabpanel" aria-labelledby="s-rules" hidden>
+      <div class="bigcard">
+        <div class="hrow">
+          <span class="hico" aria-hidden="true">📖</span>
+          <div class="htxt"><h2>المبادئ</h2><p>قواعد النظام في أربع نقاط</p></div>
+        </div>
+        <div class="list">
+          <article class="task t-y rule"><div class="task-row"><span class="ico" aria-hidden="true">⏰</span><div class="task-main static"><h3 class="task-t">كُل عند الجوع فقط</h3></div></div><p>لا وجبات بالساعة. انتظر الجوع الحقيقي، وتوقف قبل الشبع الكامل.</p></article>
+          <article class="task t-b rule"><div class="task-row"><span class="ico" aria-hidden="true">🥩</span><div class="task-main static"><h3 class="task-t">بروتين يوم بعد يوم</h3></div></div><p>اللحوم والكبدة والكوارع والحمام والأرانب والأسماك في يوم، والنشويات والخضار المطبوخ في اليوم الذي بعده.</p></article>
+          <article class="task t-p rule"><div class="task-row"><span class="ico" aria-hidden="true">🍲</span><div class="task-main static"><h3 class="task-t">المطبوخ قبل النيء</h3></div></div><p>الخضار تؤكل مطبوخة جيداً، والسلطة الخضراء والخضار النيئة خارج النظام.</p></article>
+          <article class="task t-m rule"><div class="task-row"><span class="ico" aria-hidden="true">🍚</span><div class="task-main static"><h3 class="task-t">الأساسيات اليومية</h3></div></div><p>الأرز والبطاطس والتمر والسكر وزيت الزيتون تؤكل بانتظام، وبقية المسموحات يُنصح بتنويعها وتباعدها.</p></article>
+        </div>
+      </div>
+
+      <div class="bigcard">
+        <div class="hrow"><span class="hico" aria-hidden="true">🕒</span><div class="htxt"><h2>إيقاع اليوم</h2><p>اقتراح عام، وتخطَّ ما لا تحتاجه</p></div></div>
+        <div class="rhythm">
+          <div><span class="e">🌅</span><span><b>الصباح</b>وجبة خفيفة عند أول جوع: بطاطا أو بطاطس بالزبدة، أو تمر بالقشطة مع شاي أخضر.</span></div>
+          <div><span class="e">☀️</span><span><b>الظهر</b>الوجبة الرئيسية: بروتين في يوم البروتين، وأرز مع خضار مطبوخ في يوم النشويات.</span></div>
+          <div><span class="e">🌙</span><span><b>المساء</b>عشاء خفيف من الأرز أو البطاطس أو الفاكهة مع الجبن المسموح، ولا تأكل إن لم تجُع.</span></div>
+          <div><span class="e">🍵</span><span><b>بين الوجبات</b>فترة صيام حتى الجوع التالي، وأعشاب أو شاي أخضر عند الرغبة.</span></div>
+        </div>
+      </div>
+
+      <div class="bigcard">
+        <div class="hrow"><span class="hico" aria-hidden="true">🔗</span><div class="htxt"><h2>ملاحظات المصادر</h2><p>أين تختلف التفاصيل</p></div></div>
+        <p style="font-size:.9rem;font-weight:500">الخبز والقمح والفريك والبرغل والسمك وزيت الذرة وعباد الشمس وبعض الفواكه تُذكر بشكل مختلف بين المصادر، لذلك تظهر بحالة "خلاف". راجع المصدر الأصلي للنظام قبل الاعتماد عليها.</p>
+        <div class="src">
+          <a href="https://eltayyibat.com/en/allowed-and-forbidden-foods-in-tayyibat-system/" target="_blank" rel="noopener">المناطق الخضراء والصفراء والبرتقالية</a>
+          <a href="https://tanja7.com/185934/" target="_blank" rel="noopener">المسموح والممنوع من الأكل</a>
+          <a href="https://eltayibat.com/" target="_blank" rel="noopener">دليل الأطعمة الشامل</a>
+          <a href="https://www.deema.inc/dr-diaa-el-awady-tayebat-diet-table-guide/" target="_blank" rel="noopener">جدول نظام الطيبات</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="group" id="g-health">
+    <div class="subtabs" role="tablist" aria-label="أقسام الوجبات الصحية" data-g="health">
+      <button type="button" class="stab" role="tab" id="s-h-today" data-sub="h-today" aria-selected="true">🍽️ اليوم</button>
+      <button type="button" class="stab" role="tab" id="s-h-plan" data-sub="h-plan" aria-selected="false">📅 الأسبوع</button>
+      <button type="button" class="stab" role="tab" id="s-h-guide" data-sub="h-guide" aria-selected="false">🥗 دليل الطبق</button>
+    </div>
+
+    <section class="panel stack" id="p-h-today" role="tabpanel" aria-labelledby="s-h-today">
+      <details class="notice-fold"><summary class="notice-sum">⚕️ معلومات غذائية عامة — اضغط للعرض</summary><div class="notice"><span class="em">⚕️</span><span>معلومات غذائية عامة للبالغين الأصحاء، والسعرات والعناصر الغذائية تقريبية لحصة متوسطة. احتياجك يختلف حسب العمر والوزن والنشاط. إن احتجت سعرات أكثر فاختر هدف "نشاط" أو زد حصة الحبوب الكاملة، واستشر طبيبك أو أخصائي تغذية عند وجود مرض أو حمل أو حساسية.</span></div></details>
+
+      <div class="tiles">
+        <div class="tile"><span class="tile-n" id="h-stat-done">0/4</span><span class="tile-l">وجبات تم تناولها</span></div>
+        <div class="tile"><span class="tile-n" id="h-stat-kcal">0</span><span class="tile-l">سعر حراري لخطة اليوم</span></div>
+      </div>
+
+      <div class="bigcard">
+        <div class="hrow">
+          <span class="hico" aria-hidden="true">🥗</span>
+          <div class="htxt"><h2>وجبات اليوم</h2><p id="h-today-sub"></p></div>
+          <button type="button" class="plus" id="h-swap-all" aria-label="غيّر كل الوجبات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14-4M4 5v4h4M4 13a8 8 0 0 0 14 4M20 19v-4h-4"/></svg></button>
+        </div>
+        <div class="mini-label">هدف اليوم</div>
+        <div class="pilltabs p3" role="group" aria-label="هدف اليوم">
+          <button type="button" class="ptab" data-hg="l" aria-pressed="false">خفيف<small>أقل سعرات</small></button>
+          <button type="button" class="ptab" data-hg="m" aria-pressed="true">متوازن<small>للأغلب</small></button>
+          <button type="button" class="ptab" data-hg="s" aria-pressed="false">نشاط<small>سعرات أعلى</small></button>
+        </div>
+        <div class="mini-label">الميزانية</div>
+        <div class="pilltabs p3" role="group" aria-label="الميزانية">
+          <button type="button" class="ptab" data-hbud="1" aria-pressed="false">اقتصادي<small>الأرخص</small></button>
+          <button type="button" class="ptab" data-hbud="2" aria-pressed="true">متوسط<small>معظم الأيام</small></button>
+          <button type="button" class="ptab" data-hbud="3" aria-pressed="false">مفتوح<small>بلا قيود</small></button>
+        </div>
+        <div class="list" id="h-today-slots"></div>
+      </div>
+
+      <div class="tipbar">
+        <div class="mascot" aria-hidden="true">🥗</div>
+        <div class="bubble" id="h-tip-bubble"><p id="h-tip-text"></p><div class="dots" id="h-tip-dots"></div></div>
+      </div>
+    </section>
+
+    <section class="panel stack" id="p-h-plan" role="tabpanel" aria-labelledby="s-h-plan" hidden>
+      <div class="bigcard">
+        <div class="hrow">
+          <span class="hico" aria-hidden="true">📅</span>
+          <div class="htxt"><h2>الأسبوع المتوازن</h2><p>سبعة أيام بأربع وجبات يومياً</p></div>
+        </div>
+        <div class="mini-label">الميزانية</div>
+        <div class="pilltabs p3" role="group" aria-label="الميزانية">
+          <button type="button" class="ptab" data-hbud="1" aria-pressed="false">اقتصادي<small>الأرخص</small></button>
+          <button type="button" class="ptab" data-hbud="2" aria-pressed="true">متوسط<small>معظم الأيام</small></button>
+          <button type="button" class="ptab" data-hbud="3" aria-pressed="false">مفتوح<small>بلا قيود</small></button>
+        </div>
+        <p class="guide-note">في كل ميزانية يضم الأسبوع سمكاً مرتين، وتتوزع بقية الغداءات بين الدجاج واللحم والعدس والكشري الصحي. الأرقام تقريبية، وتختلف الاحتياجات من شخص لآخر.</p>
+      </div>
+      <div class="list" id="h-plan-days"></div>
+      <div class="bigcard">
+        <div class="hrow"><span class="hico" aria-hidden="true">🧮</span><div class="htxt"><h2>تدبير الأسبوع</h2><p>كيف تأكل صحياً بأقل تكلفة</p></div></div>
+        <div class="list">
+          <article class="task t-y"><div class="task-row"><span class="ico" aria-hidden="true">🥘</span><div class="task-main static"><h3 class="task-t">اطبخ مرة وكُل مرتين</h3><span class="task-s">العدس والأرز البني والفول تُطبخ بكمية تكفي يومين وتُحفظ باردة، وتسخَّن جيداً قبل الأكل.</span></div></div></article>
+          <article class="task t-b"><div class="task-row"><span class="ico" aria-hidden="true">🍗</span><div class="task-main static"><h3 class="task-t">دجاجة كاملة بدل الصدور</h3><span class="task-s">الصدر للمشوي، والأفخاذ للصينية، والهيكل للمرق والشوربة.</span></div></div></article>
+          <article class="task t-p"><div class="task-row"><span class="ico" aria-hidden="true">🛒</span><div class="task-main static"><h3 class="task-t">اشترِ الحبوب الجافة بالكيلو</h3><span class="task-s">العدس والفول والحمص والأرز والبرغل والشوفان أوفر من العبوات الصغيرة والجاهزة.</span></div></div></article>
+          <article class="task t-m"><div class="task-row"><span class="ico" aria-hidden="true">🥬</span><div class="task-main static"><h3 class="task-t">الموسمي أرخص وأطعم</h3><span class="task-s">اختر خضار وفاكهة الموسم، والمجمد بديل جيد خارج الموسم.</span></div></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel stack" id="p-h-guide" role="tabpanel" aria-labelledby="s-h-guide" hidden>
+      <div class="bigcard">
+        <div class="hrow">
+          <span class="hico" aria-hidden="true">🍽️</span>
+          <div class="htxt"><h2>طبقك المتوازن</h2><p>نسب مقترحة لكل وجبة رئيسية</p></div>
+        </div>
+        <div class="plate-wrap">
+          <div class="plate" role="img" aria-label="طبق مقسوم: نصف للخضار والفاكهة، وربع للحبوب الكاملة، وربع للبروتين"></div>
+          <div class="plate-key">
+            <div><i style="background:#34B36B"></i><span><b>نصف الطبق: خضار وفاكهة</b>نوّع الألوان، والخضار أكثر من الفاكهة. البطاطس لا تُحسب خضاراً.</span></div>
+            <div><i style="background:#F5A00B"></i><span><b>ربع الطبق: حبوب كاملة</b>أرز بني وبرغل وشوفان وخبز أسمر.</span></div>
+            <div><i style="background:#EC6C8E"></i><span><b>ربع الطبق: بروتين</b>سمك ودجاج وبقوليات ومكسرات.</span></div>
+          </div>
+        </div>
+        <p class="guide-note">زيت الزيتون وبقية الزيوت النباتية بكميات معتدلة خارج الطبق. اشرب الماء أو القهوة أو الشاي بدون سكر.</p>
+      </div>
+
+      <div class="bigcard">
+        <div class="hrow"><span class="hico" aria-hidden="true">📏</span><div class="htxt"><h2>أرقام مرجعية</h2><p>من إرشادات منظمة الصحة العالمية للبالغين</p></div></div>
+        <div class="list">
+          <article class="task t-m"><div class="task-row"><span class="ico" aria-hidden="true">🥦</span><div class="task-main static"><h3 class="task-t">خضار وفاكهة</h3><span class="task-s">400 غرام يومياً على الأقل</span></div></div></article>
+          <article class="task t-y"><div class="task-row"><span class="ico" aria-hidden="true">🌾</span><div class="task-main static"><h3 class="task-t">الألياف</h3><span class="task-s">25 غراماً يومياً على الأقل من الحبوب الكاملة والخضار والفاكهة والبقوليات</span></div></div></article>
+          <article class="task t-b"><div class="task-row"><span class="ico" aria-hidden="true">🧂</span><div class="task-main static"><h3 class="task-t">الملح</h3><span class="task-s">أقل من 5 غرام يومياً</span></div></div></article>
+          <article class="task t-p"><div class="task-row"><span class="ico" aria-hidden="true">🍬</span><div class="task-main static"><h3 class="task-t">السكر الحر</h3><span class="task-s">أقل من 10% من السعرات، أي نحو 50 غراماً في نظام 2000 سعر</span></div></div></article>
+          <article class="task t-y"><div class="task-row"><span class="ico" aria-hidden="true">🫒</span><div class="task-main static"><h3 class="task-t">الدهون</h3><span class="task-s">المشبعة أقل من 10% من السعرات، وفضّل غير المشبعة مثل زيت الزيتون والسمك والمكسرات</span></div></div></article>
+        </div>
+      </div>
+
+      <div class="bigcard">
+        <div class="hrow"><span class="hico" aria-hidden="true">⚠️</span><div class="htxt"><h2>قلّل منها</h2><p>حسب دليل هارفارد للطبق الصحي</p></div></div>
+        <div class="chips" style="padding-top:0">
+          <span class="chip warn">المشروبات المحلاة</span>
+          <span class="chip warn">اللحوم المصنعة</span>
+          <span class="chip warn">الخبز الأبيض والأرز الأبيض</span>
+          <span class="chip warn">العصائر (كوب صغير يومياً)</span>
+          <span class="chip warn">اللحوم الحمراء</span>
+        </div>
+      </div>
+
+      <div class="bigcard">
+        <div class="hrow"><span class="hico" aria-hidden="true">🔗</span><div class="htxt"><h2>المصادر</h2><p>للاطلاع على التفاصيل</p></div></div>
+        <div class="src">
+          <a href="https://nutritionsource.hsph.harvard.edu/healthy-eating-plate/" target="_blank" rel="noopener">دليل الطبق الصحي، جامعة هارفارد</a>
+          <a href="https://www.who.int/news-room/fact-sheets/detail/healthy-diet" target="_blank" rel="noopener">صحيفة وقائع النظام الغذائي الصحي، منظمة الصحة العالمية</a>
+        </div>
+      </div>
+    </section>
+  </div>
+  </main>
+</div>
+
+<nav class="nav" aria-label="التنقل الرئيسي">
+  <div class="nav-in" role="tablist">
+    <button type="button" class="nb" role="tab" id="n-health" data-tab="health" aria-selected="true"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span>صحي متوازن<span class="bar"></span></button>
+    <button type="button" class="nb" role="tab" id="n-tay" data-tab="tay" aria-selected="false"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 7c0-1.5 1-2 1-3M13 7c0-1.5 1-2 1-3"/></svg></span>الطيبات<span class="bar"></span></button>
+  </div>
+</nav>
+
+<script>
+(function(){
+  /* ---------- icons ---------- */
+  function svg(p){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>'}
+  var IC={
+    b:svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+    l:svg('<path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 7c0-1.5 1-2 1-3M13 7c0-1.5 1-2 1-3"/>'),
+    n:svg('<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>'),
+    k:svg('<path d="M12 7c-2-2-6-1-6 4 0 4 3 9 6 9s6-5 6-9c0-5-4-6-6-4z"/><path d="M12 7c0-2 1-3 3-3"/>'),
+    swap:svg('<path d="M20 11a8 8 0 0 0-14-4M4 5v4h4M4 13a8 8 0 0 0 14 4M20 19v-4h-4"/>'),
+    chev:svg('<path d="M6 9l6 6 6-6"/>')
+  };
+  var COSTL=["","اقتصادي","متوسط","مرتفع"];
+  function fil(pool,rec,bud){
+    var f=pool.filter(function(id){return rec[id].cost<=bud});
+    return f.length?f:pool;
+  }
+
+  /* ---------- Tayyibat recipes: r(name, minutes, kind, cost 1-3, ingredients, steps, tip) ---------- */
+  function r(n,t,k,cost,ing,steps,note){return{n:n,t:t,k:k,cost:cost,ing:ing,steps:steps,note:note}}
+  var R={
+    b1:r("بطاطا مشوية بالسمن والعسل",45,"c",1,["حبتا بطاطا متوسطتان","ملعقة كبيرة سمن بلدي","ملعقة كبيرة عسل","رشة ملح"],["اغسل البطاطا جيداً وجففها ثم اغرزها بالشوكة من عدة جهات.","اخبزها في فرن على 200 درجة مدة 40 دقيقة حتى تلين.","افتحها من المنتصف وضع السمن ثم رشة الملح.","أضف العسل قبل التقديم مباشرة."],"💡 اشوِ عدة حبات دفعة واحدة واحتفظ بالباقي لفطور الغد، فتوفر الوقت والغاز."),
+    b2:r("بطاطس مهروسة بالزبدة والجبن",30,"c",2,["3 حبات بطاطس","ملعقتان كبيرتان زبدة","نصف كوب جبن رومي أو شيدر مبشور","ملح"],["قشر البطاطس وقطعها مكعبات واسلقها في ماء وملح 15 دقيقة.","صفِّها وأعدها إلى القدر وهرسها وهي ساخنة.","أضف الزبدة وقلب حتى تذوب.","أضف الجبن وقلب حتى يتجانس، وقدمها دافئة."],"💡 الجبن المطبوخ (المثلثات) بديل أرخص من الرومي، فاختر ما يناسب ميزانيتك."),
+    b3:r("تمر بالقشطة وشاي أخضر",5,"c",2,["6 تمرات منزوعة النوى","3 ملاعق كبيرة قشطة","كوب شاي أخضر"],["افتح التمرات من الجانب وانزع النوى.","املأ كل تمرة بالقشطة.","قدمها مع الشاي الأخضر الساخن."],"💡 التمر العادي غير المجدول أرخص ويؤدي الغرض نفسه."),
+    b4:r("بطاطس محمّرة بزيت الزيتون",25,"c",2,["3 حبات بطاطس","3 ملاعق كبيرة زيت زيتون أو سمن بلدي","ملح"],["قشر البطاطس وقطعها أصابع متوسطة وجففها بمنشفة.","سخن الزيت على نار متوسطة.","حمّر البطاطس 12 إلى 15 دقيقة مع التقليب حتى تتذهب.","ارفعها على ورق مطبخ وأضف الملح."],"💡 اخبزها في الفرن بملعقة واحدة من الزيت لتوفر الزيت. بعض المصادر تسمح بزيت الذرة وعباد الشمس وهو أرخص (خلاف بين المصادر)."),
+    b5:r("فاكهة الموسم بالعسل",5,"c",1,["ثمرتان من فاكهة الموسم المسموحة (جوافة أو تفاح أو كمثرى أو عنب)","ملعقة كبيرة عسل"],["اغسل الفاكهة وقطّعها في طبق.","رش العسل فوقها وقدمها."],"💡 اختر نوعاً واحداً من الفاكهة في الوجبة، وما في موسمه أرخص وأطعم."),
+    b6:r("أرز الأمس بالزبدة والعسل",5,"c",1,["كوب أرز مطبوخ من الأمس","ملعقة صغيرة زبدة","ملعقة كبيرة عسل"],["سخّن الأرز في قدر مع رشة ماء حتى يسخن تماماً.","أضف الزبدة وقلّب.","أضف العسل وقدمه."],"💡 برّد الأرز المطبوخ بسرعة بعد الطهي وسخّنه جيداً قبل الأكل، ولا تتركه في حرارة الغرفة."),
+
+    p1:r("ضاني مشوي مع بطاطس",70,"p",3,["500 غرام لحم ضاني قطع متوسطة","3 حبات بطاطس","3 ملاعق كبيرة سمن بلدي","ملح وحبات فلفل أسود كاملة"],["اغسل اللحم وجففه وتبله بالملح.","سخن السمن في قدر وحمّر اللحم من الجهات كلها.","أضف ماء يغطي نصف اللحم والفلفل الأسود، واتركه على نار هادئة 45 دقيقة.","رتب البطاطس المقطعة حول اللحم وأكمل الطهي 20 دقيقة.","انقل الصينية إلى الفرن على 220 درجة 10 دقائق ليحمر السطح."],"💡 قطع الضاني بالعظم (الرقبة والضلوع) أوفر، والكمية تكفي أكثر من فرد من الأسرة."),
+    p2:r("كندوز بالفرن مع بطاطا",80,"p",3,["600 غرام كندوز (لحم عجل) قطع","2 حبة بطاطا مقطعة","3 ملاعق كبيرة زبدة","ملح"],["تبّل الكندوز بالملح ودلكه بالزبدة.","ضعه في صينية مع قليل من الماء وغطها بورق ألومنيوم.","اخبز على 180 درجة 60 دقيقة.","أضف البطاطا وأزل الغطاء وأكمل 20 دقيقة حتى تتحمر."],"💡 الكندوز من أغلى الخيارات هنا. جرّب صينية البطاطس باللحم المفروم لتوفر التكلفة."),
+    p3:r("كبدة سوتيه بالسمن مع بطاطس",20,"p",2,["250 غرام كبدة (جاموسي أو ضاني)","2 ملعقة كبيرة سمن بلدي","ملعقة صغيرة خل قصب","ملح","3 حبات بطاطس مسلوقة للتقديم"],["قطّع الكبدة شرائح رفيعة ونظفها من الأغشية.","سخن السمن في مقلاة على نار قوية.","قلّب الكبدة 4 إلى 5 دقائق فقط حتى لا تجف.","أضف الملح وخل القصب وارفعها فوراً، وقدمها مع البطاطس."],"💡 الكبدة الجاموسي أرخص من الضاني ومشبعة، ومرة في الأسبوع تكفي."),
+    p4:r("حمام مشوي محشو بالأرز",75,"p",3,["حمامتان منظفتان","كوب أرز مغسول","3 ملاعق كبيرة زبدة","ملح وحبات فلفل كاملة"],["اسلق الأرز نصف نضج مع الملح وصفّه.","اخلطه بملعقة من الزبدة وأضف الفلفل الكامل.","املأ الحمام بالحشو بشكل غير مضغوط واغلق الفتحة.","ادهن الحمام بالباقي من الزبدة وأضف الملح.","اخبزه على 200 درجة 45 إلى 50 دقيقة مع التقليب مرة."],"💡 الحشو بالأرز يزيد الشبع، فتكفي حمامة لكل فرد."),
+    p5:r("أرانب بالسمن مع الأرز",75,"p",2,["أرنب مقطع قطعاً متوسطة","3 ملاعق كبيرة سمن بلدي","كوب أرز","ملح وحبات فلفل كاملة"],["نظف الأرنب واسلقه 40 دقيقة مع الملح والفلفل.","احتفظ بالمرق وصفِّ القطع.","حمّر القطع في السمن حتى تتذهب.","اطبخ الأرز بكوبين من المرق وقدمه مع الأرنب."],"💡 الأرنب أوفر من الضاني في أغلب الأماكن، والمرق يغني عن الماء في طبخ الأرز."),
+    p6:r("سردين مشوي مع أرز بالسمن",40,"p",1,["6 سردينات طازجة منظفة","كوب أرز","ملعقة كبيرة سمن بلدي","ملح","حبات كمون كاملة","ملعقة صغيرة خل قصب"],["نظف السردين واغسله وجففه وتبله بالملح.","اشوه في الفرن على 220 درجة 15 دقيقة أو على الجريل حتى يحمر.","اطبخ الأرز بكوب ونصف ماء مع الملح وملعقة سمن وحبات الكمون.","قدم السردين مع الأرز ورشة خل قصب."],"💡 السردين من أرخص الأسماك البحرية وأغناها. تكرار السمك يختلف بين المصادر، وبعضها يوصي بتباعده."),
+    p7:r("كوارع بمرقها مع الأرز",120,"p",1,["ربع كيلو كوارع منظفة","كوب أرز مغسول","ملعقة كبيرة سمن بلدي","ملح","حبات فلفل أسود كاملة وعود قرفة"],["اسلق الكوارع 10 دقائق في ماء يغلي ثم اصرف الماء لتتخلص من الشوائب.","أعد سلقها بماء جديد وملح والفلفل وعود القرفة على نار هادئة ساعتين، أو 40 دقيقة في قدر الضغط.","اغرف كوبين من المرق واطبخ فيهما الأرز مع ملعقة السمن.","قدم الكوارع فوق الأرز."],"💡 قدر الضغط يوفر الغاز والوقت، والمرق الغني يطبخ به الأرز بدل الماء."),
+    p8:r("صينية بطاطس باللحم المفروم",55,"p",2,["150 غرام لحم مفروم","3 حبات بطاطس","ملعقة كبيرة سمن بلدي","فلفلة رومي","ملح وحبات فلفل أسود كاملة"],["قطّع البطاطس شرائح سميكة والفلفل شرائح.","حمّر اللحم المفروم في السمن 5 دقائق مع الملح.","رتب البطاطس في صينية وضع اللحم والفلفل فوقها وأضف نصف كوب ماء.","غطِّ الصينية واخبزها على 200 درجة 40 دقيقة ثم اكشفها 10 دقائق."],"💡 من أوفر أطباق اللحم: ربع كيلو مفروم مع البطاطس يكفي شخصين أو ثلاثة."),
+
+    c1:r("كوسا مسبّكة بالسمن مع أرز",35,"c",1,["500 غرام كوسا مقطعة","2 ملعقة كبيرة سمن بلدي","ملح","كوب أرز مسلوق للتقديم"],["اغسل الكوسا وقطّعها شرائح متوسطة.","ذوّب السمن في قدر وقلّب الكوسا دقيقتين.","أضف نصف كوب ماء وملحاً وغطِّ القدر.","اتركها على نار هادئة 20 دقيقة حتى تتسبك وتنضج، وقدمها مع الأرز."],"💡 الكوسا من أرخص الخضار الموسمية. اطبخ أرزاً يكفي وجبتين وبرّد الباقي بسرعة."),
+    c2:r("باذنجان مسبّك بالفلفل مع أرز",40,"c",2,["3 حبات باذنجان مقطعة","فلفلتان رومي مقطعتان","3 ملاعق كبيرة زيت زيتون أو سمن","ملح","كوب أرز مسلوق"],["قطّع الباذنجان والفلفل مكعبات.","سخن الزيت وحمّر الباذنجان حتى يتحول لونه.","أضف الفلفل والملح وربع كوب ماء وغطِّ القدر.","اطبخ على نار هادئة 20 دقيقة وقدمه مع الأرز."],"💡 الباذنجان يمتص الزيت كثيراً، فاطبخه مغطى على نار هادئة لتقلل الكمية."),
+    c3:r("قلقاس بالسمن",45,"c",1,["500 غرام قلقاس مقشر","3 ملاعق كبيرة سمن بلدي","ملح","ملعقة صغيرة خل قصب"],["قشر القلقاس بقفازات واغسله جيداً.","اسلقه في ماء وملح 25 دقيقة حتى يلين.","قطّعه مكعبات وقلّبه في السمن الساخن 5 دقائق.","أضف خل القصب وقدمه."],"💡 القلقاس موسمي في الشتاء فيكون أرخص. يؤكل مطبوخاً جيداً ومقشراً."),
+    c4:r("أرز بالجبن والزبدة",30,"c",2,["كوب أرز مغسول","ملعقتان كبيرتان زبدة","نصف كوب شيدر مبشور","ملح"],["اطبخ الأرز بكوب ونصف ماء وملح حتى يجف الماء.","أضف الزبدة وقلّب بالشوكة.","اخلط الشيدر مع الأرز الساخن وغطِّ القدر 3 دقائق ليذوب.","قدمه دافئاً."],"💡 يمكن استبدال الشيدر بجبن مطبوخ لتقليل التكلفة."),
+    c5:r("قرنبيط مسلوق وبطاطس بالفرن",45,"c",2,["قرنبيطة صغيرة","3 حبات بطاطس","2 ملعقة كبيرة زيت زيتون أو سمن","ملح"],["قطّع البطاطس وادهنها بالزيت والملح واخبزها على 200 درجة 35 دقيقة.","قسم القرنبيط زهرات واسلقه في ماء وملح 8 دقائق حتى يلين.","صفِّه وضعه مع البطاطس ورش بقية الزيت."],"💡 القرنبيط أرخص في موسمه الشتوي."),
+    c6:r("بامية بالسمن مع أرز",40,"c",1,["500 غرام بامية","2 ملعقة كبيرة سمن بلدي","ملعقة صغيرة خل قصب","ملح","كوب أرز مسلوق"],["نظف البامية واترك الأعناق الصغيرة.","قلّبها في السمن 5 دقائق على نار متوسطة.","أضف الملح وخل القصب ونصف كوب ماء.","غطِّها واتركها 20 دقيقة على نار هادئة وقدمها مع الأرز."],"💡 البامية المجمدة خيار اقتصادي خارج الموسم."),
+    c7:r("صينية كوسا وبطاطس بالفرن",50,"c",1,["3 حبات كوسا","2 حبة بطاطس","2 ملعقة كبيرة سمن بلدي أو زيت","ملح","كوب أرز مسلوق للتقديم"],["قطّع الكوسا والبطاطس شرائح سميكة.","اخلطها بالسمن والملح وضعها في صينية.","اخبزها على 200 درجة 40 دقيقة مع التقليب مرة.","قدمها مع الأرز."],"💡 صينية واحدة تكفي الأسرة، وتوفر الغاز لأنها تُطهى في الفرن وحده."),
+
+    n1:r("أرز بالزبدة والجبن",25,"c",2,["كوب أرز","ملعقة كبيرة زبدة","3 ملاعق كبيرة جبن رومي أو شيدر مبشور","ملح"],["اطبخ الأرز بالماء والملح حتى ينضج.","أضف الزبدة وقلّب.","رش الجبن فوقه وقدمه."],"💡 قليل من الجبن يكفي لإعطاء النكهة."),
+    n2:r("بطاطس بالفرن بزيت الزيتون",40,"c",2,["3 حبات بطاطس","2 ملعقة كبيرة زيت زيتون أو سمن","ملح"],["قطّع البطاطس أرباعاً مع القشر بعد غسلها.","اخلطها بالزيت والملح.","اخبزها على 210 درجة 30 إلى 35 دقيقة مع التقليب مرة."],"💡 اخبزها مع صينية الغداء إن كان الفرن مشتعلاً لتوفر الغاز."),
+    n3:r("شوربة كوسا وبطاطس",30,"c",1,["3 حبات كوسا","حبتا بطاطس","ملعقتان كبيرتان سمن أو زيت زيتون","ملح","كوبان ماء"],["قطّع الكوسا والبطاطس مكعبات صغيرة.","سخن السمن وقلّب الخضار دقيقتين.","أضف الماء والملح واتركها 20 دقيقة حتى تنضج.","اهرسها بالمضرب أو اتركها قطعاً حسب رغبتك."],"💡 تكفي القدر لوجبتين، وتسخَّن جيداً في اليوم التالي."),
+    n4:r("فاكهة الموسم مع شرائح جبن",5,"c",2,["حبتان من فاكهة الموسم المسموحة (تين أو عنب أو جوافة)","شرائح جبن رومي أو شيدر"],["اغسل الفاكهة وقطّعها.","رتبها في طبق مع شرائح الجبن."],"💡 فاكهة الموسم أرخص، والجبن بقدر قليل يكفي."),
+    n5:r("أرز بالسمن والعسل",25,"c",1,["كوب أرز","ملعقتان كبيرتان سمن بلدي","ملعقة كبيرة عسل","رشة ملح"],["اطبخ الأرز بالماء والملح حتى ينضج.","ذوّب السمن وقلّبه مع الأرز.","أضف العسل قبل التقديم."],"💡 اطبخ الأرز لوجبتين وبرّد الباقي بسرعة."),
+    n6:r("بطاطس مسلوقة بالزبدة",25,"c",1,["3 حبات بطاطس صغيرة","ملعقة كبيرة زبدة","ملح"],["اغسل البطاطس واسلقها بقشرها في ماء وملح 20 دقيقة.","قشرها وضع الزبدة والملح وقلّبها."],"💡 من أرخص العشاءات وأكثرها إشباعاً.")
+  };
+  var POOL={b:["b1","b2","b3","b4","b5","b6"],p:["p1","p2","p3","p4","p5","p6","p7","p8"],c:["c1","c2","c3","c4","c5","c6","c7"],n:["n1","n2","n3","n4","n5","n6"]};
+  var SLOT_LABEL={b:"الفطور",l:"الغداء",n:"العشاء"};
+  var SLOT_TINT={b:"t-y",l:"t-b",n:"t-p"};
+
+  /* ---------- foods: [name, state, cheap staple] ---------- */
+  var FOODS=[
+    {c:"النشويات",e:"🍚",i:[["أرز بكل أنواعه","ok",1],["بطاطس","ok",1],["بطاطا","ok",1],["ذرة","ok",1],["فريك وبرغل","warn"],["خبز وقمح","warn"],["معكرونة","no"],["شوفان","no"],["كسكسي","no"],["بسكويت","no"],["بيتزا","no"]]},
+    {c:"البروتين",e:"🥩",i:[["لحم ضاني","ok"],["كندوز (لحم عجل)","ok"],["لحم بقري وجاموسي","ok"],["لحم مفروم","ok"],["كبدة","ok",1],["كوارع ولحمة رأس وممبار","ok",1],["حمام","ok"],["سمان","ok"],["أرانب","ok"],["أسماك بحرية وسردين","warn",1],["كابوريا","ok"],["دجاج","no"],["ديك رومي","no"],["بط","no"],["بيض","no"],["فول","no"],["عدس","no"],["فاصوليا","no"],["حمص","no"]]},
+    {c:"الدهون والأجبان",e:"🧈",i:[["زيت زيتون","ok"],["سمن بلدي","ok"],["زبدة","ok"],["قشطة","ok"],["جبن شيدر","ok"],["جبن مطبوخ (مثلثات)","ok"],["جبن موتزاريلا","ok"],["جبن رومي","ok"],["جبن ريكفورد","ok"],["جبن كشكوال","ok"],["جبن برميزان","ok"],["زيت ذرة وعباد الشمس","warn",1],["حليب سائل","no"],["زبادي","no"],["جبن أبيض وقريش","no"]]},
+    {c:"الخضار المطبوخة",e:"🥬",i:[["كوسا","ok",1],["باذنجان","ok",1],["فلفل","ok"],["قرنبيط","ok"],["قلقاس مقشر","ok",1],["بامية","ok",1],["سلطة خضراء","no"],["خضار نيئة","no"]]},
+    {c:"الفواكه",e:"🍎",i:[["تفاح","ok"],["كمثرى","ok"],["مانجو","ok"],["جوافة","ok",1],["رمان","ok"],["فراولة","ok"],["عنب","ok"],["تين","ok"],["موز","warn",1],["تمر","ok",1],["بطيخ","no"],["برتقال","no"],["كيوي","no"],["كنتالوب","no"],["بابايا","no"]]},
+    {c:"الحلويات والسكريات",e:"🍯",i:[["عسل","ok"],["سكر","ok",1],["شوكولاتة","ok"],["نوتيلا","ok"],["مربى","ok"],["حلاوة طحينية","ok"],["بسبوسة بلا لبن وبيض","warn"],["جيلي","ok"]]},
+    {c:"المشروبات",e:"🍵",i:[["شاي أخضر","ok"],["قهوة تركي","ok"],["أعشاب","ok",1],["عصير فواكه بلا بذور","ok"],["مشروبات غازية","no"]]}
+  ];
+  var CAT_TINT=["t-y","t-b","t-p","t-m","t-y","t-b","t-p"];
+  var WEEKDAYS=["السبت","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة"];
+  var TIPS=["كُل عند الجوع فقط، ولا تنتظر الموعد 🌱","الأرز والبطاطس أرخص أساسيات النظام وأكثرها إشباعاً 🍚","الخضار الموسمية أرخص وأطيب، فاشترِ ما في موسمه.","اطبخ الأرز والخضار لوجبتين، وطهِ البروتين طازجاً في يومه.","الكوارع والكبدة والسردين بدائل اقتصادية في أيام البروتين"];
+
+  /* ---------- helpers ---------- */
+  function $(s,r){return (r||document).querySelector(s)}
+  function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+  function recipePanel(r){
+    var h='<div class="recipe" hidden><div><h4>المكونات</h4><ul class="ing">'+r.ing.map(function(x){return "<li>"+x+"</li>"}).join("")+'</ul></div>';
+    h+='<div><h4>طريقة التحضير</h4><ol class="steps">'+r.steps.map(function(x){return "<li>"+x+"</li>"}).join("")+'</ol></div>';
+    if(r.note) h+='<p class="rnote">'+r.note+'</p>';
+    return h+'</div>';
+  }
+
+  /* ---------- today (Tayyibat) ---------- */
+  var d=new Date();
+  var dayNum=Math.round(new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime()/864e5);
+  var state={dt:(dayNum%2===0)?"p":"c",bud:2,bump:{b:0,l:0,n:0},done:{b:false,l:false,n:false}};
+  try{$("#today-date").textContent=d.toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}catch(e){$("#today-date").textContent=d.toDateString()}
+
+  function pick(slot,pool){
+    var f=fil(pool,R,state.bud);
+    var base=(dayNum*7+(slot==="b"?1:slot==="l"?3:5))%f.length;
+    return f[(base+state.bump[slot])%f.length];
+  }
+  function updateStats(){
+    var n=(state.done.b?1:0)+(state.done.l?1:0)+(state.done.n?1:0);
+    $("#stat-done").textContent=n+"/3";
+  }
+  function syncTBud(){$$("[data-tbud]").forEach(function(b){b.setAttribute("aria-pressed",String(+b.getAttribute("data-tbud")===state.bud))})}
+  function renderToday(){
+    var p=state.dt==="p";
+    $("#stat-type").textContent=p?"بروتين":"نشويات";
+    $("#today-sub").textContent=p?"اليوم يوم بروتين 🥩":"اليوم يوم نشويات 🍚";
+    $$("[data-dt]").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-dt")===state.dt))});
+    syncTBud();
+    var ids={b:pick("b",POOL.b),l:pick("l",POOL[state.dt]),n:pick("n",POOL.n)};
+    var html="";
+    ["b","l","n"].forEach(function(s){
+      var r=R[ids[s]];
+      html+='<article class="task '+SLOT_TINT[s]+(state.done[s]?" done":"")+'" data-slot="'+s+'"><div class="task-row">'+
+        '<button type="button" class="chk" data-chk="'+s+'" aria-pressed="'+state.done[s]+'" aria-label="تم تناول '+SLOT_LABEL[s]+'"></button>'+
+        '<span class="ico">'+IC[s]+'</span>'+
+        '<button type="button" class="task-main" data-exp aria-expanded="false"><b class="task-t">'+r.n+'</b><span class="task-s">'+SLOT_LABEL[s]+' · ⏱ '+r.t+' دقيقة · '+COSTL[r.cost]+'</span></button>'+
+        '<button type="button" class="x" data-swap="'+s+'" aria-label="غيّر اقتراح '+SLOT_LABEL[s]+'">'+IC.swap+'</button></div>'+
+        recipePanel(r)+'</article>';
+    });
+    $("#today-slots").innerHTML=html;
+    updateStats();
+  }
+  document.addEventListener("click",function(e){
+    var t;
+    if((t=e.target.closest("[data-swap]"))){var s=t.getAttribute("data-swap");state.bump[s]++;state.done[s]=false;renderToday();return}
+    if((t=e.target.closest("[data-chk]"))){
+      var k=t.getAttribute("data-chk");state.done[k]=!state.done[k];
+      t.setAttribute("aria-pressed",String(state.done[k]));
+      t.closest(".task").classList.toggle("done",state.done[k]);updateStats();return;
+    }
+    if((t=e.target.closest("[data-dt]"))){state.dt=t.getAttribute("data-dt");state.bump={b:0,l:0,n:0};state.done={b:false,l:false,n:false};renderToday();return}
+    if((t=e.target.closest("[data-tbud]"))){state.bud=+t.getAttribute("data-tbud");state.bump={b:0,l:0,n:0};state.done={b:false,l:false,n:false};renderToday();renderPlan();return}
+    if((t=e.target.closest("[data-exp]"))){
+      var c=t.closest(".mrow")||t.closest(".task");var pnl=c.querySelector(".recipe");
+      var open=pnl.hidden;pnl.hidden=!open;t.setAttribute("aria-expanded",String(open));return;
+    }
+  });
+  $("#swap-all").addEventListener("click",function(){state.bump.b++;state.bump.l++;state.bump.n++;state.done={b:false,l:false,n:false};renderToday()});
+
+  /* ---------- tips ---------- */
+  var ti=0;
+  function renderTip(){
+    $("#tip-text").textContent=TIPS[ti];
+    $("#tip-dots").innerHTML=TIPS.map(function(_,i){return '<i class="'+(i===ti?"on":"")+'"></i>'}).join("");
+  }
+  $("#tip-bubble").addEventListener("click",function(){ti=(ti+1)%TIPS.length;renderTip()});
+  renderTip();
+  try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){setInterval(function(){ti=(ti+1)%TIPS.length;renderTip()},7000)}}catch(e){}
+
+  /* ---------- foods ---------- */
+  var ff="all",fq="";
+  function counts(){
+    var c={all:0,ok:0,warn:0,no:0,cheap:0};
+    FOODS.forEach(function(g){g.i.forEach(function(x){c.all++;c[x[1]]++;if(x[2])c.cheap++})});
+    return c;
+  }
+  function renderFilters(){
+    var c=counts(),L=[["all","الكل"],["ok","مسموح"],["warn","خلاف"],["no","ممنوع"],["cheap","اقتصادي"]];
+    $("#food-filters").innerHTML=L.map(function(x){
+      return '<button type="button" class="ptab" data-f="'+x[0]+'" aria-pressed="'+(ff===x[0])+'"><span class="bd">'+c[x[0]]+'</span>'+x[1]+'</button>';
+    }).join("");
+  }
+  function renderFoods(){
+    var q=fq.trim(),out="",total=0;
+    FOODS.forEach(function(g,gi){
+      var items=g.i.filter(function(x){
+        var okf=ff==="all"||(ff==="cheap"?x[2]===1:x[1]===ff);
+        return okf&&(!q||x[0].indexOf(q)>-1);
+      });
+      if(!items.length)return;
+      total+=items.length;
+      out+='<article class="task '+CAT_TINT[gi]+'"><div class="task-row"><span class="ico" aria-hidden="true">'+g.e+'</span><div class="task-main static"><h3 class="task-t">'+g.c+'</h3><span class="task-s">'+items.length+' عنصر</span></div></div><div class="chips">'+
+        items.map(function(x){return '<span class="chip '+x[1]+'">'+x[0]+'</span>'}).join("")+'</div></article>';
+    });
+    $("#food-list").innerHTML=total?out:'<div class="bigcard"><p class="empty">لا يوجد طعام بهذا الاسم في القوائم. راجع المصدر الأصلي للنظام أو اسأل مختصاً.</p></div>';
+  }
+  $("#food-q").addEventListener("input",function(e){fq=e.target.value;renderFoods()});
+  $("#food-filters").addEventListener("click",function(e){
+    var b=e.target.closest("[data-f]");if(!b)return;
+    ff=b.getAttribute("data-f");renderFilters();renderFoods();
+  });
+
+  /* ---------- 14-day plan, built from the chosen budget ---------- */
+  var week=0;
+  function renderPlan(){
+    syncTBud();
+    var pat=week===0?["p","c","p","c","p","c","p"]:["c","p","c","p","c","p","c"];
+    var P=fil(POOL.p,R,state.bud),C=fil(POOL.c,R,state.bud),B=fil(POOL.b,R,state.bud),N=fil(POOL.n,R,state.bud);
+    var cp=week?4:0,cc=week?3:0,html="";
+    for(var i=0;i<7;i++){
+      var p=pat[i]==="p",l;
+      if(p){l=P[cp%P.length];cp++}else{l=C[cc%C.length];cc++}
+      var g=week*7+i,ids={b:B[g%B.length],l:l,n:N[(g+2)%N.length]};
+      html+='<article class="task '+(p?"t-p":"t-m")+'"><div class="task-row"><span class="ico" aria-hidden="true">'+(p?"🥩":"🍚")+'</span><div class="task-main static"><h3 class="task-t">'+WEEKDAYS[i]+'</h3><span class="task-s">'+(p?"يوم بروتين":"يوم نشويات")+'</span></div></div><div class="meals">';
+      ["b","l","n"].forEach(function(s){
+        var r=R[ids[s]];
+        html+='<div class="mrow"><button type="button" class="mrow-btn" data-exp aria-expanded="false"><span class="mi">'+IC[s]+'</span><span><small>'+SLOT_LABEL[s]+' · '+COSTL[r.cost]+'</small><b>'+r.n+'</b></span><span class="chev">'+IC.chev+'</span></button>'+recipePanel(r)+'</div>';
+      });
+      html+='</div></article>';
+    }
+    $("#plan-days").innerHTML=html;
+  }
+  $$("[data-w]").forEach(function(b){b.addEventListener("click",function(){
+    week=+b.getAttribute("data-w");
+    $$("[data-w]").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});
+    renderPlan();
+  })});
+
+  /* ---------- tabs ---------- */
+  function showTab(name){
+    $$("[data-tab]").forEach(function(b){b.setAttribute("aria-selected",String(b.getAttribute("data-tab")===name))});
+    SEC=name;document.body.setAttribute("data-sec",name==="health"?"health":"tay");
+    $("#g-tay").hidden=name!=="tay";$("#g-health").hidden=name!=="health";
+    $("#app-h1").textContent=name==="health"?"وجبات صحية متوازنة":"طيبات اليوم";
+    applySub(name);
+    try{window.scrollTo(0,0)}catch(e){}
+  }
+  $$("[data-tab]").forEach(function(b){b.addEventListener("click",function(){showTab(b.getAttribute("data-tab"))})});
+
+  /* ---------- sub tabs ---------- */
+  var SEC="health",SUB={tay:"today",health:"h-today"};
+  function applySub(g){
+    var sec=g||SEC;
+    $$("[data-g='"+sec+"'] [data-sub]").forEach(function(b){b.setAttribute("aria-selected",String(b.getAttribute("data-sub")===SUB[sec]))});
+    $$("#g-"+sec+" .panel").forEach(function(p){p.hidden=p.id!=="p-"+SUB[sec]});
+  }
+  $$("[data-sub]").forEach(function(b){b.addEventListener("click",function(){
+    var g=b.closest("[data-g]").getAttribute("data-g");
+    SUB[g]=b.getAttribute("data-sub");applySub(g);
+    try{window.scrollTo(0,0)}catch(e){}
+  })});
+
+  /* ---------- healthy balanced meals (approximate values per average adult portion) ---------- */
+  function m(n,t,cost,k,p,c,f,ing,steps,note){return{n:n,t:t,cost:cost,k:k,p:p,c:c,f:f,ing:ing,steps:steps,note:note}}
+  var H={
+    hb1:m("شوفان بالحليب والموز والمكسرات",10,2,490,17,70,17,["50 غرام شوفان","كوب (200 مل) حليب قليل الدسم","موزة متوسطة","15 غرام جوز أو فول سوداني","رشة قرفة"],["ضع الشوفان والحليب في قدر صغير على نار متوسطة.","قلّب 4 إلى 5 دقائق حتى يتكاثف.","اسكبه في طبق وضع شرائح الموز فوقه.","رش المكسرات والقرفة وقدمه دافئاً."],"💡 الشوفان بالكيلو أوفر من العبوات الصغيرة، والفول السوداني بديل أرخص للجوز."),
+    hb2:m("عجة بالخضار مع خبز بلدي أسمر",12,1,380,21,34,17,["بيضتان","نصف فلفلة رومي مقطعة","حبة طماطم صغيرة","حفنة سبانخ أو جرجير","ملعقة صغيرة زيت زيتون","نصف رغيف بلدي أسمر","ملح وفلفل"],["سخّن الزيت في مقلاة غير لاصقة.","قلّب الفلفل والطماطم والخضرة دقيقتين.","اخفق البيض مع الملح والفلفل وصبه على الخضار.","اتركه على نار هادئة 3 إلى 4 دقائق حتى يتماسك، وقدمه مع الخبز."],"💡 البيض والخضار الموسمية من أرخص مصادر البروتين وأسرعها."),
+    hb3:m("زبادي بالفاكهة والجوز والعسل",5,2,335,12,50,10,["200 غرام زبادي قليل الدسم","150 غرام فاكهة الموسم مقطعة","ملعقة كبيرة عسل","10 غرام جوز مفروم"],["ضع الزبادي في وعاء.","أضف الفاكهة فوقه.","رش الجوز وأضف العسل وقدمه بارداً."],"💡 الزبادي العادي يغني عن اليوناني الأغلى، وفاكهة الموسم أرخص وأطعم."),
+    hb4:m("فول مدمس بزيت الزيتون وخبز بلدي",10,1,345,17,56,6,["150 غرام فول مدمس مطبوخ","ملعقة صغيرة زيت زيتون","عصير نصف ليمونة","حبة طماطم","نصف رغيف بلدي أسمر"],["سخّن الفول مع قليل من مائه.","اسكبه في طبق وأضف زيت الزيتون وعصير الليمون.","قدمه مع الطماطم المقطعة والخبز."],"💡 اشترِ الفول الجاف بالكيلو واطبخ كمية تكفي يومين، فهو من أوفر الوجبات المشبعة."),
+    hb5:m("توست أسمر بالأفوكادو والبيض",10,3,360,16,34,18,["شريحتان توست أسمر","نصف ثمرة أفوكادو","بيضة مسلوقة","عصير ليمون وملح وفلفل"],["حمّص التوست.","اهرس الأفوكادو مع الليمون والملح والفلفل وافرده على التوست.","قطّع البيضة شرائح وضعها فوقه."],"💡 بديل اقتصادي: ملعقة طحينة وشرائح خيار بدل الأفوكادو."),
+    hb6:m("طعمية بالفرن مع سلطة وخبز بلدي",40,1,400,20,61,10,["50 غرام فول مجروش منقوع 12 ساعة","حفنة كزبرة وشبت وبقدونس مفرومة","نصف بصلة وفص ثوم","نصف ملعقة صغيرة كمون وكزبرة جافة وملح","ملعقة صغيرة زيت لدهن الصينية","سلطة خيار وطماطم وملعقة صغيرة طحينة","نصف رغيف بلدي"],["اطحن الفول المنقوع مع الخضرة والبصل والثوم والتوابل.","شكّله أقراصاً صغيرة (4 قطع).","ضعه على صينية مدهونة واخبزه على 200 درجة 25 دقيقة مع قلبه مرة.","قدمه مع السلطة والخبز."],"💡 شكّل كمية أكبر وجمّد الباقي نيئاً ليكون فطور الأيام القادمة جاهزاً، وهو أوفر وأخف من القلي."),
+
+    hl1:m("سلطة دجاج مشوي بالبرغل",25,2,400,42,27,14,["120 غرام صدر دجاج مشوي","100 غرام برغل مطبوخ","حفنة جرجير أو خس","خيار وطماطم وجزر مبشور","ملعقتان صغيرتان زيت زيتون وعصير ليمون"],["قطّع الدجاج المشوي شرائح.","اخلط الخضار مع البرغل في طبق عميق.","أضف الدجاج وتبّل بالزيت والليمون والملح."],"💡 البرغل أرخص من الكينوا وقيمته قريبة، ويمكنك استبداله بالكينوا إن توفرت."),
+    hl2:m("شوربة خضار مع تونة وخبز",25,2,360,33,39,9,["300 مل شوربة خضار","100 غرام تونة بالماء","شريحة خبز أسمر","سلطة صغيرة بملعقة صغيرة زيت زيتون"],["اسلق الخضار (جزر وكوسا وكرفس) في الماء حتى تنضج واهرسها جزئياً.","أضف التونة المصفاة وسخّنها دقيقة.","قدم الشوربة مع الخبز والسلطة."],"💡 استبدل التونة ببيضتين مسلوقتين لتوفر التكلفة."),
+    hl3:m("شوربة عدس مع سلطة وخبز",35,1,380,19,59,9,["65 غرام عدس أصفر","جزرة وبصلة صغيرة","نصف ملعقة صغيرة كمون","شريحة خبز أسمر","سلطة بملعقة صغيرة زيت زيتون"],["اسلق العدس والجزر والبصل في 3 أكواب ماء 25 دقيقة.","اهرسها بالمضرب وتبّل بالكمون والملح.","قدمها مع الخبز والسلطة."],"💡 العدس من أرخص مصادر البروتين، فاطبخ قدراً يكفي يومين وسخّنه جيداً."),
+    hl4:m("بامية بالصلصة مع أرز بني وزبادي",40,1,335,13,54,8,["250 غرام بامية طازجة أو مجمدة","نصف بصلة مفرومة","ملعقة صغيرة زيت زيتون","نصف كوب صلصة طماطم","100 غرام أرز بني مطبوخ","100 غرام زبادي قليل الدسم","ثوم وكزبرة جافة وملح"],["قلّب البصل في زيت الزيتون حتى يذبل.","أضف البامية والثوم والكزبرة وقلّبها دقيقتين.","أضف الصلصة ونصف كوب ماء واتركها 20 دقيقة على نار هادئة.","قدمها مع الأرز البني والزبادي."],"💡 البامية المجمدة أوفر خارج الموسم، وتكفي القدر لوجبتين."),
+
+    hm1:m("صدر دجاج مشوي مع أرز بني وخضار",35,2,470,45,45,11,["130 غرام صدر دجاج","150 غرام أرز بني مطبوخ","كوب خضار مشكلة (جزر وكوسا وبروكلي)","ملعقة صغيرة زيت زيتون","ثوم وليمون وملح وفلفل"],["تبّل الدجاج بالثوم والليمون والملح والفلفل 15 دقيقة.","اشوه 6 إلى 7 دقائق من كل جانب حتى ينضج.","قلّب الخضار في زيت الزيتون 5 دقائق.","قدم الدجاج مع الأرز والخضار."],"💡 اشترِ دجاجة كاملة وقطّعها: الصدر لهذه الوجبة، والأفخاذ لصينية البطاطس، والهيكل للمرق. الأرز البني يحتاج نحو 40 دقيقة فاطبخ كمية تكفي يومين."),
+    hm2:m("سمك مشوي مع بطاطس بالفرن وسلطة",40,2,460,38,49,13,["150 غرام سمك أبيض (بلطي أو موسى أو فيليه)","200 غرام بطاطس","طبق سلطة (خيار وطماطم وخس)","ملعقتان صغيرتان زيت زيتون","ليمون وملح وفلفل"],["قطّع البطاطس أرباعاً وضعها في الفرن على 200 درجة 25 دقيقة.","تبّل السمك بالليمون والملح والفلفل.","أضف السمك إلى الصينية وأكمل 12 إلى 15 دقيقة.","حضّر السلطة بملعقة زيت وعصير ليمون وقدم الطبق."],"💡 السمك الكامل (بلطي أو ماكريل) أوفر غالباً من الفيليه، وتنظيفه في محل السمك."),
+    hm3:m("كفتة لحم مشوية مع برغل وسلطة",30,3,450,34,35,20,["120 غرام لحم بقري مفروم قليل الدسم","نصف بصلة مبشورة","بقدونس مفروم وملح وبهارات","150 غرام برغل مطبوخ","سلطة خضراء بملعقة صغيرة زيت زيتون"],["اخلط اللحم والبصل والبقدونس والبهارات جيداً.","شكّله أصابع واشوه في الفرن على 220 درجة 12 إلى 15 دقيقة.","قدمه مع البرغل والسلطة."],"💡 زد البصل والبقدونس ليكبر الحجم، وقلّل كمية اللحم إلى 100 غرام إن أردت التوفير."),
+    hm4:m("ملوخية بالدجاج مع أرز بني",45,2,440,47,38,11,["120 غرام دجاج بدون جلد","200 غرام ملوخية مفرومة","ملعقة صغيرة زيت زيتون","ثوم وكزبرة جافة وملح","120 غرام أرز بني مطبوخ"],["اسلق الدجاج مع الملح 25 دقيقة وصفِّ المرق.","قلّب الثوم والكزبرة في زيت الزيتون.","أضف الملوخية والمرق واتركها على نار هادئة 5 دقائق دون غطاء.","قدمها مع الدجاج والأرز."],"💡 اسلق دجاجة كاملة مرة واحدة: تكفي ملوخية الغداء وشوربة العشاء ومرقاً للأرز. الملوخية المجمدة أرخص خارج الموسم."),
+    hm5:m("كشري صحي بالعدس والأرز البني",45,1,420,20,71,7,["60 غرام عدس بني جاف","100 غرام أرز بني مطبوخ","40 غرام حمص مسلوق","نصف كوب صلصة طماطم","نصف بصلة شرائح","ملعقة صغيرة زيت","خل وثوم وملح وكمون"],["اسلق العدس 20 دقيقة حتى ينضج ثم صفِّه.","اطبخ صلصة الطماطم مع الثوم والكمون والملح والخل 10 دقائق.","قلّب شرائح البصل في الزيت حتى تتحمر.","رتب الأرز والعدس والحمص في طبق وصب الصلصة وزين بالبصل."],"💡 اطبخ العدس والأرز البني بكمية تكفي يومين، فهذه من أوفر الوجبات وأكثرها إشباعاً."),
+    hm6:m("صينية بطاطس بالفراخ والخضار",60,2,490,38,50,15,["فخذ دجاج بدون جلد (نحو 200 غرام بالعظم)","200 غرام بطاطس","نصف بصلة وفلفلة رومي وجزرة","ملعقة صغيرة زيت زيتون","ثوم وملح وفلفل وبهارات"],["تبّل الدجاج بالثوم والملح والفلفل والبهارات.","قطّع البطاطس والخضار قطعاً كبيرة وتبلها بالزيت.","رتب كل شيء في صينية وغطها بورق ألومنيوم.","اخبز على 200 درجة 40 دقيقة ثم اكشفها 15 دقيقة حتى يحمر."],"💡 الأفخاذ أرخص من الصدور وأطرى. ضاعف الكمية لتكفي الأسرة من صينية واحدة."),
+    hm7:m("سردين مشوي مع بطاطس وسلطة",40,1,470,35,48,15,["150 غرام سردين طازج منظف (4 إلى 5 سمكات)","200 غرام بطاطس","طبق سلطة (خيار وطماطم وخس)","ملعقة صغيرة زيت زيتون","ليمون وثوم وملح وكمون"],["قطّع البطاطس وادهنها بنصف الزيت واخبزها على 200 درجة 25 دقيقة.","تبّل السردين بالثوم والليمون والملح والكمون.","أضفه إلى الصينية وأكمل 10 إلى 12 دقيقة حتى ينضج.","حضّر السلطة بالزيت المتبقي وعصير الليمون وقدم الطبق."],"💡 السردين من أرخص الأسماك وأغناها بأوميغا 3، ويغني عن السلمون الأغلى."),
+
+    hs1:m("مكرونة قمح كامل بالدجاج والبروكلي",25,2,590,52,70,11,["80 غرام مكرونة قمح كامل (وزن جاف)","120 غرام صدر دجاج","100 غرام بروكلي","100 غرام صلصة طماطم","ملعقة صغيرة زيت زيتون وثوم"],["اسلق المكرونة في ماء مملح حسب التعليمات.","قطّع الدجاج مكعبات وقلّبه في زيت الزيتون والثوم 6 دقائق.","أضف البروكلي وصلصة الطماطم وسخّنها 5 دقائق.","اخلط المكرونة بالصلصة وقدمها."],"💡 المكرونة العادية أرخص إن تعذر القمح الكامل، ويمكن استبدال الدجاج بالعدس لتخفيض التكلفة."),
+    hs2:m("لحم مشوي مع بطاطا حلوة وبروكلي",40,3,540,47,51,16,["150 غرام ستيك بقري قليل الدسم","200 غرام بطاطا حلوة","150 غرام بروكلي","ملعقة صغيرة زيت زيتون","ملح وفلفل وروزماري"],["قطّع البطاطا شرائح واخبزها على 200 درجة 25 دقيقة.","تبّل اللحم واشوه 3 إلى 4 دقائق من كل جانب على مقلاة ساخنة.","اسلق البروكلي 4 دقائق ثم قلّبه بزيت الزيتون.","قدم الأطباق معاً."],"💡 بديل أرخص: لحم مفروم قليل الدسم مكان الستيك، والبروكلي المجمد خارج الموسم."),
+    hs3:m("سلمون مع أرز بني وسبانخ",30,3,515,37,41,22,["130 غرام فيليه سلمون","150 غرام أرز بني مطبوخ","150 غرام سبانخ","ملعقة صغيرة زيت زيتون","ليمون وثوم وملح وفلفل"],["تبّل السلمون بالليمون والملح والفلفل.","اخبزه على 200 درجة 12 إلى 15 دقيقة.","قلّب السبانخ والثوم في زيت الزيتون 3 دقائق.","قدم السلمون مع الأرز والسبانخ."],"💡 بديل أرخص: الماكريل أو السردين الطازج، وهما غنيان بأوميغا 3 أيضاً."),
+    hs4:m("كبدة بالبصل مع بطاطا حلوة وسلطة",30,2,480,37,58,11,["120 غرام كبدة (جاموسي أو بقري)","نصف بصلة شرائح","200 غرام بطاطا حلوة","ملعقة صغيرة زيت زيتون","سلطة خضراء وخل وملح وكمون"],["اخبز البطاطا الحلوة أو اسلقها حتى تلين.","قلّب البصل في الزيت حتى يذبل.","أضف شرائح الكبدة وقلّبها 4 إلى 5 دقائق مع الملح والكمون.","قدمها مع البطاطا والسلطة."],"💡 الكبدة غنية بالحديد وأرخص من اللحم الأحمر، لكن مرة في الأسبوع تكفي لأنها غنية جداً بفيتامين أ."),
+
+    hk1:m("تفاحة مع زبدة اللوز",3,3,195,4,25,9,["تفاحة متوسطة","ملعقة كبيرة زبدة لوز"],["قطّع التفاحة شرائح.","قدمها مع زبدة اللوز للغمس."],"💡 ملعقة طحينة بديل أرخص لزبدة اللوز."),
+    hk2:m("حفنة مكسرات نيئة",1,3,180,5,6,16,["30 غرام مكسرات نيئة غير مملحة (لوز وجوز وكاجو)"],["قس الكمية بكفك أو بميزان صغير.","كلها ببطء."],"💡 الفول السوداني وبذور القرع أرخص من الجوز واللوز."),
+    hk3:m("زبادي سادة مع خيار وجزر",5,1,120,8,18,2,["150 غرام زبادي سادة قليل الدسم","نصف خيارة","جزرة صغيرة","نعناع وملح"],["اخلط الزبادي مع الخيار المقطع والنعناع.","قدمه مع أعواد الجزر."]),
+    hk4:m("بيضة مسلوقة وبرتقالة",12,1,130,7,15,5,["بيضة","برتقالة متوسطة (أو فاكهة الموسم)"],["اسلق البيضة 9 إلى 10 دقائق في ماء يغلي ثم بردها.","قدمها مع البرتقالة."],"💡 اسلق عدة بيضات دفعة واحدة وخزنها في الثلاجة بقشرها."),
+    hk5:m("موزة وحفنة فول سوداني",2,1,220,6,30,10,["موزة متوسطة","20 غرام فول سوداني نيئ غير مملح"],["قشر الموزة.","قدمها مع الفول السوداني."]),
+    hk6:m("خيار وجزر مع حمص",5,1,110,4,16,4,["150 غرام خيار وجزر أعواد","40 غرام حمص بالطحينة"],["قطّع الخيار والجزر أعواداً.","قدمها مع الحمص للغمس."],"💡 الحمص المنزلي من الحمص الجاف أوفر من الجاهز."),
+
+    hn1:m("جبن قريش بالخيار مع خبز أسمر",5,1,270,24,32,6,["100 غرام جبن قريش","150 غرام زبادي قليل الدسم","خيارة","نعناع","نصف رغيف بلدي أسمر"],["اخلط الجبن والزبادي والخيار المبشور والنعناع.","قدمه مع الخبز."]),
+    hn2:m("شوربة خضار بقطع الدجاج",30,2,230,28,18,5,["300 مل شوربة خضار","80 غرام صدر دجاج مسلوق","ملح وفلفل وبقدونس"],["اسلق الدجاج في الماء 20 دقيقة ثم فتّته.","أضف الدجاج إلى الشوربة الساخنة.","تبّل وقدمها ساخنة."],"💡 استعمل مرق دجاجة الغداء وبقايا لحمها بدل الشراء من جديد."),
+    hn3:m("عجة سبانخ بالجبن القريش مع سلطة",12,1,255,18,10,16,["بيضتان","حفنة سبانخ","30 غرام جبن قريش","سلطة صغيرة بملعقة صغيرة زيت زيتون"],["اخفق البيض مع الملح.","اسكبه في مقلاة غير لاصقة وأضف السبانخ والجبن.","اطوه نصفين بعد 3 دقائق وقدمه مع السلطة."]),
+    hn4:m("طبق تونة بالخضار والذرة",10,2,225,28,16,6,["100 غرام تونة بالماء","50 غرام ذرة","خس وخيار وطماطم","ملعقة صغيرة زيت زيتون","عصير ليمون"],["رتب الخضار في طبق.","أضف التونة المصفاة والذرة.","تبّل بالزيت والليمون."],"💡 بيضتان مسلوقتان بديل أرخص من التونة."),
+    hn5:m("خضار مشوية مع حمص بالطحينة",30,1,260,10,31,11,["250 غرام خضار (كوسا وجزر وفلفل)","ملعقة صغيرة زيت زيتون","60 غرام حمص بالطحينة","نصف رغيف بلدي أسمر"],["قطّع الخضار وادهنها بزيت الزيتون والملح.","اخبزها على 220 درجة 20 دقيقة حتى تتحمر أطرافها.","قدمها مع الحمص والخبز."],"💡 اشوها مع صينية الغداء إن كان الفرن مشتعلاً لتوفر الغاز."),
+    hn6:m("سلطة بيض وزبادي",10,1,280,19,15,16,["بيضتان مسلوقتان","خيار وطماطم وجرجير","100 غرام زبادي قليل الدسم","ملعقة صغيرة زيت زيتون","ملح وليمون"],["قطّع البيض والخضار في طبق.","اخلط الزبادي مع الليمون والملح وصبه فوق السلطة.","رش الزيت وقدمها."])
+  };
+  var HPOOL={b:["hb1","hb2","hb3","hb4","hb5","hb6"],k:["hk1","hk2","hk3","hk4","hk5","hk6"],n:["hn1","hn2","hn3","hn4","hn5","hn6"],l:["hl1","hl2","hl3","hl4"],m:["hm1","hm2","hm3","hm4","hm5","hm6","hm7"],s:["hs1","hs2","hs3","hs4","hm5","hm6","hm7"]};
+  var HSLOT=[["b","الفطور"],["l","الغداء"],["k","وجبة خفيفة"],["n","العشاء"]];
+  var HTINT={b:"t-y",l:"t-b",k:"t-m",n:"t-p"};
+  var HGOAL={l:"هدف اليوم: خفيف 🌿",m:"هدف اليوم: متوازن ⚖️",s:"هدف اليوم: نشاط عالٍ 💪"};
+  var HOFF={b:2,l:4,k:6,n:8};
+  var HS={g:"m",bud:2,bump:{b:0,l:0,k:0,n:0},done:{b:false,l:false,k:false,n:false}};
+
+  function hRecipePanel(r){
+    var h='<div class="recipe" hidden><div class="mgrid"><div><b>'+r.k+'</b><span>سعر حراري</span></div><div><b>'+r.p+'</b><span>بروتين غ</span></div><div><b>'+r.c+'</b><span>كربوهيدرات غ</span></div><div><b>'+r.f+'</b><span>دهون غ</span></div></div>';
+    h+='<div><h4>المكونات</h4><ul class="ing">'+r.ing.map(function(x){return "<li>"+x+"</li>"}).join("")+'</ul></div>';
+    h+='<div><h4>طريقة التحضير</h4><ol class="steps">'+r.steps.map(function(x){return "<li>"+x+"</li>"}).join("")+'</ol></div>';
+    if(r.note)h+='<p class="rnote">'+r.note+'</p>';
+    return h+'</div>';
+  }
+  function hpick(slot,pool){
+    var f=fil(pool,H,HS.bud);
+    var base=(dayNum*3+HOFF[slot])%f.length;
+    return f[(base+HS.bump[slot])%f.length];
+  }
+  function hStats(){
+    var n=0;for(var k in HS.done){if(HS.done[k])n++}
+    $("#h-stat-done").textContent=n+"/4";
+  }
+  function syncHBud(){$$("[data-hbud]").forEach(function(b){b.setAttribute("aria-pressed",String(+b.getAttribute("data-hbud")===HS.bud))})}
+  function renderHToday(){
+    var ids={b:hpick("b",HPOOL.b),l:hpick("l",HPOOL[HS.g]),k:hpick("k",HPOOL.k),n:hpick("n",HPOOL.n)};
+    var total=0,html="";
+    HSLOT.forEach(function(s){
+      var k=s[0],r=H[ids[k]];total+=r.k;
+      html+='<article class="task '+HTINT[k]+(HS.done[k]?" done":"")+'"><div class="task-row">'+
+        '<button type="button" class="chk" data-hchk="'+k+'" aria-pressed="'+HS.done[k]+'" aria-label="تم تناول '+s[1]+'"></button>'+
+        '<span class="ico">'+IC[k]+'</span>'+
+        '<button type="button" class="task-main" data-exp aria-expanded="false"><b class="task-t">'+r.n+'</b><span class="task-s">'+s[1]+' · ⏱ '+r.t+' دقيقة · 🔥 '+r.k+' سعر · '+COSTL[r.cost]+'</span></button>'+
+        '<button type="button" class="x" data-hswap="'+k+'" aria-label="غيّر اقتراح '+s[1]+'">'+IC.swap+'</button></div>'+
+        hRecipePanel(r)+'</article>';
+    });
+    $("#h-today-slots").innerHTML=html;
+    $("#h-stat-kcal").textContent=total.toLocaleString("en-US");
+    $("#h-today-sub").textContent=HGOAL[HS.g];
+    $$("[data-hg]").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-hg")===HS.g))});
+    syncHBud();
+    hStats();
+  }
+  document.addEventListener("click",function(e){
+    var t;
+    if((t=e.target.closest("[data-hswap]"))){var s=t.getAttribute("data-hswap");HS.bump[s]++;HS.done[s]=false;renderHToday();return}
+    if((t=e.target.closest("[data-hchk]"))){var k=t.getAttribute("data-hchk");HS.done[k]=!HS.done[k];t.setAttribute("aria-pressed",String(HS.done[k]));t.closest(".task").classList.toggle("done",HS.done[k]);hStats();return}
+    if((t=e.target.closest("[data-hg]"))){HS.g=t.getAttribute("data-hg");HS.bump={b:0,l:0,k:0,n:0};HS.done={b:false,l:false,k:false,n:false};renderHToday();return}
+    if((t=e.target.closest("[data-hbud]"))){HS.bud=+t.getAttribute("data-hbud");HS.bump={b:0,l:0,k:0,n:0};HS.done={b:false,l:false,k:false,n:false};renderHToday();renderHPlan();return}
+  });
+  $("#h-swap-all").addEventListener("click",function(){for(var k in HS.bump){HS.bump[k]++}HS.done={b:false,l:false,k:false,n:false};renderHToday()});
+
+  var HWEEK_L={
+    1:["hm5","hm7","hl3","hm5","hl4","hm7","hl3"],
+    2:["hm1","hm7","hm4","hm5","hm6","hl3","hm2"],
+    3:["hm1","hm2","hm4","hs3","hm3","hl3","hs2"]
+  };
+  function renderHPlan(){
+    syncHBud();
+    var Bf=fil(HPOOL.b,H,HS.bud),Kf=fil(HPOOL.k,H,HS.bud),Nf=fil(HPOOL.n,H,HS.bud);
+    var tints=["t-y","t-b","t-p","t-m"],html="";
+    for(var i=0;i<7;i++){
+      var dy={b:Bf[i%Bf.length],l:HWEEK_L[HS.bud][i],k:Kf[(i+1)%Kf.length],n:Nf[(i+2)%Nf.length]};
+      var tot=0;HSLOT.forEach(function(s){tot+=H[dy[s[0]]].k});
+      html+='<article class="task '+tints[i%4]+'"><div class="task-row"><span class="ico" aria-hidden="true">📅</span><div class="task-main static"><h3 class="task-t">'+WEEKDAYS[i]+'</h3><span class="task-s">🔥 نحو '+tot.toLocaleString("en-US")+' سعر</span></div></div><div class="meals">';
+      HSLOT.forEach(function(s){
+        var r=H[dy[s[0]]];
+        html+='<div class="mrow"><button type="button" class="mrow-btn" data-exp aria-expanded="false"><span class="mi">'+IC[s[0]]+'</span><span><small>'+s[1]+' · '+r.k+' سعر · '+COSTL[r.cost]+'</small><b>'+r.n+'</b></span><span class="chev">'+IC.chev+'</span></button>'+hRecipePanel(r)+'</div>';
+      });
+      html+='</div></article>';
+    }
+    $("#h-plan-days").innerHTML=html;
+  }
+
+  var HTIPS=["نصف طبقك خضار وفاكهة 🥗","العدس والفول والبيض بروتين اقتصادي ومشبع","اطبخ مرة وكُل مرتين: العدس والأرز البني يحفظان باردين ليومين.","اشترِ الحبوب الجافة والخضار الموسمية بالكيلو.","الماء أو الشاي بلا سكر بدل المشروبات المحلاة 💧"];
+  var hti=0;
+  function renderHTip(){
+    $("#h-tip-text").textContent=HTIPS[hti];
+    $("#h-tip-dots").innerHTML=HTIPS.map(function(_,i){return '<i class="'+(i===hti?"on":"")+'"></i>'}).join("");
+  }
+  $("#h-tip-bubble").addEventListener("click",function(){hti=(hti+1)%HTIPS.length;renderHTip()});
+  try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){setInterval(function(){hti=(hti+1)%HTIPS.length;renderHTip()},8000)}}catch(e){}
+
+  /* ---------- light / dark toggle (saved per browser when allowed) ---------- */
+  var root=document.documentElement,mq=window.matchMedia?window.matchMedia("(prefers-color-scheme: dark)"):null;
+  function isDark(){var a=root.getAttribute("data-theme");return a?a==="dark":!!(mq&&mq.matches)}
+  function paintTheme(){
+    var dk=isDark(),b=$("#theme-btn");
+    b.innerHTML=dk?IC.b:IC.n;
+    b.setAttribute("aria-label",dk?"التبديل إلى الوضع النهاري":"التبديل إلى الوضع الليلي");
+  }
+  try{var sv=localStorage.getItem("tay-theme");if(sv==="light"||sv==="dark")root.setAttribute("data-theme",sv)}catch(e){}
+  $("#theme-btn").addEventListener("click",function(){
+    var n=isDark()?"light":"dark";
+    root.setAttribute("data-theme",n);
+    try{localStorage.setItem("tay-theme",n)}catch(e){}
+    paintTheme();
+  });
+  if(mq&&mq.addEventListener){mq.addEventListener("change",paintTheme)}
+  paintTheme();
+
+  document.body.setAttribute("data-sec",SEC==="health"?"health":"tay");
+  renderToday();renderFilters();renderFoods();renderPlan();renderHToday();renderHPlan();renderHTip();
+})();
+</script>
+
+</body></html>

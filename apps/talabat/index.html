@@ -78,10 +78,15 @@
   .pl-logo { width: 96px; height: 96px; }
   .pl-logo img { width: 100%; height: 100%; border-radius: 26px; object-fit: cover; background: #fff; box-shadow: 0 8px 22px rgba(28,176,246,.25); }
   .pl-name { font-weight: 900; font-size: 24px; color: var(--primary-dark); }
-  .pl-sub { font-weight: 700; font-size: 13px; color: var(--text-sec); }
-  .pl-bar { width: 180px; height: 6px; border-radius: 99px; background: #D8ECF7; overflow: hidden; }
-  .pl-bar i { display: block; height: 100%; width: 40%; border-radius: 99px; background: var(--grad); animation: plSlide 1.2s ease-in-out infinite; }
-  @keyframes plSlide { 0% { transform: translateX(260%); } 100% { transform: translateX(-360%); } }
+  .pl-spin { position: relative; width: 72px; height: 72px; margin-top: 2px; }
+  .pl-spin .ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(28,176,246,.6); animation: plRipple 1.8s ease-out infinite; }
+  .pl-spin .ring.r2 { animation-delay: .6s; }
+  .pl-spin .ring.r1 { animation-delay: 1.2s; }
+  @keyframes plRipple { 0% { transform: scale(.32); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+  .pl-spin .arc { position: absolute; inset: 9px; border-radius: 50%; background: conic-gradient(from 0deg, transparent 5%, #1CB0F6 35%, #FF9600 55%, transparent 85%); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 5px)); mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 5px)); animation: plRot 1.1s linear infinite; }
+  @keyframes plRot { to { transform: rotate(360deg); } }
+  .pl-spin .core { position: absolute; inset: 27px; border-radius: 50%; background: var(--grad); box-shadow: 0 0 16px rgba(28,176,246,.8); animation: plCore 1.6s ease-in-out infinite; }
+  @keyframes plCore { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25); } }
 
   .app {
     max-width: 480px;
@@ -986,7 +991,7 @@
   .appt-row.done .appt-rem i { display: none; }
   .appt-row.overdue .appt-rem { color: var(--danger); background: #FFF5F6; }
   .appt-notes { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  /* تم حذف قسم العادات اليومية — بطاقتها تفتح ملف 1.html */
+  /* بطاقة طبق اليوم — تفتح ملف eat.html وتعرض بياناته */
   .icon-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 8px; padding: 0 14px 10px; }
   .icon-pick button { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; border-radius: 15px; background: #fff; border: 1.5px solid var(--border); padding: 7px 2px 6px; transition: transform .12s, border-color .15s, box-shadow .15s; }
   .icon-pick button .it-ic { width: 40px; height: 40px; border-radius: 13px; background: linear-gradient(135deg, var(--icbg, var(--primary-light)), #fff); color: var(--ic, var(--primary-dark)); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.8), 0 3px 8px rgba(30,27,46,.07); }
@@ -1701,7 +1706,7 @@
   </style>
 </head>
 <body>
-<div id="preloader"><div class="pl-logo"><img src="icon-192.png" alt="ناقصنا إيه"></div><div class="pl-name">ناقصنا إيه</div><div class="pl-sub">مشتريات البيت الذكية 🛒</div><div class="pl-bar"><i></i></div></div>
+  <div id="preloader"><div class="pl-logo"><img src="icon-192.png" alt="ناقصنا إيه"></div><div class="pl-name">ناقصنا إيه</div><div class="pl-spin"><span class="ring r1"></span><span class="ring r2"></span><span class="arc"></span><span class="core"></span></div></div>
 <div class="app" id="app"></div>
 <div class="toast-container" id="toastContainer"></div>
 
@@ -3642,6 +3647,107 @@
       fetchPrayerTimes(false).then(() => paintPrayerMini()).catch(() => {});
     } catch {}
   }
+  /* ===== كارت طبق اليوم: طبق يومي + تشجيع من داخل eat.html ===== */
+  function eatTodayKey() { const n = new Date(); return n.getFullYear() + '-' + (n.getMonth() + 1) + '-' + n.getDate(); }
+  const EAT_CHEERS = ['😋 الأكل الصحي طعمه أحلى — دوس للفتح', '💪 وجبة متوازنة = يوم مليان طاقة', '🌿 صحتك تستاهل — ادخل شوف أطباقك', '🍎 جوعان؟ الحل الصحي مستنيك', '⭐ النهاردة يوم الأكل النضيف', '🥗 لون طبقك… لون صحتك'];
+  function eatCheer(doy) { try { return EAT_CHEERS[doy % EAT_CHEERS.length]; } catch { return '😋 الأكل الصحي طعمه أحلى — دوس للفتح'; } }
+  function eatMiniCache() { try { const c = JSON.parse(localStorage.getItem('naqisna_eat_mini') || 'null'); if (c && c.day === eatTodayKey() && c.dish) return c; } catch {} return null; }
+  function paintEatMini(d) {
+    try {
+      const t = document.getElementById('eatMiniTxt');
+      const s = document.getElementById('eatMiniSub');
+      if (!t) return false;
+      if (d && d.dish && d.dish.name) {
+        t.textContent = (d.dish.emoji || '🍽️') + ' ' + d.dish.name;
+        if (s) s.textContent = d.cheer || 'دوس للفتح 🍎';
+        return true;
+      }
+    } catch {}
+    return false;
+  }
+  function eatDishOfDay(body, doy) {
+    try {
+      const cats = [];
+      const rc = /\{c:"([^"]+)",e:"([^"]*)",i:\[/g;
+      let m;
+      while ((m = rc.exec(body))) cats.push({ emoji: m[2], idx: m.index });
+      const items = [];
+      const ri = /\["([^"]+)"/g;
+      let n;
+      while ((n = ri.exec(body))) {
+        let emo = '🍽️';
+        for (let k = cats.length - 1; k >= 0; k--) { if (cats[k].idx < n.index) { emo = cats[k].emoji || emo; break; } }
+        items.push({ name: n[1], emoji: emo });
+      }
+      if (!items.length) return null;
+      return items[doy % items.length];
+    } catch { return null; }
+  }
+  async function refreshEatMini() {
+    try {
+      const now = new Date();
+      const doy = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 864e5);
+      const c = eatMiniCache();
+      if (c) paintEatMini(c);
+      const r = await fetch('eat.html', { cache: 'no-store' });
+      if (!r.ok) throw new Error('net');
+      const txt = await r.text();
+      const fm = txt.match(/var FOODS=\[([\s\S]*?)\];/);
+      if (!fm) throw new Error('parse');
+      const dish = eatDishOfDay(fm[1], doy) || { name: 'أكل صحي متوازن', emoji: '🥗' };
+      const d = { day: eatTodayKey(), dish, cheer: eatCheer(doy) };
+      try { localStorage.setItem('naqisna_eat_mini', JSON.stringify(d)); } catch {}
+      paintEatMini(d);
+    } catch {
+      try {
+        const now2 = new Date();
+        const doy2 = Math.floor((now2 - new Date(now2.getFullYear(), 0, 0)) / 864e5);
+        if (!paintEatMini(eatMiniCache())) paintEatMini({ day: eatTodayKey(), dish: { name: 'أكل صحي متوازن', emoji: '🥗' }, cheer: eatCheer(doy2) });
+      } catch {}
+    }
+  }
+  /* ===== كارت جُرْعَةُ شِفَاء: وصفة يومية من داخل health.html ===== */
+  const HEALTH_CHEERS = ['🍯 الطبيعة فيها شفاك — دوس للفتح', '🌿 عشب اليوم في انتظارك', '💚 صحتك من الطبيعة — ادخل واكتشف', '🍵 مشروب دافئ لصحتك — دوس للفتح', '⭐ وصفة طبيعية جديدة كل يوم'];
+  function healthCheer(doy) { try { return HEALTH_CHEERS[doy % HEALTH_CHEERS.length]; } catch { return '🍯 الطبيعة فيها شفاك — دوس للفتح'; } }
+  function healthMiniCache() { try { const c = JSON.parse(localStorage.getItem('naqisna_health_mini') || 'null'); if (c && c.day === eatTodayKey() && c.remedy) return c; } catch {} return null; }
+  function paintHealthMini(d) {
+    try {
+      const t = document.getElementById('healthMiniTxt');
+      const s = document.getElementById('healthMiniSub');
+      if (!t) return false;
+      if (d && d.remedy && d.remedy.name) {
+        t.textContent = (d.remedy.emoji || '🌿') + ' ' + d.remedy.name;
+        if (s) s.textContent = d.cheer || 'دوس للفتح 🌼';
+        return true;
+      }
+    } catch {}
+    return false;
+  }
+  async function refreshHealthMini() {
+    try {
+      const now = new Date();
+      const doy = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 864e5);
+      const c = healthMiniCache();
+      if (c) paintHealthMini(c);
+      const r = await fetch('health.html', { cache: 'no-store' });
+      if (!r.ok) throw new Error('net');
+      const txt = await r.text();
+      const list = [];
+      const rr = /\{n:'([^']+)',e:'([^']*)'/g;
+      let m;
+      while ((m = rr.exec(txt))) list.push({ name: m[1], emoji: m[2] });
+      const remedy = list.length ? list[doy % list.length] : { name: 'جُرْعَةُ شِفَاء', emoji: '🌿' };
+      const d = { day: eatTodayKey(), remedy, cheer: healthCheer(doy) };
+      try { localStorage.setItem('naqisna_health_mini', JSON.stringify(d)); } catch {}
+      paintHealthMini(d);
+    } catch {
+      try {
+        const now2 = new Date();
+        const doy2 = Math.floor((now2 - new Date(now2.getFullYear(), 0, 0)) / 864e5);
+        if (!paintHealthMini(healthMiniCache())) paintHealthMini({ day: eatTodayKey(), remedy: { name: 'جُرْعَةُ شِفَاء', emoji: '🌿' }, cheer: healthCheer(doy2) });
+      } catch {}
+    }
+  }
   function prayerTo12h(tStr) {
     try {
       const m = String(tStr || '').match(/(\d{1,2}):(\d{2})/);
@@ -3896,8 +4002,7 @@
     if (ICONS[id]) return svgIcon(id, size || 20);
     return escapeHTML(icon || '⭐');
   }
-  /* تم حذف العادات اليومية — بطاقتها تفتح ملف 1.html */
-  /* تم حذف قسم العادات اليومية — البطاقة تفتح ملف 1.html */
+  /* بطاقة طبق اليوم — تفتح ملف eat.html */
   /* =============================
      مهامي السريعة — ستايل TickTick: إضافة سريعة + تعليم + مسح
      ============================= */
@@ -4371,8 +4476,8 @@
       <div class="section"><div class="gate-grid">
         <div class="gate-card gate-prayer" data-prayer-times><span class="gc-ico">${tpS.ico}</span><span class="gc-label">مواقيت الصلاة</span><span class="gc-value" id="prayerMiniTxt" style="font-size:16px;">...</span><span class="gc-sub" id="prayerMiniSub">دوس للعرض 📍</span></div>
         <div class="gate-card gate-azkar" data-azkar-toggle style="--gc:#D97706;--gc-soft:#FEF3C7;"><span class="gc-ico">🤲</span><span class="gc-label">الأذكار</span><span class="gc-value" style="font-size:16px;">${azP === 'morning' ? 'أذكار الصباح ☀️' : 'أذكار المساء 🌙'}</span><span class="gc-sub">دوس للعرض 📖</span></div>
-        <div class="gate-card gate-tasks" data-goto-tasks style="--gc:#1CB0F6;--gc-soft:#E1F3FD;"><span class="gc-ico">📝</span><span class="gc-label">مهام اليوم</span><span class="gc-value">${tOpen}<small> معلقة</small></span><span class="gc-bar"><i style="width:${tPct}%;"></i></span><span class="gc-sub">القسم بالأسفل — دوس للانتقال</span></div>
-        <div class="gate-card gate-habits" id="habitsGateCard" style="--gc:#0284C7;--gc-soft:#E0F2FE;"><span class="gc-ico">🏒</span><span class="gc-label">تحدي الهوكي 🏆</span><span class="gc-sub">دوس للعب ⛸️</span></div>
+        <div class="gate-card gate-health" id="healthGateCard" style="--gc:#047857;--gc-soft:#D1FAE5;"><span class="gc-ico">🌿</span><span class="gc-label">جُرْعَةُ شِفَاء 🍯</span><span class="gc-value" id="healthMiniTxt" style="font-size:16px;">...</span><span class="gc-sub" id="healthMiniSub">دوس للفتح 🌼</span></div>
+        <div class="gate-card gate-eat" id="eatGateCard" style="--gc:#1CB0F6;--gc-soft:#E1F3FD;"><span class="gc-ico">🥗</span><span class="gc-label">طبق اليوم 🍽️</span><span class="gc-value" id="eatMiniTxt" style="font-size:16px;">...</span><span class="gc-sub" id="eatMiniSub">دوس للفتح 🍎</span></div>
       </div></div>
 
       ${adsByPosition('middle')}
@@ -5239,7 +5344,10 @@
     document.querySelectorAll('[data-prayer-times]').forEach(b => b.onclick = () => openPrayerPage());
     try { refreshPrayerMini(); } catch {}
     document.querySelectorAll('[data-goto-tasks]').forEach(b => b.onclick = () => { requestAnimationFrame(() => setTimeout(() => { try { const el = document.getElementById('tasksWrap') || document.getElementById('tasksSection'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {} }, 60)); });
-    const hgc = document.getElementById('habitsGateCard'); if (hgc) hgc.onclick = () => { try { window.location.href = '1.html'; } catch {} };
+    const egc = document.getElementById('eatGateCard'); if (egc) egc.onclick = () => { try { window.location.href = 'eat.html'; } catch {} };
+    try { refreshEatMini(); } catch {}
+    const hgc = document.getElementById('healthGateCard'); if (hgc) hgc.onclick = () => { try { window.location.href = 'health.html'; } catch {} };
+    try { refreshHealthMini(); } catch {}
     const azD = document.getElementById('azkarDone'); if (azD) azD.onclick = () => azkarAdvance();
     const azT = document.getElementById('azkarTap'); if (azT) azT.onclick = () => azkarAdvance();
     const azS = document.getElementById('azkarSkip'); if (azS) azS.onclick = () => azkarSkipOutside();
@@ -5256,7 +5364,7 @@
     };
     const bha = document.getElementById('basketHomeAdd'); if (bha) bha.onclick = openAddOrderModal;
     const taskTgl = document.getElementById('taskAddToggle'); if (taskTgl) taskTgl.onclick = () => { if (tasksTab() === 'appts') { state._apptAddOpen = !(state._apptAddOpen === true); persist(); render(); requestAnimationFrame(() => { const n = document.getElementById('apptTitle'); if (n) n.focus(); }); } else { state._taskAddOpen = !(state._taskAddOpen === true); if (state._taskAddOpen && !state._taskNewIcon) state._taskNewIcon = PACK_DEFAULT_ICON; persist(); render(); requestAnimationFrame(() => { const n = document.getElementById('taskAddInput'); if (n) n.focus(); }); } };
-    /* تم حذف ربط العادات اليومية — البطاقة تفتح ملف 1.html */
+    /* بطاقة طبق اليوم — تفتح ملف eat.html */
     document.querySelectorAll('[data-tasks-tab]').forEach(b => b.onclick = () => { state._tasksTab = b.dataset.tasksTab; state._apptAddOpen = false; state._taskAddOpen = false; persist(); render(); });
     // حفظ مسودات فورم المهام والمواعيد قبل أي إعادة رسم — عشان الكتابة متضيعش
     function stashTaskDraft() { try { const i = document.getElementById('taskAddInput'); if (i) state._taskNewTitle = i.value; } catch {} }
