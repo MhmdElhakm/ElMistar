@@ -3813,7 +3813,29 @@
     } catch {} return false;
   }
   function tsbBump(n) { try { const s = tsbLoad(); s.c += (n || 1); tsbSave(s); paintTsb(); } catch {} }
-  let tsbRec = null, tsbListening = false;
+  /* كلمات مميزة لكل ذكر لعدّ التكرارات داخل الجملة الواحدة */
+  const TSB_KEYS = [
+    ['سبحان'],
+    ['الحمد'],
+    ['اكبر'],
+    ['اله'],
+    ['استغفر'],
+    ['محمد', 'النبي', 'صلي', 'صلى']
+  ];
+  function tsbNorm(s) { return String(s || '').replace(/[ً-ٰٟ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه'); }
+  function tsbCountRep(txt, idx) {
+    const t = tsbNorm(txt);
+    const keys = TSB_KEYS[idx] || [];
+    let best = 0;
+    keys.forEach(k => {
+      const kk = tsbNorm(k);
+      let n = 0, p = 0;
+      while ((p = t.indexOf(kk, p)) !== -1) { n++; p += kk.length; }
+      if (n > best) best = n;
+    });
+    return best;
+  }
+  let tsbRec = null, tsbWant = false;
   function tsbWire() {
     try {
       const tap = document.getElementById('tsbTap');
@@ -3824,19 +3846,41 @@
       const hint = document.getElementById('tsbHint');
       if (mic && !mic._wired) {
         mic._wired = true;
-        mic.onclick = (e) => {
-          try { e.stopPropagation(); } catch {}
+        const startRec = () => {
           const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-          if (!SR) { if (hint) hint.textContent = 'متصفحك لا يدعم الصوت — دوس للعد'; return; }
-          if (tsbListening && tsbRec) { try { tsbRec.stop(); } catch {} return; }
+          if (!SR) { if (hint) hint.textContent = 'متصفحك لا يدعم الصوت — دوس للعد'; tsbWant = false; return; }
           try {
             tsbRec = new SR(); tsbRec.lang = 'ar-EG'; tsbRec.continuous = true; tsbRec.interimResults = false;
-            tsbRec.onstart = () => { tsbListening = true; mic.classList.add('on'); if (hint) hint.textContent = '🎙 استمع... كرر الذكر بصوتك'; };
-            tsbRec.onend = () => { tsbListening = false; mic.classList.remove('on'); if (hint) hint.textContent = 'دوس للعد • أو 🎤 بالصوت'; };
-            tsbRec.onerror = () => { try { tsbRec.stop(); } catch {} };
-            tsbRec.onresult = (ev) => { let n = 0; for (let i = ev.resultIndex; i < ev.results.length; i++) if (ev.results[i].isFinal) n++; if (n > 0) tsbBump(n); };
+            tsbRec.onstart = () => { mic.classList.add('on'); if (hint) hint.textContent = '🎙 استمع... كرر الذكر بصوتك دون توقف'; };
+            /* إن فصل المتصفح تلقائيًا نعيد التشغيل طالما المستخدم لم يضغط إيقاف */
+            tsbRec.onend = () => {
+              mic.classList.remove('on');
+              if (tsbWant) { if (hint) hint.textContent = '🎙 استمع... كرر الذكر بصوتك دون توقف'; try { setTimeout(() => { if (tsbWant && tsbRec) { try { tsbRec.start(); } catch {} } }, 250); } catch {} }
+              else if (hint) hint.textContent = 'دوس للعد • أو بالصوت';
+            };
+            tsbRec.onerror = (ev) => {
+              const err = (ev && ev.error) || '';
+              if (err === 'not-allowed' || err === 'audio-capture' || err === 'service-not-allowed') { tsbWant = false; mic.classList.remove('on'); if (hint) hint.textContent = 'تعذّر الميكروفون — اسمح بالوصول ثم حاول مجددًا'; try { tsbRec.stop(); } catch {} }
+            };
+            tsbRec.onresult = (ev) => {
+              let txt = '';
+              for (let i = ev.resultIndex; i < ev.results.length; i++) if (ev.results[i].isFinal) txt += ' ' + ev.results[i][0].transcript;
+              txt = txt.trim();
+              if (!txt) return;
+              const s = tsbLoad();
+              let n = tsbCountRep(txt, s.i);
+              if (n <= 0) n = 1;
+              tsbBump(n);
+              if (hint) hint.textContent = '✅ +' + n + ' — واصل التكرار 🎙';
+            };
             tsbRec.start();
-          } catch {}
+          } catch { tsbWant = false; }
+        };
+        mic.onclick = (e) => {
+          try { e.stopPropagation(); } catch {}
+          if (tsbWant) { tsbWant = false; try { tsbRec.stop(); } catch {} return; }
+          tsbWant = true;
+          startRec();
         };
       }
       paintTsb();
