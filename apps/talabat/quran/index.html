@@ -1,3 +1,4 @@
+1
 <!doctype html>
 <html>
 
@@ -42,7 +43,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap">
   <style>
-    /* Layout: one mushaf page at a time in a centered column. Each line is set in the King Fahd Complex page font (QCF4); full lines are justified, short lines centered. A tap on a verse opens a bottom sheet; the surah index slides in from the right. */
+    /* Quran pages flow vertically in order. Lines use the King Fahd Complex page font (QCF4); full lines are justified and short lines centered. */
     @font-face {
       font-family: "QCF4_Hafs_01";
       src: url(fonts/QCF4_Hafs_01_W.woff2) format("woff2");
@@ -415,8 +416,7 @@
       font-family: var(--font-ui);
       direction: rtl;
       padding-block: 0;
-      padding-left: max(16px, env(safe-area-inset-left, 0px));
-      padding-right: max(16px, env(safe-area-inset-right, 0px));
+      padding-inline: 0;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -437,12 +437,71 @@
     }
 
     .page {
+      width: 100%;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .page-view {
       container-type: inline-size;
-      max-width: 600px;
+      width: 100%;
       margin: 0 auto;
       padding-block: 2cqw 0;
+      padding-inline: max(12px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-left, 0px));
       position: relative;
       min-height: 100svh;
+    }
+
+    .page-view.opening {
+      display: flex;
+      flex-direction: column;
+      height: 100svh;
+    }
+
+    .page-view.opening .run,
+    .page-view.opening .foot {
+      flex: none;
+    }
+
+    .page-view.opening .sheet {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .page-view.opening .sheet>* {
+      flex: none;
+    }
+
+    body.horizontal-pages {
+      overflow: hidden;
+    }
+
+    .horizontal-pages #pageList {
+      display: flex;
+      direction: ltr;
+      width: 100vw;
+      height: 100svh;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .horizontal-pages #pageList::-webkit-scrollbar {
+      display: none;
+    }
+
+    .horizontal-pages .page-view {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100svh;
+      min-height: 100svh;
+      overflow: hidden;
+      direction: rtl;
+      scroll-snap-align: start;
     }
 
     .measure {
@@ -453,6 +512,7 @@
       pointer-events: none;
       white-space: nowrap;
       font-size: 100px;
+      font-weight: 700;
       line-height: 1;
     }
 
@@ -537,6 +597,7 @@
     .hdr .hn {
       position: relative;
       font-family: "QCF4_QBSML";
+      font-weight: 700;
       line-height: 1;
       white-space: nowrap;
       color: var(--ink);
@@ -548,6 +609,7 @@
       align-items: center;
       justify-content: center;
       font-family: "QCF4_Hafs_01";
+      font-weight: 700;
       line-height: 1;
       white-space: nowrap;
     }
@@ -589,11 +651,16 @@
       z-index: 0;
     }
 
+    .slot-band {
+      z-index: 1;
+    }
+
     .w {
       flex: none;
       cursor: pointer;
+      font-weight: 700;
       position: relative;
-      z-index: 1;
+      z-index: 2;
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
@@ -610,6 +677,15 @@
       background: var(--annot-bg);
       border-radius: .16em;
       box-shadow: 0 0 0 .035em var(--annot-bg);
+    }
+
+    .annot-verse-band {
+      position: absolute;
+      top: 7%;
+      bottom: 7%;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 0;
     }
 
     .w.annot-underline {
@@ -669,14 +745,14 @@
       stroke-linecap: round;
     }
 
-    body.vs .foot {
+    body.vs .page-view.active .foot {
       padding-bottom: 80svh;
     }
 
     .foot {
       display: flex;
       justify-content: center;
-      padding: 5cqw 0 24cqw;
+      padding: 5cqw 0 6cqw;
     }
 
     .badge {
@@ -952,26 +1028,187 @@
 
     .d-actions {
       display: flex;
+      flex-wrap: nowrap;
       gap: 8px;
       padding: 10px 14px;
       border-top: 1px solid var(--line);
       background: var(--panel);
     }
 
+    .drawer-credit {
+      flex: none;
+      padding: 8px 12px calc(env(safe-area-inset-bottom, 0px) + 10px);
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .scroll-controls {
+      flex: none;
+      display: grid;
+      grid-template-columns: minmax(108px, auto) minmax(0, 1fr);
+      align-items: center;
+      gap: 8px 12px;
+      padding: 12px 14px;
+      border-top: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .page-mode {
+      display: flex;
+      flex: none;
+      gap: 8px;
+      padding: 8px 14px;
+      border-top: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .page-mode button {
+      flex: 1;
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .page-mode button[aria-pressed="true"] {
+      border-color: var(--green);
+      color: var(--green);
+      background: color-mix(in srgb, var(--green) 10%, var(--panel));
+    }
+
+    .scroll-toggle {
+      grid-row: span 2;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid color-mix(in srgb, var(--green) 24%, var(--line));
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: background .18s, border-color .18s, color .18s, transform .18s;
+    }
+
+    .scroll-toggle[aria-pressed="true"] {
+      color: var(--green);
+      border-color: color-mix(in srgb, var(--green) 45%, var(--line));
+      background: color-mix(in srgb, var(--green) 9%, var(--panel));
+    }
+
+    .scroll-toggle:active {
+      transform: scale(.98);
+    }
+
+    .scroll-toggle svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      flex: none;
+    }
+
+    .scroll-speed-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    .scroll-speed-label output {
+      color: var(--ink);
+      font-weight: 700;
+      white-space: nowrap;
+      direction: rtl;
+    }
+
+    #scrollSpeed {
+      width: 100%;
+      min-width: 0;
+      height: 20px;
+      margin: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      direction: ltr;
+      cursor: pointer;
+    }
+
+    #scrollSpeed::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(to right, var(--green) 0 var(--scroll-progress, 26%), var(--line) var(--scroll-progress, 26%) 100%);
+    }
+
+    #scrollSpeed::-moz-range-track {
+      height: 6px;
+      border-radius: 999px;
+      background: var(--line);
+    }
+
+    #scrollSpeed::-moz-range-progress {
+      height: 6px;
+      border-radius: 999px;
+      background: var(--green);
+    }
+
+    #scrollSpeed::-webkit-slider-thumb {
+      width: 18px;
+      height: 18px;
+      margin-top: -6px;
+      border: 3px solid var(--panel);
+      border-radius: 50%;
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--green);
+      box-shadow: 0 1px 5px rgba(0, 0, 0, .22), 0 0 0 1px color-mix(in srgb, var(--green) 55%, transparent);
+    }
+
+    #scrollSpeed::-moz-range-thumb {
+      width: 13px;
+      height: 13px;
+      border: 3px solid var(--panel);
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 1px 5px rgba(0, 0, 0, .22), 0 0 0 1px color-mix(in srgb, var(--green) 55%, transparent);
+    }
+
+    #scrollSpeed:focus-visible {
+      outline: 2px solid color-mix(in srgb, var(--green) 45%, transparent);
+      outline-offset: 3px;
+      border-radius: 999px;
+    }
+
+    #bScreen {
+      flex: 1;
+    }
+
     .d-action {
       flex: 1;
       min-width: 0;
-      min-height: 42px;
+      min-height: 48px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 8px;
+      gap: 3px;
+      padding: 4px;
       border: 1px solid var(--line);
       border-radius: 10px;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 11px;
       font-weight: 700;
+      line-height: 1.25;
+      text-align: center;
     }
 
     .d-action:active,
@@ -981,10 +1218,73 @@
     }
 
     .d-action svg {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       flex: none;
       fill: currentColor;
+    }
+
+    @media (max-height: 480px) {
+      .d-top {
+        padding: calc(env(safe-area-inset-top, 0px) + 8px) 14px 8px;
+        gap: 6px;
+      }
+
+      .seg button {
+        padding-block: 6px;
+      }
+
+      .search {
+        padding-block: 6px;
+      }
+
+      .d-body {
+        min-height: 72px;
+      }
+
+      .d-actions {
+        gap: 5px;
+        padding: 6px 10px;
+      }
+
+      .scroll-controls {
+        gap: 5px 8px;
+        padding: 8px 10px;
+      }
+
+      .scroll-toggle {
+        min-height: 38px;
+        gap: 5px;
+        padding: 5px 8px;
+        font-size: 11px;
+      }
+
+      .scroll-speed-label {
+        font-size: 10px;
+      }
+
+      #scrollSpeed {
+        height: 18px;
+      }
+
+      .d-action {
+        min-height: 42px;
+        font-size: 10px;
+      }
+
+      .d-action svg {
+        width: 16px;
+        height: 16px;
+      }
+
+    }
+
+    #bScreen svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .seg {
@@ -992,7 +1292,7 @@
       border: 1.5px solid var(--line);
       border-radius: 8px;
       overflow: hidden;
-      width: min(100%, 300px);
+      width: min(100%, 360px);
       background: var(--panel-top);
     }
 
@@ -1001,7 +1301,8 @@
       padding: 11px 8px;
       font-weight: 500;
       color: var(--muted);
-      font-size: 16px;
+      font-size: 14px;
+      white-space: nowrap;
     }
 
     .seg button[aria-selected="true"] {
@@ -1025,6 +1326,46 @@
 
     .search[hidden] {
       display: none;
+    }
+
+    .search-mode {
+      display: flex;
+      width: 100%;
+      gap: 6px;
+    }
+
+    .search-mode button {
+      flex: 1;
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .search-mode button[aria-pressed="true"] {
+      border-color: var(--green);
+      color: var(--green);
+      background: color-mix(in srgb, var(--green) 10%, var(--panel));
+    }
+
+    .search-results-info {
+      padding: 10px 20px;
+      color: var(--sub);
+      font-size: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .search-more {
+      display: block;
+      width: calc(100% - 32px);
+      margin: 10px 16px 16px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--green);
+      font-weight: 700;
     }
 
     .d-body {
@@ -1106,153 +1447,12 @@
       z-index: 1;
     }
 
-    .mrow {
-      display: flex;
-      align-items: center;
-    }
-
-    .mrow .srow {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .del {
-      flex: none;
-      margin-inline: 12px;
-      padding: 8px 12px;
-      border-radius: 10px;
-      color: var(--muted);
-      font-size: 14px;
-      border: 1px solid var(--line);
-    }
-
     .empty {
       padding: 56px 28px;
       text-align: center;
       color: var(--muted);
       line-height: 1.9;
       font-size: 16px;
-    }
-
-    .kh {
-      padding: 28px 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .kh .big {
-      font-size: 34px;
-      font-weight: 700;
-      color: var(--green);
-    }
-
-    .kh .tr {
-      height: 10px;
-      border-radius: 99px;
-      background: var(--chip);
-      overflow: hidden;
-    }
-
-    .kh .tr i {
-      display: block;
-      height: 100%;
-      background: var(--green);
-    }
-
-    .kh-head {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .kh-head h3 {
-      margin: 0;
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .kh-head small {
-      display: block;
-      margin-bottom: 4px;
-      color: var(--sub);
-      font-size: 14px;
-    }
-
-    .kh-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      border-block: 1px solid var(--line);
-    }
-
-    .kh-stat {
-      padding: 12px 8px;
-    }
-
-    .kh-stat+.kh-stat {
-      border-inline-start: 1px solid var(--line);
-    }
-
-    .kh-stat span {
-      display: block;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .kh-stat strong {
-      display: block;
-      margin-top: 3px;
-      font-size: 21px;
-    }
-
-    .kh-plan {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-weight: 700;
-    }
-
-    .kh-plan select {
-      max-width: 52%;
-      padding: 8px 10px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel);
-      color: var(--ink);
-      font: inherit;
-      font-size: 14px;
-    }
-
-    .kh-target {
-      color: var(--sub);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    .kh-reset {
-      align-self: flex-start;
-    }
-
-    .kh-read {
-      min-height: 44px;
-      border: 1px solid var(--green);
-      border-radius: 8px;
-      background: color-mix(in srgb, var(--green) 10%, var(--panel));
-      color: var(--green);
-      font: inherit;
-      font-weight: 700;
-    }
-
-    .kh-read[aria-pressed="true"] {
-      background: var(--green);
-      color: var(--on-green);
-    }
-
-    .kh-current {
-      color: var(--muted);
-      font-size: 14px;
     }
 
     .pill {
@@ -1264,36 +1464,6 @@
       font-size: 15px;
     }
 
-    .d-nav {
-      display: flex;
-      border-top: 1px solid var(--line);
-      background: var(--panel);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-    }
-
-    .d-nav button {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      padding: 10px 2px 12px;
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .d-nav button svg {
-      width: 26px;
-      height: 26px;
-      fill: currentColor;
-    }
-
-    .d-nav button[aria-selected="true"] {
-      color: var(--green);
-      font-weight: 700;
-    }
-
     .vsheet {
       position: fixed;
       left: 0;
@@ -1302,7 +1472,7 @@
       z-index: 35;
       margin-inline: auto;
       width: min(100%, 600px);
-      max-height: 88svh;
+      max-height: 72svh;
       overflow-y: auto;
       background: var(--panel-top);
       border-radius: 28px 28px 0 0;
@@ -1311,7 +1481,7 @@
       visibility: hidden;
       transition: transform .26s ease, visibility 0s .26s;
       box-shadow: 0 -10px 40px rgba(0, 0, 0, .2);
-      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
     }
 
     body.vs .vsheet {
@@ -1326,14 +1496,14 @@
       justify-content: space-between;
       background: var(--panel);
       border-radius: 28px 28px 0 0;
-      padding: 26px 24px 22px;
+      padding: 14px 18px 12px;
       position: sticky;
       top: 0;
     }
 
     .v-top h2 {
       margin: 0;
-      font-size: 28px;
+      font-size: 22px;
       font-weight: 700;
     }
 
@@ -1348,19 +1518,19 @@
 
     .v-card {
       background: var(--card);
-      border-radius: 22px;
-      margin: 18px 18px 0;
+      border-radius: 16px;
+      margin: 10px 12px 0;
       overflow: hidden;
     }
 
     .v-row {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 12px;
       width: 100%;
-      padding: 22px 26px;
+      padding: 12px 16px;
       text-align: right;
-      min-height: 84px;
+      min-height: 58px;
     }
 
     .v-row:active {
@@ -1368,19 +1538,15 @@
     }
 
     .v-row>svg {
-      width: 30px;
-      height: 30px;
+      width: 24px;
+      height: 24px;
       flex: none;
       fill: var(--green);
     }
 
-    .v-row.red>svg {
-      fill: var(--red);
-    }
-
     .v-row b {
       display: block;
-      font-size: 24px;
+      font-size: 18px;
       font-weight: 700;
       line-height: 1.3;
     }
@@ -1388,42 +1554,112 @@
     .v-row small {
       display: block;
       color: var(--sub);
-      font-size: 16px;
-      margin-top: 4px;
+      font-size: 13px;
+      margin-top: 2px;
       font-weight: 500;
     }
 
-    .v-note {
-      padding: 0 22px 22px;
+    .v-mark-row {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
+      align-items: stretch;
+      border-top: 1px solid var(--line);
     }
 
-    .v-note[hidden] {
+    .v-mark-row .v-row {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .v-mark-remove {
+      width: 42px;
+      flex: none;
+      color: var(--muted);
+      font-size: 20px;
+    }
+
+    .v-mark-remove:active {
+      color: var(--red);
+      background: var(--panel-top);
+    }
+
+    .v-add {
+      padding: 8px 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .v-add-toggle {
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .mark-create {
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      gap: 12px;
+    }
+
+    .mark-create[hidden] {
       display: none;
     }
 
-    .v-note textarea {
-      width: 100%;
-      min-height: 96px;
-      resize: vertical;
-      font: inherit;
-      font-size: 17px;
-      color: var(--ink);
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 12px;
+    .mark-create label {
+      display: grid;
+      gap: 6px;
+      color: var(--sub);
+      font-size: 13px;
+      font-weight: 700;
     }
 
-    .v-note button {
-      align-self: flex-start;
+    .mark-create input {
+      width: 100%;
+      min-height: 42px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel);
+      color: var(--ink);
+      font: inherit;
+      font-size: 15px;
+    }
+
+    .mark-create input:focus {
+      outline: 2px solid color-mix(in srgb, var(--green) 55%, transparent);
+      border-color: var(--green);
+    }
+
+    .mark-create-colors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .mark-create-colors button {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 3px solid var(--card);
+      box-shadow: 0 0 0 1px var(--line);
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .mark-create-colors button[aria-pressed="true"] {
+      box-shadow: 0 0 0 2px var(--green);
+      transform: scale(1.08);
+    }
+
+    .mark-create-submit {
+      min-height: 40px;
+      border-radius: 9px;
       background: var(--green);
       color: var(--on-green);
-      border-radius: 10px;
-      padding: 10px 20px;
       font-weight: 700;
+    }
+
+    .mark-create-submit:disabled {
+      opacity: .5;
     }
 
     /* word popover */
@@ -1597,7 +1833,6 @@
       display: flex;
     }
 
-    body.titled .seg,
     body.titled .search {
       display: none;
     }
@@ -1678,10 +1913,10 @@
     }
 
     .mk-add {
-      padding: 16px 22px 20px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
       color: var(--muted);
       font-size: 15px;
     }
@@ -1698,6 +1933,29 @@
       border-radius: 50%;
       border: 3px solid var(--card);
       box-shadow: 0 0 0 1px var(--line);
+    }
+
+    .mk-add .mk-add-name {
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .mk-add .mk-add-name input {
+      min-height: 42px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel);
+      color: var(--ink);
+      font: inherit;
+      font-size: 15px;
+    }
+
+    .mk-add .sw button[aria-pressed="true"] {
+      box-shadow: 0 0 0 2px var(--green);
+      transform: scale(1.08);
     }
 
     .v-colors {
@@ -1718,19 +1976,19 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 18px;
-      padding: 22px 26px;
+      gap: 12px;
+      padding: 10px 14px;
       border-radius: 0;
       border: 0;
       border-top: 1px solid var(--line);
       color: var(--ink);
       text-align: right;
-      min-height: 84px;
+      min-height: 58px;
     }
 
     .v-colors .v-slot>svg {
-      width: 30px;
-      height: 30px;
+      width: 24px;
+      height: 24px;
       flex: none;
       fill: var(--mark-color);
     }
@@ -1738,6 +1996,64 @@
     .v-colors button.on {
       background: var(--panel-top);
       color: var(--ink);
+      font-weight: 700;
+    }
+
+    .v-mark-edit {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 12px 14px;
+      border-top: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .v-mark-edit input {
+      flex: 1 1 100%;
+      min-width: 0;
+      min-height: 40px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-top);
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+    }
+
+    .v-mark-edit .v-mark-swatches {
+      display: flex;
+      flex: 1;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .v-mark-edit button {
+      width: 25px;
+      height: 25px;
+      min-height: 0;
+      padding: 0;
+      border: 2px solid var(--panel);
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px var(--line);
+    }
+
+    .v-mark-edit button[aria-pressed="true"] {
+      box-shadow: 0 0 0 2px var(--green);
+    }
+
+    .v-mark-edit button[data-vslot-remove] {
+      width: auto;
+      height: auto;
+      min-height: 36px;
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: none;
+      color: var(--red);
+      font: inherit;
+      font-size: 14px;
       font-weight: 700;
     }
 
@@ -1803,16 +2119,20 @@
 
   <main class="page" id="page" lang="ar">
     <div class="measure" id="measure" aria-hidden="true"></div>
-    <div class="run">
-      <button type="button" id="openJuz" aria-label="فتح فهرس السور"></button>
-      <svg class="bm" id="bm" viewBox="0 0 24 24" hidden aria-label="صفحة عليها فاصل">
-        <path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z" />
-      </svg>
-      <span class="names" id="names"></span>
+    <div id="pageList">
+      <section class="page-view" data-page="1">
+        <div class="run">
+          <button type="button" class="open-juz" aria-label="فتح فهرس السور"></button>
+          <svg class="bm" viewBox="0 0 24 24" hidden aria-label="صفحة عليها فاصل">
+            <path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1 1z" />
+          </svg>
+          <span class="names"></span>
+        </div>
+        <div class="sheet"></div>
+        <div class="foot"><button type="button" class="badge" aria-label="فتح فهرس السور"></button></div>
+      </section>
     </div>
-    <div class="sheet" id="sheet"></div>
     <div class="wp" id="wp" role="dialog" aria-label="معنى الكلمة" hidden></div>
-    <div class="foot"><button type="button" class="badge" id="badge" aria-label="فتح فهرس السور"></button></div>
   </main>
 
   <div class="bar" id="bar" hidden>
@@ -1858,9 +2178,14 @@
       <div class="seg" role="tablist">
         <button type="button" role="tab" id="tabQ" aria-selected="false">الأرباع</button>
         <button type="button" role="tab" id="tabS" aria-selected="true">السور</button>
+        <button type="button" role="tab" id="tabM" aria-selected="false">العلامات</button>
       </div>
       <input class="search" id="search" type="search" placeholder="سورة أو رقم صفحة" autocomplete="off"
         aria-label="ابحث عن سورة أو رقم صفحة">
+      <div class="search-mode" id="searchMode" role="group" aria-label="نطاق البحث">
+        <button type="button" data-search-mode="surahs" aria-pressed="true">السور والصفحات</button>
+        <button type="button" data-search-mode="verses" aria-pressed="false">كلمات الآيات</button>
+      </div>
       <div class="d-title">
         <h2 id="dTitleT"></h2><button type="button" id="dEdit" hidden>تحرير</button>
       </div>
@@ -1868,10 +2193,32 @@
     <div class="d-body" id="paneSurahs"></div>
     <div class="d-body" id="paneQuarters" hidden></div>
     <div class="d-body" id="paneMarks" hidden></div>
-    <div class="d-body" id="paneStars" hidden></div>
-    <div class="d-body" id="paneNotes" hidden></div>
-    <div class="d-body" id="paneKhatma" hidden></div>
+    <div class="page-mode" role="group" aria-label="طريقة التنقل بين الصفحات">
+      <button type="button" data-page-mode="vertical" aria-pressed="true">تمرير رأسي</button>
+      <button type="button" data-page-mode="horizontal" aria-pressed="false">تمرير أفقي</button>
+    </div>
+    <div class="scroll-controls" aria-label="التمرير التلقائي">
+      <button type="button" class="scroll-toggle" id="scrollToggle" aria-pressed="false">
+        <svg id="scrollToggleIcon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+        <span id="scrollToggleLabel">بدء التمرير</span>
+      </button>
+      <label class="scroll-speed-label" for="scrollSpeed">
+        <span>سرعة التمرير</span>
+        <output id="scrollSpeedValue" for="scrollSpeed"></output>
+      </label>
+      <input id="scrollSpeed" type="range" min="5" max="100" step="5" value="30"
+        aria-label="سرعة التمرير بالبكسل في الثانية">
+    </div>
     <div class="d-actions">
+      <button type="button" class="d-action" id="bScreen" aria-label="ملء الشاشة والتدوير أفقيًا" aria-pressed="false"
+        title="ملء الشاشة والتدوير أفقيًا">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5M7 12a5 5 0 0 1 8.5-3.5L17 10M17 12a5 5 0 0 1-8.5 3.5L7 14" />
+        </svg>
+        <span id="screenLabel">ملء الشاشة</span>
+      </button>
       <button type="button" class="d-action" id="bAnnot" aria-label="تعديل الصفحات" aria-pressed="false">
         <svg viewBox="0 0 24 24">
           <path
@@ -1886,30 +2233,13 @@
         <span id="themeLabel">الوضع الليلي</span>
       </button>
     </div>
-    <nav class="d-nav" id="dnav">
-      <button type="button" data-k="notes" aria-selected="false"><svg viewBox="0 0 24 24">
-          <path d="M19 3H5a2 2 0 0 0-2 2v14l4-4h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM7 8h10v2H7zm0 4h7v2H7z" />
-        </svg>الملاحظات</button>
-      <button type="button" data-k="stars" aria-selected="false"><svg viewBox="0 0 24 24">
-          <path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7.3L12 17.8 5.7 21.5l1.7-7.3L2 9.5l7.1-.6z" />
-        </svg>مميزة بنجمة</button>
-      <button type="button" data-k="marks" aria-selected="false"><svg viewBox="0 0 24 24">
-          <path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z" />
-        </svg>الفواصل</button>
-      <button type="button" data-k="khatma" aria-selected="false"><svg viewBox="0 0 24 24">
-          <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-2 15l-4-4 1.4-1.4L10 14.2l6.6-6.6L18 9z" />
-        </svg>الختمة</button>
-      <button type="button" data-k="surahs" aria-selected="true"><svg viewBox="0 0 24 24">
-          <path d="M3 5h2v2H3zm4 0h14v2H7zM3 11h2v2H3zm4 0h14v2H7zM3 17h2v2H3zm4 0h14v2H7z" />
-        </svg>السور</button>
-    </nav>
+    <div class="drawer-credit">صدقة جارية على روح أمي وجدتي، نسألكم الدعاء<br>برمجة محمد سعيد الحاكم</div>
   </aside>
 
   <section class="vsheet" id="vsheet" aria-label="خيارات الآية" aria-hidden="true">
     <div class="v-top">
       <h2 id="vTitle"></h2>
       <div class="ics">
-        <button type="button" class="ib" id="vStar" aria-label="تمييز بنجمة"></button>
         <button type="button" class="ib" id="vShare" aria-label="نسخ الآية"><svg viewBox="0 0 24 24">
             <path
               d="M18 16.1c-.8 0-1.5.3-2 .8l-7.1-4.2c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.2c.5.5 1.2.8 2 .8a3 3 0 1 0-3-3c0 .2 0 .5.1.7L8 9.8A3 3 0 1 0 8 14.2l7.1 4.2c-.1.2-.1.4-.1.6a2.9 2.9 0 1 0 3-2.9z" />
@@ -1917,23 +2247,22 @@
       </div>
     </div>
     <div class="v-card">
-      <button type="button" class="v-row red" id="vWird"><svg viewBox="0 0 24 24">
-          <path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z" />
-        </svg><span><b>الورد اليومي</b><small id="vWirdSub"></small></span></button>
       <div class="v-colors" id="vColors"></div>
+      <div class="v-add">
+        <button type="button" class="v-add-toggle" id="vAddToggle" aria-expanded="false">إضافة علامة</button>
+        <div class="mark-create" id="vAddForm" hidden>
+          <label for="vAddName">اسم العلامة</label>
+          <input type="text" id="vAddName" maxlength="40" placeholder="مثال: مراجعة أو حفظ" autocomplete="off">
+          <div class="mark-create-colors" id="vAddColors" role="group" aria-label="اختر لون العلامة"></div>
+          <button type="button" class="mark-create-submit" id="vAddSave">إضافة العلامة لهذه الآية</button>
+        </div>
+      </div>
     </div>
     <div class="v-card">
       <button type="button" class="v-row" id="vCopy"><svg viewBox="0 0 24 24">
           <path
             d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11z" />
         </svg><span><b>نسخ الآية</b></span></button>
-      <button type="button" class="v-row" id="vNote"><svg viewBox="0 0 24 24">
-          <path d="M19 3H5a2 2 0 0 0-2 2v14l4-4h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM7 8h10v2H7zm0 4h7v2H7z" />
-        </svg><span><b>ملاحظة</b></span></button>
-      <div class="v-note" id="vNoteBox" hidden>
-        <textarea id="vNoteTx" placeholder="اكتب ملاحظتك على هذه الآية" aria-label="ملاحظة"></textarea>
-        <button type="button" id="vNoteSave">حفظ الملاحظة</button>
-      </div>
     </div>
   </section>
   <div class="toast" id="toast" role="status"></div>
@@ -1968,32 +2297,36 @@
       /* ---------- saved state ---------- */
       var COL = { red: ['#c8283a', 'الأحمر'], yellow: ['#d9a21b', 'الأصفر'], green: ['#3aa24a', 'الأخضر'], blue: ['#1f7fc4', 'الأزرق'], purple: ['#8a4fc7', 'البنفسجي'], orange: ['#e8782a', 'البرتقالي'], pink: ['#d94f8c', 'الوردي'], teal: ['#159a9a', 'الفيروزي'] };
       var PALETTE = Object.keys(COL).filter(function (c) { return c !== 'teal'; });
-      var slots = load('mq.slots', null);
-      if (!slots) {
-        slots = ['red', 'yellow', 'green', 'blue'].map(function (c) { return { id: c, c: c, nm: '', v: 0, ts: 0 }; });
-        var oldWird = +load('mq.wird', 0); if (oldWird) { slots[0].v = oldWird; slots[0].ts = Date.now(); }
+      var ANNOT_PALETTE = ['purple', 'blue', 'green', 'yellow', 'red'];
+      var slots = load('mq.slots', []);
+      if (!Array.isArray(slots)) slots = [];
+      if (store('mq.marksCleared') !== '1') {
+        slots = [];
+        store('mq.slots', '[]');
+        store('mq.marksCleared', '1');
       }
-      var stars = load('mq.stars', []);
-      var notes = load('mq.notes', {});
+      slots = slots.filter(function (slot) { return slot.id !== 'red'; });
+      save('mq.slots', slots);
+      try { localStorage.removeItem('mq.wird'); } catch (e) { }
       var pageAnnotations = load('mq.annotations', {});
       var annotPrefs = load('mq.annotPrefs', { enabled: false, mode: 'word', type: 'highlight', color: 'yellow' });
       if (['word', 'verse'].indexOf(annotPrefs.mode) < 0) annotPrefs.mode = 'word';
       if (['highlight', 'underline', 'erase'].indexOf(annotPrefs.type) < 0) annotPrefs.type = 'highlight';
-      if (!COL[annotPrefs.color]) annotPrefs.color = 'yellow';
+      if (ANNOT_PALETTE.indexOf(annotPrefs.color) < 0) annotPrefs.color = 'yellow';
       var annotEnabled = !!annotPrefs.enabled;
-      var khatmaReadPages = load('mq.khatma.read', {});
-      if (!khatmaReadPages || typeof khatmaReadPages !== 'object' || Array.isArray(khatmaReadPages)) khatmaReadPages = {};
-      var khatmaDays = +store('mq.khatma.days') || 30;
-      if ([30, 45, 60, 90].indexOf(khatmaDays) < 0) khatmaDays = 30;
-      var khatmaStart = +store('mq.khatma.start') || Date.now();
-      store('mq.khatma.start', String(khatmaStart));
       function save(k, v) { store(k, JSON.stringify(v)); }
-      function khatmaReadCount() {
-        return Object.keys(khatmaReadPages).filter(function (p) { return khatmaReadPages[p] && +p >= 1 && +p <= TOTAL; }).length;
-      }
       function saveSlots() { save('mq.slots', slots); }
       function slotById(id) { for (var i = 0; i < slots.length; i++) if (slots[i].id === id) return slots[i]; return null; }
-      function slotName(s) { if (s.nm) return s.nm; if (s.id === 'red') return 'الورد اليومي'; if (s.v) return 'سورة ' + D.surahs[Math.floor(s.v / 1000) - 1][1]; return COL[s.c][1]; }
+      function slotName(s) { if (s.nm) return s.nm; if (s.v) return 'سورة ' + D.surahs[Math.floor(s.v / 1000) - 1][1]; return COL[s.c][1]; }
+      function escapeHtml(value) { return String(value).replace(/[&<>"']/g, function (char) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]; }); }
+      function addMarkSlot(color, name, verse) {
+        var id = 'x' + Date.now();
+        while (slotById(id)) id += 'x';
+        var slot = { id: id, c: color, nm: name, v: verse || 0, ts: verse ? Date.now() : 0 };
+        slots.push(slot);
+        saveSlots();
+        return slot;
+      }
       function fmtTs(ts) {
         var d = new Date(ts), n = new Date();
         if (d.toDateString() === n.toDateString()) { var h = d.getHours(), m = d.getMinutes(); return ar((h % 12) || 12) + ':' + ar((m < 10 ? '0' : '') + m) + ' ' + (h < 12 ? 'ص' : 'م'); }
@@ -2003,14 +2336,16 @@
       var BM_F = 'M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z';
       var BM_O = 'M17 3H7a2 2 0 0 0-2 2v16l7-3 7 3V5a2 2 0 0 0-2-2zm0 15-5-2.2L7 18V5h10z';
       function bmSvg(c, filled) { return '<svg viewBox="0 0 24 24" fill="' + COL[c][0] + '"><path d="' + (filled ? BM_F : BM_O) + '"/></svg>'; }
-      function has(arr, v) { return arr.indexOf(v) >= 0; }
-      function toggle(arr, v) { var i = arr.indexOf(v); if (i >= 0) arr.splice(i, 1); else arr.push(v); arr.sort(function (a, b) { return a - b; }); return i < 0; }
       function label(v) { return D.surahs[Math.floor(v / 1000) - 1][1] + ':' + ar(v % 1000); }
       function pageOfV(v) { return pageOfId(idOf(Math.floor(v / 1000), v % 1000)); }
 
       /* ---------- drawing ---------- */
-      var pageEl = $('page'), mEl = $('measure'), sheet = $('sheet');
-      var cur = 1, token = 0, sel = 0, widths = {};
+      var pageEl = $('page'), pageList = $('pageList'), mEl = $('measure');
+      var activeView = pageList.querySelector('.page-view'), sheet = activeView.querySelector('.sheet');
+      var cur = 1, sel = 0, widths = {}, renderQueue = Promise.resolve();
+      var loadingPrevious = false;
+      var scrollMode = store('mq.scrollMode') === 'horizontal' ? 'horizontal' : 'vertical';
+      document.body.classList.toggle('horizontal-pages', scrollMode === 'horizontal');
 
       function bannerSVG() {
         return '<svg viewBox="0 0 1000 124" preserveAspectRatio="none" aria-hidden="true">' +
@@ -2044,11 +2379,59 @@
         return Promise.all(Object.keys(need).map(function (f) { return document.fonts.load('100px "' + f + '"', need[f]).catch(function () { }); }));
       }
 
-      function render() {
-        var my = ++token, p = cur, lines = G[p - 1];
-        ensureFonts(lines).then(function () {
-          if (my !== token) return;
-          var W = pageEl.clientWidth, Wc = W * 0.968;
+      function createPageView(p) {
+        var view = document.createElement('section');
+        view.className = 'page-view';
+        view.setAttribute('data-page', String(p));
+        view.innerHTML = '<div class="run"><button type="button" class="open-juz" aria-label="فتح فهرس السور"></button>' +
+          '<svg class="bm" viewBox="0 0 24 24" hidden aria-label="صفحة عليها فاصل"><path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z"/></svg>' +
+          '<span class="names"></span></div><div class="sheet"></div><div class="foot"><button type="button" class="badge" aria-label="فتح فهرس السور"></button></div>';
+        return view;
+      }
+
+      function syncPageStatus(view, p) {
+        var lines = G[p - 1], secs = [], seen = {};
+        lines.forEach(function (l) {
+          if (l[0] === 'w') l[2].forEach(function (it) {
+            if (it[0]) { var s = Math.floor(it[0] / 1000); if (!seen[s]) { seen[s] = 1; secs.push(s); } }
+          });
+        });
+        view.querySelector('.open-juz').textContent = 'الجزء ' + JUZ[juzOfId(D.pages[p - 1]) - 1];
+        view.querySelector('.names').textContent = secs.map(function (s) { return D.surahs[s - 1][1]; }).join(' ');
+        view.querySelector('.badge').textContent = ar(p);
+        if (activeView === view) {
+          if (document.activeElement !== $('pgIn')) $('pgIn').value = ar(p);
+          $('pgTotal').textContent = '/ ' + ar(TOTAL);
+          $('bPrev').disabled = p <= 1; $('bNext').disabled = p >= TOTAL;
+          updateBm();
+          document.querySelectorAll('#paneSurahs .srow').forEach(function (r) { r.classList.toggle('here', secs.indexOf(+r.getAttribute('data-s')) >= 0); });
+        }
+      }
+
+      function activatePage(view) {
+        if (!view || view === activeView) return;
+        if (activeView) activeView.classList.remove('active');
+        view.classList.add('active');
+        activeView = view; sheet = view.querySelector('.sheet');
+        cur = +view.getAttribute('data-page'); store('mq.page', String(cur));
+        if (document.activeElement !== $('pgIn')) $('pgIn').value = ar(cur);
+        $('bPrev').disabled = cur <= 1; $('bNext').disabled = cur >= TOTAL;
+        updateBm();
+        var seen = {};
+        sheet.querySelectorAll('.w[data-v]').forEach(function (w) {
+          var v = +w.getAttribute('data-v'); if (v) seen[Math.floor(v / 1000)] = 1;
+        });
+        document.querySelectorAll('#paneSurahs .srow').forEach(function (r) { r.classList.toggle('here', !!seen[+r.getAttribute('data-s')]); });
+      }
+
+      function render(view, p) {
+        p = p || cur; view = view || activeView;
+        var lines = G[p - 1], targetSheet = view.querySelector('.sheet');
+        view.classList.toggle('opening', p <= 2);
+        syncPageStatus(view, p);
+        renderQueue = renderQueue.then(function () { return ensureFonts(lines); }).then(function () {
+          if (!view.isConnected) return;
+          var W = view.clientWidth, Wc = W * 0.968;
           var gapMin = 0.13, M = 0, info = [];
           lines.forEach(function (l, i) {
             if (l[0] !== 'w') { info.push(null); return; }
@@ -2056,11 +2439,10 @@
             var em = (sum / 100) + gapMin * (ws.length - 1);
             info.push({ ws: ws, em: em }); if (em > M) M = em;
           });
-          var fs = Wc / M;
-          if (M === 0 || p <= 2) fs = Math.min(fs, W * 0.085);
+          var fs = M ? Wc / M : W * 0.085;
           fs = Math.min(fs, W * 0.085);
-          var spaced = p > 2;
-          var html = '';
+          if (p <= 2) fs *= 0.85;
+          var spaced = p > 2, html = '';
           lines.forEach(function (l, i) {
             if (l[0] === 'h') {
               var hw = measureLine(l, p + ':' + i)[0] / 100, hs = Math.min(W * 0.078, W * 0.30 / hw);
@@ -2074,25 +2456,65 @@
               html += '<div class="ln ' + (full ? 'full' : 'cen') + '" data-vs="' + Object.keys(vs).join(',') + '" style="font-size:' + fs.toFixed(2) + 'px">' + inner + '</div>';
             }
           });
-          sheet.innerHTML = html;
-          sheet.classList.remove('fade'); void sheet.offsetWidth; sheet.classList.add('fade');
-          paintSel();
-          paintSlots();
-          paintAnnotations();
+          targetSheet.innerHTML = html;
+          paintSel(targetSheet, p); paintSlots(targetSheet, p); paintAnnotations(targetSheet, p);
+          if (activeView === view) sheet = targetSheet;
           prefetch(p);
         });
-        var secs = [], seen = {};
-        lines.forEach(function (l) { if (l[0] === 'w') l[2].forEach(function (it) { if (it[0]) { var s = Math.floor(it[0] / 1000); if (!seen[s]) { seen[s] = 1; secs.push(s); } } }); });
-        var j = juzOfId(D.pages[p - 1]);
-        $('openJuz').textContent = 'الجزء ' + JUZ[j - 1];
-        $('names').textContent = secs.map(function (s) { return D.surahs[s - 1][1]; }).join(' ');
-        $('badge').textContent = ar(p);
-        if (document.activeElement !== $('pgIn')) $('pgIn').value = ar(p);
-        $('pgTotal').textContent = '/ ' + ar(TOTAL);
-        $('bPrev').disabled = p <= 1; $('bNext').disabled = p >= TOTAL;
-        updateBm();
-        document.querySelectorAll('#paneSurahs .srow').forEach(function (r) { r.classList.toggle('here', secs.indexOf(+r.getAttribute('data-s')) >= 0); });
-        if (paneK && !paneK.hidden) buildKhatma();
+      }
+
+      function renderInitialPage(p) {
+        pageList.innerHTML = '';
+        activeView = createPageView(p); pageList.appendChild(activeView);
+        activeView.classList.add('active');
+        sheet = activeView.querySelector('.sheet'); cur = p; store('mq.page', String(p));
+        render(activeView, p);
+        appendNextPage();
+      }
+
+      function appendNextPage() {
+        var last = pageList.lastElementChild, next = last ? +last.getAttribute('data-page') + 1 : cur + 1;
+        if (next > TOTAL) return;
+        var view = createPageView(next);
+        pageList.appendChild(view); render(view, next);
+      }
+
+      function prependPreviousPage() {
+        var first = pageList.firstElementChild, previous = first ? +first.getAttribute('data-page') - 1 : 0;
+        if (previous < 1 || loadingPrevious) return;
+        loadingPrevious = true;
+        var rect = first.getBoundingClientRect(), view = createPageView(previous);
+        pageList.insertBefore(view, first); render(view, previous);
+        requestAnimationFrame(function () {
+          var nextRect = first.getBoundingClientRect();
+          if (scrollMode === 'horizontal') pageList.scrollLeft += nextRect.left - rect.left;
+          else window.scrollBy(0, nextRect.top - rect.top);
+          loadingPrevious = false;
+        });
+      }
+
+      function updateContinuousPages() {
+        var views = pageList.children, visible = null, first = pageList.firstElementChild, last = pageList.lastElementChild;
+        if (scrollMode === 'horizontal') {
+          var listRect = pageList.getBoundingClientRect(), markerX = listRect.left + pageList.clientWidth / 2;
+          for (var i = 0; i < views.length; i++) {
+            var pageRect = views[i].getBoundingClientRect();
+            if (pageRect.left <= markerX && pageRect.right > markerX) { visible = views[i]; break; }
+          }
+          if (first && pageList.scrollLeft < pageList.clientWidth * 0.5 && +first.getAttribute('data-page') > 1) prependPreviousPage();
+          if (last && last.getBoundingClientRect().left < listRect.right + pageList.clientWidth * 2 && +last.getAttribute('data-page') < TOTAL) appendNextPage();
+        } else {
+          var marker = window.scrollY + window.innerHeight * 0.38, lo = 0, hi = views.length - 1;
+          while (lo < hi) {
+            var mid = (lo + hi) >> 1;
+            if (views[mid].offsetTop + views[mid].offsetHeight <= marker) lo = mid + 1;
+            else hi = mid;
+          }
+          visible = views[lo];
+          if (first && window.scrollY < window.innerHeight * 0.5 && +first.getAttribute('data-page') > 1) prependPreviousPage();
+          if (last && last.getBoundingClientRect().top < window.innerHeight * 2 && +last.getAttribute('data-page') < TOTAL) appendNextPage();
+        }
+        if (visible) activatePage(visible);
       }
 
       function prefetch(p) {
@@ -2104,101 +2526,177 @@
         });
       }
 
-      function paintSel() {
-        sheet.querySelectorAll('.hl').forEach(function (n) { n.remove(); });
+      function paintSel(targetSheet) {
+        var targets = targetSheet ? [targetSheet] : pageList.querySelectorAll('.sheet');
+        targets.forEach(function (target) { target.querySelectorAll('.hl:not(.slot-band)').forEach(function (n) { n.remove(); }); });
         if (!sel) return;
-        sheet.querySelectorAll('.ln').forEach(function (el) {
-          if (el.getAttribute('data-vs').split(',').indexOf(String(sel)) < 0) return;
-          var ws = el.querySelectorAll('.w[data-v="' + sel + '"]'); if (!ws.length) return;
-          var lr = el.getBoundingClientRect(), fsz = parseFloat(el.style.fontSize) || 20, lo = 1e9, hi = -1e9;
-          ws.forEach(function (w) { var r = w.getBoundingClientRect(); if (r.left < lo) lo = r.left; if (r.right > hi) hi = r.right; });
-          var pad = fsz * 0.2, i = document.createElement('i'); i.className = 'hl';
-          i.style.left = (lo - lr.left - pad).toFixed(1) + 'px'; i.style.width = (hi - lo + pad * 2).toFixed(1) + 'px';
-          el.insertBefore(i, el.firstChild);
-        });
-      }
-      function updateBm() {
-        var f = null; slots.forEach(function (s) { if (!f && s.v && pageOfV(s.v) === cur) f = s; });
-        var el = $('bm'); el.hidden = !f; if (f) el.style.fill = COL[f.c][0];
-      }
-      function paintSlots() {
-        sheet.querySelectorAll('.slot-band').forEach(function (n) { n.remove(); });
-        sheet.querySelectorAll('.w.slot').forEach(function (n) { n.classList.remove('slot'); n.style.color = ''; });
-        slots.forEach(function (s) {
-          if (!s.v || pageOfV(s.v) !== cur) return;
-          var col = COL[s.c][0];
-          sheet.querySelectorAll('.ln').forEach(function (el) {
-            if (el.getAttribute('data-vs').split(',').indexOf(String(s.v)) < 0) return;
-            var ws = el.querySelectorAll('.w[data-v="' + s.v + '"]'); if (!ws.length) return;
+        targets.forEach(function (target) {
+          target.querySelectorAll('.ln').forEach(function (el) {
+            if (el.getAttribute('data-vs').split(',').indexOf(String(sel)) < 0) return;
+            var ws = el.querySelectorAll('.w[data-v="' + sel + '"]'); if (!ws.length) return;
             var lr = el.getBoundingClientRect(), fsz = parseFloat(el.style.fontSize) || 20, lo = 1e9, hi = -1e9;
-            ws.forEach(function (w) {
-              var r = w.getBoundingClientRect();
-              if (r.left < lo) lo = r.left; if (r.right > hi) hi = r.right;
-              w.classList.add('slot');
-              w.style.color = col;
-            });
-            var pad = fsz * 0.2, i = document.createElement('i'); i.className = 'hl slot-band';
-            i.style.left = (lo - lr.left - pad).toFixed(1) + 'px';
-            i.style.width = (hi - lo + pad * 2).toFixed(1) + 'px';
-            i.style.background = 'color-mix(in srgb, ' + col + ' 14%, transparent)';
+            ws.forEach(function (w) { var r = w.getBoundingClientRect(); if (r.left < lo) lo = r.left; if (r.right > hi) hi = r.right; });
+            var pad = fsz * 0.2, i = document.createElement('i'); i.className = 'hl';
+            i.style.left = (lo - lr.left - pad).toFixed(1) + 'px'; i.style.width = (hi - lo + pad * 2).toFixed(1) + 'px';
             el.insertBefore(i, el.firstChild);
           });
         });
       }
+      function updateBm() {
+        var f = null; slots.forEach(function (s) { if (!f && s.v && pageOfV(s.v) === cur) f = s; });
+        var el = activeView.querySelector('.bm'); el.hidden = !f; if (f) el.style.fill = COL[f.c][0];
+      }
+      function paintSlots(targetSheet, page) {
+        var targets = targetSheet ? [targetSheet] : pageList.querySelectorAll('.sheet');
+        targets.forEach(function (target) {
+          var targetPage = page || +target.closest('.page-view').getAttribute('data-page');
+          target.querySelectorAll('.slot-band').forEach(function (n) { n.remove(); });
+          slots.forEach(function (s) {
+            if (!s.v || pageOfV(s.v) !== targetPage) return;
+            var col = COL[s.c][0];
+            target.querySelectorAll('.ln').forEach(function (el) {
+              if (el.getAttribute('data-vs').split(',').indexOf(String(s.v)) < 0) return;
+              var ws = el.querySelectorAll('.w[data-v="' + s.v + '"]'); if (!ws.length) return;
+              var lr = el.getBoundingClientRect(), fsz = parseFloat(el.style.fontSize) || 20, lo = 1e9, hi = -1e9;
+              ws.forEach(function (w) {
+                var r = w.getBoundingClientRect();
+                if (r.left < lo) lo = r.left; if (r.right > hi) hi = r.right;
+              });
+              var pad = fsz * 0.2, i = document.createElement('i'); i.className = 'hl slot-band';
+              i.style.left = (lo - lr.left - pad).toFixed(1) + 'px';
+              i.style.width = (hi - lo + pad * 2).toFixed(1) + 'px';
+              var r = parseInt(col.slice(1, 3), 16), g = parseInt(col.slice(3, 5), 16), b = parseInt(col.slice(5, 7), 16);
+              i.style.background = 'rgba(' + r + ', ' + g + ', ' + b + ', 0.4)';
+              el.insertBefore(i, el.firstChild);
+            });
+          });
+        });
+      }
 
-      function paintAnnotations() {
-        var words = sheet.querySelectorAll('.w');
-        words.forEach(function (w) {
-          w.classList.remove('annot-highlight', 'annot-underline');
-          w.style.removeProperty('--annot-bg'); w.style.removeProperty('--annot-color');
-          var verse = w.getAttribute('data-v'), pos = w.getAttribute('data-p'), marks = pageAnnotations[cur] || [], mark = null;
-          marks.forEach(function (m) { if (String(m.v) === verse && m.p === null) mark = m; });
-          marks.forEach(function (m) { if (String(m.v) === verse && String(m.p) === pos) mark = m; });
-          if (!mark || mark.t === 'erase') return;
-          var color = COL[mark.c][0];
-          w.style.setProperty('--annot-color', color);
-          if (mark.t === 'highlight') {
-            w.style.setProperty('--annot-bg', 'color-mix(in srgb, ' + color + ' 24%, transparent)');
-            w.classList.add('annot-highlight');
-          } else if (mark.t === 'underline') w.classList.add('annot-underline');
+      function paintAnnotations(targetSheet, page) {
+        var targets = targetSheet ? [targetSheet] : pageList.querySelectorAll('.sheet');
+        targets.forEach(function (target) {
+          var targetPage = page || +target.closest('.page-view').getAttribute('data-page');
+          target.querySelectorAll('.annot-verse-band').forEach(function (band) { band.remove(); });
+          var words = target.querySelectorAll('.w');
+          words.forEach(function (w) {
+            w.classList.remove('annot-highlight', 'annot-underline');
+            w.style.removeProperty('--annot-bg'); w.style.removeProperty('--annot-color');
+            var verse = w.getAttribute('data-v'), pos = w.getAttribute('data-p'), marks = pageAnnotations[targetPage] || [], mark = null;
+            marks.forEach(function (m) { if (String(m.v) === verse && m.p === null) mark = m; });
+            marks.forEach(function (m) { if (String(m.v) === verse && String(m.p) === pos) mark = m; });
+            if (!mark || mark.t === 'erase') return;
+            var color = COL[mark.c][0];
+            w.style.setProperty('--annot-color', color);
+            if (mark.t === 'highlight') {
+              w.style.setProperty('--annot-bg', 'color-mix(in srgb, ' + color + ' 24%, transparent)');
+              if (mark.p === null) {
+                var line = w.closest('.ln'), verseWords = line.querySelectorAll('.w[data-v="' + verse + '"]');
+                var lineRect = line.getBoundingClientRect(), left = Infinity, right = -Infinity;
+                verseWords.forEach(function (verseWord) {
+                  var rect = verseWord.getBoundingClientRect();
+                  left = Math.min(left, rect.left); right = Math.max(right, rect.right);
+                });
+                var band = line.querySelector('.annot-verse-band[data-v="' + verse + '"]');
+                if (!band) {
+                  band = document.createElement('i');
+                  band.className = 'annot-verse-band';
+                  band.setAttribute('data-v', verse);
+                  line.insertBefore(band, line.firstChild);
+                }
+                band.style.left = (left - lineRect.left - 2).toFixed(1) + 'px';
+                band.style.width = (right - left + 4).toFixed(1) + 'px';
+                band.style.background = 'color-mix(in srgb, ' + color + ' 24%, transparent)';
+              } else w.classList.add('annot-highlight');
+            } else if (mark.t === 'underline') w.classList.add('annot-underline');
+          });
         });
       }
 
       function saveAnnotations() { save('mq.annotations', pageAnnotations); }
-      function markFromTap(w) {
+      function markFromTap(w, page) {
         var verse = +w.getAttribute('data-v'), pos = +w.getAttribute('data-p'), isVerse = annotPrefs.mode === 'verse';
-        var marks = pageAnnotations[cur] || (pageAnnotations[cur] = []);
+        page = page || cur;
+        var marks = pageAnnotations[page] || (pageAnnotations[page] = []);
         marks = marks.filter(function (m) { return isVerse ? m.v !== verse : !(m.v === verse && m.p === pos); });
         marks.push({ v: verse, p: isVerse ? null : pos, c: annotPrefs.color, t: annotPrefs.type });
-        pageAnnotations[cur] = marks;
+        pageAnnotations[page] = marks;
         saveAnnotations(); paintAnnotations();
         toast(annotPrefs.type === 'erase' ? 'أُزيل التمييز' : 'حُفظ التمييز لهذه الصفحة');
       }
 
       function goTo(p, keepSel) {
         p = Math.max(1, Math.min(TOTAL, p | 0));
-        cur = p; store('mq.page', String(p));
         if (!keepSel) sel = 0;
-        closeWp(); render(); window.scrollTo(0, 0);
+        closeWp();
+        var view = pageList.querySelector('.page-view[data-page="' + p + '"]');
+        if (!view) { renderInitialPage(p); view = activeView; }
+        activatePage(view);
+        paintSel();
+        if (scrollMode === 'horizontal') {
+          var listLeft = pageList.getBoundingClientRect().left;
+          pageList.scrollTo({ left: pageList.scrollLeft + view.getBoundingClientRect().left - listLeft, behavior: 'smooth' });
+        } else window.scrollTo(0, view.offsetTop);
+      }
+      function navigateToVerse(id) {
+        var page = pageOfV(id);
+        sel = id;
+        goTo(page, true);
+        renderQueue.then(function () {
+          requestAnimationFrame(function () {
+            var verse = pageList.querySelector('.page-view[data-page="' + page + '"] .w[data-v="' + id + '"]');
+            if (verse) verse.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+            paintSel();
+          });
+        });
       }
 
       /* ---------- verse sheet ---------- */
       var body = document.body, vsheet = $('vsheet');
       var toastEl = $('toast'), tt;
       function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove('show'); }, 2200); }
-
-      var STAR_O = '<svg viewBox="0 0 24 24"><path d="M12 15.4l-3.8 2.3 1-4.3-3.3-2.9 4.4-.4L12 6l1.7 4.1 4.4.4-3.3 2.9 1 4.3zM22 9.2l-7.2-.6L12 2 9.2 8.6 2 9.2l5.5 4.7L5.8 21 12 17.3l6.2 3.7-1.6-7.1z"/></svg>';
-      var STAR_F = '<svg viewBox="0 0 24 24"><path d="M12 17.3 18.2 21l-1.6-7.1L22 9.2l-7.2-.6L12 2 9.2 8.6 2 9.2l5.5 4.7L5.8 21z"/></svg>';
+      var bScreen = $('bScreen');
+      function syncScreenButton() {
+        var active = !!document.fullscreenElement;
+        bScreen.setAttribute('aria-pressed', String(active));
+        var label = active ? 'إيقاف ملء الشاشة' : 'ملء الشاشة';
+        bScreen.setAttribute('aria-label', active ? label : 'ملء الشاشة والتدوير أفقيًا');
+        bScreen.title = active ? label : 'ملء الشاشة والتدوير أفقيًا';
+        $('screenLabel').textContent = label;
+      }
+      bScreen.addEventListener('click', function () {
+        if (document.fullscreenElement) {
+          var currentOrientation = window.screen && window.screen.orientation;
+          if (currentOrientation && typeof currentOrientation.unlock === 'function') currentOrientation.unlock();
+          if (typeof document.exitFullscreen !== 'function') { toast('لا يدعم هذا المتصفح الخروج من وضع ملء الشاشة'); return; }
+          document.exitFullscreen().catch(function () { toast('تعذر إيقاف وضع ملء الشاشة'); });
+          return;
+        }
+        if (typeof document.documentElement.requestFullscreen !== 'function') {
+          toast('لا يدعم هذا المتصفح وضع ملء الشاشة؛ يمكنك تدوير الجهاز من إعداداته');
+          return;
+        }
+        document.documentElement.requestFullscreen().then(function () {
+          syncScreenButton();
+          var currentOrientation = window.screen && window.screen.orientation;
+          if (currentOrientation && typeof currentOrientation.lock === 'function') {
+            return currentOrientation.lock('landscape').then(function () {
+              toast('تم تفعيل العرض الأفقي بملء الشاشة');
+            }).catch(function () {
+              toast('تم تفعيل ملء الشاشة؛ فعّل التدوير من إعدادات الجهاز إذا لم تدر الشاشة');
+            });
+          }
+          toast('تم تفعيل ملء الشاشة؛ أدر الجهاز لتغيير اتجاه العرض');
+        }).catch(function () {
+          toast('تعذر تفعيل ملء الشاشة؛ تحقق من دعم المتصفح');
+        });
+      });
+      document.addEventListener('fullscreenchange', syncScreenButton);
 
       function fillSheet() {
         var s = Math.floor(sel / 1000), a = sel % 1000;
         $('vTitle').textContent = D.surahs[s - 1][1] + ':' + ar(a);
-        $('vStar').innerHTML = has(stars, sel) ? STAR_F : STAR_O;
-        $('vStar').setAttribute('aria-label', has(stars, sel) ? 'إزالة النجمة' : 'تمييز بنجمة');
-        var rd = slotById('red');
-        $('vWirdSub').textContent = rd && rd.v ? slotSub(rd) : 'اضغط لتعيين الورد عند هذه الآية';
         fillColors();
-        $('vNoteBox').hidden = true; $('vNoteTx').value = notes[sel] || '';
       }
       function openV(v) {
         sel = v; paintSel(); fillSheet(); closeWp();
@@ -2208,24 +2706,120 @@
       }
       function closeV() { if (!body.classList.contains('vs')) return; body.classList.remove('vs'); vsheet.setAttribute('aria-hidden', 'true'); sel = 0; paintSel(); }
 
-      $('vStar').addEventListener('click', function () { var on = toggle(stars, sel); save('mq.stars', stars); fillSheet(); buildStars(); toast(on ? 'تم تمييز الآية بنجمة' : 'أُزيلت النجمة'); });
       function setSlot(id, v) {
         var s = slotById(id);
-        if (!s && id === 'red') { s = { id: 'red', c: 'red', nm: '', v: 0, ts: 0 }; slots.unshift(s); }
         if (!s) return false;
         if (s.v === v) { s.v = 0; s.ts = 0; saveSlots(); return false; }
         s.v = v; s.ts = Date.now(); saveSlots(); return true;
       }
-      $('vWird').addEventListener('click', function () { var on = setSlot('red', sel); fillSheet(); buildKhatma(); buildMarks(); updateBm(); paintSlots(); toast(on ? 'تم تعيين الورد اليومي' : 'أُزيل الورد اليومي'); });
+      var activeSlotEditId = '', suppressMarkTap = false, markPressTimer = 0, markPressStart = null;
       function fillColors() {
         $('vColors').innerHTML = slots.map(function (s) {
-          return '<button type="button" data-id="' + s.id + '" class="v-row v-slot ' + (s.v === sel ? 'on' : '') + '" style="--mark-color:' + COL[s.c][0] + '">' + bmSvg(s.c, !!s.v) + '<span><b>' + slotName(s) + '</b><small>' + (s.v === sel ? 'اضغط لإزالة الفاصل' : 'اضغط لإضافة الفاصل') + '</small></span></button>';
+          var row = '<button type="button" data-id="' + s.id + '" class="v-row v-slot ' + (s.v === sel ? 'on' : '') + '" style="--mark-color:' + COL[s.c][0] + '">' + bmSvg(s.c, !!s.v) + '<span><b class="v-slot-name">' + escapeHtml(slotName(s)) + '</b></span></button>';
+          if (activeSlotEditId === s.id) {
+            row += '<div class="v-mark-edit"><input type="text" maxlength="40" value="' + escapeHtml(s.nm || '') + '" placeholder="' + escapeHtml(slotName(s)) + '" data-vslot-name="' + s.id + '" aria-label="اسم العلامة"><div class="v-mark-swatches">' + PALETTE.map(function (c) { return '<button type="button" data-vslot-color="' + s.id + '" data-color="' + c + '" aria-pressed="' + (s.c === c) + '" style="background:' + COL[c][0] + '" aria-label="' + COL[c][1] + '" title="' + COL[c][1] + '"></button>'; }).join('') + '</div><button type="button" data-vslot-remove="' + s.id + '">حذف العلامة</button></div>';
+          }
+          return '<div class="v-mark-entry">' + row + '</div>';
         }).join('');
       }
+      var newVerseMarkColor = PALETTE[0];
+      function fillAddColors() {
+        $('vAddColors').innerHTML = PALETTE.map(function (color) {
+          return '<button type="button" data-add-color="' + color + '" aria-pressed="' + (color === newVerseMarkColor) + '" title="' + COL[color][1] + '" aria-label="' + COL[color][1] + '" style="background:' + COL[color][0] + '"></button>';
+        }).join('');
+      }
+      $('vAddToggle').addEventListener('click', function () {
+        var form = $('vAddForm'), expanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', String(!expanded));
+        form.hidden = expanded;
+        if (!expanded) $('vAddName').focus();
+      });
+      fillAddColors();
+      $('vAddColors').addEventListener('click', function (e) {
+        var button = e.target.closest('[data-add-color]');
+        if (!button) return;
+        newVerseMarkColor = button.getAttribute('data-add-color');
+        fillAddColors();
+      });
+      $('vAddSave').addEventListener('click', function () {
+        var name = $('vAddName').value.trim();
+        if (!name) { $('vAddName').focus(); toast('اكتب اسم العلامة أولًا'); return; }
+        addMarkSlot(newVerseMarkColor, name, sel);
+        $('vAddName').value = '';
+        $('vAddForm').hidden = true;
+        $('vAddToggle').setAttribute('aria-expanded', 'false');
+        fillSheet(); buildMarks(); updateBm(); paintSlots();
+        toast('أُضيفت العلامة لهذه الآية');
+      });
+      $('vAddName').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); $('vAddSave').click(); }
+      });
       $('vColors').addEventListener('click', function (e) {
-        var b = e.target.closest('button'); if (!b) return;
+        var remove = e.target.closest('[data-vslot-remove]');
+        if (remove) {
+          var removeId = remove.getAttribute('data-vslot-remove');
+          slots = slots.filter(function (slot) { return slot.id !== removeId; });
+          activeSlotEditId = '';
+          saveSlots(); fillColors(); buildMarks(); updateBm(); paintSlots();
+          toast('تم حذف العلامة');
+          return;
+        }
+        var color = e.target.closest('[data-vslot-color]');
+        if (color) {
+          var colored = slotById(color.getAttribute('data-vslot-color'));
+          if (!colored) return;
+          colored.c = color.getAttribute('data-color');
+          saveSlots(); fillColors(); buildMarks(); updateBm(); paintSlots();
+          toast('تم تغيير لون العلامة');
+          return;
+        }
+        if (e.target.closest('.v-mark-edit')) return;
+        if (suppressMarkTap) { suppressMarkTap = false; return; }
+        var b = e.target.closest('[data-id]'); if (!b) return;
         var id = b.getAttribute('data-id'), on = setSlot(id, sel), s = slotById(id);
-        fillColors(); buildMarks(); updateBm(); paintSlots(); toast(on ? 'حُفظ الفاصل ' + (s.nm || COL[s.c][1]) : 'أُزيل الفاصل');
+        fillColors(); buildMarks(); updateBm(); paintSlots(); toast(on ? 'حُفظت العلامة ' + slotName(s) : 'أُزيل موضع العلامة');
+      });
+      $('vColors').addEventListener('input', function (e) {
+        var input = e.target.closest('[data-vslot-name]');
+        if (!input) return;
+        var slot = slotById(input.getAttribute('data-vslot-name'));
+        if (!slot) return;
+        slot.nm = input.value.trim();
+        saveSlots(); updateBm();
+        var name = input.closest('.v-mark-entry').querySelector('.v-slot-name');
+        if (name) name.textContent = slotName(slot);
+      });
+      $('vColors').addEventListener('pointerdown', function (e) {
+        var row = e.target.closest('.v-slot');
+        if (!row || e.target.closest('.v-mark-edit')) return;
+        window.clearTimeout(markPressTimer);
+        markPressStart = { id: row.getAttribute('data-id'), x: e.clientX, y: e.clientY };
+        markPressTimer = window.setTimeout(function () {
+          activeSlotEditId = markPressStart.id;
+          suppressMarkTap = true;
+          fillColors();
+          window.setTimeout(function () { suppressMarkTap = false; }, 900);
+        }, 550);
+      });
+      $('vColors').addEventListener('pointermove', function (e) {
+        if (!markPressStart) return;
+        if (Math.abs(e.clientX - markPressStart.x) > 10 || Math.abs(e.clientY - markPressStart.y) > 10) {
+          window.clearTimeout(markPressTimer);
+          markPressStart = null;
+        }
+      });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (type) {
+        $('vColors').addEventListener(type, function () {
+          window.clearTimeout(markPressTimer);
+          markPressStart = null;
+        });
+      });
+      $('vColors').addEventListener('contextmenu', function (e) {
+        var row = e.target.closest('.v-slot');
+        if (!row) return;
+        e.preventDefault();
+        activeSlotEditId = row.getAttribute('data-id');
+        fillColors();
       });
       function copyText(t, ok) {
         function fb() { var ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast(ok); } catch (e) { toast('تعذر النسخ'); } ta.remove(); }
@@ -2234,16 +2828,87 @@
       function ayahCopy() { var s = Math.floor(sel / 1000), a = sel % 1000; return '﴿' + verseText(s, a) + '﴾ [' + D.surahs[s - 1][1] + ': ' + ar(a) + ']'; }
       $('vShare').addEventListener('click', function () { copyText(ayahCopy(), 'تم نسخ الآية'); });
       $('vCopy').addEventListener('click', function () { copyText(ayahCopy(), 'تم نسخ الآية'); });
-      $('vNote').addEventListener('click', function () { var b = $('vNoteBox'); b.hidden = !b.hidden; if (!b.hidden) $('vNoteTx').focus(); });
-      $('vNoteSave').addEventListener('click', function () {
-        var t = $('vNoteTx').value.trim();
-        if (t) notes[sel] = t; else delete notes[sel];
-        save('mq.notes', notes); buildNotes(); $('vNoteBox').hidden = true; toast(t ? 'حُفظت الملاحظة' : 'حُذفت الملاحظة');
-      });
 
       /* ---------- drawer ---------- */
       var drawer = $('drawer');
+      var pageModeButtons = document.querySelectorAll('[data-page-mode]');
+      function syncPageModeButtons() {
+        pageModeButtons.forEach(function (button) {
+          button.setAttribute('aria-pressed', String(button.getAttribute('data-page-mode') === scrollMode));
+        });
+      }
+      function setPageMode(mode) {
+        if (mode !== 'vertical' && mode !== 'horizontal' || mode === scrollMode) return;
+        stopAutoScroll();
+        scrollMode = mode; store('mq.scrollMode', mode);
+        document.body.classList.toggle('horizontal-pages', mode === 'horizontal');
+        renderInitialPage(cur);
+        pageList.scrollLeft = 0; window.scrollTo(0, 0);
+        syncPageModeButtons();
+        requestAnimationFrame(updateContinuousPages);
+      }
+      pageModeButtons.forEach(function (button) {
+        button.addEventListener('click', function () { setPageMode(button.getAttribute('data-page-mode')); });
+      });
+      syncPageModeButtons();
+      var scrollSpeed = Math.max(5, Math.min(100, +store('mq.scrollSpeed') || 30));
+      var autoScrollFrame = 0, autoScrollTime = 0;
+      var scrollToggle = $('scrollToggle'), scrollSpeedInput = $('scrollSpeed');
+      function syncScrollControls() {
+        var running = !!autoScrollFrame;
+        scrollToggle.setAttribute('aria-pressed', String(running));
+        $('scrollToggleLabel').textContent = running ? 'إيقاف التمرير' : 'بدء التمرير';
+        $('scrollToggleIcon').innerHTML = running ? '<path d="M7 5h4v14H7zm6 0h4v14h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
+        scrollSpeedInput.value = String(scrollSpeed);
+        scrollSpeedInput.style.setProperty('--scroll-progress', ((scrollSpeed - 5) / 95 * 100).toFixed(1) + '%');
+        $('scrollSpeedValue').textContent = ar(scrollSpeed) + ' بكسل/ثانية';
+      }
+      function stopAutoScroll() {
+        if (!autoScrollFrame) return;
+        cancelAnimationFrame(autoScrollFrame); autoScrollFrame = 0; autoScrollTime = 0; syncScrollControls();
+      }
+      function autoScrollStep(time) {
+        if (!autoScrollFrame) return;
+        if (body.classList.contains('open') || body.classList.contains('vs')) { stopAutoScroll(); return; }
+        if (!autoScrollTime) autoScrollTime = time;
+        var elapsed = Math.min(250, time - autoScrollTime);
+        autoScrollTime = time;
+        var maxScroll = scrollMode === 'horizontal'
+          ? Math.max(0, pageList.scrollWidth - pageList.clientWidth)
+          : Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        var atEnd = scrollMode === 'horizontal' ? pageList.scrollLeft >= maxScroll - 1 : window.scrollY >= maxScroll - 1;
+        if (pageList.lastElementChild && +pageList.lastElementChild.getAttribute('data-page') === TOTAL && atEnd) {
+          stopAutoScroll(); toast('وصلت إلى نهاية المصحف'); return;
+        }
+        if (scrollMode === 'horizontal') pageList.scrollBy({ left: scrollSpeed * elapsed / 1000 });
+        else window.scrollBy(0, scrollSpeed * elapsed / 1000);
+        autoScrollFrame = requestAnimationFrame(autoScrollStep);
+      }
+      function startAutoScroll() {
+        if (autoScrollFrame) return;
+        autoScrollTime = 0; autoScrollFrame = requestAnimationFrame(autoScrollStep); syncScrollControls();
+      }
+      scrollToggle.addEventListener('click', function () {
+        if (autoScrollFrame) { stopAutoScroll(); return; }
+        closeD();
+        if (scrollMode !== 'vertical') setPageMode('vertical');
+        startAutoScroll();
+      });
+      scrollSpeedInput.value = String(scrollSpeed);
+      scrollSpeedInput.addEventListener('input', function () {
+        scrollSpeed = Math.max(5, Math.min(100, +scrollSpeedInput.value));
+        store('mq.scrollSpeed', String(scrollSpeed)); syncScrollControls();
+      });
+      document.addEventListener('wheel', stopAutoScroll, { passive: true });
+      document.addEventListener('touchstart', function (e) {
+        if (!e.target.closest('#drawer')) stopAutoScroll();
+      }, { passive: true });
+      document.addEventListener('pointerdown', function (e) {
+        if (!e.target.closest('#drawer')) stopAutoScroll();
+      }, true);
+      syncScrollControls();
       function openD() {
+        stopAutoScroll();
         closeV(); body.classList.add('open'); drawer.setAttribute('aria-hidden', 'false');
         var h = document.querySelector('#paneSurahs .srow.here');
         if (h && !$('paneSurahs').hidden) setTimeout(function () { h.scrollIntoView({ block: 'center' }); }, 30);
@@ -2256,7 +2921,71 @@
         return '<button type="button" class="srow" data-s="' + s[0] + '" data-n="' + norm(s[1]) + '"><span class="num">' + ar(s[0]) + '</span><span><div class="sname">' + s[1] + '</div><div class="smeta">الصفحة ' + ar(s[4]) + ' - آياتها ' + ar(s[3]) + ' - ' + (s[2] ? 'مكية' : 'مدنية') + '</div></span></button>';
       }).join('') + '<div class="empty" id="noHit" hidden>لا توجد سورة بهذا الاسم.</div>';
       var rows = paneS.querySelectorAll('.srow[data-s]');
+      var verseSearchResults = document.createElement('div');
+      verseSearchResults.id = 'verseSearchResults';
+      verseSearchResults.hidden = true;
+      paneS.insertBefore(verseSearchResults, paneS.firstChild);
+      var searchMode = 'surahs', matchingVerses = [], renderedVerseCount = 0;
+      var verseBatchSize = 100;
+      var searchModeButtons = document.querySelectorAll('[data-search-mode]');
+      function syncSearchMode() {
+        searchModeButtons.forEach(function (button) {
+          button.setAttribute('aria-pressed', String(button.getAttribute('data-search-mode') === searchMode));
+        });
+        $('search').placeholder = searchMode === 'verses' ? 'اكتب كلمة أو عبارة من آية' : 'سورة أو رقم صفحة';
+        $('search').setAttribute('aria-label', $('search').placeholder);
+      }
+      function drawVerseResults(reset) {
+        if (reset) {
+          renderedVerseCount = 0;
+          verseSearchResults.innerHTML = '<div class="search-results-info">عدد الآيات المطابقة: ' + ar(matchingVerses.length) + '</div>';
+        }
+        var end = Math.min(matchingVerses.length, renderedVerseCount + verseBatchSize), html = '';
+        for (var i = renderedVerseCount; i < end; i++) {
+          var result = matchingVerses[i], surah = D.surahs[result.surah - 1], page = pageOfV(result.id);
+          html += '<button type="button" class="srow" data-verse="' + result.id + '"><span class="num">' + ar(i + 1) + '</span><span><div class="sname q">﴿' + escapeHtml(verseText(result.surah, result.ayah)) + '﴾</div><div class="smeta">سورة ' + escapeHtml(surah[1]) + ' - الآية ' + ar(result.ayah) + ' - الصفحة ' + ar(page) + '</div></span></button>';
+        }
+        var more = verseSearchResults.querySelector('.search-more');
+        if (more) more.remove();
+        verseSearchResults.insertAdjacentHTML('beforeend', html);
+        renderedVerseCount = end;
+        if (renderedVerseCount < matchingVerses.length) {
+          var button = document.createElement('button');
+          button.type = 'button'; button.className = 'search-more';
+          button.setAttribute('data-search-more', 'true');
+          button.textContent = 'عرض المزيد من النتائج';
+          verseSearchResults.appendChild(button);
+        }
+      }
+      function searchVerses(raw) {
+        var query = norm(raw).replace(/[^\u0621-\u064A\u0660-\u0669\u06F0-\u06F9a-z0-9\s]/gi, ' ').replace(/\s+/g, ' ').trim();
+        matchingVerses = [];
+        if (query) {
+          D.texts.forEach(function (surah, surahIndex) {
+            surah.forEach(function (text, ayahIndex) {
+              var normalized = norm(text).replace(/[^\u0621-\u064A\u0660-\u0669\u06F0-\u06F9a-z0-9\s]/gi, ' ').replace(/\s+/g, ' ').trim();
+              if ((' ' + normalized + ' ').indexOf(' ' + query + ' ') >= 0) {
+                matchingVerses.push({ id: (surahIndex + 1) * 1000 + ayahIndex + 1, surah: surahIndex + 1, ayah: ayahIndex + 1 });
+              }
+            });
+          });
+        }
+        drawVerseResults(true);
+        verseSearchResults.hidden = false;
+      }
+      searchModeButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          searchMode = button.getAttribute('data-search-mode');
+          syncSearchMode();
+          $('search').dispatchEvent(new Event('input'));
+          $('search').focus();
+        });
+      });
+      syncSearchMode();
       paneS.addEventListener('click', function (e) {
+        if (e.target.closest('[data-search-more]')) { drawVerseResults(false); return; }
+        var verseButton = e.target.closest('[data-verse]');
+        if (verseButton) { closeD(); navigateToVerse(+verseButton.getAttribute('data-verse')); return; }
         var pageButton = e.target.closest('.page-hit[data-page]');
         if (pageButton && pageButton.getAttribute('data-page')) { closeD(); goTo(+pageButton.getAttribute('data-page')); return; }
         var b = e.target.closest('.srow[data-s]'); if (!b) return;
@@ -2264,7 +2993,16 @@
       });
       $('search').addEventListener('input', function () {
         var raw = this.value.trim(), q = norm(raw), numeric = /^[\d٠-٩]+$/.test(raw), num = numeric ? parseNum(raw) : NaN;
-        var hasPage = numeric && num >= 1 && num <= TOTAL, pageHit = $('pageHit'), any = hasPage;
+        var pageHit = $('pageHit');
+        if (searchMode === 'verses') {
+          pageHit.hidden = true;
+          rows.forEach(function (r) { r.hidden = true; });
+          $('noHit').hidden = true;
+          searchVerses(raw);
+          return;
+        }
+        verseSearchResults.hidden = true;
+        var hasPage = numeric && num >= 1 && num <= TOTAL, any = hasPage;
         pageHit.hidden = !hasPage;
         if (hasPage) {
           pageHit.setAttribute('data-page', String(num));
@@ -2275,6 +3013,7 @@
         $('noHit').hidden = any;
       });
       $('search').addEventListener('keydown', function (e) {
+        if (searchMode === 'verses') return;
         var raw = this.value.trim(), num = parseNum(raw);
         if (e.key !== 'Enter' || !/^[\d٠-٩]+$/.test(raw) || num < 1 || num > TOTAL) return;
         e.preventDefault(); closeD(); goTo(num);
@@ -2292,113 +3031,80 @@
       })();
       paneQ.addEventListener('click', function (e) { var b = e.target.closest('.srow'); if (!b) return; closeD(); goTo(+b.getAttribute('data-p')); });
 
-      function listPane(el, arr, emptyMsg, extra) {
-        if (!arr.length) { el.innerHTML = '<div class="empty">' + emptyMsg + '</div>'; return; }
-        el.innerHTML = arr.map(function (v) {
-          var s = Math.floor(v / 1000), a = v % 1000;
-          return '<div class="mrow"><button type="button" class="srow" data-v="' + v + '"><span class="num">' + ar(a) + '</span><span><div class="sname">' + D.surahs[s - 1][1] + ':' + ar(a) + '</div><div class="smeta">' + (extra ? extra(v) : 'الصفحة ' + ar(pageOfV(v))) + '</div></span></button><button type="button" class="del" data-d="' + v + '">حذف</button></div>';
-        }).join('');
-      }
-      var paneM = $('paneMarks'), paneT = $('paneStars'), paneN = $('paneNotes'), paneK = $('paneKhatma');
+      var paneM = $('paneMarks');
       var editing = false;
+      var newDrawerMarkColor = PALETTE[0], newDrawerMarkName = '';
       function buildMarks() {
         var h = slots.map(function (s) {
-          var row = '<button type="button" class="srow" data-id="' + s.id + '">' + bmSvg(s.c, !!s.v) + '<span><div class="sname">' + slotName(s) + '</div>' + (s.v ? '<div class="smeta">' + slotSub(s) + '</div>' : '') + '</span></button>';
+          var row = '<button type="button" class="srow" data-id="' + s.id + '">' + bmSvg(s.c, !!s.v) + '<span><div class="sname" data-mark-name="' + s.id + '">' + escapeHtml(slotName(s)) + '</div>' + (s.v ? '<div class="smeta">' + slotSub(s) + '</div>' : '') + '</span></button>';
           if (editing) {
             var swatches = PALETTE.map(function (c) { return '<button type="button" data-slot-color="' + s.id + '" data-color="' + c + '" aria-label="' + COL[c][1] + '" title="' + COL[c][1] + '" aria-pressed="' + (s.c === c) + '" style="background:' + COL[c][0] + '"></button>'; }).join('');
-            row += '<div class="mk-edit"><input type="text" value="' + (s.nm || '').replace(/"/g, '&quot;') + '" placeholder="' + slotName(s).replace(/"/g, '&quot;') + '" data-nm="' + s.id + '" aria-label="اسم الفاصل"><div class="sw">' + swatches + '</div>' + (s.v ? '<button type="button" data-clr="' + s.id + '">مسح الموضع</button>' : '') + '<button type="button" data-rm="' + s.id + '">حذف الفاصل</button></div>';
+            row += '<div class="mk-edit"><input type="text" value="' + escapeHtml(s.nm || '') + '" placeholder="' + escapeHtml(slotName(s)) + '" data-nm="' + s.id + '" aria-label="اسم العلامة"><div class="sw">' + swatches + '</div>' + (s.v ? '<button type="button" data-clr="' + s.id + '">مسح الموضع</button>' : '') + '<button type="button" data-rm="' + s.id + '">حذف العلامة</button></div>';
           }
           return row;
         }).join('');
-        var used = {}; slots.forEach(function (s) { used[s.c] = (used[s.c] || 0) + 1; });
-        var add = editing ? '<div class="mk-add"><span>إضافة فاصل بلون جديد</span><div class="sw">' + PALETTE.map(function (c) { return '<button type="button" data-add="' + c + '" style="background:' + COL[c][0] + '" aria-label="' + COL[c][1] + '"></button>'; }).join('') + '</div></div>' : '';
-        paneM.innerHTML = '<div class="mk-card">' + h + add + '</div>';
+        var add = editing ? '<div class="mk-add"><label class="mk-add-name">اسم العلامة<input type="text" maxlength="40" value="' + escapeHtml(newDrawerMarkName) + '" data-new-mark-name placeholder="اكتب اسمًا واضحًا للعلامة" autocomplete="off"></label><span>اختر لون العلامة</span><div class="sw">' + PALETTE.map(function (c) { return '<button type="button" data-new-mark-color="' + c + '" aria-pressed="' + (c === newDrawerMarkColor) + '" style="background:' + COL[c][0] + '" aria-label="' + COL[c][1] + '" title="' + COL[c][1] + '"></button>'; }).join('') + '</div><button type="button" class="mark-create-submit" data-create-mark>إضافة العلامة</button></div>' : '';
+        var empty = !slots.length && !editing ? '<div class="empty">لا توجد علامات محفوظة. اختر «تحرير» لإضافة علامة جديدة.</div>' : '';
+        paneM.innerHTML = '<div class="mk-card">' + h + add + empty + '</div>';
       }
       paneM.addEventListener('click', function (e) {
-        var a = e.target.closest('[data-add]'), c = e.target.closest('[data-clr]'), r = e.target.closest('[data-rm]'), color = e.target.closest('[data-slot-color]');
-        if (a) { var col = a.getAttribute('data-add'); slots.push({ id: 'x' + Date.now(), c: col, nm: '', v: 0, ts: 0 }); saveSlots(); buildMarks(); return; }
-        if (color) { var colored = slotById(color.getAttribute('data-slot-color')); if (!colored) return; colored.c = color.getAttribute('data-color'); saveSlots(); buildMarks(); updateBm(); paintSlots(); fillColors(); toast('تم تغيير لون الفاصل'); return; }
-        if (c) { var s0 = slotById(c.getAttribute('data-clr')); s0.v = 0; s0.ts = 0; saveSlots(); buildMarks(); updateBm(); return; }
-        if (r) { var id = r.getAttribute('data-rm'); slots = slots.filter(function (x) { return x.id !== id; }); saveSlots(); buildMarks(); updateBm(); paintSlots(); buildKhatma(); fillColors(); return; }
+        var a = e.target.closest('[data-create-mark]'), c = e.target.closest('[data-clr]'), r = e.target.closest('[data-rm]'), color = e.target.closest('[data-slot-color]'), newColor = e.target.closest('[data-new-mark-color]');
+        if (a) {
+          var name = newDrawerMarkName.trim();
+          if (!name) { var nameInput = paneM.querySelector('[data-new-mark-name]'); if (nameInput) nameInput.focus(); toast('اكتب اسم العلامة أولًا'); return; }
+          addMarkSlot(newDrawerMarkColor, name); newDrawerMarkName = '';
+          buildMarks(); fillColors(); toast('تمت إضافة العلامة');
+          return;
+        }
+        if (newColor) {
+          newDrawerMarkColor = newColor.getAttribute('data-new-mark-color');
+          paneM.querySelectorAll('[data-new-mark-color]').forEach(function (button) {
+            button.setAttribute('aria-pressed', String(button === newColor));
+          });
+          return;
+        }
+        if (color) { var colored = slotById(color.getAttribute('data-slot-color')); if (!colored) return; colored.c = color.getAttribute('data-color'); saveSlots(); buildMarks(); updateBm(); paintSlots(); fillColors(); toast('تم تغيير لون العلامة'); return; }
+        if (c) { var s0 = slotById(c.getAttribute('data-clr')); if (!s0) return; s0.v = 0; s0.ts = 0; saveSlots(); buildMarks(); updateBm(); paintSlots(); fillColors(); return; }
+        if (r) { var id = r.getAttribute('data-rm'); slots = slots.filter(function (x) { return x.id !== id; }); saveSlots(); buildMarks(); updateBm(); paintSlots(); fillColors(); return; }
         if (e.target.closest('.mk-edit')) return;
         var b = e.target.closest('.srow'); if (!b || editing) return;
         var s = slotById(b.getAttribute('data-id'));
         if (!s.v) { toast('اضغط على آية واختر «فاصل آخر» لحفظ هذا الفاصل'); return; }
-        closeD(); goTo(pageOfV(s.v)); sel = s.v; setTimeout(paintSel, 80);
+        closeD(); navigateToVerse(s.v);
       });
       paneM.addEventListener('input', function (e) {
+        if (e.target.matches('[data-new-mark-name]')) { newDrawerMarkName = e.target.value; return; }
         var i = e.target.closest('[data-nm]'); if (!i) return;
-        slotById(i.getAttribute('data-nm')).nm = i.value.trim(); saveSlots(); updateBm();
+        var slot = slotById(i.getAttribute('data-nm'));
+        if (!slot) return;
+        slot.nm = i.value.trim(); saveSlots(); updateBm();
+        var name = paneM.querySelector('[data-mark-name="' + slot.id + '"]');
+        if (name) name.textContent = slotName(slot);
       });
       $('dEdit').addEventListener('click', function () {
         editing = !editing; $('dEdit').textContent = editing ? 'تم' : 'تحرير'; buildMarks();
       });
-      function buildStars() { listPane(paneT, stars, 'لا توجد آيات مميزة بنجمة.<br>اضغط على أي آية ثم على النجمة.'); }
-      function noteKeys() { return Object.keys(notes).map(Number).sort(function (a, b) { return a - b; }); }
-      function buildNotes() { listPane(paneN, noteKeys(), 'لا توجد ملاحظات.<br>اضغط على أي آية واختر «ملاحظة».', function (v) { var t = notes[v]; return t.length > 70 ? t.slice(0, 70) + '…' : t; }); }
-      function buildKhatma() {
-        var readCount = khatmaReadCount(), pct = Math.round(readCount / TOTAL * 100), remaining = TOTAL - readCount;
-        var elapsed = Math.max(0, Math.floor((Date.now() - khatmaStart) / 86400000));
-        var daysLeft = Math.max(1, khatmaDays - elapsed), dailyPages = remaining ? Math.ceil(remaining / daysLeft) : 0;
-        var targetDate = fmtTs(khatmaStart + khatmaDays * 86400000);
-        var targetText = remaining ? 'الحصة المقترحة: ' + ar(dailyPages) + ' صفحة يوميًا، والموعد المستهدف ' + targetDate : 'أتممت الختمة، تقبّل الله منك.';
-        var pageRead = !!khatmaReadPages[cur];
-        paneK.innerHTML = '<div class="kh"><div class="kh-head"><div><small>الختمة الحالية</small><h3>تقدم القراءة</h3></div><div class="big">' + ar(pct) + '٪</div></div>' +
-          '<div class="tr" role="progressbar" aria-label="تقدم الختمة" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '"><i style="width:' + pct + '%"></i></div>' +
-          '<div class="kh-stats"><div class="kh-stat"><span>صفحات مقروءة</span><strong>' + ar(readCount) + ' / ' + ar(TOTAL) + '</strong></div><div class="kh-stat"><span>صفحات متبقية</span><strong>' + ar(remaining) + '</strong></div></div>' +
-          '<button type="button" class="kh-read" id="khReadToggle" aria-pressed="' + pageRead + '">' + (pageRead ? 'إلغاء تعليم الصفحة الحالية' : 'تعليم الصفحة الحالية كمقروءة') + '</button><div class="kh-current">الصفحة الحالية ' + ar(cur) + '</div>' +
-          '<div class="kh-plan"><label for="khDays">مدة الختمة</label><select id="khDays" aria-label="مدة الختمة">' + [30, 45, 60, 90].map(function (d) { return '<option value="' + d + '"' + (khatmaDays === d ? ' selected' : '') + '>' + ar(d) + ' يومًا</option>'; }).join('') + '</select></div>' +
-          '<div class="kh-target">' + targetText + '</div>' +
-          (slotById('red') && slotById('red').v ? '<button type="button" class="srow" data-v="' + slotById('red').v + '"><span class="num">ورد</span><span><div class="sname">الورد اليومي</div><div class="smeta">' + slotSub(slotById('red')) + '</div></span></button>' : '') +
-          '<button type="button" class="pill kh-reset" id="khReset">ابدأ ختمة جديدة</button></div>';
-      }
-      function listClick(arr, key, rebuild) {
-        return function (e) {
-          var d = e.target.closest('.del');
-          if (d) { var v = +d.getAttribute('data-d'); if (key === 'mq.notes') delete notes[v]; else arr.splice(arr.indexOf(v), 1); save(key, key === 'mq.notes' ? notes : arr); rebuild(); return; }
-          var b = e.target.closest('.srow'); if (!b) return;
-          var vv = +b.getAttribute('data-v'); closeD(); goTo(pageOfV(vv)); sel = vv; setTimeout(paintSel, 60);
-        };
-      }
-      paneT.addEventListener('click', listClick(stars, 'mq.stars', buildStars));
-      paneN.addEventListener('click', listClick(notes, 'mq.notes', buildNotes));
-      paneK.addEventListener('click', function (e) {
-        if (e.target.closest('#khReadToggle')) {
-          if (khatmaReadPages[cur]) delete khatmaReadPages[cur]; else khatmaReadPages[cur] = true;
-          save('mq.khatma.read', khatmaReadPages); buildKhatma();
-          toast(khatmaReadPages[cur] ? 'تم تعليم الصفحة كمقروءة' : 'أُلغي تعليم الصفحة'); return;
-        }
-        if (e.target.closest('#khReset')) {
-          if (!window.confirm('بدء ختمة جديدة من الصفحة الأولى؟')) return;
-          khatmaReadPages = {}; save('mq.khatma.read', khatmaReadPages);
-          khatmaStart = Date.now(); store('mq.khatma.start', String(khatmaStart));
-          goTo(1); buildKhatma(); toast('بدأت ختمة جديدة'); return;
-        }
-        var b = e.target.closest('.srow'); if (b) { var vv = +b.getAttribute('data-v'); closeD(); goTo(pageOfV(vv)); }
-      });
-      paneK.addEventListener('change', function (e) {
-        if (e.target.id !== 'khDays') return;
-        khatmaDays = +e.target.value; khatmaStart = Date.now();
-        store('mq.khatma.days', String(khatmaDays)); store('mq.khatma.start', String(khatmaStart)); buildKhatma();
-      });
-      buildMarks(); buildStars(); buildNotes(); buildKhatma();
+      buildMarks();
 
-      var panes = { surahs: paneS, quarters: paneQ, marks: paneM, stars: paneT, notes: paneN, khatma: paneK };
-      var navBtns = document.querySelectorAll('#dnav button'), tabQ = $('tabQ'), tabS = $('tabS');
+      var panes = { surahs: paneS, quarters: paneQ, marks: paneM };
+      var tabQ = $('tabQ'), tabS = $('tabS'), tabM = $('tabM');
       function show(k) {
-        if (k === 'khatma') buildKhatma();
-        navBtns.forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-k') === k)); });
-        tabS.setAttribute('aria-selected', String(k === 'surahs')); tabQ.setAttribute('aria-selected', String(k === 'quarters'));
+        tabS.setAttribute('aria-selected', String(k === 'surahs'));
+        tabQ.setAttribute('aria-selected', String(k === 'quarters'));
+        tabM.setAttribute('aria-selected', String(k === 'marks'));
         Object.keys(panes).forEach(function (n) { panes[n].hidden = n !== k; });
         $('search').hidden = k !== 'surahs';
-        var TT = { marks: 'الفواصل', stars: 'مميزة بنجمة', notes: 'الملاحظات', khatma: 'الختمة' };
-        body.classList.toggle('titled', !!TT[k]); $('dTitleT').textContent = TT[k] || '';
+        $('searchMode').hidden = k !== 'surahs';
+        var TT = {};
+        body.classList.toggle('titled', k === 'marks' || !!TT[k]);
+        $('dTitleT').textContent = TT[k] || '';
+        $('dTitleT').hidden = !TT[k];
         $('dEdit').hidden = k !== 'marks';
         if (k === 'marks') buildMarks();
       }
-      navBtns.forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-k')); }); });
       tabS.addEventListener('click', function () { show('surahs'); });
       tabQ.addEventListener('click', function () { show('quarters'); });
+      tabM.addEventListener('click', function () { show('marks'); });
 
       /* ---------- controls ---------- */
       var bar = $('bar');
@@ -2467,32 +3173,36 @@
         if (m) { var on = wp.classList.toggle('open'); m.textContent = on ? 'عرض أقل' : 'المزيد'; if (popWord) placeWp(popWord); }
       });
       function lpCancel() { clearTimeout(lpT); lpT = 0; }
-      sheet.addEventListener('pointerdown', function (e) {
+      pageList.addEventListener('pointerdown', function (e) {
+        var view = e.target.closest('.page-view'); if (view) activatePage(view);
         var w = e.target.closest('.w'); lpFired = false; lpCancel();
         if (annotEnabled || !w || !+w.getAttribute('data-v') || (e.pointerType === 'mouse' && e.button !== 0)) return;
         lpX = e.clientX; lpY = e.clientY;
         lpT = setTimeout(function () { lpFired = true; lpT = 0; if (navigator.vibrate) try { navigator.vibrate(12); } catch (x) { } closeV(); showWp(w); }, 420);
       });
-      sheet.addEventListener('pointermove', function (e) { if (lpT && (Math.abs(e.clientX - lpX) > 10 || Math.abs(e.clientY - lpY) > 10)) lpCancel(); });
-      ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { sheet.addEventListener(n, lpCancel); });
-      sheet.addEventListener('contextmenu', function (e) { if (e.target.closest('.w')) e.preventDefault(); });
+      pageList.addEventListener('pointermove', function (e) { if (lpT && (Math.abs(e.clientX - lpX) > 10 || Math.abs(e.clientY - lpY) > 10)) lpCancel(); });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { pageList.addEventListener(n, lpCancel); });
+      pageList.addEventListener('contextmenu', function (e) { if (e.target.closest('.w')) e.preventDefault(); });
       document.addEventListener('pointerdown', function (e) { if (!wp.hidden && !e.target.closest('#wp') && !e.target.closest('.w')) closeWp(); }, true);
-      window.addEventListener('scroll', function () { if (!wp.hidden) closeWp(); }, { passive: true });
+      window.addEventListener('scroll', function () { if (!wp.hidden) closeWp(); if (scrollMode === 'vertical') updateContinuousPages(); }, { passive: true });
+      pageList.addEventListener('scroll', function () { if (scrollMode === 'horizontal') updateContinuousPages(); }, { passive: true });
 
-      sheet.addEventListener('click', function (e) {
+      pageList.addEventListener('click', function (e) {
+        var view = e.target.closest('.page-view'); if (!view) return;
+        activatePage(view);
+        if (e.target.closest('.open-juz, .badge')) { openD(); return; }
         if (lpFired) { lpFired = false; e.preventDefault(); return; }
         var w = e.target.closest('.w');
-        if (annotEnabled && w && +w.getAttribute('data-v')) { closeWp(); markFromTap(w); e.preventDefault(); return; }
+        if (annotEnabled && w && +w.getAttribute('data-v')) { closeWp(); markFromTap(w, +view.getAttribute('data-page')); e.preventDefault(); return; }
         if (!wp.hidden) { closeWp(); if (!w) return; }
         var s = window.getSelection && String(window.getSelection()); if (s) return;
         if (w && +w.getAttribute('data-v') && +w.getAttribute('data-p') <= 0) { openV(+w.getAttribute('data-v')); return; }
-        if (w && +w.getAttribute('data-v')) { openD(); return; }
       });
       pageEl.addEventListener('click', function (e) {
-        if (e.target.closest('.w, .wp, button, input, label')) return;
+        if (e.target.closest('.w, .wp, .run, .hdr, .bis, .foot, button, input, label')) return;
         openD();
       });
-      $('openJuz').addEventListener('click', openD); $('badge').addEventListener('click', openD); $('bMenu').addEventListener('click', openD);
+      $('bMenu').addEventListener('click', openD);
       $('scrim').addEventListener('click', function () { closeD(); closeV(); });
       $('bNext').addEventListener('click', function () { goTo(cur + 1); });
       $('bPrev').addEventListener('click', function () { goTo(cur - 1); });
@@ -2549,7 +3259,7 @@
         annotControls.querySelectorAll('[data-annot-mode]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-annot-mode') === annotPrefs.mode)); });
         annotControls.querySelectorAll('[data-annot-type]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-annot-type') === annotPrefs.type)); });
       }
-      annotColors.innerHTML = PALETTE.map(function (c) { return '<button type="button" data-annot-color="' + c + '" aria-label="' + COL[c][1] + '" title="' + COL[c][1] + '" style="background:' + COL[c][0] + '"></button>'; }).join('');
+      annotColors.innerHTML = ANNOT_PALETTE.map(function (c) { return '<button type="button" data-annot-color="' + c + '" aria-label="' + COL[c][1] + '" title="' + COL[c][1] + '" style="background:' + COL[c][0] + '"></button>'; }).join('');
       annotColors.addEventListener('click', function (e) {
         var b = e.target.closest('[data-annot-color]'); if (!b) return;
         annotPrefs.color = b.getAttribute('data-annot-color'); annotPrefs.type = 'highlight'; saveAnnotPrefs(); syncAnnotControls();
@@ -2591,21 +3301,23 @@
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') { closeD(); closeV(); return; }
         if (body.classList.contains('open') || body.classList.contains('vs') || e.target.closest('input, textarea')) return;
-        if (e.key === 'ArrowLeft') goTo(cur + 1); else if (e.key === 'ArrowRight') goTo(cur - 1);
+        if (e.key === 'ArrowLeft') { stopAutoScroll(); goTo(cur + 1); }
+        else if (e.key === 'ArrowRight') { stopAutoScroll(); goTo(cur - 1); }
       });
       var tx = 0, ty = 0, t0 = 0;
       pageEl.addEventListener('touchstart', function (e) { var t = e.changedTouches[0]; tx = t.clientX; ty = t.clientY; t0 = Date.now(); }, { passive: true });
       pageEl.addEventListener('touchend', function (e) {
         var t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty;
-        if (Math.abs(dx) > 70 && Math.abs(dy) < 50 && Date.now() - t0 < 700) goTo(cur + (dx > 0 ? 1 : -1));
+        if (scrollMode === 'vertical' && Math.abs(dx) > 70 && Math.abs(dy) < 50 && Date.now() - t0 < 700) goTo(cur + (dx > 0 ? 1 : -1));
       }, { passive: true });
       var rt, lastW = 0;
-      window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (annotEnabled && annotPosition) restoreAnnotPosition(); if (pageEl.clientWidth !== lastW) { lastW = pageEl.clientWidth; render(); } }, 120); });
+      window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (annotEnabled && annotPosition) restoreAnnotPosition(); if (pageEl.clientWidth !== lastW) { lastW = pageEl.clientWidth; renderInitialPage(cur); window.scrollTo(0, 0); } }, 120); });
 
       var saved = parseInt(store('mq.page') || '', 10);
-      cur = saved >= 1 && saved <= TOTAL ? saved : 604;
+      cur = saved >= 1 && saved <= TOTAL ? saved : 1;
       lastW = pageEl.clientWidth;
-      render();
+      renderInitialPage(cur);
+      requestAnimationFrame(updateContinuousPages);
       if (!store('mq.hint')) { store('mq.hint', '1'); toast('اسحب لتقليب الصفحات، واضغط على آية لخياراتها'); }
     })();
   </script>

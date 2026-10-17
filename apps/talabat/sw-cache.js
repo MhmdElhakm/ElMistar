@@ -2,11 +2,7 @@
  * PWA offline caching only (no notifications).
  */
 
-<<<<<<< HEAD
 const CACHE_NAME = 'naqisna-pwa-v18';
-=======
-const CACHE_NAME = 'naqisna-pwa-v17';
->>>>>>> 814716bfa26c15e153c48faffe96b94fe46f4763
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
