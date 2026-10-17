@@ -3305,8 +3305,13 @@ function initAdminDashboard() {
         loadEnrollments();
         loadEnrollmentToggleSetting();
         loadCongratsToggleSetting();
+<<<<<<< HEAD
         loadRegistrationToggleSetting();
 
+=======
+        loadRegistrationToggleSetting();
+
+>>>>>>> 814716bfa26c15e153c48faffe96b94fe46f4763
         // Announcement modal events
         document.getElementById('ann-add-btn')?.addEventListener('click', () => openAnnouncementFormModal());
         document.getElementById('close-ann-form-modal')?.addEventListener('click', () => document.getElementById('announcement-form-modal')?.classList.add('hidden'));
@@ -9591,6 +9596,7 @@ document.addEventListener('DOMContentLoaded', function() {
 (function () {
     'use strict';
 
+<<<<<<< HEAD
     var STORAGE_KEY = 'elmistar_apps_config';
     var MIGRATED_KEY = 'elmistar_apps_migrated';
     var FIRESTORE_COLLECTION = 'apps';
@@ -9742,6 +9748,159 @@ document.addEventListener('DOMContentLoaded', function() {
         t = t.replace(/([^\/])index\.html$/i, '$1/index.html');
         t = t.replace(/\/{2,}/g, '/');
         return t;
+=======
+    var STORAGE_KEY = 'elmistar_apps_config';
+    var MIGRATED_KEY = 'elmistar_apps_migrated';
+    var FIRESTORE_COLLECTION = 'apps';
+    var SECTION_DOC_ID = 'appsSection';
+
+    // State
+    var appsData = [];
+    var editingId = null;
+
+    var LEGACY_DEFAULT_IDS = { calculator:1, quiz:1, converter:1 };
+
+    function isLegacyDefault(a) {
+        if (!a || !LEGACY_DEFAULT_IDS[a.id]) return false;
+        var u = a.iconUrl || '';
+        return (u === '' || u.indexOf('img/apps/') === 0);
+    }
+
+    function readLocalApps() {
+        try {
+            var stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                var parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) {
+                    return parsed.filter(function(a){ return !isLegacyDefault(a); }).map(function(a){
+                        if ('icon' in a) delete a.icon;
+                        return a;
+                    });
+                }
+            }
+        } catch(e){}
+        return [];
+    }
+
+    function syncLocalApps() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appsData)); } catch (e) {}
+        try { window.dispatchEvent(new StorageEvent('storage', { key: STORAGE_KEY })); } catch (e) {}
+    }
+
+    function serverTimestamp() {
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore && firebase.firestore.FieldValue) {
+                return firebase.firestore.FieldValue.serverTimestamp();
+            }
+        } catch (e) {}
+        return new Date().toISOString();
+    }
+
+    function cleanAppDoc(a) {
+        return {
+            name: a.name || '',
+            description: a.description || '',
+            iconUrl: a.iconUrl || '',
+            tag: a.tag || '',
+            color: a.color || 'theme-blue',
+            order: a.order || 1,
+            url: a.url || '',
+            visible: a.visible !== false,
+            updatedAt: serverTimestamp()
+        };
+    }
+
+    function loadAppsFromServer() {
+        var get = (window.ElmistarBoot && window.ElmistarBoot.getDocsServer)
+            ? window.ElmistarBoot.getDocsServer(FIRESTORE_COLLECTION)
+            : window.db.collection(FIRESTORE_COLLECTION).get({ source: 'server' });
+        return get.then(function (snap) {
+            var list = [];
+            snap.forEach(function (doc) {
+                var d = doc.data() || {};
+                d.id = doc.id;
+                if ('icon' in d) delete d.icon;
+                list.push(d);
+            });
+            return list.filter(function (a) { return !isLegacyDefault(a); });
+        });
+    }
+
+    function migrateLocalToServer(localList) {
+        var batch = window.db.batch();
+        localList.forEach(function (a) {
+            if (!a.id) a.id = 'app_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            batch.set(window.db.collection(FIRESTORE_COLLECTION).doc(a.id), cleanAppDoc(a), { merge: false });
+        });
+        return batch.commit().then(function () {
+            try { localStorage.setItem(MIGRATED_KEY, '1'); } catch (e) {}
+            return localList;
+        });
+    }
+
+    function wasMigrated() {
+        try { return localStorage.getItem(MIGRATED_KEY) === '1'; } catch (e) { return false; }
+    }
+
+    function loadApps() {
+        appsData = readLocalApps();
+        if (!window.db) return Promise.resolve(appsData);
+        return loadAppsFromServer().then(function (list) {
+            if ((!list || !list.length) && !wasMigrated()) {
+                var local = readLocalApps();
+                if (local.length) return migrateLocalToServer(local);
+            }
+            return list || [];
+        }).then(function (list) {
+            appsData = list;
+            syncLocalApps();
+            return appsData;
+        }, function () {
+            appsData = readLocalApps();
+            return appsData;
+        });
+    }
+
+    function saveApps() {
+        syncLocalApps();
+        if (!window.db) return Promise.resolve(false);
+        var col = window.db.collection(FIRESTORE_COLLECTION);
+        var batch = window.db.batch();
+        appsData.forEach(function (a) {
+            if (!a.id) a.id = 'app_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            batch.set(col.doc(a.id), cleanAppDoc(a), { merge: false });
+        });
+        return col.get().then(function (snap) {
+            snap.forEach(function (doc) {
+                var kept = false;
+                for (var i = 0; i < appsData.length; i++) {
+                    if (appsData[i].id === doc.id) { kept = true; break; }
+                }
+                if (!kept) batch.delete(doc.ref);
+            });
+            return batch.commit();
+        }).then(function () {
+            return true;
+        }, function () {
+            return false;
+        });
+    }
+
+    function esc(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    // Fix common mistakes in saved URLs (e.g. "appsGadwalindex.html" -> "apps/Gadwal/index.html")
+    function normalizeAppUrl(u) {
+        if (!u) return '';
+        var t = String(u).trim().replace(/\\/g, '/');
+        if (/^https?:\/\//i.test(t) || t.charAt(0) === '#') return t;
+        t = t.replace(/^apps(?=[^\/])/i, 'apps/');
+        t = t.replace(/([^\/])index\.html$/i, '$1/index.html');
+        t = t.replace(/\/{2,}/g, '/');
+        return t;
+>>>>>>> 814716bfa26c15e153c48faffe96b94fe46f4763
     }
 
     var colorMap = {
@@ -9763,6 +9922,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var sorted = appsData.slice().sort(function(a,b){ return (a.order||99)-(b.order||99); });
 
+<<<<<<< HEAD
         list.innerHTML = sorted.map(function(app) {
             var bg = colorBgMap[app.color] || colorBgMap['theme-blue'];
             var visClass = app.visible ? '' : 'style="opacity:0.55"';
@@ -9772,6 +9932,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 : '<div class="admin-app-row-banner" style="background:'+bg+';width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;flex-shrink:0;"><i class="bx bx-image"></i></div>';
             return (
                 '<div class="admin-app-row doodle-card" id="admin-app-row-'+esc(app.id)+'" '+visClass+'>' +
+=======
+        list.innerHTML = sorted.map(function(app) {
+            var bg = colorBgMap[app.color] || colorBgMap['theme-blue'];
+            var visClass = app.visible ? '' : 'style="opacity:0.55"';
+            var thumbUrl = app.iconUrl || '';
+            var iconHtml = thumbUrl
+                ? '<div class="admin-app-row-banner" style="background:#f1f5f9;width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;"><img src="'+esc(thumbUrl)+'" alt="'+esc(app.name)+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.remove();"></div>'
+                : '<div class="admin-app-row-banner" style="background:'+bg+';width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;flex-shrink:0;"><i class="bx bx-image"></i></div>';
+            return (
+                '<div class="admin-app-row doodle-card" id="admin-app-row-'+esc(app.id)+'" '+visClass+'>' +
+>>>>>>> 814716bfa26c15e153c48faffe96b94fe46f4763
                   iconHtml +
                   '<div style="flex:1;min-width:0;">' +
                     '<div style="font-weight:800;font-size:1rem;color:var(--text-primary);">'+esc(app.name)+'</div>' +
@@ -9782,6 +9953,7 @@ document.addEventListener('DOMContentLoaded', function() {
                       '<span style="font-size:0.7rem;direction:ltr;color:var(--text-muted);">'+esc(app.url)+'</span>' +
                     '</div>' +
                   '</div>' +
+<<<<<<< HEAD
                   '<div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">' +
                     '<button class="btn btn-sm '+(app.visible ? 'btn-primary' : 'btn-outline')+' app-toggle-btn" data-id="'+esc(app.id)+'" title="'+(app.visible?'إخفاء':'إظهار')+'">' +
                       (app.visible ? '<i class="bx bx-show"></i>' : '<i class="bx bx-hide"></i>') +
@@ -9795,6 +9967,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     '<button class="btn btn-sm btn-outline app-delete-btn" data-id="'+esc(app.id)+'" title="حذف التطبيق" style="color:#ef4444;border-color:#fca5a5;">' +
                       '<i class="bx bx-trash"></i>' +
                     '</button>' +
+=======
+                  '<div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">' +
+                    '<button class="btn btn-sm '+(app.visible ? 'btn-primary' : 'btn-outline')+' app-toggle-btn" data-id="'+esc(app.id)+'" title="'+(app.visible?'إخفاء':'إظهار')+'">' +
+                      (app.visible ? '<i class="bx bx-show"></i>' : '<i class="bx bx-hide"></i>') +
+                    '</button>' +
+                    '<button class="btn btn-outline btn-sm app-edit-btn" data-id="'+esc(app.id)+'">' +
+                      '<i class="bx bx-edit"></i>' +
+                    '</button>' +
+                    '<a href="'+esc(normalizeAppUrl(app.url))+'" target="_blank" class="btn btn-outline btn-sm" title="فتح التطبيق">' +
+                      '<i class="bx bx-link-external"></i>' +
+                    '</a>' +
+                    '<button class="btn btn-sm btn-outline app-delete-btn" data-id="'+esc(app.id)+'" title="حذف التطبيق" style="color:#ef4444;border-color:#fca5a5;">' +
+                      '<i class="bx bx-trash"></i>' +
+                    '</button>' +
+>>>>>>> 814716bfa26c15e153c48faffe96b94fe46f4763
                   '</div>' +
                 '</div>'
             );
@@ -9804,6 +9991,7 @@ document.addEventListener('DOMContentLoaded', function() {
         list.querySelectorAll('.app-toggle-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 var id = btn.dataset.id;
+<<<<<<< HEAD
                 var app = appsData.find(function(a){ return a.id===id; });
                 if (app) { app.visible = !app.visible; saveApps(); renderAdminApps(); }
             });
@@ -9893,6 +10081,97 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+=======
+                var app = appsData.find(function(a){ return a.id===id; });
+                if (app) { app.visible = !app.visible; saveApps(); renderAdminApps(); }
+            });
+        });
+        list.querySelectorAll('.app-edit-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                openEditModal(btn.dataset.id);
+            });
+        });
+        list.querySelectorAll('.app-delete-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                deleteApp(btn.dataset.id);
+            });
+        });
+    }
+
+    function openEditModal(id) {
+        var app = null;
+        for (var i = 0; i < appsData.length; i++) {
+            if (appsData[i].id === id) { app = appsData[i]; break; }
+        }
+        if (!app) return;
+        editingId = id;
+        safeSetVal('app-edit-id', id);
+        safeSetVal('app-edit-name', app.name || '');
+        safeSetVal('app-edit-desc', app.description || '');
+        safeSetVal('app-edit-iconUrl', app.iconUrl || '');
+        safeSetVal('app-edit-tag', app.tag || '');
+        safeSetVal('app-edit-color', app.color || 'theme-blue');
+        safeSetVal('app-edit-order', app.order || 1);
+        safeSetVal('app-edit-url', app.url || '');
+        safeSetChecked('app-edit-visible', app.visible !== false);
+        try { updateImagePreview(app.iconUrl || ''); } catch (e) {}
+        var titleEl = document.getElementById('app-edit-modal-title');
+        if (titleEl) titleEl.innerHTML = "<i class='bx bx-edit' style='color:var(--accent);'></i> تعديل التطبيق";
+        var modal = document.getElementById('app-edit-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        }
+    }
+
+    function openAddModal() {
+        editingId = null;
+        safeSetVal('app-edit-id', '');
+        safeSetVal('app-edit-name', '');
+        safeSetVal('app-edit-desc', '');
+        safeSetVal('app-edit-iconUrl', '');
+        safeSetVal('app-edit-tag', '');
+        safeSetVal('app-edit-color', 'theme-blue');
+        safeSetVal('app-edit-order', (appsData ? appsData.length : 0) + 1);
+        safeSetVal('app-edit-url', '');
+        safeSetChecked('app-edit-visible', true);
+        try { updateImagePreview(''); } catch (e) {}
+        var titleEl = document.getElementById('app-edit-modal-title');
+        if (titleEl) titleEl.innerHTML = "<i class='bx bx-plus-circle' style='color:var(--accent);'></i> إضافة تطبيق جديد";
+        var modal = document.getElementById('app-edit-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        }
+    }
+
+    function updateImagePreview(url) {
+        var thumb = document.getElementById('app-edit-img-thumb');
+        var placeholder = document.getElementById('app-edit-img-placeholder');
+        var removeBtn = document.getElementById('app-edit-img-remove');
+        if (url) {
+            if (thumb) { thumb.src = url; thumb.style.display = 'block'; }
+            if (placeholder) placeholder.style.display = 'none';
+            if (removeBtn) removeBtn.style.display = 'inline-flex';
+        } else {
+            if (thumb) { thumb.src = ''; thumb.style.display = 'none'; }
+            if (placeholder) placeholder.style.display = 'block';
+            if (removeBtn) removeBtn.style.display = 'none';
+        }
+    }
+
+    function deleteApp(id) {
+        var app = appsData.find(function(a){ return a.id===id; });
+        if (!app) return;
+        if (!confirm('هل أنت متأكد من حذف التطبيق "'+app.name+'"؟\nلا يمكن التراجع عن هذا الإجراء.')) return;
+        appsData = appsData.filter(function(a){ return a.id!==id; });
+        saveApps().then(function (ok) {
+            renderAdminApps();
+            showSaveMsg(ok ? 'تم حذف التطبيق "'+app.name+'" من قاعدة البيانات' : 'تم الحذف محلياً فقط — تحقق من الاتصال', !ok);
+        });
+    }
+
+>>>>>>> 814716bfa26c15e153c48faffe96b94fe46f4763
     function closeEditModal() {
         var modal = document.getElementById('app-edit-modal');
         if (modal) modal.classList.add('hidden');
@@ -9908,6 +10187,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(function(){ el.style.display='none'; }, 3000);
     }
 
+<<<<<<< HEAD
     function showListLoading() {
         var list = document.getElementById('admin-apps-list');
         if (list) {
@@ -10098,12 +10378,205 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
+=======
+    function showListLoading() {
+        var list = document.getElementById('admin-apps-list');
+        if (list) {
+            list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);">جاري تحميل التطبيقات من قاعدة البيانات...</div>';
+        }
+    }
+
+    function safeSetVal(id, val) {
+        try {
+            var el = document.getElementById(id);
+            if (el) el.value = (val === undefined || val === null) ? '' : val;
+        } catch (e) {}
+    }
+
+    function safeSetChecked(id, val) {
+        try {
+            var el = document.getElementById(id);
+            if (el) el.checked = !!val;
+        } catch (e) {}
+    }
+
+    function init() {
+        // Add button (bound first so it always works)
+        try {
+            var addBtn = document.getElementById('admin-apps-add-btn');
+            if (addBtn) {
+                addBtn.addEventListener('click', function() {
+                    try {
+                        openAddModal();
+                    } catch (err) {
+                        try { console.error('[Apps] openAddModal failed:', err); } catch (e) {}
+                        alert('تعذر فتح نافذة الإضافة: ' + (err && err.message ? err.message : err));
+                    }
+                });
+            }
+        } catch (e) {}
+
+        try {
+            showListLoading();
+            renderAdminApps();
+        } catch (e) {}
+        try {
+            loadApps().then(function () {
+                renderAdminApps();
+            }, function () {
+                renderAdminApps();
+                showSaveMsg('تعذر الاتصال بقاعدة البيانات — عرض نسخة محلية', true);
+            });
+        } catch (e) {
+            try { renderAdminApps(); } catch (e2) {}
+        }
+        try { loadSectionForm(); } catch (e) {}
+
+        // Save button
+        var saveBtn = document.getElementById('admin-apps-save-btn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', function() {
+                saveApps().then(function (ok) {
+                    showSaveMsg(ok ? '✅ تم حفظ التغييرات في قاعدة البيانات بنجاح!' : 'تم الحفظ محلياً فقط — تحقق من الاتصال', !ok);
+                });
+            });
+        }
+
+        // Reset button
+        var resetBtn = document.getElementById('admin-apps-reset-btn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+                if (confirm('هل تريد حذف جميع التطبيقات؟')) {
+                    appsData = [];
+                    saveApps().then(function () {
+                        renderAdminApps();
+                        showSaveMsg('تم حذف جميع التطبيقات', false);
+                    });
+                }
+            });
+        }
+
+        // Image file upload
+        var fileInput = document.getElementById('app-edit-img-file');
+        var imgPreview = document.getElementById('app-edit-img-preview');
+        var removeImgBtn = document.getElementById('app-edit-img-remove');
+        
+        function compressAppImage(file, maxDim, quality) {
+            return new Promise(function (resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function (ev) {
+                    var img = new Image();
+                    img.onload = function () {
+                        try {
+                            var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+                            var canvas = document.createElement('canvas');
+                            canvas.width = Math.max(1, Math.round(img.width * scale));
+                            canvas.height = Math.max(1, Math.round(img.height * scale));
+                            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                            resolve(canvas.toDataURL('image/jpeg', quality));
+                        } catch (err) { reject(err); }
+                    };
+                    img.onerror = function () { reject(new Error('bad-image')); };
+                    img.src = ev.target.result;
+                };
+                reader.onerror = function () { reject(new Error('read-error')); };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function readFileDirect(file) {
+            return new Promise(function (resolve, reject) {
+                var reader = new FileReader();
+                reader.onload = function (ev) { resolve(ev.target.result); };
+                reader.onerror = function () { reject(new Error('read-error')); };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('حجم الصورة كبير جداً — الحد الأقصى 5MB قبل الضغط');
+                    fileInput.value = '';
+                    return;
+                }
+                if (!file.type.startsWith('image/')) {
+                    alert('يرجى اختيار ملف صورة صالح');
+                    fileInput.value = '';
+                    return;
+                }
+                var done = function (base64) {
+                    if (base64 && base64.length > 700000) {
+                        alert('الصورة كبيرة بعد الضغط — اختر صورة أصغر (الحد ~700KB)');
+                        fileInput.value = '';
+                        return;
+                    }
+                    document.getElementById('app-edit-iconUrl').value = base64;
+                    updateImagePreview(base64);
+                };
+                var fail = function () {
+                    alert('تعذر معالجة الصورة — جرب صورة أخرى');
+                    fileInput.value = '';
+                };
+                if (file.type === 'image/svg+xml') {
+                    readFileDirect(file).then(function (base64) {
+                        if (base64.length > 300000) { fail(); return; }
+                        done(base64);
+                    }, fail);
+                    return;
+                }
+                compressAppImage(file, 800, 0.82).then(function (base64) {
+                    if (base64.length > 700000) {
+                        return compressAppImage(file, 800, 0.6).then(done, fail);
+                    }
+                    done(base64);
+                }, fail);
+            });
+        }
+        
+        if (imgPreview) {
+            imgPreview.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                imgPreview.style.borderColor = 'var(--accent,#f97316)';
+                imgPreview.style.background = 'rgba(249,115,22,0.05)';
+            });
+            imgPreview.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                imgPreview.style.borderColor = '';
+                imgPreview.style.background = '';
+            });
+            imgPreview.addEventListener('drop', function(e) {
+                e.preventDefault();
+                imgPreview.style.borderColor = '';
+                imgPreview.style.background = '';
+                var file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    fileInput.files = e.dataTransfer.files;
+                    fileInput.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+        
+        if (removeImgBtn) {
+            removeImgBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('app-edit-iconUrl').value = '';
+                if (fileInput) fileInput.value = '';
+                updateImagePreview('');
+            });
+        }
+
+>>>>>>> 814716bfa26c15e153c48faffe96b94fe46f4763
         // Modal close
         var closeBtn = document.getElementById('app-edit-close');
         if (closeBtn) closeBtn.addEventListener('click', closeEditModal);
         var cancelBtn = document.getElementById('app-edit-cancel');
         if (cancelBtn) cancelBtn.addEventListener('click', closeEditModal);
 
+<<<<<<< HEAD
         // Modal save
         var editSaveBtn = document.getElementById('app-edit-save');
         if (editSaveBtn) {
@@ -10143,10 +10616,52 @@ document.addEventListener('DOMContentLoaded', function() {
                     showSaveMsg(ok ? (wasEditing ? 'تم تعديل التطبيق وحفظه في قاعدة البيانات' : 'تمت إضافة التطبيق وحفظه في قاعدة البيانات') : 'تم الحفظ محلياً فقط — تحقق من الاتصال', !ok);
                 });
             });
+=======
+        // Modal save
+        var editSaveBtn = document.getElementById('app-edit-save');
+        if (editSaveBtn) {
+            editSaveBtn.addEventListener('click', function() {
+                var name = document.getElementById('app-edit-name').value.trim();
+                if (!name) { alert('الاسم مطلوب'); return; }
+                
+                var appData = {
+                    name: name,
+                    description: document.getElementById('app-edit-desc').value.trim(),
+                    iconUrl: document.getElementById('app-edit-iconUrl').value.trim(),
+                    tag: document.getElementById('app-edit-tag').value.trim(),
+                    color: document.getElementById('app-edit-color').value,
+                    order: parseInt(document.getElementById('app-edit-order').value) || 1,
+                    url: normalizeAppUrl(document.getElementById('app-edit-url').value),
+                    visible: document.getElementById('app-edit-visible').checked
+                };
+
+                if (editingId) {
+                    // Edit existing app
+                    var app = appsData.find(function(a){ return a.id===editingId; });
+                    if (app) {
+                        Object.assign(app, appData);
+                    }
+                } else {
+                    // Add new app
+                    var newId = 'app_' + Date.now();
+                    appData.id = newId;
+                    appsData.push(appData);
+                }
+                
+                var wasEditing = !!editingId;
+                closeEditModal();
+                renderAdminApps();
+                saveApps().then(function (ok) {
+                    renderAdminApps();
+                    showSaveMsg(ok ? (wasEditing ? 'تم تعديل التطبيق وحفظه في قاعدة البيانات' : 'تمت إضافة التطبيق وحفظه في قاعدة البيانات') : 'تم الحفظ محلياً فقط — تحقق من الاتصال', !ok);
+                });
+            });
+>>>>>>> 814716bfa26c15e153c48faffe96b94fe46f4763
         }
 
         // Close modal on overlay click
         var modal = document.getElementById('app-edit-modal');
+<<<<<<< HEAD
         if (modal) {
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) closeEditModal();
@@ -10269,4 +10784,128 @@ document.addEventListener('DOMContentLoaded', function() {
         reload: function() { loadApps().then(function () { renderAdminApps(); }); },
         save: saveApps
     };
+=======
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeEditModal();
+            });
+        }
+
+        // Section header settings (Firestore: settings/appsSection)
+        var SECTION_STORAGE_KEY = 'elmistar_apps_section_config';
+        var SECTION_MIGRATED_KEY = 'elmistar_apps_section_migrated';
+        var defaultSectionConfig = {
+            title: 'تطبيقات تعليمية تفاعلية',
+            description: 'أدوات تعليمية مجانية مصممة خصيصاً لطلاب المستر',
+            tag: '🚀 تطبيقاتنا'
+        };
+
+        function readLocalSection() {
+            try {
+                var stored = localStorage.getItem(SECTION_STORAGE_KEY);
+                if (stored) {
+                    var parsed = JSON.parse(stored);
+                    if (parsed && typeof parsed === 'object') return parsed;
+                }
+            } catch(e){}
+            return JSON.parse(JSON.stringify(defaultSectionConfig));
+        }
+
+        function fillSectionForm(config) {
+            var titleInput = document.getElementById('apps-section-title');
+            var descInput = document.getElementById('apps-section-desc');
+            var tagInput = document.getElementById('apps-section-tag');
+            if (titleInput) titleInput.value = config.title || '';
+            if (descInput) descInput.value = config.description || '';
+            if (tagInput) tagInput.value = config.tag || '';
+        }
+
+        function sectionSavedMsg(ok) {
+            var msgEl = document.getElementById('apps-section-save-msg');
+            if (!msgEl) return;
+            msgEl.textContent = ok ? '✅ تم حفظ إعدادات العنوان في قاعدة البيانات بنجاح!' : 'تم الحفظ محلياً فقط — تحقق من الاتصال';
+            msgEl.style.color = ok ? '#10b981' : '#ef4444';
+            msgEl.style.display = 'inline';
+            setTimeout(function(){ msgEl.style.display='none'; }, 3000);
+        }
+
+        function serverSectionDoc() {
+            if (window.ElmistarBoot && window.ElmistarBoot.getDocServer) {
+                return window.ElmistarBoot.getDocServer('settings', SECTION_DOC_ID);
+            }
+            return window.db.collection('settings').doc(SECTION_DOC_ID).get({ source: 'server' });
+        }
+
+        function loadSectionForm() {
+            var local = readLocalSection();
+            fillSectionForm(local);
+            if (!window.db) return;
+            serverSectionDoc().then(function (doc) {
+                if (doc && doc.exists) {
+                    var d = doc.data() || {};
+                    var config = JSON.parse(JSON.stringify(defaultSectionConfig));
+                    if (d.title) config.title = d.title;
+                    if (d.description) config.description = d.description;
+                    if (d.tag) config.tag = d.tag;
+                    fillSectionForm(config);
+                    try { localStorage.setItem(SECTION_STORAGE_KEY, JSON.stringify(config)); } catch (e) {}
+                } else {
+                    var already = false;
+                    try { already = localStorage.getItem(SECTION_MIGRATED_KEY) === '1'; } catch (e) {}
+                    if (!already && localStorage.getItem(SECTION_STORAGE_KEY)) {
+                        window.db.collection('settings').doc(SECTION_DOC_ID).set({
+                            title: local.title || defaultSectionConfig.title,
+                            description: local.description || defaultSectionConfig.description,
+                            tag: local.tag || defaultSectionConfig.tag,
+                            updatedAt: serverTimestamp()
+                        }, { merge: true }).then(function () {
+                            try { localStorage.setItem(SECTION_MIGRATED_KEY, '1'); } catch (e) {}
+                        }, function () {});
+                    }
+                }
+            }, function () {});
+        }
+
+        // Save section settings
+        var sectionSaveBtn = document.getElementById('apps-section-save-btn');
+        if (sectionSaveBtn) {
+            sectionSaveBtn.addEventListener('click', function() {
+                var titleInput = document.getElementById('apps-section-title');
+                var descInput = document.getElementById('apps-section-desc');
+                var tagInput = document.getElementById('apps-section-tag');
+                var config = {
+                    title: (titleInput ? titleInput.value.trim() : '') || defaultSectionConfig.title,
+                    description: (descInput ? descInput.value.trim() : '') || defaultSectionConfig.description,
+                    tag: (tagInput ? tagInput.value.trim() : '') || defaultSectionConfig.tag
+                };
+                try { localStorage.setItem(SECTION_STORAGE_KEY, JSON.stringify(config)); } catch (e) {}
+                try { window.dispatchEvent(new StorageEvent('storage', { key: SECTION_STORAGE_KEY })); } catch (e) {}
+                if (!window.db) { sectionSavedMsg(false); return; }
+                config.updatedAt = serverTimestamp();
+                window.db.collection('settings').doc(SECTION_DOC_ID).set(config, { merge: true }).then(function () {
+                    sectionSavedMsg(true);
+                }, function () {
+                    sectionSavedMsg(false);
+                });
+            });
+        }
+    }
+
+    // Wait for DOM
+    document.addEventListener('DOMContentLoaded', function() {
+        // Run when apps-view is activated
+        var appsNavItems = document.querySelectorAll('[data-target="apps-view"]');
+        appsNavItems.forEach(function(item) {
+            item.addEventListener('click', function() {
+                renderAdminApps();
+            });
+        });
+        init();
+    });
+
+    window.AdminAppsManager = {
+        reload: function() { loadApps().then(function () { renderAdminApps(); }); },
+        save: saveApps
+    };
+>>>>>>> 814716bfa26c15e153c48faffe96b94fe46f4763
 })();
