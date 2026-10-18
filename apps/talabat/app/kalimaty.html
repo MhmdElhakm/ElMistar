@@ -1,0 +1,1225 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>كلماتي</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&display=swap">
+<style>
+/* Layout: sky-blue header card, tinted task-style cards, floating bottom tab bar. RTL, content hugs the right edge. */
+:root{
+  --bg:#EAF5FC; --glow:#FFF1D2; --surface:#FFFFFF; --field:#F3F9FD; --fg:#1D2B3A; --muted:#7A8DA0; --line:#DCE8F1;
+  --accent:#1CB0F6; --accent-dark:#0E8FCC; --accent-soft:#D8F0FD; --accent-fg:#FFFFFF;
+  --good:#17A34A; --good-soft:#DCFCE7; --bad:#E5484D; --bad-soft:#FEE2E2; --warn:#A8570A; --warn-soft:#FEF0C7;
+  --amber-b:#FEF3C7; --amber-e:#F59E0B; --amber-i:#A8570A;
+  --sky-b:#E0F1FD; --sky-e:#1CB0F6; --sky-i:#0B78AE;
+  --rose-b:#FCE7F3; --rose-e:#EC4899; --rose-i:#B0155E;
+  --mint-b:#D3F8EC; --mint-e:#14B8A6; --mint-i:#0B7A6E;
+  --vio-b:#EDE5FF; --vio-e:#8B5CF6; --vio-i:#5B2FC9;
+  --ora-b:#FFE8D3; --ora-e:#FF7A1A; --ora-i:#B04A00;
+  --shadow:0 10px 28px rgba(28,110,160,.10);
+  --f-ui:'Baloo Bhaijaan 2','Cairo','Segoe UI',Tahoma,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1620; --glow:#14303C; --surface:#132431; --field:#0E1C27; --fg:#E8F2F9; --muted:#8FA6B8; --line:#233847;
+    --accent:#38BDF8; --accent-dark:#1E93C9; --accent-soft:#12394D; --accent-fg:#04202E;
+    --good:#4ADE80; --good-soft:#123222; --bad:#FF8A8E; --bad-soft:#3B1B1D; --warn:#F5B94D; --warn-soft:#3A2D10;
+    --amber-b:#392E12; --amber-e:#F5B02E; --amber-i:#F6C453;
+    --sky-b:#10303F; --sky-e:#38BDF8; --sky-i:#7DD3FC;
+    --rose-b:#3A1830; --rose-e:#F472B6; --rose-i:#F9A8D4;
+    --mint-b:#0F3330; --mint-e:#2DD4BF; --mint-i:#5EEAD4;
+    --vio-b:#2B2150; --vio-e:#A78BFA; --vio-i:#C4B5FD;
+    --ora-b:#3D2512; --ora-e:#FB923C; --ora-i:#FDBA74;
+    --shadow:0 10px 28px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1620; --glow:#14303C; --surface:#132431; --field:#0E1C27; --fg:#E8F2F9; --muted:#8FA6B8; --line:#233847;
+  --accent:#38BDF8; --accent-dark:#1E93C9; --accent-soft:#12394D; --accent-fg:#04202E;
+  --good:#4ADE80; --good-soft:#123222; --bad:#FF8A8E; --bad-soft:#3B1B1D; --warn:#F5B94D; --warn-soft:#3A2D10;
+  --amber-b:#392E12; --amber-e:#F5B02E; --amber-i:#F6C453;
+  --sky-b:#10303F; --sky-e:#38BDF8; --sky-i:#7DD3FC;
+  --rose-b:#3A1830; --rose-e:#F472B6; --rose-i:#F9A8D4;
+  --mint-b:#0F3330; --mint-e:#2DD4BF; --mint-i:#5EEAD4;
+    --vio-b:#2B2150; --vio-e:#A78BFA; --vio-i:#C4B5FD;
+    --ora-b:#3D2512; --ora-e:#FB923C; --ora-i:#FDBA74;
+  --shadow:0 10px 28px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+
+/* Each stage has its own accent so the app changes colour as the student moves forward. */
+body[data-stage="1"]{--accent:#8B5CF6;--accent-dark:#6D3FD6;--accent-soft:#EDE5FF;--glow:#FCE4F3}
+body[data-stage="2"]{--accent:#FF7A1A;--accent-dark:#D05A04;--accent-soft:#FFE8D3;--glow:#FFF6C9}
+body[data-stage="3"]{--accent:#12B76A;--accent-dark:#0B9453;--accent-soft:#D6F6E6;--glow:#DDF4FF}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) body[data-stage="1"]{--accent:#A78BFA;--accent-dark:#7C5CE0;--accent-soft:#2A2150;--glow:#2A1A3F}
+  :root:not([data-theme="light"]) body[data-stage="2"]{--accent:#FB923C;--accent-dark:#D9731F;--accent-soft:#40250F;--glow:#3A2410}
+  :root:not([data-theme="light"]) body[data-stage="3"]{--accent:#34D399;--accent-dark:#1FA574;--accent-soft:#0F3A2B;--glow:#0F3A33}
+}
+:root[data-theme="dark"] body[data-stage="1"]{--accent:#A78BFA;--accent-dark:#7C5CE0;--accent-soft:#2A2150;--glow:#2A1A3F}
+:root[data-theme="dark"] body[data-stage="2"]{--accent:#FB923C;--accent-dark:#D9731F;--accent-soft:#40250F;--glow:#3A2410}
+:root[data-theme="dark"] body[data-stage="3"]{--accent:#34D399;--accent-dark:#1FA574;--accent-soft:#0F3A2B;--glow:#0F3A33}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  background-color:var(--bg);
+  background-image:radial-gradient(120% 50% at 0 0,var(--glow),transparent 62%);
+  background-repeat:no-repeat;
+  color:var(--fg);font-family:var(--f-ui);font-weight:500;font-size:17px;line-height:1.6;
+  padding-block:16px 120px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.app{max-width:680px;margin-inline:auto;display:flex;flex-direction:column;gap:16px}
+p{margin:0}
+h2{margin:0;font-size:1.25rem;font-weight:800;line-height:1.35;text-wrap:balance}
+.hint{color:var(--muted);font-size:.95rem}
+.center{text-align:center;align-items:center}
+
+.head{background:var(--surface);border-radius:26px;border-top:5px solid var(--accent);padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
+.hico{width:58px;height:58px;border-radius:19px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 65%,#fff),var(--accent));display:grid;place-items:center;color:#fff;box-shadow:0 8px 16px color-mix(in srgb,var(--accent) 35%,transparent);flex:none}
+.htx{flex:1;min-width:0}
+.htx h1{margin:0;font-size:1.45rem;font-weight:800;line-height:1.3}
+.htx p{color:var(--muted);font-size:.98rem;line-height:1.4}
+.sbtn{width:48px;height:48px;border-radius:50%;border:2px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;flex:none;padding:0;transition:background .2s,color .2s,border-color .2s}
+.sbtn.on{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-radius:28px 28px 0 0;box-shadow:0 -10px 30px rgba(20,90,140,.13);
+  padding:10px max(12px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.nav-in{max-width:680px;margin-inline:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.ni{border:0;background:none;font:inherit;font-size:.8rem;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;padding:2px 0;cursor:pointer;min-height:62px;position:relative;line-height:1.2}
+.ni .pill{width:60px;height:36px;border-radius:18px;display:grid;place-items:center;transition:background .25s,color .25s,transform .25s}
+.ni::after{content:"";width:34px;height:4px;border-radius:4px;background:transparent;margin-top:2px;transition:background .25s}
+.ni.on{color:var(--accent);font-weight:700}
+.ni.on .pill{background:var(--accent-soft);color:var(--accent);transform:translateY(-2px)}
+.ni.on::after{background:var(--accent)}
+.ni:disabled{opacity:.4;cursor:default}
+.ni .dot{position:absolute;top:2px;right:calc(50% - 30px);width:11px;height:11px;border-radius:50%;background:var(--good);border:2px solid var(--surface)}
+
+.panel{background:var(--surface);border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0;box-shadow:var(--shadow)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row.mid{justify-content:center}
+.row.between{justify-content:space-between}
+.btn{
+  font:inherit;font-weight:700;font-size:1rem;min-height:50px;padding:0 20px;border-radius:16px;border:2px solid var(--line);
+  background:var(--surface);color:var(--fg);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 0 var(--line);transition:transform .08s,box-shadow .08s,background .2s;
+}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg);box-shadow:0 4px 0 var(--accent-dark)}
+.btn.primary:active:not(:disabled){box-shadow:0 1px 0 var(--accent-dark)}
+.btn.big{width:100%;min-height:58px;font-size:1.15rem;border-radius:18px}
+.btn.ghost{background:transparent;border-color:transparent;box-shadow:none;color:var(--muted)}
+.btn.live{background:var(--accent-soft);border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:default;box-shadow:none}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg button{font:inherit;font-weight:800;font-size:1.08rem;min-height:58px;border-radius:20px;border:2px solid var(--line);background:var(--surface);color:var(--fg);display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:background .2s,color .2s,box-shadow .2s}
+.seg button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg);box-shadow:0 8px 18px color-mix(in srgb,var(--accent) 32%,transparent)}
+.cnt{min-width:32px;height:32px;border-radius:16px;display:inline-grid;place-items:center;background:var(--line);color:var(--muted);font-size:.95rem;padding:0 8px}
+.seg .on .cnt{background:rgba(255,255,255,.3);color:inherit}
+
+.addrow{display:flex;flex-wrap:wrap;gap:10px}
+.fld{position:relative;flex:1 1 150px;min-width:0}
+.inp{width:100%;min-height:56px;border-radius:16px;border:2px solid var(--line);background:var(--field);color:var(--fg);padding:0 16px;font:inherit;font-size:1.08rem}
+.inp.hasmic{padding-left:54px}
+.fld .mini{position:absolute;left:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:0;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;cursor:pointer;padding:0}
+.fld .mini.live{background:var(--accent);color:var(--accent-fg)}
+.plus{flex:0 0 56px;height:56px;border-radius:16px;border:0;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 0 var(--accent-dark);padding:0}
+.plus:active{transform:translateY(3px);box-shadow:0 1px 0 var(--accent-dark)}
+textarea{width:100%;min-height:170px;resize:vertical;font:inherit;font-size:1.05rem;padding:14px;border-radius:16px;border:2px solid var(--line);background:var(--field);color:var(--fg);text-align:start;line-height:1.9}
+.preview{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{display:inline-flex;gap:6px;align-items:baseline;background:var(--accent-soft);border-radius:10px;padding:2px 12px;font-size:.92rem}
+.chip i{font-style:normal;color:var(--muted)}
+.chip.nomean{background:var(--warn-soft)}
+
+.listhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.wlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.t0{--tb:var(--amber-b);--te:var(--amber-e);--ti:var(--amber-i)}
+.t1{--tb:var(--sky-b);--te:var(--sky-e);--ti:var(--sky-i)}
+.t2{--tb:var(--rose-b);--te:var(--rose-e);--ti:var(--rose-i)}
+.t3{--tb:var(--mint-b);--te:var(--mint-e);--ti:var(--mint-i)}
+.t4{--tb:var(--vio-b);--te:var(--vio-e);--ti:var(--vio-i)}
+.t5{--tb:var(--ora-b);--te:var(--ora-e);--ti:var(--ora-i)}
+.wc{display:flex;align-items:center;gap:12px;background:var(--tb);border-radius:22px;border-inline-start:6px solid var(--te);padding:12px 14px 12px 8px;min-height:84px;box-shadow:inset 0 0 0 1px rgba(120,140,160,.12)}
+.wc .chk{width:36px;height:36px;border-radius:50%;border:3px solid var(--te);background:transparent;color:#fff;display:grid;place-items:center;cursor:pointer;flex:none;padding:0;transition:background .2s,border-color .2s}
+.wc.m .chk{background:var(--good);border-color:var(--good)}
+.wc:not(.m) .chk svg{display:none}
+.wc .ico{width:50px;height:50px;border-radius:17px;background:var(--surface);color:var(--te);display:grid;place-items:center;border:0;cursor:pointer;flex:none;padding:0;box-shadow:0 4px 10px rgba(0,0,0,.08)}
+.wc .ico:active{transform:scale(.94)}
+.wtx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}
+.wtx b{font-size:1.2rem;font-weight:800;overflow-wrap:anywhere;text-align:start}
+.wtx span{font-size:.95rem;color:var(--ti);overflow-wrap:anywhere}
+.wc .x{border:0;background:none;color:var(--muted);width:42px;height:42px;border-radius:14px;cursor:pointer;display:grid;place-items:center;flex:none;padding:0}
+.empty{border:2px dashed var(--line);border-radius:22px;padding:22px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:12px;align-items:center}
+
+.badge{font-size:.8rem;font-weight:700;background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:0 10px;white-space:nowrap}
+.wc.rvrow{flex-direction:column;align-items:stretch;padding:12px;gap:10px}
+.wc.rvrow.off{opacity:.55}
+.rvl1{display:flex;align-items:center;gap:10px}
+.rvin{min-height:50px;font-weight:700}
+.rvl1 .rvin{flex:1;min-width:0}
+.edform{display:flex;flex-direction:column;gap:10px;width:100%}
+.spinrow{display:flex;align-items:center;gap:10px}
+.spinrow::before{content:"";width:18px;height:18px;border-radius:50%;border:3px solid currentColor;border-top-color:transparent;animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:400px){.wc .ico{width:42px;height:42px}.wc .x{width:34px}.wc{gap:8px}}
+@media (prefers-reduced-motion: reduce){.spinrow::before{animation:none}}
+.bar{height:12px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 60%,#fff));border-radius:99px;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.meta{display:flex;justify-content:space-between;gap:8px;font-size:.92rem;color:var(--muted)}
+.wcard{background:var(--tb);border-radius:22px;border-inline-start:6px solid var(--te);padding:18px 14px;display:flex;flex-direction:column;gap:2px}
+.word-en{font-weight:800;font-size:clamp(2.4rem,12vw,3.8rem);line-height:1.15;text-align:center;direction:ltr;overflow-wrap:anywhere}
+.word-ar{text-align:center;font-size:1.35rem;color:var(--ti)}
+.prompt{text-align:center;font-size:2rem;font-weight:800;line-height:1.35;overflow-wrap:anywhere}
+.label{text-align:center;font-size:.95rem;color:var(--muted)}
+
+.mic{
+  align-self:center;width:96px;height:96px;border-radius:50%;border:0;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 65%,#fff),var(--accent));color:#fff;
+  display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 0 var(--accent-dark),0 0 0 0 var(--accent-soft);transition:transform .1s;padding:0;
+}
+.mic:active:not(:disabled){transform:translateY(5px);box-shadow:0 3px 0 var(--accent-dark)}
+.mic.live{animation:pulse 1.3s infinite}
+.mic:disabled{opacity:.5;box-shadow:none}
+@keyframes pulse{0%{box-shadow:0 8px 0 var(--accent-dark),0 0 0 0 color-mix(in srgb,var(--accent) 50%,transparent)}70%{box-shadow:0 8px 0 var(--accent-dark),0 0 0 24px transparent}100%{box-shadow:0 8px 0 var(--accent-dark),0 0 0 0 transparent}}
+
+.note{border-radius:18px;padding:12px 16px;font-size:1rem;animation:rise .25s ease both}
+.note.good{background:var(--good-soft);color:var(--good)}
+.note.bad{background:var(--bad-soft);color:var(--bad)}
+.note.warn{background:var(--warn-soft);color:var(--warn)}
+.note ul{margin:6px 0 0;padding-inline-start:22px}
+.note li{margin-bottom:4px}
+.letters{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;direction:ltr;animation:rise .25s ease both}
+.lt{font-size:1.7rem;font-weight:800;min-width:1.4ch;padding:0 5px;text-align:center;border-bottom:4px solid transparent;border-radius:6px}
+.lt.ok{color:var(--good);border-color:var(--good)}
+.lt.bad{color:var(--bad);border-color:var(--bad);background:var(--bad-soft)}
+.lt.sp{min-width:.8ch}
+
+.cells{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.cell{width:48px;height:58px;display:inline-grid;place-items:center;text-align:center;font:800 1.6rem var(--f-ui);border:2px solid var(--line);border-radius:16px;background:var(--field);color:var(--fg);padding:0}
+input.cell:focus{border-color:var(--accent);background:var(--accent-soft)}
+.cell.fixed{background:var(--tb,var(--accent-soft));border-color:transparent;color:var(--ti,var(--fg))}
+.cell.good{background:var(--good-soft);border-color:var(--good);color:var(--good);animation:bump .3s}
+.cell.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.gap{width:16px}
+.tile{font:800 1.6rem var(--f-ui);width:52px;height:58px;border-radius:16px;border:2px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;padding:0;box-shadow:0 4px 0 var(--line);transition:transform .08s}
+.tile:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.tile.sel{border-color:var(--accent);color:var(--accent);box-shadow:0 4px 0 var(--accent-dark)}
+.tile.slot{border-style:dashed;background:transparent;box-shadow:none;cursor:default}
+.tile.good{background:var(--good-soft);border-color:var(--good);color:var(--good);box-shadow:none;animation:bump .3s}
+.tile.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);box-shadow:none}
+.pool{border-top:2px dashed var(--line);padding-top:16px}
+.answer{width:100%;font:inherit;font-weight:700;font-size:1.4rem;min-height:60px;padding:0 16px;border-radius:18px;border:2px solid var(--line);background:var(--field);color:var(--fg);text-align:center}
+.score{font-size:3.4rem;font-weight:800;line-height:1.1;color:var(--accent)}
+table{border-collapse:collapse;width:100%}
+.tw{overflow-x:auto;width:100%}
+th,td{text-align:start;padding:10px 10px;border-bottom:2px solid var(--line);font-size:.98rem;vertical-align:top}
+th{color:var(--muted);font-weight:600}
+
+.view.enter{animation:enter .32s cubic-bezier(.2,.8,.2,1) both}
+@keyframes enter{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes bump{50%{transform:scale(1.12)}}
+@media (prefers-reduced-motion: reduce){
+  .view.enter,.note,.letters,.cell.good,.tile.good{animation:none}
+  .mic.live{animation:none;box-shadow:0 8px 0 var(--accent-dark),0 0 0 10px var(--accent-soft)}
+  .bar>i,.ni .pill,.btn,.tile{transition:none}
+}
+</style>
+
+<div class="app" dir="rtl" lang="ar" id="shell">
+  <header class="head">
+    <a href="../index.html" class="sbtn" title="العودة للرئيسية" style="display:grid;place-items:center;text-decoration:none;font-size:1.3rem;">🏠</a>
+    <div class="hico" id="hico"></div>
+    <div class="htx"><h1>كلماتي</h1><p id="sub"></p></div>
+    <button type="button" class="sbtn" id="snd" aria-label="الصوت"></button>
+  </header>
+  <main id="stage" class="view"></main>
+</div>
+<nav class="nav" id="nav" dir="rtl" aria-label="مراحل الحفظ"></nav>
+
+<script>
+(function(){
+'use strict';
+var $stage=document.getElementById('stage'),$nav=document.getElementById('nav'),$sub=document.getElementById('sub'),$snd=document.getElementById('snd'),$hico=document.getElementById('hico');
+var LS='wordtrainer:v2';
+var SAMPLE=['apple - تفاحة','beautiful - جميل','through - عبر','library - مكتبة','comfortable - مريح','vegetable - خضار','purple - بنفسجي','knowledge - معرفة'];
+
+/* ---------- icons ---------- */
+function svg(inner,sz){return '<svg viewBox="0 0 24 24" width="'+(sz||22)+'" height="'+(sz||22)+'" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+inner+'</svg>';}
+var PATHS={
+  spk:'<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>',
+  off:'<path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 6 6M22 9l-6 6"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  list:'<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>',
+  pen:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  trophy:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  check:'<path d="m5 12 5 5 9-10"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m21 16-5-5-8 8"/>',
+  tr:'<path d="M4 5h9M8.5 3v2M6 5c0 4 3 7 6 8M12 5c-1 4-4 7-8 8"/><path d="m13 20 4-9 4 9M14.5 17h5"/>',
+  book:'<path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H20v16H5.5A1.5 1.5 0 0 0 4 20.5z"/><path d="M4 20.5A1.5 1.5 0 0 0 5.5 22H20"/>'
+};
+function ic(n,sz){return svg(PATHS[n],sz);}
+
+/* ---------- sound effects (synthesised, no files) ---------- */
+var AC=null,master=null;
+function ctx(){
+  if(!AC){
+    try{
+      var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;
+      AC=new C();master=AC.createGain();master.gain.value=0.55;
+      var lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=4800;
+      master.connect(lp);lp.connect(AC.destination);
+    }catch(e){AC=null;return null;}
+  }
+  if(AC.state==='suspended'){try{AC.resume();}catch(e){}}
+  return AC;
+}
+function tone(f,t0,d,type,vol,slideTo){
+  var c=ctx();if(!c)return;
+  var o=c.createOscillator(),g=c.createGain(),t=c.currentTime+t0;
+  o.type=type||'sine';o.frequency.setValueAtTime(f,t);
+  if(slideTo)o.frequency.exponentialRampToValueAtTime(slideTo,t+d);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(vol||0.25,t+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+  o.connect(g);g.connect(master);o.start(t);o.stop(t+d+0.05);
+}
+var SFX={
+  tap:function(){tone(700,0,0.05,'sine',0.10);},
+  nav:function(){tone(440,0,0.08,'sine',0.14,640);},
+  pop:function(){tone(520,0,0.09,'sine',0.20,820);},
+  pop2:function(){tone(720,0,0.08,'sine',0.15,470);},
+  micOn:function(){tone(520,0,0.10,'sine',0.18);tone(780,0.09,0.14,'sine',0.20);},
+  correct:function(){tone(784,0,0.14,'triangle',0.24);tone(988,0.10,0.14,'triangle',0.24);tone(1319,0.20,0.30,'triangle',0.26);},
+  wrong:function(){tone(310,0,0.18,'triangle',0.20,230);tone(230,0.17,0.28,'triangle',0.20,170);},
+  done:function(){tone(523,0,0.14,'triangle',0.20);tone(784,0.12,0.32,'triangle',0.22);},
+  win:function(){[523,659,784,1047,1319].forEach(function(f,i){tone(f,i*0.09,0.32,'triangle',0.22);});tone(1568,0.52,0.55,'sine',0.16);}
+};
+function sfx(n){if(!S.sound)return;try{if(SFX[n])SFX[n]();}catch(e){}}
+function buzz(ms){try{if(navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
+
+/* ---------- state ---------- */
+var S={stage:0,dir:'ar-en',tab0:'list',raw:'',add:{en:'',ar:'',tried:''},addMsg:'',addBusy:false,rev:null,photo:{busy:false,msg:''},edit:null,hasAI:false,canImg:false,words:[],mastered:{},sound:true,
+  pron:null,drill:null,fin:null,done:[false,false,false,false],mic:'unknown',dict:{busy:false,msg:''}};
+function validW(w){return w&&typeof w.en==='string'&&w.en.trim()&&typeof w.ar==='string';}
+try{
+  var o=JSON.parse(localStorage.getItem(LS)||'null');
+  if(o){
+    if(Array.isArray(o.words))S.words=o.words.filter(validW);
+    if(o.mastered&&typeof o.mastered==='object')S.mastered=o.mastered;
+    S.sound=o.sound!==false;
+  }else{
+    var o1=JSON.parse(localStorage.getItem('wordtrainer:v1')||'null');
+    if(o1&&o1.raw)S.words=parseWords(String(o1.raw)).words;
+  }
+}catch(e){}
+function save(){try{localStorage.setItem(LS,JSON.stringify({words:S.words,mastered:S.mastered,sound:S.sound}));}catch(e){}}
+function mkey(w){return w.en.toLowerCase();}
+function isM(w){return !!S.mastered[mkey(w)];}
+function wordsChanged(){S.pron=null;S.drill=null;S.fin=null;S.done=[false,false,false,false];}
+function tint(i){return 't'+(i%6);}
+
+/* ---------- Claude (optional, only inside the claude.ai viewer) ---------- */
+var AIFN=null;
+try{
+  if(window.claude&&typeof window.claude.use==='function'){
+    window.claude.use('sample').then(function(fn){
+      if(!fn)return;
+      AIFN=fn;S.hasAI=true;
+      var done=function(){render();};
+      try{fn.limits().then(function(l){S.canImg=!!(l&&l.images);done();},done);}catch(e){done();}
+    }).catch(function(){});
+  }
+}catch(e){}
+
+/* ---------- helpers ---------- */
+var AR_RE=/[؀-ۿ]/, LAT_RE=/[A-Za-z]/, LETTER_RE=/[A-Za-z0-9ء-ي]/;
+var EDGE=/^[\s\-–—=:|,.;\t>]+|[\s\-–—=:|,.;\t>]+$/g;
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function stripDiac(s){return s.replace(/[ً-ٰٟـ]/g,'');}
+function normAr(s){return stripDiac(s).replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[^ء-ي0-9]/g,'');}
+function normEn(s){return s.toLowerCase().replace(/[^a-z0-9]/g,'');}
+function normSp(s){return s.toLowerCase().replace(/[^a-z0-9\s']/g,'').replace(/\s+/g,' ').trim();}
+function norm(s,l){return l==='ar'?normAr(s):normEn(s);}
+function ansLang(){return S.dir==='en-ar'?'ar':'en';}
+function promptLang(){return S.dir==='en-ar'?'en':'ar';}
+function answersOf(w,l){
+  if(l==='en')return [w.en];
+  var a=w.ar.split(/[،؛;\/|]|,/).map(function(x){return x.trim();}).filter(Boolean);
+  return a.length?a:[w.ar];
+}
+function isCorrect(input,w,l){var n=norm(input,l);return n.length>0&&answersOf(w,l).some(function(a){return norm(a,l)===n;});}
+function dirOf(l){return l==='ar'?'rtl':'ltr';}
+function hasMeaning(w){return !!w.ar;}
+function promptOf(w){return S.dir==='en-ar'?w.en:w.ar;}
+
+function parseWords(raw){
+  var words=[],ignored=0,seen={};
+  raw.split(/\r?\n/).forEach(function(line){
+    var t=line.trim();if(!t)return;
+    var en='',ar='',first=t.search(AR_RE);
+    if(first===-1){en=t;}
+    else{
+      var last=t.length-1;while(last>=0&&!AR_RE.test(t[last]))last--;
+      var pre=t.slice(0,first);
+      if(first>0&&LAT_RE.test(pre)){en=pre;ar=t.slice(first);}
+      else{ar=t.slice(0,last+1);en=t.slice(last+1);}
+    }
+    en=en.replace(EDGE,'').trim();ar=ar.replace(EDGE,'').trim();
+    if(!en||!LAT_RE.test(en)){ignored++;return;}
+    var key=en.toLowerCase();if(seen[key])return;seen[key]=1;
+    words.push({en:en,ar:ar});
+  });
+  return {words:words,ignored:ignored};
+}
+function mergeWords(list){
+  var have={};S.words.forEach(function(w){have[mkey(w)]=1;});
+  var added=0;
+  list.forEach(function(w){if(!have[mkey(w)]){have[mkey(w)]=1;S.words.push(w);added++;}});
+  if(added){wordsChanged();save();}
+  return added;
+}
+
+/* ---------- speech out ---------- */
+function pickVoice(lang){
+  try{var v=speechSynthesis.getVoices();
+    return v.find(function(x){return x.lang===lang;})||v.find(function(x){return x.lang.toLowerCase().indexOf(lang.slice(0,2))===0;})||null;}catch(e){return null;}
+}
+function speak(text,lang,rate){
+  try{
+    if(!('speechSynthesis' in window))return;
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);u.lang=lang;u.rate=rate||0.9;
+    var v=pickVoice(lang);if(v)u.voice=v;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function spellOut(word){speak(word.replace(/[^A-Za-z0-9]/g,'').toUpperCase().split('').join('. ')+'.','en-US',0.7);}
+
+/* ---------- alignment + pronunciation tips ---------- */
+function align(a,b){
+  var n=a.length,m=b.length,d=[],i,j;
+  for(i=0;i<=n;i++){d.push(new Array(m+1).fill(0));d[i][0]=i;}
+  for(j=0;j<=m;j++)d[0][j]=j;
+  for(i=1;i<=n;i++)for(j=1;j<=m;j++){
+    d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  }
+  var ops=[];i=n;j=m;
+  while(i>0||j>0){
+    if(i>0&&j>0&&d[i][j]===d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)){ops.push({t:a[i-1]===b[j-1]?'m':'s',a:a[i-1],b:b[j-1]});i--;j--;}
+    else if(i>0&&d[i][j]===d[i-1][j]+1){ops.push({t:'d',a:a[i-1]});i--;}
+    else{ops.push({t:'i',b:b[j-1]});j--;}
+  }
+  ops.reverse();
+  return {ops:ops,dist:d[n][m]};
+}
+var RULES=[
+  [/th/g,'صوت th: ضع طرف لسانك بين الأسنان العلوية والسفلية وأخرج الهواء بلطف. لا تنطقه ث أو س أو ز أو ت.'],
+  [/sh/g,'صوت sh: استدر الشفتين قليلًا وأخرج هواءً مستمرًا مثل حرف «ش».'],
+  [/ch/g,'صوت ch: يبدأ بتاء سريعة ثم شين، فيخرج مثل «تش».'],
+  [/ng/g,'صوت ng: يخرج من الأنف بآخر اللسان، ولا تضف حرف g مستقلًا في النهاية.'],
+  [/p/g,'حرف p: انفجار هواء من الشفتين بلا اهتزاز في الحلق. ضع ورقة أمام فمك فتتحرك. لا تنطقه باءً.'],
+  [/v/g,'حرف v: ضع الأسنان العلوية على الشفة السفلى مع اهتزاز في الحلق. ليس فاءً.'],
+  [/r/g,'حرف r: ارفع اللسان دون أن يلمس سقف الفم، ولا تكرر الراء.'],
+  [/w/g,'حرف w: ضمّ الشفتين واستدرهما كحرف «و» دون أن تلمس الأسنان.'],
+  [/[aeiou]+/g,'الحروف المتحركة a e i o u تحمل أكثر من صوت في الإنجليزية. استمع للكلمة ببطء وقلّد طول كل مقطع.']
+];
+function tipsFor(t,ops){
+  var bad={},ti=0,extras=[],tips=[];
+  ops.forEach(function(o){
+    if(o.t==='i'){extras.push(o.b);return;}
+    if(o.t!=='m')bad[ti]=true;
+    ti++;
+  });
+  RULES.forEach(function(r){
+    var re=new RegExp(r[0].source,'g'),m,hit=false;
+    while((m=re.exec(t))){for(var k=m.index;k<m.index+m[0].length;k++){if(bad[k])hit=true;}if(m[0].length===0)re.lastIndex++;}
+    if(hit)tips.push(r[1]);
+  });
+  var lastOp=ops.filter(function(o){return o.t!=='i';}).slice(-1)[0];
+  if(lastOp&&lastOp.t==='d')tips.push('لا تُسقط الصوت الأخير من الكلمة، انطق آخر حرف بوضوح.');
+  var ex=extras.filter(function(x){return x!==' ';});
+  if(ex.length)tips.push('أضفت صوتًا زائدًا ('+ex.join(' ')+'). انطق الكلمة كما هي دون إضافات.');
+  if(!tips.length)tips.push('كرّر الكلمة ببطء مقطعًا مقطعًا ثم انطقها كاملة.');
+  return tips.slice(0,3);
+}
+
+/* ---------- stage control ---------- */
+var rec=null,recTimer=null,drillTimer=null,lastStage=-1;
+function stopRec(){clearTimeout(recTimer);if(rec){var r=rec;rec=null;r.onresult=r.onerror=r.onend=null;try{r.abort();}catch(e){}}}
+function leave(){stopRec();if(S.pron)S.pron.listening=false;clearTimeout(drillTimer);try{speechSynthesis.cancel();}catch(e){}}
+function go(n){
+  leave();S.dict={busy:false,msg:''};S.stage=n;
+  if(n===1&&!S.pron)initPron();
+  if(n===2)initDrill();
+  if(n===3)initFinal();
+  render();window.scrollTo(0,0);
+}
+function initPron(){S.pron={i:0,tries:[],passed:[],fb:null,listening:false};}
+function drillWords(){return S.words.map(function(w,i){return i;}).filter(function(i){return hasMeaning(S.words[i]);});}
+function initDrill(){
+  var items=[];
+  drillWords().forEach(function(i){items.push({i:i,mode:'blank',st:null});items.push({i:i,mode:'scramble',st:null});});
+  shuffle(items);
+  for(var k=1;k<items.length;k++){
+    if(items[k].i===items[k-1].i){for(var j=k+1;j<items.length;j++){if(items[j].i!==items[k-1].i){var t=items[k];items[k]=items[j];items[j]=t;break;}}}
+  }
+  S.drill={queue:items,total:items.length,done:0,fb:null};
+}
+function initFinal(){
+  var all=shuffle(drillWords());
+  S.fin={all:all,list:all.slice(),pos:0,res:{},phase:'ask',draft:''};
+}
+
+/* ---------- rendering ---------- */
+function captureInputs(){
+  var D=S.drill;
+  if(S.stage===2&&D&&D.queue.length&&!D.fb){
+    var st=D.queue[0].st;
+    if(st&&st.hidden){Object.keys(st.hidden).forEach(function(k){
+      var el=document.getElementById('c'+k);
+      if(el&&el.getAttribute('data-uid')===String(st.uid))st.typed[k]=el.value;
+    });}
+  }
+  var F=S.fin,a=document.getElementById('ans');
+  if(S.stage===3&&F&&F.phase==='ask'&&a&&a.getAttribute('data-pos')===String(F.pos))F.draft=a.value;
+  if(S.stage===0){
+    var e1=document.getElementById('inEn'),e2=document.getElementById('inAr');
+    if(e1)S.add.en=e1.value;if(e2)S.add.ar=e2.value;
+    if(S.edit){var x1=document.getElementById('edEn'),x2=document.getElementById('edAr');if(x1)S.edit.en=x1.value;if(x2)S.edit.ar=x2.value;}
+    if(S.rev){S.rev.rows.forEach(function(r,i){
+      var a1=document.getElementById('rvE'+i),a2=document.getElementById('rvA'+i);
+      if(a1)r.en=a1.value;if(a2)r.ar=a2.value;
+    });}
+  }
+}
+function subText(){
+  var n=S.words.length;
+  if(S.stage===0){
+    var m=S.words.filter(isM).length;
+    return n?('عندك '+n+(n===1?' كلمة':' كلمات')+' للحفظ'+(m?' • '+m+' محفوظة':'')):'أضف كلمات لتبدأ الحفظ';
+  }
+  if(S.stage===1)return 'النطق • كلمة '+((S.pron?S.pron.i:0)+1)+' من '+n;
+  if(S.stage===2)return 'التدريب • اكتب الكلمة الإنجليزية';
+  return 'الاختبار النهائي • بلا مساعدة';
+}
+function render(nocap){
+  if(!nocap)captureInputs();
+  var ta=document.getElementById('wordsInput');if(ta)S.raw=ta.value;
+  var enter=lastStage!==S.stage;lastStage=S.stage;document.body.setAttribute('data-stage',String(S.stage));
+  var ready=S.words.length>0;
+  var items=[['list','الكلمات'],['mic','النطق'],['pen','التدريب'],['trophy','الاختبار']];
+  $nav.innerHTML='<div class="nav-in">'+items.map(function(it,i){
+    return '<button type="button" class="ni'+(i===S.stage?' on':'')+'" data-go="'+i+'"'+((i>0&&!ready)?' disabled':'')+'><span class="pill">'+ic(it[0],24)+'</span><span>'+it[1]+'</span>'+(S.done[i]&&i!==S.stage?'<i class="dot"></i>':'')+'</button>';
+  }).join('')+'</div>';
+  $sub.textContent=subText();
+  $snd.className='sbtn'+(S.sound?' on':'');
+  $snd.innerHTML=ic(S.sound?'spk':'off',22);
+  $snd.setAttribute('aria-label',S.sound?'إيقاف الأصوات':'تشغيل الأصوات');
+  $hico.innerHTML=ic('book',30);
+  var views=[viewInput,viewPron,viewDrill,viewFinal];
+  $stage.className=enter?'view enter':'view';
+  $stage.innerHTML=views[S.stage]();
+  if(S.stage===0&&S.tab0==='bulk')updatePreview();
+  if(S.stage===2&&S.drill&&S.drill.queue.length&&!S.drill.fb){var f=$stage.querySelector('input.cell');if(f)f.focus();}
+  if(S.stage===3&&S.fin&&S.fin.phase==='ask'){var a=document.getElementById('ans');if(a)a.focus();}
+}
+
+/* stage 0 */
+function micOk(){return !(S.mic==='blocked'||S.mic==='unsupported');}
+function micBtn(key){
+  if(!micOk())return '';
+  return '<button type="button" class="mini'+(S.dict.busy&&S.dict.t===key?' live':'')+'" data-act="dfield" data-k="'+key+'" aria-label="قلها بصوتك">'+ic('mic',20)+'</button>';
+}
+function viewInput(){
+  var n=S.words.length;
+  var seg='<div class="seg"><button type="button" class="'+(S.tab0==='list'?'on':'')+'" data-act="tab" data-t="list">الكلمات <span class="cnt">'+n+'</span></button>'+
+    '<button type="button" class="'+(S.tab0==='bulk'?'on':'')+'" data-act="tab" data-t="bulk">إضافة قائمة</button></div>';
+  if(S.tab0==='bulk')return '<div class="app" style="gap:16px">'+seg+(S.rev?viewReview():viewBulk())+'</div>';
+  var mk=micOk(),cls=mk?' hasmic':'';
+  var form='<section class="panel"><h2>إضافة كلمة</h2>'+
+    '<form class="addrow" id="addForm" autocomplete="off">'+
+    '<div class="fld"><input class="inp'+cls+'" id="inEn" lang="en" dir="ltr" placeholder="الكلمة بالإنجليزية" value="'+esc(S.add.en)+'" autocapitalize="off" spellcheck="false" aria-label="الكلمة بالإنجليزية">'+micBtn('addEn')+'</div>'+
+    '<div class="fld"><input class="inp'+cls+'" id="inAr" dir="rtl" placeholder="المعنى (اتركه فارغًا ليُقترح)" value="'+esc(S.add.ar)+'" aria-label="المعنى بالعربية">'+micBtn('addAr')+'</div>'+
+    '<button type="submit" class="plus" aria-label="إضافة"'+(S.addBusy?' disabled':'')+'>'+ic('plus',28)+'</button></form>'+
+    '<div class="row"><button type="button" class="btn" data-act="qtrans"'+(S.addBusy?' disabled':'')+'>'+ic('tr',20)+'اقترح المعنى</button></div>'+
+    ((S.addMsg||S.dict.msg)?'<p class="hint">'+esc(S.addMsg||S.dict.msg)+'</p>':'')+
+    (mk?'':'<p class="hint">الإدخال الصوتي غير متاح داخل هذه الصفحة. افتح الملف المستقل في Chrome.</p>')+'</section>';
+  var list;
+  if(!n){
+    list='<div class="empty"><p>قائمتك فارغة. أضف كلمة من الأعلى أو صوّر صفحة من كتابك.</p><button type="button" class="btn" data-act="sample">أضف كلمات تجريبية</button></div>';
+  }else{
+    list='<ul class="wlist">'+S.words.map(function(w,i){
+      if(S.edit&&S.edit.i===i){
+        return '<li class="wc rvrow '+tint(i)+'"><form id="editForm" class="edform" autocomplete="off">'+
+          '<input class="inp rvin" id="edEn" lang="en" dir="ltr" value="'+esc(S.edit.en)+'" autocapitalize="off" spellcheck="false" aria-label="الكلمة بالإنجليزية">'+
+          '<div class="fld"><input class="inp rvin'+cls+'" id="edAr" dir="rtl" placeholder="المعنى بالعربية" value="'+esc(S.edit.ar)+'" aria-label="المعنى بالعربية">'+micBtn('edAr')+'</div>'+
+          (S.edit.msg?'<p class="hint">'+esc(S.edit.msg)+'</p>':'')+
+          '<div class="row"><button type="submit" class="btn primary">حفظ</button><button type="button" class="btn" data-act="etrans">'+ic('tr',20)+'اقترح المعنى</button><button type="button" class="btn ghost" data-act="ecancel">إلغاء</button></div></form></li>';
+      }
+      var m=isM(w);
+      return '<li class="wc '+tint(i)+(m?' m':'')+'">'+
+        '<button type="button" class="chk" data-act="mtoggle" data-i="'+i+'" aria-label="'+(m?'إلغاء الحفظ':'تم حفظها')+'">'+ic('check',20)+'</button>'+
+        '<button type="button" class="ico" data-act="wsay" data-i="'+i+'" aria-label="استمع">'+ic('spk',22)+'</button>'+
+        '<div class="wtx"><b><bdi dir="ltr">'+esc(w.en)+'</bdi></b><span>'+(w.ar?esc(w.ar):'بلا معنى')+'</span></div>'+
+        '<button type="button" class="x" data-act="wedit" data-i="'+i+'" aria-label="تعديل">'+ic('pen',20)+'</button>'+
+        '<button type="button" class="x" data-act="wdel" data-i="'+i+'" aria-label="حذف">'+ic('x',22)+'</button></li>';
+    }).join('')+'</ul>';
+  }
+  return '<div class="app" style="gap:16px">'+seg+form+
+    (n?'<div class="listhead"><h2>قائمتي</h2><span class="hint">اضغط الدائرة عند حفظ الكلمة</span></div>':'')+list+
+    (n?'<button type="button" class="btn primary big" data-act="start">ابدأ الحفظ</button>':'')+'</div>';
+}
+function viewBulk(){
+  var P=S.photo;
+  return '<section class="panel"><div><h2>إضافة قائمة كلمات</h2>'+
+  '<p class="hint">صوّر صفحة من كتابك، أو الصق كلماتك، أو اكتب الكلمات الإنجليزية فقط وسأقترح معانيها. بعد ذلك تراجع القائمة وتعدّل أي معنى قبل الإضافة.</p></div>'+
+  '<div class="row"><button type="button" class="btn primary" data-act="cam"'+(P.busy?' disabled':'')+'>'+ic('cam',22)+'تصوير بالكاميرا</button>'+
+  '<button type="button" class="btn" data-act="gal"'+(P.busy?' disabled':'')+'>'+ic('img',22)+'صورة من المعرض</button></div>'+
+  '<input type="file" id="camIn" accept="image/*" capture="environment" hidden><input type="file" id="galIn" accept="image/*" hidden>'+
+  '<p class="hint">'+(S.canImg?'يقرأ Claude الكلمات من الصورة ويقترح معانيها.':'تُقرأ الصورة بمحرك التعرف على النص داخل المتصفح ويحتاج إلى إنترنت. الأفضل صورة واضحة ومستقيمة.')+'</p>'+
+  (P.busy?'<div class="note good spinrow">'+esc(P.msg)+'</div>':(P.msg?'<div class="note warn">'+esc(P.msg)+'</div>':''))+
+  '<textarea id="wordsInput" rows="7" dir="auto" spellcheck="false" placeholder="apple&#10;beautiful - جميل&#10;library = مكتبة">'+esc(S.raw)+'</textarea>'+
+  '<div class="preview" id="preview"></div>'+
+  '<button type="button" class="btn primary big" id="bulkBtn" data-act="analyze">حلّل وراجع</button></section>';
+}
+function viewReview(){
+  var R=S.rev,cls=micOk()?' hasmic':'';
+  var sel=R.rows.filter(function(r){return r.on&&r.en.trim();}).length;
+  var miss=R.rows.filter(function(r){return r.en.trim()&&!r.ar.trim();}).length;
+  return '<section class="panel"><div class="listhead"><h2>راجع الكلمات</h2><span class="hint">'+R.rows.length+' كلمة • '+sel+' محددة</span></div>'+
+    (R.msg?'<div class="note '+(R.warn?'warn':'good')+'">'+esc(R.msg)+'</div>':'')+
+    (R.busy?'<div class="note good spinrow">جارٍ البحث عن المعاني...</div>':'')+
+    '<div class="row"><button type="button" class="btn" data-act="rvtrans"'+((miss&&!R.busy)?'':' disabled')+'>'+ic('tr',20)+'اقترح المعاني الناقصة ('+miss+')</button>'+
+    '<button type="button" class="btn ghost" data-act="rvadd">'+ic('plus',20)+'سطر</button></div>'+
+    '<ul class="wlist">'+R.rows.map(function(r,i){
+      return '<li class="wc rvrow '+tint(i)+(r.on?' m':' off')+'">'+
+        '<div class="rvl1"><button type="button" class="chk" data-act="rvchk" data-i="'+i+'" aria-label="تحديد">'+ic('check',20)+'</button>'+
+        '<input class="inp rvin" id="rvE'+i+'" lang="en" dir="ltr" value="'+esc(r.en)+'" placeholder="English" autocapitalize="off" spellcheck="false" aria-label="الكلمة الإنجليزية">'+
+        (r.dup?'<span class="badge">موجودة</span>':'')+
+        '<button type="button" class="x" data-act="rvdel" data-i="'+i+'" aria-label="حذف السطر">'+ic('x',22)+'</button></div>'+
+        '<div class="fld"><input class="inp rvin'+cls+'" id="rvA'+i+'" dir="rtl" value="'+esc(r.ar)+'" placeholder="المعنى بالعربية" aria-label="المعنى بالعربية">'+micBtn('rvA'+i)+'</div></li>';
+    }).join('')+'</ul>'+
+    '<div class="row between"><button type="button" class="btn" data-act="rvcancel">إلغاء</button>'+
+    '<button type="button" class="btn primary" data-act="rvconfirm"'+(sel?'':' disabled')+'>أضف المحدد ('+sel+')</button></div></section>';
+}
+function updatePreview(){
+  var ta=document.getElementById('wordsInput'),pv=document.getElementById('preview'),sb=document.getElementById('bulkBtn');
+  if(!ta||!pv)return;
+  var r=parseWords(ta.value),nm=r.words.filter(function(w){return !w.ar;}).length;
+  if(!r.words.length){pv.innerHTML='<span class="hint">لم تُضف كلمات بعد.</span>';}
+  else{
+    pv.innerHTML=r.words.map(function(w){
+      return '<span class="chip'+(w.ar?'':' nomean')+'"><bdi dir="ltr">'+esc(w.en)+'</bdi><i>←</i><bdi>'+(w.ar?esc(w.ar):'سيُقترح معنى')+'</bdi></span>';
+    }).join('')+
+    '<p class="hint" style="width:100%">'+r.words.length+' كلمة'+(nm?' • '+nm+' بلا معنى (سيُقترح لها معنى في المراجعة)':'')+(r.ignored?' • '+r.ignored+' سطر بلا كلمة إنجليزية تم تجاهله':'')+'</p>';
+  }
+  if(sb)sb.disabled=!r.words.length;
+}
+
+/* ---- fields, dictation, translation ---- */
+function fieldId(k){return k==='addEn'?'inEn':k==='addAr'?'inAr':k;}
+function applyField(k,v){
+  var m;
+  if(k==='addEn'){S.add.en=v;S.add.tried='';}
+  else if(k==='addAr')S.add.ar=v;
+  else if(k==='edEn'&&S.edit)S.edit.en=v;
+  else if(k==='edAr'&&S.edit)S.edit.ar=v;
+  else if((m=/^rv([EA])(\d+)$/.exec(k))&&S.rev){var r=S.rev.rows[+m[2]];if(r){if(m[1]==='E')r.en=v;else r.ar=v;}}
+}
+function setVal(k,v){applyField(k,v);var el=document.getElementById(fieldId(k));if(el)el.value=v;}
+function isArField(k){return k==='addAr'||k==='edAr'||k.indexOf('rvA')===0;}
+function dictField(k){
+  if(S.dict.busy&&S.dict.t===k){stopRec();S.dict={busy:false,msg:'',t:''};render();return;}
+  captureInputs();
+  var ar=isArField(k);
+  S.dict={busy:false,msg:'',t:k};
+  recognize(function(alts){
+    var v=(alts[0]||'').trim().replace(/[.,!?،؟]+$/,'');
+    if(!ar)v=v.toLowerCase();
+    if(v)setVal(k,v);
+    S.dict.msg='';render();
+  },function(kind,m){S.dict.msg=(kind==='blocked'||kind==='unsupported')?'':(m||'');render();},
+  function(b){S.dict.busy=b;if(b){S.dict.msg='';sfx('micOn');}render();},ar?'ar-SA':'en-US');
+}
+var TR_PROMPT='For each English word or phrase below give the most common short Arabic meaning (one or two Arabic words; if two meanings are needed separate them with ،). Reply with only a JSON array in the same order, like [{"en":"apple","ar":"تفاحة"}]. Words: ';
+function withTimeout(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},ms);})]);}
+async function webTranslate(w){
+  if(typeof fetch!=='function')return '';
+  var ctl=typeof AbortController==='function'?new AbortController():null;
+  var t=setTimeout(function(){if(ctl)ctl.abort();},8000);
+  try{
+    var res=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(w)+'&langpair=en|ar',ctl?{signal:ctl.signal}:undefined);
+    if(!res.ok)return '';
+    var j=await res.json();
+    var tx=j&&j.responseData&&j.responseData.translatedText;
+    if(typeof tx!=='string')return '';
+    tx=tx.trim();
+    if(!tx||/MYMEMORY|WARNING/i.test(tx)||LAT_RE.test(tx)||!AR_RE.test(tx))return '';
+    return tx;
+  }catch(e){return '';}
+  finally{clearTimeout(t);}
+}
+async function lookupMeanings(list){
+  var out={};
+  if(AIFN){
+    try{
+      var arr=await AIFN.json(TR_PROMPT+JSON.stringify(list),{modelTier:'quick'});
+      if(Array.isArray(arr))arr.forEach(function(x){if(x&&x.en&&x.ar)out[String(x.en).toLowerCase().trim()]=String(x.ar).trim();});
+      if(Object.keys(out).length)return {map:out,via:'claude'};
+    }catch(e){}
+  }
+  for(var i=0;i<list.length;i+=3){
+    var part=list.slice(i,i+3);
+    var rs=await Promise.all(part.map(webTranslate));
+    part.forEach(function(w,k){if(rs[k])out[w.toLowerCase().trim()]=rs[k];});
+  }
+  return {map:out,via:Object.keys(out).length?'web':''};
+}
+async function quickTranslate(){
+  captureInputs();
+  var en=S.add.en.trim();
+  if(!en||!LAT_RE.test(en)){S.addMsg='اكتب الكلمة بالإنجليزية أولًا.';sfx('wrong');render();return;}
+  S.addBusy=true;S.addMsg='جارٍ البحث عن المعنى...';render();
+  var res=await lookupMeanings([en]);
+  captureInputs();
+  S.addBusy=false;S.add.tried=en.toLowerCase();
+  var ar=res.map[en.toLowerCase()];
+  if(ar){S.addMsg='هذا معنى مقترح'+(res.via==='claude'?' من Claude':'')+'. عدّله إن أردت ثم اضغط + للإضافة.';render();setVal('addAr',ar);sfx('pop');}
+  else{S.addMsg='لم أجد معنى تلقائيًا. اكتبه أو قله بصوتك، أو اضغط + لإضافة الكلمة بلا معنى.';render();}
+}
+function addWord(){
+  captureInputs();
+  var en=S.add.en.trim(),ar=S.add.ar.trim();
+  if(AR_RE.test(en)&&!AR_RE.test(ar)&&LAT_RE.test(ar)){var t=en;en=ar;ar=t;}
+  S.add.en=en;S.add.ar=ar;
+  if(!en||!LAT_RE.test(en)){S.addMsg='اكتب الكلمة بالإنجليزية أولًا.';sfx('wrong');render();return;}
+  if(S.words.some(function(w){return mkey(w)===en.toLowerCase();})){S.addMsg='هذه الكلمة موجودة في قائمتك.';sfx('wrong');render();return;}
+  if(!ar&&S.add.tried!==en.toLowerCase()){quickTranslate();return;}
+  S.words.push({en:en,ar:ar});S.addMsg='';
+  setVal('addEn','');setVal('addAr','');S.add.tried='';
+  wordsChanged();save();sfx('pop');render();
+  var f=document.getElementById('inEn');if(f)f.focus();
+}
+
+/* ---- edit an existing word ---- */
+function saveEdit(){
+  captureInputs();
+  var E=S.edit;if(!E)return;
+  var en=E.en.trim(),ar=E.ar.trim();
+  if(!en||!LAT_RE.test(en)){E.msg='اكتب الكلمة بالإنجليزية.';sfx('wrong');render();return;}
+  var k=en.toLowerCase();
+  if(S.words.some(function(w,i){return i!==E.i&&mkey(w)===k;})){E.msg='هذه الكلمة موجودة في قائمتك.';sfx('wrong');render();return;}
+  var old=S.words[E.i];
+  if(mkey(old)!==k){delete S.mastered[mkey(old)];}
+  S.words[E.i]={en:en,ar:ar};
+  S.edit=null;wordsChanged();save();sfx('pop');render();
+}
+async function editTranslate(){
+  captureInputs();
+  var E=S.edit;if(!E)return;
+  var en=E.en.trim();
+  if(!en||!LAT_RE.test(en)){E.msg='اكتب الكلمة بالإنجليزية.';render();return;}
+  E.msg='جارٍ البحث عن المعنى...';render();
+  var res=await lookupMeanings([en]);
+  if(S.edit!==E)return;
+  captureInputs();
+  var ar=res.map[en.toLowerCase()];
+  if(ar){E.msg='معنى مقترح'+(res.via==='claude'?' من Claude':'')+'. عدّله إن أردت ثم احفظ.';render();setVal('edAr',ar);}
+  else{E.msg='لم أجد معنى تلقائيًا. اكتبه أو قله بصوتك.';render();}
+}
+
+/* ---- review sheet (paste / English-only / photo) ---- */
+function mkRows(list){
+  var have={},seen={},rows=[];
+  S.words.forEach(function(w){have[mkey(w)]=1;});
+  list.forEach(function(x){
+    var en=String(x.en||'').trim(),k=en.toLowerCase();
+    if(!en||seen[k])return;seen[k]=1;
+    rows.push({en:en,ar:String(x.ar||'').trim(),on:!have[k],dup:!!have[k]});
+  });
+  return rows;
+}
+async function autoTranslate(rows){
+  var R=S.rev;if(!R)return;
+  var need=rows.filter(function(r){return r.en.trim()&&!r.ar.trim();});
+  if(!need.length)return;
+  R.busy=true;render();
+  var res=await lookupMeanings(need.map(function(r){return r.en.trim();}));
+  if(S.rev!==R)return;
+  captureInputs();
+  var found=0;
+  need.forEach(function(r){
+    if(r.ar.trim())return;
+    var ar=res.map[r.en.trim().toLowerCase()],idx=R.rows.indexOf(r);
+    if(ar&&idx>=0){setVal('rvA'+idx,ar);found++;}
+  });
+  R.busy=false;
+  if(found){R.msg='اقترحت معنى لـ '+found+' من '+need.length+(res.via==='claude'?' بواسطة Claude':'')+'. راجع المعاني وعدّلها عند الحاجة.';R.warn=found<need.length;sfx('done');}
+  else{R.msg='تعذّر جلب المعاني تلقائيًا. اكتبها أو قلها بصوتك، أو أضف الكلمات بلا معنى.';R.warn=true;}
+  render();
+}
+function analyzeText(){
+  var ta=document.getElementById('wordsInput');if(ta)S.raw=ta.value;
+  var r=parseWords(S.raw);
+  if(!r.words.length){S.photo={busy:false,msg:'اكتب أو الصق كلمات إنجليزية أولًا.'};render();return;}
+  S.photo={busy:false,msg:''};S.raw='';if(ta)ta.value='';
+  S.rev={rows:mkRows(r.words),msg:'',warn:false,busy:false};
+  render();
+  autoTranslate(S.rev.rows);
+}
+function confirmReview(){
+  captureInputs();
+  var R=S.rev;if(!R)return;
+  var have={},added=0,skipped=0;
+  S.words.forEach(function(w){have[mkey(w)]=1;});
+  R.rows.forEach(function(r){
+    if(!r.on)return;
+    var en=r.en.trim(),ar=r.ar.trim();
+    if(!en||!LAT_RE.test(en)){skipped++;return;}
+    var k=en.toLowerCase();
+    if(have[k]){skipped++;return;}
+    have[k]=1;S.words.push({en:en,ar:ar});added++;
+  });
+  if(added){wordsChanged();save();sfx('correct');}else sfx('wrong');
+  S.rev=null;S.tab0='list';
+  S.addMsg=added?('أُضيفت '+added+(added===1?' كلمة':' كلمات')+(skipped?' وتجاوزت '+skipped+' مكررة أو غير صالحة':'')+'.'):'لم تُضف كلمات جديدة.';
+  render();
+}
+
+/* ---- photo -> words ---- */
+var PHOTO_PROMPT='This photo shows English words a student wants to memorise (a vocabulary list, textbook page, board or handwriting). Extract every distinct English word or short phrase you can read; ignore page numbers, headings and Arabic text. For each give the most common short Arabic meaning (one or two Arabic words, two meanings separated by ،). If an Arabic meaning is printed next to the word in the photo, use it. Keep each word as written (lower-case unless a proper noun). Reply with only a JSON array like [{"en":"apple","ar":"تفاحة"}], at most 100 items, or [] if no English words are readable.';
+var PHOTO_ERR={rate_limited:'تجاوزت حد استخدام Claude مؤقتًا. حاول بعد قليل.',image_rejected:'لم تُقبل هذه الصورة. جرّب صورة أخرى.',refused:'تعذّر تحليل هذه الصورة.',invalid_json:'لم أتمكن من استخراج الكلمات من الصورة. جرّب صورة أوضح.',empty_completion:'لم أتمكن من قراءة الصورة. جرّب صورة أوضح.',prompt_too_large:'الصورة كبيرة جدًا.',cancelled:'أُلغيت القراءة.'};
+async function prepImage(file){
+  try{
+    var bmp=await createImageBitmap(file);
+    var sc=Math.min(1,1800/Math.max(bmp.width,bmp.height));
+    var c=document.createElement('canvas');c.width=Math.max(1,Math.round(bmp.width*sc));c.height=Math.max(1,Math.round(bmp.height*sc));
+    c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+    var b=await new Promise(function(res){c.toBlob(res,'image/jpeg',0.85);});
+    return b||file;
+  }catch(e){return file;}
+}
+async function readWithClaude(blob){
+  var arr=await AIFN.json(PHOTO_PROMPT,{images:[blob]});
+  if(!Array.isArray(arr))throw {code:'invalid_json'};
+  return arr.map(function(x){return {en:String(x&&x.en||'').trim(),ar:String(x&&x.ar||'').trim()};}).filter(function(x){return x.en&&LAT_RE.test(x.en);}).slice(0,120);
+}
+function loadScript(src){return new Promise(function(res,rej){var el=document.createElement('script');el.src=src;el.onload=res;el.onerror=function(){rej(new Error('load'));};document.head.appendChild(el);});}
+async function ocrWords(blob){
+  if(!window.Tesseract)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js');
+  var r=await window.Tesseract.recognize(blob,'eng');
+  var text=(r&&r.data&&r.data.text)||'';
+  var toks=text.match(/[A-Za-z][A-Za-z'’-]*[A-Za-z]|[A-Za-z]/g)||[];
+  var seen={},out=[];
+  toks.forEach(function(t){t=t.toLowerCase().replace(/’/g,"'");if(t.length<2||t.length>24||seen[t])return;seen[t]=1;out.push({en:t,ar:''});});
+  return out.slice(0,150);
+}
+async function handlePhoto(file){
+  S.tab0='bulk';S.rev=null;
+  S.photo={busy:true,msg:'جارٍ تجهيز الصورة...'};render();
+  var blob=await prepImage(file),list=null,via='';
+  if(AIFN&&S.canImg){
+    S.photo.msg='Claude يقرأ الصورة ويقترح المعاني...';render();
+    try{list=await readWithClaude(blob);via='claude';}
+    catch(e){var c=e&&e.code;if(PHOTO_ERR[c]){S.photo={busy:false,msg:PHOTO_ERR[c]};sfx('wrong');render();return;}}
+  }
+  if(!list){
+    S.photo.msg='جارٍ قراءة النص من الصورة...';render();
+    try{list=await withTimeout(ocrWords(blob),60000);via='ocr';}
+    catch(e){S.photo={busy:false,msg:'تعذّرت قراءة الصورة هنا. افتح الملف المستقل في Chrome، أو الصق الكلمات مباشرة.'};sfx('wrong');render();return;}
+  }
+  if(!list.length){S.photo={busy:false,msg:'لم أجد كلمات إنجليزية واضحة في الصورة. جرّب صورة أقرب وأوضح.'};sfx('wrong');render();return;}
+  S.photo={busy:false,msg:''};
+  var rows=mkRows(list);
+  S.rev={rows:rows,msg:via==='claude'?'قرأ Claude '+rows.length+' كلمة من الصورة واقترح معانيها. راجعها وعدّل ما يلزم.':'قُرئت '+rows.length+' كلمة من الصورة. احذف أو صحّح أي كلمة خاطئة، ثم أضف المحدد.',warn:false,busy:false};
+  sfx('done');render();
+  autoTranslate(rows);
+}
+
+/* stage 1 */
+function viewPron(){
+  var P=S.pron,w=S.words[P.i],n=S.words.length,tries=P.tries[P.i]||0;
+  var canNext=P.passed[P.i]||tries>=3;
+  return '<section class="panel"><div class="meta"><span>كلمة '+(P.i+1)+' من '+n+'</span><span>'+P.passed.filter(Boolean).length+' نُطقت جيدًا</span></div>'+
+  '<div class="bar"><i style="width:'+Math.round((P.i/n)*100)+'%"></i></div>'+
+  '<div class="wcard '+tint(P.i)+'"><div class="word-en" dir="ltr">'+esc(w.en)+'</div>'+(w.ar?'<div class="word-ar">'+esc(w.ar)+'</div>':'')+'</div>'+
+  '<div class="row mid"><button type="button" class="btn" data-act="say">'+ic('spk',20)+'استمع</button>'+
+  '<button type="button" class="btn" data-act="slow">ببطء</button>'+
+  '<button type="button" class="btn" data-act="spell">تهجئة</button>'+
+  (w.ar?'<button type="button" class="btn ghost" data-act="sayar">المعنى</button>':'')+'</div>'+
+  '<p class="label">استمع ثم اضغط الميكروفون وردّد الكلمة</p>'+
+  '<button type="button" class="mic'+(P.listening?' live':'')+'" id="micBtn" data-act="mic" aria-label="ابدأ التسجيل"'+(S.mic==='blocked'||S.mic==='unsupported'?' disabled':'')+'>'+ic('mic',40)+'</button>'+
+  (P.listening?'<p class="label">أستمع إليك الآن...</p>':'')+
+  micNote()+fbHtml(P.fb)+
+  '<div class="row between"><button type="button" class="btn" data-act="pprev"'+(P.i===0?' disabled':'')+'>السابق</button>'+
+  '<button type="button" class="btn primary" data-act="pnext"'+(canNext?'':' disabled')+'>'+(P.i===n-1?'ابدأ التدريب الكتابي':'التالي')+'</button></div>'+
+  (!canNext&&tries>0?'<p class="hint" style="text-align:center">يُفتح الانتقال عند النطق الصحيح أو بعد ثلاث محاولات.</p>':'')+
+  '</section>';
+}
+function micNote(){
+  if(S.mic==='blocked'||S.mic==='unsupported'){
+    return '<div class="note warn">'+(S.mic==='unsupported'?'متصفحك لا يدعم التعرف على الصوت.':'الميكروفون غير متاح داخل هذه الصفحة، فلا يستطيع التطبيق سماع نطقك هنا.')+
+    ' افتح التطبيق كملف في Chrome لتفعيل التصحيح الصوتي. يمكنك الآن تقييم نطقك بنفسك بعد الاستماع للكلمة.</div>'+
+    '<div class="row mid"><button type="button" class="btn primary" data-act="selfok">نطقتها صحيحة</button><button type="button" class="btn" data-act="say">أعد الاستماع</button></div>';
+  }
+  return '';
+}
+function fbHtml(f){
+  if(!f)return '';
+  if(f.err)return '<div class="note warn">'+esc(f.err)+'</div>';
+  var letters=f.ops.filter(function(o){return o.t!=='i';}).map(function(o){
+    if(o.a===' ')return '<span class="lt sp"></span>';
+    return '<span class="lt '+(o.t==='m'?'ok':'bad')+'">'+esc(o.a)+'</span>';
+  }).join('');
+  var verdict=f.pass?'<div class="note good">نطقك سليم. أحسنت.</div>':
+    '<div class="note '+(f.near?'warn':'bad')+'"><b>'+(f.near?'قريب جدًا. صحّح الحروف الملوّنة بالأحمر.':'لم تُنطق الكلمة كما ينبغي. الحروف الحمراء هي موضع الخطأ.')+'</b><ul>'+f.tips.map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ul></div>';
+  return '<div class="letters" dir="ltr">'+letters+'</div>'+
+  '<p class="label">سمعتك تقول: <b dir="ltr">'+esc(f.heard)+'</b></p>'+verdict+
+  (f.pass?'':'<div class="row mid"><button type="button" class="btn ghost" data-act="selfok">اعتبرها صحيحة</button></div><p class="hint" style="text-align:center">التعرف على الصوت تقديري وقد يخطئ في سماع كلمات قريبة.</p>');
+}
+
+/* ---------- speech in ---------- */
+function recognize(onAlts,onFail,setBusy,lang){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){S.mic='unsupported';onFail('unsupported');return;}
+  stopRec();try{speechSynthesis.cancel();}catch(e){}
+  var r;try{r=new SR();}catch(e){S.mic='unsupported';onFail('unsupported');return;}
+  rec=r;r.lang=lang||'en-US';r.interimResults=false;r.maxAlternatives=5;r.continuous=false;
+  var started=false,finished=false;
+  function fail(k,m){if(finished)return;finished=true;clearTimeout(recTimer);setBusy(false);onFail(k,m);}
+  r.onaudiostart=function(){started=true;};
+  r.onresult=function(ev){
+    if(finished)return;finished=true;clearTimeout(recTimer);setBusy(false);
+    onAlts(Array.prototype.map.call(ev.results[0],function(x){return x.transcript;}));
+  };
+  r.onerror=function(ev){
+    var e=ev.error;
+    if(e==='aborted'){return;}
+    if(e==='not-allowed'||e==='service-not-allowed'){S.mic='blocked';fail('blocked');}
+    else if(e==='no-speech')fail('nospeech','لم أسمع صوتًا. اقترب من الميكروفون وتكلّم بصوت أوضح.');
+    else if(e==='network')fail('network','تعذّر الاتصال بخدمة التعرف على الصوت. تحقق من الإنترنت.');
+    else fail('other','تعذّر التعرف على الصوت ('+e+').');
+  };
+  r.onend=function(){if(rec===r)rec=null;fail('nospeech','لم أسمع صوتًا. حاول مرة أخرى.');};
+  try{
+    r.start();setBusy(true);
+    recTimer=setTimeout(function(){
+      if(finished)return;
+      try{r.abort();}catch(e){}
+      if(!started){S.mic='blocked';fail('blocked');}else fail('nospeech','لم أسمع صوتًا. حاول مرة أخرى.');
+    },9000);
+  }catch(e){S.mic='blocked';fail('blocked');}
+}
+function listen(){
+  var P=S.pron,w=S.words[P.i];
+  recognize(function(alts){evaluate(w,alts);},
+    function(k,m){P.listening=false;P.fb=(k==='blocked'||k==='unsupported')?null:{err:m};render();},
+    function(b){P.listening=b;if(b){P.fb=null;sfx('micOn');}render();});
+}
+function evaluate(w,alts){
+  var P=S.pron;P.listening=false;P.tries[P.i]=(P.tries[P.i]||0)+1;
+  var t=normSp(w.en),best=null;
+  alts.forEach(function(a){
+    var h=normSp(a),al=align(t,h),sim=1-al.dist/Math.max(t.length,h.length,1);
+    if(!best||sim>best.sim)best={raw:a,h:h,sim:sim,al:al};
+  });
+  var pass=best.al.dist===0;
+  P.fb={heard:best.raw,pass:pass,near:!pass&&best.sim>=0.7,ops:best.al.ops,tips:pass?[]:tipsFor(t,best.al.ops)};
+  if(pass){P.passed[P.i]=true;sfx('correct');buzz(20);}else{sfx('wrong');buzz([30,40,30]);}
+  render();
+}
+
+/* ---------- voice dictation into answers ---------- */
+function dictBlock(){
+  var D=S.dict||{busy:false,msg:''};
+  if(S.mic==='blocked'||S.mic==='unsupported'){
+    return '<p class="hint" style="text-align:center">الإملاء الصوتي غير متاح داخل هذه الصفحة. افتح الملف المستقل في Chrome لتفعيله، أو اكتب بلوحة المفاتيح.</p>';
+  }
+  return '<div class="row mid"><button type="button" class="btn'+(D.busy?' live':'')+'" data-act="dict" aria-label="قل الكلمة بصوتك">'+ic('mic',20)+(D.busy?'أستمع إليك...':'قلها بصوتك')+'</button></div>'+
+    (D.msg?'<p class="hint" style="text-align:center">'+esc(D.msg)+'</p>':'');
+}
+function startDictation(apply){
+  S.dict={busy:false,msg:''};
+  recognize(function(alts){S.dict.msg=apply(alts)||'';render();},
+    function(k,m){S.dict.msg=(k==='blocked'||k==='unsupported')?'':(m||'');render();},
+    function(b){S.dict.busy=b;if(b){S.dict.msg='';sfx('micOn');}render();});
+}
+function dictClick(){
+  if(S.dict.busy){stopRec();S.dict={busy:false,msg:''};render();return;}
+  if(S.stage===3){startDictation(applyFinal);return;}
+  var D=S.drill,it=D&&D.queue[0];if(!it||D.fb)return;
+  startDictation(it.mode==='blank'?applyBlank:applyScramble);
+}
+function applyBlank(alts){
+  var st=S.drill.queue[0].st,pos=[];
+  st.chars.forEach(function(c,i){if(LETTER_RE.test(c))pos.push(i);});
+  for(var a=0;a<alts.length;a++){
+    var h=normEn(alts[a]);
+    if(h.length===pos.length){
+      pos.forEach(function(ci,k){
+        if(st.hidden[ci]){st.typed[ci]=h[k];var el=document.getElementById('c'+ci);if(el)el.value=h[k];}
+      });
+      return '';
+    }
+  }
+  return 'سمعتك تقول «'+alts[0]+'» لكن عدد حروفها لا يطابق الكلمة. قلها مرة أخرى بوضوح.';
+}
+function applyScramble(alts){
+  var st=S.drill.queue[0].st;
+  for(var a=0;a<alts.length;a++){
+    var h=normEn(alts[a]);
+    if(h.length!==st.all.length)continue;
+    var used={},ids=[],ok=true;
+    for(var k=0;k<h.length&&ok;k++){
+      var ch=h[k],t=null;
+      for(var q=0;q<st.all.length;q++){if(!used[st.all[q].id]&&st.all[q].ch.toLowerCase()===ch){t=st.all[q];break;}}
+      if(t){used[t.id]=1;ids.push(t.id);}else ok=false;
+    }
+    if(ok){st.picked=ids;return '';}
+  }
+  return 'سمعتك تقول «'+alts[0]+'» لكن حروفها لا تطابق الحروف المعروضة. قلها مرة أخرى بوضوح.';
+}
+function applyFinal(alts){
+  var v=(alts[0]||'').replace(/[.,!?]+$/,'').toLowerCase().trim();
+  S.fin.draft=v;var el=document.getElementById('ans');if(el)el.value=v;
+  return '';
+}
+
+/* stage 2 */
+var UID=0;
+function makeState(it,w,l){
+  var first=answersOf(w,l)[0];
+  var target=(l==='ar'?stripDiac(first):first).trim();
+  var chars=Array.from(target),idx=[];
+  chars.forEach(function(c,i){if(LETTER_RE.test(c))idx.push(i);});
+  if(it.mode==='blank'){
+    var hn=Math.max(1,Math.round(idx.length*0.45));
+    hn=Math.min(hn,Math.max(1,idx.length-1));
+    var hidden={};shuffle(idx.slice()).slice(0,hn).forEach(function(i){hidden[i]=true;});
+    return {uid:++UID,target:target,chars:chars,hidden:hidden,typed:{}};
+  }
+  var tiles=idx.map(function(ci,k){return {id:k,ch:chars[ci]};});
+  var sh=tiles.slice(),tries=0;
+  do{shuffle(sh);tries++;}while(sh.length>1&&sh.every(function(t,k){return t.id===k;})&&tries<12);
+  return {uid:++UID,target:target,tiles:sh,all:tiles,picked:[]};
+}
+function noMeaning(){
+  return '<section class="panel center"><h2>أضف معاني الكلمات</h2><p class="hint">التدريب والاختبار يحتاجان معنى لكل كلمة، مثل <bdi dir="ltr">apple - تفاحة</bdi>.</p><button type="button" class="btn primary" data-go="0">العودة إلى الكلمات</button></section>';
+}
+function viewDrill(){
+  var D=S.drill;
+  if(!D.total)return noMeaning();
+  if(!D.queue.length){
+    return '<section class="panel center"><div class="score">'+ic('trophy',64)+'</div><h2>أحسنت، أنهيت التدريب</h2><p class="hint">أجبت عن كل التمارين بشكل صحيح. الخطوة التالية اختبار نهائي بلا أي مساعدة.</p><button type="button" class="btn primary big" data-act="tofinal">ابدأ الاختبار النهائي</button></section>';
+  }
+  var it=D.queue[0],w=S.words[it.i],l=ansLang(),pl=promptLang();
+  if(!it.st)it.st=makeState(it,w,l);
+  var st=it.st,pct=Math.round(D.done/D.total*100);
+  var h='<section class="panel"><div class="meta"><span>المتبقي '+D.queue.length+' تمرين</span><span>'+pct+'%</span></div>'+
+  '<div class="bar"><i style="width:'+pct+'%"></i></div>'+
+  '<div class="wcard '+tint(it.i)+'"><p class="label">'+(it.mode==='blank'?'أكمل الحروف الناقصة':'رتّب الحروف المبعثرة')+(l==='ar'?' لتكوين المعنى العربي':' لتكوين الكلمة الإنجليزية')+'</p>'+
+  '<div class="prompt" dir="'+dirOf(pl)+'">'+esc(promptOf(w))+'</div></div>';
+  if(it.mode==='blank'){
+    h+='<div class="cells '+tint(it.i)+'" dir="'+dirOf(l)+'">'+st.chars.map(function(ch,ci){
+      if(!LETTER_RE.test(ch))return ch===' '?'<span class="gap"></span>':'<span class="cell fixed">'+esc(ch)+'</span>';
+      if(!st.hidden[ci])return '<span class="cell fixed">'+esc(ch)+'</span>';
+      if(D.fb){
+        var tv=st.typed[ci]||'';
+        var ok=norm(tv,l)===norm(ch,l);
+        return '<span class="cell '+(ok?'good':'bad')+'">'+(esc(tv)||'·')+'</span>';
+      }
+      return '<input class="cell" id="c'+ci+'" data-k="'+ci+'" data-uid="'+st.uid+'" value="'+esc(st.typed[ci]||'')+'" maxlength="1" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="حرف ناقص">';
+    }).join('')+'</div>';
+    if(!D.fb)h+=dictBlock()+'<button type="button" class="btn primary big" data-act="dcheck">تحقق</button>';
+  }else{
+    var picked=st.picked.map(function(id){return st.all[id];});
+    var okAll=D.fb?norm(picked.map(function(t){return t.ch;}).join(''),l)===norm(st.target,l):null;
+    h+='<div class="cells" dir="'+dirOf(l)+'">'+
+      picked.map(function(t){return '<button type="button" class="tile sel'+(D.fb?(okAll?' good':' bad'):'')+'" data-act="unpick" data-id="'+t.id+'"'+(D.fb?' disabled':'')+'>'+esc(t.ch)+'</button>';}).join('')+
+      new Array(st.all.length-picked.length+1).join('<span class="tile slot"></span>')+'</div>';
+    if(!D.fb){
+      h+='<div class="cells pool" dir="'+dirOf(l)+'">'+st.tiles.filter(function(t){return st.picked.indexOf(t.id)===-1;}).map(function(t){return '<button type="button" class="tile" data-act="pick" data-id="'+t.id+'">'+esc(t.ch)+'</button>';}).join('')+'</div>'+dictBlock()+
+      '<div class="row mid"><button type="button" class="btn" data-act="clearpick"'+(st.picked.length?'':' disabled')+'>مسح</button>'+
+      '<button type="button" class="btn primary" data-act="dcheck"'+(st.picked.length===st.all.length?'':' disabled')+'>تحقق</button></div>';
+    }
+  }
+  if(D.fb){
+    h+=D.fb.ok?'<div class="note good">صحيح، أحسنت.</div>':
+      '<div class="note bad">الإجابة الصحيحة: <b dir="'+dirOf(l)+'">'+esc(answersOf(w,l).join(' / '))+'</b><br>سيعود هذا التمرين لاحقًا.</div><button type="button" class="btn primary big" data-act="dnext">التالي</button>';
+  }
+  return h+'</section>';
+}
+function drillCheck(){
+  var D=S.drill;if(D.fb)return;
+  var it=D.queue[0],st=it.st,w=S.words[it.i],l=ansLang(),ok;
+  if(it.mode==='blank'){
+    var composed=st.chars.map(function(ch,ci){
+      if(!st.hidden[ci])return ch;
+      var el=document.getElementById('c'+ci),v=el?el.value:'';st.typed[ci]=v;return v;
+    }).join('');
+    ok=norm(composed,l)===norm(st.target,l);
+  }else{
+    if(st.picked.length!==st.all.length)return;
+    ok=norm(st.picked.map(function(id){return st.all[id].ch;}).join(''),l)===norm(st.target,l);
+  }
+  stopRec();S.dict={busy:false,msg:''};D.fb={ok:ok};
+  if(ok){sfx('correct');buzz(20);speak(w.en,'en-US',0.9);drillTimer=setTimeout(drillNext,1100);}
+  else{sfx('wrong');buzz([30,40,30]);}
+  render();
+}
+function drillNext(){
+  clearTimeout(drillTimer);
+  var D=S.drill;if(!D||!D.fb)return;
+  var it=D.queue.shift();
+  if(D.fb.ok)D.done++;else{it.st=null;D.queue.push(it);}
+  D.fb=null;
+  if(!D.queue.length){S.done[2]=true;sfx('win');}
+  render();
+}
+
+/* stage 3 */
+function viewFinal(){
+  var F=S.fin;
+  if(!F.all.length)return noMeaning();
+  var l=ansLang(),pl=promptLang();
+  if(F.phase==='ask'){
+    var idx=F.list[F.pos],w=S.words[idx],pct=Math.round(F.pos/F.list.length*100);
+    return '<section class="panel"><div class="meta"><span>سؤال '+(F.pos+1)+' من '+F.list.length+'</span><span>اختبار بلا مساعدة</span></div>'+
+    '<div class="bar"><i style="width:'+pct+'%"></i></div>'+
+    '<div class="wcard '+tint(idx)+'"><p class="label">'+(l==='ar'?'اكتب المعنى بالعربية':'اكتب الكلمة بالإنجليزية')+'</p>'+
+    '<div class="prompt" dir="'+dirOf(pl)+'">'+esc(promptOf(w))+'</div></div>'+
+    '<input class="answer" id="ans" data-pos="'+F.pos+'" value="'+esc(F.draft||'')+'" dir="'+dirOf(l)+'" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="إجابتك">'+dictBlock()+
+    '<button type="button" class="btn primary big" data-act="fsubmit">تأكيد</button></section>';
+  }
+  var correct=F.all.filter(function(i){return F.res[i]&&F.res[i].ok;}).length,total=F.all.length;
+  var wrong=F.all.filter(function(i){return !(F.res[i]&&F.res[i].ok);});
+  var h='<section class="panel center"><div class="score">'+correct+' / '+total+'</div>'+
+  '<h2>'+(wrong.length?'راجع الكلمات التالية ثم أعد اختبارها':'أتممت حفظ الكلمات')+'</h2>'+
+  (wrong.length?'':'<p class="hint">أجبت عن كل الكلمات بشكل صحيح دون مساعدة، وعُلّمت الكلمات كمحفوظة في قائمتك.</p>');
+  if(wrong.length){
+    h+='<div class="tw"><table><thead><tr><th>السؤال</th><th>إجابتك</th><th>الصحيح</th></tr></thead><tbody>'+
+    wrong.map(function(i){var w=S.words[i],r=F.res[i]||{};
+      return '<tr><td dir="'+dirOf(pl)+'">'+esc(promptOf(w))+'</td><td dir="'+dirOf(l)+'">'+(esc(r.given||'')||'—')+'</td><td dir="'+dirOf(l)+'"><b>'+esc(answersOf(w,l).join(' / '))+'</b></td></tr>';}).join('')+
+    '</tbody></table></div>'+
+    '<div class="row mid"><button type="button" class="btn primary" data-act="fretry">اختبر الكلمات الخاطئة فقط</button><button type="button" class="btn" data-go="1">راجع النطق</button></div>';
+  }else{
+    h+='<div class="row mid"><button type="button" class="btn primary" data-act="frestart">اختبار جديد</button><button type="button" class="btn" data-go="0">قائمتي</button></div>';
+  }
+  return h+'</section>';
+}
+function finalSubmit(){
+  var F=S.fin,el=document.getElementById('ans');if(!el)return;
+  var idx=F.list[F.pos],w=S.words[idx],v=el.value;
+  stopRec();S.dict={busy:false,msg:''};F.draft='';
+  var ok=isCorrect(v,w,ansLang());
+  F.res[idx]={ok:ok,given:v.trim()};
+  if(ok)S.mastered[mkey(w)]=true;else delete S.mastered[mkey(w)];
+  save();
+  F.pos++;
+  if(F.pos>=F.list.length){
+    F.phase='sum';S.done[3]=true;
+    var allOk=F.all.every(function(i){return F.res[i]&&F.res[i].ok;});
+    sfx(allOk?'win':'done');
+  }else sfx('tap');
+  render();
+}
+
+/* ---------- events ---------- */
+$nav.addEventListener('click',function(e){
+  var b=e.target.closest('[data-go]');if(!b||b.disabled)return;
+  sfx('nav');go(+b.getAttribute('data-go'));
+});
+$snd.addEventListener('click',function(){
+  S.sound=!S.sound;save();
+  if(S.sound)sfx('pop');
+  render();
+});
+$stage.addEventListener('click',function(e){
+  var g=e.target.closest('[data-go]');
+  if(g){sfx('nav');go(+g.getAttribute('data-go'));return;}
+  var b=e.target.closest('[data-act]');if(!b||b.disabled)return;
+  var a=b.getAttribute('data-act'),P=S.pron;
+  var own={mic:1,dcheck:1,dict:1,dfield:1,selfok:1,pick:1,unpick:1,fsubmit:1,tofinal:1,analyze:1,sample:1,start:1,rvconfirm:1,qtrans:1,etrans:1,rvtrans:1,cam:1,gal:1};
+  if(!own[a])sfx('tap');
+  var wi=+b.getAttribute('data-i');
+  if(a==='tab'){captureInputs();S.tab0=b.getAttribute('data-t')==='bulk'?'bulk':'list';S.addMsg='';render();}
+  else if(a==='analyze')analyzeText();
+  else if(a==='cam'||a==='gal'){var fi=document.getElementById(a==='cam'?'camIn':'galIn');if(fi){fi.value='';fi.click();}}
+  else if(a==='qtrans')quickTranslate();
+  else if(a==='dfield')dictField(b.getAttribute('data-k'));
+  else if(a==='wedit'){captureInputs();var ew=S.words[wi];S.edit={i:wi,en:ew.en,ar:ew.ar,msg:''};render();}
+  else if(a==='ecancel'){S.edit=null;render();}
+  else if(a==='etrans')editTranslate();
+  else if(a==='rvchk'){captureInputs();var rr=S.rev.rows[wi];rr.on=!rr.on;render();}
+  else if(a==='rvdel'){captureInputs();S.rev.rows.splice(wi,1);render(true);}
+  else if(a==='rvadd'){captureInputs();S.rev.rows.push({en:'',ar:'',on:true,dup:false});render();var nf=document.getElementById('rvE'+(S.rev.rows.length-1));if(nf)nf.focus();}
+  else if(a==='rvtrans'){captureInputs();autoTranslate(S.rev.rows);}
+  else if(a==='rvcancel'){S.rev=null;render();}
+  else if(a==='rvconfirm')confirmReview();
+  else if(a==='sample'){mergeWords(parseWords(SAMPLE.join('\n')).words);sfx('pop');render();}
+  else if(a==='mtoggle'){var w0=S.words[wi];if(isM(w0)){delete S.mastered[mkey(w0)];sfx('tap');}else{S.mastered[mkey(w0)]=true;sfx('correct');}save();render();}
+  else if(a==='wsay')speak(S.words[wi].en,'en-US',0.9);
+  else if(a==='wdel'){var d0=S.words[wi];delete S.mastered[mkey(d0)];S.words.splice(wi,1);S.edit=null;wordsChanged();save();render();}
+  else if(a==='start'){if(!S.words.length)return;S.pron=null;S.drill=null;S.fin=null;S.done=[true,false,false,false];sfx('pop');go(1);}
+  else if(a==='say')speak(S.words[P.i].en,'en-US',0.9);
+  else if(a==='slow')speak(S.words[P.i].en,'en-US',0.5);
+  else if(a==='spell')spellOut(S.words[P.i].en);
+  else if(a==='sayar')speak(S.words[P.i].ar,'ar-SA',0.85);
+  else if(a==='mic')listen();
+  else if(a==='selfok'){P.passed[P.i]=true;P.tries[P.i]=Math.max(P.tries[P.i]||0,1);P.fb=null;sfx('correct');render();}
+  else if(a==='pprev'){stopRec();P.listening=false;P.i=Math.max(0,P.i-1);P.fb=null;render();}
+  else if(a==='pnext'){
+    stopRec();P.listening=false;
+    if(P.i>=S.words.length-1){S.done[1]=true;sfx('done');go(2);}
+    else{P.i++;P.fb=null;render();}
+  }
+  else if(a==='pick'){S.drill.queue[0].st.picked.push(+b.getAttribute('data-id'));sfx('pop');render();}
+  else if(a==='unpick'){var s2=S.drill.queue[0].st,id=+b.getAttribute('data-id');s2.picked=s2.picked.filter(function(x){return x!==id;});sfx('pop2');render();}
+  else if(a==='clearpick'){S.drill.queue[0].st.picked=[];render();}
+  else if(a==='dict')dictClick();
+  else if(a==='dcheck')drillCheck();
+  else if(a==='dnext')drillNext();
+  else if(a==='tofinal'){sfx('nav');go(3);}
+  else if(a==='fsubmit')finalSubmit();
+  else if(a==='fretry'){
+    var F=S.fin;F.list=shuffle(F.all.filter(function(i){return !(F.res[i]&&F.res[i].ok);}));F.pos=0;F.draft='';F.phase='ask';render();
+  }
+  else if(a==='frestart')go(3);
+});
+$stage.addEventListener('submit',function(e){
+  if(e.target.id==='addForm'){e.preventDefault();addWord();}
+  else if(e.target.id==='editForm'){e.preventDefault();saveEdit();}
+});
+$stage.addEventListener('change',function(e){
+  var t=e.target;
+  if(t&&(t.id==='camIn'||t.id==='galIn')){var f=t.files&&t.files[0];if(f)handlePhoto(f);}
+});
+$stage.addEventListener('input',function(e){
+  var t=e.target;
+  if(t.id==='wordsInput'){S.raw=t.value;updatePreview();return;}
+  if(t.classList&&t.classList.contains('cell')&&t.value){
+    var cs=Array.prototype.slice.call($stage.querySelectorAll('input.cell')),k=cs.indexOf(t);
+    if(cs[k+1])cs[k+1].focus();
+  }
+});
+$stage.addEventListener('keydown',function(e){
+  var t=e.target;
+  if(e.key==='Enter'){
+    if(S.stage===2&&S.drill&&S.drill.queue.length){e.preventDefault();if(S.drill.fb){if(!S.drill.fb.ok)drillNext();}else drillCheck();}
+    else if(S.stage===3&&t.id==='ans'){e.preventDefault();finalSubmit();}
+  }else if(e.key==='Backspace'&&t.classList&&t.classList.contains('cell')&&!t.value){
+    var cs=Array.prototype.slice.call($stage.querySelectorAll('input.cell')),k=cs.indexOf(t);
+    if(cs[k-1])cs[k-1].focus();
+  }
+});
+try{if('speechSynthesis' in window)speechSynthesis.getVoices();}catch(e){}
+render();
+})();
+</script>
+</body></html>

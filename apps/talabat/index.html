@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
@@ -317,6 +317,11 @@
   .fin-ctl-seg button[data-expkind="income"].active { background: linear-gradient(135deg,#34D399,#059669); color: #fff; box-shadow: 0 6px 14px rgba(16,185,129,.35); }
   .fin-ctl-seg button[data-expkind="debt"].active { background: linear-gradient(135deg,#FBBF24,#D97706); color: #fff; box-shadow: 0 6px 14px rgba(245,158,11,.35); }
   .fin-ctl-seg button.active .n { background: rgba(255,255,255,.28); }
+  .fin-subtabs-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: var(--card); border: 1.5px solid var(--border); border-radius: 18px; padding: 6px; margin: 0 18px 14px; box-shadow: var(--shadow-sm); }
+  .fin-subtab-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 14px; border-radius: 14px; font-size: 13.5px; font-weight: 900; color: var(--text-sec); background: transparent; border: none; cursor: pointer; transition: all .2s cubic-bezier(0.4, 0, 0.2, 1); min-height: 46px; }
+  .fin-subtab-btn:active { transform: scale(.96); }
+  .fin-subtab-btn.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 6px 14px rgba(28, 176, 246, .35); }
+  .fin-subtab-btn .st-ico { font-size: 17px; }
   .fin-hero-month { display: inline-block; font-size: 11.5px; font-weight: 900; background: var(--primary-light); border: 1px solid rgba(28,176,246,.25); color: var(--primary-dark); padding: 4px 14px; border-radius: 999px; margin-right: 6px; }
   .exp-card { background: #fff; border: 1.5px solid var(--border); border-inline-start: 4px solid var(--kc, var(--primary)); border-radius: 18px; padding: 12px; margin: 0 18px 9px; box-shadow: var(--shadow-sm); display: flex; gap: 11px; align-items: center; animation: popIn .3s ease-out; }
   .exp-card[data-editexp] { cursor: pointer; }
@@ -1010,6 +1015,7 @@
   .collapsible-wrap.open { grid-template-rows: 1fr; opacity: 1; transform: none; margin-bottom: 14px; }
   .collapsible-in { overflow: hidden; min-height: 0; }
   .collapsible-in > .category-group { margin-bottom: 0; padding: 0 14px; }
+  #tasksWrap { margin-top: 20px; }
   .collapsible-wrap.open .task-card { animation: expandCard .55s cubic-bezier(.22,1,.36,1) both; transform-origin: top center; }
   @keyframes expandCard { 0% { opacity: 0; transform: translateY(-16px) scale(.96); } 60% { opacity: 1; transform: translateY(4px) scale(1.005); } 100% { opacity: 1; transform: none; } }
   .collapsible-wrap.open .task-row { animation: staggerIn .45s cubic-bezier(.22,1,.36,1) both; }
@@ -1477,6 +1483,411 @@
   @keyframes tsbPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(217,119,6,.45); } 50% { box-shadow: 0 0 0 8px rgba(217,119,6,0); } }
   .tsb-hint { display: block; font-size: 10.5px; font-weight: 800; color: var(--text-muted); margin-top: 6px; position: relative; z-index: 1; }
   .gate-card.expandable.open { box-shadow: 0 10px 26px rgba(28,176,246,.22); border-color: rgba(28,176,246,.4); }
+
+  /* ===== الكروت الأفقية القابلة للطي (الروحانيات، التسوق، تطبيقات البيت) — حجم كبير وألوان فخمة وخطوط واضحة ===== */
+  .faith-section-wrap {
+    margin-top: 16px;
+    margin-bottom: 2px;
+  }
+  .faith-banner {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 26px;
+    padding: 19px 20px;
+    background: radial-gradient(120% 100% at 95% 0%, rgba(251,191,36,.18) 0%, transparent 60%), linear-gradient(145deg, #FFFDF5 0%, #FFF8E7 55%, #F4F8EE 100%);
+    border: 1.5px solid rgba(217, 166, 55, 0.42);
+    box-shadow: 0 12px 28px rgba(117, 91, 28, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    color: #243B35;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    cursor: pointer;
+    text-align: right;
+    transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease, border-color .2s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .faith-banner:active {
+    transform: scale(.98);
+  }
+  .faith-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; left: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #F59E0B, #FDE68A 50%, #10B981 100%);
+  }
+  .faith-banner::after {
+    content: '';
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.18), transparent 70%);
+    left: -30px;
+    bottom: -40px;
+    pointer-events: none;
+  }
+  .faith-banner .fb-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+  }
+  .faith-banner .fb-ico {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.22) 0%, rgba(255, 255, 255, 0.72) 100%);
+    color: #B7791F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 0 1.5px rgba(217, 166, 55, 0.42), 0 6px 16px rgba(117, 91, 28, 0.12);
+  }
+  .faith-banner .fb-ico svg {
+    width: 30px;
+    height: 30px;
+    stroke-width: 2.2;
+  }
+  .faith-banner .fb-info {
+    min-width: 0;
+    flex: 1;
+  }
+  .faith-banner .fb-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+  .faith-banner .fb-title {
+    font-size: 16.5px;
+    font-weight: 900;
+    color: #263F38;
+    line-height: 1.3;
+    letter-spacing: .1px;
+    white-space: nowrap;
+    overflow: visible;
+  }
+  .faith-banner .fb-badge {
+    display: none !important;
+  }
+  .faith-banner .fb-sub {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #66756D;
+    margin-top: 4px;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .faith-banner .fb-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .faith-banner .fb-action-txt {
+    display: none !important;
+  }
+  .faith-banner .fb-chev {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.72);
+    color: #B7791F;
+    border: 1px solid rgba(217, 166, 55, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .28s cubic-bezier(.34,1.56,.64,1), background .2s, color .2s;
+  }
+  .faith-banner .fb-chev svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.8;
+    transition: transform .28s cubic-bezier(.34,1.56,.64,1);
+  }
+  .faith-banner.open .fb-chev svg, .faith-banner .fb-chev.open svg {
+    transform: rotate(180deg);
+  }
+  .faith-banner.open .fb-chev {
+    background: rgba(251, 191, 36, 0.28);
+    color: #7A5415;
+  }
+  /* Animation for collapse / expand */
+  .faith-collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows .35s cubic-bezier(.22,1,.36,1), opacity .3s ease;
+    overflow: hidden;
+  }
+  .faith-collapse.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .faith-collapse-inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Shopping & Expenses Horizontal Banner Theme (فاتح ومناسب مع هوية التطبيق) */
+  .faith-banner.banner-shop {
+    background: radial-gradient(120% 100% at 95% 0%, rgba(2,132,199,.15) 0%, transparent 60%), linear-gradient(145deg, #FFFFFF 0%, #F0F9FF 55%, #E1F3FD 100%) !important;
+    border-color: rgba(2, 132, 199, 0.25) !important;
+    box-shadow: 0 8px 24px rgba(2, 132, 199, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+    color: #0C2136 !important;
+  }
+  .faith-banner.banner-shop::before {
+    background: linear-gradient(90deg, #F59E0B, #FBBF24 50%, #38BDF8 100%) !important;
+  }
+  .faith-banner.banner-shop::after {
+    background: radial-gradient(circle, rgba(2, 132, 199, 0.08), transparent 70%) !important;
+  }
+  .faith-banner.banner-shop .fb-ico {
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.15) 0%, rgba(255, 255, 255, 0.6) 100%) !important;
+    color: #0284C7 !important;
+    box-shadow: inset 0 0 0 1.5px rgba(2, 132, 199, 0.25), 0 6px 16px rgba(0, 0, 0, 0.05) !important;
+  }
+  .faith-banner.banner-shop .fb-title {
+    color: #0C2136 !important;
+  }
+  .faith-banner.banner-shop .fb-badge {
+    color: #0284C7 !important;
+    background: rgba(2, 132, 199, 0.12) !important;
+    border-color: rgba(2, 132, 199, 0.25) !important;
+  }
+  .faith-banner.banner-shop .fb-sub {
+    color: rgba(12, 33, 54, 0.7) !important;
+  }
+  .faith-banner.banner-shop .fb-action-txt {
+    color: #0284C7 !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-color: rgba(2, 132, 199, 0.25) !important;
+  }
+  .faith-banner.banner-shop .fb-chev {
+    color: #0284C7 !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-color: rgba(2, 132, 199, 0.2) !important;
+  }
+  .faith-banner.banner-shop.open .fb-chev {
+    background: rgba(2, 132, 199, 0.25) !important;
+    color: #0C2136 !important;
+  }
+
+  /* Home Apps Horizontal Banner Theme (كبير وألوان فخمة فاتح) */
+  .faith-banner.banner-apps {
+    background: radial-gradient(120% 100% at 95% 0%, rgba(124,58,237,.15) 0%, transparent 60%), linear-gradient(145deg, #FFFFFF 0%, #FAF5FF 55%, #F3E8FF 100%) !important;
+    border-color: rgba(124, 58, 237, 0.25) !important;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+    color: #5B21B6 !important;
+  }
+  .faith-banner.banner-apps::before {
+    background: linear-gradient(90deg, #F59E0B, #A855F7 50%, #7C3AED 100%) !important;
+  }
+  .faith-banner.banner-apps::after {
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.08), transparent 70%) !important;
+  }
+  .faith-banner.banner-apps .fb-ico {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(255, 255, 255, 0.6) 100%) !important;
+    color: #A855F7 !important;
+    box-shadow: inset 0 0 0 1.5px rgba(124, 58, 237, 0.25), 0 6px 16px rgba(0, 0, 0, 0.05) !important;
+  }
+  .faith-banner.banner-apps .fb-title {
+    color: #5B21B6 !important;
+  }
+  .faith-banner.banner-apps .fb-badge {
+    color: #A855F7 !important;
+    background: rgba(124, 58, 237, 0.12) !important;
+    border-color: rgba(124, 58, 237, 0.25) !important;
+  }
+  .faith-banner.banner-apps .fb-sub {
+    color: rgba(91, 33, 182, 0.7) !important;
+  }
+  .faith-banner.banner-apps .fb-action-txt {
+    color: #A855F7 !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-color: rgba(124, 58, 237, 0.25) !important;
+  }
+  .faith-banner.banner-apps .fb-chev {
+    color: #A855F7 !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-color: rgba(124, 58, 237, 0.2) !important;
+  }
+  .faith-banner.banner-apps.open .fb-chev {
+    background: rgba(124, 58, 237, 0.25) !important;
+    color: #5B21B6 !important;
+  }
+
+  /* Tasks & Appointments Horizontal Banner Theme (فاتح ومناسب مع هوية التطبيق) */
+  .faith-banner.banner-tasks {
+    background: radial-gradient(120% 100% at 95% 0%, rgba(20,184,166,.15) 0%, transparent 60%), linear-gradient(145deg, #FFFFFF 0%, #F0FDFA 55%, #DCFCE7 100%) !important;
+    border-color: rgba(20, 184, 166, 0.25) !important;
+    box-shadow: 0 8px 24px rgba(20, 184, 166, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+    color: #064E3B !important;
+  }
+  .faith-banner.banner-tasks::before {
+    background: linear-gradient(90deg, #10B981, #14B8A6 50%, #38BDF8 100%) !important;
+  }
+  .faith-banner.banner-tasks::after {
+    background: radial-gradient(circle, rgba(20, 184, 166, 0.08), transparent 70%) !important;
+  }
+  .faith-banner.banner-tasks .fb-ico {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(255, 255, 255, 0.6) 100%) !important;
+    color: #10B981 !important;
+    box-shadow: inset 0 0 0 1.5px rgba(20, 184, 166, 0.25), 0 6px 16px rgba(0, 0, 0, 0.05) !important;
+  }
+  .faith-banner.banner-tasks .fb-title {
+    color: #064E3B !important;
+  }
+  .faith-banner.banner-tasks .fb-badge {
+    color: #10B981 !important;
+    background: rgba(20, 184, 166, 0.12) !important;
+    border-color: rgba(20, 184, 166, 0.25) !important;
+  }
+  .faith-banner.banner-tasks .fb-sub {
+    color: rgba(6, 78, 59, 0.7) !important;
+  }
+  .faith-banner.banner-tasks .fb-chev {
+    color: #10B981 !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-color: rgba(20, 184, 166, 0.2) !important;
+  }
+  .faith-banner.banner-tasks.open .fb-chev {
+    background: rgba(20, 184, 166, 0.25) !important;
+    color: #064E3B !important;
+  }
+
+  /* ===== بطاقات التطبيقات المدمجة (طيبات اليوم، صحتي، كلماتي، شؤون الطلاب) ===== */
+  .gate-card.gate-eat {
+    --gc: #EA580C;
+    --gc2: #F59E0B;
+    --gc-soft: #FFEDD5;
+    background: linear-gradient(165deg, #FFFDF8 25%, #FFF6EB 70%, #FFEED8 100%);
+    border-color: rgba(249,115,22,.24);
+    box-shadow: 0 10px 24px rgba(234,88,12,.12);
+  }
+  .gate-card.gate-eat:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(234,88,12,.22);
+  }
+  .gate-card.gate-eat .gc-ico {
+    background: linear-gradient(135deg, #FFEDD5 0%, #FFFDF8 100%);
+    color: #EA580C;
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.9), 0 6px 14px rgba(234,88,12,.15);
+  }
+  .gate-card.gate-eat .gc-value { color: #EA580C; }
+
+  .gate-card.gate-student {
+    --gc: #38BDF8;
+    --gc2: #3B82F6;
+    --gc-soft: rgba(56,189,248,.16);
+    background: linear-gradient(150deg, #1C273C 0%, #0E1626 100%);
+    border-color: rgba(56,189,248,.24);
+    box-shadow: 0 12px 28px rgba(13,21,38,.45);
+    color: #fff;
+  }
+  .gate-card.gate-student:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 34px rgba(56,189,248,.25);
+  }
+  .gate-card.gate-student .gc-label { color: rgba(255,255,255,.82); }
+  .gate-card.gate-student .gc-sub { color: rgba(255,255,255,.62); }
+  .gate-card.gate-student .gc-ico {
+    background: rgba(56,189,248,.14);
+    color: #38BDF8;
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.14), 0 6px 16px rgba(0,0,0,.25);
+  }
+  .gate-card.gate-student .gc-value { color: #38BDF8; }
+
+  .gate-card.gate-health {
+    --gc: #059669;
+    --gc2: #10B981;
+    --gc-soft: #D1FAE5;
+    background: linear-gradient(165deg, #F6FDF9 25%, #ECFDF5 70%, #DCFCE7 100%);
+    border-color: rgba(16,185,129,.24);
+    box-shadow: 0 10px 24px rgba(5,150,105,.12);
+  }
+  .gate-card.gate-health:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(5,150,105,.22);
+  }
+  .gate-card.gate-health .gc-ico {
+    background: linear-gradient(135deg, #D1FAE5 0%, #F6FDF9 100%);
+    color: #059669;
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.9), 0 6px 14px rgba(5,150,105,.15);
+  }
+  .gate-card.gate-health .gc-value { color: #059669; }
+
+  .gate-card.gate-kalimaty {
+    --gc: #7C3AED;
+    --gc2: #A855F7;
+    --gc-soft: #EDE9FE;
+    background: linear-gradient(165deg, #FAF7FF 25%, #F4EEFF 70%, #EAE0FE 100%);
+    border-color: rgba(124,58,237,.24);
+    box-shadow: 0 10px 24px rgba(124,58,237,.12);
+  }
+  .gate-card.gate-kalimaty:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(124,58,237,.22);
+  }
+  .gate-card.gate-kalimaty .gc-ico {
+    background: linear-gradient(135deg, #EDE9FE 0%, #FAF7FF 100%);
+    color: #7C3AED;
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.9), 0 6px 14px rgba(124,58,237,.15);
+  }
+  .gate-card.gate-kalimaty .gc-value { color: #7C3AED; }
+
+  .gate-card.gate-shop {
+    --gc: #0284C7;
+    --gc2: #1CB0F6;
+    --gc-soft: #E0F2FE;
+    background: linear-gradient(165deg, #F8FAFC 25%, #F0F9FF 70%, #E0F2FE 100%);
+    border-color: rgba(28,176,246,.24);
+    box-shadow: 0 10px 24px rgba(2,132,199,.12);
+  }
+  .gate-card.gate-shop:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(2,132,199,.22);
+  }
+  .gate-card.gate-shop .gc-ico {
+    background: linear-gradient(135deg, #E0F2FE 0%, #FFFFFF 100%);
+    color: #0284C7;
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.9), 0 6px 14px rgba(2,132,199,.15);
+  }
+  .gate-card.gate-shop .gc-value { color: #0284C7; }
+
+  .gate-card.gate-finances {
+    --gc: #E11D48;
+    --gc2: #F43F5E;
+    --gc-soft: #FFE4E6;
+    background: linear-gradient(165deg, #FFFDFD 25%, #FFF1F2 70%, #FFE4E6 100%);
+    border-color: rgba(244,63,94,.24);
+    box-shadow: 0 10px 24px rgba(225,29,72,.12);
+  }
+  .gate-card.gate-finances:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(225,29,72,.22);
+  }
+  .gate-card.gate-finances .gc-ico {
+    background: linear-gradient(135deg, #FFE4E6 0%, #FFFFFF 100%);
+    color: #E11D48;
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.9), 0 6px 14px rgba(225,29,72,.15);
+  }
+  .gate-card.gate-finances .gc-value { color: #E11D48; }
+
   /* ===== تثبيت الواجهة ضد الرعشة: إيقاف أنيميشن الدخول بعد أول رسم لكل تبويب ===== */
   .app.fx-off .task-row, .app.fx-off .appt-row, .app.fx-off .task-check, .app.fx-off .task-row.done .task-check,
   .app.fx-off .order-card, .app.fx-off .exp-card, .app.fx-off .exp-grp,
@@ -1524,7 +1935,7 @@
   .noura-card { display: flex; gap: 10px; align-items: flex-end; margin: 0 20px 14px; animation: popIn .4s ease-out; }
   .noura-char { flex-shrink: 0; width: 76px; animation: nouraBob 2.8s ease-in-out infinite; filter: drop-shadow(0 10px 14px rgba(28,176,246,.25)); }
   .noura-char svg { width: 100%; height: auto; display: block; }
-  .noura-bubble { flex: 1; background: #fff; border-radius: 20px 20px 20px 6px; padding: 12px 14px 10px; box-shadow: var(--shadow-sm); border: 1px solid rgba(28,176,246,.09); position: relative; }
+  .noura-bubble { flex: 1; background: var(--grad-soft); border-radius: 20px 20px 20px 6px; padding: 12px 14px 10px; box-shadow: var(--shadow-sm); border: 1px solid rgba(28,176,246,.12); position: relative; }
   .noura-name { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 900; color: var(--primary); margin-bottom: 3px; }
   .noura-msg { font-size: 13.5px; font-weight: 700; color: var(--text); line-height: 1.7; }
   .noura-live { display: flex; align-items: center; justify-content: flex-end; gap: 7px; margin-top: 7px; font-size: 10.5px; font-weight: 800; color: var(--text-muted); }
@@ -2419,7 +2830,7 @@
     state.categoryIcons = {};
     return true;
   }
-  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} try { localStorage.removeItem('naqisna_audio_items'); } catch {} try { localStorage.removeItem('naqisna_comedy_messages'); } catch {} try { localStorage.removeItem('naqisna_last_joke'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); delete state.notifs; delete state.notifPrefs; delete state._notifOn; delete state._notifOrders; delete state._notifExp; delete state._notifExpTime; delete state._notifDaily; delete state._notifDailyTime; delete state._notifAppt; delete state._azkarNotif; delete state._azkarMorningTime; delete state._azkarEveningTime; delete state._prayerNotif; delete state._azkarOff; delete state._fxOff; delete state._notifSound; delete state._soundOn; delete state._audioOn; delete state._audioVol; delete state._fxOn; delete state._audioLib; delete state.audioUploads; delete state._audioMigrated; delete state._memeOn; delete state._memeMode; delete state._memeVol; delete state._memeOff; delete state._memeCustom; delete state._habits; delete state._habitAddOpen; delete state._habitNewIcon; delete state._showHabits; delete state._expandedOrder; delete state._expDraft; delete state._expandedBasket; delete state._basketDraft; delete state._syncedOnce; try { if (!state.photos) state.photos = { me: '' }; if (!state.photos.me && (state.photos.mom || state.photos.dad)) state.photos.me = state.photos.mom || state.photos.dad; delete state.photos.mom; delete state.photos.dad; } catch {} state._accountOpen = false; state._catOpen = false; state._catsTuneOpen = false; state._learnedOpen = false; state._dataOpen = false; wipeCatalogOnce(); migrateCats(); migrateOrderLists(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
+  function restore() { try { localStorage.removeItem('baytna_enc_v1'); } catch {} try { localStorage.removeItem('naqisna_audio_items'); } catch {} try { localStorage.removeItem('naqisna_comedy_messages'); } catch {} try { localStorage.removeItem('naqisna_last_joke'); } catch {} const s = Storage.load(); if (s) { state = Object.assign(state, s); delete state.notifs; delete state.notifPrefs; delete state._notifOn; delete state._notifOrders; delete state._notifExp; delete state._notifExpTime; delete state._notifDaily; delete state._notifDailyTime; delete state._notifAppt; delete state._azkarNotif; delete state._azkarMorningTime; delete state._azkarEveningTime; delete state._prayerNotif; delete state._azkarOff; delete state._fxOff; delete state._notifSound; delete state._soundOn; delete state._audioOn; delete state._audioVol; delete state._fxOn; delete state._audioLib; delete state.audioUploads; delete state._audioMigrated; delete state._memeOn; delete state._memeMode; delete state._memeVol; delete state._memeOff; delete state._memeCustom; delete state._habits; delete state._habitAddOpen; delete state._habitNewIcon; delete state._showHabits; delete state._expandedOrder; delete state._expDraft; delete state._expandedBasket; delete state._basketDraft; delete state._syncedOnce; try { if (!state.photos) state.photos = { me: '' }; if (!state.photos.me && (state.photos.mom || state.photos.dad)) state.photos.me = state.photos.mom || state.photos.dad; delete state.photos.mom; delete state.photos.dad; } catch {} state._accountOpen = false; state._catOpen = false; state._catsTuneOpen = false; state._learnedOpen = false; state._dataOpen = false; state._shopOpen = false; wipeCatalogOnce(); migrateCats(); migrateOrderLists(); const seenP = {}; const before = (state.orders || []).length; state.orders = (state.orders || []).filter(o => { if (!o || o.status === 'purchased') return true; const k = normalizeTerm(o.name || ''); if (seenP[k]) return false; seenP[k] = 1; return true; }); if (state.orders.length !== before) persist(); return true; } return false; }
   function catDeptById(id) {
     if (CATEGORIES[id]) return CATEGORIES[id];
     const ad = ((state.catalogCustom || {}).addedDepts || []).find(x => x.id === id);
@@ -2933,7 +3344,16 @@
   /* =============================
      ROUTER
      ============================= */
-  function setTab(tab) { state.currentTab = tab; state._expandedOrder = null; state._expDraft = null; state._expandedBasket = null; state._basketDraft = null; state._catBrowse = null; state._shopQuery = ''; state._repPickerOpen = null; state._expPickerOpen = false; state._expGrpOpen = null; state._forceTop = true; persist(); render(); }
+  function setTab(tab) {
+    if (tab === 'reports') {
+      state.currentTab = 'expenses';
+      state._expSubTab = 'reports';
+    } else {
+      state.currentTab = tab;
+      if (tab === 'expenses' && state._expSubTab !== 'reports') state._expSubTab = 'list';
+    }
+    state._expandedOrder = null; state._expDraft = null; state._expandedBasket = null; state._basketDraft = null; state._catBrowse = null; state._shopQuery = ''; state._repPickerOpen = null; state._expPickerOpen = false; state._expGrpOpen = null; state._forceTop = true; persist(); render();
+  }
   function scrollToTop() { try { window.scrollTo(0, 0); } catch (_) {} try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch (_) {} try { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; } catch (_) {} try { document.querySelectorAll('.azp-body,.pr-body,.modal,.app').forEach(function (el) { el.scrollTop = 0; }); } catch (_) {} }
 
   /* =============================
@@ -3308,9 +3728,6 @@
     const t = state.currentTab;
     const tabs = [
       { id: 'home', label: 'الرئيسية', icon: 'home' },
-      { id: 'shop', label: 'التسوق', icon: 'basket' },
-      { id: 'expenses', label: 'المصروفات', icon: 'wallet' },
-      { id: 'reports', label: 'التقارير', icon: 'chart' },
       { id: 'settings', label: 'الإعدادات', icon: 'gear' }
     ];
     return `<nav class="bottom-nav">${tabs.map(tab => `<button class="nav-item ${t === tab.id ? 'active' : ''}" data-tab="${tab.id}"><span class="nav-ico">${svgIcon(tab.icon, 22)}</span><span>${tab.label}</span></button>`).join('')}</nav>`;
@@ -3322,7 +3739,9 @@
       case 'orders': return renderOrders();
       case 'shop': return renderShop();
       case 'expenses': return renderExpenses();
-      case 'reports': return renderReports();
+      case 'reports': 
+        state._expSubTab = 'reports';
+        return renderExpenses();
       case 'settings': return renderSettings();
       default: return renderHome();
     }
@@ -3665,6 +4084,8 @@
           if (cd.h > 0) parts.push(cd.h + ' س');
           parts.push(cd.m + ' د');
           s.textContent = 'متبقي ' + parts.join(' و ');
+          const fbs = document.getElementById('faithBannerSub');
+          if (fbs) fbs.textContent = nx.meta.name + ' ' + tm + ' • الأذكار • السبحة • القرآن';
           return true;
         }
       }
@@ -3783,7 +4204,7 @@
       const doy = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 864e5);
       const c = healthMiniCache();
       if (c) paintHealthMini(c);
-      const r = await fetch('health.html', { cache: 'no-store' });
+      const r = await fetch('app/health.html', { cache: 'no-store' });
       if (!r.ok) throw new Error('net');
       const txt = await r.text();
       const list = [];
@@ -4605,6 +5026,9 @@
     const today = sumExpensesInRange('day');
     const userName = state.user?.name || 'صديقي';
     const shopCount = getCatalog().reduce((a, d) => a + catDeptCount(d), 0);
+    const bCount = basketItems().length;
+    const fkey = selectedFiscalKey();
+    const monthExp = sumInFiscalMonth(fkey, 'expense');
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'صباح الخير' : hour < 17 ? 'مساء النور' : 'مساء الخير';
     const tp = dayPhase();
@@ -4620,6 +5044,7 @@
     const tList = taskList().filter(t => taskVisibleToday(t));
     const tOpen = tList.filter(t => !t.done).length;
     const tPct = tList.length ? Math.round(((tList.length - tOpen) / tList.length) * 100) : 0;
+    const apOpen = apptList().filter(a => !a.done).length;
     const achv = [
       { t: 'أول طلب', s: totalTasks > 0 ? 'اتفتح' : 'ضيف طلبك', ok: totalTasks > 0, bg: '#E1F3FD', c: '#1CB0F6', ic: 'star' },
       { t: 'سلسلة ' + streak + ' يوم', s: streak > 1 ? 'مكملة' : 'ابدأ اليوم', ok: streak > 1, bg: '#FEF3C7', c: '#D97706', ic: 'flame' },
@@ -4627,6 +5052,10 @@
     ];
 
     const roleTag = '';
+    const _openCards = ['_faithOpen', '_shopOpen', '_appsOpen'].filter(k => !!state[k]);
+    if (_openCards.length > 1) {
+      _openCards.slice(0, -1).forEach(k => { state[k] = false; });
+    }
     return `<div class="page">
       <div class="duo-hero" dir="ltr">
         <div class="duo-cloud c1"></div>
@@ -4634,7 +5063,6 @@
           <div class="duo-tx">
             <div class="duo-hello" dir="auto">${greeting}، <span class="nm">${escapeHTML(userName)}!</span> 👋</div>
             <div class="duo-sub" dir="rtl" style="text-align:left;">${progress >= 100 ? 'خلصت كل مهام اليوم يا بطل 🎉' : (done > 0 ? `فاضل ${pending} ${pending === 1 ? 'مهمة' : pending === 2 ? 'مهمتين' : 'مهام'} وتقفل اليوم 💪` : 'طلب واحد يقربك من هدف بيتك ✨')}</div>
-            <button class="duo-btn" id="duoContinue"><span dir="rtl">تابع طلابك</span> <span style="font-size:16px;line-height:1;">→</span></button>
           </div>
           <div class="duo-art">
             <div class="duo-logo-wrap"><img src="logo.png" alt="ناقصنا إيه" /></div>
@@ -4643,18 +5071,173 @@
       </div>
       ${adsByPosition('top')}
 
-      <div class="section"><div class="gate-grid">
-        <div class="gate-card gate-prayer" data-prayer-times><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.2 2"/><path d="M8 2.8h8"/></svg></span><span class="gc-label">مواقيت الصلاة</span><span class="gc-value" id="prayerMiniTxt" style="font-size:16px;">...</span><span class="gc-sub" id="prayerMiniSub">اضغط لعرض المواقيت</span></div>
-        <div class="gate-card gate-azkar" data-azkar-toggle style="--gc:#D97706;--gc-soft:#FEF3C7;"><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v2"/><path d="M4.9 5.2l1.4 1.4"/><path d="M3 12h2"/><path d="M19 12h2"/><path d="M17.7 6.6l1.4-1.4"/><path d="M5 19c1.3-2.5 3.7-4 7-4s5.7 1.5 7 4"/><path d="M8 11a4 4 0 1 1 8 0"/></svg></span><span class="gc-label">الأذكار</span><span class="gc-value" style="font-size:16px;">${azP === 'morning' ? 'أذكار الصباح' : 'أذكار المساء'}</span><span class="gc-sub">اضغط لفتح الأذكار</span></div>
-        <div class="gate-card gate-tasbih" id="tsbGateCard" style="--gc:#7C3AED;--gc-soft:#EDE9FE;"><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/><path d="M12 7a5 5 0 1 0 5 5"/><circle cx="12" cy="12" r="1"/><circle cx="20" cy="4" r="1"/><circle cx="17" cy="3" r=".7"/></svg></span><span class="gc-label">السبحة الإلكترونية</span><span class="tsb-dhikr" id="tsbDhikr" title="دوس لتغيير الذكر">سُبْحَانَ الله<small>دوس لتغيير الذكر</small></span><span class="tsb-mot" id="tsbMot">ابدأ الآن — كل تسبيحة تقرّبك خطوة</span><div class="tsb-row"><button class="tsb-tap" id="tsbTap" title="دوس للعد"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5V6a1.8 1.8 0 0 1 3.6 0v5.5"/><path d="M12.6 11a1.8 1.8 0 0 1 3.6.5v2.3a6.5 6.5 0 0 1-6.5 6.5h-.4a6.5 6.5 0 0 1-5.2-2.6l-1.9-2.6a1.7 1.7 0 0 1 2.7-2L7 14.6V9.5a1.8 1.8 0 0 1 3.6 0"/></svg><span class="tsb-num" id="tsbTapNum">0</span></button><button class="tsb-mic" id="tsbMic" title="العد بالصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><line x1="12" y1="17.5" x2="12" y2="21.5"/><line x1="8.5" y1="21.5" x2="15.5" y2="21.5"/></svg></button></div><span class="tsb-hint" id="tsbHint">دوس للعد • أو بالصوت</span></div>
-        <div class="gate-card gate-quran" id="quranGateCard"><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 6.5C10.2 5.1 7.5 4.5 3.5 5v13c4-.5 6.7.1 8.5 1.5"/><path d="M12 6.5c1.8-1.4 4.5-2 8.5-1.5v13c-4-.5-6.7.1-8.5 1.5"/><path d="M12 6.5v13"/><path d="M6.5 8.5c1.4-.1 2.7.1 3.8.5"/><path d="M17.5 8.5c-1.4-.1-2.7.1-3.8.5"/></svg></span><span class="gc-label">القرآن الكريم</span><span class="quran-kind" id="quranDailyKind">كلمة اليوم</span><span class="gc-value" id="quranMiniTxt">...</span><span class="quran-meaning" id="quranMiniMeaning"></span><span class="quran-ref" id="quranMiniRef"></span><span class="gc-sub" id="quranMiniSub">من التفسير الميسّر • اضغط لقراءة المزيد</span></div>
-      </div></div>
+      <!-- كارتي التسوق والمصروفات (مباشر خارج الكارت أعلى قسم الروحانيات) -->
+      <div class="category-group" style="margin-top: 14px; margin-bottom: 2px;">
+        <div class="gate-grid">
+          <!-- كارت التسوق والطلبات -->
+          <div class="gate-card gate-shop" data-gotab="shop" title="فتح تبويب التسوق">
+            <span class="gc-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            </span>
+            <span class="gc-label">التسوق والطلبات</span>
+            <span class="gc-value" style="font-size:18px;">${pending > 0 ? `${pending} مطلوب` : `${shopCount} صنف`}</span>
+            <span class="gc-sub">${pending > 0 ? `🛒 ${pending} أصناف للشراء` : (bCount > 0 ? `🛒 ${bCount} في السلة` : '🛍️ الكتالوج والسلة')}</span>
+          </div>
+
+          <!-- كارت المصروفات والميزانية -->
+          <div class="gate-card gate-finances" data-gotab="expenses" title="فتح تبويب المصروفات">
+            <span class="gc-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="18" cy="15" r="1"/></svg>
+            </span>
+            <span class="gc-label">المصروفات والميزانية</span>
+            <span class="gc-value" style="font-size:18px;">${today.total > 0 ? `${formatCurrency(today.total)} ج.م` : (monthExp.total > 0 ? `${formatCurrency(monthExp.total)} ج.م` : 'سجّل الآن')}</span>
+            <span class="gc-sub">${today.total > 0 ? '💸 مصاريف اليوم المسجلة' : (monthExp.total > 0 ? '📊 إجمالي مصاريف الشهر' : '💰 ميزانية ومصاريف البيت')}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- قسم المهام والمواعيد (يظهر مباشرة أسفل كارتي التسوق والمصروفات) -->
+      <div class="collapsible-wrap open" id="tasksWrap" style="margin-top: 14px;"><div class="collapsible-in">${renderTasksSection()}</div></div>
+      ${nouraCardHTML()}
+
+      <!-- قسم الروحانيات والعبادات: كارت أفقي احترافي يفتح الأقسام عند الضغط -->
+      <div class="section faith-section-wrap">
+        <div class="faith-banner ${state._faithOpen ? 'open' : ''}" id="faithBannerToggle" role="button" tabindex="0" aria-expanded="${state._faithOpen ? 'true' : 'false'}" title="اضغط لفتح أو إغلاق قسم الروحانيات والعبادات">
+          <div class="fb-main">
+            <div class="fb-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.5 5.5 0 0 1-7.54-7.54A9 9 0 0 0 12 3z"/>
+                <path d="M19 5l.7 1.5 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2z"/>
+              </svg>
+            </div>
+            <div class="fb-info">
+              <div class="fb-title-row">
+                <span class="fb-title">الروحانيات والعبادات</span>
+              </div>
+              <span class="fb-sub" id="faithBannerSub">مواقيت الصلاة • الأذكار • السبحة • القرآن</span>
+            </div>
+          </div>
+          <div class="fb-action">
+            <span class="fb-chev ${state._faithOpen ? 'open' : ''}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- الأقسام الأربعة التي تظهر عند الضغط -->
+        <div class="faith-collapse ${state._faithOpen ? 'open' : ''}" id="faithCollapse">
+          <div class="faith-collapse-inner">
+            <div class="gate-grid" style="padding-top:10px;">
+              <div class="gate-card gate-prayer" data-prayer-times><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.2 2"/><path d="M8 2.8h8"/></svg></span><span class="gc-label">مواقيت الصلاة</span><span class="gc-value" id="prayerMiniTxt" style="font-size:16px;">...</span><span class="gc-sub" id="prayerMiniSub">اضغط لعرض المواقيت</span></div>
+              <div class="gate-card gate-azkar" data-azkar-toggle style="--gc:#D97706;--gc-soft:#FEF3C7;"><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v2"/><path d="M4.9 5.2l1.4 1.4"/><path d="M3 12h2"/><path d="M19 12h2"/><path d="M17.7 6.6l1.4-1.4"/><path d="M5 19c1.3-2.5 3.7-4 7-4s5.7 1.5 7 4"/><path d="M8 11a4 4 0 1 1 8 0"/></svg></span><span class="gc-label">الأذكار</span><span class="gc-value" style="font-size:16px;">${azP === 'morning' ? 'أذكار الصباح' : 'أذكار المساء'}</span><span class="gc-sub">اضغط لفتح الأذكار</span></div>
+              <div class="gate-card gate-tasbih" id="tsbGateCard" style="--gc:#7C3AED;--gc-soft:#EDE9FE;"><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/><path d="M12 7a5 5 0 1 0 5 5"/><circle cx="12" cy="12" r="1"/><circle cx="20" cy="4" r="1"/><circle cx="17" cy="3" r=".7"/></svg></span><span class="gc-label">السبحة الإلكترونية</span><span class="tsb-dhikr" id="tsbDhikr" title="دوس لتغيير الذكر">سُبْحَانَ الله<small>دوس لتغيير الذكر</small></span><span class="tsb-mot" id="tsbMot">ابدأ الآن — كل تسبيحة تقرّبك خطوة</span><div class="tsb-row"><button class="tsb-tap" id="tsbTap" title="دوس للعد"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5V6a1.8 1.8 0 0 1 3.6 0v5.5"/><path d="M12.6 11a1.8 1.8 0 0 1 3.6.5v2.3a6.5 6.5 0 0 1-6.5 6.5h-.4a6.5 6.5 0 0 1-5.2-2.6l-1.9-2.6a1.7 1.7 0 0 1 2.7-2L7 14.6V9.5a1.8 1.8 0 0 1 3.6 0"/></svg><span class="tsb-num" id="tsbTapNum">0</span></button><button class="tsb-mic" id="tsbMic" title="العد بالصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><line x1="12" y1="17.5" x2="12" y2="21.5"/><line x1="8.5" y1="21.5" x2="15.5" y2="21.5"/></svg></button></div><span class="tsb-hint" id="tsbHint">دوس للعد • أو بالصوت</span></div>
+              <div class="gate-card gate-quran" id="quranGateCard"><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 6.5C10.2 5.1 7.5 4.5 3.5 5v13c4-.5 6.7.1 8.5 1.5"/><path d="M12 6.5c1.8-1.4 4.5-2 8.5-1.5v13c-4-.5-6.7.1-8.5 1.5"/><path d="M12 6.5v13"/><path d="M6.5 8.5c1.4-.1 2.7.1 3.8.5"/><path d="M17.5 8.5c-1.4-.1-2.7.1-3.8.5"/></svg></span><span class="gc-label">القرآن الكريم</span><span class="quran-kind" id="quranDailyKind">كلمة اليوم</span><span class="gc-value" id="quranMiniTxt">...</span><span class="quran-meaning" id="quranMiniMeaning"></span><span class="quran-ref" id="quranMiniRef"></span><span class="gc-sub" id="quranMiniSub">من التفسير الميسّر • اضغط لقراءة المزيد</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- قسم طيبات وصحة البيت: كارت أفقي احترافي يفتح الأقسام عند الضغط -->
+      <div class="section faith-section-wrap">
+        <div class="faith-banner banner-shop ${state._shopOpen ? 'open' : ''}" id="shopBannerToggle" role="button" tabindex="0" aria-expanded="${state._shopOpen ? 'true' : 'false'}" title="اضغط لفتح أو إغلاق قسم طيبات وصحة البيت">
+          <div class="fb-main">
+            <div class="fb-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v3"/><path d="M8 4v2"/><path d="M16 4v2"/><path d="M3 11h18c-.8 5.6-4.9 9-9 9s-8.2-3.4-9-9z"/><line x1="2" y1="11" x2="22" y2="11"/>
+              </svg>
+            </div>
+            <div class="fb-info">
+              <div class="fb-title-row">
+                <span class="fb-title">طيبات وصحة البيت</span>
+              </div>
+              <span class="fb-sub">طيبات اليوم • صحتي الطبيعية</span>
+            </div>
+          </div>
+          <div class="fb-action">
+            <span class="fb-chev ${state._shopOpen ? 'open' : ''}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="faith-collapse ${state._shopOpen ? 'open' : ''}" id="shopCollapse">
+          <div class="faith-collapse-inner">
+            <div class="gate-grid" style="padding-top:10px;">
+              <!-- 1. طيبات اليوم: app/eat.html -->
+              <div class="gate-card gate-eat" data-app-url="app/eat.html" title="فتح طيبات اليوم">
+                <span class="gc-ico" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M12 3v3"/><path d="M8 4v2"/><path d="M16 4v2"/><path d="M3 11h18c-.8 5.6-4.9 9-9 9s-8.2-3.4-9-9z"/><line x1="2" y1="11" x2="22" y2="11"/></svg>
+                </span>
+                <span class="gc-label">طيبات اليوم</span>
+                <span class="gc-value" style="font-size:18px;">وجبات ومطبخ</span>
+                <span class="gc-sub">أفكار صحية وتغذية متوازنة 🍲</span>
+              </div>
+
+              <!-- 2. صحتي الطبيعية: app/health.html -->
+              <div class="gate-card gate-health" data-app-url="app/health.html" title="فتح صحتي الطبيعية">
+                <span class="gc-ico" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M2 22s2.5-1.5 5-2c5-1 14-7 15-18-11 1-17 10-18 15-.5 2.5-2 5-2 5z"/><path d="M9 15l6-6"/></svg>
+                </span>
+                <span class="gc-label">صحتي الطبيعية</span>
+                <span class="gc-value" id="healthMiniTxt" style="font-size:18px;">طب وبدائل طبيعية</span>
+                <span class="gc-sub" id="healthMiniSub">علاجات وتمارين تنفس 🌿</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- قسم تطبيقات المعلم والطالب: كارت أفقي احترافي يفتح الأقسام عند الضغط -->
+      <div class="section faith-section-wrap">
+        <div class="faith-banner banner-apps ${state._appsOpen ? 'open' : ''}" id="appsBannerToggle" role="button" tabindex="0" aria-expanded="${state._appsOpen ? 'true' : 'false'}" title="اضغط لفتح أو إغلاق قسم تطبيقات المعلم والطالب">
+          <div class="fb-main">
+            <div class="fb-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/>
+              </svg>
+            </div>
+            <div class="fb-info">
+              <div class="fb-title-row">
+                <span class="fb-title">تطبيقات المعلم والطالب</span>
+              </div>
+              <span class="fb-sub">شؤون الطلاب EduSmart • تطبيق كلماتي</span>
+            </div>
+          </div>
+          <div class="fb-action">
+            <span class="fb-chev ${state._appsOpen ? 'open' : ''}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="faith-collapse ${state._appsOpen ? 'open' : ''}" id="appsCollapse">
+          <div class="faith-collapse-inner">
+            <div class="gate-grid" style="padding-top:10px;">
+              <!-- 1. شؤون الطلاب EduSmart: app/student.html -->
+              <div class="gate-card gate-student" data-app-url="app/student.html" title="فتح شؤون الطلاب EduSmart">
+                <span class="gc-ico" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/></svg>
+                </span>
+                <span class="gc-label">شؤون الطلاب</span>
+                <span class="gc-value" style="font-size:18px;">الدروس والحصص</span>
+                <span class="gc-sub">متابعة وواجبات وحضور 🎓</span>
+              </div>
+
+              <!-- 2. تطبيق كلماتي: app/kalimaty.html -->
+              <div class="gate-card gate-kalimaty" data-app-url="app/kalimaty.html" title="فتح تطبيق كلماتي">
+                <span class="gc-ico" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>
+                </span>
+                <span class="gc-label">تطبيق كلماتي</span>
+                <span class="gc-value" style="font-size:18px;">تعلّم الإنجليزية</span>
+                <span class="gc-sub">مراحل ومفردات تفاعلية 📚</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       ${adsByPosition('middle')}
 
-      <div class="collapsible-wrap open" id="tasksWrap"><div class="collapsible-in">${renderTasksSection()}</div></div>
-
-      ${nouraCardHTML()}
       ${adsByPosition('bottom')}
     </div>`;
   }
@@ -4998,7 +5581,10 @@
     _lastShopTab = tab;
     const q = (state._shopQuery || '').trim();
     return `<div class="page">
-      <div class="topbar"><div class="greeting">تسوّق براحتك 🛍️</div></div>
+      <div class="topbar" style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="greeting">تسوّق براحتك 🛍️</div>
+        <button class="btn-secondary btn-sm" data-gotab="home" style="min-height:36px;padding:4px 14px;border-radius:12px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;"><span>الرئيسية</span> <span style="font-size:14px;">🏠</span></button>
+      </div>
       <div class="page-title">التسوق</div>
       ${nouraCardHTML(SHOP_FUNNY_MSGS)}
       ${renderShopAchv()}
@@ -5067,6 +5653,7 @@
     </div>`;
   }
   function renderExpenses() {
+    const expSubTab = state._expSubTab || 'list';
     const fk = (state._expKind === 'income' || state._expKind === 'debt') ? state._expKind : 'expense';
     const fkey = selectedFiscalKey();
     const month = sumInFiscalMonth(fkey, 'expense');
@@ -5083,54 +5670,89 @@
     const openGrp = state._expGrpOpen || null;
     const shareOn = shareFinKind('expense');
     return `<div class="page">
-      <div class="topbar"><div class="greeting">تابع تقدمك</div></div>
-      <div class="page-title">المصروفات</div>
-      <div class="section hidden"><button class="tgl-row" id="tglShareExp" aria-label="مشاركة المصروفات"><span class="tgl"><b>${shareOn ? '☁️ المصروفات مشتركة' : '🔒 المصروفات محلية فقط'}</b><small>${shareOn ? 'تظهر عند الطرف الآخر تلقائياً' : 'محفوظة على جهازك — شاركها وقت ما تحب'}</small></span><span class="sw ${shareOn ? 'on' : ''}"></span></button></div>
+      <div class="topbar" style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="greeting">${expSubTab === 'reports' ? 'لوحة الإنجازات' : 'تابع تقدمك'}</div>
+        <button class="btn-secondary btn-sm" data-gotab="home" style="min-height:36px;padding:4px 14px;border-radius:12px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;"><span>الرئيسية</span> <span style="font-size:14px;">🏠</span></button>
+      </div>
+      <div class="page-title">${expSubTab === 'reports' ? 'إحصائيات وتقارير البيت' : 'المصروفات والميزانية'}</div>
 
-      <div class="fin-hero">
-        <div class="fin-hero-head"><span>💼 ملخص ${escapeHTML(fiscalLabel(fkey))}</span><span class="fin-hero-month">من يوم ${monthStartDay()}</span></div>
-        <div class="fin-hero-net ${monthInc.total - month.total < 0 ? 'neg' : 'pos'}"><small>الصافي (دخل − مصروف)</small><b>${formatCurrency(monthInc.total - month.total)} ج.م</b></div>
-        <div class="fin-hero-cols">
-          <div><span class="fh-ico" style="background:#FFE4E6;">💸</span><span class="fh-tx"><b>${formatCurrency(month.total)}</b><small>مصروفات</small></span></div>
-          <div><span class="fh-ico" style="background:#DCFCE7;">💰</span><span class="fh-tx"><b>${formatCurrency(monthInc.total)}</b><small>دخل</small></span></div>
-          <div><span class="fh-ico" style="background:#FEF3C7;">🏦</span><span class="fh-tx"><b>${formatCurrency(monthDebt.total)}</b><small>ديون</small></span></div>
-        </div>
+      <!-- تبويبات المصروفات والتقارير الاحترافية -->
+      <div class="fin-subtabs-wrap">
+        <button class="fin-subtab-btn ${expSubTab === 'list' ? 'active' : ''}" data-expsubtab="list">
+          <span class="st-ico">💸</span>
+          <span>الحركات والميزانية</span>
+        </button>
+        <button class="fin-subtab-btn ${expSubTab === 'reports' ? 'active' : ''}" data-expsubtab="reports">
+          <span class="st-ico">📊</span>
+          <span>التقارير والإحصائيات</span>
+        </button>
       </div>
 
-      <div class="section"><div class="fin-ctl-card">
-        <div class="fin-ctl-top"><a href="#" id="addExpenseLink" class="fin-ctl-add"><span class="plus">+</span> ضيف حركة جديدة</a></div>
-        <div class="fin-ctl-seg">
-          <button class="${fk === 'expense' ? 'active' : ''}" data-expkind="expense">💸 مصروفات <span class="n">${state.expenses.filter(e => finKindOf(e) === 'expense').length}</span></button>
-          <button class="${fk === 'income' ? 'active' : ''}" data-expkind="income">💰 دخل <span class="n">${state.expenses.filter(e => finKindOf(e) === 'income').length}</span></button>
-          <button class="${fk === 'debt' ? 'active' : ''}" data-expkind="debt">🏦 ديون <span class="n">${state.expenses.filter(e => finKindOf(e) === 'debt').length}</span></button>
+      ${expSubTab === 'reports' ? renderReportsContent() : `
+        <!-- كارت الانتقال السريع للتقارير -->
+        <div style="margin:0 18px 14px;background:linear-gradient(135deg, rgba(28,176,246,0.1), rgba(124,58,237,0.08));border:1.5px solid rgba(28,176,246,0.25);border-radius:18px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;box-shadow:var(--shadow-sm);" data-expsubtab="reports">
+          <div style="display:flex;align-items:center;gap:11px;">
+            <span style="font-size:22px;background:#fff;border-radius:12px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);">📊</span>
+            <div>
+              <div style="font-weight:900;font-size:13.5px;color:var(--text);">لوحة التقارير والرسوم البيانية</div>
+              <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);">تقرير اليوم، الأسبوع، نسب الصرف، ومقارنة الشهور</div>
+            </div>
+          </div>
+          <span style="background:var(--primary);color:#fff;font-size:12px;font-weight:900;padding:6px 14px;border-radius:12px;white-space:nowrap;box-shadow:0 2px 6px rgba(28,176,246,0.35);">عرض ‹</span>
         </div>
-        <div style="margin-top:8px;">
-          <button class="rep-picker-btn ${(state._expPickerOpen) ? 'open' : ''}" id="expMonthBtn"><span class="pk-ico">🗂️</span><span class="pk-tx"><b>${expMonthFilter === 'all' ? 'كل الشهور' : escapeHTML(fiscalLabel(expMonthFilter))}</b><small>${shown.length} حركة • دوس للفلترة بالشهر</small></span><span class="pk-chev">‹</span></button>
-        </div>
-        ${(state._expPickerOpen) ? `<div class="rep-picker-panel" style="margin-top:8px;"><div class="pk-list">
-          <button class="pk-item ${expMonthFilter === 'all' ? 'sel' : ''}" data-pickexpmonth="all"><span class="pk-dot" style="background:${expMonthFilter === 'all' ? 'var(--primary)' : 'var(--border)'};"></span><span>🗂️ كل الشهور</span>${expMonthFilter === 'all' ? '<span class="pk-check">✓</span>' : ''}</button>
-          ${months.map(k => `<button class="pk-item ${expMonthFilter === k ? 'sel' : ''}" data-pickexpmonth="${k}"><span class="pk-dot" style="background:${expMonthFilter === k ? 'var(--primary)' : 'var(--border)'};"></span><span>📅 ${escapeHTML(fiscalLabel(k))}</span>${expMonthFilter === k ? '<span class="pk-check">✓</span>' : ''}</button>`).join('')}
-        </div></div>` : ''}
-      </div></div>
 
-      ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-title">مفيش حركات لسه</div><div class="empty-desc">لما تشتري أو تسجّل حركة هنسجلها هنا</div><button class="btn btn-primary" id="emptyAddExpense">سجّل حركة</button></div>` :
-        shown.length === 0 ? `<div class="empty"><div class="empty-title">مفيش حركات هنا</div><div class="empty-desc">جرّب شهر أو فلتر تاني أو سجّل حركة جديدة</div></div>` :
-        groups.map(g => {
-          const open = openGrp === g.meta.id;
-          return `<div class="exp-grp ${open ? 'open' : ''}">
-            <button class="exp-grp-head" data-expgrp="${escapeHTML(g.meta.id)}">
-              <span class="exp-grp-ico" style="background:${g.meta.color}18;color:${g.meta.color};">${svgIcon(g.meta.icon || 'box', 22)}</span>
-              <span class="exp-grp-tx"><b>${escapeHTML(g.meta.name)}</b><small>${g.items.length} ${g.items.length === 1 ? 'حركة' : 'حركات'}</small></span>
-              <span class="exp-grp-total" style="color:${g.meta.color};">${formatCurrency(g.total)} ج.م</span>
-              <span class="exp-grp-chev">‹</span>
-            </button>
-            ${open ? `<div class="exp-grp-body">${g.items.map(e => expCardHTML(e)).join('')}</div>` : ''}
-          </div>`;
-        }).join('')}
+        <div class="section hidden"><button class="tgl-row" id="tglShareExp" aria-label="مشاركة المصروفات"><span class="tgl"><b>${shareOn ? '☁️ المصروفات مشتركة' : '🔒 المصروفات محلية فقط'}</b><small>${shareOn ? 'تظهر عند الطرف الآخر تلقائياً' : 'محفوظة على جهازك — شاركها وقت ما تحب'}</small></span><span class="sw ${shareOn ? 'on' : ''}"></span></button></div>
+
+        <div class="fin-hero">
+          <div class="fin-hero-head"><span>💼 ملخص ${escapeHTML(fiscalLabel(fkey))}</span><span class="fin-hero-month">من يوم ${monthStartDay()}</span></div>
+          <div class="fin-hero-net ${monthInc.total - month.total < 0 ? 'neg' : 'pos'}"><small>الصافي (دخل − مصروف)</small><b>${formatCurrency(monthInc.total - month.total)} ج.م</b></div>
+          <div class="fin-hero-cols">
+            <div><span class="fh-ico" style="background:#FFE4E6;">💸</span><span class="fh-tx"><b>${formatCurrency(month.total)}</b><small>مصروفات</small></span></div>
+            <div><span class="fh-ico" style="background:#DCFCE7;">💰</span><span class="fh-tx"><b>${formatCurrency(monthInc.total)}</b><small>دخل</small></span></div>
+            <div><span class="fh-ico" style="background:#FEF3C7;">🏦</span><span class="fh-tx"><b>${formatCurrency(monthDebt.total)}</b><small>ديون</small></span></div>
+          </div>
+        </div>
+
+        <div class="section"><div class="fin-ctl-card">
+          <div class="fin-ctl-top"><a href="#" id="addExpenseLink" class="fin-ctl-add"><span class="plus">+</span> ضيف حركة جديدة</a></div>
+          <div class="fin-ctl-seg">
+            <button class="${fk === 'expense' ? 'active' : ''}" data-expkind="expense">💸 مصروفات <span class="n">${state.expenses.filter(e => finKindOf(e) === 'expense').length}</span></button>
+            <button class="${fk === 'income' ? 'active' : ''}" data-expkind="income">💰 دخل <span class="n">${state.expenses.filter(e => finKindOf(e) === 'income').length}</span></button>
+            <button class="${fk === 'debt' ? 'active' : ''}" data-expkind="debt">🏦 ديون <span class="n">${state.expenses.filter(e => finKindOf(e) === 'debt').length}</span></button>
+          </div>
+          <div style="margin-top:8px;">
+            <button class="rep-picker-btn ${(state._expPickerOpen) ? 'open' : ''}" id="expMonthBtn"><span class="pk-ico">🗂️</span><span class="pk-tx"><b>${expMonthFilter === 'all' ? 'كل الشهور' : escapeHTML(fiscalLabel(expMonthFilter))}</b><small>${shown.length} حركة • دوس للفلترة بالشهر</small></span><span class="pk-chev">‹</span></button>
+          </div>
+          ${(state._expPickerOpen) ? `<div class="rep-picker-panel" style="margin-top:8px;"><div class="pk-list">
+            <button class="pk-item ${expMonthFilter === 'all' ? 'sel' : ''}" data-pickexpmonth="all"><span class="pk-dot" style="background:${expMonthFilter === 'all' ? 'var(--primary)' : 'var(--border)'};"></span><span>🗂️ كل الشهور</span>${expMonthFilter === 'all' ? '<span class="pk-check">✓</span>' : ''}</button>
+            ${months.map(k => `<button class="pk-item ${expMonthFilter === k ? 'sel' : ''}" data-pickexpmonth="${k}"><span class="pk-dot" style="background:${expMonthFilter === k ? 'var(--primary)' : 'var(--border)'};"></span><span>📅 ${escapeHTML(fiscalLabel(k))}</span>${expMonthFilter === k ? '<span class="pk-check">✓</span>' : ''}</button>`).join('')}
+          </div></div>` : ''}
+        </div></div>
+
+        ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-title">مفيش حركات لسه</div><div class="empty-desc">لما تشتري أو تسجّل حركة هنسجلها هنا</div><button class="btn btn-primary" id="emptyAddExpense">سجّل حركة</button></div>` :
+          shown.length === 0 ? `<div class="empty"><div class="empty-title">مفيش حركات هنا</div><div class="empty-desc">جرّب شهر أو فلتر تاني أو سجّل حركة جديدة</div></div>` :
+          groups.map(g => {
+            const open = openGrp === g.meta.id;
+            return `<div class="exp-grp ${open ? 'open' : ''}">
+              <button class="exp-grp-head" data-expgrp="${escapeHTML(g.meta.id)}">
+                <span class="exp-grp-ico" style="background:${g.meta.color}18;color:${g.meta.color};">${svgIcon(g.meta.icon || 'box', 22)}</span>
+                <span class="exp-grp-tx"><b>${escapeHTML(g.meta.name)}</b><small>${g.items.length} ${g.items.length === 1 ? 'حركة' : 'حركات'}</small></span>
+                <span class="exp-grp-total" style="color:${g.meta.color};">${formatCurrency(g.total)} ج.م</span>
+                <span class="exp-grp-chev">‹</span>
+              </button>
+              ${open ? `<div class="exp-grp-body">${g.items.map(e => expCardHTML(e)).join('')}</div>` : ''}
+            </div>`;
+          }).join('')}
+      `}
     </div>`;
   }
 
   function renderReports() {
+    state._expSubTab = 'reports';
+    return renderExpenses();
+  }
+
+  function renderReportsContent() {
     const day = sumExpensesInRange('day'); const week = sumExpensesInRange('week'); const all = sumExpensesInRange('all');
     const dayCat = topCategoryInRange('day'); const weekCat = topCategoryInRange('week');
     const weekDay = mostExpensiveDayWeek(); const weekDays = last7DaysBars();
@@ -5149,10 +5771,10 @@
       return { key: k, label: fiscalLabel(k), exp: e.total, expN: e.count, inc: i.total, debt: d.total, net: i.total - e.total };
     });
     const maxExp = Math.max(1, ...cmp.map(c => c.exp));
-    return `<div class="page">
-      <div class="topbar"><div class="greeting">لوحة الإنجازات</div></div>
-      <div class="page-title">إحصائيات البيت</div>
-      ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-title">مفيش بيانات كفاية</div><div class="empty-desc">اشتري طلبات أو ضيف مصاريف وهتظهرلك الإحصائيات</div></div>` : `
+    if (state.expenses.length === 0) {
+      return `<div class="empty"><div class="empty-title">مفيش بيانات كفاية</div><div class="empty-desc">اشتري طلبات أو ضيف مصاريف وهتظهرلك الإحصائيات</div><button class="btn btn-primary" data-expsubtab="list" style="margin-top:12px;">سجّل حركة الآن</button></div>`;
+    }
+    return `
       <div class="rep-card"><div class="rep-head"><span class="rep-ico" style="background:#E0F2FE;">📅</span><b>تقرير النهاردة</b><small>${day.count} مشتريات</small></div><div class="rep-grid">
         <div class="rep-tile" style="background:#E1F3FD;"><span class="t-ico">🛒</span><span class="t-tx"><small>عدد المشتريات</small><b>${day.count}</b></span></div>
         <div class="rep-tile" style="background:#DCFCE7;"><span class="t-ico">💸</span><span class="t-tx"><small>إجمالي النهاردة</small><b>${formatCurrency(day.total)}<span> ج.م</span></b></span></div>
@@ -5198,8 +5820,8 @@
         <div class="rep-hero-head">🏆 الخلاصة</div>
         <div class="rep-hero-net"><small>الإجمالي كله • ${all.count} عملية شرا</small><b>${formatCurrency(all.total)} ج.م</b></div>
       </div>
-      ${assistantSay('تقارير النهاردة جاهزة 🎉', null, 'تقرير الإنجاز', 'me')}`}
-    </div>`;
+      ${assistantSay('تقارير النهاردة جاهزة 🎉', null, 'تقرير الإنجاز', 'me')}
+    `;
   }
 
   function renderDonut(breakdown, total) {
@@ -5506,14 +6128,66 @@
     const edRole = document.getElementById('editRoleBtn'); if (edRole) edRole.onclick = () => openProfileModal();
     const edWa = document.getElementById('editWaBtn'); if (edWa) edWa.onclick = () => openProfileModal();
     document.querySelectorAll('.nav-item[data-tab]').forEach(b => { b.onclick = () => setTab(b.dataset.tab); });
-    const gl = document.querySelector('[data-gotab="orders"]'); if (gl) gl.onclick = (e) => { e.preventDefault(); setTab('orders'); };
+    document.querySelectorAll('[data-gotab]').forEach(b => {
+      b.onclick = (e) => { e.preventDefault(); setTab(b.dataset.gotab); };
+    });
     const fab = document.getElementById('fabBtn'); if (fab) fab.onclick = openAddOrderModal;
     const ha = document.getElementById('heroAddOrder'); if (ha) ha.onclick = openAddOrderModal;
-    const dc = document.getElementById('duoContinue'); if (dc) dc.onclick = () => { try { window.location.href = 'st.html'; } catch {} };
+    const dc = document.getElementById('duoContinue'); if (dc) dc.onclick = () => { try { window.location.href = 'app/student.html'; } catch {} };
+    document.querySelectorAll('[data-app-url]').forEach(b => {
+      b.onclick = () => {
+        const u = b.dataset.appUrl;
+        if (u) { try { window.location.href = u; } catch { window.open(u, '_self'); } }
+      };
+    });
+    const HUB_ACCORDIONS = [
+      { btnId: 'faithBannerToggle', colId: 'faithCollapse', txtId: 'faithToggleTxt', stateKey: '_faithOpen' },
+      { btnId: 'shopBannerToggle', colId: 'shopCollapse', txtId: 'shopToggleTxt', stateKey: '_shopOpen' },
+      { btnId: 'appsBannerToggle', colId: 'appsCollapse', txtId: 'appsToggleTxt', stateKey: '_appsOpen' }
+    ];
+    HUB_ACCORDIONS.forEach(item => {
+      const b = document.getElementById(item.btnId);
+      if (b) {
+        b.onclick = () => {
+          const willOpen = !state[item.stateKey];
+          // إغلاق باقي الكروت تلقائياً ليبقى كارت واحد مفتوح فقط
+          HUB_ACCORDIONS.forEach(other => {
+            state[other.stateKey] = false;
+            const ob = document.getElementById(other.btnId);
+            const oc = document.getElementById(other.colId);
+            const ot = document.getElementById(other.txtId);
+            const ochev = ob ? ob.querySelector('.fb-chev') : null;
+            if (oc) oc.classList.remove('open');
+            if (ob) {
+              ob.classList.remove('open');
+              ob.setAttribute('aria-expanded', 'false');
+            }
+            if (ot) ot.textContent = 'عرض الأقسام';
+            if (ochev) ochev.classList.remove('open');
+          });
+
+          if (willOpen) {
+            state[item.stateKey] = true;
+            const col = document.getElementById(item.colId);
+            const txt = document.getElementById(item.txtId);
+            const chev = b.querySelector('.fb-chev');
+            if (col) col.classList.add('open');
+            b.classList.add('open');
+            b.setAttribute('aria-expanded', 'true');
+            if (txt) txt.textContent = 'إخفاء الأقسام';
+            if (chev) chev.classList.add('open');
+          }
+        };
+        b.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); } };
+      }
+    });
     document.querySelectorAll('[data-azkar-toggle]').forEach(b => b.onclick = () => openAzkarPage());
     document.querySelectorAll('[data-prayer-times]').forEach(b => b.onclick = () => openPrayerPage());
     try { refreshPrayerMini(); } catch {}
-    document.querySelectorAll('[data-goto-tasks]').forEach(b => b.onclick = () => { requestAnimationFrame(() => setTimeout(() => { try { const el = document.getElementById('tasksWrap') || document.getElementById('tasksSection'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {} }, 60)); });
+    try { refreshHealthMini(); } catch {}
+    document.querySelectorAll('[data-goto-tasks]').forEach(b => b.onclick = () => {
+      requestAnimationFrame(() => setTimeout(() => { try { const el = document.getElementById('tasksWrap') || document.getElementById('tasksSection'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {} }, 60));
+    });
     const qgc = document.getElementById('quranGateCard'); if (qgc) qgc.onclick = () => { try { window.location.href = 'quran/index.html'; } catch {} };
     try { refreshQuranMini(); } catch {}
     try { tsbWire(); } catch {}
@@ -5677,6 +6351,13 @@
         }
       } catch {}
     };
+    document.querySelectorAll('[data-expsubtab]').forEach(b => b.onclick = (e) => {
+      e.preventDefault();
+      state._expSubTab = b.dataset.expsubtab;
+      persist();
+      render();
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
+    });
     document.querySelectorAll('[data-expkind]').forEach(b => b.onclick = () => { state._expKind = b.dataset.expkind; state._expGrpOpen = null; persist(); render(); });
     const expMonthBtn = document.getElementById('expMonthBtn'); if (expMonthBtn) expMonthBtn.onclick = () => { state._expPickerOpen = !state._expPickerOpen; persist(); render(); };
     document.querySelectorAll('[data-pickexpmonth]').forEach(b => b.onclick = () => { state._expMonth = b.dataset.pickexpmonth; state._expPickerOpen = false; state._expGrpOpen = null; persist(); render(); });

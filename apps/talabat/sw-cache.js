@@ -2,7 +2,7 @@
  * PWA offline caching only (no notifications).
  */
 
-const CACHE_NAME = 'naqisna-pwa-v18';
+const CACHE_NAME = 'naqisna-pwa-v19';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -26,7 +26,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
       .then((keys) => Promise.all(
-        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+        keys.filter((k) => k !== CACHE_NAME && !k.startsWith('mushaf-offline-')).map((k) => caches.delete(k))
       ))
       .then(() => self.clients.claim())
       .catch(() => {})
@@ -47,14 +47,22 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         })
-        .catch(() => caches.match(event.request).then((c) => c || caches.match('./index.html')))
+        .catch(() => caches.match(event.request, { ignoreSearch: true, ignoreVary: true })
+          .then((c) => {
+            if (c) return c;
+            const path = new URL(event.request.url).pathname;
+            // The Mushaf has its own page + offline cache; serve it when the directory URL was not cached
+            const fallback = /\/quran\//.test(path) ? '/quran/index.html' : './index.html';
+            return caches.match(fallback, { ignoreSearch: true, ignoreVary: true })
+              .then((f) => f || caches.match('./index.html'));
+          }))
     );
     return;
   }
 
   // Cache-first for static assets
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
+    caches.match(event.request, { ignoreSearch: true, ignoreVary: true }).then((cachedResponse) => {
       const fetchPromise = fetch(event.request)
         .then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {

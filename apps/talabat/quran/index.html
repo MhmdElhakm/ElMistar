@@ -14,7 +14,9 @@
     }
 
     html {
-      scroll-padding-top: env(safe-area-inset-top, 0px)
+      scroll-padding-top: env(safe-area-inset-top, 0px);
+      overflow-x: hidden;
+      scroll-behavior: smooth;
     }
 
     body {
@@ -22,7 +24,8 @@
       padding: 0;
       font: 14px -apple-system, BlinkMacSystemFont, sans-serif;
       background: #fff;
-      color: #000
+      color: #000;
+      overflow-x: hidden;
     }
 
     img {
@@ -455,7 +458,8 @@
     .page-view.opening {
       display: flex;
       flex-direction: column;
-      height: 100svh;
+      height: auto;
+      min-height: 100svh;
     }
 
     .page-view.opening .run,
@@ -465,6 +469,7 @@
 
     .page-view.opening .sheet {
       flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -474,34 +479,10 @@
       flex: none;
     }
 
-    body.horizontal-pages {
-      overflow: hidden;
-    }
-
-    .horizontal-pages #pageList {
-      display: flex;
-      direction: ltr;
-      width: 100vw;
-      height: 100svh;
-      overflow-x: auto;
-      overflow-y: hidden;
-      overscroll-behavior-x: contain;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
-    }
-
-    .horizontal-pages #pageList::-webkit-scrollbar {
-      display: none;
-    }
-
-    .horizontal-pages .page-view {
-      flex: 0 0 100%;
-      width: 100%;
-      height: 100svh;
-      min-height: 100svh;
-      overflow: hidden;
-      direction: rtl;
-      scroll-snap-align: start;
+    #pageList {
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
+      max-width: 100%;
     }
 
     .measure {
@@ -810,10 +791,12 @@
       border-radius: 12px;
       color: var(--ink);
       flex: none;
+      transition: transform .18s cubic-bezier(.34, 1.56, .64, 1), background .18s;
     }
 
     .ib:active {
       background: var(--panel-top);
+      transform: scale(.9);
     }
 
     .ib svg {
@@ -984,7 +967,7 @@
       background: var(--scrim);
       opacity: 0;
       pointer-events: none;
-      transition: opacity .22s;
+      transition: opacity .34s cubic-bezier(.4, 0, .2, 1);
       z-index: 20;
     }
 
@@ -999,48 +982,142 @@
       top: 0;
       bottom: 0;
       right: 0;
-      width: min(92vw, 440px);
+      width: min(86vw, 350px);
       z-index: 30;
       background: var(--panel);
       display: flex;
       flex-direction: column;
-      transform: translateX(104%);
-      transition: transform .26s ease, visibility 0s .26s;
+      transform: translateX(100%);
+      transition: transform .4s cubic-bezier(.32, .72, 0, 1), visibility 0s .4s;
       visibility: hidden;
       box-shadow: -8px 0 30px rgba(0, 0, 0, .18);
       direction: rtl;
+      will-change: transform;
     }
 
     body.open .drawer {
-      transform: none;
+      transform: translateX(0);
       visibility: visible;
-      transition: transform .26s ease, visibility 0s;
+      transition: transform .42s cubic-bezier(.32, .72, 0, 1), visibility 0s;
+    }
+
+    body.open .drawer>.d-top,
+    body.open .drawer>.d-body,
+    body.open .drawer>.settings,
+    body.open .drawer>.drawer-credit {
+      animation: drawerIn .46s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    body.open .drawer>.d-top {
+      animation-delay: .06s;
+    }
+
+    body.open .drawer>.d-body {
+      animation-delay: .12s;
+    }
+
+    body.open .drawer>.settings {
+      animation-delay: .18s;
+    }
+
+    body.open .drawer>.drawer-credit {
+      animation-delay: .22s;
+    }
+
+    @keyframes drawerIn {
+      from {
+        opacity: 0;
+        transform: translateX(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
 
     .d-top {
       background: var(--panel-top);
-      padding: calc(env(safe-area-inset-top, 0px) + 22px) 20px 14px;
+      padding: calc(env(safe-area-inset-top, 0px) + 14px) 12px 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 9px;
+    }
+
+    /* collapsible settings section */
+    .settings {
+      flex: none;
+      border-top: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .settings-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .settings-toggle .settings-title {
+      flex: 1;
+      text-align: right;
+    }
+
+    .settings-toggle .ic {
+      width: 18px;
+      height: 18px;
+      flex: none;
+      fill: currentColor;
+    }
+
+    .settings-toggle .chev {
+      width: 16px;
+      height: 16px;
+      flex: none;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform .2s;
+    }
+
+    .settings-toggle[aria-expanded="true"] {
+      color: var(--green);
+    }
+
+    .settings-toggle[aria-expanded="true"] .chev {
+      transform: rotate(180deg);
+    }
+
+    .settings-body[hidden] {
+      display: none;
+    }
+
+    .settings-body .scroll-controls {
+      border-top: 0;
     }
 
     .d-actions {
       display: flex;
       flex-wrap: nowrap;
-      gap: 8px;
-      padding: 10px 14px;
+      gap: 6px;
+      padding: 8px 10px;
       border-top: 1px solid var(--line);
       background: var(--panel);
     }
 
     .drawer-credit {
       flex: none;
-      padding: 8px 12px calc(env(safe-area-inset-bottom, 0px) + 10px);
+      padding: 7px 10px calc(env(safe-area-inset-bottom, 0px) + 8px);
       border-top: 1px solid var(--line);
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       text-align: center;
     }
@@ -1048,10 +1125,10 @@
     .scroll-controls {
       flex: none;
       display: grid;
-      grid-template-columns: minmax(108px, auto) minmax(0, 1fr);
+      grid-template-columns: minmax(96px, auto) minmax(0, 1fr);
       align-items: center;
-      gap: 8px 12px;
-      padding: 12px 14px;
+      gap: 6px 10px;
+      padding: 9px 10px;
       border-top: 1px solid var(--line);
       background: var(--panel);
     }
@@ -1083,15 +1160,15 @@
 
     .scroll-toggle {
       grid-row: span 2;
-      min-height: 48px;
+      min-height: 44px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
+      gap: 6px;
+      padding: 7px 10px;
       border: 1px solid color-mix(in srgb, var(--green) 24%, var(--line));
       border-radius: 10px;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       white-space: nowrap;
       transition: background .18s, border-color .18s, color .18s, transform .18s;
@@ -1195,7 +1272,7 @@
     .d-action {
       flex: 1;
       min-width: 0;
-      min-height: 48px;
+      min-height: 42px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1205,7 +1282,7 @@
       border: 1px solid var(--line);
       border-radius: 10px;
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       line-height: 1.25;
       text-align: center;
@@ -1218,8 +1295,8 @@
     }
 
     .d-action svg {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       flex: none;
       fill: currentColor;
     }
@@ -1298,10 +1375,10 @@
 
     .seg button {
       flex: 1;
-      padding: 11px 8px;
+      padding: 8px 6px;
       font-weight: 500;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 12.5px;
       white-space: nowrap;
     }
 
@@ -1321,7 +1398,7 @@
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 10px;
-      padding: 10px 14px;
+      padding: 8px 12px;
     }
 
     .search[hidden] {
@@ -1336,11 +1413,11 @@
 
     .search-mode button {
       flex: 1;
-      min-height: 32px;
+      min-height: 30px;
       border: 1px solid var(--line);
       border-radius: 8px;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
     }
 
@@ -1381,11 +1458,11 @@
     .srow {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
       width: 100%;
-      padding: 13px 20px;
+      padding: 8px 12px;
       text-align: right;
-      min-height: 76px;
+      min-height: 50px;
     }
 
     .srow:active {
@@ -1394,15 +1471,15 @@
 
     .num {
       flex: none;
-      width: 46px;
-      height: 46px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       background: var(--chip);
       color: var(--muted);
       display: grid;
       place-items: center;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 12.5px;
     }
 
     .srow.here .num {
@@ -1417,13 +1494,13 @@
 
     .sname {
       font-weight: 700;
-      font-size: 21px;
+      font-size: 16px;
       line-height: 1.35;
     }
 
     .sname.q {
       font-weight: 500;
-      font-size: 18px;
+      font-size: 13.5px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1431,8 +1508,8 @@
 
     .smeta {
       color: var(--sub);
-      font-size: 14.5px;
-      margin-top: 2px;
+      font-size: 12px;
+      margin-top: 1px;
     }
 
     .gh {
@@ -1441,8 +1518,8 @@
       background: var(--panel-top);
       color: var(--sub);
       font-weight: 700;
-      font-size: 14px;
-      padding: 8px 20px;
+      font-size: 12.5px;
+      padding: 7px 14px;
       border-block: 1px solid var(--line);
       z-index: 1;
     }
@@ -1477,17 +1554,47 @@
       background: var(--panel-top);
       border-radius: 28px 28px 0 0;
       direction: rtl;
-      transform: translateY(104%);
+      transform: translateY(100%);
       visibility: hidden;
-      transition: transform .26s ease, visibility 0s .26s;
+      transition: transform .4s cubic-bezier(.32, .72, 0, 1), visibility 0s .4s;
       box-shadow: 0 -10px 40px rgba(0, 0, 0, .2);
       padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+      will-change: transform;
     }
 
     body.vs .vsheet {
-      transform: none;
+      transform: translateY(0);
       visibility: visible;
-      transition: transform .26s ease, visibility 0s;
+      transition: transform .42s cubic-bezier(.32, .72, 0, 1), visibility 0s;
+    }
+
+    body.vs .vsheet>.v-top,
+    body.vs .vsheet>.v-card {
+      animation: sheetIn .46s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    body.vs .vsheet>.v-card:nth-of-type(1) {
+      animation-delay: .1s;
+    }
+
+    body.vs .vsheet>.v-card:nth-of-type(2) {
+      animation-delay: .15s;
+    }
+
+    body.vs .vsheet>.v-card:nth-of-type(3) {
+      animation-delay: .2s;
+    }
+
+    @keyframes sheetIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .v-top {
@@ -1516,11 +1623,185 @@
       color: var(--green);
     }
 
+    .share-range {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      align-items: end;
+      gap: 8px;
+      margin: 8px 12px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+    }
+
+    .share-range[hidden] { display: none; }
+
+    .share-range label {
+      display: grid;
+      gap: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .share-range input {
+      width: 100%;
+      min-width: 0;
+      height: 36px;
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--panel-top);
+      font: inherit;
+      text-align: center;
+    }
+
+    .share-range button {
+      min-height: 36px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      color: var(--on-green);
+      background: var(--green);
+      font: inherit;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
     .v-card {
       background: var(--card);
       border-radius: 16px;
       margin: 10px 12px 0;
       overflow: hidden;
+    }
+
+    .v-scroll-controls {
+      border-top: 0;
+      background: transparent;
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .v-scroll-controls .scroll-toggle {
+      grid-row: auto;
+      flex: none;
+      min-height: 42px;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--green) 14%, var(--panel)), var(--panel));
+      border: 1px solid color-mix(in srgb, var(--green) 32%, var(--line));
+      box-shadow: 0 2px 8px color-mix(in srgb, var(--green) 12%, transparent);
+    }
+
+    .v-scroll-controls .scroll-toggle svg {
+      width: 17px;
+      height: 17px;
+      transition: transform .25s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .v-scroll-controls .scroll-toggle:active {
+      transform: scale(.95);
+    }
+
+    .v-scroll-controls .scroll-toggle[aria-pressed="true"] {
+      color: var(--on-green);
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--green), color-mix(in srgb, var(--green) 78%, #000));
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--green) 42%, transparent);
+    }
+
+    .v-scroll-controls .scroll-toggle[aria-pressed="true"] svg {
+      transform: scale(1.08);
+    }
+
+    .v-scroll-controls .scroll-speed-label {
+      flex: none;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 1px;
+      font-size: 10.5px;
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+
+    .v-scroll-controls .scroll-speed-label output {
+      font-size: 12px;
+      color: var(--green);
+    }
+
+    .v-scroll-controls #scrollSpeed {
+      flex: 1;
+      min-width: 0;
+      height: 30px;
+    }
+
+    .v-scroll-controls #scrollSpeed::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, color-mix(in srgb, var(--green) 60%, var(--line)) 0 var(--scroll-progress, 26%), var(--chip) var(--scroll-progress, 26%) 100%);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, .14);
+    }
+
+    .v-scroll-controls #scrollSpeed::-moz-range-track {
+      height: 8px;
+      border-radius: 999px;
+      background: var(--chip);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, .14);
+    }
+
+    .v-scroll-controls #scrollSpeed::-moz-range-progress {
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, color-mix(in srgb, var(--green) 80%, #000), var(--green));
+    }
+
+    .v-scroll-controls #scrollSpeed::-webkit-slider-thumb {
+      width: 22px;
+      height: 22px;
+      margin-top: -7px;
+      border: 3px solid var(--panel);
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 2px 8px color-mix(in srgb, var(--green) 48%, transparent), 0 0 0 1px color-mix(in srgb, var(--green) 40%, transparent);
+      transition: transform .16s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .v-scroll-controls #scrollSpeed::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border: 3px solid var(--panel);
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 2px 8px color-mix(in srgb, var(--green) 48%, transparent), 0 0 0 1px color-mix(in srgb, var(--green) 40%, transparent);
+      transition: transform .16s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .v-scroll-controls #scrollSpeed:active::-webkit-slider-thumb {
+      transform: scale(1.18);
+    }
+
+    .v-scroll-controls #scrollSpeed:active::-moz-range-thumb {
+      transform: scale(1.18);
+    }
+
+    .v-scroll-controls #scrollSpeed:focus-visible {
+      outline: none;
+    }
+
+    .v-scroll-controls #scrollSpeed:focus-visible::-webkit-slider-thumb {
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--green) 28%, transparent), 0 2px 8px color-mix(in srgb, var(--green) 48%, transparent);
+    }
+
+    .v-scroll-controls #scrollSpeed:focus-visible::-moz-range-thumb {
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--green) 28%, transparent), 0 2px 8px color-mix(in srgb, var(--green) 48%, transparent);
     }
 
     .v-row {
@@ -1582,72 +1863,117 @@
       background: var(--panel-top);
     }
 
-    .v-add {
-      padding: 8px 12px;
-      border-top: 1px solid var(--line);
-    }
-
-    .v-add-toggle {
-      color: var(--green);
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .mark-create {
+    .annot-action {
+      position: relative;
+      gap: 14px;
+      min-height: 72px;
       padding: 14px 16px;
-      border-top: 1px solid var(--line);
-      display: grid;
-      gap: 12px;
+      overflow: hidden;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--green) 9%, var(--card)) 0%, var(--card) 55%);
+      transition: transform .2s cubic-bezier(.34, 1.4, .64, 1), box-shadow .25s, background .3s;
     }
 
-    .mark-create[hidden] {
-      display: none;
+    .annot-action::after {
+      content: "";
+      position: absolute;
+      inset-inline-start: 0;
+      top: 12%;
+      bottom: 12%;
+      width: 4px;
+      border-radius: 0 4px 4px 0;
+      background: linear-gradient(180deg, var(--green), color-mix(in srgb, var(--green) 55%, transparent));
+      opacity: .85;
+      transition: opacity .25s, width .25s;
     }
 
-    .mark-create label {
+    .annot-action:active {
+      background: linear-gradient(135deg, color-mix(in srgb, var(--green) 16%, var(--card)) 0%, var(--card) 60%);
+      transform: scale(.985);
+    }
+
+    .annot-action-ic {
+      flex: none;
+      width: 46px;
+      height: 46px;
       display: grid;
-      gap: 6px;
-      color: var(--sub);
-      font-size: 13px;
+      place-items: center;
+      border-radius: 14px;
+      color: var(--on-green);
+      background: linear-gradient(140deg, var(--green), color-mix(in srgb, var(--green) 70%, #000));
+      box-shadow: 0 4px 12px color-mix(in srgb, var(--green) 35%, transparent), inset 0 1px 0 rgba(255, 255, 255, .18);
+      transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s;
+    }
+
+    .annot-action-ic svg {
+      width: 23px;
+      height: 23px;
+      fill: currentColor;
+    }
+
+    .annot-action-txt {
+      flex: 1;
+      min-width: 0;
+      text-align: right;
+    }
+
+    .annot-action-txt b {
+      display: block;
+      font-size: 17px;
       font-weight: 700;
-    }
-
-    .mark-create input {
-      width: 100%;
-      min-height: 42px;
-      padding: 9px 12px;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      background: var(--panel);
+      line-height: 1.25;
       color: var(--ink);
-      font: inherit;
-      font-size: 15px;
     }
 
-    .mark-create input:focus {
-      outline: 2px solid color-mix(in srgb, var(--green) 55%, transparent);
-      border-color: var(--green);
+    .annot-action-txt small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .mark-create-colors {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .mark-create-colors button {
-      width: 28px;
-      height: 28px;
+    .annot-action-glyph {
+      flex: none;
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
       border-radius: 50%;
-      border: 3px solid var(--card);
-      box-shadow: 0 0 0 1px var(--line);
-      transition: transform .15s, box-shadow .15s;
+      color: var(--green);
+      background: color-mix(in srgb, var(--green) 12%, transparent);
+      opacity: .8;
+      transition: transform .3s, background .3s, color .3s;
     }
 
-    .mark-create-colors button[aria-pressed="true"] {
-      box-shadow: 0 0 0 2px var(--green);
+    .annot-action-glyph svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .annot-action[aria-pressed="true"] {
+      background: linear-gradient(135deg, color-mix(in srgb, var(--green) 20%, var(--card)) 0%, var(--card) 60%);
+      box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--green) 45%, transparent);
+    }
+
+    .annot-action[aria-pressed="true"]::after {
+      width: 5px;
+      opacity: 1;
+    }
+
+    .annot-action[aria-pressed="true"] .annot-action-ic {
+      transform: rotate(-8deg) scale(1.05);
+      box-shadow: 0 6px 16px color-mix(in srgb, var(--green) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, .2);
+    }
+
+    .annot-action[aria-pressed="true"] .annot-action-glyph {
+      color: var(--on-green);
+      background: var(--green);
       transform: scale(1.08);
+      opacity: 1;
     }
 
     .mark-create-submit {
@@ -1808,14 +2134,14 @@
     .d-title {
       display: none;
       width: 100%;
-      padding-top: 14px;
+      padding-top: 10px;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .d-title h2 {
       margin: 0;
-      font-size: 30px;
+      font-size: 22px;
       font-weight: 500;
       line-height: 1.2;
     }
@@ -1824,8 +2150,8 @@
       align-self: flex-start;
       color: var(--green);
       font-weight: 500;
-      font-size: 20px;
-      padding: 10px 12px;
+      font-size: 15px;
+      padding: 8px 10px;
       margin-inline-start: 4px;
     }
 
@@ -1845,24 +2171,24 @@
     }
 
     .mk-card .srow {
-      min-height: 92px;
-      padding: 18px 22px;
-      gap: 20px;
+      min-height: 60px;
+      padding: 11px 14px;
+      gap: 12px;
     }
 
     .mk-card .srow>svg {
-      width: 30px;
-      height: 30px;
+      width: 24px;
+      height: 24px;
       flex: none;
     }
 
     .mk-card .sname {
-      font-size: 20px;
+      font-size: 15px;
     }
 
     .mk-card .smeta {
-      font-size: 16px;
-      margin-top: 4px;
+      font-size: 12.5px;
+      margin-top: 2px;
     }
 
     .mk-edit {
@@ -1886,23 +2212,26 @@
       padding: 9px 12px;
     }
 
-    .mk-edit button {
-      padding: 8px 12px;
+    .mk-edit>button {
+      flex: 1 1 calc(50% - 5px);
+      padding: 9px 10px;
       border-radius: 10px;
       border: 1px solid var(--line);
       color: var(--muted);
       font-size: 14px;
       white-space: nowrap;
+      background: var(--panel);
     }
 
     .mk-edit .sw {
-      flex: 1;
-      gap: 8px;
+      flex: 1 1 100%;
+      gap: 10px;
+      padding: 4px 0;
     }
 
     .mk-edit .sw button {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       padding: 0;
       border: 2px solid var(--panel);
       border-radius: 50%;
@@ -2057,6 +2386,172 @@
       font-weight: 700;
     }
 
+    /* first-open download of the Quran texts for offline use */
+    .dl-chip {
+      position: fixed;
+      left: 50%;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 96px);
+      transform: translateX(-50%);
+      width: min(320px, calc(100vw - 32px));
+      padding: 9px 12px 11px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .2);
+      z-index: 59;
+      direction: rtl;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .dl-chip .dl-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+
+    .dl-chip .dl-track {
+      height: 6px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--green) 18%, var(--line));
+      overflow: hidden;
+    }
+
+    .dl-chip .dl-track i {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: var(--green);
+      transition: width .25s linear;
+    }
+
+    .recitation-panel {
+      position: relative;
+      width: calc(100% - 24px);
+      margin: 10px 12px;
+      padding: 8px 10px;
+      direction: rtl;
+      color: var(--ink);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, .1);
+      font-family: var(--font-ui);
+    }
+
+    .recitation-marks {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 0 0 8px;
+      border-bottom: 1px solid var(--line);
+      scrollbar-width: thin;
+    }
+
+    .recitation-marks button {
+      flex: none;
+      max-width: 150px;
+      padding: 5px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: var(--panel-top);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .recitation-marks button:active { transform: scale(.97); }
+    .recitation-marks .recitation-marks-empty { color: var(--muted); font-size: 12px; white-space: nowrap; }
+
+    .recitation-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 0 5px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .recitation-title label { display: flex; align-items: center; gap: 6px; }
+
+    .recitation-panel select,
+    .recitation-panel input {
+      min-width: 0;
+      height: 34px;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--panel-top);
+      font: inherit;
+      font-size: 13px;
+    }
+
+    #reciterSelect { width: 154px; }
+
+    .recitation-range {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 74px 74px;
+      gap: 7px;
+    }
+
+    .recitation-range label {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .recitation-range label:first-child { display: block; }
+    .recitation-range label:first-child select { width: 100%; margin-top: 2px; }
+    .recitation-range input { width: 100%; text-align: center; }
+
+    .recitation-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding-top: 8px;
+    }
+
+    .recitation-play {
+      flex: none;
+      min-height: 36px;
+      padding: 5px 15px;
+      border-radius: 9px;
+      color: var(--on-green);
+      background: var(--green);
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .recitation-status {
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 360px) {
+      .recitation-panel { margin-inline: 8px; width: calc(100% - 16px); padding: 8px; }
+      .recitation-range { grid-template-columns: minmax(0, 1fr) 66px 66px; gap: 5px; }
+      #reciterSelect { width: 136px; }
+    }
+
     .toast {
       position: fixed;
       left: 50%;
@@ -2193,46 +2688,35 @@
     <div class="d-body" id="paneSurahs"></div>
     <div class="d-body" id="paneQuarters" hidden></div>
     <div class="d-body" id="paneMarks" hidden></div>
-    <div class="page-mode" role="group" aria-label="طريقة التنقل بين الصفحات">
-      <button type="button" data-page-mode="vertical" aria-pressed="true">تمرير رأسي</button>
-      <button type="button" data-page-mode="horizontal" aria-pressed="false">تمرير أفقي</button>
-    </div>
-    <div class="scroll-controls" aria-label="التمرير التلقائي">
-      <button type="button" class="scroll-toggle" id="scrollToggle" aria-pressed="false">
-        <svg id="scrollToggleIcon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8 5v14l11-7z" />
-        </svg>
-        <span id="scrollToggleLabel">بدء التمرير</span>
-      </button>
-      <label class="scroll-speed-label" for="scrollSpeed">
-        <span>سرعة التمرير</span>
-        <output id="scrollSpeedValue" for="scrollSpeed"></output>
-      </label>
-      <input id="scrollSpeed" type="range" min="5" max="100" step="5" value="30"
-        aria-label="سرعة التمرير بالبكسل في الثانية">
-    </div>
-    <div class="d-actions">
-      <button type="button" class="d-action" id="bScreen" aria-label="ملء الشاشة والتدوير أفقيًا" aria-pressed="false"
-        title="ملء الشاشة والتدوير أفقيًا">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5M7 12a5 5 0 0 1 8.5-3.5L17 10M17 12a5 5 0 0 1-8.5 3.5L7 14" />
-        </svg>
-        <span id="screenLabel">ملء الشاشة</span>
-      </button>
-      <button type="button" class="d-action" id="bAnnot" aria-label="تعديل الصفحات" aria-pressed="false">
-        <svg viewBox="0 0 24 24">
+    <section class="settings" aria-label="الإعدادات">
+      <button type="button" class="settings-toggle" id="settingsToggle" aria-expanded="false" aria-controls="settingsBody">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
           <path
-            d="m3 17.25 9.06-9.06 3.75 3.75L6.75 21H3zm11.12-11.12 2.12-2.12a1.5 1.5 0 0 1 2.12 0l1.63 1.63a1.5 1.5 0 0 1 0 2.12l-2.12 2.12zM3 22h18v-2H3z" />
+            d="M19.14 12.94a7.07 7.07 0 0 0 0-1.88l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.59.24-1.13.56-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.07 7.07 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.5.38 1.04.7 1.63.94l.36 2.54a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.54c.59-.24 1.13-.56 1.63-.94l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z" />
         </svg>
-        <span id="annotToggleLabel">تعديل الصفحات</span>
-      </button>
-      <button type="button" class="d-action" id="bTheme" aria-label="تفعيل الوضع الليلي" aria-pressed="false">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z" />
+        <span class="settings-title">الإعدادات</span>
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m6 9 6 6 6-6" />
         </svg>
-        <span id="themeLabel">الوضع الليلي</span>
       </button>
-    </div>
+      <div class="settings-body" id="settingsBody" hidden>
+        <div class="d-actions">
+          <button type="button" class="d-action" id="bScreen" aria-label="ملء الشاشة والتدوير أفقيًا"
+            aria-pressed="false" title="ملء الشاشة والتدوير أفقيًا">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5M7 12a5 5 0 0 1 8.5-3.5L17 10M17 12a5 5 0 0 1-8.5 3.5L7 14" />
+            </svg>
+            <span id="screenLabel">ملء الشاشة</span>
+          </button>
+          <button type="button" class="d-action" id="bTheme" aria-label="تفعيل الوضع الليلي" aria-pressed="false">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z" />
+            </svg>
+            <span id="themeLabel">الوضع الليلي</span>
+          </button>
+        </div>
+      </div>
+    </section>
     <div class="drawer-credit">صدقة جارية على روح أمي وجدتي، نسألكم الدعاء<br>برمجة محمد سعيد الحاكم</div>
   </aside>
 
@@ -2240,32 +2724,95 @@
     <div class="v-top">
       <h2 id="vTitle"></h2>
       <div class="ics">
-        <button type="button" class="ib" id="vShare" aria-label="نسخ الآية"><svg viewBox="0 0 24 24">
+        <button type="button" class="ib" id="vShare" aria-label="تحديد آيات للنسخ" aria-expanded="false" aria-controls="shareRange"><svg viewBox="0 0 24 24">
             <path
               d="M18 16.1c-.8 0-1.5.3-2 .8l-7.1-4.2c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.2c.5.5 1.2.8 2 .8a3 3 0 1 0-3-3c0 .2 0 .5.1.7L8 9.8A3 3 0 1 0 8 14.2l7.1 4.2c-.1.2-.1.4-.1.6a2.9 2.9 0 1 0 3-2.9z" />
           </svg></button>
       </div>
     </div>
+    <div class="share-range" id="shareRange" hidden>
+      <label for="shareFrom">من آية
+        <input id="shareFrom" type="number" min="1" inputmode="numeric">
+      </label>
+      <label for="shareTo">إلى آية
+        <input id="shareTo" type="number" min="1" inputmode="numeric">
+      </label>
+      <button type="button" id="copyVerseRange">نسخ الآيات</button>
+    </div>
     <div class="v-card">
       <div class="v-colors" id="vColors"></div>
-      <div class="v-add">
-        <button type="button" class="v-add-toggle" id="vAddToggle" aria-expanded="false">إضافة علامة</button>
-        <div class="mark-create" id="vAddForm" hidden>
-          <label for="vAddName">اسم العلامة</label>
-          <input type="text" id="vAddName" maxlength="40" placeholder="مثال: مراجعة أو حفظ" autocomplete="off">
-          <div class="mark-create-colors" id="vAddColors" role="group" aria-label="اختر لون العلامة"></div>
-          <button type="button" class="mark-create-submit" id="vAddSave">إضافة العلامة لهذه الآية</button>
-        </div>
+    </div>
+    <section class="recitation-panel" aria-label="تشغيل الآيات">
+      <div class="recitation-marks" id="recitationMarks" aria-label="العلامات المحفوظة"></div>
+      <div class="recitation-title">
+        <strong>تشغيل الآيات</strong>
+        <label for="reciterSelect">القارئ
+          <select id="reciterSelect" aria-label="اختر القارئ">
+            <option value="Alafasy_128kbps">مشاري العفاسي</option>
+            <option value="Abdurrahmaan_As-Sudais_192kbps">عبدالرحمن السديس</option>
+            <option value="Husary_128kbps">محمود خليل الحصري</option>
+            <option value="Maher_AlMuaiqly_64kbps">ماهر المعيقلي</option>
+          </select>
+        </label>
+      </div>
+      <div class="recitation-range">
+        <label for="recitationSurah">السورة
+          <select id="recitationSurah" aria-label="اختر السورة"></select>
+        </label>
+        <label for="recitationFrom">من آية
+          <input id="recitationFrom" type="number" min="1" value="1" inputmode="numeric">
+        </label>
+        <label for="recitationTo">إلى آية
+          <input id="recitationTo" type="number" min="1" value="1" inputmode="numeric">
+        </label>
+      </div>
+      <div class="recitation-actions">
+        <button type="button" class="recitation-play" id="recitationPlay" aria-pressed="false">استماع</button>
+        <span class="recitation-status" id="recitationStatus" role="status" aria-live="polite">اختر نطاق الآيات للاستماع</span>
+      </div>
+    </section>
+    <div class="v-card">
+      <div class="scroll-controls v-scroll-controls" aria-label="التمرير التلقائي">
+        <button type="button" class="scroll-toggle" id="scrollToggle" aria-pressed="false">
+          <svg id="scrollToggleIcon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          <span id="scrollToggleLabel">بدء التمرير</span>
+        </button>
+        <label class="scroll-speed-label" for="scrollSpeed">
+          <span>سرعة التمرير</span>
+          <output id="scrollSpeedValue" for="scrollSpeed"></output>
+        </label>
+        <input id="scrollSpeed" type="range" min="5" max="100" step="5" value="30"
+          aria-label="سرعة التمرير بالبكسل في الثانية">
       </div>
     </div>
     <div class="v-card">
-      <button type="button" class="v-row" id="vCopy"><svg viewBox="0 0 24 24">
-          <path
-            d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11z" />
-        </svg><span><b>نسخ الآية</b></span></button>
+      <button type="button" class="v-row annot-action" id="bAnnot" aria-label="تعديل الصفحات" aria-pressed="false">
+        <span class="annot-action-ic">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="m3 17.25 9.06-9.06 3.75 3.75L6.75 21H3zm11.12-11.12 2.12-2.12a1.5 1.5 0 0 1 2.12 0l1.63 1.63a1.5 1.5 0 0 1 0 2.12l-2.12 2.12zM3 22h18v-2H3z" />
+          </svg>
+        </span>
+        <span class="annot-action-txt">
+          <b id="annotToggleLabel">تعديل الصفحات</b>
+          <small>تمييز الكلمات والآيات بألوان</small>
+        </span>
+        <span class="annot-action-glyph" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3a9 9 0 1 0 0 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-1 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+          </svg>
+        </span>
+      </button>
     </div>
   </section>
   <div class="toast" id="toast" role="status"></div>
+
+  <div class="dl-chip" id="dlChip" hidden aria-live="polite">
+    <div class="dl-row"><span id="dlLabel">جارٍ تحميل النصوص القرآنية…</span><span id="dlPct">٠٪</span></div>
+    <div class="dl-track"><i id="dlBar"></i></div>
+  </div>
 
   <script src="muyassar-data.js"></script>
   <script>
@@ -2344,8 +2891,8 @@
       var activeView = pageList.querySelector('.page-view'), sheet = activeView.querySelector('.sheet');
       var cur = 1, sel = 0, widths = {}, renderQueue = Promise.resolve();
       var loadingPrevious = false;
-      var scrollMode = store('mq.scrollMode') === 'horizontal' ? 'horizontal' : 'vertical';
-      document.body.classList.toggle('horizontal-pages', scrollMode === 'horizontal');
+      var scrollMode = 'vertical';
+      store('mq.scrollMode', 'vertical');
 
       function bannerSVG() {
         return '<svg viewBox="0 0 1000 124" preserveAspectRatio="none" aria-hidden="true">' +
@@ -2487,33 +3034,22 @@
         pageList.insertBefore(view, first); render(view, previous);
         requestAnimationFrame(function () {
           var nextRect = first.getBoundingClientRect();
-          if (scrollMode === 'horizontal') pageList.scrollLeft += nextRect.left - rect.left;
-          else window.scrollBy(0, nextRect.top - rect.top);
+          window.scrollBy(0, nextRect.top - rect.top);
           loadingPrevious = false;
         });
       }
 
       function updateContinuousPages() {
         var views = pageList.children, visible = null, first = pageList.firstElementChild, last = pageList.lastElementChild;
-        if (scrollMode === 'horizontal') {
-          var listRect = pageList.getBoundingClientRect(), markerX = listRect.left + pageList.clientWidth / 2;
-          for (var i = 0; i < views.length; i++) {
-            var pageRect = views[i].getBoundingClientRect();
-            if (pageRect.left <= markerX && pageRect.right > markerX) { visible = views[i]; break; }
-          }
-          if (first && pageList.scrollLeft < pageList.clientWidth * 0.5 && +first.getAttribute('data-page') > 1) prependPreviousPage();
-          if (last && last.getBoundingClientRect().left < listRect.right + pageList.clientWidth * 2 && +last.getAttribute('data-page') < TOTAL) appendNextPage();
-        } else {
-          var marker = window.scrollY + window.innerHeight * 0.38, lo = 0, hi = views.length - 1;
-          while (lo < hi) {
-            var mid = (lo + hi) >> 1;
-            if (views[mid].offsetTop + views[mid].offsetHeight <= marker) lo = mid + 1;
-            else hi = mid;
-          }
-          visible = views[lo];
-          if (first && window.scrollY < window.innerHeight * 0.5 && +first.getAttribute('data-page') > 1) prependPreviousPage();
-          if (last && last.getBoundingClientRect().top < window.innerHeight * 2 && +last.getAttribute('data-page') < TOTAL) appendNextPage();
+        var marker = window.scrollY + window.innerHeight * 0.38, lo = 0, hi = views.length - 1;
+        while (lo < hi) {
+          var mid = (lo + hi) >> 1;
+          if (views[mid].offsetTop + views[mid].offsetHeight <= marker) lo = mid + 1;
+          else hi = mid;
         }
+        visible = views[lo];
+        if (first && window.scrollY < window.innerHeight * 0.5 && +first.getAttribute('data-page') > 1) prependPreviousPage();
+        if (last && last.getBoundingClientRect().top < window.innerHeight * 2 && +last.getAttribute('data-page') < TOTAL) appendNextPage();
         if (visible) activatePage(visible);
       }
 
@@ -2633,10 +3169,7 @@
         if (!view) { renderInitialPage(p); view = activeView; }
         activatePage(view);
         paintSel();
-        if (scrollMode === 'horizontal') {
-          var listLeft = pageList.getBoundingClientRect().left;
-          pageList.scrollTo({ left: pageList.scrollLeft + view.getBoundingClientRect().left - listLeft, behavior: 'smooth' });
-        } else window.scrollTo(0, view.offsetTop);
+        window.scrollTo({ top: view.offsetTop, behavior: 'smooth' });
       }
       function navigateToVerse(id) {
         var page = pageOfV(id);
@@ -2655,6 +3188,171 @@
       var body = document.body, vsheet = $('vsheet');
       var toastEl = $('toast'), tt;
       function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove('show'); }, 2200); }
+      var recitationAudio = new Audio(), recitationRange = null, recitationAyah = 0;
+      var recitationSurah = $('recitationSurah'), recitationFrom = $('recitationFrom');
+      var recitationTo = $('recitationTo'), recitationPlay = $('recitationPlay');
+      var recitationStatus = $('recitationStatus'), recitationMarks = $('recitationMarks');
+      var recitationPrefs = load('mq.recitationPrefs', {});
+      var reciterSelect = $('reciterSelect');
+      var reciterIds = Array.prototype.map.call(reciterSelect.options, function (option) { return option.value; });
+      if (reciterIds.indexOf(recitationPrefs.reciter) >= 0) reciterSelect.value = recitationPrefs.reciter;
+      var initialSurah = Math.max(1, Math.min(D.surahs.length, +recitationPrefs.surah || 1));
+      recitationSurah.innerHTML = D.surahs.map(function (surah) {
+        return '<option value="' + surah[0] + '">' + escapeHtml(surah[1]) + '</option>';
+      }).join('');
+      recitationSurah.value = String(initialSurah);
+
+      function updateRecitationBounds(reset) {
+        var surah = +recitationSurah.value;
+        var count = D.surahs[surah - 1][3];
+        recitationFrom.max = String(count);
+        recitationTo.max = String(count);
+        var from = reset ? 1 : Math.max(1, Math.min(count, +recitationFrom.value || 1));
+        var to = reset ? from : Math.max(1, Math.min(count, +recitationTo.value || from));
+        if (to < from) to = from;
+        recitationFrom.value = String(from);
+        recitationTo.value = String(to);
+      }
+
+      function saveRecitationPrefs() {
+        save('mq.recitationPrefs', {
+          surah: +recitationSurah.value,
+          from: +recitationFrom.value,
+          to: +recitationTo.value,
+          reciter: reciterSelect.value
+        });
+      }
+
+      function renderRecitationMarks() {
+        var marked = slots.filter(function (slot) { return slot.v && slot.v > 0; });
+        recitationMarks.innerHTML = marked.length ? marked.map(function (slot) {
+          return '<button type="button" data-recitation-mark="' + escapeHtml(slot.id) + '" style="border-color:' + COL[slot.c][0] + '" title="' + escapeHtml(label(slot.v)) + '">' +
+            escapeHtml(slotName(slot)) + ' • ' + escapeHtml(label(slot.v)) + '</button>';
+        }).join('') : '<span class="recitation-marks-empty">العلامات المحفوظة تظهر هنا</span>';
+      }
+
+      function setRecitationButton(playing) {
+        recitationPlay.textContent = playing ? 'إيقاف مؤقت' : 'استماع';
+        recitationPlay.setAttribute('aria-pressed', String(playing));
+      }
+
+      function recitationUrl(surah, ayah) {
+        var surahNumber = ('00' + surah).slice(-3);
+        var ayahNumber = ('00' + ayah).slice(-3);
+        return 'https://everyayah.com/data/' + encodeURIComponent(reciterSelect.value) + '/' + surahNumber + ayahNumber + '.mp3';
+      }
+
+      function stopRecitation(message) {
+        recitationAudio.pause();
+        recitationAudio.removeAttribute('src');
+        recitationAudio.load();
+        recitationRange = null;
+        recitationAyah = 0;
+        setRecitationButton(false);
+        if (message) recitationStatus.textContent = message;
+      }
+
+      function playRecitationAyah() {
+        if (!recitationRange) return;
+        recitationStatus.textContent = 'الآية ' + ar(recitationAyah) + ' من ' + ar(recitationRange.to);
+        recitationAudio.src = recitationUrl(recitationRange.surah, recitationAyah);
+        recitationAudio.load();
+        var playback = recitationAudio.play();
+        if (playback && typeof playback.catch === 'function') {
+          playback.catch(function () {
+            if (!recitationRange) return;
+            stopRecitation('تعذّر تشغيل التلاوة؛ تحقق من اتصال الإنترنت وحاول مجددًا');
+            toast('تعذّر تشغيل التلاوة');
+          });
+        }
+      }
+
+      recitationAudio.preload = 'none';
+      recitationAudio.addEventListener('ended', function () {
+        if (!recitationRange) return;
+        if (recitationAyah < recitationRange.to) {
+          recitationAyah += 1;
+          playRecitationAyah();
+          return;
+        }
+        recitationRange = null;
+        recitationAyah = 0;
+        setRecitationButton(false);
+        recitationStatus.textContent = 'اكتمل الاستماع إلى النطاق المحدد';
+      });
+      recitationAudio.addEventListener('error', function () {
+        if (!recitationRange) return;
+        stopRecitation('تعذّر تحميل التلاوة؛ تحقق من الاتصال أو اختر قارئًا آخر');
+        toast('تعذّر تحميل الآية');
+      });
+
+      recitationSurah.addEventListener('change', function () {
+        stopRecitation('تم تغيير السورة؛ حدد الآيات ثم ابدأ الاستماع');
+        updateRecitationBounds(true);
+        saveRecitationPrefs();
+      });
+      recitationFrom.addEventListener('change', function () {
+        stopRecitation('تم تغيير نطاق الآيات؛ ابدأ الاستماع');
+        updateRecitationBounds(false);
+        saveRecitationPrefs();
+      });
+      recitationTo.addEventListener('change', function () {
+        stopRecitation('تم تغيير نطاق الآيات؛ ابدأ الاستماع');
+        updateRecitationBounds(false);
+        saveRecitationPrefs();
+      });
+      reciterSelect.addEventListener('change', function () {
+        stopRecitation('تم تغيير القارئ؛ ابدأ الاستماع');
+        saveRecitationPrefs();
+      });
+      recitationPlay.addEventListener('click', function () {
+        if (!recitationAudio.paused) {
+          recitationAudio.pause();
+          setRecitationButton(false);
+          recitationStatus.textContent = 'التلاوة متوقفة مؤقتًا';
+          return;
+        }
+        if (recitationRange) {
+          setRecitationButton(true);
+          var playback = recitationAudio.play();
+          if (playback && typeof playback.catch === 'function') {
+            playback.catch(function () {
+              if (!recitationRange) return;
+              stopRecitation('تعذّر استئناف التلاوة؛ تحقق من اتصال الإنترنت وحاول مجددًا');
+              toast('تعذّر استئناف التلاوة');
+            });
+          }
+          return;
+        }
+        updateRecitationBounds(false);
+        var from = +recitationFrom.value, to = +recitationTo.value;
+        if (!from || !to || from > to) {
+          toast('حدد نطاقًا صحيحًا للآيات');
+          return;
+        }
+        saveRecitationPrefs();
+        recitationRange = { surah: +recitationSurah.value, from: from, to: to };
+        recitationAyah = from;
+        setRecitationButton(true);
+        playRecitationAyah();
+      });
+      recitationMarks.addEventListener('click', function (event) {
+        var button = event.target.closest('[data-recitation-mark]');
+        if (!button) return;
+        var mark = slotById(button.getAttribute('data-recitation-mark'));
+        if (!mark || !mark.v) return;
+        stopRecitation('تم اختيار موضع العلامة؛ ابدأ الاستماع');
+        recitationSurah.value = String(Math.floor(mark.v / 1000));
+        updateRecitationBounds(true);
+        recitationFrom.value = String(mark.v % 1000);
+        recitationTo.value = String(mark.v % 1000);
+        saveRecitationPrefs();
+        navigateToVerse(mark.v);
+      });
+      recitationFrom.value = String(Math.max(1, Math.min(D.surahs[initialSurah - 1][3], +recitationPrefs.from || 1)));
+      recitationTo.value = String(Math.max(+recitationFrom.value, Math.min(D.surahs[initialSurah - 1][3], +recitationPrefs.to || +recitationFrom.value)));
+      updateRecitationBounds(false);
+      renderRecitationMarks();
       var bScreen = $('bScreen');
       function syncScreenButton() {
         var active = !!document.fullscreenElement;
@@ -2696,6 +3394,13 @@
       function fillSheet() {
         var s = Math.floor(sel / 1000), a = sel % 1000;
         $('vTitle').textContent = D.surahs[s - 1][1] + ':' + ar(a);
+        var shareFrom = $('shareFrom'), shareTo = $('shareTo');
+        shareFrom.max = String(D.surahs[s - 1][3]);
+        shareTo.max = String(D.surahs[s - 1][3]);
+        shareFrom.value = String(a);
+        shareTo.value = String(a);
+        $('shareRange').hidden = true;
+        $('vShare').setAttribute('aria-expanded', 'false');
         fillColors();
       }
       function openV(v) {
@@ -2722,38 +3427,6 @@
           return '<div class="v-mark-entry">' + row + '</div>';
         }).join('');
       }
-      var newVerseMarkColor = PALETTE[0];
-      function fillAddColors() {
-        $('vAddColors').innerHTML = PALETTE.map(function (color) {
-          return '<button type="button" data-add-color="' + color + '" aria-pressed="' + (color === newVerseMarkColor) + '" title="' + COL[color][1] + '" aria-label="' + COL[color][1] + '" style="background:' + COL[color][0] + '"></button>';
-        }).join('');
-      }
-      $('vAddToggle').addEventListener('click', function () {
-        var form = $('vAddForm'), expanded = this.getAttribute('aria-expanded') === 'true';
-        this.setAttribute('aria-expanded', String(!expanded));
-        form.hidden = expanded;
-        if (!expanded) $('vAddName').focus();
-      });
-      fillAddColors();
-      $('vAddColors').addEventListener('click', function (e) {
-        var button = e.target.closest('[data-add-color]');
-        if (!button) return;
-        newVerseMarkColor = button.getAttribute('data-add-color');
-        fillAddColors();
-      });
-      $('vAddSave').addEventListener('click', function () {
-        var name = $('vAddName').value.trim();
-        if (!name) { $('vAddName').focus(); toast('اكتب اسم العلامة أولًا'); return; }
-        addMarkSlot(newVerseMarkColor, name, sel);
-        $('vAddName').value = '';
-        $('vAddForm').hidden = true;
-        $('vAddToggle').setAttribute('aria-expanded', 'false');
-        fillSheet(); buildMarks(); updateBm(); paintSlots();
-        toast('أُضيفت العلامة لهذه الآية');
-      });
-      $('vAddName').addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); $('vAddSave').click(); }
-      });
       $('vColors').addEventListener('click', function (e) {
         var remove = e.target.closest('[data-vslot-remove]');
         if (remove) {
@@ -2786,6 +3459,7 @@
         if (!slot) return;
         slot.nm = input.value.trim();
         saveSlots(); updateBm();
+        renderRecitationMarks();
         var name = input.closest('.v-mark-entry').querySelector('.v-slot-name');
         if (name) name.textContent = slotName(slot);
       });
@@ -2826,8 +3500,28 @@
         if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { toast(ok); }, fb); else fb();
       }
       function ayahCopy() { var s = Math.floor(sel / 1000), a = sel % 1000; return '﴿' + verseText(s, a) + '﴾ [' + D.surahs[s - 1][1] + ': ' + ar(a) + ']'; }
-      $('vShare').addEventListener('click', function () { copyText(ayahCopy(), 'تم نسخ الآية'); });
-      $('vCopy').addEventListener('click', function () { copyText(ayahCopy(), 'تم نسخ الآية'); });
+      $('vShare').addEventListener('click', function () {
+        var range = $('shareRange');
+        range.hidden = !range.hidden;
+        this.setAttribute('aria-expanded', String(!range.hidden));
+        if (!range.hidden) $('shareFrom').focus();
+      });
+      $('copyVerseRange').addEventListener('click', function () {
+        var surahNumber = Math.floor(sel / 1000), surah = D.surahs[surahNumber - 1];
+        var from = Math.max(1, Math.min(surah[3], +$('shareFrom').value || 0));
+        var to = Math.max(1, Math.min(surah[3], +$('shareTo').value || 0));
+        if (!from || !to || from > to) {
+          toast('حدد نطاقًا صحيحًا للآيات');
+          return;
+        }
+        $('shareFrom').value = String(from);
+        $('shareTo').value = String(to);
+        var text = [];
+        for (var ayah = from; ayah <= to; ayah++) {
+          text.push('﴿' + verseText(surahNumber, ayah) + '﴾ [' + surah[1] + ': ' + ar(ayah) + ']');
+        }
+        copyText(text.join('\n'), from === to ? 'تم نسخ الآية' : 'تم نسخ الآيات');
+      });
 
       /* ---------- drawer ---------- */
       var drawer = $('drawer');
@@ -2838,10 +3532,10 @@
         });
       }
       function setPageMode(mode) {
-        if (mode !== 'vertical' && mode !== 'horizontal' || mode === scrollMode) return;
+        mode = 'vertical';
+        if (mode === scrollMode) return;
         stopAutoScroll();
         scrollMode = mode; store('mq.scrollMode', mode);
-        document.body.classList.toggle('horizontal-pages', mode === 'horizontal');
         renderInitialPage(cur);
         pageList.scrollLeft = 0; window.scrollTo(0, 0);
         syncPageModeButtons();
@@ -2873,15 +3567,12 @@
         if (!autoScrollTime) autoScrollTime = time;
         var elapsed = Math.min(250, time - autoScrollTime);
         autoScrollTime = time;
-        var maxScroll = scrollMode === 'horizontal'
-          ? Math.max(0, pageList.scrollWidth - pageList.clientWidth)
-          : Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-        var atEnd = scrollMode === 'horizontal' ? pageList.scrollLeft >= maxScroll - 1 : window.scrollY >= maxScroll - 1;
+        var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        var atEnd = window.scrollY >= maxScroll - 1;
         if (pageList.lastElementChild && +pageList.lastElementChild.getAttribute('data-page') === TOTAL && atEnd) {
           stopAutoScroll(); toast('وصلت إلى نهاية المصحف'); return;
         }
-        if (scrollMode === 'horizontal') pageList.scrollBy({ left: scrollSpeed * elapsed / 1000 });
-        else window.scrollBy(0, scrollSpeed * elapsed / 1000);
+        window.scrollBy(0, scrollSpeed * elapsed / 1000);
         autoScrollFrame = requestAnimationFrame(autoScrollStep);
       }
       function startAutoScroll() {
@@ -2890,7 +3581,7 @@
       }
       scrollToggle.addEventListener('click', function () {
         if (autoScrollFrame) { stopAutoScroll(); return; }
-        closeD();
+        closeV();
         if (scrollMode !== 'vertical') setPageMode('vertical');
         startAutoScroll();
       });
@@ -2901,10 +3592,10 @@
       });
       document.addEventListener('wheel', stopAutoScroll, { passive: true });
       document.addEventListener('touchstart', function (e) {
-        if (!e.target.closest('#drawer')) stopAutoScroll();
+        if (!e.target.closest('#drawer, #vsheet')) stopAutoScroll();
       }, { passive: true });
       document.addEventListener('pointerdown', function (e) {
-        if (!e.target.closest('#drawer')) stopAutoScroll();
+        if (!e.target.closest('#drawer, #vsheet')) stopAutoScroll();
       }, true);
       syncScrollControls();
       function openD() {
@@ -3046,6 +3737,7 @@
         var add = editing ? '<div class="mk-add"><label class="mk-add-name">اسم العلامة<input type="text" maxlength="40" value="' + escapeHtml(newDrawerMarkName) + '" data-new-mark-name placeholder="اكتب اسمًا واضحًا للعلامة" autocomplete="off"></label><span>اختر لون العلامة</span><div class="sw">' + PALETTE.map(function (c) { return '<button type="button" data-new-mark-color="' + c + '" aria-pressed="' + (c === newDrawerMarkColor) + '" style="background:' + COL[c][0] + '" aria-label="' + COL[c][1] + '" title="' + COL[c][1] + '"></button>'; }).join('') + '</div><button type="button" class="mark-create-submit" data-create-mark>إضافة العلامة</button></div>' : '';
         var empty = !slots.length && !editing ? '<div class="empty">لا توجد علامات محفوظة. اختر «تحرير» لإضافة علامة جديدة.</div>' : '';
         paneM.innerHTML = '<div class="mk-card">' + h + add + empty + '</div>';
+        renderRecitationMarks();
       }
       paneM.addEventListener('click', function (e) {
         var a = e.target.closest('[data-create-mark]'), c = e.target.closest('[data-clr]'), r = e.target.closest('[data-rm]'), color = e.target.closest('[data-slot-color]'), newColor = e.target.closest('[data-new-mark-color]');
@@ -3078,6 +3770,7 @@
         var slot = slotById(i.getAttribute('data-nm'));
         if (!slot) return;
         slot.nm = i.value.trim(); saveSlots(); updateBm();
+        renderRecitationMarks();
         var name = paneM.querySelector('[data-mark-name="' + slot.id + '"]');
         if (name) name.textContent = slotName(slot);
       });
@@ -3184,8 +3877,7 @@
       ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { pageList.addEventListener(n, lpCancel); });
       pageList.addEventListener('contextmenu', function (e) { if (e.target.closest('.w')) e.preventDefault(); });
       document.addEventListener('pointerdown', function (e) { if (!wp.hidden && !e.target.closest('#wp') && !e.target.closest('.w')) closeWp(); }, true);
-      window.addEventListener('scroll', function () { if (!wp.hidden) closeWp(); if (scrollMode === 'vertical') updateContinuousPages(); }, { passive: true });
-      pageList.addEventListener('scroll', function () { if (scrollMode === 'horizontal') updateContinuousPages(); }, { passive: true });
+      window.addEventListener('scroll', function () { if (!wp.hidden) closeWp(); updateContinuousPages(); }, { passive: true });
 
       pageList.addEventListener('click', function (e) {
         var view = e.target.closest('.page-view'); if (!view) return;
@@ -3276,7 +3968,7 @@
       });
       $('bAnnot').addEventListener('click', function () {
         annotEnabled = !annotEnabled; saveAnnotPrefs(); syncAnnotControls(); closeWp();
-        if (annotEnabled) closeD();
+        if (annotEnabled) closeV();
       });
       annotColors.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-annot-color') === annotPrefs.color)); });
       syncAnnotControls();
@@ -3293,6 +3985,21 @@
       });
       var th = store('mq.theme'); if (th === 'dark' || th === 'light') document.documentElement.setAttribute('data-theme', th);
       syncThemeButton();
+
+      /* settings section */
+      var settingsToggle = $('settingsToggle'), settingsBody = $('settingsBody');
+      var settingsOpen = store('mq.settingsOpen') === '1';
+      function syncSettings() {
+        settingsBody.hidden = !settingsOpen;
+        settingsToggle.setAttribute('aria-expanded', String(settingsOpen));
+      }
+      settingsToggle.addEventListener('click', function () {
+        settingsOpen = !settingsOpen;
+        store('mq.settingsOpen', settingsOpen ? '1' : '0');
+        syncSettings();
+      });
+      syncSettings();
+
       var pgIn = $('pgIn');
       pgIn.addEventListener('focus', function () { pgIn.select(); });
       function commitPage() { var n = parseNum(pgIn.value); if (!isNaN(n)) goTo(n); else pgIn.value = ar(cur); }
@@ -3319,6 +4026,150 @@
       renderInitialPage(cur);
       requestAnimationFrame(updateContinuousPages);
       if (!store('mq.hint')) { store('mq.hint', '1'); toast('اسحب لتقليب الصفحات، واضغط على آية لخياراتها'); }
+    })();
+  </script>
+
+  <script>
+    /* ---------- offline: on first open, download every Quran text/font so the Mushaf works without internet ---------- */
+    (function () {
+      var CACHE = 'mushaf-offline-v1', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '1';
+      function ar(n) { return String(n).replace(/\d/g, function (d) { return AR[d]; }); }
+      var urls = (function () {
+        var a = ['./', './index.html', './muyassar-data.js', './muyassar.json', './words.json'];
+        for (var i = 1; i <= 47; i++) a.push('./fonts/QCF4_Hafs_' + (i < 10 ? '0' : '') + i + '_W.woff2');
+        a.push('./fonts/QCF4_QBSML.woff2');
+        return a;
+      })();
+      var chip = document.getElementById('dlChip'), bar = document.getElementById('dlBar'),
+        pct = document.getElementById('dlPct'), lbl = document.getElementById('dlLabel');
+      /* optional: covered by the service worker navigation cache or unused by this page */
+      var OPTIONAL = ['./', './muyassar.json', './words.json'];
+      var done = 0, running = false, failed = [], firstError = '';
+
+      function isDone() { try { return localStorage.getItem(DONE_KEY) === VER; } catch (e) { return false; } }
+      function markDone() { try { localStorage.setItem(DONE_KEY, VER); } catch (e) { } }
+      function update() {
+        var p = Math.round(done / urls.length * 100);
+        if (bar) bar.style.width = p + '%';
+        if (pct) pct.textContent = ar(p) + '٪';
+      }
+      function show() { if (chip) { chip.hidden = false; update(); } }
+      function hideLater(ms) { setTimeout(function () { if (chip) chip.hidden = true; }, ms); }
+      function finish() {
+        done = urls.length; update();
+        if (lbl) lbl.textContent = 'اكتمل تحميل النصوص القرآنية — يعمل المصحف بدون إنترنت';
+        hideLater(2600);
+      }
+      function softDone() {
+        done = urls.length; update();
+        if (lbl) lbl.textContent = 'المتصفح منع التخزين الدائم — سيستخدم المصحف كاش التصفح للعمل بدون إنترنت';
+        hideLater(5000);
+      }
+      function fail(have) {
+        var msg = (typeof have === 'number' ? 'تم تحميل ' + ar(have) + ' من ' + ar(urls.length) + ' — ' : '') + 'سيُستأنف التحميل تلقائيًا عند الفتح التالي';
+        if (firstError) msg += ' — ' + firstError;
+        if (lbl) lbl.textContent = msg;
+        hideLater(6000);
+      }
+
+      function grab(cache, url) {
+        return fetch(url).then(function (r) {
+          if (!r || !(r.ok || r.type === 'opaque')) throw new Error('HTTP ' + (r && r.status));
+          return cache.put(url, r.clone()).catch(function (e) { throw new Error('cache:' + (e && e.message || e)); });
+        }, function (e) {
+          throw new Error('net:' + (e && e.message || e));
+        });
+      }
+      function grabTwice(cache, url) {
+        return grab(cache, url).catch(function () {
+          return grab(cache, url).catch(function (e) {
+            if (!firstError) firstError = (e && e.message) || String(e);
+            throw e;
+          });
+        });
+      }
+
+      function download(cache, queue) {
+        return new Promise(function (resolve) {
+          function next() {
+            if (!queue.length) return Promise.resolve();
+            var url = queue.shift();
+            return grabTwice(cache, url).then(function () {
+              done++; update();
+            }, function (e) {
+              failed.push({ url: url, err: (e && e.message) || String(e) });
+            }).then(next);
+          }
+          var workers = [];
+          for (var i = 0; i < 4; i++) workers.push(next());
+          Promise.all(workers).then(resolve);
+        });
+      }
+      function cached(cache, u) {
+        var opts = { ignoreSearch: true, ignoreVary: true };
+        return cache.match(u, opts).then(function (m) { return m || caches.match(u, opts); }).then(function (m) { return !!m; });
+      }
+      function verify(cache) {
+        return Promise.all(urls.map(function (u) { return cached(cache, u); }))
+          .then(function (hits) { return hits.filter(Boolean).length; });
+      }
+      function startUI(queue) {
+        done = urls.length - queue.length;
+        show();
+        return queue;
+      }
+
+      function run() {
+        if (running || isDone()) return;
+        /* offline caching is only meaningful (and fetch only allowed) over http/https */
+        if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+        running = true;
+        failed = [];
+        firstError = '';
+
+        if (!('caches' in window)) {
+          var i = 0;
+          show();
+          (function step() {
+            if (i >= urls.length) { running = false; markDone(); finish(); return; }
+            var u = urls[i++];
+            fetch(u).catch(function () { }).then(function () { done = i; update(); step(); });
+          })();
+          return;
+        }
+
+        caches.open(CACHE).then(function (cache) {
+          fetch('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap')
+            .then(function (r) { if (r && (r.ok || r.type === 'opaque')) return cache.put('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap', r.clone()); })
+            .catch(function () { });
+          return Promise.all(urls.map(function (u) { return cached(cache, u).then(function (ok) { return !ok; }); }))
+            .then(function (missing) {
+              var queue = urls.filter(function (u, idx) { return missing[idx]; });
+              if (!queue.length) { running = false; markDone(); return; }
+              startUI(queue);
+              return download(cache, queue).then(function () {
+                var blocking = failed.filter(function (f) { return OPTIONAL.indexOf(f.url) < 0; });
+                if (!blocking.length) { running = false; markDone(); finish(); return; }
+                var storageBlocked = blocking.every(function (f) { return f.err.indexOf('cache:') === 0; });
+                if (storageBlocked) { running = false; markDone(); softDone(); return; }
+                return verify(cache).then(function (have) {
+                  running = false;
+                  if (have >= urls.length) { markDone(); finish(); } else { fail(have); }
+                });
+              });
+            });
+        }).catch(function () { running = false; fail(); });
+      }
+
+      /* keep the service worker (offline cache) alive even when the Mushaf is opened directly */
+      try {
+        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
+          navigator.serviceWorker.register('../sw.js').catch(function () { });
+        }
+      } catch (e) { }
+
+      if (document.readyState === 'complete') setTimeout(run, 400);
+      else window.addEventListener('load', function () { setTimeout(run, 400); });
     })();
   </script>
 
