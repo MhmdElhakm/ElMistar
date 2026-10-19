@@ -16,7 +16,9 @@
     html {
       scroll-padding-top: env(safe-area-inset-top, 0px);
       overflow-x: hidden;
-      scroll-behavior: smooth;
+      /* لا نستخدم smooth افتراضيًا؛ التمرير التلقائي يتحرك بإحداثيات دقيقة كل إطار،
+         وخلط smooth معه يكدّس انتقالات متنافسة ويسبب الاهتزاز. */
+      scroll-behavior: auto;
     }
 
     body {
@@ -356,6 +358,12 @@
       --muted: #6f655a;
       --line: #e9dfd0;
       --scrim: rgba(40, 34, 26, .42);
+      --backup-bg-a: #ecfbf7;
+      --backup-bg-b: #fff8e2;
+      --backup-border: rgba(42, 150, 132, .22);
+      --backup-text: #176f68;
+      --backup-button-border: rgba(42, 150, 132, .2);
+      --backup-button-bg: rgba(255, 255, 255, .72);
       --font-ui: "Tajawal", system-ui, sans-serif;
     }
 
@@ -381,6 +389,12 @@
         --muted: #a99d8c;
         --line: #302a20;
         --scrim: rgba(0, 0, 0, .6);
+        --backup-bg-a: #243c39;
+        --backup-bg-b: #3a3424;
+        --backup-border: rgba(82, 193, 166, .42);
+        --backup-text: #8de0c9;
+        --backup-button-border: rgba(82, 193, 166, .34);
+        --backup-button-bg: rgba(41, 54, 48, .88);
         color-scheme: dark;
       }
     }
@@ -406,6 +420,12 @@
       --muted: #a99d8c;
       --line: #302a20;
       --scrim: rgba(0, 0, 0, .6);
+      --backup-bg-a: #243c39;
+      --backup-bg-b: #3a3424;
+      --backup-border: rgba(82, 193, 166, .42);
+      --backup-text: #8de0c9;
+      --backup-button-border: rgba(82, 193, 166, .34);
+      --backup-button-bg: rgba(41, 54, 48, .88);
       color-scheme: dark;
     }
 
@@ -658,6 +678,24 @@
       background: var(--annot-bg);
       border-radius: .16em;
       box-shadow: 0 0 0 .035em var(--annot-bg);
+    }
+
+    .w.recitation-active {
+      background: color-mix(in srgb, var(--green) 34%, transparent);
+      border-radius: .16em;
+      box-shadow: 0 0 0 .055em color-mix(in srgb, var(--green) 34%, transparent);
+      transition: background .12s ease, box-shadow .12s ease;
+    }
+
+    .recitation-verse-band {
+      position: absolute;
+      top: 7%;
+      bottom: 7%;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 1;
+      background: color-mix(in srgb, var(--green) 25%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--green) 18%, transparent);
     }
 
     .annot-verse-band {
@@ -1111,6 +1149,57 @@
       border-top: 1px solid var(--line);
       background: var(--panel);
     }
+
+    .backup-panel {
+      margin: 8px 10px 10px;
+      padding: 11px;
+      border: 1px solid var(--backup-border);
+      border-radius: 15px;
+      background: linear-gradient(135deg, var(--backup-bg-a), var(--backup-bg-b));
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+    }
+
+    .backup-panel h3 {
+      margin: 0 0 3px;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .backup-panel p {
+      margin: 0 0 9px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.6;
+    }
+
+    .backup-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .backup-actions button {
+      min-height: 36px;
+      padding: 7px 8px;
+      border: 1px solid var(--backup-button-border);
+      border-radius: 10px;
+      color: var(--backup-text);
+      background: var(--backup-button-bg);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .backup-actions button:first-child {
+      color: #fff;
+      border-color: #239886;
+      background: linear-gradient(135deg, #31ad98, #218b86);
+      box-shadow: 0 5px 12px rgba(35, 152, 134, .2);
+    }
+
+    .backup-actions button:active { transform: scale(.98); }
 
     .drawer-credit {
       flex: none;
@@ -2715,6 +2804,15 @@
             <span id="themeLabel">الوضع الليلي</span>
           </button>
         </div>
+        <div class="backup-panel" aria-label="النسخ الاحتياطي">
+          <h3>حفظ واستعادة بيانات المصحف</h3>
+          <p>احفظ العلامات والتظليل والتفضيلات والصفحة الحالية في ملف واحد باسم التطبيق.</p>
+          <div class="backup-actions">
+            <button type="button" id="backupExport">⬇️ تنزيل نسخة احتياطية</button>
+            <button type="button" id="backupImportButton">⬆️ استعادة نسخة</button>
+          </div>
+          <input type="file" id="backupImport" accept="application/json,.json" hidden>
+        </div>
       </div>
     </section>
     <div class="drawer-credit">صدقة جارية على روح أمي وجدتي، نسألكم الدعاء<br>برمجة محمد سعيد الحاكم</div>
@@ -2863,6 +2961,52 @@
       var annotEnabled = !!annotPrefs.enabled;
       function save(k, v) { store(k, JSON.stringify(v)); }
       function saveSlots() { save('mq.slots', slots); }
+
+      function collectQuranBackup() {
+        var storage = {};
+        try {
+          for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            if (key && key.indexOf('mq.') === 0) storage[key] = localStorage.getItem(key);
+          }
+        } catch (e) { }
+        return { app: 'المصحف الشريف', format: 'quran-backup', version: 1, createdAt: new Date().toISOString(), storage: storage };
+      }
+
+      function downloadQuranBackup() {
+        var payload = collectQuranBackup();
+        var stamp = new Date().toISOString().slice(0, 10);
+        var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+        var url = URL.createObjectURL(blob), link = document.createElement('a');
+        link.href = url;
+        link.download = 'المصحف_الشريف_نسخة_احتياطية_' + stamp + '.json';
+        document.body.appendChild(link); link.click(); link.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 500);
+        toast('تم تنزيل نسخة المصحف الاحتياطية');
+      }
+
+      function restoreQuranBackup(file) {
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          try {
+            var payload = JSON.parse(reader.result), source = payload && payload.storage;
+            if (!source || typeof source !== 'object' || (payload.app && payload.app !== 'المصحف الشريف')) throw new Error('invalid');
+            var entries = Object.keys(source).filter(function (key) { return key.indexOf('mq.') === 0 && typeof source[key] === 'string'; });
+            if (!entries.length) throw new Error('empty');
+            if (!window.confirm('سيتم استبدال بيانات المصحف الحالية بالنسخة المختارة. هل تريد المتابعة؟')) return;
+            for (var i = localStorage.length - 1; i >= 0; i--) {
+              var key = localStorage.key(i);
+              if (key && key.indexOf('mq.') === 0) localStorage.removeItem(key);
+            }
+            entries.forEach(function (key) { localStorage.setItem(key, source[key]); });
+            toast('تمت استعادة بيانات المصحف، جارٍ تحديث التطبيق');
+            setTimeout(function () { location.reload(); }, 700);
+          } catch (e) { toast('ملف النسخة الاحتياطية غير صالح'); }
+        };
+        reader.onerror = function () { toast('تعذر قراءة ملف النسخة الاحتياطية'); };
+        reader.readAsText(file, 'utf-8');
+      }
       function slotById(id) { for (var i = 0; i < slots.length; i++) if (slots[i].id === id) return slots[i]; return null; }
       function slotName(s) { if (s.nm) return s.nm; if (s.v) return 'سورة ' + D.surahs[Math.floor(s.v / 1000) - 1][1]; return COL[s.c][1]; }
       function escapeHtml(value) { return String(value).replace(/[&<>"']/g, function (char) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]; }); }
@@ -3034,7 +3178,7 @@
         pageList.insertBefore(view, first); render(view, previous);
         requestAnimationFrame(function () {
           var nextRect = first.getBoundingClientRect();
-          window.scrollBy(0, nextRect.top - rect.top);
+          window.scrollBy({ top: nextRect.top - rect.top, left: 0, behavior: 'auto' });
           loadingPrevious = false;
         });
       }
@@ -3102,7 +3246,7 @@
               i.style.left = (lo - lr.left - pad).toFixed(1) + 'px';
               i.style.width = (hi - lo + pad * 2).toFixed(1) + 'px';
               var r = parseInt(col.slice(1, 3), 16), g = parseInt(col.slice(3, 5), 16), b = parseInt(col.slice(5, 7), 16);
-              i.style.background = 'rgba(' + r + ', ' + g + ', ' + b + ', 0.4)';
+              i.style.background = 'rgba(' + r + ', ' + g + ', ' + b + ', 0.62)';
               el.insertBefore(i, el.firstChild);
             });
           });
@@ -3248,12 +3392,45 @@
         recitationAudio.load();
         recitationRange = null;
         recitationAyah = 0;
+        paintRecitationAyah(0);
         setRecitationButton(false);
         if (message) recitationStatus.textContent = message;
       }
 
+      function paintRecitationAyah(ayah) {
+        pageList.querySelectorAll('.recitation-verse-band').forEach(function (band) { band.remove(); });
+        pageList.querySelectorAll('.w.recitation-active').forEach(function (word) { word.classList.remove('recitation-active'); });
+        if (!ayah || !recitationRange) return;
+        var id = recitationRange.surah * 1000 + ayah;
+        var page = pageOfV(id), target = pageList.querySelector('.page-view[data-page="' + page + '"]');
+        if (!target) {
+          goTo(page, true);
+          renderQueue.then(function () { requestAnimationFrame(function () { paintRecitationAyah(ayah); }); });
+          return;
+        }
+        var words = target.querySelectorAll('.w[data-v="' + id + '"]');
+        if (!words.length) return;
+        words.forEach(function (word) { word.classList.add('recitation-active'); });
+        target.querySelectorAll('.ln').forEach(function (line) {
+          if (line.getAttribute('data-vs').split(',').indexOf(String(id)) < 0) return;
+          var lineWords = line.querySelectorAll('.w[data-v="' + id + '"]');
+          if (!lineWords.length) return;
+          var lineRect = line.getBoundingClientRect(), left = Infinity, right = -Infinity;
+          lineWords.forEach(function (word) {
+            var rect = word.getBoundingClientRect();
+            left = Math.min(left, rect.left); right = Math.max(right, rect.right);
+          });
+          var band = document.createElement('i');
+          band.className = 'recitation-verse-band';
+          band.style.left = (left - lineRect.left - 2).toFixed(1) + 'px';
+          band.style.width = (right - left + 4).toFixed(1) + 'px';
+          line.insertBefore(band, line.firstChild);
+        });
+      }
+
       function playRecitationAyah() {
         if (!recitationRange) return;
+        paintRecitationAyah(recitationAyah);
         recitationStatus.textContent = 'الآية ' + ar(recitationAyah) + ' من ' + ar(recitationRange.to);
         recitationAudio.src = recitationUrl(recitationRange.surah, recitationAyah);
         recitationAudio.load();
@@ -3277,6 +3454,7 @@
         }
         recitationRange = null;
         recitationAyah = 0;
+        paintRecitationAyah(0);
         setRecitationButton(false);
         recitationStatus.textContent = 'اكتمل الاستماع إلى النطاق المحدد';
       });
@@ -3546,7 +3724,7 @@
       });
       syncPageModeButtons();
       var scrollSpeed = Math.max(5, Math.min(100, +store('mq.scrollSpeed') || 30));
-      var autoScrollFrame = 0, autoScrollTime = 0;
+      var autoScrollFrame = 0, autoScrollTime = 0, autoScrollHeld = false;
       var scrollToggle = $('scrollToggle'), scrollSpeedInput = $('scrollSpeed');
       function syncScrollControls() {
         var running = !!autoScrollFrame;
@@ -3561,6 +3739,16 @@
         if (!autoScrollFrame) return;
         cancelAnimationFrame(autoScrollFrame); autoScrollFrame = 0; autoScrollTime = 0; syncScrollControls();
       }
+      function pauseAutoScrollForInteraction() {
+        if (!autoScrollFrame) return;
+        autoScrollHeld = true;
+        stopAutoScroll();
+      }
+      function resumeAutoScrollAfterInteraction() {
+        if (!autoScrollHeld) return;
+        autoScrollHeld = false;
+        if (!body.classList.contains('open') && !body.classList.contains('vs') && scrollMode === 'vertical') startAutoScroll();
+      }
       function autoScrollStep(time) {
         if (!autoScrollFrame) return;
         if (body.classList.contains('open') || body.classList.contains('vs')) { stopAutoScroll(); return; }
@@ -3572,7 +3760,8 @@
         if (pageList.lastElementChild && +pageList.lastElementChild.getAttribute('data-page') === TOTAL && atEnd) {
           stopAutoScroll(); toast('وصلت إلى نهاية المصحف'); return;
         }
-        window.scrollBy(0, scrollSpeed * elapsed / 1000);
+        var nextTop = Math.min(maxScroll, window.scrollY + scrollSpeed * elapsed / 1000);
+        window.scrollTo({ top: nextTop, left: 0, behavior: 'auto' });
         autoScrollFrame = requestAnimationFrame(autoScrollStep);
       }
       function startAutoScroll() {
@@ -3590,13 +3779,20 @@
         scrollSpeed = Math.max(5, Math.min(100, +scrollSpeedInput.value));
         store('mq.scrollSpeed', String(scrollSpeed)); syncScrollControls();
       });
-      document.addEventListener('wheel', stopAutoScroll, { passive: true });
       document.addEventListener('touchstart', function (e) {
-        if (!e.target.closest('#drawer, #vsheet')) stopAutoScroll();
+        var target = e.target instanceof Element ? e.target : null;
+        if (target && target.closest('#pageList, .page-view, .sheet')) pauseAutoScrollForInteraction();
       }, { passive: true });
       document.addEventListener('pointerdown', function (e) {
-        if (!e.target.closest('#drawer, #vsheet')) stopAutoScroll();
+        var target = e.target instanceof Element ? e.target : null;
+        if (target && target.closest('#pageList, .page-view, .sheet')) pauseAutoScrollForInteraction();
       }, true);
+      ['touchend', 'touchcancel', 'pointerup', 'pointercancel'].forEach(function (type) {
+        document.addEventListener(type, function (e) {
+          var target = e.target instanceof Element ? e.target : null;
+          if ((target && target.closest('#pageList, .page-view, .sheet')) || autoScrollHeld) resumeAutoScrollAfterInteraction();
+        }, { passive: true });
+      });
       syncScrollControls();
       function openD() {
         stopAutoScroll();
@@ -3877,7 +4073,15 @@
       ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { pageList.addEventListener(n, lpCancel); });
       pageList.addEventListener('contextmenu', function (e) { if (e.target.closest('.w')) e.preventDefault(); });
       document.addEventListener('pointerdown', function (e) { if (!wp.hidden && !e.target.closest('#wp') && !e.target.closest('.w')) closeWp(); }, true);
-      window.addEventListener('scroll', function () { if (!wp.hidden) closeWp(); updateContinuousPages(); }, { passive: true });
+      var continuousUpdateFrame = 0;
+      function scheduleContinuousPages() {
+        if (continuousUpdateFrame) return;
+        continuousUpdateFrame = requestAnimationFrame(function () {
+          continuousUpdateFrame = 0;
+          updateContinuousPages();
+        });
+      }
+      window.addEventListener('scroll', function () { if (!wp.hidden) closeWp(); scheduleContinuousPages(); }, { passive: true });
 
       pageList.addEventListener('click', function (e) {
         var view = e.target.closest('.page-view'); if (!view) return;
@@ -3999,6 +4203,13 @@
         syncSettings();
       });
       syncSettings();
+      $('backupExport').addEventListener('click', downloadQuranBackup);
+      $('backupImportButton').addEventListener('click', function () { $('backupImport').click(); });
+      $('backupImport').addEventListener('change', function () {
+        var file = this.files && this.files[0];
+        restoreQuranBackup(file);
+        this.value = '';
+      });
 
       var pgIn = $('pgIn');
       pgIn.addEventListener('focus', function () { pgIn.select(); });
