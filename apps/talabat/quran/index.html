@@ -2519,6 +2519,9 @@
       transition: width .25s linear;
     }
 
+    /* The Mushaf remains usable offline without showing network/download notices. */
+    #dlChip { display: none !important; }
+
     .recitation-panel {
       position: relative;
       width: calc(100% - 24px);
@@ -3155,12 +3158,27 @@
       }
 
       function renderInitialPage(p) {
+        var firstOpen = !store('mq.pagesPreparedV2');
         pageList.innerHTML = '';
-        activeView = createPageView(p); pageList.appendChild(activeView);
-        activeView.classList.add('active');
-        sheet = activeView.querySelector('.sheet'); cur = p; store('mq.page', String(p));
-        render(activeView, p);
-        appendNextPage();
+        if (firstOpen) {
+          /* Prepare every page during the first open so the complete Mushaf is
+             already available when the app is opened without a network. */
+          for (var page = 1; page <= TOTAL; page++) {
+            var view = createPageView(page);
+            pageList.appendChild(view);
+            if (page === p) activeView = view;
+            render(view, page);
+          }
+          activeView.classList.add('active');
+          sheet = activeView.querySelector('.sheet'); cur = p; store('mq.page', String(p));
+          renderQueue.then(function () { store('mq.pagesPreparedV2', '1'); });
+        } else {
+          activeView = createPageView(p); pageList.appendChild(activeView);
+          activeView.classList.add('active');
+          sheet = activeView.querySelector('.sheet'); cur = p; store('mq.page', String(p));
+          render(activeView, p);
+          appendNextPage();
+        }
       }
 
       function appendNextPage() {
