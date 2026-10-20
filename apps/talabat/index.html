@@ -58,7 +58,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
   body {
-    font-family: "Cairo", "Nunito", sans-serif;
+    font-family: "Cairo", "Nunito", system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
     background: var(--bg);
     background-image: radial-gradient(600px 320px at 85% -60px, #D6EEFB 0%, transparent 60%), radial-gradient(500px 300px at 0% 0%, #FFEED3 0%, transparent 55%), radial-gradient(700px 420px at 50% 110%, #CDEAFB 0%, transparent 60%);
     background-attachment: fixed;
@@ -1616,9 +1616,24 @@
   .home-cards-layout .home-task-slot .task-card { width: 100%; margin: 0 !important; }
   .home-cards-layout .noura-card { grid-column: 1 / -1; margin: 0; width: 100%; }
   @media (max-width: 560px) {
-    .home-cards-layout { grid-template-columns: 1fr; gap: 12px; }
-    .home-card, .home-card-size-large, .home-card-size-full { grid-column: 1; }
+    .home-cards-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-inline: 16px; }
+    .home-card { grid-column: span 1; }
+    .home-card-size-large, .home-card-size-full, .home-task-slot, .noura-card { grid-column: 1 / -1; }
+    .home-cards-layout .gate-card { padding: 14px 11px 12px; border-radius: 20px; }
+    .home-cards-layout .gate-card .gc-label { font-size: 13px; }
+    .home-cards-layout .gate-card .gc-value { font-size: 24px; }
+    .home-cards-layout .gate-card .gc-sub { font-size: 11px; }
   }
+  @media (max-width: 360px) {
+    .home-cards-layout { margin-inline: 12px; gap: 9px; }
+    .home-cards-layout .gate-card { padding-inline: 9px; }
+    .home-cards-layout .gate-card .gc-value { font-size: 21px; }
+  }
+  .network-status { position: fixed; top: max(8px, env(safe-area-inset-top)); right: 50%; transform: translateX(50%); z-index: 10000; display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 999px; background: rgba(255,255,255,.94); border: 1px solid var(--border); box-shadow: 0 8px 22px rgba(30,27,46,.12); color: var(--text-sec); font-size: 11.5px; font-weight: 800; opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
+  .network-status.show { opacity: 1; transform: translateX(50%) translateY(2px); }
+  .network-status.offline { color: #9A3412; border-color: #FDBA74; background: #FFF7ED; }
+  .network-status.online { color: #047857; border-color: #86EFAC; background: #F0FDF4; }
+  .network-status i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
   .home-hub-layout { display: contents; }
   .home-hub-layout > .faith-section-wrap { margin: 0; padding-inline: 20px; }
   .home-hub-layout > .faith-section-wrap[style*="display:none"] { display: none !important; }
@@ -2329,6 +2344,7 @@
   </style>
 </head>
 <body>
+<div id="networkStatus" class="network-status" role="status" aria-live="polite"><i></i><span></span></div>
   <div id="preloader"><div class="pl-logo"><img src="icon-192.png" alt="ناقصنا إيه"></div><div class="pl-name">ناقصنا إيه</div><div class="pl-spin"><span class="ring r1"></span><span class="ring r2"></span><span class="arc"></span><span class="core"></span></div></div>
 <div class="app" id="app"></div>
 <div class="toast-container" id="toastContainer"></div>
@@ -9050,6 +9066,19 @@
     return true;
   }
   let _syncSubscribed = null, _syncPoll = null, _presenceJoined = false;
+  function updateNetworkStatus(isOnline, announce) {
+    try {
+      const el = document.getElementById('networkStatus');
+      if (!el) return;
+      el.classList.toggle('offline', !isOnline);
+      el.classList.toggle('online', !!isOnline);
+      el.querySelector('span').textContent = isOnline ? 'عاد الاتصال — تتم المزامنة' : 'أنت دون اتصال — بياناتك محفوظة على الجهاز';
+      el.classList.toggle('show', !isOnline || !!announce);
+      if (isOnline && announce) setTimeout(() => el.classList.remove('show'), 3200);
+    } catch {}
+  }
+  window.addEventListener('offline', () => updateNetworkStatus(false, true));
+  window.addEventListener('online', () => { updateNetworkStatus(true, true); try { initSupabaseSync(); } catch {} });
   function updateOnlinePill(n) {
     try {
       const pill = document.getElementById('onlinePill');
@@ -9134,6 +9163,7 @@
     state._expandedOrder = null; state._expDraft = null;
     state._expandedBasket = null; state._basketDraft = null;
     render();
+    updateNetworkStatus(navigator.onLine !== false, false);
     setTimeout(() => { try { document.getElementById('preloader').classList.add('hide'); } catch {} }, 900);
     try { if (typeof _ensureExitGuard === 'function') _ensureExitGuard(); } catch {}
     initSupabaseSync();

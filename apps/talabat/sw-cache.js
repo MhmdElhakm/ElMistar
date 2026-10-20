@@ -2,7 +2,7 @@
  * PWA offline caching only (no notifications).
  */
 
-const CACHE_NAME = 'naqisna-pwa-v19';
+const CACHE_NAME = 'naqisna-pwa-v20';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -10,7 +10,17 @@ const ASSETS_TO_CACHE = [
   './icon-192.png',
   './icon-512.png',
   './manifest.webmanifest',
-  './supabase-client.js'
+  './supabase-client.js',
+  './app/teachers.json',
+  './app/teacher.html',
+  './app/student.html',
+  './app/kalimaty.html',
+  './app/health.html',
+  './app/eat.html',
+  './quran/index.html',
+  './quran/words.json',
+  './quran/muyassar.json',
+  './quran/muyassar-data.js'
 ];
 
 self.addEventListener('install', (event) => {

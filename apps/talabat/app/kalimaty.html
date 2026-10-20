@@ -1,4 +1,4 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>كلماتي</title>
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>مدرّب الكلمات</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -153,12 +153,26 @@ textarea{width:100%;min-height:170px;resize:vertical;font:inherit;font-size:1.05
 .wc .x{border:0;background:none;color:var(--muted);width:42px;height:42px;border-radius:14px;cursor:pointer;display:grid;place-items:center;flex:none;padding:0}
 .empty{border:2px dashed var(--line);border-radius:22px;padding:22px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:12px;align-items:center}
 
+.why{font-size:.78rem;font-weight:700;background:var(--accent-soft);color:var(--ti,var(--accent));border-radius:10px;padding:0 10px;white-space:nowrap}
+.seg.sm button{min-height:46px;font-size:1rem;border-radius:16px}
+.vgrp{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.vgrp .fld{flex:1 1 150px}
+.vtag{flex:0 0 100%;font-size:.85rem;font-weight:700;color:var(--muted)}
+.vform .plus{margin-inline-start:auto}
+.vrow{display:flex;gap:10px;flex-wrap:wrap}
+.vrow .fld{flex:1 1 150px;min-width:0}
+.tagrow{text-align:center}
+.mini2.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.wtx b .why{margin-inline-start:8px;vertical-align:middle}
 .badge{font-size:.8rem;font-weight:700;background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:0 10px;white-space:nowrap}
 .wc.rvrow{flex-direction:column;align-items:stretch;padding:12px;gap:10px}
 .wc.rvrow.off{opacity:.55}
 .rvl1{display:flex;align-items:center;gap:10px}
 .rvin{min-height:50px;font-weight:700}
 .rvl1 .rvin{flex:1;min-width:0}
+.chips2{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mini2{font:inherit;font-weight:700;font-size:.9rem;min-height:38px;padding:0 14px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.mini2:active{transform:translateY(2px)}
 .edform{display:flex;flex-direction:column;gap:10px;width:100%}
 .spinrow{display:flex;align-items:center;gap:10px}
 .spinrow::before{content:"";width:18px;height:18px;border-radius:50%;border:3px solid currentColor;border-top-color:transparent;animation:spin .8s linear infinite;flex:none}
@@ -197,7 +211,10 @@ textarea{width:100%;min-height:170px;resize:vertical;font:inherit;font-size:1.05
 
 .cells{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
 .cell{width:48px;height:58px;display:inline-grid;place-items:center;text-align:center;font:800 1.6rem var(--f-ui);border:2px solid var(--line);border-radius:16px;background:var(--field);color:var(--fg);padding:0}
-input.cell:focus{border-color:var(--accent);background:var(--accent-soft)}
+.cell.slot{border-style:dashed;background:transparent}
+.cell.slot.next{border-color:var(--accent);background:var(--accent-soft);border-style:solid}
+.cell.filled{cursor:pointer;background:var(--surface);border-color:var(--accent);color:var(--accent);box-shadow:0 3px 0 var(--accent-dark)}
+.cell.filled:active{transform:translateY(2px);box-shadow:0 1px 0 var(--accent-dark)}
 .cell.fixed{background:var(--tb,var(--accent-soft));border-color:transparent;color:var(--ti,var(--fg))}
 .cell.good{background:var(--good-soft);border-color:var(--good);color:var(--good);animation:bump .3s}
 .cell.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
@@ -209,6 +226,16 @@ input.cell:focus{border-color:var(--accent);background:var(--accent-soft)}
 .tile.good{background:var(--good-soft);border-color:var(--good);color:var(--good);box-shadow:none;animation:bump .3s}
 .tile.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);box-shadow:none}
 .pool{border-top:2px dashed var(--line);padding-top:16px}
+.ansbox{width:100%;min-height:68px;display:flex;align-items:center;justify-content:center;gap:2px;border-radius:18px;border:2px solid var(--accent);background:var(--field);color:var(--fg);font:800 2rem var(--f-ui);letter-spacing:.08em;overflow-wrap:anywhere;padding:6px 14px;text-align:center}
+.ansbox .ph{font-size:1rem;font-weight:500;color:var(--muted);letter-spacing:0}
+.caret{display:inline-block;width:3px;height:1.5em;background:var(--accent);border-radius:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.kbd{display:flex;flex-direction:column;gap:8px;width:100%}
+.krow{display:flex;justify-content:center;gap:5px}
+.key{flex:1 1 0;min-width:0;max-width:46px;height:54px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--fg);font:800 1.2rem var(--f-ui);text-transform:uppercase;box-shadow:0 3px 0 var(--line);padding:0;cursor:pointer;display:grid;place-items:center}
+.key:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.key.wide{flex:1.7 1 0;max-width:78px;text-transform:none}
+@media (prefers-reduced-motion: reduce){.caret{animation:none}}
 .answer{width:100%;font:inherit;font-weight:700;font-size:1.4rem;min-height:60px;padding:0 16px;border-radius:18px;border:2px solid var(--line);background:var(--field);color:var(--fg);text-align:center}
 .score{font-size:3.4rem;font-weight:800;line-height:1.1;color:var(--accent)}
 table{border-collapse:collapse;width:100%}
@@ -229,9 +256,8 @@ th{color:var(--muted);font-weight:600}
 
 <div class="app" dir="rtl" lang="ar" id="shell">
   <header class="head">
-    <a href="../index.html" class="sbtn" title="العودة للرئيسية" style="display:grid;place-items:center;text-decoration:none;font-size:1.3rem;">🏠</a>
     <div class="hico" id="hico"></div>
-    <div class="htx"><h1>كلماتي</h1><p id="sub"></p></div>
+    <div class="htx"><h1>مدرّب الكلمات</h1><p id="sub"></p></div>
     <button type="button" class="sbtn" id="snd" aria-label="الصوت"></button>
   </header>
   <main id="stage" class="view"></main>
@@ -243,6 +269,7 @@ th{color:var(--muted);font-weight:600}
 'use strict';
 var $stage=document.getElementById('stage'),$nav=document.getElementById('nav'),$sub=document.getElementById('sub'),$snd=document.getElementById('snd'),$hico=document.getElementById('hico');
 var LS='wordtrainer:v2';
+var SAMPLE_VERBS=[{type:'verb',en:'go',ar:'يذهب',pen:'went',par:'ذهب'},{type:'verb',en:'eat',ar:'يأكل',pen:'ate',par:'أكل'},{type:'verb',en:'write',ar:'يكتب',pen:'wrote',par:'كتب'}];
 var SAMPLE=['apple - تفاحة','beautiful - جميل','through - عبر','library - مكتبة','comfortable - مريح','vegetable - خضار','purple - بنفسجي','knowledge - معرفة'];
 
 /* ---------- icons ---------- */
@@ -257,6 +284,7 @@ var PATHS={
   plus:'<path d="M12 5v14M5 12h14"/>',
   check:'<path d="m5 12 5 5 9-10"/>',
   x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  back:'<path d="M21 5H9l-6 7 6 7h12z"/><path d="m13 9 4 6M17 9l-4 6"/>',
   cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
   img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m21 16-5-5-8 8"/>',
   tr:'<path d="M4 5h9M8.5 3v2M6 5c0 4 3 7 6 8M12 5c-1 4-4 7-8 8"/><path d="m13 20 4-9 4 9M14.5 17h5"/>',
@@ -303,13 +331,15 @@ function sfx(n){if(!S.sound)return;try{if(SFX[n])SFX[n]();}catch(e){}}
 function buzz(ms){try{if(navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
 
 /* ---------- state ---------- */
-var S={stage:0,dir:'ar-en',tab0:'list',raw:'',add:{en:'',ar:'',tried:''},addMsg:'',addBusy:false,rev:null,photo:{busy:false,msg:''},edit:null,hasAI:false,canImg:false,words:[],mastered:{},sound:true,
+var S={stage:0,dir:'ar-en',tab0:'list',raw:'',add:{en:'',ar:'',pen:'',par:'',tried:'',type:'word'},btype:'word',addMsg:'',addBusy:false,rev:null,photo:{busy:false,msg:''},edit:null,hasAI:false,canImg:false,words:[],mastered:{},sound:true,
   pron:null,drill:null,fin:null,done:[false,false,false,false],mic:'unknown',dict:{busy:false,msg:''}};
 function validW(w){return w&&typeof w.en==='string'&&w.en.trim()&&typeof w.ar==='string';}
+function normW(w){return w.type==='verb'?{type:'verb',en:w.en,ar:w.ar,pen:String(w.pen||''),par:String(w.par||'')}:{en:w.en,ar:w.ar};}
+function isVerb(w){return !!w&&w.type==='verb';}
 try{
   var o=JSON.parse(localStorage.getItem(LS)||'null');
   if(o){
-    if(Array.isArray(o.words))S.words=o.words.filter(validW);
+    if(Array.isArray(o.words))S.words=o.words.filter(validW).map(normW);
     if(o.mastered&&typeof o.mastered==='object')S.mastered=o.mastered;
     S.sound=o.sound!==false;
   }else{
@@ -320,7 +350,20 @@ try{
 function save(){try{localStorage.setItem(LS,JSON.stringify({words:S.words,mastered:S.mastered,sound:S.sound}));}catch(e){}}
 function mkey(w){return w.en.toLowerCase();}
 function isM(w){return !!S.mastered[mkey(w)];}
-function wordsChanged(){S.pron=null;S.drill=null;S.fin=null;S.done=[false,false,false,false];}
+var UCACHE=null;
+function wordsChanged(){UCACHE=null;S.pron=null;S.drill=null;S.fin=null;S.done=[false,false,false,false];}
+/* A word is one memorising unit; a verb is two (present, then past). Stages 1-3 work on units. */
+function units(){
+  if(UCACHE)return UCACHE;
+  var u=[];
+  S.words.forEach(function(w,wi){
+    if(isVerb(w)){
+      u.push({wi:wi,f:0,en:w.en,ar:w.ar,tag:'مضارع'});
+      if(w.pen)u.push({wi:wi,f:1,en:w.pen,ar:w.par||'',tag:'ماضي'});
+    }else u.push({wi:wi,f:0,en:w.en,ar:w.ar,tag:''});
+  });
+  return (UCACHE=u);
+}
 function tint(i){return 't'+(i%6);}
 
 /* ---------- Claude (optional, only inside the claude.ai viewer) ---------- */
@@ -461,13 +504,14 @@ function go(n){
   render();window.scrollTo(0,0);
 }
 function initPron(){S.pron={i:0,tries:[],passed:[],fb:null,listening:false};}
-function drillWords(){return S.words.map(function(w,i){return i;}).filter(function(i){return hasMeaning(S.words[i]);});}
+function drillWords(){var U=units();return U.map(function(u,i){return i;}).filter(function(i){return hasMeaning(U[i]);});}
 function initDrill(){
   var items=[];
   drillWords().forEach(function(i){items.push({i:i,mode:'blank',st:null});items.push({i:i,mode:'scramble',st:null});});
   shuffle(items);
+  var U=units();
   for(var k=1;k<items.length;k++){
-    if(items[k].i===items[k-1].i){for(var j=k+1;j<items.length;j++){if(items[j].i!==items[k-1].i){var t=items[k];items[k]=items[j];items[j]=t;break;}}}
+    if(U[items[k].i].wi===U[items[k-1].i].wi){for(var j=k+1;j<items.length;j++){if(U[items[j].i].wi!==U[items[k-1].i].wi){var t=items[k];items[k]=items[j];items[j]=t;break;}}}
   }
   S.drill={queue:items,total:items.length,done:0,fb:null};
 }
@@ -478,25 +522,11 @@ function initFinal(){
 
 /* ---------- rendering ---------- */
 function captureInputs(){
-  var D=S.drill;
-  if(S.stage===2&&D&&D.queue.length&&!D.fb){
-    var st=D.queue[0].st;
-    if(st&&st.hidden){Object.keys(st.hidden).forEach(function(k){
-      var el=document.getElementById('c'+k);
-      if(el&&el.getAttribute('data-uid')===String(st.uid))st.typed[k]=el.value;
-    });}
-  }
-  var F=S.fin,a=document.getElementById('ans');
-  if(S.stage===3&&F&&F.phase==='ask'&&a&&a.getAttribute('data-pos')===String(F.pos))F.draft=a.value;
-  if(S.stage===0){
-    var e1=document.getElementById('inEn'),e2=document.getElementById('inAr');
-    if(e1)S.add.en=e1.value;if(e2)S.add.ar=e2.value;
-    if(S.edit){var x1=document.getElementById('edEn'),x2=document.getElementById('edAr');if(x1)S.edit.en=x1.value;if(x2)S.edit.ar=x2.value;}
-    if(S.rev){S.rev.rows.forEach(function(r,i){
-      var a1=document.getElementById('rvE'+i),a2=document.getElementById('rvA'+i);
-      if(a1)r.en=a1.value;if(a2)r.ar=a2.value;
-    });}
-  }
+  if(S.stage!==0)return;
+  function grab(id,obj,prop){var el=document.getElementById(id);if(el)obj[prop]=el.value;}
+  grab('inEn',S.add,'en');grab('inAr',S.add,'ar');grab('inPE',S.add,'pen');grab('inPA',S.add,'par');
+  if(S.edit){grab('edEn',S.edit,'en');grab('edAr',S.edit,'ar');grab('edPE',S.edit,'pen');grab('edPA',S.edit,'par');}
+  if(S.rev){S.rev.rows.forEach(function(r,i){grab('rvE'+i,r,'en');grab('rvA'+i,r,'ar');grab('rvP'+i,r,'pen');grab('rvQ'+i,r,'par');});}
 }
 function subText(){
   var n=S.words.length;
@@ -504,7 +534,7 @@ function subText(){
     var m=S.words.filter(isM).length;
     return n?('عندك '+n+(n===1?' كلمة':' كلمات')+' للحفظ'+(m?' • '+m+' محفوظة':'')):'أضف كلمات لتبدأ الحفظ';
   }
-  if(S.stage===1)return 'النطق • كلمة '+((S.pron?S.pron.i:0)+1)+' من '+n;
+  if(S.stage===1)return 'النطق • كلمة '+((S.pron?S.pron.i:0)+1)+' من '+units().length;
   if(S.stage===2)return 'التدريب • اكتب الكلمة الإنجليزية';
   return 'الاختبار النهائي • بلا مساعدة';
 }
@@ -526,8 +556,6 @@ function render(nocap){
   $stage.className=enter?'view enter':'view';
   $stage.innerHTML=views[S.stage]();
   if(S.stage===0&&S.tab0==='bulk')updatePreview();
-  if(S.stage===2&&S.drill&&S.drill.queue.length&&!S.drill.fb){var f=$stage.querySelector('input.cell');if(f)f.focus();}
-  if(S.stage===3&&S.fin&&S.fin.phase==='ask'){var a=document.getElementById('ans');if(a)a.focus();}
 }
 
 /* stage 0 */
@@ -536,37 +564,51 @@ function micBtn(key){
   if(!micOk())return '';
   return '<button type="button" class="mini'+(S.dict.busy&&S.dict.t===key?' live':'')+'" data-act="dfield" data-k="'+key+'" aria-label="قلها بصوتك">'+ic('mic',20)+'</button>';
 }
+function inpFld(id,key,ph,val,cls,extra){
+  return '<div class="fld"><input class="inp'+(extra||'')+cls+'" id="'+id+'" '+(isArField(key)?'dir="rtl"':'lang="en" dir="ltr" autocapitalize="off" spellcheck="false"')+' placeholder="'+esc(ph)+'" value="'+esc(val)+'" aria-label="'+esc(ph)+'">'+micBtn(key)+'</div>';
+}
+function typeSeg(act,cur,w1,w2){
+  return '<div class="seg sm"><button type="button" class="'+(cur!=='verb'?'on':'')+'" data-act="'+act+'" data-t="word">'+w1+'</button><button type="button" class="'+(cur==='verb'?'on':'')+'" data-act="'+act+'" data-t="verb">'+w2+'</button></div>';
+}
 function viewInput(){
   var n=S.words.length;
   var seg='<div class="seg"><button type="button" class="'+(S.tab0==='list'?'on':'')+'" data-act="tab" data-t="list">الكلمات <span class="cnt">'+n+'</span></button>'+
     '<button type="button" class="'+(S.tab0==='bulk'?'on':'')+'" data-act="tab" data-t="bulk">إضافة قائمة</button></div>';
   if(S.tab0==='bulk')return '<div class="app" style="gap:16px">'+seg+(S.rev?viewReview():viewBulk())+'</div>';
-  var mk=micOk(),cls=mk?' hasmic':'';
-  var form='<section class="panel"><h2>إضافة كلمة</h2>'+
-    '<form class="addrow" id="addForm" autocomplete="off">'+
-    '<div class="fld"><input class="inp'+cls+'" id="inEn" lang="en" dir="ltr" placeholder="الكلمة بالإنجليزية" value="'+esc(S.add.en)+'" autocapitalize="off" spellcheck="false" aria-label="الكلمة بالإنجليزية">'+micBtn('addEn')+'</div>'+
-    '<div class="fld"><input class="inp'+cls+'" id="inAr" dir="rtl" placeholder="المعنى (اتركه فارغًا ليُقترح)" value="'+esc(S.add.ar)+'" aria-label="المعنى بالعربية">'+micBtn('addAr')+'</div>'+
+  var mk=micOk(),cls=mk?' hasmic':'',A=S.add,isV=A.type==='verb';
+  var form='<section class="panel"><h2>'+(isV?'إضافة فعل':'إضافة كلمة')+'</h2>'+
+    typeSeg('atype',A.type,'كلمة','فعل (مضارع وماضي)')+
+    '<form class="addrow'+(isV?' vform':'')+'" id="addForm" autocomplete="off">'+
+    (isV?
+      '<div class="vgrp"><span class="vtag">المضارع</span>'+inpFld('inEn','addEn','الفعل بالإنجليزية (go)',A.en,cls)+inpFld('inAr','addAr','معناه (يذهب)',A.ar,cls)+'</div>'+
+      '<div class="vgrp"><span class="vtag">الماضي</span>'+inpFld('inPE','addPE','الماضي (went)',A.pen,cls)+inpFld('inPA','addPA','معنى الماضي (ذهب)',A.par,cls)+'</div>':
+      inpFld('inEn','addEn','الكلمة بالإنجليزية',A.en,cls)+inpFld('inAr','addAr','المعنى (اتركه فارغًا ليُقترح)',A.ar,cls))+
     '<button type="submit" class="plus" aria-label="إضافة"'+(S.addBusy?' disabled':'')+'>'+ic('plus',28)+'</button></form>'+
-    '<div class="row"><button type="button" class="btn" data-act="qtrans"'+(S.addBusy?' disabled':'')+'>'+ic('tr',20)+'اقترح المعنى</button></div>'+
+    '<div class="row"><button type="button" class="btn" data-act="qtrans"'+(S.addBusy?' disabled':'')+'>'+ic('tr',20)+(isV?'اقترح الماضي والمعاني':'اقترح المعنى')+'</button></div>'+
     ((S.addMsg||S.dict.msg)?'<p class="hint">'+esc(S.addMsg||S.dict.msg)+'</p>':'')+
     (mk?'':'<p class="hint">الإدخال الصوتي غير متاح داخل هذه الصفحة. افتح الملف المستقل في Chrome.</p>')+'</section>';
   var list;
   if(!n){
-    list='<div class="empty"><p>قائمتك فارغة. أضف كلمة من الأعلى أو صوّر صفحة من كتابك.</p><button type="button" class="btn" data-act="sample">أضف كلمات تجريبية</button></div>';
+    list='<div class="empty"><p>قائمتك فارغة. أضف كلمة أو فعلًا من الأعلى، أو صوّر صفحة من كتابك.</p><button type="button" class="btn" data-act="sample">أضف أمثلة تجريبية</button></div>';
   }else{
     list='<ul class="wlist">'+S.words.map(function(w,i){
       if(S.edit&&S.edit.i===i){
+        var E=S.edit,ev=E.type==='verb';
         return '<li class="wc rvrow '+tint(i)+'"><form id="editForm" class="edform" autocomplete="off">'+
-          '<input class="inp rvin" id="edEn" lang="en" dir="ltr" value="'+esc(S.edit.en)+'" autocapitalize="off" spellcheck="false" aria-label="الكلمة بالإنجليزية">'+
-          '<div class="fld"><input class="inp rvin'+cls+'" id="edAr" dir="rtl" placeholder="المعنى بالعربية" value="'+esc(S.edit.ar)+'" aria-label="المعنى بالعربية">'+micBtn('edAr')+'</div>'+
-          (S.edit.msg?'<p class="hint">'+esc(S.edit.msg)+'</p>':'')+
-          '<div class="row"><button type="submit" class="btn primary">حفظ</button><button type="button" class="btn" data-act="etrans">'+ic('tr',20)+'اقترح المعنى</button><button type="button" class="btn ghost" data-act="ecancel">إلغاء</button></div></form></li>';
+          typeSeg('etype',E.type,'كلمة','فعل')+
+          (ev?
+            '<div class="vgrp"><span class="vtag">المضارع</span>'+inpFld('edEn','edEn','الفعل بالإنجليزية',E.en,cls,' rvin')+inpFld('edAr','edAr','معناه',E.ar,cls,' rvin')+'</div>'+
+            '<div class="vgrp"><span class="vtag">الماضي</span>'+inpFld('edPE','edPE','الماضي',E.pen,cls,' rvin')+inpFld('edPA','edPA','معنى الماضي',E.par,cls,' rvin')+'</div>':
+            inpFld('edEn','edEn','الكلمة بالإنجليزية',E.en,cls,' rvin')+inpFld('edAr','edAr','المعنى بالعربية',E.ar,cls,' rvin'))+
+          (E.msg?'<p class="hint">'+esc(E.msg)+'</p>':'')+
+          '<div class="row"><button type="submit" class="btn primary">حفظ</button><button type="button" class="btn" data-act="etrans">'+ic('tr',20)+(ev?'اقترح الماضي والمعاني':'اقترح المعنى')+'</button><button type="button" class="btn ghost" data-act="ecancel">إلغاء</button></div></form></li>';
       }
-      var m=isM(w);
+      var m=isM(w),v=isVerb(w);
+      var meaning=v?[w.ar,w.par].filter(Boolean).join(' • '):w.ar;
       return '<li class="wc '+tint(i)+(m?' m':'')+'">'+
         '<button type="button" class="chk" data-act="mtoggle" data-i="'+i+'" aria-label="'+(m?'إلغاء الحفظ':'تم حفظها')+'">'+ic('check',20)+'</button>'+
         '<button type="button" class="ico" data-act="wsay" data-i="'+i+'" aria-label="استمع">'+ic('spk',22)+'</button>'+
-        '<div class="wtx"><b><bdi dir="ltr">'+esc(w.en)+'</bdi></b><span>'+(w.ar?esc(w.ar):'بلا معنى')+'</span></div>'+
+        '<div class="wtx"><b><bdi dir="ltr">'+esc(w.en)+'</bdi>'+(v&&w.pen?' • <bdi dir="ltr">'+esc(w.pen)+'</bdi>':'')+(v?'<span class="why">فعل</span>':'')+'</b><span>'+(meaning?esc(meaning):'بلا معنى')+'</span></div>'+
         '<button type="button" class="x" data-act="wedit" data-i="'+i+'" aria-label="تعديل">'+ic('pen',20)+'</button>'+
         '<button type="button" class="x" data-act="wdel" data-i="'+i+'" aria-label="حذف">'+ic('x',22)+'</button></li>';
     }).join('')+'</ul>';
@@ -577,36 +619,47 @@ function viewInput(){
 }
 function viewBulk(){
   var P=S.photo;
-  return '<section class="panel"><div><h2>إضافة قائمة كلمات</h2>'+
-  '<p class="hint">صوّر صفحة من كتابك، أو الصق كلماتك، أو اكتب الكلمات الإنجليزية فقط وسأقترح معانيها. بعد ذلك تراجع القائمة وتعدّل أي معنى قبل الإضافة.</p></div>'+
+  var bv=S.btype==='verb';
+  return '<section class="panel"><div><h2>'+(bv?'إضافة قائمة أفعال':'إضافة قائمة كلمات')+'</h2>'+
+  '<p class="hint">'+(bv?'صوّر صفحة أفعال، أو الصق الأفعال بصيغة المضارع فقط، وسأقترح الماضي ومعنى كل صيغة. بعد ذلك تراجع القائمة وتعدّل ما يلزم قبل الإضافة.':'صوّر صفحة من كتابك، أو الصق كلماتك، أو اكتب الكلمات الإنجليزية فقط وسأقترح معانيها. بعد ذلك تراجع القائمة وتعدّل أي معنى قبل الإضافة.')+'</p></div>'+
+  typeSeg('btype',S.btype,'كلمات','أفعال (مضارع وماضي)')+
   '<div class="row"><button type="button" class="btn primary" data-act="cam"'+(P.busy?' disabled':'')+'>'+ic('cam',22)+'تصوير بالكاميرا</button>'+
   '<button type="button" class="btn" data-act="gal"'+(P.busy?' disabled':'')+'>'+ic('img',22)+'صورة من المعرض</button></div>'+
   '<input type="file" id="camIn" accept="image/*" capture="environment" hidden><input type="file" id="galIn" accept="image/*" hidden>'+
   '<p class="hint">'+(S.canImg?'يقرأ Claude الكلمات من الصورة ويقترح معانيها.':'تُقرأ الصورة بمحرك التعرف على النص داخل المتصفح ويحتاج إلى إنترنت. الأفضل صورة واضحة ومستقيمة.')+'</p>'+
   (P.busy?'<div class="note good spinrow">'+esc(P.msg)+'</div>':(P.msg?'<div class="note warn">'+esc(P.msg)+'</div>':''))+
-  '<textarea id="wordsInput" rows="7" dir="auto" spellcheck="false" placeholder="apple&#10;beautiful - جميل&#10;library = مكتبة">'+esc(S.raw)+'</textarea>'+
+  '<textarea id="wordsInput" rows="7" dir="auto" spellcheck="false" placeholder="'+(bv?'go&#10;eat - يأكل&#10;write':'apple&#10;beautiful - جميل&#10;library = مكتبة')+'">'+esc(S.raw)+'</textarea>'+
   '<div class="preview" id="preview"></div>'+
   '<button type="button" class="btn primary big" id="bulkBtn" data-act="analyze">حلّل وراجع</button></section>';
 }
 function viewReview(){
   var R=S.rev,cls=micOk()?' hasmic':'';
   var sel=R.rows.filter(function(r){return r.on&&r.en.trim();}).length;
-  var miss=R.rows.filter(function(r){return r.en.trim()&&!r.ar.trim();}).length;
-  return '<section class="panel"><div class="listhead"><h2>راجع الكلمات</h2><span class="hint">'+R.rows.length+' كلمة • '+sel+' محددة</span></div>'+
-    (R.msg?'<div class="note '+(R.warn?'warn':'good')+'">'+esc(R.msg)+'</div>':'')+
+  var miss=R.rows.filter(function(r){return needsLookup(r);}).length;
+  return '<section class="panel"><div class="listhead"><h2>راجع الكلمات</h2><span class="hint">'+R.rows.length+' عنصر • '+sel+' محدد</span></div>'+
+    (R.msg?'<div class="note good">'+esc(R.msg)+'</div>':'')+
+    (R.tmsg?'<div class="note '+(R.twarn?'warn':'good')+'">'+esc(R.tmsg)+'</div>':'')+
     (R.busy?'<div class="note good spinrow">جارٍ البحث عن المعاني...</div>':'')+
-    '<div class="row"><button type="button" class="btn" data-act="rvtrans"'+((miss&&!R.busy)?'':' disabled')+'>'+ic('tr',20)+'اقترح المعاني الناقصة ('+miss+')</button>'+
+    (R.rows.some(function(r){return r.rec===false;})?'<div class="chips2"><span class="hint">تحديد:</span><button type="button" class="mini2" data-act="rvsel" data-m="rec">الموصى بها</button><button type="button" class="mini2" data-act="rvsel" data-m="all">الكل</button><button type="button" class="mini2" data-act="rvsel" data-m="none">لا شيء</button></div>':'')+
+    '<div class="row"><button type="button" class="btn" data-act="rvtrans"'+((miss&&!R.busy)?'':' disabled')+'>'+ic('tr',20)+'اقترح الناقص ('+miss+')</button>'+
     '<button type="button" class="btn ghost" data-act="rvadd">'+ic('plus',20)+'سطر</button></div>'+
     '<ul class="wlist">'+R.rows.map(function(r,i){
+      var v=r.type==='verb';
       return '<li class="wc rvrow '+tint(i)+(r.on?' m':' off')+'">'+
         '<div class="rvl1"><button type="button" class="chk" data-act="rvchk" data-i="'+i+'" aria-label="تحديد">'+ic('check',20)+'</button>'+
         '<input class="inp rvin" id="rvE'+i+'" lang="en" dir="ltr" value="'+esc(r.en)+'" placeholder="English" autocapitalize="off" spellcheck="false" aria-label="الكلمة الإنجليزية">'+
-        (r.dup?'<span class="badge">موجودة</span>':'')+
+        (r.dup?'<span class="badge">موجودة</span>':(r.why?'<span class="why">'+esc(WHY[r.why])+'</span>':''))+
+        '<button type="button" class="mini2'+(v?' on':'')+'" data-act="rvtype" data-i="'+i+'" aria-pressed="'+(v?'true':'false')+'">فعل</button>'+
         '<button type="button" class="x" data-act="rvdel" data-i="'+i+'" aria-label="حذف السطر">'+ic('x',22)+'</button></div>'+
-        '<div class="fld"><input class="inp rvin'+cls+'" id="rvA'+i+'" dir="rtl" value="'+esc(r.ar)+'" placeholder="المعنى بالعربية" aria-label="المعنى بالعربية">'+micBtn('rvA'+i)+'</div></li>';
+        '<div class="fld"><input class="inp rvin'+cls+'" id="rvA'+i+'" dir="rtl" value="'+esc(r.ar)+'" placeholder="'+(v?'معنى المضارع (يذهب)':'المعنى بالعربية')+'" aria-label="المعنى بالعربية">'+micBtn('rvA'+i)+'</div>'+
+        (v?'<div class="vrow">'+inpFld('rvP'+i,'rvP'+i,'الماضي (went)',r.pen,cls,' rvin')+inpFld('rvQ'+i,'rvQ'+i,'معنى الماضي (ذهب)',r.par,cls,' rvin')+'</div>':'')+'</li>';
     }).join('')+'</ul>'+
     '<div class="row between"><button type="button" class="btn" data-act="rvcancel">إلغاء</button>'+
     '<button type="button" class="btn primary" data-act="rvconfirm"'+(sel?'':' disabled')+'>أضف المحدد ('+sel+')</button></div></section>';
+}
+function needsLookup(r){
+  if(!r.en.trim())return false;
+  return r.type==='verb'?(!r.ar.trim()||!r.pen.trim()||!r.par.trim()):!r.ar.trim();
 }
 function updatePreview(){
   var ta=document.getElementById('wordsInput'),pv=document.getElementById('preview'),sb=document.getElementById('bulkBtn');
@@ -614,6 +667,7 @@ function updatePreview(){
   var r=parseWords(ta.value),nm=r.words.filter(function(w){return !w.ar;}).length;
   if(!r.words.length){pv.innerHTML='<span class="hint">لم تُضف كلمات بعد.</span>';}
   else{
+    if(looksLikeProse(ta.value)){pv.innerHTML='<span class="hint">يبدو أنه نص كامل. سأختار أهم الكلمات منه ولن أضيف كل كلماته.</span>';if(sb)sb.disabled=false;return;}
     pv.innerHTML=r.words.map(function(w){
       return '<span class="chip'+(w.ar?'':' nomean')+'"><bdi dir="ltr">'+esc(w.en)+'</bdi><i>←</i><bdi>'+(w.ar?esc(w.ar):'سيُقترح معنى')+'</bdi></span>';
     }).join('')+
@@ -623,17 +677,16 @@ function updatePreview(){
 }
 
 /* ---- fields, dictation, translation ---- */
-function fieldId(k){return k==='addEn'?'inEn':k==='addAr'?'inAr':k;}
+var FID={addEn:'inEn',addAr:'inAr',addPE:'inPE',addPA:'inPA'};
+function fieldId(k){return FID[k]||k;}
 function applyField(k,v){
-  var m;
-  if(k==='addEn'){S.add.en=v;S.add.tried='';}
-  else if(k==='addAr')S.add.ar=v;
-  else if(k==='edEn'&&S.edit)S.edit.en=v;
-  else if(k==='edAr'&&S.edit)S.edit.ar=v;
-  else if((m=/^rv([EA])(\d+)$/.exec(k))&&S.rev){var r=S.rev.rows[+m[2]];if(r){if(m[1]==='E')r.en=v;else r.ar=v;}}
+  var m,map={addEn:'en',addAr:'ar',addPE:'pen',addPA:'par'},emap={edEn:'en',edAr:'ar',edPE:'pen',edPA:'par'};
+  if(map[k]){S.add[map[k]]=v;if(k==='addEn')S.add.tried='';}
+  else if(emap[k]&&S.edit)S.edit[emap[k]]=v;
+  else if((m=/^rv([EAPQ])(\d+)$/.exec(k))&&S.rev){var r=S.rev.rows[+m[2]];if(r)r[{E:'en',A:'ar',P:'pen',Q:'par'}[m[1]]]=v;}
 }
 function setVal(k,v){applyField(k,v);var el=document.getElementById(fieldId(k));if(el)el.value=v;}
-function isArField(k){return k==='addAr'||k==='edAr'||k.indexOf('rvA')===0;}
+function isArField(k){return k==='addAr'||k==='addPA'||k==='edAr'||k==='edPA'||k.indexOf('rvA')===0||k.indexOf('rvQ')===0;}
 function dictField(k){
   if(S.dict.busy&&S.dict.t===k){stopRec();S.dict={busy:false,msg:'',t:''};render();return;}
   captureInputs();
@@ -681,11 +734,72 @@ async function lookupMeanings(list){
   }
   return {map:out,via:Object.keys(out).length?'web':''};
 }
+/* ---- verbs: simple past rules + lookup ---- */
+var IRREG={be:'was',have:'had',do:'did',say:'said',go:'went',get:'got',make:'made',know:'knew',think:'thought',take:'took',see:'saw',come:'came',give:'gave',find:'found',tell:'told',become:'became',leave:'left',feel:'felt',bring:'brought',begin:'began',keep:'kept',hold:'held',write:'wrote',stand:'stood',hear:'heard',let:'let',mean:'meant',set:'set',meet:'met',run:'ran',pay:'paid',sit:'sat',speak:'spoke',lie:'lay',lead:'led',read:'read',grow:'grew',lose:'lost',fall:'fell',send:'sent',build:'built',understand:'understood',draw:'drew',break:'broke',spend:'spent',cut:'cut',rise:'rose',drive:'drove',buy:'bought',wear:'wore',choose:'chose',eat:'ate',drink:'drank',sleep:'slept',sing:'sang',swim:'swam',fly:'flew',forget:'forgot',teach:'taught',catch:'caught',sell:'sold',win:'won',fight:'fought',throw:'threw',hide:'hid',bite:'bit',blow:'blew',shake:'shook',steal:'stole',wake:'woke',ride:'rode',ring:'rang',shoot:'shot',sweep:'swept',swing:'swung',tear:'tore',hang:'hung',lend:'lent',bend:'bent',dig:'dug',feed:'fed',hit:'hit',hurt:'hurt',put:'put',quit:'quit',shut:'shut',spread:'spread',cost:'cost',bet:'bet',burst:'burst',cast:'cast',sink:'sank',spin:'spun',stick:'stuck',strike:'struck',swear:'swore',weep:'wept',lay:'laid',light:'lit',slide:'slid',seek:'sought',forgive:'forgave',withdraw:'withdrew',overcome:'overcame',freeze:'froze',deal:'dealt',fit:'fit',lean:'leant',leap:'leapt',kneel:'knelt',spill:'spilt',spoil:'spoilt'};
+function pastOf(v){
+  v=String(v||'').toLowerCase().trim();if(!v)return '';
+  var sp=v.indexOf(' ');
+  if(sp>0)return pastOf(v.slice(0,sp))+v.slice(sp);
+  if(IRREG[v])return IRREG[v];
+  if(/e$/.test(v))return v+'d';
+  if(/[^aeiou]y$/.test(v))return v.slice(0,-1)+'ied';
+  if(/^[^aeiou]*[aeiou][^aeiouwxy]$/.test(v)&&v.length<=4)return v+v.slice(-1)+'ed';
+  return v+'ed';
+}
+function thirdOf(v){
+  v=String(v||'').toLowerCase().trim();
+  var sp=v.indexOf(' ');if(sp>0)return thirdOf(v.slice(0,sp))+v.slice(sp);
+  if(/(s|x|z|ch|sh|o)$/.test(v))return v+'es';
+  if(/[^aeiou]y$/.test(v))return v.slice(0,-1)+'ies';
+  return v+'s';
+}
+var VERB_TR_PROMPT='For each English verb below (base form) give: "past" = its simple past form, "ar" = the Arabic meaning of the present form written as a present-tense verb (for example يذهب), "arPast" = the Arabic meaning written as a past-tense verb (for example ذهب). Reply with only a JSON array in the same order, like [{"en":"go","past":"went","ar":"يذهب","arPast":"ذهب"}]. Verbs: ';
+function cleanAr(tx){return String(tx||'').replace(/^\s*(هو|إنه|انه)\s+/,'').replace(/\s+(هو)\s*$/,'').trim();}
+async function webVerb(en){
+  var pen=pastOf(en);
+  var rs=await Promise.all([webTranslate('he '+thirdOf(en)),webTranslate('he '+pen)]);
+  return {pen:pen,ar:cleanAr(rs[0]),par:cleanAr(rs[1])};
+}
+async function lookupVerbs(list){
+  var out={};
+  if(AIFN){
+    try{
+      var arr=await AIFN.json(VERB_TR_PROMPT+JSON.stringify(list),{modelTier:'quick'});
+      if(Array.isArray(arr))arr.forEach(function(x){
+        if(!x||!x.en)return;
+        var k=String(x.en).toLowerCase().trim();
+        out[k]={pen:String(x.past||'').trim()||pastOf(k),ar:String(x.ar||'').trim(),par:String(x.arPast||'').trim()};
+      });
+      if(Object.keys(out).length)return {map:out,via:'claude'};
+    }catch(e){}
+  }
+  var via='';
+  for(var i=0;i<list.length;i+=2){
+    var part=list.slice(i,i+2);
+    var rs=await Promise.all(part.map(webVerb));
+    part.forEach(function(w,k){out[w.toLowerCase().trim()]=rs[k];if(rs[k].ar||rs[k].par)via='web';});
+  }
+  return {map:out,via:via};
+}
 async function quickTranslate(){
   captureInputs();
-  var en=S.add.en.trim();
+  var A=S.add,en=A.en.trim(),isV=A.type==='verb';
   if(!en||!LAT_RE.test(en)){S.addMsg='اكتب الكلمة بالإنجليزية أولًا.';sfx('wrong');render();return;}
-  S.addBusy=true;S.addMsg='جارٍ البحث عن المعنى...';render();
+  S.addBusy=true;S.addMsg=isV?'جارٍ البحث عن الماضي والمعاني...':'جارٍ البحث عن المعنى...';render();
+  if(isV){
+    var rv=await lookupVerbs([en]);
+    captureInputs();
+    S.addBusy=false;S.add.tried=en.toLowerCase();
+    var v=rv.map[en.toLowerCase()]||{},got=0;
+    S.addMsg='';render();
+    if(v.pen&&!S.add.pen.trim()){setVal('addPE',v.pen);got++;}
+    if(v.ar&&!S.add.ar.trim()){setVal('addAr',v.ar);got++;}
+    if(v.par&&!S.add.par.trim()){setVal('addPA',v.par);got++;}
+    S.addMsg=got?'هذه صيغ ومعانٍ مقترحة'+(rv.via==='claude'?' من Claude':'')+'. راجعها وعدّلها إن أردت ثم اضغط + للإضافة.':'لم أجد اقتراحات جديدة. اكتب الناقص أو قله بصوتك، أو اضغط + لإضافة الفعل كما هو.';
+    if(got)sfx('pop');
+    render();
+    return;
+  }
   var res=await lookupMeanings([en]);
   captureInputs();
   S.addBusy=false;S.add.tried=en.toLowerCase();
@@ -695,14 +809,22 @@ async function quickTranslate(){
 }
 function addWord(){
   captureInputs();
-  var en=S.add.en.trim(),ar=S.add.ar.trim();
-  if(AR_RE.test(en)&&!AR_RE.test(ar)&&LAT_RE.test(ar)){var t=en;en=ar;ar=t;}
-  S.add.en=en;S.add.ar=ar;
-  if(!en||!LAT_RE.test(en)){S.addMsg='اكتب الكلمة بالإنجليزية أولًا.';sfx('wrong');render();return;}
+  var A=S.add,isV=A.type==='verb';
+  var en=A.en.trim(),ar=A.ar.trim(),pen=A.pen.trim(),par=A.par.trim();
+  if(!isV&&AR_RE.test(en)&&!AR_RE.test(ar)&&LAT_RE.test(ar)){var t=en;en=ar;ar=t;}
+  A.en=en;A.ar=ar;
+  if(!en||!LAT_RE.test(en)){S.addMsg='اكتب '+(isV?'الفعل':'الكلمة')+' بالإنجليزية أولًا.';sfx('wrong');render();return;}
   if(S.words.some(function(w){return mkey(w)===en.toLowerCase();})){S.addMsg='هذه الكلمة موجودة في قائمتك.';sfx('wrong');render();return;}
-  if(!ar&&S.add.tried!==en.toLowerCase()){quickTranslate();return;}
-  S.words.push({en:en,ar:ar});S.addMsg='';
-  setVal('addEn','');setVal('addAr','');S.add.tried='';
+  if(isV){
+    if(pen&&!LAT_RE.test(pen)){S.addMsg='اكتب الماضي بالإنجليزية.';sfx('wrong');render();return;}
+    if((!pen||!ar||!par)&&A.tried!==en.toLowerCase()){quickTranslate();return;}
+    S.words.push({type:'verb',en:en,ar:ar,pen:pen,par:par});
+  }else{
+    if(!ar&&A.tried!==en.toLowerCase()){quickTranslate();return;}
+    S.words.push({en:en,ar:ar});
+  }
+  S.addMsg='';
+  setVal('addEn','');setVal('addAr','');setVal('addPE','');setVal('addPA','');A.tried='';
   wordsChanged();save();sfx('pop');render();
   var f=document.getElementById('inEn');if(f)f.focus();
 }
@@ -711,21 +833,34 @@ function addWord(){
 function saveEdit(){
   captureInputs();
   var E=S.edit;if(!E)return;
-  var en=E.en.trim(),ar=E.ar.trim();
+  var en=E.en.trim(),ar=E.ar.trim(),pen=E.pen.trim(),par=E.par.trim(),isV=E.type==='verb';
   if(!en||!LAT_RE.test(en)){E.msg='اكتب الكلمة بالإنجليزية.';sfx('wrong');render();return;}
+  if(isV&&pen&&!LAT_RE.test(pen)){E.msg='اكتب الماضي بالإنجليزية.';sfx('wrong');render();return;}
   var k=en.toLowerCase();
   if(S.words.some(function(w,i){return i!==E.i&&mkey(w)===k;})){E.msg='هذه الكلمة موجودة في قائمتك.';sfx('wrong');render();return;}
   var old=S.words[E.i];
-  if(mkey(old)!==k){delete S.mastered[mkey(old)];}
-  S.words[E.i]={en:en,ar:ar};
+  if(mkey(old)!==k||isVerb(old)!==isV){delete S.mastered[mkey(old)];}
+  S.words[E.i]=isV?{type:'verb',en:en,ar:ar,pen:pen,par:par}:{en:en,ar:ar};
   S.edit=null;wordsChanged();save();sfx('pop');render();
 }
 async function editTranslate(){
   captureInputs();
   var E=S.edit;if(!E)return;
-  var en=E.en.trim();
+  var en=E.en.trim(),isV=E.type==='verb';
   if(!en||!LAT_RE.test(en)){E.msg='اكتب الكلمة بالإنجليزية.';render();return;}
-  E.msg='جارٍ البحث عن المعنى...';render();
+  E.msg=isV?'جارٍ البحث عن الماضي والمعاني...':'جارٍ البحث عن المعنى...';render();
+  if(isV){
+    var rv=await lookupVerbs([en]);
+    if(S.edit!==E)return;
+    captureInputs();
+    var v=rv.map[en.toLowerCase()]||{},got=0;
+    E.msg='';render();
+    if(v.pen&&!E.pen.trim()){setVal('edPE',v.pen);got++;}
+    if(v.ar&&!E.ar.trim()){setVal('edAr',v.ar);got++;}
+    if(v.par&&!E.par.trim()){setVal('edPA',v.par);got++;}
+    E.msg=got?'صيغ ومعانٍ مقترحة'+(rv.via==='claude'?' من Claude':'')+'. عدّلها إن أردت ثم احفظ.':'لم أجد اقتراحات جديدة. اكتب الناقص أو قله بصوتك.';
+    render();return;
+  }
   var res=await lookupMeanings([en]);
   if(S.edit!==E)return;
   captureInputs();
@@ -735,43 +870,76 @@ async function editTranslate(){
 }
 
 /* ---- review sheet (paste / English-only / photo) ---- */
-function mkRows(list){
+function arCount(n){return n===1?'كلمة واحدة':n===2?'كلمتين':n<=10?n+' كلمات':n+' كلمة';}
+var WHY={list:'من القائمة',marked:'مميّزة',key:'كلمة مهمة',extra:'اقتراح إضافي'};
+function mkRows(list,forceType){
   var have={},seen={},rows=[];
   S.words.forEach(function(w){have[mkey(w)]=1;});
   list.forEach(function(x){
     var en=String(x.en||'').trim(),k=en.toLowerCase();
     if(!en||seen[k])return;seen[k]=1;
-    rows.push({en:en,ar:String(x.ar||'').trim(),on:!have[k],dup:!!have[k]});
+    var rec=x.pick!==false,v=forceType==='verb'||x.type==='verb';
+    rows.push({type:v?'verb':'word',en:en,ar:String(x.ar||'').trim(),pen:String(x.pen||'').trim(),par:String(x.par||'').trim(),on:rec&&!have[k],dup:!!have[k],rec:rec,why:WHY[x.why]?x.why:''});
   });
   return rows;
 }
-async function autoTranslate(rows){
+/* Looks up what is missing. With opts.drop (photo / pasted text) rows that still have no meaning are removed, because a word with no meaning is usually a reading mistake. */
+async function autoTranslate(rows,opts){
   var R=S.rev;if(!R)return;
-  var need=rows.filter(function(r){return r.en.trim()&&!r.ar.trim();});
-  if(!need.length)return;
+  var drop=!!(opts&&opts.drop);
+  var needW=rows.filter(function(r){return r.type!=='verb'&&r.en.trim()&&!r.ar.trim();});
+  var needV=rows.filter(function(r){return r.type==='verb'&&needsLookup(r);});
+  if(!needW.length&&!needV.length)return;
   R.busy=true;render();
-  var res=await lookupMeanings(need.map(function(r){return r.en.trim();}));
+  var rw=needW.length?await lookupMeanings(needW.map(function(r){return r.en.trim();})):{map:{},via:''};
+  var rv=needV.length?await lookupVerbs(needV.map(function(r){return r.en.trim();})):{map:{},via:''};
   if(S.rev!==R)return;
   captureInputs();
-  var found=0;
-  need.forEach(function(r){
-    if(r.ar.trim())return;
-    var ar=res.map[r.en.trim().toLowerCase()],idx=R.rows.indexOf(r);
-    if(ar&&idx>=0){setVal('rvA'+idx,ar);found++;}
+  var found=0,total=needW.length+needV.length;
+  needW.forEach(function(r){
+    var idx=R.rows.indexOf(r),ar=rw.map[r.en.trim().toLowerCase()];
+    if(ar&&idx>=0&&!r.ar.trim()){setVal('rvA'+idx,ar);found++;}
   });
+  needV.forEach(function(r){
+    var idx=R.rows.indexOf(r),v=rv.map[r.en.trim().toLowerCase()]||{},any=false;
+    if(idx<0)return;
+    if(v.ar&&!r.ar.trim()){setVal('rvA'+idx,v.ar);any=true;}
+    if(v.pen&&!r.pen.trim()){setVal('rvP'+idx,v.pen);}
+    if(v.par&&!r.par.trim()){setVal('rvQ'+idx,v.par);any=true;}
+    if(any)found++;
+  });
+  var svc=!!(rw.via||rv.via),dropped=0;
+  if(drop&&svc){
+    R.rows=R.rows.filter(function(r){if(!r.en.trim()||r.ar.trim())return true;dropped++;return false;});
+  }
+  var via=(rw.via==='claude'||rv.via==='claude')?'claude':'';
+  var parts=[];
+  if(found)parts.push('اقترحت معنى لـ '+found+' من '+total+(via?' بواسطة Claude':''));
+  if(dropped)parts.push('استبعدت '+arCount(dropped)+' لم أجد لها معنى (غالبًا أخطاء في قراءة الصورة)');
+  if(parts.length){R.tmsg=parts.join('، ')+'. راجع المعاني وعدّلها عند الحاجة.';R.twarn=dropped>0||found<total;sfx('done');}
+  else{R.tmsg='تعذّر جلب المعاني تلقائيًا. اكتبها أو قلها بصوتك، أو أضف الكلمات بلا معنى.'+(drop?' لذلك لم أستبعد أي كلمة.':'');R.twarn=true;}
+  if(dropped){
+    if(!R.rows.length){R.msg='';R.tmsg='لم تبقَ أي كلمة لها معنى. جرّب صورة أوضح، أو اكتب الكلمات بنفسك.';R.twarn=true;}
+    else if(R.msg&&R.auto)R.msg=pickMsg(R.rows,R.via);
+  }
   R.busy=false;
-  if(found){R.msg='اقترحت معنى لـ '+found+' من '+need.length+(res.via==='claude'?' بواسطة Claude':'')+'. راجع المعاني وعدّلها عند الحاجة.';R.warn=found<need.length;sfx('done');}
-  else{R.msg='تعذّر جلب المعاني تلقائيًا. اكتبها أو قلها بصوتك، أو أضف الكلمات بلا معنى.';R.warn=true;}
-  render();
+  render(true);
+}
+function looksLikeProse(text){
+  var lines=String(text).split(/\r?\n/).map(function(l){return l.trim();}).filter(Boolean);
+  if(!lines.length||AR_RE.test(text))return false;
+  return lines.some(function(l){return (l.match(/[A-Za-z]+/g)||[]).length>6;});
 }
 function analyzeText(){
   var ta=document.getElementById('wordsInput');if(ta)S.raw=ta.value;
-  var r=parseWords(S.raw);
+  var prose=looksLikeProse(S.raw);
+  var r=prose?{words:pickSmart(S.raw)}:parseWords(S.raw);
   if(!r.words.length){S.photo={busy:false,msg:'اكتب أو الصق كلمات إنجليزية أولًا.'};render();return;}
   S.photo={busy:false,msg:''};S.raw='';if(ta)ta.value='';
-  S.rev={rows:mkRows(r.words),msg:'',warn:false,busy:false};
+  var rows=mkRows(r.words,S.btype);
+  S.rev={rows:rows,msg:prose?pickMsg(rows,'text'):'',warn:false,busy:false,auto:prose,via:'text'};
   render();
-  autoTranslate(S.rev.rows);
+  autoTranslate(rows,{drop:prose});
 }
 function confirmReview(){
   captureInputs();
@@ -784,16 +952,59 @@ function confirmReview(){
     if(!en||!LAT_RE.test(en)){skipped++;return;}
     var k=en.toLowerCase();
     if(have[k]){skipped++;return;}
-    have[k]=1;S.words.push({en:en,ar:ar});added++;
+    have[k]=1;
+    if(r.type==='verb'){var pen=r.pen.trim();S.words.push({type:'verb',en:en,ar:ar,pen:LAT_RE.test(pen)?pen:'',par:r.par.trim()});}
+    else S.words.push({en:en,ar:ar});
+    added++;
   });
   if(added){wordsChanged();save();sfx('correct');}else sfx('wrong');
   S.rev=null;S.tab0='list';
-  S.addMsg=added?('أُضيفت '+added+(added===1?' كلمة':' كلمات')+(skipped?' وتجاوزت '+skipped+' مكررة أو غير صالحة':'')+'.'):'لم تُضف كلمات جديدة.';
+  S.addMsg=added?('أُضيفت '+arCount(added)+(skipped?' وتجاوزت '+skipped+' مكررة أو غير صالحة':'')+'.'):'لم تُضف كلمات جديدة.';
   render();
 }
 
+/* ---- smart local word picking (used without Claude, and for pasted paragraphs) ---- */
+var STOP=('the be to of and a in that have it for not on with he as you do at this but his by from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us is was are were been being has had did does done said made went came took saw got thing things man woman child world life hand part place case week company system program question government number night point home water room mother area money story fact month lot right study book eye job word business issue side kind head house service friend father power hour game line end member law car city community name president team minute idea kid body information parent face others level office door health person art war history party result change morning reason research girl guy moment air teacher force education foot boy age policy music market sense nation plan college interest death experience effect class control care field development role effort rate heart drug show leader light voice wife police mind price report decision son view relationship town road arm difference value building action model season society tax director position player record paper space ground form event official matter center couple site project activity star table need court oil situation cost industry figure street image phone data picture practice piece land product doctor wall patient worker news test movie north love support technology step baby computer type attention film tree source organization hair window culture chance brother energy period course summer plant opportunity term letter condition choice little very much more many such still every again own while where here before between both each few those through during without under against should might must shall may does done being really always never often sometimes usually already almost quite rather though although until since upon among within across behind beyond around along toward towards another something nothing everything anything someone anyone everyone nobody whose whom whether either neither than too yes please thank thanks hello great big small long short old young high low large early late next last same different important able sure free full whole real best better worse worst going gone coming making taking looking getting putting keeping letting seeming helping starting running moving living believe bring happen write provide sit stand lose pay meet include continue set learn lead understand watch follow stop create speak read allow add spend grow open walk win offer remember consider appear buy wait serve die send expect build stay fall cut reach kill remain suggest raise pass sell require report decide pull'.split(' ')).reduce(function(o,w){o[w]=1;return o;},{});
+var SUFFIX=/(tion|sion|ment|ness|ity|ous|ive|able|ible|ful|less|ence|ance|ize|ise|ify|ical|ally)$/;
+function pickSmart(text){
+  var lines=String(text).split(/\r?\n/).map(function(l){return l.trim();}).filter(Boolean);
+  var tokRe=/[A-Za-z][A-Za-z'’-]*[A-Za-z]|[A-Za-z]/g;
+  if(!lines.length)return [];
+  var short=lines.filter(function(l){return (l.match(tokRe)||[]).length<=3;}).length;
+  var out=[],seen={};
+  if(short/lines.length>=0.6){
+    lines.forEach(function(l){(l.match(tokRe)||[]).forEach(function(t){
+      t=t.toLowerCase().replace(/’/g,"'");
+      if(t.length<2||t.length>24||seen[t])return;seen[t]=1;out.push({en:t,ar:'',pick:true,why:'list'});
+    });});
+    return out.slice(0,150);
+  }
+  var cand=[],re=/[A-Za-z][A-Za-z'’-]*[A-Za-z]|[A-Za-z]/g,m,txt=String(text);
+  while((m=re.exec(txt))){
+    var raw=m[0],t=raw.toLowerCase().replace(/’/g,"'");
+    if(t.length<4||t.length>24||STOP[t]||seen[t])continue;
+    var before=txt.slice(0,m.index).replace(/[\s"'(\[]+$/,'');
+    var sentStart=!before||/[.!?:]$/.test(before)||/\n\s*$/.test(txt.slice(0,m.index));
+    if(/^[A-Z][a-z'’-]+$/.test(raw)&&!sentStart)continue;
+    if(/^[A-Z]{2,}$/.test(raw))continue;
+    seen[t]=1;
+    cand.push({en:t,score:t.length+(SUFFIX.test(t)?2:0)+(/s$/.test(t)&&t.length>4?-0.5:0)});
+  }
+  cand.sort(function(a,b){return b.score-a.score;});
+  return cand.slice(0,40).map(function(c,i){return {en:c.en,ar:'',pick:i<15,why:i<15?'key':'extra'};});
+}
+
+function pickMsg(rows,via){
+  var rec=rows.filter(function(r){return r.rec;}).length,extra=rows.length-rec;
+  var txt=rec?'اخترت '+arCount(rec)+(rows.some(function(r){return r.why==='list'||r.why==='marked';})?' من القائمة أو الكلمات المميّزة':' مهمة من الصفحة'):'لم أجد كلمات مميّزة';
+  if(extra)txt+='، وتركت '+arCount(extra)+' إضافية غير محددة';
+  txt+='. ';
+  if(via==='claude')txt+='قرأها Claude واقترح معانيها. ';else if(via==='ocr')txt+='الاختيار تقريبي لأن القراءة من داخل المتصفح. ';
+  return txt+'راجع القائمة وعدّل ما يلزم.';
+}
 /* ---- photo -> words ---- */
-var PHOTO_PROMPT='This photo shows English words a student wants to memorise (a vocabulary list, textbook page, board or handwriting). Extract every distinct English word or short phrase you can read; ignore page numbers, headings and Arabic text. For each give the most common short Arabic meaning (one or two Arabic words, two meanings separated by ،). If an Arabic meaning is printed next to the word in the photo, use it. Keep each word as written (lower-case unless a proper noun). Reply with only a JSON array like [{"en":"apple","ar":"تفاحة"}], at most 100 items, or [] if no English words are readable.';
+var PHOTO_PROMPT='This photo shows a page a student wants to learn English vocabulary from. Do NOT list every word on the page; choose only the words worth memorising.\n1) If the page has a vocabulary list or glossary, or words that are marked (highlighted, bold, underlined, circled, starred, boxed, or listed with meanings), those are the vocabulary: return exactly those words with pick:true and why:"list" (a list or glossary) or why:"marked" (marked inside ordinary text).\n2) If it is ordinary text with nothing marked, choose the 8 to 15 most useful words to learn (nouns, verbs, adjectives and adverbs that are key to the text or less common, at intermediate level or above). Skip very common words, names, numbers and abbreviations. Give them pick:true and why:"key". Then add up to 15 more useful candidates with pick:false and why:"extra".\nFor every item give the most common short Arabic meaning (one or two Arabic words; separate two meanings with ،). If an Arabic meaning is printed next to the word, use it. Use the base form of a word (run, not running) unless the form shown is itself the vocabulary item. Reply with only a JSON array like [{"en":"apple","ar":"تفاحة","pick":true,"why":"key"}], at most 60 items, or [] if no English words are readable.';
+var VERB_PHOTO_PROMPT='This photo shows a page a student wants to learn English verbs from (a verb list, an irregular-verb table, or ordinary text). Return only verbs, not other words. If verbs are listed or marked (highlighted, bold, underlined, circled, boxed), return exactly those verbs with pick:true and why:"list" (a list or table) or why:"marked". If it is ordinary text with nothing marked, choose the 8 to 15 most useful verbs with pick:true and why:"key", then up to 15 more with pick:false and why:"extra". For each verb give: "en" = the base (present) form, "past" = the simple past form (use the one printed on the page if there is one), "ar" = the Arabic meaning of the present form written as a present-tense verb (for example يذهب), "arPast" = the Arabic meaning written as a past-tense verb (for example ذهب). Reply with only a JSON array like [{"en":"go","past":"went","ar":"يذهب","arPast":"ذهب","pick":true,"why":"list"}], at most 60 items, or [] if no verbs are readable.';
 var PHOTO_ERR={rate_limited:'تجاوزت حد استخدام Claude مؤقتًا. حاول بعد قليل.',image_rejected:'لم تُقبل هذه الصورة. جرّب صورة أخرى.',refused:'تعذّر تحليل هذه الصورة.',invalid_json:'لم أتمكن من استخراج الكلمات من الصورة. جرّب صورة أوضح.',empty_completion:'لم أتمكن من قراءة الصورة. جرّب صورة أوضح.',prompt_too_large:'الصورة كبيرة جدًا.',cancelled:'أُلغيت القراءة.'};
 async function prepImage(file){
   try{
@@ -805,20 +1016,19 @@ async function prepImage(file){
     return b||file;
   }catch(e){return file;}
 }
-async function readWithClaude(blob){
-  var arr=await AIFN.json(PHOTO_PROMPT,{images:[blob]});
+async function readWithClaude(blob,mode){
+  var arr=await AIFN.json(mode==='verb'?VERB_PHOTO_PROMPT:PHOTO_PROMPT,{images:[blob]});
   if(!Array.isArray(arr))throw {code:'invalid_json'};
-  return arr.map(function(x){return {en:String(x&&x.en||'').trim(),ar:String(x&&x.ar||'').trim()};}).filter(function(x){return x.en&&LAT_RE.test(x.en);}).slice(0,120);
+  var v=mode==='verb';
+  return arr.map(function(x){
+    return {type:v?'verb':'word',en:String(x&&x.en||'').trim(),ar:String(x&&x.ar||'').trim(),pen:String(x&&x.past||'').trim(),par:String(x&&x.arPast||'').trim(),pick:!(x&&x.pick===false),why:String(x&&x.why||'')};
+  }).filter(function(x){return x.en&&LAT_RE.test(x.en)&&x.ar;}).slice(0,80);
 }
 function loadScript(src){return new Promise(function(res,rej){var el=document.createElement('script');el.src=src;el.onload=res;el.onerror=function(){rej(new Error('load'));};document.head.appendChild(el);});}
 async function ocrWords(blob){
   if(!window.Tesseract)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js');
   var r=await window.Tesseract.recognize(blob,'eng');
-  var text=(r&&r.data&&r.data.text)||'';
-  var toks=text.match(/[A-Za-z][A-Za-z'’-]*[A-Za-z]|[A-Za-z]/g)||[];
-  var seen={},out=[];
-  toks.forEach(function(t){t=t.toLowerCase().replace(/’/g,"'");if(t.length<2||t.length>24||seen[t])return;seen[t]=1;out.push({en:t,ar:''});});
-  return out.slice(0,150);
+  return pickSmart((r&&r.data&&r.data.text)||'');
 }
 async function handlePhoto(file){
   S.tab0='bulk';S.rev=null;
@@ -826,7 +1036,7 @@ async function handlePhoto(file){
   var blob=await prepImage(file),list=null,via='';
   if(AIFN&&S.canImg){
     S.photo.msg='Claude يقرأ الصورة ويقترح المعاني...';render();
-    try{list=await readWithClaude(blob);via='claude';}
+    try{list=await readWithClaude(blob,S.btype);via='claude';}
     catch(e){var c=e&&e.code;if(PHOTO_ERR[c]){S.photo={busy:false,msg:PHOTO_ERR[c]};sfx('wrong');render();return;}}
   }
   if(!list){
@@ -836,19 +1046,20 @@ async function handlePhoto(file){
   }
   if(!list.length){S.photo={busy:false,msg:'لم أجد كلمات إنجليزية واضحة في الصورة. جرّب صورة أقرب وأوضح.'};sfx('wrong');render();return;}
   S.photo={busy:false,msg:''};
-  var rows=mkRows(list);
-  S.rev={rows:rows,msg:via==='claude'?'قرأ Claude '+rows.length+' كلمة من الصورة واقترح معانيها. راجعها وعدّل ما يلزم.':'قُرئت '+rows.length+' كلمة من الصورة. احذف أو صحّح أي كلمة خاطئة، ثم أضف المحدد.',warn:false,busy:false};
+  var rows=mkRows(list,S.btype);
+  if(!rows.length){S.photo={busy:false,msg:'لم أجد في الصورة كلمات لها معنى. جرّب صورة أوضح.'};sfx('wrong');render();return;}
+  S.rev={rows:rows,msg:pickMsg(rows,via),warn:false,busy:false,auto:true,via:via};
   sfx('done');render();
-  autoTranslate(rows);
+  autoTranslate(rows,{drop:true});
 }
 
 /* stage 1 */
 function viewPron(){
-  var P=S.pron,w=S.words[P.i],n=S.words.length,tries=P.tries[P.i]||0;
+  var P=S.pron,U=units(),w=U[P.i],n=U.length,tries=P.tries[P.i]||0;
   var canNext=P.passed[P.i]||tries>=3;
   return '<section class="panel"><div class="meta"><span>كلمة '+(P.i+1)+' من '+n+'</span><span>'+P.passed.filter(Boolean).length+' نُطقت جيدًا</span></div>'+
   '<div class="bar"><i style="width:'+Math.round((P.i/n)*100)+'%"></i></div>'+
-  '<div class="wcard '+tint(P.i)+'"><div class="word-en" dir="ltr">'+esc(w.en)+'</div>'+(w.ar?'<div class="word-ar">'+esc(w.ar)+'</div>':'')+'</div>'+
+  '<div class="wcard '+tint(w.wi)+'">'+(w.tag?'<div class="tagrow"><span class="why">'+w.tag+'</span></div>':'')+'<div class="word-en" dir="ltr">'+esc(w.en)+'</div>'+(w.ar?'<div class="word-ar">'+esc(w.ar)+'</div>':'')+'</div>'+
   '<div class="row mid"><button type="button" class="btn" data-act="say">'+ic('spk',20)+'استمع</button>'+
   '<button type="button" class="btn" data-act="slow">ببطء</button>'+
   '<button type="button" class="btn" data-act="spell">تهجئة</button>'+
@@ -917,7 +1128,7 @@ function recognize(onAlts,onFail,setBusy,lang){
   }catch(e){S.mic='blocked';fail('blocked');}
 }
 function listen(){
-  var P=S.pron,w=S.words[P.i];
+  var P=S.pron,w=units()[P.i];
   recognize(function(alts){evaluate(w,alts);},
     function(k,m){P.listening=false;P.fb=(k==='blocked'||k==='unsupported')?null:{err:m};render();},
     function(b){P.listening=b;if(b){P.fb=null;sfx('micOn');}render();});
@@ -939,7 +1150,7 @@ function evaluate(w,alts){
 function dictBlock(){
   var D=S.dict||{busy:false,msg:''};
   if(S.mic==='blocked'||S.mic==='unsupported'){
-    return '<p class="hint" style="text-align:center">الإملاء الصوتي غير متاح داخل هذه الصفحة. افتح الملف المستقل في Chrome لتفعيله، أو اكتب بلوحة المفاتيح.</p>';
+    return '<p class="hint" style="text-align:center">الإملاء الصوتي غير متاح داخل هذه الصفحة. افتح الملف المستقل في Chrome لتفعيله.</p>';
   }
   return '<div class="row mid"><button type="button" class="btn'+(D.busy?' live':'')+'" data-act="dict" aria-label="قل الكلمة بصوتك">'+ic('mic',20)+(D.busy?'أستمع إليك...':'قلها بصوتك')+'</button></div>'+
     (D.msg?'<p class="hint" style="text-align:center">'+esc(D.msg)+'</p>':'');
@@ -961,14 +1172,17 @@ function applyBlank(alts){
   st.chars.forEach(function(c,i){if(LETTER_RE.test(c))pos.push(i);});
   for(var a=0;a<alts.length;a++){
     var h=normEn(alts[a]);
-    if(h.length===pos.length){
-      pos.forEach(function(ci,k){
-        if(st.hidden[ci]){st.typed[ci]=h[k];var el=document.getElementById('c'+ci);if(el)el.value=h[k];}
-      });
-      return '';
-    }
+    if(h.length!==pos.length)continue;
+    var used={},slots={},ok=true;
+    Object.keys(st.hidden).map(Number).forEach(function(ci){
+      if(!ok)return;
+      var ch=h[pos.indexOf(ci)],t=null;
+      for(var q=0;q<st.tiles.length;q++){if(!used[st.tiles[q].id]&&st.tiles[q].ch.toLowerCase()===ch){t=st.tiles[q];break;}}
+      if(t){used[t.id]=1;slots[ci]=t.id;}else ok=false;
+    });
+    if(ok){st.slots=slots;return '';}
   }
-  return 'سمعتك تقول «'+alts[0]+'» لكن عدد حروفها لا يطابق الكلمة. قلها مرة أخرى بوضوح.';
+  return 'سمعتك تقول «'+alts[0]+'» لكن حروفها لا تطابق الحروف المعروضة. قلها مرة أخرى بوضوح.';
 }
 function applyScramble(alts){
   var st=S.drill.queue[0].st;
@@ -986,8 +1200,8 @@ function applyScramble(alts){
   return 'سمعتك تقول «'+alts[0]+'» لكن حروفها لا تطابق الحروف المعروضة. قلها مرة أخرى بوضوح.';
 }
 function applyFinal(alts){
-  var v=(alts[0]||'').replace(/[.,!?]+$/,'').toLowerCase().trim();
-  S.fin.draft=v;var el=document.getElementById('ans');if(el)el.value=v;
+  var v=(alts[0]||'').toLowerCase().replace(/[^a-z]/g,'');
+  S.fin.draft=v;
   return '';
 }
 
@@ -1002,7 +1216,14 @@ function makeState(it,w,l){
     var hn=Math.max(1,Math.round(idx.length*0.45));
     hn=Math.min(hn,Math.max(1,idx.length-1));
     var hidden={};shuffle(idx.slice()).slice(0,hn).forEach(function(i){hidden[i]=true;});
-    return {uid:++UID,target:target,chars:chars,hidden:hidden,typed:{}};
+    var need=idx.filter(function(i){return hidden[i];}).map(function(i){return chars[i];});
+    var pool=need.map(function(ch,k){return {id:k,ch:ch};});
+    if(l==='en'){
+      var have={};need.forEach(function(c){have[c.toLowerCase()]=1;});
+      var extra=shuffle('abcdefghijklmnopqrstuvwxyz'.split('').filter(function(c){return !have[c];})).slice(0,need.length>=4?3:2);
+      extra.forEach(function(c){pool.push({id:pool.length,ch:c});});
+    }
+    return {uid:++UID,target:target,chars:chars,hidden:hidden,tiles:shuffle(pool),slots:{}};
   }
   var tiles=idx.map(function(ci,k){return {id:k,ch:chars[ci]};});
   var sh=tiles.slice(),tries=0;
@@ -1012,31 +1233,44 @@ function makeState(it,w,l){
 function noMeaning(){
   return '<section class="panel center"><h2>أضف معاني الكلمات</h2><p class="hint">التدريب والاختبار يحتاجان معنى لكل كلمة، مثل <bdi dir="ltr">apple - تفاحة</bdi>.</p><button type="button" class="btn primary" data-go="0">العودة إلى الكلمات</button></section>';
 }
+function usedIds(st){return Object.keys(st.slots).map(function(k){return st.slots[k];});}
+function tileCh(st,id){for(var i=0;i<st.tiles.length;i++){if(st.tiles[i].id===id)return st.tiles[i].ch;}return '';}
+function nextEmpty(st){
+  var ks=Object.keys(st.hidden).map(Number).sort(function(a,b){return a-b;});
+  for(var i=0;i<ks.length;i++){if(st.slots[ks[i]]===undefined)return ks[i];}
+  return -1;
+}
 function viewDrill(){
   var D=S.drill;
   if(!D.total)return noMeaning();
   if(!D.queue.length){
     return '<section class="panel center"><div class="score">'+ic('trophy',64)+'</div><h2>أحسنت، أنهيت التدريب</h2><p class="hint">أجبت عن كل التمارين بشكل صحيح. الخطوة التالية اختبار نهائي بلا أي مساعدة.</p><button type="button" class="btn primary big" data-act="tofinal">ابدأ الاختبار النهائي</button></section>';
   }
-  var it=D.queue[0],w=S.words[it.i],l=ansLang(),pl=promptLang();
+  var it=D.queue[0],w=units()[it.i],l=ansLang(),pl=promptLang();
   if(!it.st)it.st=makeState(it,w,l);
   var st=it.st,pct=Math.round(D.done/D.total*100);
   var h='<section class="panel"><div class="meta"><span>المتبقي '+D.queue.length+' تمرين</span><span>'+pct+'%</span></div>'+
   '<div class="bar"><i style="width:'+pct+'%"></i></div>'+
-  '<div class="wcard '+tint(it.i)+'"><p class="label">'+(it.mode==='blank'?'أكمل الحروف الناقصة':'رتّب الحروف المبعثرة')+(l==='ar'?' لتكوين المعنى العربي':' لتكوين الكلمة الإنجليزية')+'</p>'+
+  '<div class="wcard '+tint(w.wi)+'">'+(w.tag?'<div class="tagrow"><span class="why">'+w.tag+'</span></div>':'')+'<p class="label">'+(it.mode==='blank'?'أكمل الحروف الناقصة':'رتّب الحروف المبعثرة')+(l==='ar'?' لتكوين المعنى العربي':' لتكوين الكلمة الإنجليزية')+'</p>'+
   '<div class="prompt" dir="'+dirOf(pl)+'">'+esc(promptOf(w))+'</div></div>';
   if(it.mode==='blank'){
-    h+='<div class="cells '+tint(it.i)+'" dir="'+dirOf(l)+'">'+st.chars.map(function(ch,ci){
+    var nxt=nextEmpty(st),filled=0,total=0;
+    h+='<div class="cells '+tint(w.wi)+'" dir="'+dirOf(l)+'">'+st.chars.map(function(ch,ci){
       if(!LETTER_RE.test(ch))return ch===' '?'<span class="gap"></span>':'<span class="cell fixed">'+esc(ch)+'</span>';
       if(!st.hidden[ci])return '<span class="cell fixed">'+esc(ch)+'</span>';
-      if(D.fb){
-        var tv=st.typed[ci]||'';
-        var ok=norm(tv,l)===norm(ch,l);
-        return '<span class="cell '+(ok?'good':'bad')+'">'+(esc(tv)||'·')+'</span>';
-      }
-      return '<input class="cell" id="c'+ci+'" data-k="'+ci+'" data-uid="'+st.uid+'" value="'+esc(st.typed[ci]||'')+'" maxlength="1" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="حرف ناقص">';
+      total++;
+      var tid=st.slots[ci],tl=tid===undefined?'':tileCh(st,tid);
+      if(tid!==undefined)filled++;
+      if(D.fb){return '<span class="cell '+(norm(tl,l)===norm(ch,l)?'good':'bad')+'">'+(esc(tl)||'·')+'</span>';}
+      if(tid!==undefined)return '<button type="button" class="cell filled" data-act="unslot" data-ci="'+ci+'" aria-label="إزالة الحرف">'+esc(tl)+'</button>';
+      return '<span class="cell slot'+(ci===nxt?' next':'')+'" data-ci="'+ci+'"></span>';
     }).join('')+'</div>';
-    if(!D.fb)h+=dictBlock()+'<button type="button" class="btn primary big" data-act="dcheck">تحقق</button>';
+    if(!D.fb){
+      var used=usedIds(st);
+      h+='<div class="cells pool" dir="ltr">'+st.tiles.filter(function(t){return used.indexOf(t.id)===-1;}).map(function(t){return '<button type="button" class="tile" data-act="slotpick" data-id="'+t.id+'">'+esc(t.ch)+'</button>';}).join('')+'</div>'+dictBlock()+
+      '<div class="row mid"><button type="button" class="btn" data-act="clearslots"'+(filled?'':' disabled')+'>مسح</button>'+
+      '<button type="button" class="btn primary" data-act="dcheck"'+(filled===total?'':' disabled')+'>تحقق</button></div>';
+    }
   }else{
     var picked=st.picked.map(function(id){return st.all[id];});
     var okAll=D.fb?norm(picked.map(function(t){return t.ch;}).join(''),l)===norm(st.target,l):null;
@@ -1057,12 +1291,15 @@ function viewDrill(){
 }
 function drillCheck(){
   var D=S.drill;if(D.fb)return;
-  var it=D.queue[0],st=it.st,w=S.words[it.i],l=ansLang(),ok;
+  var it=D.queue[0],st=it.st,w=units()[it.i],l=ansLang(),ok;
   if(it.mode==='blank'){
+    var all=true;
     var composed=st.chars.map(function(ch,ci){
       if(!st.hidden[ci])return ch;
-      var el=document.getElementById('c'+ci),v=el?el.value:'';st.typed[ci]=v;return v;
+      var tid=st.slots[ci];if(tid===undefined){all=false;return '';}
+      return tileCh(st,tid);
     }).join('');
+    if(!all)return;
     ok=norm(composed,l)===norm(st.target,l);
   }else{
     if(st.picked.length!==st.all.length)return;
@@ -1084,18 +1321,26 @@ function drillNext(){
 }
 
 /* stage 3 */
+var KROWS=['qwertyuiop','asdfghjkl','zxcvbnm'];
+function kbd(){
+  return '<div class="kbd" dir="ltr">'+KROWS.map(function(r,i){
+    return '<div class="krow">'+r.split('').map(function(c){return '<button type="button" class="key" data-act="key" data-k="'+c+'">'+c+'</button>';}).join('')+
+    (i===2?'<button type="button" class="key wide" data-act="bksp" aria-label="حذف حرف">'+ic('back',22)+'</button>':'')+'</div>';
+  }).join('')+'</div>';
+}
 function viewFinal(){
   var F=S.fin;
   if(!F.all.length)return noMeaning();
   var l=ansLang(),pl=promptLang();
   if(F.phase==='ask'){
-    var idx=F.list[F.pos],w=S.words[idx],pct=Math.round(F.pos/F.list.length*100);
+    var idx=F.list[F.pos],w=units()[idx],pct=Math.round(F.pos/F.list.length*100);
     return '<section class="panel"><div class="meta"><span>سؤال '+(F.pos+1)+' من '+F.list.length+'</span><span>اختبار بلا مساعدة</span></div>'+
     '<div class="bar"><i style="width:'+pct+'%"></i></div>'+
-    '<div class="wcard '+tint(idx)+'"><p class="label">'+(l==='ar'?'اكتب المعنى بالعربية':'اكتب الكلمة بالإنجليزية')+'</p>'+
+    '<div class="wcard '+tint(w.wi)+'">'+(w.tag?'<div class="tagrow"><span class="why">'+w.tag+'</span></div>':'')+'<p class="label">'+(l==='ar'?'اكتب المعنى بالعربية':'اكتب الكلمة بالإنجليزية')+'</p>'+
     '<div class="prompt" dir="'+dirOf(pl)+'">'+esc(promptOf(w))+'</div></div>'+
-    '<input class="answer" id="ans" data-pos="'+F.pos+'" value="'+esc(F.draft||'')+'" dir="'+dirOf(l)+'" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="إجابتك">'+dictBlock()+
-    '<button type="button" class="btn primary big" data-act="fsubmit">تأكيد</button></section>';
+    '<div class="ansbox" dir="ltr" aria-live="polite" aria-label="إجابتك">'+(F.draft?esc(F.draft):'<span class="ph">اضغط الحروف لكتابة الكلمة</span>')+'<i class="caret"></i></div>'+
+    kbd()+dictBlock()+
+    '<button type="button" class="btn primary big" data-act="fsubmit"'+(F.draft?'':' disabled')+'>تأكيد</button></section>';
   }
   var correct=F.all.filter(function(i){return F.res[i]&&F.res[i].ok;}).length,total=F.all.length;
   var wrong=F.all.filter(function(i){return !(F.res[i]&&F.res[i].ok);});
@@ -1104,8 +1349,8 @@ function viewFinal(){
   (wrong.length?'':'<p class="hint">أجبت عن كل الكلمات بشكل صحيح دون مساعدة، وعُلّمت الكلمات كمحفوظة في قائمتك.</p>');
   if(wrong.length){
     h+='<div class="tw"><table><thead><tr><th>السؤال</th><th>إجابتك</th><th>الصحيح</th></tr></thead><tbody>'+
-    wrong.map(function(i){var w=S.words[i],r=F.res[i]||{};
-      return '<tr><td dir="'+dirOf(pl)+'">'+esc(promptOf(w))+'</td><td dir="'+dirOf(l)+'">'+(esc(r.given||'')||'—')+'</td><td dir="'+dirOf(l)+'"><b>'+esc(answersOf(w,l).join(' / '))+'</b></td></tr>';}).join('')+
+    wrong.map(function(i){var w=units()[i],r=F.res[i]||{};
+      return '<tr><td dir="'+dirOf(pl)+'">'+esc(promptOf(w))+(w.tag?' ('+w.tag+')':'')+'</td><td dir="'+dirOf(l)+'">'+(esc(r.given||'')||'—')+'</td><td dir="'+dirOf(l)+'"><b>'+esc(answersOf(w,l).join(' / '))+'</b></td></tr>';}).join('')+
     '</tbody></table></div>'+
     '<div class="row mid"><button type="button" class="btn primary" data-act="fretry">اختبر الكلمات الخاطئة فقط</button><button type="button" class="btn" data-go="1">راجع النطق</button></div>';
   }else{
@@ -1113,17 +1358,26 @@ function viewFinal(){
   }
   return h+'</section>';
 }
+/* A word is memorised when its answer is right; a verb only when both its present and past answers are right. */
+function updateMastered(){
+  var U=units(),F=S.fin,grp={};
+  F.all.forEach(function(i){var wi=U[i].wi;(grp[wi]=grp[wi]||[]).push(i);});
+  Object.keys(grp).forEach(function(wi){
+    var w=S.words[+wi];if(!w)return;
+    var ok=grp[wi].every(function(i){return F.res[i]&&F.res[i].ok;});
+    if(ok)S.mastered[mkey(w)]=true;else delete S.mastered[mkey(w)];
+  });
+  save();
+}
 function finalSubmit(){
-  var F=S.fin,el=document.getElementById('ans');if(!el)return;
-  var idx=F.list[F.pos],w=S.words[idx],v=el.value;
+  var F=S.fin;if(!F||F.phase!=='ask'||!F.draft)return;
+  var idx=F.list[F.pos],w=units()[idx],v=F.draft;
   stopRec();S.dict={busy:false,msg:''};F.draft='';
   var ok=isCorrect(v,w,ansLang());
   F.res[idx]={ok:ok,given:v.trim()};
-  if(ok)S.mastered[mkey(w)]=true;else delete S.mastered[mkey(w)];
-  save();
   F.pos++;
   if(F.pos>=F.list.length){
-    F.phase='sum';S.done[3]=true;
+    F.phase='sum';S.done[3]=true;updateMastered();
     var allOk=F.all.every(function(i){return F.res[i]&&F.res[i].ok;});
     sfx(allOk?'win':'done');
   }else sfx('tap');
@@ -1145,44 +1399,54 @@ $stage.addEventListener('click',function(e){
   if(g){sfx('nav');go(+g.getAttribute('data-go'));return;}
   var b=e.target.closest('[data-act]');if(!b||b.disabled)return;
   var a=b.getAttribute('data-act'),P=S.pron;
-  var own={mic:1,dcheck:1,dict:1,dfield:1,selfok:1,pick:1,unpick:1,fsubmit:1,tofinal:1,analyze:1,sample:1,start:1,rvconfirm:1,qtrans:1,etrans:1,rvtrans:1,cam:1,gal:1};
+  var own={atype:1,etype:1,btype:1,rvtype:1,mic:1,dcheck:1,dict:1,dfield:1,selfok:1,pick:1,unpick:1,fsubmit:1,tofinal:1,analyze:1,sample:1,start:1,rvconfirm:1,rvsel:1,slotpick:1,unslot:1,qtrans:1,etrans:1,rvtrans:1,cam:1,gal:1};
   if(!own[a])sfx('tap');
   var wi=+b.getAttribute('data-i');
   if(a==='tab'){captureInputs();S.tab0=b.getAttribute('data-t')==='bulk'?'bulk':'list';S.addMsg='';render();}
+  else if(a==='atype'){captureInputs();S.add.type=b.getAttribute('data-t')==='verb'?'verb':'word';S.add.tried='';S.addMsg='';sfx('tap');render();}
+  else if(a==='etype'){captureInputs();S.edit.type=b.getAttribute('data-t')==='verb'?'verb':'word';sfx('tap');render();}
+  else if(a==='btype'){S.btype=b.getAttribute('data-t')==='verb'?'verb':'word';sfx('tap');render();}
+  else if(a==='rvtype'){captureInputs();var rt=S.rev.rows[wi];rt.type=rt.type==='verb'?'word':'verb';sfx('tap');render();if(rt.type==='verb')autoTranslate([rt]);}
   else if(a==='analyze')analyzeText();
   else if(a==='cam'||a==='gal'){var fi=document.getElementById(a==='cam'?'camIn':'galIn');if(fi){fi.value='';fi.click();}}
   else if(a==='qtrans')quickTranslate();
   else if(a==='dfield')dictField(b.getAttribute('data-k'));
-  else if(a==='wedit'){captureInputs();var ew=S.words[wi];S.edit={i:wi,en:ew.en,ar:ew.ar,msg:''};render();}
+  else if(a==='wedit'){captureInputs();var ew=S.words[wi];S.edit={i:wi,type:isVerb(ew)?'verb':'word',en:ew.en,ar:ew.ar,pen:ew.pen||'',par:ew.par||'',msg:''};render();}
   else if(a==='ecancel'){S.edit=null;render();}
   else if(a==='etrans')editTranslate();
   else if(a==='rvchk'){captureInputs();var rr=S.rev.rows[wi];rr.on=!rr.on;render();}
   else if(a==='rvdel'){captureInputs();S.rev.rows.splice(wi,1);render(true);}
-  else if(a==='rvadd'){captureInputs();S.rev.rows.push({en:'',ar:'',on:true,dup:false});render();var nf=document.getElementById('rvE'+(S.rev.rows.length-1));if(nf)nf.focus();}
+  else if(a==='rvadd'){captureInputs();S.rev.rows.push({type:S.btype==='verb'?'verb':'word',en:'',ar:'',pen:'',par:'',on:true,dup:false});render();var nf=document.getElementById('rvE'+(S.rev.rows.length-1));if(nf)nf.focus();}
   else if(a==='rvtrans'){captureInputs();autoTranslate(S.rev.rows);}
+  else if(a==='rvsel'){captureInputs();var mm=b.getAttribute('data-m');S.rev.rows.forEach(function(r){r.on=mm==='all'?true:mm==='none'?false:(r.rec!==false&&!r.dup);});render();}
   else if(a==='rvcancel'){S.rev=null;render();}
   else if(a==='rvconfirm')confirmReview();
-  else if(a==='sample'){mergeWords(parseWords(SAMPLE.join('\n')).words);sfx('pop');render();}
+  else if(a==='sample'){mergeWords(parseWords(SAMPLE.join('\n')).words.concat(SAMPLE_VERBS));sfx('pop');render();}
   else if(a==='mtoggle'){var w0=S.words[wi];if(isM(w0)){delete S.mastered[mkey(w0)];sfx('tap');}else{S.mastered[mkey(w0)]=true;sfx('correct');}save();render();}
-  else if(a==='wsay')speak(S.words[wi].en,'en-US',0.9);
+  else if(a==='wsay'){var sw=S.words[wi];speak(isVerb(sw)&&sw.pen?sw.en+', '+sw.pen:sw.en,'en-US',0.9);}
   else if(a==='wdel'){var d0=S.words[wi];delete S.mastered[mkey(d0)];S.words.splice(wi,1);S.edit=null;wordsChanged();save();render();}
   else if(a==='start'){if(!S.words.length)return;S.pron=null;S.drill=null;S.fin=null;S.done=[true,false,false,false];sfx('pop');go(1);}
-  else if(a==='say')speak(S.words[P.i].en,'en-US',0.9);
-  else if(a==='slow')speak(S.words[P.i].en,'en-US',0.5);
-  else if(a==='spell')spellOut(S.words[P.i].en);
-  else if(a==='sayar')speak(S.words[P.i].ar,'ar-SA',0.85);
+  else if(a==='say')speak(units()[P.i].en,'en-US',0.9);
+  else if(a==='slow')speak(units()[P.i].en,'en-US',0.5);
+  else if(a==='spell')spellOut(units()[P.i].en);
+  else if(a==='sayar')speak(units()[P.i].ar,'ar-SA',0.85);
   else if(a==='mic')listen();
   else if(a==='selfok'){P.passed[P.i]=true;P.tries[P.i]=Math.max(P.tries[P.i]||0,1);P.fb=null;sfx('correct');render();}
   else if(a==='pprev'){stopRec();P.listening=false;P.i=Math.max(0,P.i-1);P.fb=null;render();}
   else if(a==='pnext'){
     stopRec();P.listening=false;
-    if(P.i>=S.words.length-1){S.done[1]=true;sfx('done');go(2);}
+    if(P.i>=units().length-1){S.done[1]=true;sfx('done');go(2);}
     else{P.i++;P.fb=null;render();}
   }
   else if(a==='pick'){S.drill.queue[0].st.picked.push(+b.getAttribute('data-id'));sfx('pop');render();}
   else if(a==='unpick'){var s2=S.drill.queue[0].st,id=+b.getAttribute('data-id');s2.picked=s2.picked.filter(function(x){return x!==id;});sfx('pop2');render();}
   else if(a==='clearpick'){S.drill.queue[0].st.picked=[];render();}
   else if(a==='dict')dictClick();
+  else if(a==='slotpick'){var sb=S.drill.queue[0].st,sc=nextEmpty(sb);if(sc>=0){sb.slots[sc]=+b.getAttribute('data-id');sfx('pop');render();}}
+  else if(a==='unslot'){delete S.drill.queue[0].st.slots[+b.getAttribute('data-ci')];sfx('pop2');render();}
+  else if(a==='clearslots'){S.drill.queue[0].st.slots={};render();}
+  else if(a==='key'){var F2=S.fin;if(F2&&F2.phase==='ask'&&(F2.draft||'').length<30){F2.draft=(F2.draft||'')+b.getAttribute('data-k');render();}}
+  else if(a==='bksp'){var F3=S.fin;if(F3&&F3.draft){F3.draft=F3.draft.slice(0,-1);render();}}
   else if(a==='dcheck')drillCheck();
   else if(a==='dnext')drillNext();
   else if(a==='tofinal'){sfx('nav');go(3);}
@@ -1202,20 +1466,42 @@ $stage.addEventListener('change',function(e){
 });
 $stage.addEventListener('input',function(e){
   var t=e.target;
-  if(t.id==='wordsInput'){S.raw=t.value;updatePreview();return;}
-  if(t.classList&&t.classList.contains('cell')&&t.value){
-    var cs=Array.prototype.slice.call($stage.querySelectorAll('input.cell')),k=cs.indexOf(t);
-    if(cs[k+1])cs[k+1].focus();
-  }
+  if(t.id==='wordsInput'){S.raw=t.value;updatePreview();}
 });
-$stage.addEventListener('keydown',function(e){
-  var t=e.target;
-  if(e.key==='Enter'){
-    if(S.stage===2&&S.drill&&S.drill.queue.length){e.preventDefault();if(S.drill.fb){if(!S.drill.fb.ok)drillNext();}else drillCheck();}
-    else if(S.stage===3&&t.id==='ans'){e.preventDefault();finalSubmit();}
-  }else if(e.key==='Backspace'&&t.classList&&t.classList.contains('cell')&&!t.value){
-    var cs=Array.prototype.slice.call($stage.querySelectorAll('input.cell')),k=cs.indexOf(t);
-    if(cs[k-1])cs[k-1].focus();
+/* physical keyboard (desktop only): letters fill the exercise, Backspace undoes, Enter confirms. Phones never open a keyboard here. */
+document.addEventListener('keydown',function(e){
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  var tg=e.target,tag=tg&&tg.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA')return;
+  var isLetter=/^[a-z]$/i.test(e.key),c=e.key.toLowerCase();
+  if(S.stage===3&&S.fin&&S.fin.phase==='ask'){
+    if(isLetter&&(S.fin.draft||'').length<30){S.fin.draft=(S.fin.draft||'')+c;sfx('tap');render();}
+    else if(e.key==='Backspace'&&S.fin.draft){S.fin.draft=S.fin.draft.slice(0,-1);render();}
+    else if(e.key==='Enter'&&tag!=='BUTTON'){e.preventDefault();finalSubmit();}
+    return;
+  }
+  if(S.stage===2&&S.drill&&S.drill.queue.length){
+    var D=S.drill,it=D.queue[0];
+    if(D.fb){if(e.key==='Enter'&&tag!=='BUTTON'&&!D.fb.ok){e.preventDefault();drillNext();}return;}
+    var st=it.st;if(!st)return;
+    if(it.mode==='blank'){
+      if(isLetter){
+        var ne=nextEmpty(st);if(ne<0)return;
+        var used=usedIds(st),t=null;
+        for(var i=0;i<st.tiles.length;i++){if(used.indexOf(st.tiles[i].id)===-1&&st.tiles[i].ch.toLowerCase()===c){t=st.tiles[i];break;}}
+        if(t){st.slots[ne]=t.id;sfx('pop');render();}
+      }else if(e.key==='Backspace'){
+        var ks=Object.keys(st.slots).map(Number).sort(function(a,b){return a-b;});
+        if(ks.length){delete st.slots[ks[ks.length-1]];sfx('pop2');render();}
+      }
+    }else{
+      if(isLetter){
+        var u2=st.picked,t2=null;
+        for(var j=0;j<st.tiles.length;j++){if(u2.indexOf(st.tiles[j].id)===-1&&st.tiles[j].ch.toLowerCase()===c){t2=st.tiles[j];break;}}
+        if(t2){st.picked.push(t2.id);sfx('pop');render();}
+      }else if(e.key==='Backspace'&&st.picked.length){st.picked.pop();sfx('pop2');render();}
+    }
+    if(e.key==='Enter'&&tag!=='BUTTON'){e.preventDefault();drillCheck();}
   }
 });
 try{if('speechSynthesis' in window)speechSynthesis.getVoices();}catch(e){}
