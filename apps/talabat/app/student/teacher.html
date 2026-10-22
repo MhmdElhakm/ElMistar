@@ -179,7 +179,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
       <h2>اختر الطالب</h2>
       <p id="chooseSub"></p>
       <div id="chooseList" style="text-align:right"></div>
-      <button class="btn btn-ghost" id="backBtn" style="margin-top:6px">رجوع</button>
+      <button class="btn btn-ghost" id="backBtn" style="margin-top:6px">العودة إلى التطبيق الأساسي</button>
     </div>
 
     <div id="stuView" class="hidden">
@@ -312,7 +312,7 @@ function openStudent(id){
 $('loginBtn').onclick=doLogin;
 try{var ft=$('followToggle');if(ft)ft.onclick=function(){var b=$('followBody');if(!b)return;b.classList.toggle('hidden');var c=$('followChev');if(c)c.classList.toggle('open',!b.classList.contains('hidden'))};}catch(e){}
 $('phInput').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
-$('backBtn').onclick=function(){show('loginView');};
+$('backBtn').onclick=function(){window.location.href='../../index.html';};
 $('switchBtn').onclick=function(){show('loginView');};
 $('logoutBtn').onclick=function(){try{sessionStorage.removeItem('t_sid');sessionStorage.removeItem('t_phone');}catch(e){}$('phInput').value='';show('loginView');};
 

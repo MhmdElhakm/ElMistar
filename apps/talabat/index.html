@@ -4,21 +4,425 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <meta name="theme-color" content="#1CB0F6" />
-<title>ناقصنا ايه | مشتريات البيت</title>
-<link rel="icon" type="image/png" href="icon-192.png" />
-<link rel="apple-touch-icon" href="icon-192.png" />
+<title>ElMistar</title>
+<link rel="icon" type="image/png" href="logo.png" />
+<link rel="apple-touch-icon" href="logo.png" />
 <link rel="manifest" href="manifest.webmanifest" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="ناقصنا إيه" />
-<meta name="application-name" content="ناقصنا إيه" />
+<meta name="apple-mobile-web-app-title" content="ElMistar" />
+<meta name="application-name" content="ElMistar" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>window.SUPABASE_URL="https://dicnuwzxolqdtribhdnb.supabase.co";window.SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpY251d3p4b2xxZHRyaWJoZG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1Njg2OTMsImV4cCI6MjEwNTE0NDY5M30.ye-Bm9drZt4xoq-jKKI3koVV_vTa3HRYvz6dOPvLylc";</script>
-<script src="supabase-client.js"></script>
+<script>
+/**
+ * ⚡ ElMistar - Supabase Integration Client
+ * Lightweight, robust Supabase integration module for Vanilla JS HTML5 PWA.
+ */
+
+window.NaqisnaSupabase = (function () {
+  let client = null;
+  let activeChannel = null;
+
+  function getStoredConfig() {
+    try {
+      const url = localStorage.getItem('naqisna_sb_url') || window.SUPABASE_URL || '';
+      const key = localStorage.getItem('naqisna_sb_key') || window.SUPABASE_ANON_KEY || '';
+      return { url: url.trim(), key: key.trim() };
+    } catch {
+      return { url: '', key: '' };
+    }
+  }
+
+  function setConfig(url, key) {
+    try {
+      if (url) localStorage.setItem('naqisna_sb_url', url.trim());
+      else localStorage.removeItem('naqisna_sb_url');
+
+      if (key) localStorage.setItem('naqisna_sb_key', key.trim());
+      else localStorage.removeItem('naqisna_sb_key');
+
+      initClient();
+    } catch (e) {
+      console.error('Failed to save Supabase config:', e);
+    }
+  }
+
+  function initClient() {
+    const { url, key } = getStoredConfig();
+    if (url && key && window.supabase && typeof window.supabase.createClient === 'function') {
+      try {
+        client = window.supabase.createClient(url, key, {
+          auth: { persistSession: true, autoRefreshToken: true },
+          realtime: { params: { eventsPerSecond: 10 } }
+        });
+        console.log('✅ Supabase Client Initialized Successfully');
+        return true;
+      } catch (e) {
+        console.warn('⚠️ Supabase client creation failed:', e);
+        client = null;
+        return false;
+      }
+    }
+    client = null;
+    return false;
+  }
+
+  function isConfigured() {
+    if (!client) initClient();
+    return !!client;
+  }
+
+  function getClient() {
+    if (!client) initClient();
+    return client;
+  }
+
+  // Single shared blob table (code PK, data jsonb). All home state lives
+  // inside data so no FK / multi-table schema is required.
+  const BLOB_TABLE = 'app_homes';
+
+  function blobSnapshot(homeCode, state, extra) {
+    return {
+      name: (state.home && state.home.name) || 'منزلنا السعيد',
+      user: state.user ? { id: state.user.id, name: state.user.name, role: 'member', whatsapp: state.user.whatsapp } : null,
+      deliveryWhatsapp: state.deliveryWhatsapp || (state.home && state.home.deliveryWhatsapp) || null,
+      deliveryName: state.deliveryName || (state.home && state.home.deliveryName) || null,
+      partnerWhatsapp: state.partnerWhatsapp || (state.home && state.home.partnerWhatsapp) || null,
+      orders: Array.isArray(state.orders) ? state.orders : [],
+      expenses: Array.isArray(state.expenses) ? state.expenses : [],
+      orderLists: Array.isArray(state.orderLists) ? state.orderLists : [],
+      notifications: Array.isArray(state.notifications) ? state.notifications : [],
+      updatedAt: new Date().toISOString(),
+      updatedAtMs: Date.now(),
+      ...(extra || {})
+    };
+  }
+
+  async function readBlob(homeCode) {
+    const sb = getClient();
+    if (!sb || !homeCode) { console.warn('⚠️ readBlob: client=', !!sb, 'homeCode=', homeCode); return null; }
+    try {
+      console.log('🔍 readBlob: searching for code=', homeCode);
+      const { data, error } = await sb.from(BLOB_TABLE).select('data').eq('code', homeCode).maybeSingle();
+      console.log('🔍 readBlob result: data=', data, 'error=', error);
+      if (error) { console.warn('Supabase blob read warning:', error); return null; }
+      return (data && data.data) || null;
+    } catch (e) {
+      console.error('Supabase blob read failed:', e);
+      return null;
+    }
+  }
+
+  async function writeBlob(homeCode, snapshot) {
+    const sb = getClient();
+    if (!sb || !homeCode || !snapshot) return false;
+    try {
+      const { error } = await sb.from(BLOB_TABLE).upsert({
+        code: homeCode,
+        data: snapshot,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'code' });
+      if (error) { console.error('Supabase blob write failed:', error); return false; }
+      return true;
+    } catch (e) {
+      console.error('Supabase blob write error:', e);
+      return false;
+    }
+  }
+
+  // --- Home Management ---
+  async function joinOrCreateHome(homeCode, homeName, userId, userName, gender) {
+    const sb = getClient();
+    if (!sb || !homeCode) return null;
+
+    try {
+      const existing = await readBlob(homeCode);
+      if (!existing) {
+        await writeBlob(homeCode, { name: homeName || 'منزلنا السعيد', orders: [], expenses: [], orderLists: [], deliveryWhatsapp: null, deliveryName: null, updatedAt: new Date().toISOString(), updatedAtMs: Date.now() });
+        return { code: homeCode, name: homeName || 'منزلنا السعيد' };
+      }
+      return { code: homeCode, name: existing.name || homeName || 'منزلنا السعيد' };
+    } catch (e) {
+      console.error('Error in joinOrCreateHome:', e);
+      return null;
+    }
+  }
+
+  // --- Fetch Home Data ---
+  async function fetchHomeData(homeCode) {
+    const sb = getClient();
+    if (!sb || !homeCode) return null;
+
+    try {
+      const blob = await readBlob(homeCode);
+      if (!blob) return null;
+      return {
+        name: blob.name || null,
+        deliveryWhatsapp: blob.deliveryWhatsapp || null,
+        deliveryName: blob.deliveryName || null,
+        partnerWhatsapp: blob.partnerWhatsapp || null,
+        user: blob.user || null,
+        orders: Array.isArray(blob.orders) ? blob.orders : [],
+        expenses: Array.isArray(blob.expenses) ? blob.expenses : [],
+        orderLists: Array.isArray(blob.orderLists) ? blob.orderLists : [],
+        notifications: Array.isArray(blob.notifications) ? blob.notifications : [],
+        updatedAt: blob.updatedAt || null,
+        updatedAtMs: blob.updatedAtMs || 0
+      };
+    } catch (e) {
+      console.error('Failed to fetch home data from Supabase:', e);
+      return null;
+    }
+  }
+
+  // --- Sync Single Items (read-modify-write on the blob) ---
+  async function upsertOrder(homeCode, order) {
+    if (!homeCode || !order || !order.id) return;
+    try {
+      const blob = (await readBlob(homeCode)) || { orders: [], expenses: [] };
+      const arr = Array.isArray(blob.orders) ? blob.orders : [];
+      const i = arr.findIndex(o => o && String(o.id) === String(order.id));
+      if (i >= 0) arr[i] = order; else arr.push(order);
+      blob.orders = arr;
+      await writeBlob(homeCode, blob);
+    } catch (e) {
+      console.error('Failed to upsert order to Supabase:', e);
+    }
+  }
+
+  async function deleteOrder(homeCode, orderId) {
+    if (!homeCode || orderId === undefined || orderId === null) return;
+    try {
+      const blob = (await readBlob(homeCode)) || { orders: [], expenses: [] };
+      blob.orders = (Array.isArray(blob.orders) ? blob.orders : []).filter(o => o && String(o.id) !== String(orderId));
+      await writeBlob(homeCode, blob);
+    } catch (e) {
+      console.error('Failed to delete order from Supabase:', e);
+    }
+  }
+
+  async function upsertExpense(homeCode, exp) {
+    if (!homeCode || !exp || !exp.id) return;
+    try {
+      const blob = (await readBlob(homeCode)) || { orders: [], expenses: [] };
+      const arr = Array.isArray(blob.expenses) ? blob.expenses : [];
+      const i = arr.findIndex(x => x && String(x.id) === String(exp.id));
+      if (i >= 0) arr[i] = exp; else arr.push(exp);
+      blob.expenses = arr;
+      await writeBlob(homeCode, blob);
+    } catch (e) {
+      console.error('Failed to upsert expense to Supabase:', e);
+    }
+  }
+
+  async function deleteExpense(homeCode, expId) {
+    if (!homeCode || expId === undefined || expId === null) return;
+    try {
+      const blob = (await readBlob(homeCode)) || { orders: [], expenses: [] };
+      blob.expenses = (Array.isArray(blob.expenses) ? blob.expenses : []).filter(x => x && String(x.id) !== String(expId));
+      await writeBlob(homeCode, blob);
+    } catch (e) {
+      console.error('Failed to delete expense from Supabase:', e);
+    }
+  }
+
+  // --- Delete Home Permanently (single blob row) ---
+  async function deleteHome(homeCode) {
+    const sb = getClient();
+    if (!sb || !homeCode) return false;
+    try {
+      const { error } = await sb.from(BLOB_TABLE).delete().eq('code', homeCode);
+      if (error) { console.error('Supabase home delete failed:', error); return false; }
+      return true;
+    } catch (e) {
+      console.error('Supabase home delete error:', e);
+      return false;
+    }
+  }
+
+  // Guard: never let a stale/empty device wipe shared cloud content.
+  // Skips the write when local has no orders while the cloud does,
+  // unless this device already completed its first pull-merge.
+  function pushAllowed(state, remote) {
+    try {
+      const localOrders = Array.isArray(state.orders) ? state.orders : [];
+      const localExp = Array.isArray(state.expenses) ? state.expenses : [];
+      const remoteOrders = remote && Array.isArray(remote.orders) ? remote.orders : [];
+      if (!remote && !localOrders.length && !localExp.length) return false;
+      if (remoteOrders.length && !localOrders.length && !state._syncedOnce) return false;
+      return true;
+    } catch { return true; }
+  }
+
+  // --- Full State Sync Push (single blob row) ---
+  async function pushFullState(homeCode, state) {
+    const sb = getClient();
+    if (!sb || !homeCode || !state) return;
+
+    try {
+      const remote = await readBlob(homeCode);
+      if (!pushAllowed(state, remote)) return;
+      await writeBlob(homeCode, blobSnapshot(homeCode, state));
+    } catch (e) {
+      console.error('Push full state error:', e);
+    }
+  }
+
+  // --- Offline-First expenses: push orders only, keep remote expenses untouched (privacy mode) ---
+  async function pushOrdersOnly(homeCode, state) {
+    if (!homeCode || !state) return;
+    try {
+      const remote = (await readBlob(homeCode)) || {};
+      if (!pushAllowed(state, remote)) return;
+      const snap = blobSnapshot(homeCode, state);
+      snap.expenses = Array.isArray(remote.expenses) ? remote.expenses : [];
+      if (!snap.deliveryWhatsapp && remote.deliveryWhatsapp) snap.deliveryWhatsapp = remote.deliveryWhatsapp;
+      if (!snap.deliveryName && remote.deliveryName) snap.deliveryName = remote.deliveryName;
+      if (!snap.partnerWhatsapp && remote.partnerWhatsapp) snap.partnerWhatsapp = remote.partnerWhatsapp;
+      await writeBlob(homeCode, snap);
+    } catch (e) {
+      console.error('Push orders-only error:', e);
+    }
+  }
+
+  // --- Per-section finance sharing: push only shared kinds, keep private kinds untouched ---
+  // shareMap: { expense: bool, income: bool, debt: bool }
+  // - Shared kinds: local list is authoritative for that slice (uploads + propagates local deletes)
+  // - Private kinds: remote items preserved, plus local items explicitly marked shared:true are upserted
+  async function pushFinPartial(homeCode, state, shareMap) {
+    if (!homeCode || !state) return;
+    try {
+      const remote = (await readBlob(homeCode)) || {};
+      if (!pushAllowed(state, remote)) return;
+      const kindOf = (e) => (e && e.kind) || 'expense';
+      const snap = blobSnapshot(homeCode, state);
+      const remoteExp = Array.isArray(remote.expenses) ? remote.expenses : [];
+      const localExp = Array.isArray(state.expenses) ? state.expenses : [];
+      const localById = new Map();
+      localExp.forEach(e => { if (e && e.id != null) localById.set(String(e.id), e); });
+      const out = [];
+      remoteExp.forEach(re => {
+        if (!re) return;
+        const k = kindOf(re);
+        const shared = shareMap && shareMap[k] === true;
+        if (!shared) { out.push(re); return; }
+        const le = localById.get(String(re.id));
+        if (le) out.push(le);
+        // else: deleted locally in a shared kind -> drop it (propagate delete)
+      });
+      const outIds = new Set(out.map(e => e && String(e.id)));
+      localExp.forEach(le => {
+        if (!le || le.id == null || outIds.has(String(le.id))) return;
+        const k = kindOf(le);
+        if ((shareMap && shareMap[k] === true) || le.shared === true) out.push(le);
+      });
+      snap.expenses = out;
+      if (!snap.deliveryWhatsapp && remote.deliveryWhatsapp) snap.deliveryWhatsapp = remote.deliveryWhatsapp;
+      if (!snap.deliveryName && remote.deliveryName) snap.deliveryName = remote.deliveryName;
+      if (!snap.partnerWhatsapp && remote.partnerWhatsapp) snap.partnerWhatsapp = remote.partnerWhatsapp;
+      await writeBlob(homeCode, snap);
+    } catch (e) {
+      console.error('Push fin-partial error:', e);
+    }
+  }
+
+  // --- Realtime Subscription ---
+  function subscribeToHomeChanges(homeCode, onChangeCallback) {
+    const sb = getClient();
+    if (!sb || !homeCode) return null;
+
+    if (activeChannel) {
+      try { activeChannel.unsubscribe(); } catch {}
+    }
+
+    try {
+      activeChannel = sb
+        .channel(`naqisna-home-${homeCode}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: BLOB_TABLE, filter: `code=eq.${homeCode}` },
+          payload => { if (typeof onChangeCallback === 'function') onChangeCallback('home', payload); }
+        )
+        .subscribe((status) => {
+          console.log(`📡 Supabase Realtime channel status for ${homeCode}:`, status);
+        });
+
+      return activeChannel;
+    } catch (e) {
+      console.error('Realtime subscription failed:', e);
+      return null;
+    }
+  }
+
+  // --- Online Presence (active users counter, no DB table needed) ---
+  let presenceChannel = null;
+  function joinPresence(user, onSync) {
+    const sb = getClient();
+    if (!sb || !user) return null;
+    try {
+      if (presenceChannel) { try { presenceChannel.unsubscribe(); } catch {} presenceChannel = null; }
+      const key = String(user.id || user.whatsapp || ('guest-' + Math.random().toString(36).slice(2, 8)));
+      presenceChannel = sb.channel('naqisna-online', { config: { presence: { key } } });
+      presenceChannel.on('presence', { event: 'sync' }, () => {
+        try {
+          const st = presenceChannel.presenceState() || {};
+          const n = Object.keys(st).length;
+          if (typeof onSync === 'function') onSync(n);
+        } catch {}
+      });
+      presenceChannel.subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          try { await presenceChannel.track({ user: user.name || 'مستخدم', at: Date.now() }); } catch {}
+        }
+      });
+      return presenceChannel;
+    } catch (e) {
+      console.error('Presence join failed:', e);
+      return null;
+    }
+  }
+
+  // --- Admin Helpers ---
+  async function fetchAdminAds() {
+    const sb = getClient();
+    if (!sb) return null;
+    try {
+      const { data } = await sb.from('admin_ads').select('*').eq('is_active', true);
+      return data;
+    } catch { return null; }
+  }
+
+  // Auto initialize if config is present
+  setTimeout(initClient, 100);
+
+  return {
+    getConfig: getStoredConfig,
+    setConfig,
+    isConfigured,
+    getClient,
+    joinOrCreateHome,
+    fetchHomeData,
+    upsertOrder,
+    deleteOrder,
+    upsertExpense,
+    deleteExpense,
+    deleteHome,
+    pushFullState,
+    pushOrdersOnly,
+    pushFinPartial,
+    subscribeToHomeChanges,
+    joinPresence,
+    fetchAdminAds
+  };
+})();
+
+
+</script>
 <style>
   :root {
     --bg: #F4FAFE;
@@ -89,6 +493,7 @@
   @keyframes plCore { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25); } }
 
   .app {
+    width: 100%;
     max-width: 480px;
     margin: 0 auto;
     min-height: 100vh;
@@ -1285,6 +1690,195 @@
   .nav-item svg { width: 22px; height: 22px; }
   .nav-item.active { color: var(--primary); font-weight: 800; }
 
+  /* Navigation views: the main shell is shared, while each tab reveals its own hub. */
+  #app[data-view="islamic"] .home-cards-layout > .category-group,
+  #app[data-view="islamic"] .hub-wellness,
+  #app[data-view="islamic"] .hub-apps,
+  #app[data-view="islamic"] #tasksWrap,
+  #app[data-view="islamic"] .home-cards-layout > .noura-card,
+  #app[data-view="family"] .hub-faith { display: none !important; }
+  #app[data-view="family"] .home-cards-layout > .category-group { display: none !important; }
+  #app .home-cards-layout > .category-group { display: none !important; }
+  #app[data-view="family"] .home-hub-layout { margin-top: 14px; }
+  #app[data-view="islamic"] .home-hub-layout { margin-top: 14px; }
+  #app[data-view="family"] .home-cards-layout .hub-wellness .faith-banner,
+  #app[data-view="family"] .home-cards-layout .hub-apps .faith-banner { display: flex !important; }
+  .settings-card:has(#catCustomHead) { display: none !important; }
+  .tab-app-setting-group { margin: 0 12px 10px; padding: 11px 12px; border: 1px solid rgba(28,176,246,.14); border-radius: 15px; background: rgba(255,255,255,.58); }
+  .tab-app-setting-group > b { display: block; margin-bottom: 8px; color: var(--primary-dark); font-size: 13px; }
+  .tab-app-setting-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .tab-app-check { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 7px 8px; border-radius: 10px; background: var(--bg); color: var(--text); font-size: 11px; font-weight: 800; cursor: pointer; }
+  .tab-app-check input { accent-color: var(--primary); flex: 0 0 auto; }
+  .tab-app-check span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .unified-app-control-card > .tab-app-settings-card,
+  .unified-app-control-card > .hub-layout-card { margin: 0; padding: 0; border: 0; box-shadow: none; background: transparent; }
+  .unified-app-control-card > .tab-app-settings-card > .settings-title,
+  .unified-app-control-card > .tab-app-settings-card > .help-text { display: none; }
+  .unified-app-control-card > .hub-layout-card { margin-top: 8px; }
+  .unified-app-control-card > .hub-layout-card #homeCardsHead { border-top: 1px solid rgba(28,176,246,.14); padding-top: 14px; }
+  .tab-card-control-section { margin: 0 18px 12px; padding: 14px 16px 16px; border-top: 0; }
+  .admin-controls-shell { margin: 0 18px 14px; }
+  .settings-control-zone { margin: 0 18px 14px; padding: 10px; display: grid; gap: 10px; border: 1px solid rgba(28,176,246,.16); border-radius: 22px; background: linear-gradient(145deg,#fff,#F3FBFF); box-shadow: 0 10px 26px rgba(28,176,246,.08); }
+  .settings-control-zone > .admin-controls-shell, .settings-control-zone > .backup-settings-card { margin: 0; }
+  .admin-lock-card { overflow: hidden; border: 1.5px solid rgba(28,176,246,.2); background: linear-gradient(145deg,#fff,#f3fbff); }
+  .admin-lock-head { display:flex; align-items:center; gap:12px; padding:16px; }
+  .admin-lock-icon { width:44px; height:44px; border-radius:15px; display:grid; place-items:center; flex-shrink:0; background:linear-gradient(145deg,#49b8f2,#218fd0); color:#fff; font-size:21px; box-shadow:0 8px 18px rgba(33,143,208,.22); }
+  .admin-lock-copy { flex:1; min-width:0; text-align:right; }
+  .admin-lock-copy b { display:block; color:var(--text); font-size:15px; font-weight:950; }
+  .admin-lock-copy small { display:block; margin-top:3px; color:var(--text-muted); font-size:11px; font-weight:750; line-height:1.55; }
+  .admin-lock-state { color:#f59e0b; font-size:11px; font-weight:900; white-space:nowrap; }
+  .admin-lock-form { display:flex; gap:9px; padding:0 16px 16px; }
+  .admin-lock-form input { min-width:0; flex:1; height:44px; border:1.5px solid var(--border); border-radius:13px; background:#fff; color:var(--text); text-align:center; letter-spacing:4px; font:inherit; font-weight:900; outline:none; }
+  .admin-lock-form input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(28,176,246,.12); }
+  .admin-lock-form button { min-width:112px; border:0; border-radius:13px; background:linear-gradient(145deg,#4bb8f1,#258fce); color:#fff; font:inherit; font-size:12px; font-weight:900; cursor:pointer; box-shadow:0 8px 16px rgba(37,143,206,.2); }
+  .admin-lock-error { padding:0 16px 13px; color:#e11d48; font-size:11px; font-weight:850; text-align:center; }
+  .admin-unlocked-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 2px 10px; }
+  .admin-unlocked-head b { color:var(--text-sec); font-size:13px; font-weight:950; }
+  .admin-unlock-close { border:1px solid #ffd0d9; background:#fff5f6; color:#e11d48; border-radius:10px; padding:6px 10px; font:inherit; font-size:11px; font-weight:850; cursor:pointer; }
+  .admin-controls-shell > .hub-layout-card,
+  .admin-controls-shell > .custom-app-settings { margin: 0 0 10px; padding: 6px 10px 8px; border-radius: 20px; }
+  .admin-controls-shell > .hub-layout-card > .collapsible-head,
+  .admin-controls-shell > .custom-app-settings > .collapsible-head { padding: 8px 10px; gap: 9px; min-height: 58px; }
+  .admin-controls-shell > .hub-layout-card .ch-icon,
+  .admin-controls-shell > .custom-app-settings .ch-icon { width: 38px; height: 38px; border-radius: 13px; font-size: 18px; }
+  .admin-controls-shell > .hub-layout-card .ch-texts b,
+  .admin-controls-shell > .custom-app-settings .ch-texts b { font-size: 14px; }
+  .admin-controls-shell > .hub-layout-card .ch-texts small,
+  .admin-controls-shell > .custom-app-settings .ch-texts small { font-size: 10.5px; }
+  .admin-controls-shell > .hub-layout-card .collapsible-head .chev,
+  .admin-controls-shell > .custom-app-settings .collapsible-head .chev { width: 26px; height: 26px; font-size: 18px; }
+  .tab-card-control-title { padding: 14px 16px; color: var(--primary-dark); }
+  .tab-card-layout-list { padding: 0 8px; }
+  @media (max-width: 380px) { .tab-app-setting-grid { grid-template-columns: 1fr; } }
+  #app[data-view="islamic"] .home-hub-layout > .hub-faith,
+  #app[data-view="family"] .home-hub-layout > .hub-wellness,
+  #app[data-view="family"] .home-hub-layout > .hub-apps { animation: tabViewIn .38s cubic-bezier(.22,1,.36,1) both; }
+  #app .hub-wellness,
+  #app .hub-apps { display: none !important; }
+  .settings-page > .topbar,
+  .settings-page > .page-title,
+  .settings-page > .settings-card:has(#accountHead),
+  .settings-page > .settings-card:has(#editDeliveryBtn),
+  .settings-page > .settings-card:has(#dataHead) { display: none !important; }
+  .settings-page { display: flex; flex-direction: column; }
+  .settings-page,
+  #app[data-view="settings"] { width: 100%; min-width: 0; }
+  .settings-page > .settings-control-zone { width: calc(100% - 36px); max-width: none; align-self: center; }
+  .settings-page .admin-controls-shell,
+  .settings-page .admin-unlocked-head { width: 100%; min-width: 0; }
+  .settings-page > .settings-card:has(#installAppBtn) { order: -1; }
+  .settings-page > .backup-settings-card { order: 100; }
+  .settings-page > .about { order: 101; }
+  #app[data-view="settings"] { display: flex; flex-direction: column; }
+  #app[data-view="settings"] > .topbar,
+  #app[data-view="settings"] > .page-title,
+  #app[data-view="settings"] > .settings-card:has(#accountHead),
+  #app[data-view="settings"] > .settings-card:has(#editDeliveryBtn),
+  #app[data-view="settings"] > .settings-card:has(#dataHead) { display: none !important; }
+  #app[data-view="settings"] > .settings-card:has(#installAppBtn) { order: -1; }
+  #app[data-view="settings"] > .backup-settings-card { order: 100; }
+  #app[data-view="settings"] > .about { order: 101; }
+  .custom-apps-section { grid-column: 1 / -1; display: none; margin: 0; width: 100%; }
+  .custom-apps-section[data-custom-app-section="family"], .custom-apps-section[data-custom-app-section="islamic"] { padding: 6px 0 10px; }
+  .custom-apps-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  /* التطبيقات المضافة تصبح عناصر مباشرة في شبكة التبويب حتى يطابق ترتيبها ترتيب بطاقات النظام */
+  .home-cards-layout .custom-apps-section,
+  .home-cards-layout .custom-apps-grid { display: contents; }
+  .custom-app-card { --gc: var(--custom-app-color, var(--primary)); --gc2: color-mix(in srgb, var(--custom-app-color, #1CB0F6) 70%, #fff); --gc-soft: color-mix(in srgb, var(--custom-app-color, #1CB0F6) 14%, #fff); }
+  .custom-app-card { position: relative; display: grid !important; grid-template-columns: minmax(0, 1fr) 58px; grid-template-rows: auto auto auto; grid-template-areas: "label ico" "value ico" "sub ico"; align-items: center; min-height: 122px; padding: 17px 18px !important; gap: 3px 14px; overflow: hidden; text-align: right; border: 1px solid color-mix(in srgb, var(--custom-app-color, #1CB0F6) 24%, #fff) !important; border-inline-start: 4px solid var(--gc) !important; background: linear-gradient(135deg,#fff 0%,var(--gc-soft) 100%) !important; box-shadow: 0 8px 20px color-mix(in srgb, var(--custom-app-color, #1CB0F6) 12%, transparent), inset 0 1px 0 rgba(255,255,255,.9) !important; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+  .custom-app-card::before { content: ''; position: absolute; inset: 0 0 auto; height: 3px; background: linear-gradient(90deg,transparent,var(--gc),transparent); opacity: .8; }
+  .custom-app-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--custom-app-color, #1CB0F6) 45%, #fff) !important; box-shadow: 0 14px 30px color-mix(in srgb, var(--custom-app-color, #1CB0F6) 22%, transparent), inset 0 1px 0 rgba(255,255,255,.95) !important; }
+  .custom-app-card .gc-ico { grid-area: ico; width: 56px; height: 56px; display: grid; place-items: center; border-radius: 17px; color: var(--gc); background: linear-gradient(145deg,var(--gc-soft),#fff); border: 1px solid color-mix(in srgb, var(--custom-app-color, #1CB0F6) 22%, #fff); box-shadow: 0 7px 15px color-mix(in srgb, var(--custom-app-color, #1CB0F6) 18%, transparent); font-size: 26px; }
+  .custom-app-card .gc-ico svg { width: 29px; height: 29px; }
+  .custom-app-card .gc-label { grid-area: label; align-self: end; color: var(--text); font-size: 17px; font-weight: 950; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .custom-app-card .gc-value { grid-area: value; font-size: 12.5px !important; font-weight: 800; color: var(--text-sec); line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .custom-app-card .gc-sub { grid-area: sub; align-self: start; font-size: 10px; font-weight: 800; color: var(--gc); opacity: .85; }
+  .custom-app-settings { order: 0; overflow: hidden; border: 1px solid rgba(28,176,246,.2); background: linear-gradient(145deg,#fff,#F3FBFF); box-shadow: 0 12px 30px rgba(28,176,246,.11); }
+  .custom-app-settings > .collapsible-head { background: linear-gradient(135deg,#fff,#EAF8FF); border-bottom: 1px solid rgba(28,176,246,.14); }
+  .custom-app-settings .collapsible-body { padding-top: 12px; }
+  .custom-app-form { display: grid; gap: 9px; padding: 0 16px 14px; }
+  .custom-app-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .custom-app-form input, .custom-app-form select { width: 100%; min-height: 40px; border: 1px solid var(--border); border-radius: 11px; padding: 8px 10px; background: var(--bg); color: var(--text); font: inherit; font-size: 12px; font-weight: 700; }
+  .custom-app-form input[type="color"] { padding: 4px; }
+  .custom-icon-picker { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 7px; align-items: stretch; padding: 10px; border: 1px solid rgba(28,176,246,.16); border-radius: 15px; background: linear-gradient(145deg,#F8FDFF,#EEF9FF); }
+  .custom-icon-picker-toggle { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 34px; padding: 0 4px; border: 0; border-radius: 9px; background: transparent; color: var(--text-sec); font: inherit; cursor: pointer; }
+  .custom-icon-picker-toggle:hover { background: #EAF8FF; }
+  .custom-icon-picker-title { color: var(--text-sec); font-size: 11px; font-weight: 900; padding: 0 2px; }
+  .custom-icon-picker-chevron { color: var(--primary); font-size: 19px; font-weight: 950; line-height: 1; transition: transform .2s ease; }
+  .custom-icon-picker:not(.open) [data-custom-icon] { display: none; }
+  .custom-icon-picker.open .custom-icon-picker-chevron { transform: rotate(180deg); }
+  .custom-icon-picker button { min-height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 1px solid rgba(28,176,246,.16); border-radius: 12px; background: rgba(255,255,255,.9); color: var(--primary); cursor: pointer; transition: .18s ease; }
+  .custom-icon-picker .custom-icon-picker-toggle { min-height: 34px; flex-direction: row; border: 0; border-radius: 9px; background: transparent; color: var(--text-sec); }
+  .custom-icon-picker button svg { width: 22px; height: 22px; color: var(--primary); vertical-align: middle; }
+  .custom-icon-picker button small { color: var(--text-sec); font-size: 9px; font-weight: 800; line-height: 1.1; }
+  .custom-icon-picker button:hover, .custom-icon-picker button.selected { border-color: var(--primary); background: #EAF8FF; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(28,176,246,.14); }
+  .custom-app-list { display: grid; gap: 8px; padding: 0 16px 14px; }
+  .custom-app-row { direction: rtl; display: flex; align-items: center; gap: 11px; width: 100%; box-sizing: border-box; min-height: 76px; padding: 11px 13px; border: 1px solid rgba(28,176,246,.18); border-radius: 18px; background: linear-gradient(135deg,#fff 0%,#F5FBFF 100%); box-shadow: 0 5px 14px rgba(23,59,88,.06), inset 0 1px 0 rgba(255,255,255,.9); cursor: grab; transition: .2s ease; }
+  .custom-app-row:hover { transform: translateY(-2px); border-color: rgba(28,176,246,.35); box-shadow: 0 10px 20px rgba(28,176,246,.12), inset 0 1px 0 rgba(255,255,255,.95); }
+  .custom-app-row.dragging { opacity: .45; transform: scale(.99); }
+  .custom-app-row > span:first-child { width: 18px; color: var(--primary) !important; opacity: .58; font-size: 20px !important; text-align: center; cursor: grab; }
+  .custom-app-row .custom-app-row-icon { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; flex-shrink: 0; color: var(--primary); font-size: 21px; background: linear-gradient(145deg,#E6F7FF,#fff); border: 1px solid rgba(28,176,246,.18); box-shadow: 0 5px 12px rgba(28,176,246,.13); }
+  .custom-app-row .custom-app-row-icon svg { width: 24px; height: 24px; }
+  .custom-app-row .custom-app-row-info { flex: 1 1 0; min-width: 0; padding: 0 5px; text-align: center; }
+  .custom-app-row .custom-app-row-info b { display: block; color: var(--text); font-size: 15px; font-weight: 950; line-height: 1.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .custom-app-row .custom-app-row-info small { display: block; margin-top: 4px; color: var(--text-sec); font-size: 11px; font-weight: 750; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; }
+  .custom-app-row .custom-app-row-info input { display: block; width: 100%; min-width: 0; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--text); padding: 3px 5px; font: inherit; font-size: 13px; font-weight: 950; line-height: 1.45; }
+  .custom-app-row .custom-app-row-info input:last-child { color: var(--text-sec); font-size: 10px; font-weight: 700; margin-top: 3px; }
+  .custom-app-row .custom-app-row-info input:focus { outline: none; border-color: rgba(28,176,246,.4); background: #fff; box-shadow: 0 0 0 3px rgba(28,176,246,.08); }
+  .custom-app-row .custom-app-row-color { width: 32px; height: 32px; padding: 3px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); cursor: pointer; }
+  .custom-app-row-actions { direction: ltr; display: flex; align-items: center; gap: 6px; margin-inline-start: auto; flex-shrink: 0; }
+  .custom-app-move-wrap { display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 7px 0 4px; border: 1px solid rgba(28,176,246,.18); border-radius: 11px; background: #F5FBFF; color: var(--text-sec); white-space: nowrap; }
+  .custom-app-move-wrap span { font-size: 9px; font-weight: 850; }
+  .custom-app-row-actions .custom-app-move { min-width: 76px; height: 28px; padding: 0 6px; border: 0; border-radius: 8px; background: transparent; color: var(--text); font: inherit; font-size: 10px; font-weight: 900; cursor: pointer; }
+  .custom-app-row-actions .custom-app-move:hover { background: #E7F7FF; }
+  .custom-app-row-actions .custom-app-move:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(28,176,246,.08); }
+  .custom-app-row-actions button { width: 32px; height: 32px; border-radius: 10px; border: 1px solid var(--border); background: #fff; color: var(--text-sec); transition: .18s ease; }
+  .custom-app-row-actions button:hover { transform: translateY(-1px); border-color: var(--primary); color: var(--primary); background: #EAF8FF; }
+  .custom-app-row-actions .hub-switch { width: 38px; height: 22px; border-radius: 99px; }
+  .custom-app-row-actions [data-custom-delete] { width: 46px; color: #D6455D; border-color: rgba(214,69,93,.28); background: #FFF3F5; font-size: 0; font-weight: 950; }
+  .custom-app-row-actions [data-custom-delete]::after { content: 'حذف'; font-size: 10px; }
+  .custom-app-row-actions [data-custom-delete]:hover { color: #B52D45; border-color: #D6455D; background: #FFE5EA; box-shadow: 0 5px 12px rgba(214,69,93,.16); }
+  .custom-app-row-actions { display: none !important; }
+  .custom-app-row::after { content: 'اضغط مطولاً للإدارة'; margin-inline-start: auto; color: var(--text-muted); font-size: 10px; font-weight: 800; white-space: nowrap; }
+  .custom-app-card { -webkit-touch-callout: none; touch-action: pan-x pan-y; }
+  .custom-app-card.long-pressing, .custom-app-row.long-pressing { transform: scale(.985); filter: brightness(.98); }
+  .custom-context-menu { min-width: 220px; max-width: calc(100vw - 20px); }
+  .custom-context-head { display:flex; align-items:center; gap:9px; padding:8px 10px 10px; border-bottom:1px solid var(--border); margin-bottom:4px; }
+  .custom-context-head .ctx-icon { width:34px; height:34px; border-radius:11px; display:grid; place-items:center; background:#EAF8FF; color:var(--primary); flex-shrink:0; }
+  .custom-context-head b { display:block; font-size:12px; font-weight:950; color:var(--text); }
+  .custom-context-head small { display:block; margin-top:2px; color:var(--text-muted); font-size:10px; font-weight:750; }
+  .custom-context-menu .context-menu-item.move .ctx-icon { background:#EAF8FF; color:var(--primary); }
+  .custom-context-menu .context-menu-item.edit .ctx-icon { background:#F0EAFE; color:#7C3AED; }
+  .custom-edit-overlay { position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; padding: 18px; background: rgba(15,35,52,.42); backdrop-filter: blur(7px); animation: customEditFade .2s ease both; }
+  .custom-edit-dialog { width: min(100%, 390px); direction: rtl; overflow: hidden; border: 1px solid rgba(28,176,246,.2); border-radius: 22px; background: linear-gradient(145deg,#fff,#F2FAFF); box-shadow: 0 22px 60px rgba(15,55,80,.25); animation: customEditPop .24s cubic-bezier(.2,.8,.2,1) both; }
+  .custom-edit-head { display: flex; align-items: center; gap: 10px; padding: 17px 18px; border-bottom: 1px solid rgba(28,176,246,.14); background: linear-gradient(135deg,#EAF8FF,#fff); }
+  .custom-edit-head-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; color: var(--primary); background: #DDF4FF; }
+  .custom-edit-head-icon svg { width: 23px; height: 23px; }
+  .custom-edit-head b { display: block; color: var(--text); font-size: 15px; font-weight: 950; }
+  .custom-edit-head small { display: block; margin-top: 3px; color: var(--text-sec); font-size: 10px; font-weight: 700; }
+  .custom-edit-form { display: grid; gap: 10px; padding: 16px 18px 18px; }
+  .custom-edit-form label { display: grid; gap: 5px; color: var(--text-sec); font-size: 10px; font-weight: 900; }
+  .custom-edit-form input { width: 100%; box-sizing: border-box; min-height: 42px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 11px; background: #fff; color: var(--text); font: inherit; font-size: 12px; font-weight: 750; }
+  .custom-edit-form input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(28,176,246,.1); }
+  .custom-edit-color-row { display: block; }
+  .custom-edit-color-row label { display: flex; align-items: center; justify-content: space-between; }
+  .custom-edit-color-row > div { display: none; }
+  .custom-edit-form input[type="color"] { width: 44px; height: 44px; padding: 3px; border-radius: 50%; cursor: pointer; }
+  .custom-edit-form input[type="color"]::-webkit-color-swatch-wrapper, .custom-app-form input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  .custom-edit-form input[type="color"]::-webkit-color-swatch, .custom-app-form input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 50%; }
+  .custom-edit-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+  .custom-edit-actions button { min-height: 42px; border: 0; border-radius: 12px; font: inherit; font-size: 12px; font-weight: 950; cursor: pointer; transition: .18s ease; }
+  .custom-edit-actions button:hover { transform: translateY(-1px); }
+  .custom-edit-cancel { color: var(--text-sec); background: #EEF5F8; }
+  .custom-edit-save { color: #fff; background: linear-gradient(135deg,#35B7F4,#168FCC); box-shadow: 0 8px 18px rgba(28,176,246,.22); }
+  @keyframes customEditFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes customEditPop { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .custom-app-form-grid:last-child { align-items: center; }
+  .custom-app-form-grid:last-child .btn { min-height: 44px; border-radius: 14px; font-weight: 950; box-shadow: 0 9px 20px rgba(28,176,246,.2); }
+  .custom-app-form input[type="color"] { width: 44px; min-height: 44px; height: 44px; justify-self: center; padding: 3px; border-radius: 50%; cursor: pointer; }
+  @media (max-width: 700px) { .custom-apps-grid { grid-template-columns: 1fr; } .custom-app-form-grid { grid-template-columns: 1fr; } .custom-app-row { gap: 7px; min-height: 68px; padding: 9px; } .custom-app-row .custom-app-row-icon { width: 40px; height: 40px; } .custom-app-row .custom-app-row-info b { font-size: 13px; } .custom-app-row .custom-app-row-info small { font-size: 10px; } .custom-app-row-actions { gap: 4px; } .custom-app-move-wrap { gap: 2px; padding-inline: 4px; } .custom-app-move-wrap span { display: none; } .custom-app-row-actions .custom-app-move { min-width: 66px; padding: 0 4px; font-size: 9px; } .custom-app-row-actions button { width: 28px; height: 28px; } .custom-app-row-actions [data-custom-delete] { width: 40px; } }
+  @keyframes tabViewIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
   .modal-backdrop {
     position: fixed; inset: 0; background: rgba(30,27,46,.52);
     -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px);
@@ -1568,6 +2162,13 @@
   .gate-card.gate-quran .quran-meaning { color: #456563; }
   .gate-card.gate-quran .quran-ref { color: #278F82; }
   .gate-card.gate-quran .gc-value { display: block; max-width: 100%; font-size: clamp(12px, 3.2vw, 16px); line-height: 1.55; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gate-card.gate-quran .quran-meaning,
+  .gate-card.gate-quran .quran-ref {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .gate-card.gate-quran .gc-sub { color: #5E7B78; border-top-color: rgba(54,142,130,.18); }
   .gate-card.gate-quran .gc-ico { background: linear-gradient(145deg, #DDF7F0, #FFF0C9); color: #258E82; border-color: #A8DCCE; box-shadow: 0 8px 18px rgba(42,143,127,.14); }
   /* ===== كارت السبحة الإلكترونية (مكان جرعة شفاء) ===== */
@@ -1662,6 +2263,21 @@
   .hub-layout-meta { color: var(--text-sec); font-size: 10.5px; font-weight: 700; margin-top: 1px; }
   .hub-layout-actions { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
   .hub-layout-actions select { min-height: 32px; padding: 4px 7px; border: 1px solid var(--border); border-radius: 9px; color: var(--text); background: var(--bg); font-size: 11px; font-weight: 800; }
+  .admin-controls-shell select,
+  .settings-page .backup-settings-card select,
+  .home-card-layout-row select,
+  .hub-layout-actions select { appearance: none; -webkit-appearance: none; background-color: #F7FCFF; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235D7188' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 8px center; padding-left: 25px !important; border: 1.5px solid rgba(28,176,246,.22) !important; box-shadow: 0 3px 9px rgba(28,112,150,.07); transition: border-color .18s, box-shadow .18s, transform .18s; cursor: pointer; }
+  .admin-controls-shell select:hover,
+  .settings-page .backup-settings-card select:hover,
+  .home-card-layout-row select:hover,
+  .hub-layout-actions select:hover { border-color: var(--primary) !important; box-shadow: 0 5px 13px rgba(28,176,246,.13); }
+  .admin-controls-shell select:focus,
+  .settings-page .backup-settings-card select:focus,
+  .home-card-layout-row select:focus,
+  .hub-layout-actions select:focus { outline: none; border-color: var(--primary) !important; box-shadow: 0 0 0 3px rgba(28,176,246,.12); }
+  .admin-controls-shell select option,
+  .home-card-layout-row select option,
+  .hub-layout-actions select option { background: #fff; color: var(--text); font-weight: 800; }
   .hub-move { width: 30px; height: 30px; border-radius: 9px; border: 1px solid var(--border); background: var(--bg); color: var(--primary-dark); font-size: 16px; line-height: 1; }
   .hub-move:disabled { opacity: .35; cursor: not-allowed; }
   .hub-switch { width: 38px; height: 22px; border-radius: 99px; background: #CBD5E1; position: relative; flex-shrink: 0; transition: background .2s; }
@@ -2344,7 +2960,7 @@
   </style>
 </head>
 <body>
-  <div id="preloader"><div class="pl-logo"><img src="icon-192.png" alt="ناقصنا إيه"></div><div class="pl-name">ناقصنا إيه</div><div class="pl-spin"><span class="ring r1"></span><span class="ring r2"></span><span class="arc"></span><span class="core"></span></div></div>
+<div id="preloader"><div class="pl-logo"><img src="logo.png" alt="ElMistar"></div><div class="pl-name">ElMistar</div><div class="pl-spin"><span class="ring r1"></span><span class="ring r2"></span><span class="arc"></span><span class="core"></span></div></div>
 <div class="app" id="app"></div>
 <div class="toast-container" id="toastContainer"></div>
 
@@ -2368,6 +2984,7 @@
   }
   /* EdTech SVG icon system - rounded, friendly */
   const ICONS = {
+    grid: '<rect x="3" y="3" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>',
     home: '<path d="M4 11l8-7 8 7v8a2 2 0 0 1-2 2h-4v-6h-4v6H6a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
     cart: '<circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="17" cy="20" r="1.6" fill="currentColor"/><path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h7.6a1.5 1.5 0 0 0 1.5-1.2L20 8H6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
     wallet: '<rect x="3" y="6" width="18" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 13h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
@@ -2463,7 +3080,7 @@
   function parentPhoto(type, size) {
     const s = size || 44;
     const url = (state.photos && (state.photos[type] || state.photos.me)) || appDefaultPhoto();
-    return '<img src="' + url + '" width="' + s + '" height="' + s + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="صورتي" onerror="this.onerror=null;this.src=\'icon-192.png\';"/>';
+    return '<img src="' + url + '" width="' + s + '" height="' + s + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="صورتي" onerror="this.onerror=null;this.src=\'logo.png\';"/>';
   }
   function parentAvatar(type, size) {
     return parentPhoto('me', size);
@@ -2560,11 +3177,11 @@
   /* Family photo card - husband/wife photo + live speech bubble */
   function photoCharHTML(type, cls) {
     const url = (state.photos && state.photos[type]) || appDefaultPhoto();
-    return '<div class="' + (cls || 'noura-char photo-char') + '"><img src="' + url + '" alt="صورتي" onerror="this.onerror=null;this.src=\'icon-192.png\';"/></div>';
+    return '<div class="' + (cls || 'noura-char photo-char') + '"><img src="' + url + '" alt="صورتي" onerror="this.onerror=null;this.src=\'logo.png\';"/></div>';
   }
   function assistantSay(msg, mood, label, who) {
     const url = (who && state.photos && state.photos[who]) || appDefaultPhoto();
-    const av = '<div class="noura-char photo-char"><img src="' + url + '" alt="" onerror="this.onerror=null;this.src=\'icon-192.png\';"/></div>';
+    const av = '<div class="noura-char photo-char"><img src="' + url + '" alt="" onerror="this.onerror=null;this.src=\'logo.png\';"/></div>';
     return '<div class="noura-card">' + av
       + '<div class="noura-bubble"><div class="noura-name"><span class="waves"><i></i><i></i><i></i><i></i></span> ' + (label || 'رسالة جديدة') + '</div>'
       + '<div class="noura-msg">' + msg + '</div>'
@@ -2804,40 +3421,86 @@
     currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: ''
   };
 
+  /* Published by the admin page. Keep this deliberately small and portable so the
+     same setting works for the local PWA and the admin console. */
+  const TAB_APP_CONFIG_KEY = 'naqisna_tab_app_config';
+  const TAB_APP_DEFAULTS = {
+    home: ['faith', 'prayer', 'azkar', 'tasbih', 'tasks', 'noura'],
+    family: [],
+    islamic: []
+  };
+  const TAB_APP_ORDER = ['home', 'family', 'islamic'];
+  const TAB_APP_IDS = [...new Set(Object.values(TAB_APP_DEFAULTS).flat())];
+  const TAB_APP_DEFAULT_OWNER = Object.fromEntries(TAB_APP_ORDER.flatMap(tab => TAB_APP_DEFAULTS[tab].map(id => [id, tab])));
+  function tabAppConfig() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(TAB_APP_CONFIG_KEY) || 'null');
+      const lists = Object.fromEntries(TAB_APP_ORDER.map(tab => [tab, Array.isArray(raw?.[tab]) ? raw[tab] : TAB_APP_DEFAULTS[tab]]));
+      const config = Object.fromEntries(TAB_APP_ORDER.map(tab => [tab, []]));
+      TAB_APP_IDS.forEach(id => {
+        const selectedIn = TAB_APP_ORDER.filter(tab => lists[tab].includes(id));
+        if (!selectedIn.length) return;
+        const owner = selectedIn.includes(TAB_APP_DEFAULT_OWNER[id]) ? TAB_APP_DEFAULT_OWNER[id] : selectedIn[0];
+        config[owner].push(id);
+      });
+      // هذه البطاقات تابعة للرئيسية دائمًا ولا تُكرر في تبويب آخر.
+      ['prayer', 'azkar', 'tasbih'].forEach(id => {
+        TAB_APP_ORDER.forEach(tab => { config[tab] = config[tab].filter(item => item !== id); });
+        config.home.push(id);
+      });
+      try {
+        const normalized = JSON.stringify(config);
+        if (localStorage.getItem(TAB_APP_CONFIG_KEY) !== normalized) localStorage.setItem(TAB_APP_CONFIG_KEY, normalized);
+      } catch {}
+      return config;
+    } catch { return TAB_APP_DEFAULTS; }
+  }
+  function tabAppEnabled(tab, id) { return (tabAppConfig()[tab] || []).includes(id); }
+  function claimTabApp(tab, id, enabled) {
+    if (!TAB_APP_ORDER.includes(tab) || !TAB_APP_IDS.includes(id)) return;
+    const cfg = tabAppConfig();
+    if (enabled) {
+      TAB_APP_ORDER.forEach(otherTab => { cfg[otherTab] = (cfg[otherTab] || []).filter(item => item !== id); });
+      cfg[tab].push(id);
+    } else {
+      cfg[tab] = (cfg[tab] || []).filter(item => item !== id);
+    }
+    try { localStorage.setItem(TAB_APP_CONFIG_KEY, JSON.stringify(cfg)); } catch {}
+  }
+  function applyTabAppVisibility() {
+    const tab = state.currentTab === 'settings' ? 'home' : (state.currentTab || 'home');
+    const enabled = tabAppConfig()[tab] || [];
+    document.querySelectorAll('[data-home-card]').forEach(el => {
+      const id = el.dataset.homeCard;
+      if (['prayer', 'azkar', 'tasbih', 'tasks', 'noura'].includes(id)) {
+        el.style.display = enabled.includes(id) ? '' : 'none';
+      }
+    });
+    document.querySelectorAll('[data-hub-section]').forEach(el => {
+      const id = el.dataset.hubSection;
+      if (id === 'faith' || id === 'wellness' || id === 'apps') el.style.display = enabled.includes(id) ? 'contents' : 'none';
+    });
+    const task = document.getElementById('tasksWrap'); if (task) task.style.display = enabled.includes('tasks') ? '' : 'none';
+  }
+
   const HOME_HUB_DEFS = [
     { id: 'faith', title: 'الروحانيات والعبادات', sub: 'الصلاة • الأذكار • السبحة • القرآن', icon: '🌙' },
-    { id: 'wellness', title: 'طيبات وصحة البيت', sub: 'طيبات اليوم • صحتي الطبيعية', icon: '🍲' },
-    { id: 'apps', title: 'تطبيقات المعلم والطالب', sub: 'شؤون الطلاب EduSmart • تطبيق كلماتي', icon: '▦' }
   ];
   const HOME_HUB_DEFAULTS = {
-    faith: { visible: true, shape: 'grid' }, wellness: { visible: true, shape: 'grid' }, apps: { visible: true, shape: 'grid' }
+    faith: { visible: true, shape: 'grid' }
   };
   const HOME_CARD_DEFS = [
-    { id: 'shop', title: 'التسوق والطلبات', sub: 'قائمة المشتريات والسلة', icon: '🛒' },
-    { id: 'finances', title: 'المصروفات والميزانية', sub: 'المصروفات والدخل والديون', icon: '💳' },
     { id: 'prayer', title: 'مواعيد الصلاة', sub: 'المواقيت اليومية', icon: '🕒' },
     { id: 'azkar', title: 'الأذكار', sub: 'أذكار الصباح والمساء', icon: '☀️' },
     { id: 'tasbih', title: 'السبحة الإلكترونية', sub: 'عداد التسبيح الصوتي واليدوي', icon: '📿' },
-    { id: 'quran', title: 'القرآن الكريم', sub: 'آية وتفسير جديد كل ساعة', icon: '📖' },
-    { id: 'eat', title: 'طيبات اليوم', sub: 'وجبات وأفكار صحية', icon: '🥗' },
-    { id: 'health', title: 'صحتي الطبيعية', sub: 'علاجات وتمارين طبيعية', icon: '🌿' },
-    { id: 'student', title: 'شؤون الطلاب', sub: 'الدروس والحصص والواجبات', icon: '🎓' },
-    { id: 'kalimaty', title: 'تطبيق كلماتي', sub: 'تعلم الإنجليزية', icon: '📚' },
     { id: 'tasks', title: 'المهام والمواعيد', sub: 'المهام والمواعيد اليومية', icon: '✅' },
     { id: 'noura', title: 'رسالة اليوم', sub: 'رسالة تحفيزية للبيت', icon: '💬' }
   ];
   /* الإعدادات الافتراضية للرئيسية: مطابقة للتخطيط المتوازن المعتمد */
   const HOME_CARD_DEFAULTS = {
-    shop: { visible: true, size: 'medium' },
-    finances: { visible: true, size: 'medium' },
     prayer: { visible: true, size: 'small' },
     azkar: { visible: true, size: 'small' },
     tasbih: { visible: true, size: 'small' },
-    quran: { visible: true, size: 'small' },
-    eat: { visible: false, size: 'medium' },
-    health: { visible: false, size: 'medium' },
-    student: { visible: false, size: 'small' },
-    kalimaty: { visible: false, size: 'small' },
     tasks: { visible: true, size: 'large' },
     noura: { visible: true, size: 'full' }
   };
@@ -2853,12 +3516,12 @@
     return order.map((id, position) => {
       const d = HOME_CARD_DEFS.find(x => x.id === id);
       const s = { ...HOME_CARD_DEFAULTS[id], ...(settings[id] || {}) };
-      return { ...d, position, visible: s.visible !== false, size: ['small', 'medium', 'large', 'full'].includes(s.size) ? s.size : HOME_CARD_DEFAULTS[id].size, title: typeof s.title === 'string' && s.title.trim() ? s.title.trim() : d.title, sub: typeof s.sub === 'string' && s.sub.trim() ? s.sub.trim() : d.sub };
+      return { ...d, position, visible: s.visible !== false && tabAppEnabled('home', id), size: ['small', 'medium', 'large', 'full'].includes(s.size) ? s.size : HOME_CARD_DEFAULTS[id].size, title: typeof s.title === 'string' && s.title.trim() ? s.title.trim() : d.title, sub: typeof s.sub === 'string' && s.sub.trim() ? s.sub.trim() : d.sub };
     });
   }
   function homeCard(id) { return homeCardLayout().find(x => x.id === id) || HOME_CARD_DEFS.find(x => x.id === id) || HOME_CARD_DEFS[0]; }
   function homeCardAttrs(id) {
-    return `data-home-card="${id}"`;
+    return `data-home-card="${id}"${['quran', 'eat', 'health', 'student', 'kalimaty'].includes(id) ? ' style="display:none!important;"' : ''}`;
   }
   function homeCardClass(id, base) { return `${base || ''} home-card home-card-${id} home-card-size-${homeCard(id).size}`.trim(); }
   function applyHomeCardLayout() {
@@ -2868,15 +3531,25 @@
       if (!card) return;
       el.style.order = String(card.position);
       el.style.display = card.visible ? '' : 'none';
+      el.classList.remove('home-card-size-small', 'home-card-size-medium', 'home-card-size-large', 'home-card-size-full');
+      el.classList.add('home-card-size-' + (card.size || 'medium'));
+    });
+    const mixed = homeControlLayout();
+    const mixedOrder = Object.fromEntries(mixed.map(item => [item.id, item.position]));
+    const appsById = Object.fromEntries(customAppsForTab('home').map(app => [app.id, app]));
+    document.querySelectorAll('[data-custom-app-card]').forEach(el => {
+      const app = appsById[el.dataset.customAppCard];
+      if (!app || state.currentTab !== 'home') return;
+      el.style.order = String(mixedOrder[app.id] ?? 0);
+      el.style.display = app.visible !== false ? '' : 'none';
+      el.classList.remove('home-card-size-small', 'home-card-size-medium', 'home-card-size-large', 'home-card-size-full');
+      el.classList.add('home-card-size-' + (app.size || 'medium'));
     });
   }
   function applyHomeCardText() {
     const map = {
-      shop: ['.gate-shop .gc-label', '.gate-shop .gc-sub'], finances: ['.gate-finances .gc-label', '.gate-finances .gc-sub'],
       prayer: ['.gate-prayer .gc-label', '.gate-prayer .gc-sub'], azkar: ['.gate-azkar .gc-label', '.gate-azkar .gc-sub'],
-      tasbih: ['.gate-tasbih .gc-label', '.gate-tasbih .tsb-hint'], quran: ['.gate-quran .gc-label', '.gate-quran .gc-sub'],
-      eat: ['.gate-eat .gc-label', '.gate-eat .gc-sub'], health: ['.gate-health .gc-label', '.gate-health .gc-sub'],
-      student: ['.gate-student .gc-label', '.gate-student .gc-sub'], kalimaty: ['.gate-kalimaty .gc-label', '.gate-kalimaty .gc-sub']
+      tasbih: ['.gate-tasbih .gc-label', '.gate-tasbih .tsb-hint']
     };
     Object.entries(map).forEach(([id, selectors]) => { const card = homeCard(id); selectors.forEach((selector, i) => { const el = document.querySelector(selector); if (el) el.textContent = i ? card.sub : card.title; }); });
     const task = homeCard('tasks'); const taskTitle = document.querySelector('#tasksWrap .task-head-tx b'); const taskSub = document.querySelector('#tasksWrap .task-head-tx small');
@@ -2898,10 +3571,237 @@
   function homeHub(id) { return homeHubLayout().find(x => x.id === id) || homeHubLayout()[0]; }
   function homeHubAttrs(id) {
     const h = homeHub(id);
-    return `data-hub-section="${id}" class="section faith-section-wrap hub-${id} hub-shape-${h.shape}" style="display:contents;"`;
+    const removed = ['wellness', 'apps'].includes(id);
+    return `data-hub-section="${id}" class="section faith-section-wrap hub-${id} hub-shape-${h.shape}" style="${removed ? 'display:none!important;' : 'display:contents;'}"`;
   }
   function saveHomeHubLayout(next) {
     state.homeLayout = next; persist(); render();
+  }
+
+  function renderTabAppSettings() {
+    const cfg = tabAppConfig();
+    const labels = {
+      faith: 'الإسلاميات', prayer: 'مواقيت الصلاة', azkar: 'الأذكار', tasbih: 'السبحة',
+      tasks: 'المهام والمواعيد', noura: 'رسالة اليوم'
+    };
+    const tabs = { home: 'الرئيسية', family: 'الأسرة', islamic: 'تطبيقاتي' };
+    return `<div class="settings-card tab-app-settings-card">
+      <div class="settings-title">🧭 التحكم في تبويبات التطبيق</div>
+      <div class="help-text" style="padding:0 16px 10px;">اختَر التطبيقات التي تظهر داخل كل تبويب. التغييرات تُحفظ تلقائيًا.</div>
+      ${Object.entries(tabs).map(([tab, title]) => `<div class="tab-app-setting-group"><b>${title}</b><div class="tab-app-setting-grid">${Object.entries(labels).map(([id, label]) => `<label class="tab-app-check"><input type="checkbox" data-tab-app-index="${tab}:${id}" ${cfg[tab].includes(id) ? 'checked' : ''}><span>${label}</span></label>`).join('')}</div></div>`).join('')}
+    </div>`;
+  }
+
+  function saveTabAppSetting(input) {
+    const cfg = tabAppConfig();
+    const [tab, id] = String(input.dataset.tabAppIndex || '').split(':');
+    if (!cfg[tab] || !id) return;
+    cfg[tab] = cfg[tab].filter(x => x !== id);
+    if (input.checked) {
+      TAB_APP_ORDER.filter(otherTab => otherTab !== tab).forEach(otherTab => { cfg[otherTab] = (cfg[otherTab] || []).filter(x => x !== id); });
+      cfg[tab].push(id);
+    }
+    try { localStorage.setItem(TAB_APP_CONFIG_KEY, JSON.stringify(cfg)); } catch {}
+    applyTabAppVisibility();
+  }
+
+  const TAB_CARD_LAYOUT_KEY = 'naqisna_tab_card_layout';
+  const TAB_CARD_IDS = {
+    islamic: [],
+    family: []
+  };
+  function tabCardConfig() {
+    try { return JSON.parse(localStorage.getItem(TAB_CARD_LAYOUT_KEY) || '{}') || {}; } catch { return {}; }
+  }
+  function tabCard(tab, id) {
+    const custom = customApps().find(app => app.id === id && app.tab === tab);
+    const base = custom || homeCard(id) || HOME_CARD_DEFS.find(x => x.id === id) || { id, title: id, sub: '' };
+    const saved = tabCardConfig()?.[tab]?.settings?.[id] || {};
+    return { ...base, ...saved, visible: saved.visible !== false && (String(id).startsWith('custom_') || tabAppEnabled(tab, id)), size: saved.size || base.size || 'medium' };
+  }
+  function tabCardLayout(tab) {
+    const cfg = tabCardConfig()?.[tab] || {};
+    const customIds = customAppsForTab(tab).map(app => app.id);
+    const allowed = new Set([...(TAB_CARD_IDS[tab] || []), ...customIds]);
+    const ids = Array.isArray(cfg.order) ? cfg.order.filter(id => allowed.has(id)) : [];
+    [...(TAB_CARD_IDS[tab] || []), ...customIds].forEach(id => { if (!ids.includes(id)) ids.push(id); });
+    return ids.map((id, position) => ({ ...tabCard(tab, id), position }));
+  }
+  function saveTabCard(tab, id, patch) {
+    if (String(id).startsWith('custom_')) {
+      const apps = customApps();
+      const app = apps.find(item => item.id === id);
+      if (!app) return;
+      const next = apps.map(item => item.id === id ? { ...item, ...patch } : item);
+      saveCustomApps(next);
+      return;
+    }
+    if (Object.prototype.hasOwnProperty.call(patch, 'visible')) claimTabApp(tab, id, patch.visible);
+    const cfg = tabCardConfig(); cfg[tab] = cfg[tab] || { order: [...TAB_CARD_IDS[tab]], settings: {} };
+    cfg[tab].settings = cfg[tab].settings || {};
+    cfg[tab].settings[id] = { ...(cfg[tab].settings[id] || {}), ...patch };
+    try { localStorage.setItem(TAB_CARD_LAYOUT_KEY, JSON.stringify(cfg)); } catch {}
+    render();
+  }
+  function saveTabCardOrder(tab, order) {
+    const cfg = tabCardConfig(); cfg[tab] = cfg[tab] || { settings: {} };
+    cfg[tab].order = order; cfg[tab].settings = cfg[tab].settings || {};
+    try { localStorage.setItem(TAB_CARD_LAYOUT_KEY, JSON.stringify(cfg)); } catch {}
+    render();
+  }
+  function applyTabCardSettings() {
+    const tab = state.currentTab;
+    if (!TAB_CARD_IDS[tab]) return;
+    const layout = tabCardLayout(tab);
+    const order = Object.fromEntries(layout.map(x => [x.id, x.position]));
+    document.querySelectorAll('[data-home-card]').forEach(el => {
+      const id = el.dataset.homeCard; const card = layout.find(x => x.id === id);
+      if (!card) return;
+      el.style.order = String(order[id]);
+      el.style.display = (card.visible && tabAppEnabled(tab, id)) ? '' : 'none';
+      el.classList.remove('home-card-size-small', 'home-card-size-medium', 'home-card-size-large', 'home-card-size-full');
+      el.classList.add('home-card-size-' + (card.size || 'medium'));
+    });
+    document.querySelectorAll('[data-custom-app-card]').forEach(el => {
+      const card = layout.find(item => item.id === el.dataset.customAppCard);
+      if (!card) return;
+      el.style.order = String(card.position);
+      el.style.display = card.visible ? '' : 'none';
+      el.classList.remove('home-card-size-small', 'home-card-size-medium', 'home-card-size-large', 'home-card-size-full');
+      el.classList.add('home-card-size-' + (card.size || 'medium'));
+    });
+    const selectors = {
+      prayer: ['.gate-prayer .gc-label', '.gate-prayer .gc-sub'], azkar: ['.gate-azkar .gc-label', '.gate-azkar .gc-sub'],
+      tasbih: ['.gate-tasbih .gc-label', '.gate-tasbih .tsb-hint'], quran: ['.gate-quran .gc-label', '.gate-quran .gc-sub'],
+      eat: ['.gate-eat .gc-label', '.gate-eat .gc-sub'], health: ['.gate-health .gc-label', '.gate-health .gc-sub'],
+      student: ['.gate-student .gc-label', '.gate-student .gc-sub'], kalimaty: ['.gate-kalimaty .gc-label', '.gate-kalimaty .gc-sub']
+    };
+    layout.forEach(card => (selectors[card.id] || []).forEach((selector, i) => { const el = document.querySelector(selector); if (el) el.textContent = i ? card.sub : card.title; }));
+    const task = layout.find(x => x.id === 'tasks'); const taskTitle = document.querySelector('#tasksWrap .task-head-tx b'); const taskSub = document.querySelector('#tasksWrap .task-head-tx small');
+    if (task && taskTitle) taskTitle.textContent = task.title;
+    if (task && taskSub) taskSub.textContent = task.sub;
+  }
+
+  const CUSTOM_APPS_KEY = 'naqisna_custom_apps';
+  const CUSTOM_APP_TABS = { home: 'الرئيسية', family: 'الأسرة', islamic: 'تطبيقاتي' };
+  const CUSTOM_APP_ICONS = [
+    { id: 'grid', label: 'تطبيقات', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg>' },
+    { id: 'book', label: 'كتاب', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h6M9 11h4"/></svg>' },
+    { id: 'home', label: 'منزل', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/></svg>' },
+    { id: 'calendar', label: 'مواعيد', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M16 2v4M8 2v4M3 9h18"/><path d="M8 13h.01M12 13h.01M16 13h.01M8 17h.01M12 17h.01"/></svg>' },
+    { id: 'heart', label: 'صحة', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.7c0 5.5-8.8 11.3-8.8 11.3S3.2 14.2 3.2 8.7A4.7 4.7 0 0 1 12 6.1a4.7 4.7 0 0 1 8.8 2.6Z"/><path d="M8.5 11.5h2l1-2.5 1.5 5 1-2.5h1.5"/></svg>' },
+    { id: 'school', label: 'تعليم', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m2 10 10-5 10 5-10 5L2 10Z"/><path d="M6 12v5c3 2 9 2 12 0v-5M22 10v6"/></svg>' },
+    { id: 'shopping', label: 'تسوق', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1 12H5L4 8Z"/><path d="M8 8a4 4 0 0 1 8 0M9 12h.01M15 12h.01"/></svg>' },
+    { id: 'settings', label: 'إعدادات', svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.1h-2.6v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H4.4v-2.6h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5V4.4H13v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9c.2.6.8 1 1.5 1h.1V13h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>' }
+    , ...[
+      ['mosque','صلاة'],['sparkle','أذكار'],['drop','مياه'],['activity','رياضة'],['dumbbell','تمارين'],['walk','مشي'],['leaf','طبيعة'],['apple','فاكهة'],['pill','دواء'],['smile','امتنان'],['target','هدف'],['trophy','إنجاز'],['ban','إقلاع'],['flame','حماس'],['bolt','طاقة'],['star','نجمة'],['check','تم'],['cart','عربة'],['wallet','محفظة'],['chart','إحصائيات'],['box','صندوق'],['gear','أدوات'],['search','بحث'],['music','موسيقى'],['moon','ليل'],['sun','نهار'],['plus','إضافة'],['copy','نسخ'],['pencil','تعديل'],['trash','حذف'],['help','مساعدة'],['warn','تنبيه']
+    ].map(([id, label]) => ({ id, label, svg: svgIcon(id, 24) }))
+  ];
+  function customAppIconMarkup(value) {
+    const normalized = typeof normalizePackIcon === 'function' ? normalizePackIcon(value) : value;
+    const icon = CUSTOM_APP_ICONS.find(item => item.id === value || item.id === normalized);
+    if (icon) return icon.svg;
+    return ICONS[normalized] ? svgIcon(normalized, 24) : escapeHTML(value || '📱');
+  }
+  function customApps() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(CUSTOM_APPS_KEY) || '[]');
+      return Array.isArray(raw) ? raw.filter(a => a && a.id && CUSTOM_APP_TABS[a.tab]) : [];
+    } catch { return []; }
+  }
+  function saveCustomApps(apps) { try { localStorage.setItem(CUSTOM_APPS_KEY, JSON.stringify(apps)); } catch {} render(); }
+  function customAppsForTab(tab) { return customApps().filter(a => a.tab === tab).sort((a, b) => (a.order || 0) - (b.order || 0)); }
+  function customAppColor(color) { return /^#[0-9A-F]{6}$/i.test(String(color || '')) ? color : '#1CB0F6'; }
+  function customAppLink(value) {
+    const link = String(value || '').trim().replace(/\\/g, '/');
+    if (!link || /^javascript:/i.test(link)) return '';
+    return link;
+  }
+  function renderCustomApps(tab) {
+    const apps = customAppsForTab(tab);
+    if (!apps.length) return `<div class="custom-apps-section" data-custom-app-section="${tab}"></div>`;
+    return `<div class="custom-apps-section" data-custom-app-section="${tab}"><div class="custom-apps-grid">${apps.map(app => `<div class="gate-card custom-app-card home-card-size-${app.size || 'medium'}" data-custom-app-card="${app.id}" data-custom-app-url="${escapeHTML(app.url || '')}" style="--custom-app-color:${customAppColor(app.color)};" title="${escapeHTML(app.title)}"><span class="gc-ico" aria-hidden="true">${customAppIconMarkup(app.icon)}</span><span class="gc-label">${escapeHTML(app.title)}</span><span class="gc-value">${escapeHTML(app.sub || '')}</span><span class="gc-sub">تطبيق مخصص • اضغط للفتح</span></div>`).join('')}</div></div>`;
+  }
+  function applyCustomAppsVisibility() {
+    const tab = state.currentTab === 'settings' ? 'home' : (state.currentTab || 'home');
+    document.querySelectorAll('[data-custom-app-section]').forEach(section => { section.style.display = section.dataset.customAppSection === tab ? 'contents' : 'none'; });
+    const byId = Object.fromEntries(customApps().map(a => [a.id, a]));
+    document.querySelectorAll('[data-custom-app-card]').forEach(card => { const app = byId[card.dataset.customAppCard]; card.style.display = app && app.visible !== false ? '' : 'none'; });
+  }
+  function openCustomAppEditor(app) {
+    document.querySelector('.custom-edit-overlay')?.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'custom-edit-overlay';
+    overlay.innerHTML = `<section class="custom-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="customEditTitle"><div class="custom-edit-head"><span class="custom-edit-head-icon">${customAppIconMarkup(app.icon)}</span><div><b id="customEditTitle">تعديل التطبيق</b><small>حدّث بيانات الكارت واحفظ التغييرات</small></div></div><form class="custom-edit-form"><label>اسم التطبيق<input name="title" maxlength="50" value="${escapeHTML(app.title || '')}" required /></label><label>الوصف المختصر<input name="sub" maxlength="90" value="${escapeHTML(app.sub || '')}" placeholder="أضف وصفاً واضحاً للتطبيق" /></label><div class="custom-edit-color-row"><label>لون التطبيق<input name="color" type="color" value="${customAppColor(app.color)}" /></label><div></div></div><div class="custom-edit-actions"><button type="button" class="custom-edit-cancel">إلغاء</button><button type="submit" class="custom-edit-save">حفظ التعديلات</button></div></form></section>`;
+    document.body.appendChild(overlay);
+    const form = overlay.querySelector('.custom-edit-form');
+    overlay.addEventListener('click', event => { if (event.target === overlay) overlay.remove(); });
+    overlay.querySelector('.custom-edit-cancel').onclick = () => overlay.remove();
+    form.onsubmit = event => {
+      event.preventDefault();
+      const data = new FormData(form), apps = customApps(), current = apps.find(item => item.id === app.id);
+      if (!current) return overlay.remove();
+      current.title = String(data.get('title') || '').trim() || current.title;
+      current.sub = String(data.get('sub') || '').trim();
+      current.color = customAppColor(data.get('color'));
+      overlay.remove();
+      saveCustomApps(apps);
+      toast('تم حفظ تعديلات التطبيق ✓', 'success');
+    };
+    requestAnimationFrame(() => form.querySelector('input[name="title"]')?.focus());
+  }
+  function renderCustomAppsSettings() {
+    const apps = customApps();
+    return `<div class="settings-card custom-app-settings"><button class="collapsible-head" id="customAppsHead"><span class="ch-icon">🧩</span><span class="ch-texts"><b>إدارة التطبيقات المخصصة</b><small>أضف تطبيقاتك واعرضها في أي تبويب بتحكم كامل</small></span><span class="chev ${state._customAppsOpen ? 'open' : ''}">‹</span></button><div class="collapsible-body ${state._customAppsOpen ? '' : 'hidden'}"><form class="custom-app-form" id="customAppForm"><div class="custom-app-form-grid"><input id="customAppTitle" required maxlength="50" placeholder="اسم التطبيق" /><input id="customAppSub" maxlength="90" placeholder="الوصف المختصر" /><input id="customAppUrl" required type="url" placeholder="رابط التطبيق https://..." /><input id="customAppIcon" maxlength="4" placeholder="الأيقونة مثل 📱" /></div><div class="custom-app-form-grid"><select id="customAppTab">${Object.entries(CUSTOM_APP_TABS).map(([id, label]) => `<option value="${id}">${label}</option>`).join('')}</select><select id="customAppSize"><option value="small">صغير</option><option value="medium" selected>متوسط</option><option value="large">كبير</option><option value="full">عرض كامل</option></select><input id="customAppColor" type="color" value="#1CB0F6" aria-label="لون التطبيق" /><button class="btn btn-primary btn-sm" type="submit">+ إضافة التطبيق</button></div></form>${Object.entries(CUSTOM_APP_TABS).map(([tab, label]) => `<div class="settings-title" style="padding:8px 16px 6px;">${label}</div><div class="custom-app-list" data-custom-app-list="${tab}">${apps.filter(a => a.tab === tab).map(app => `<div class="custom-app-row" draggable="true" data-custom-app-row="${app.id}"><span style="color:var(--text-muted);font-size:17px;">⋮⋮</span><span class="custom-app-row-icon" style="background:${customAppColor(app.color)}20;color:${customAppColor(app.color)};">${escapeHTML(app.icon || '📱')}</span><div class="custom-app-row-info"><b>${escapeHTML(app.title)}</b><small>${escapeHTML(app.sub || 'بدون وصف')} • ${escapeHTML(app.url || '')}</small></div><div class="custom-app-row-actions"><select class="custom-app-move" data-custom-move="${app.id}" title="نقل التطبيق">${Object.entries(CUSTOM_APP_TABS).map(([targetId, targetLabel]) => `<option value="${targetId}" ${targetId === app.tab ? 'selected' : ''}>${targetLabel}</option>`).join('')}</select><button type="button" data-custom-visible="${app.id}" class="hub-switch ${app.visible !== false ? 'on' : ''}" title="إظهار/إخفاء"><i></i></button><button type="button" data-custom-delete="${app.id}" title="حذف">🗑️</button></div></div>`).join('') || '<div class="help-text">لا توجد تطبيقات مضافة في هذا التبويب.</div>'}</div>`).join('')}</div></div></div>`;
+  }
+
+  function renderBackupSettings() {
+    return `<div class="settings-card backup-settings-card">
+      <button class="collapsible-head" id="backupHead"><span class="ch-icon">💾</span><span class="ch-texts"><b>النسخ الاحتياطي</b><small>تصدير أو استيراد بيانات التطبيق</small></span><span class="chev ${state._backupOpen ? 'open' : ''}">‹</span></button>
+      <div class="collapsible-body ${state._backupOpen ? '' : 'hidden'}">
+      <div style="padding:0 16px 6px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button class="btn btn-primary btn-sm" id="exportBackupBottomBtn" style="min-height:48px;">⬇️ تصدير نسخة</button>
+        <label for="importBackupBottomFile" class="btn btn-secondary btn-sm" style="min-height:48px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">⬆️ استيراد نسخة</label>
+        <input type="file" id="importBackupBottomFile" accept="application/json,.json" class="hidden" />
+      </div>
+      <div class="help-text" style="padding:0 16px 8px;">نسخة JSON بكل بياناتك بتتحمل على جهازك • الاستيراد يستبدل البيانات الحالية</div>
+      </div>
+    </div>`;
+  }
+
+  function renderUnifiedAppSettings() {
+    return `${renderHomeHubSettings()}${renderTabCardControls()}`;
+  }
+
+  const ADMIN_PIN = '439512';
+  function adminControlsUnlocked() {
+    try { return sessionStorage.getItem('naqisna_admin_unlocked') === '1'; } catch { return false; }
+  }
+  function renderAdminControls() {
+    if (!adminControlsUnlocked()) return `<div class="admin-controls-shell"><div class="settings-card admin-lock-card"><div class="admin-lock-head"><span class="admin-lock-icon">🔐</span><div class="admin-lock-copy"><b>قسم الإدارة</b><small>تحكم كامل في كروت الرئيسية والأسرة وتطبيقاتي والتطبيقات المخصصة</small></div><span class="admin-lock-state">مقفل</span></div><form class="admin-lock-form" id="adminPinForm"><input id="adminPinInput" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="الرقم السري" aria-label="الرقم السري لقسم الإدارة" /><button type="submit">فتح القسم</button></form></div></div>`;
+    return `<div class="admin-controls-shell"><div class="admin-unlocked-head"><b>🔓 قسم الإدارة مفتوح</b><button type="button" class="admin-unlock-close" id="adminLockBtn">قفل القسم</button></div>${renderUnifiedAppSettings()}${renderCustomAppsSettings()}</div>`;
+  }
+
+  function renderTabCardControls() {
+    const tabs = { family: { title: 'الأسرة', icon: '👨‍👩‍👧' }, islamic: { title: 'تطبيقاتي', icon: '🕌' } };
+    return Object.entries(tabs).map(([tab, meta]) => {
+      const title = meta.title;
+      const layout = tabCardLayout(tab);
+      const isOpen = !!state._tabCardControlsOpen?.[tab];
+      return `<div class="settings-card hub-layout-card tab-card-control-section"><button type="button" class="collapsible-head tab-card-control-title" data-tabcard-section="${tab}"><span class="ch-icon">${meta.icon}</span><span class="ch-texts"><b>${title}</b><small>تحكم مستقل في كروت هذا التبويب</small></span><span class="chev ${isOpen ? 'open' : ''}">‹</span></button><div class="collapsible-body tab-card-layout-body ${isOpen ? '' : 'hidden'}"><div class="hub-layout-note">اسحب أي بطاقة لتغيير ترتيبها، وتحكم في حجمها أو أخفِها. التغييرات تحفظ تلقائيًا.</div><div class="home-card-layout-list tab-card-layout-list" data-tab-card-list="${tab}">${layout.map(card => `<div class="home-card-layout-row" draggable="true" data-tabcard-row="${tab}:${card.id}">
+        <span class="home-card-drag" title="اسحب لتغيير الترتيب">⋮⋮</span><span class="hub-layout-icon">${String(card.id).startsWith('custom_') ? customAppIconMarkup(card.icon) : (card.icon || '◈')}</span>
+        <div class="home-card-layout-copy"><input type="text" value="${escapeHTML(card.title)}" data-tabcard-title="${tab}:${card.id}" maxlength="50" /><input type="text" value="${escapeHTML(card.sub)}" data-tabcard-sub="${tab}:${card.id}" maxlength="90" /></div>
+        <div class="hub-layout-actions"><button type="button" class="hub-switch ${card.visible ? 'on' : ''}" data-tabcard-visible="${tab}:${card.id}"><i></i></button><select data-tabcard-size="${tab}:${card.id}"><option value="small" ${card.size === 'small' ? 'selected' : ''}>صغير</option><option value="medium" ${card.size === 'medium' ? 'selected' : ''}>متوسط</option><option value="large" ${card.size === 'large' ? 'selected' : ''}>كبير</option><option value="full" ${card.size === 'full' ? 'selected' : ''}>عرض كامل</option></select></div>
+      </div>`).join('')}</div></div></div>`;
+    }).join('');
+  }
+
+  function renderIndependentTabCardSettings() {
+    return `<div class="settings-card independent-tab-card-settings">
+      <div class="settings-title">🎛️ التحكم في كروت تبويبي تطبيقاتي والأسرة</div>
+      <div class="help-text" style="padding:0 16px 10px;">تحكم مستقل عن الرئيسية: إظهار أو إخفاء، تعديل الاسم والوصف، تغيير الحجم، أو السحب لترتيب الكروت.</div>
+      ${renderTabCardControls()}
+    </div>`;
   }
 
   function uid() { return Math.random().toString(36).slice(2, 10); }
@@ -3481,6 +4381,17 @@
     }
   }
 
+  /* New four-section router. Legacy shopping/finance routes intentionally have no UI entry. */
+  function renderMain() {
+    let content;
+    if (state.currentTab === 'settings') {
+      content = `${renderHome()}<div class="settings-modal-backdrop" id="settingsModal" role="dialog" aria-modal="true"><div class="settings-modal-shell"><div class="settings-modal-head"><span class="sm-icon">⚙️</span><div class="sm-copy"><b>إعدادات البيت</b><small>تحكم في الكروت والتطبيقات والبيانات بسهولة</small></div><button type="button" class="settings-modal-close" id="settingsModalClose" aria-label="إغلاق الإعدادات">×</button></div><div class="settings-modal-scroll">${renderSettings()}</div></div></div>`;
+    } else {
+      content = renderHome();
+    }
+    return content + renderBottomNav();
+  }
+
   /* =============================
      AGGREGATION
      ============================= */
@@ -3711,7 +4622,7 @@
   function fallbackCopy(text) { try { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); return true; } catch { return false; } }
   function shareHomeCode(code, name) {
     const text = `تعالى انضم لبيتنا 🏠\nكود البيت: ${code}`;
-    if (navigator.share) return navigator.share({ title: 'ناقصنا ايه', text }).then(() => true).catch(() => false);
+    if (navigator.share) return navigator.share({ title: 'ElMistar', text }).then(() => true).catch(() => false);
     return copyToClipboard(text).then(ok => { toast(ok ? 'الكود اتنسخ ✓' : 'مقدرش أنسخ', ok ? 'success' : 'error'); return ok; });
   }
   function openModal(html, opts) {
@@ -3921,7 +4832,11 @@
     } catch {}
     if (!state.initialized || !state.user) { try { autoInitUser(); } catch {} }
     app.innerHTML = renderMain();
+    app.dataset.view = state.currentTab || 'home';
     try { applyHomeCardLayout(); } catch {}
+    try { applyTabAppVisibility(); } catch {}
+    try { applyTabCardSettings(); } catch {}
+    try { applyCustomAppsVisibility(); } catch {}
     try { applyHomeCardText(); } catch {}
     bindMain();
     try { applyHomeCardText(); } catch {}
@@ -3946,8 +4861,8 @@
     ];
     return `<div class="onboarding wb"><div class="welcome-card">
       <div class="wb-blob b1"></div><div class="wb-blob b2"></div>
-      <div class="logo-show w-anim"><span class="logo-ring"></span><span class="logo-fallback" style="color:#fff;">${svgIcon('home', 54)}</span><img src="logo.png" alt="ناقصنا ايه" onerror="this.remove()" /></div>
-      <div class="brand-title grad w-anim d1">ناقصنا ايه</div>
+      <div class="logo-show w-anim"><span class="logo-ring"></span><span class="logo-fallback" style="color:#fff;">${svgIcon('home', 54)}</span><img src="logo.png" alt="ElMistar" onerror="this.remove()" /></div>
+      <div class="brand-title grad w-anim d1">ElMistar</div>
       <div class="brand-desc w-anim d2">مشتريات البيت بقت لعبة ممتعة — مهام ونقاط وشارات لعيلتك كلها</div>
       <div class="feat-row w-anim d3">${feats.map(f => `<div class="feat-pill"><span class="feat-ico" style="background:${f.bg};color:${f.c};">${svgIcon(f.ic, 19)}</span><span>${f.t}</span></div>`).join('')}</div>
       <div class="w-anim d4">${assistantSay('اعمل بيتك وادعي عيلتك عشان تظبطوا المشتريات سوا', null, 'أول مهمة', 'me')}</div>
@@ -4024,6 +4939,8 @@
   function renderBottomNav() {
     const t = state.currentTab;
     const tabs = [
+      { id: 'family', label: '\u0627\u0644\u0623\u0633\u0631\u0629', icon: 'heart' },
+      { id: 'islamic', label: '\u062a\u0637\u0628\u064a\u0642\u0627\u062a\u064a', icon: 'grid' },
       { id: 'home', label: 'الرئيسية', icon: 'home' },
       { id: 'settings', label: 'الإعدادات', icon: 'gear' }
     ];
@@ -5443,6 +6360,27 @@
       'بالراحة يا جماعة.. الميزانية بتستغيث 😂',
       'آخر طلب بقى.. والنبي 😂'
   ];
+  function renderBottomNav() {
+    const tabs = [
+      { id: 'home', label: '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629', icon: 'home' },
+      { id: 'family', label: '\u0627\u0644\u0623\u0633\u0631\u0629', icon: 'heart' },
+      { id: 'islamic', label: '\u062a\u0637\u0628\u064a\u0642\u0627\u062a\u064a', icon: 'grid' },
+      { id: 'settings', label: '\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a', icon: 'gear' }
+    ];
+    return `<nav class="bottom-nav">${tabs.map(tab => `<button class="nav-item ${state.currentTab === tab.id ? 'active' : ''}" data-tab="${tab.id}"><span class="nav-ico">${svgIcon(tab.icon, 22)}</span><span>${tab.label}</span></button>`).join('')}</nav>`;
+  }
+
+  /* Final router override: four user-facing tabs only. */
+  function renderMain() {
+    let content;
+    if (state.currentTab === 'settings') {
+      content = `${renderHome()}<div class="settings-modal-backdrop" id="settingsModal" role="dialog" aria-modal="true"><div class="settings-modal-shell"><div class="settings-modal-head"><span class="sm-icon">⚙️</span><div class="sm-copy"><b>إعدادات البيت</b><small>تحكم في الكروت والتطبيقات والبيانات بسهولة</small></div><button type="button" class="settings-modal-close" id="settingsModalClose" aria-label="إغلاق الإعدادات">×</button></div><div class="settings-modal-scroll">${renderSettings()}</div></div></div>`;
+    } else {
+      content = renderHome();
+    }
+    return content + renderBottomNav();
+  }
+
   function renderHome() {
     try { renewDailyTasks(); } catch {}
     const { pending, done } = statsCounts();
@@ -5485,39 +6423,13 @@
             <div class="duo-sub" dir="rtl" style="text-align:left;">${progress >= 100 ? 'خلصت كل مهام اليوم يا بطل 🎉' : (done > 0 ? `فاضل ${pending} ${pending === 1 ? 'مهمة' : pending === 2 ? 'مهمتين' : 'مهام'} وتقفل اليوم 💪` : 'طلب واحد يقربك من هدف بيتك ✨')}</div>
           </div>
           <div class="duo-art">
-            <div class="duo-logo-wrap"><img src="logo.png" alt="ناقصنا إيه" /></div>
+            <div class="duo-logo-wrap"><img src="logo.png" alt="ElMistar" /></div>
           </div>
         </div>
       </div>
       ${adsByPosition('top')}
 
-      <!-- كارتي التسوق والمصروفات (مباشر خارج الكارت أعلى قسم الروحانيات) -->
       <div class="home-cards-layout">
-      <div class="category-group" style="margin-top: 14px; margin-bottom: 2px;">
-        <div class="gate-grid">
-          <!-- كارت التسوق والطلبات -->
-          <div ${homeCardAttrs('shop')} class="${homeCardClass('shop', 'gate-card gate-shop')}" data-gotab="shop" title="فتح تبويب التسوق">
-            <span class="gc-ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            </span>
-            <span class="gc-label">${escapeHTML(homeCard('shop').title)}</span>
-            <span class="gc-value" style="font-size:18px;">${pending > 0 ? `${pending} مطلوب` : `${shopCount} صنف`}</span>
-            <span class="gc-sub">${escapeHTML(homeCard('shop').sub)}</span>
-          </div>
-
-          <!-- كارت المصروفات والميزانية -->
-          <div ${homeCardAttrs('finances')} class="${homeCardClass('finances', 'gate-card gate-finances')}" data-gotab="expenses" title="فتح تبويب المصروفات">
-            <span class="gc-ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="18" cy="15" r="1"/></svg>
-            </span>
-            <span class="gc-label">${escapeHTML(homeCard('finances').title)}</span>
-            <span class="gc-value" style="font-size:18px;">${today.total > 0 ? `${formatCurrency(today.total)} ج.م` : (monthExp.total > 0 ? `${formatCurrency(monthExp.total)} ج.م` : 'سجّل الآن')}</span>
-            <span class="gc-sub">${escapeHTML(homeCard('finances').sub)}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- قسم المهام والمواعيد (يظهر مباشرة أسفل كارتي التسوق والمصروفات) -->
       <!-- قسم الروحانيات والعبادات: كارت أفقي احترافي يفتح الأقسام عند الضغط -->
       <div class="home-hub-layout">
       <div ${homeHubAttrs('faith')}>
@@ -5550,7 +6462,6 @@
               <div ${homeCardAttrs('prayer')} class="${homeCardClass('prayer', 'gate-card gate-prayer')}" data-prayer-times><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.2 2"/><path d="M8 2.8h8"/></svg></span><span class="gc-label">${escapeHTML(homeCard('prayer').title)}</span><span class="gc-value" id="prayerMiniTxt" style="font-size:16px;">...</span><span class="gc-sub" id="prayerMiniSub">${escapeHTML(homeCard('prayer').sub)}</span></div>
               <div ${homeCardAttrs('azkar')} class="${homeCardClass('azkar', 'gate-card gate-azkar')}" data-azkar-toggle style="--gc:#D97706;--gc-soft:#FEF3C7;"><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v2"/><path d="M4.9 5.2l1.4 1.4"/><path d="M3 12h2"/><path d="M19 12h2"/><path d="M17.7 6.6l1.4-1.4"/><path d="M5 19c1.3-2.5 3.7-4 7-4s5.7 1.5 7 4"/><path d="M8 11a4 4 0 1 1 8 0"/></svg></span><span class="gc-label">${escapeHTML(homeCard('azkar').title)}</span><span class="gc-value" style="font-size:16px;">${azP === 'morning' ? 'أذكار الصباح' : 'أذكار المساء'}</span><span class="gc-sub">${escapeHTML(homeCard('azkar').sub)}</span></div>
               <div ${homeCardAttrs('tasbih')} class="${homeCardClass('tasbih', 'gate-card gate-tasbih')}" id="tsbGateCard" style="--gc:#7C3AED;--gc-soft:#EDE9FE;"><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/><path d="M12 7a5 5 0 1 0 5 5"/><circle cx="12" cy="12" r="1"/><circle cx="20" cy="4" r="1"/><circle cx="17" cy="3" r=".7"/></svg></span><span class="gc-label">السبحة الإلكترونية</span><span class="tsb-dhikr" id="tsbDhikr" title="دوس لتغيير الذكر">سُبْحَانَ الله<small>دوس لتغيير الذكر</small></span><span class="tsb-mot" id="tsbMot">ابدأ الآن — كل تسبيحة تقرّبك خطوة</span><div class="tsb-row"><button class="tsb-tap" id="tsbTap" title="دوس للعد"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5V6a1.8 1.8 0 0 1 3.6 0v5.5"/><path d="M12.6 11a1.8 1.8 0 0 1 3.6.5v2.3a6.5 6.5 0 0 1-6.5 6.5h-.4a6.5 6.5 0 0 1-5.2-2.6l-1.9-2.6a1.7 1.7 0 0 1 2.7-2L7 14.6V9.5a1.8 1.8 0 0 1 3.6 0"/></svg><span class="tsb-num" id="tsbTapNum">0</span></button><button class="tsb-mic" id="tsbMic" title="العد بالصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><line x1="12" y1="17.5" x2="12" y2="21.5"/><line x1="8.5" y1="21.5" x2="15.5" y2="21.5"/></svg></button></div><span class="tsb-hint" id="tsbHint">دوس للعد • أو بالصوت</span></div>
-              <div ${homeCardAttrs('quran')} class="${homeCardClass('quran', 'gate-card gate-quran')}" id="quranGateCard"><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 6.5C10.2 5.1 7.5 4.5 3.5 5v13c4-.5 6.7.1 8.5 1.5"/><path d="M12 6.5c1.8-1.4 4.5-2 8.5-1.5v13c-4-.5-6.7-.1-8.5 1.5"/><path d="M12 6.5v13"/><path d="M6.5 8.5c1.4-.1 2.7.1 3.8.5"/><path d="M17.5 8.5c-1.4-.1-2.7.1-3.8.5"/></svg></span><span class="gc-label">القرآن الكريم</span><span class="quran-kind" id="quranDailyKind">كلمة اليوم</span><span class="gc-value" id="quranMiniTxt">...</span><span class="quran-meaning" id="quranMiniMeaning"></span><span class="quran-ref" id="quranMiniRef"></span><span class="gc-sub" id="quranMiniSub">من التفسير الميسّر • اضغط لقراءة المزيد</span></div>
             </div>
           </div>
         </div>
@@ -5655,6 +6566,9 @@
         </div>
       </div>
       <div ${homeCardAttrs('tasks')} class="${homeCardClass('tasks', 'home-task-slot')}" id="tasksWrap">${renderTasksSection()}</div>
+      ${renderCustomApps('home')}
+      ${renderCustomApps('islamic')}
+      ${renderCustomApps('family')}
       ${nouraCardHTML()}
       </div>
 
@@ -6267,30 +7181,46 @@
     return `<div class="barchart" style="height:110px;">${sampled.map(d => { const h = (d.total / max) * 100; return `<div class="bar-item"><div class="bar-fill" style="height:${Math.max(h, 2)}%"></div><div class="bar-label">${d.label}</div></div>`; }).join('')}</div>`;
   }
 
+  function homeControlLayout() {
+    const base = homeCardLayout();
+    const custom = customAppsForTab('home').map(app => ({ ...app, visible: app.visible !== false, size: ['small', 'medium', 'large', 'full'].includes(app.size) ? app.size : 'medium' }));
+    const items = [...base, ...custom];
+    const allowed = new Set(items.map(item => item.id));
+    const saved = tabCardConfig()?.home?.order;
+    const order = Array.isArray(saved) ? saved.filter(id => allowed.has(id)) : [];
+    items.forEach(item => { if (!order.includes(item.id)) order.push(item.id); });
+    return order.map((id, position) => ({ ...items.find(item => item.id === id), position }));
+  }
+  function renderHomeControlRow(h) {
+    if (String(h.id).startsWith('custom_')) return `<div class="home-card-layout-row custom-home-card-row" draggable="true" data-homecustom-row="${h.id}" data-custom-app-row="${h.id}">
+      <span class="home-card-drag" title="اسحب لترتيب التطبيق">⋮⋮</span>
+      <span class="hub-layout-icon">${customAppIconMarkup(h.icon)}</span>
+      <div class="home-card-layout-copy"><input type="text" value="${escapeHTML(h.title)}" data-tabcard-title="home:${h.id}" aria-label="اسم ${escapeHTML(h.title)}" maxlength="50" /><input type="text" value="${escapeHTML(h.sub || '')}" data-tabcard-sub="home:${h.id}" aria-label="وصف ${escapeHTML(h.title)}" maxlength="90" /></div>
+      <div class="hub-layout-actions"><button type="button" class="hub-switch ${h.visible ? 'on' : ''}" data-tabcard-visible="home:${h.id}" aria-label="${h.visible ? 'إخفاء' : 'إظهار'} ${escapeHTML(h.title)}"><i></i></button><select data-tabcard-size="home:${h.id}" aria-label="حجم ${escapeHTML(h.title)}"><option value="small" ${h.size === 'small' ? 'selected' : ''}>صغير</option><option value="medium" ${h.size === 'medium' ? 'selected' : ''}>متوسط</option><option value="large" ${h.size === 'large' ? 'selected' : ''}>كبير</option><option value="full" ${h.size === 'full' ? 'selected' : ''}>عرض كامل</option></select></div>
+    </div>`;
+    return `<div class="home-card-layout-row" draggable="true" data-homecard-row="${h.id}">
+      <span class="home-card-drag" title="اسحب لترتيب البطاقة">⋮⋮</span>
+      <span class="hub-layout-icon">${h.icon}</span>
+      <div class="home-card-layout-copy"><input type="text" value="${escapeHTML(h.title)}" data-homecard-title="${h.id}" aria-label="اسم ${escapeHTML(h.title)}" maxlength="50" /><input type="text" value="${escapeHTML(h.sub)}" data-homecard-sub="${h.id}" aria-label="وصف ${escapeHTML(h.title)}" maxlength="90" /></div>
+      <div class="hub-layout-actions"><button type="button" class="hub-switch ${h.visible ? 'on' : ''}" data-homecard-visible="${h.id}" aria-label="${h.visible ? 'إخفاء' : 'إظهار'} ${escapeHTML(h.title)}"><i></i></button><select data-homecard-size="${h.id}" aria-label="حجم ${escapeHTML(h.title)}"><option value="small" ${h.size === 'small' ? 'selected' : ''}>صغير</option><option value="medium" ${h.size === 'medium' ? 'selected' : ''}>متوسط</option><option value="large" ${h.size === 'large' ? 'selected' : ''}>كبير</option><option value="full" ${h.size === 'full' ? 'selected' : ''}>عرض كامل</option></select></div>
+    </div>`;
+  }
   function renderHomeHubSettings() {
-    const layout = homeCardLayout();
+    const layout = homeControlLayout();
     return `<div class="settings-card hub-layout-card">
       <button class="collapsible-head" id="homeCardsHead"><span class="ch-icon">⚙️</span><span class="ch-texts"><b>تحكم كامل في كروت الرئيسية</b><small>تعديل الأسماء والأوصاف والترتيب والحجم</small></span><span class="chev ${state._homeCardsOpen ? 'open' : ''}">‹</span></button>
       <div class="collapsible-body ${state._homeCardsOpen ? '' : 'hidden'}">
       <div class="hub-layout-note">اسحب أي بطاقة لتغيير مكانها، تحكم في حجمها أو أخفِها. كل بطاقة مستقلة والتغييرات تُحفظ تلقائيًا.</div>
       <div class="home-card-layout-list" id="homeCardLayoutList">
-      ${layout.map((h, i) => `<div class="home-card-layout-row" draggable="true" data-homecard-row="${h.id}">
-        <span class="home-card-drag" title="اسحب لترتيب البطاقة">⋮⋮</span>
-        <span class="hub-layout-icon">${h.icon}</span>
-        <div class="home-card-layout-copy"><input type="text" value="${escapeHTML(h.title)}" data-homecard-title="${h.id}" aria-label="اسم ${escapeHTML(h.title)}" maxlength="50" /><input type="text" value="${escapeHTML(h.sub)}" data-homecard-sub="${h.id}" aria-label="وصف ${escapeHTML(h.title)}" maxlength="90" /></div>
-        <div class="hub-layout-actions">
-          <button type="button" class="hub-switch ${h.visible ? 'on' : ''}" data-homecard-visible="${h.id}" aria-label="${h.visible ? 'إخفاء' : 'إظهار'} ${escapeHTML(h.title)}"><i></i></button>
-          <select data-homecard-size="${h.id}" aria-label="حجم ${escapeHTML(h.title)}"><option value="small" ${h.size === 'small' ? 'selected' : ''}>صغير</option><option value="medium" ${h.size === 'medium' ? 'selected' : ''}>متوسط</option><option value="large" ${h.size === 'large' ? 'selected' : ''}>كبير</option><option value="full" ${h.size === 'full' ? 'selected' : ''}>عرض كامل</option></select>
-        </div>
-      </div>`).join('')}
-      </div>
+      ${layout.map(renderHomeControlRow).join('')}
       </div>
     </div>`;
   }
 
   function renderSettings() {
     const learnedEntries = Object.entries(state.learnedMap || {}); const totalSavings = sumExpensesInRange('all').savings;
-    return `<div class="page">
+    return `<div class="page settings-page">
+      <div class="settings-control-zone">${renderAdminControls()}${renderBackupSettings()}</div>
       <div class="topbar"><div class="greeting">التحكم</div></div>
       <div class="page-title">إدارة البيت</div>
       <div class="settings-card"><button class="collapsible-head" id="accountHead"><span class="ch-icon">👨‍👩‍👧</span><span class="ch-texts"><b>الحساب والبيت</b><small>بياناتك • دوس عشان تشوف</small></span><span class="chev ${state._accountOpen ? 'open' : ''}">‹</span></button>
@@ -6311,9 +7241,8 @@
         <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🚴</div><div class="si-body"><div class="si-label">${escapeHTML(state.deliveryName || state.home?.deliveryName || 'ديليفري')}</div><div class="si-value">بيانات الدليفري بتاعك</div></div><button class="si-wa" id="sendDeliveryBtn" title="ابعت الطلبات واتساب للدليفري">💬</button><button class="si-action" id="editDeliveryBtn">تعديل</button></div>
       </div>
       <div class="settings-card"><div class="settings-title">التطبيق</div>
-        <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span>ناقصنا إيه</span><button class="btn btn-primary btn-sm" id="installAppBtn" style="width:auto;min-height:30px;padding:5px 12px;font-size:11.5px;border-radius:999px;flex-shrink:0;white-space:nowrap;">📲 ثبّت التطبيق</button></div></div></div>
+        <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span>ElMistar</span><button class="btn btn-primary btn-sm" id="installAppBtn" style="width:auto;min-height:30px;padding:5px 12px;font-size:11.5px;border-radius:999px;flex-shrink:0;white-space:nowrap;">📲 ثبّت التطبيق</button></div></div></div>
       </div>
-      ${renderHomeHubSettings()}
       <div class="settings-card"><button class="collapsible-head" id="catCustomHead"><span class="ch-icon">${svgIcon('sparkle', 22)}</span><span class="ch-texts"><b>الأقسام والمنتجات</b></span><span class="chev ${state._catOpen ? 'open' : ''}">‹</span></button>
         <div class="collapsible-body ${state._catOpen ? '' : 'hidden'}">
         <div style="padding:8px 16px 0;"><button class="collapsible-head sub" id="catsTuneHead"><span class="ch-texts"><b>تظبيط الأقسام (${allCats().length})</b></span><span class="chev ${state._catsTuneOpen ? 'open' : ''}">‹</span></button></div>
@@ -6587,12 +7516,189 @@
         if (u) { try { window.location.href = u; } catch { window.open(u, '_self'); } }
       };
     });
+    document.querySelectorAll('[data-custom-app-card], [data-custom-app-row]').forEach(card => {
+      let pressTimer = null, active = false, sx = 0, sy = 0, longPressed = false;
+      const id = card.dataset.customAppCard || card.dataset.customAppRow;
+      const canManage = state.currentTab === 'settings' && Boolean(card.dataset.customAppRow);
+      const startPress = (x, y) => { if (!canManage) return; active = true; longPressed = false; sx = x; sy = y; clearTimeout(pressTimer); pressTimer = setTimeout(() => { if (!active) return; active = false; longPressed = true; card.classList.add('long-pressing'); if (navigator.vibrate) { try { navigator.vibrate(25); } catch {} } showCustomAppContextMenuAt(x, y, id); setTimeout(() => card.classList.remove('long-pressing'), 220); }, 600); };
+      const movePress = (x, y) => { if (!active) return; if (Math.hypot(x - sx, y - sy) > 12) { active = false; clearTimeout(pressTimer); } };
+      const endPress = () => { active = false; clearTimeout(pressTimer); };
+      card.addEventListener('touchstart', e => { const t = e.touches[0]; startPress(t.clientX, t.clientY); }, { passive: true });
+      card.addEventListener('touchmove', e => { const t = e.touches[0]; movePress(t.clientX, t.clientY); }, { passive: true });
+      card.addEventListener('touchend', endPress); card.addEventListener('touchcancel', endPress);
+      card.addEventListener('mousedown', e => startPress(e.clientX, e.clientY));
+      card.addEventListener('mousemove', e => movePress(e.clientX, e.clientY));
+      card.addEventListener('mouseup', endPress); card.addEventListener('mouseleave', endPress);
+      card.addEventListener('contextmenu', e => e.preventDefault());
+      card.onclick = e => {
+        if (longPressed || e.target.closest('button, input, select, textarea, a')) return;
+        if (card.dataset.customAppCard) {
+          if (!canManage) {
+            const url = card.dataset.customAppUrl;
+            if (url) { try { window.location.href = url; } catch { window.open(url, '_self'); } }
+            return;
+          }
+          const rect = card.getBoundingClientRect();
+          showCustomAppContextMenuAt(rect.left + rect.width / 2, rect.top + rect.height / 2, card.dataset.customAppCard);
+        }
+      };
+    });
     document.querySelectorAll('[data-homecard-visible]').forEach(b => b.onclick = () => {
-      const id = b.dataset.homecardVisible, current = homeCard(id);
+      const id = b.dataset.homecardVisible, current = homeCard(id), nextVisible = !current.visible;
+      claimTabApp('home', id, nextVisible);
       const next = state.homeCards || { order: homeCardLayout().map(x => x.id), settings: {} };
       next.settings = next.settings || {};
-      next.settings[id] = { ...(next.settings[id] || HOME_CARD_DEFAULTS[id]), visible: !current.visible };
+      next.settings[id] = { ...(next.settings[id] || HOME_CARD_DEFAULTS[id]), visible: nextVisible };
       saveHomeCards(next);
+    });
+    document.querySelectorAll('[data-tab-app-index]').forEach(input => input.onchange = () => saveTabAppSetting(input));
+    const adminPinForm = document.getElementById('adminPinForm');
+    if (adminPinForm) adminPinForm.onsubmit = event => {
+      event.preventDefault();
+      const input = document.getElementById('adminPinInput');
+      if (input?.value === ADMIN_PIN) {
+        try { sessionStorage.setItem('naqisna_admin_unlocked', '1'); } catch {}
+        state._homeCardsOpen = false;
+        state._customAppsOpen = false;
+        state._backupOpen = false;
+        state._tabCardControlsOpen = { family: false, islamic: false };
+        render();
+        toast('تم فتح قسم الإدارة ✓', 'success');
+      } else {
+        input?.select();
+        toast('الرقم السري غير صحيح', 'warning');
+      }
+    };
+    const adminLockBtn = document.getElementById('adminLockBtn');
+    if (adminLockBtn) adminLockBtn.onclick = () => {
+      try { sessionStorage.removeItem('naqisna_admin_unlocked'); } catch {}
+      state._homeCardsOpen = false;
+      state._customAppsOpen = false;
+      state._backupOpen = false;
+      state._tabCardControlsOpen = { family: false, islamic: false };
+      render();
+    };
+    const closeOtherAdminSections = except => {
+      if (except !== 'home') state._homeCardsOpen = false;
+      if (except !== 'custom') state._customAppsOpen = false;
+      if (except !== 'backup') state._backupOpen = false;
+      state._tabCardControlsOpen = state._tabCardControlsOpen || {};
+      if (except !== 'family') state._tabCardControlsOpen.family = false;
+      if (except !== 'islamic') state._tabCardControlsOpen.islamic = false;
+    };
+    const customAppsHead = document.getElementById('customAppsHead');
+    if (customAppsHead) customAppsHead.onclick = () => { const willOpen = !state._customAppsOpen; closeOtherAdminSections(willOpen ? 'custom' : 'none'); state._customAppsOpen = willOpen; render(); };
+    const backupHead = document.getElementById('backupHead');
+    if (backupHead) backupHead.onclick = () => { const willOpen = !state._backupOpen; if (willOpen) closeOtherAdminSections('backup'); state._backupOpen = willOpen; render(); };
+    const customForm = document.getElementById('customAppForm');
+    const customUrlInput = document.getElementById('customAppUrl');
+    if (customUrlInput) { customUrlInput.type = 'text'; customUrlInput.placeholder = 'مسار التطبيق داخل المشروع مثل app/my-app.html'; customUrlInput.removeAttribute('pattern'); }
+    const customIconInput = document.getElementById('customAppIcon');
+    if (customIconInput) {
+      const iconChoices = ['🕌','🕋','📖','🧿','🤲','⏰','📅','✅','🎓','👨‍👩‍👧','🏠','🍽️','🛒','💡','📱','🧩','🌙','⭐'];
+      const picker = document.createElement('div');
+      picker.className = 'custom-icon-picker';
+      picker.setAttribute('aria-label', 'اختيار أيقونة التطبيق');
+      picker.innerHTML = iconChoices.map(icon => `<button type="button" data-custom-icon="${icon}" title="${icon}">${icon}</button>`).join('');
+      customIconInput.type = 'hidden';
+      customIconInput.insertAdjacentElement('afterend', picker);
+      const chooseIcon = icon => {
+        customIconInput.value = icon;
+        picker.querySelectorAll('[data-custom-icon]').forEach(button => button.classList.toggle('selected', button.dataset.customIcon === icon));
+      };
+      picker.querySelectorAll('[data-custom-icon]').forEach(button => button.onclick = () => chooseIcon(button.dataset.customIcon));
+      chooseIcon(customIconInput.value || iconChoices[0]);
+      picker.innerHTML = `<button type="button" class="custom-icon-picker-toggle"><span class="custom-icon-picker-title">اختر أيقونة التطبيق</span><span class="custom-icon-picker-chevron">⌄</span></button>${CUSTOM_APP_ICONS.map(icon => `<button type="button" data-custom-icon="${icon.id}" title="${icon.label}">${icon.svg}<small>${icon.label}</small></button>`).join('')}`;
+      picker.querySelector('.custom-icon-picker-toggle').onclick = () => picker.classList.toggle('open');
+      const chooseProfessionalIcon = id => {
+        const selected = CUSTOM_APP_ICONS.some(icon => icon.id === id) ? id : 'grid';
+        customIconInput.value = selected;
+        picker.querySelectorAll('[data-custom-icon]').forEach(button => button.classList.toggle('selected', button.dataset.customIcon === selected));
+      };
+      picker.querySelectorAll('[data-custom-icon]').forEach(button => button.onclick = () => chooseProfessionalIcon(button.dataset.customIcon));
+      chooseProfessionalIcon(customIconInput.value);
+    }
+    if (customForm) customForm.onsubmit = e => {
+      e.preventDefault();
+      const app = { id: 'custom_' + uid(), tab: document.getElementById('customAppTab').value, title: document.getElementById('customAppTitle').value.trim(), sub: document.getElementById('customAppSub').value.trim(), url: customAppLink(document.getElementById('customAppUrl').value), icon: document.getElementById('customAppIcon').value.trim() || '📱', color: customAppColor(document.getElementById('customAppColor').value), size: document.getElementById('customAppSize').value, visible: true, order: customAppsForTab(document.getElementById('customAppTab').value).length };
+      if (!app.title || !app.url) return;
+      saveCustomApps([...customApps(), app]);
+      toast('تمت إضافة التطبيق ✓', 'success');
+    };
+    document.querySelectorAll('[data-custom-move]').forEach(select => {
+      if (!select.parentElement.classList.contains('custom-app-move-wrap')) {
+        const wrap = document.createElement('label');
+        wrap.className = 'custom-app-move-wrap';
+        wrap.title = 'نقل التطبيق';
+        select.parentElement.insertBefore(wrap, select);
+        wrap.append(select);
+      }
+      select.onchange = () => {
+      const apps = customApps();
+      const app = apps.find(item => item.id === select.dataset.customMove);
+      if (!app || !CUSTOM_APP_TABS[select.value]) return;
+      const targetApps = customAppsForTab(select.value).filter(item => item.id !== app.id);
+      app.tab = select.value;
+      app.order = targetApps.length;
+      saveCustomApps(apps);
+      toast('تم نقل التطبيق إلى القسم الجديد ✓', 'success');
+      };
+    });
+    document.querySelectorAll('[data-custom-visible]').forEach(button => button.onclick = () => { const apps = customApps(); const app = apps.find(a => a.id === button.dataset.customVisible); if (!app) return; app.visible = app.visible === false; saveCustomApps(apps); });
+    document.querySelectorAll('[data-custom-delete]').forEach(button => button.onclick = () => { const apps = customApps(); saveCustomApps(apps.filter(a => a.id !== button.dataset.customDelete)); toast('تم حذف التطبيق ✓', 'success'); });
+    document.querySelectorAll('.custom-app-row-icon').forEach(icon => {
+      const row = icon.closest('[data-custom-app-row]');
+      const app = row && customApps().find(item => item.id === row.dataset.customAppRow);
+      if (app) icon.innerHTML = customAppIconMarkup(app.icon);
+    });
+    document.querySelectorAll('[data-custom-app-row]').forEach(row => {
+      const app = customApps().find(item => item.id === row.dataset.customAppRow);
+      const info = row.querySelector('.custom-app-row-info');
+      if (app && info) {
+        const description = info.querySelector('small');
+        if (description) description.textContent = app.sub || 'بدون وصف';
+        row.title = app.url || 'تطبيق مخصص';
+      }
+    });
+    document.querySelectorAll('[data-custom-app-row]').forEach(row => {
+      const id = row.dataset.customAppRow, actions = row.querySelector('.custom-app-row-actions');
+      if (actions) actions.insertAdjacentHTML('afterbegin', `<button type="button" data-custom-edit="${id}" title="تعديل">✏️</button>`);
+    });
+    document.querySelectorAll('[data-custom-edit]').forEach(button => button.onclick = () => {
+      const app = customApps().find(item => item.id === button.dataset.customEdit);
+      if (app) openCustomAppEditor(app);
+    });
+    document.querySelectorAll('[data-custom-app-list]').forEach(list => {
+      let dragging = null;
+      list.querySelectorAll('[data-custom-app-row]').forEach(row => {
+        row.addEventListener('dragstart', () => { dragging = row; row.classList.add('dragging'); });
+        row.addEventListener('dragend', () => { dragging = null; row.classList.remove('dragging'); });
+        row.addEventListener('dragover', e => e.preventDefault());
+        row.addEventListener('drop', e => { e.preventDefault(); if (!dragging || dragging === row) return; list.insertBefore(dragging, row); const ids = [...list.querySelectorAll('[data-custom-app-row]')].map(x => x.dataset.customAppRow); const apps = customApps(); ids.forEach((id, i) => { const a = apps.find(x => x.id === id); if (a) a.order = i; }); saveCustomApps(apps); });
+      });
+    });
+    document.querySelectorAll('[data-tabcard-section]').forEach(button => button.onclick = () => {
+      state._tabCardControlsOpen = state._tabCardControlsOpen || {};
+      const tab = button.dataset.tabcardSection;
+      const willOpen = !state._tabCardControlsOpen[tab];
+      if (willOpen) closeOtherAdminSections(tab);
+      state._tabCardControlsOpen[tab] = willOpen;
+      render();
+    });
+    document.querySelectorAll('[data-tabcard-visible]').forEach(b => b.onclick = () => { const [tab, id] = b.dataset.tabcardVisible.split(':'); saveTabCard(tab, id, { visible: !tabCard(tab, id).visible }); });
+    document.querySelectorAll('[data-tabcard-size]').forEach(s => s.onchange = () => { const [tab, id] = s.dataset.tabcardSize.split(':'); saveTabCard(tab, id, { size: s.value }); });
+    const saveTabCardText = (el, key) => { const [tab, id] = el.dataset[key === 'title' ? 'tabcardTitle' : 'tabcardSub'].split(':'); const value = el.value.trim(); if (value) saveTabCard(tab, id, { [key]: value }); };
+    document.querySelectorAll('[data-tabcard-title]').forEach(input => { input.onchange = () => saveTabCardText(input, 'title'); });
+    document.querySelectorAll('[data-tabcard-sub]').forEach(input => { input.onchange = () => saveTabCardText(input, 'sub'); });
+    document.querySelectorAll('[data-tab-card-list]').forEach(list => {
+      let dragging = null;
+      list.querySelectorAll('[data-tabcard-row]').forEach(row => {
+        row.addEventListener('dragstart', () => { dragging = row; row.classList.add('dragging'); });
+        row.addEventListener('dragend', () => { dragging = null; row.classList.remove('dragging'); list.querySelectorAll('.drag-over').forEach(x => x.classList.remove('drag-over')); });
+        row.addEventListener('dragover', e => { e.preventDefault(); if (dragging && dragging !== row) row.classList.add('drag-over'); });
+        row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+        row.addEventListener('drop', e => { e.preventDefault(); row.classList.remove('drag-over'); if (!dragging || dragging === row) return; const rect = row.getBoundingClientRect(); list.insertBefore(dragging, e.clientY < rect.top + rect.height / 2 ? row : row.nextSibling); const tab = list.dataset.tabCardList; saveTabCardOrder(tab, [...list.querySelectorAll('[data-tabcard-row]')].map(x => x.dataset.tabcardRow.split(':')[1])); });
+      });
     });
     document.querySelectorAll('[data-homecard-size]').forEach(s => s.onchange = () => {
       const id = s.dataset.homecardSize;
@@ -6624,17 +7730,27 @@
     const cardList = document.getElementById('homeCardLayoutList');
     if (cardList) {
       let dragging = null;
-      cardList.querySelectorAll('[data-homecard-row]').forEach(row => {
-        row.addEventListener('dragstart', e => { dragging = row.dataset.homecardRow; row.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragging); });
+      const rowKey = row => row.dataset.homecardRow || row.dataset.homecustomRow;
+      const saveHomeControlOrder = order => {
+        const baseOrder = order.filter(id => !String(id).startsWith('custom_'));
+        state.homeCards = { ...(state.homeCards || {}), order: baseOrder, orderVersion: 2 };
+        persist();
+        const cfg = tabCardConfig(); cfg.home = cfg.home || { settings: {} }; cfg.home.order = order;
+        try { localStorage.setItem(TAB_CARD_LAYOUT_KEY, JSON.stringify(cfg)); } catch {}
+        const apps = customApps(); order.filter(id => String(id).startsWith('custom_')).forEach((id, index) => { const app = apps.find(item => item.id === id); if (app) app.order = index; });
+        try { localStorage.setItem(CUSTOM_APPS_KEY, JSON.stringify(apps)); } catch {}
+        render();
+      };
+      cardList.querySelectorAll('[data-homecard-row], [data-homecustom-row]').forEach(row => {
+        row.addEventListener('dragstart', e => { dragging = rowKey(row); row.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragging); });
         row.addEventListener('dragend', () => { dragging = null; row.classList.remove('dragging'); cardList.querySelectorAll('.drag-over').forEach(x => x.classList.remove('drag-over')); });
-        row.addEventListener('dragover', e => { e.preventDefault(); if (dragging && dragging !== row.dataset.homecardRow) row.classList.add('drag-over'); });
+        row.addEventListener('dragover', e => { e.preventDefault(); if (dragging && dragging !== rowKey(row)) row.classList.add('drag-over'); });
         row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
         row.addEventListener('drop', e => {
           e.preventDefault(); row.classList.remove('drag-over');
-          const target = row.dataset.homecardRow; if (!dragging || dragging === target) return;
-          const order = homeCardLayout().map(x => x.id); const from = order.indexOf(dragging); const to = order.indexOf(target);
-          if (from < 0 || to < 0) return; order.splice(from, 1); order.splice(to, 0, dragging);
-          saveHomeCards({ ...(state.homeCards || {}), order, settings: (state.homeCards || {}).settings || {} });
+          const target = rowKey(row); if (!dragging || dragging === target) return;
+          const order = [...cardList.querySelectorAll('[data-homecard-row], [data-homecustom-row]')].map(rowKey); const from = order.indexOf(dragging); const to = order.indexOf(target);
+          if (from < 0 || to < 0) return; order.splice(from, 1); order.splice(to, 0, dragging); saveHomeControlOrder(order);
         });
       });
     }
@@ -6678,11 +7794,10 @@
     document.querySelectorAll('[data-azkar-toggle]').forEach(b => b.onclick = () => openAzkarPage());
     document.querySelectorAll('[data-prayer-times]').forEach(b => b.onclick = () => openPrayerPage());
     try { refreshPrayerMini(); } catch {}
-    try { refreshHealthMini(); } catch {}
     document.querySelectorAll('[data-goto-tasks]').forEach(b => b.onclick = () => {
       requestAnimationFrame(() => setTimeout(() => { try { const el = document.getElementById('tasksWrap') || document.getElementById('tasksSection'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {} }, 60));
     });
-    const qgc = document.getElementById('quranGateCard'); if (qgc) qgc.onclick = () => { try { window.location.href = 'quran/index.html'; } catch {} };
+    const qgc = document.getElementById('quranGateCard'); if (qgc) qgc.onclick = () => { try { window.location.href = 'app/quran/index.html'; } catch {} };
     try { refreshQuranMini(); } catch {}
     try { tsbWire(); } catch {}
     const azD = document.getElementById('azkarDone'); if (azD) azD.onclick = () => azkarAdvance();
@@ -6920,6 +8035,40 @@
     if (e.touches?.length) { x = e.touches[0].clientX; y = e.touches[0].clientY; } else { x = e.clientX; y = e.clientY; }
     showContextMenuAt(x, y, orderId);
   }
+  function moveCustomApp(appId, targetTab) {
+    const apps = customApps();
+    const app = apps.find(item => item.id === appId);
+    if (!app || !CUSTOM_APP_TABS[targetTab] || app.tab === targetTab) return;
+    app.tab = targetTab;
+    app.order = customAppsForTab(targetTab).filter(item => item.id !== appId).length;
+    saveCustomApps(apps);
+    toast(`تم نقل التطبيق إلى ${CUSTOM_APP_TABS[targetTab]} ✓`, 'success');
+  }
+  function showCustomAppContextMenuAt(x, y, appId) {
+    closeContextMenu();
+    const app = customApps().find(item => item.id === appId); if (!app) return;
+    const back = document.createElement('div'); back.className = 'ctx-backdrop'; back.id = 'ctxBackdrop';
+    const menu = document.createElement('div'); menu.className = 'context-menu custom-context-menu'; menu.id = 'activeContextMenu';
+    const otherTabs = Object.entries(CUSTOM_APP_TABS).filter(([id]) => id !== app.tab);
+    menu.innerHTML = `<div class="custom-context-head"><span class="ctx-icon">${customAppIconMarkup(app.icon)}</span><span><b>${escapeHTML(app.title)}</b><small>إدارة التطبيق المضاف</small></span></div><button class="context-menu-item edit" data-custom-ctx-edit><span class="ctx-icon">${svgIcon('pencil', 17)}</span><span>تعديل بيانات التطبيق</span></button><div class="context-menu-sep"></div>${otherTabs.map(([id, label]) => `<button class="context-menu-item move" data-custom-ctx-move="${id}"><span class="ctx-icon">↔</span><span>نقل إلى ${label}</span></button>`).join('')}<div class="context-menu-sep"></div><button class="context-menu-item delete" data-custom-ctx-delete><span class="ctx-icon">${svgIcon('trash', 18)}</span><span>حذف التطبيق نهائياً</span></button>`;
+    document.body.appendChild(back); document.body.appendChild(menu);
+    const rect = menu.getBoundingClientRect();
+    if (x + rect.width > window.innerWidth - 10) x = window.innerWidth - rect.width - 10;
+    if (y + rect.height > window.innerHeight - 10) y = window.innerHeight - rect.height - 10;
+    if (x < 10) x = 10; if (y < 10) y = 10;
+    menu.style.left = x + 'px'; menu.style.top = y + 'px';
+    back.addEventListener('click', closeContextMenu); back.addEventListener('touchend', ev => { ev.preventDefault(); closeContextMenu(); });
+    let acted = false;
+    const act = fn => ev => { if (acted) return; acted = true; ev.preventDefault(); ev.stopPropagation(); closeContextMenu(); setTimeout(fn, 30); };
+    menu.querySelector('[data-custom-ctx-edit]')?.addEventListener('click', act(() => { const current = customApps().find(item => item.id === appId); if (current) openCustomAppEditor(current); }));
+    menu.querySelector('[data-custom-ctx-edit]')?.addEventListener('touchend', act(() => { const current = customApps().find(item => item.id === appId); if (current) openCustomAppEditor(current); }));
+    menu.querySelectorAll('[data-custom-ctx-move]').forEach(button => {
+      const fn = () => moveCustomApp(appId, button.dataset.customCtxMove);
+      button.addEventListener('click', act(fn)); button.addEventListener('touchend', act(fn));
+    });
+    const deleteFn = () => confirmDialog({ title: 'حذف التطبيق؟', message: `سيتم حذف «${escapeHTML(app.title)}» نهائياً من التطبيق.`, confirmText: 'حذف نهائياً', cancelText: 'إلغاء', danger: true }).then(ok => { if (ok) { saveCustomApps(customApps().filter(item => item.id !== appId)); toast('تم حذف التطبيق ✓', 'success'); } });
+    menu.querySelector('[data-custom-ctx-delete]')?.addEventListener('click', act(deleteFn)); menu.querySelector('[data-custom-ctx-delete]')?.addEventListener('touchend', act(deleteFn));
+  }
   function showContextMenuAt(x, y, orderId) {
     closeContextMenu();
     const o = state.orders.find(x => x.id === orderId); if (!o) return;
@@ -7007,6 +8156,13 @@
     const toggleAcc = (key, id) => {
       const willOpen = !state[key];
       accKeys.forEach(k => { state[k] = (k === key ? willOpen : false); });
+      if (key === '_homeCardsOpen' && willOpen) {
+        state._customAppsOpen = false;
+        state._backupOpen = false;
+        state._tabCardControlsOpen = state._tabCardControlsOpen || {};
+        state._tabCardControlsOpen.family = false;
+        state._tabCardControlsOpen.islamic = false;
+      }
       persist(); render(); scrollToId(id);
     };
     const cch = document.getElementById('catCustomHead'); if (cch) cch.onclick = () => toggleAcc('_catOpen', 'catCustomHead');
@@ -7055,6 +8211,7 @@
     function buildBackupObject() {
       const data = {};
       Object.keys(state).forEach(k => { data[k] = state[k]; });
+      data.customApps = customApps();
       ['_forceTop', '_expandedOrder', '_expDraft', '_expandedBasket', '_basketDraft', '_catBrowse', '_shopQuery', '_shopOpen', '_repPickerOpen', '_expPickerOpen', '_expGrpOpen', '_pendingCode', '_pendingName', '_pendingCloud', '_isJoining', '_taskAddOpen', '_taskNewDays', '_taskNewTitle', '_taskDaysOpen', '_apptAddOpen', '_apptRepeat', '_apptDays', '_apptDaysOpen', '_apptDayTimes', '_apptExtraTimes', '_apptRemOpen', '_apptTitle', '_apptDate', '_apptTime', '_apptNotes', '_habitAddOpen', '_habitNewIcon', '_showTasks', '_showHabits', '_syncedOnce', 'searchQuery', 'orderFilter', 'categoryFilter'].forEach(k => { delete data[k]; });
       data.app = 'naqisna'; data.backupV = 1; data.exportedAt = nowISO();
       return data;
@@ -7074,6 +8231,7 @@
     function applyBackupData(data) {
       const skip = ['app', 'backupV', 'exportedAt', '_forceTop', '_expandedOrder', '_expDraft', '_expandedBasket', '_basketDraft', '_catBrowse', '_shopQuery', '_shopOpen', '_repPickerOpen', '_expPickerOpen', '_expGrpOpen', '_pendingCode', '_pendingName', '_pendingCloud', '_isJoining', '_taskAddOpen', '_taskNewDays', '_taskNewTitle', '_taskDaysOpen', '_apptAddOpen', '_apptRepeat', '_apptDays', '_apptDaysOpen', '_apptDayTimes', '_apptExtraTimes', '_apptRemOpen', '_apptTitle', '_apptDate', '_apptTime', '_apptNotes', '_habitAddOpen', '_habitNewIcon', '_showTasks', '_showHabits', '_syncedOnce', 'searchQuery', 'orderFilter', 'categoryFilter'];
       Object.keys(data).forEach(k => { if (!skip.includes(k)) state[k] = data[k]; });
+      if (Array.isArray(data.customApps)) { try { localStorage.setItem(CUSTOM_APPS_KEY, JSON.stringify(data.customApps)); } catch {} }
       if (!state.home) state.home = { code: genHomeCode(), name: 'بيتنا', createdAt: nowISO() };
       if (!state.user) state.user = { id: uid(), name: 'المستر', role: 'member', whatsapp: '', joinedAt: nowISO() };
       if (!Array.isArray(state.orders)) state.orders = [];
@@ -7103,6 +8261,10 @@
     if (expBackupBtn) expBackupBtn.onclick = () => downloadBackup();
     const impBackupInp = document.getElementById('importBackupFile');
     if (impBackupInp) impBackupInp.onchange = () => { importBackupFile(impBackupInp.files && impBackupInp.files[0]); impBackupInp.value = ''; };
+    const expBackupBottomBtn = document.getElementById('exportBackupBottomBtn');
+    if (expBackupBottomBtn) expBackupBottomBtn.onclick = () => downloadBackup();
+    const impBackupBottomInp = document.getElementById('importBackupBottomFile');
+    if (impBackupBottomInp) impBackupBottomInp.onchange = () => { importBackupFile(impBackupBottomInp.files && impBackupBottomInp.files[0]); impBackupBottomInp.value = ''; };
     /* حذف البيت نهائياً: من الجهاز + قاعدة البيانات */
     async function deleteHomeForever(code) {
       let cloudOk = false, cloudTried = false;
@@ -7642,7 +8804,7 @@
   }
   function openInstallHelpModal() {
     const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    const html = `<div class="modal-handle"></div><h2>ثبّت ناقصنا إيه</h2><p class="m-sub">${isiOS ? 'على الآيفون من سفاري' : 'على الأندرويد من كروم'}</p>
+    const html = `<div class="modal-handle"></div><h2>ثبّت ElMistar</h2><p class="m-sub">${isiOS ? 'على الآيفون من سفاري' : 'على الأندرويد من كروم'}</p>
       <div class="help-steps">${isiOS ? '1) دوس زرار المشاركة اللي تحت<br>2) اختار "إضافة للشاشة الرئيسية"<br>3) دوس إضافة' : '1) دوس قايمة النقط ⋮ اللي فوق<br>2) اختار "تثبيت التطبيق" أو "إضافة للشاشة الرئيسية"<br>3) دوس تثبيت'}</div>
       <div class="btn-group" style="margin-top:12px;"><button class="btn btn-primary" id="closeHelpBtn">تمام</button></div>`;
     const m = openModal(html);
@@ -7704,7 +8866,7 @@
       const nt = o.notes ? ` - ${o.notes}` : '';
       return `${i + 1}. ${o.name}${q}${nt}`;
     });
-    return `🚴 أهلاً ${d.name || 'يا بطل'}، طلبات توصيل 🏠\n\n🛒 الطلبات (${list.length}):\n${lines.length ? lines.join('\n') : 'مفيش طلبات معلقة'}\n\n📍 يا ريت التوصيل لعنوان البيت المتسجل. شكرًا 🙏\nتطبيق ناقصنا إيه`;
+    return `🚴 أهلاً ${d.name || 'يا بطل'}، طلبات توصيل 🏠\n\n🛒 الطلبات (${list.length}):\n${lines.length ? lines.join('\n') : 'مفيش طلبات معلقة'}\n\n📍 يا ريت التوصيل لعنوان البيت المتسجل. شكرًا 🙏\nتطبيق ElMistar`;
   }
   function sendDeliveryWa() {
     const d = getDeliveryInfo();
@@ -9152,6 +10314,12 @@
   /* =============================
      INIT
      ============================= */
+  /* Settings is a regular page, not a translucent modal. */
+  function renderMain() {
+    const content = state.currentTab === 'settings' ? renderSettings() : renderHome();
+    return content + renderBottomNav();
+  }
+
   function init() {
     restore();
     // لا توجد شاشة ترحيب نهائياً ولا بيت تلقائي: دخول مباشر، والبيت من الإعدادات

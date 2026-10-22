@@ -2638,6 +2638,85 @@
       white-space: nowrap;
     }
 
+    /* Integrated memorisation screen */
+    .tasmee-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(18, 35, 49, .48);
+      backdrop-filter: blur(8px);
+    }
+
+    .tasmee-modal[hidden] { display: none; }
+
+    .tasmee-shell {
+      display: flex;
+      flex-direction: column;
+      width: min(980px, 100%);
+      height: min(900px, 94vh);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .72);
+      border-radius: 26px;
+      background: var(--panel);
+      box-shadow: 0 24px 80px rgba(16, 39, 56, .32);
+    }
+
+    .tasmee-modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 18px;
+      direction: rtl;
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--panel-top), var(--panel));
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tasmee-modal-head strong,
+    .tasmee-modal-head small { display: block; }
+    .tasmee-modal-head strong { font-size: 17px; }
+    .tasmee-modal-head small { margin-top: 3px; color: var(--muted); font-size: 11px; }
+
+    .tasmee-close {
+      display: grid;
+      flex: none;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--muted);
+      background: var(--panel-top);
+      font-size: 24px;
+      line-height: 1;
+      transition: .2s ease;
+    }
+
+    .tasmee-close:hover,
+    .tasmee-close:focus-visible { color: var(--green); border-color: var(--green); transform: rotate(90deg); }
+
+    .tasmee-frame {
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+      border: 0;
+      background: #f4f8f9;
+    }
+
+    .tasmee-action { color: var(--green); }
+    .tasmee-action svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    @media (max-width: 600px) {
+      .tasmee-modal { padding: 0; }
+      .tasmee-shell { width: 100%; height: 100%; border-radius: 0; border: 0; }
+      .tasmee-modal-head { padding-inline: 14px; }
+    }
+
     @media (max-width: 360px) {
       .recitation-panel { margin-inline: 8px; width: calc(100% - 16px); padding: 8px; }
       .recitation-range { grid-template-columns: minmax(0, 1fr) 66px 66px; gap: 5px; }
@@ -2806,6 +2885,13 @@
             </svg>
             <span id="themeLabel">الوضع الليلي</span>
           </button>
+          <button type="button" class="d-action tasmee-action" id="openTasmee" aria-label="فتح تسميع القرآن">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 3.5h10A2.5 2.5 0 0 1 19.5 6v12A2.5 2.5 0 0 1 17 20.5H7A2.5 2.5 0 0 1 4.5 18V6A2.5 2.5 0 0 1 7 3.5Z" />
+              <path d="M8 8h8M8 12h5M8 16h8" />
+            </svg>
+            <span>تسميع القرآن</span>
+          </button>
         </div>
         <div class="backup-panel" aria-label="النسخ الاحتياطي">
           <h3>حفظ واستعادة بيانات المصحف</h3>
@@ -2909,6 +2995,20 @@
     </div>
   </section>
   <div class="toast" id="toast" role="status"></div>
+
+  <div class="tasmee-modal" id="tasmeeModal" role="dialog" aria-modal="true"
+    aria-labelledby="tasmeeModalTitle" hidden>
+    <section class="tasmee-shell">
+      <header class="tasmee-modal-head">
+        <div>
+          <strong id="tasmeeModalTitle">تسميع القرآن الكريم</strong>
+          <small>اختبر حفظك وتابع تقدمك داخل المصحف</small>
+        </div>
+        <button type="button" class="tasmee-close" id="closeTasmee" aria-label="إغلاق تسميع القرآن">×</button>
+      </header>
+      <iframe class="tasmee-frame" id="tasmeeFrame" src="tasmee.html" title="تطبيق تسميع القرآن الكريم"></iframe>
+    </section>
+  </div>
 
   <div class="dl-chip" id="dlChip" hidden aria-live="polite">
     <div class="dl-row"><span id="dlLabel">جارٍ تحميل النصوص القرآنية…</span><span id="dlPct">٠٪</span></div>
@@ -4399,6 +4499,36 @@
 
       if (document.readyState === 'complete') setTimeout(run, 400);
       else window.addEventListener('load', function () { setTimeout(run, 400); });
+    })();
+
+    /* Open the standalone tasmee app inside the Mushaf without sharing globals. */
+    (function () {
+      var modal = document.getElementById('tasmeeModal');
+      var open = document.getElementById('openTasmee');
+      var close = document.getElementById('closeTasmee');
+      if (!modal || !open) return;
+      var previousFocus = null;
+
+      function setOpen(isOpen) {
+        modal.hidden = !isOpen;
+        modal.setAttribute('aria-hidden', String(!isOpen));
+        document.body.classList.toggle('tasmee-open', isOpen);
+        if (isOpen) {
+          previousFocus = document.activeElement;
+          if (close) close.focus();
+        } else if (previousFocus && typeof previousFocus.focus === 'function') {
+          previousFocus.focus();
+        }
+      }
+
+      open.addEventListener('click', function () { setOpen(true); });
+      if (close) close.addEventListener('click', function () { setOpen(false); });
+      modal.addEventListener('click', function (event) {
+        if (event.target === modal) setOpen(false);
+      });
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !modal.hidden) setOpen(false);
+      });
     })();
   </script>
 
