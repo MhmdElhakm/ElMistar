@@ -97,6 +97,10 @@ window.NaqisnaSupabase = (function () {
       expenses: Array.isArray(state.expenses) ? state.expenses : [],
       orderLists: Array.isArray(state.orderLists) ? state.orderLists : [],
       notifications: Array.isArray(state.notifications) ? state.notifications : [],
+      // إعدادات التطبيق جزء من حالة البيت المشتركة وليست تفضيلات جهاز فقط.
+      // لا تدخل المسودة غير المعتمدة في مزامنة الطلبات/المصروفات.
+      settings: state._settingsPendingApply && state._settingsCommitted ? state._settingsCommitted : sharedSettingsSnapshot(state),
+      settingsUpdatedAt: Number(state.settingsUpdatedAt) || Date.now(),
       updatedAt: new Date().toISOString(),
       updatedAtMs: Date.now(),
       ...(extra || {})
@@ -171,6 +175,8 @@ window.NaqisnaSupabase = (function () {
         expenses: Array.isArray(blob.expenses) ? blob.expenses : [],
         orderLists: Array.isArray(blob.orderLists) ? blob.orderLists : [],
         notifications: Array.isArray(blob.notifications) ? blob.notifications : [],
+        settings: blob.settings && typeof blob.settings === 'object' ? blob.settings : {},
+        settingsUpdatedAt: Number(blob.settingsUpdatedAt) || 0,
         updatedAt: blob.updatedAt || null,
         updatedAtMs: blob.updatedAtMs || 0
       };
@@ -271,6 +277,21 @@ window.NaqisnaSupabase = (function () {
     } catch (e) {
       console.error('Push full state error:', e);
     }
+  }
+
+  // رفع مستقل للإعدادات فقط؛ لا يقرأ أو يكتب الطلبات والمصروفات من حالة الجهاز.
+  async function pushSettingsOnly(homeCode, state) {
+    const sb = getClient();
+    if (!sb || !homeCode || !state) return false;
+    try {
+      const remote = (await readBlob(homeCode)) || {};
+      const next = { ...remote,
+        settings: sharedSettingsSnapshot(state),
+        settingsUpdatedAt: Number(state.settingsUpdatedAt) || Date.now(),
+        updatedAt: new Date().toISOString(), updatedAtMs: Date.now()
+      };
+      return await writeBlob(homeCode, next);
+    } catch (e) { console.error('Push settings error:', e); return false; }
   }
 
   // --- Offline-First expenses: push orders only, keep remote expenses untouched (privacy mode) ---
@@ -413,6 +434,7 @@ window.NaqisnaSupabase = (function () {
     deleteExpense,
     deleteHome,
     pushFullState,
+    pushSettingsOnly,
     pushOrdersOnly,
     pushFinPartial,
     subscribeToHomeChanges,
@@ -3421,6 +3443,31 @@ window.NaqisnaSupabase = (function () {
     currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: ''
   };
 
+  // كل إعداد يتم تغييره من الواجهة يُكتب هنا أولاً، ثم persist() يرفعه للسحابة
+  // عند وجود بيت متصل. نحتفظ بترحيل صامت للقيم القديمة حتى لا تضيع إعدادات المستخدم.
+  function appSettings() {
+    if (!state.appSettings || typeof state.appSettings !== 'object') state.appSettings = {};
+    return state.appSettings;
+  }
+  function sharedSettingsSnapshot(source) {
+    const s = source || {};
+    return {
+      appSettings: s.appSettings || {}, homeCards: s.homeCards || {}, homeLayout: s.homeLayout || {},
+      finCustom: s.finCustom || {}, categoryNames: s.categoryNames || {}, categoryColors: s.categoryColors || {},
+      categoryIcons: s.categoryIcons || {}, productIcons: s.productIcons || {}, customCats: s.customCats || [], hiddenCats: s.hiddenCats || []
+    };
+  }
+  function settingsChanged() {
+    state._settingsPendingApply = true;
+    persist();
+  }
+  function legacySetting(key, fallback) {
+    try { const v = JSON.parse(localStorage.getItem(key) || 'null'); return v == null ? fallback : v; } catch { return fallback; }
+  }
+  function settingsSignature() {
+    try { return JSON.stringify(sharedSettingsSnapshot(state)); } catch { return ''; }
+  }
+
   /* Published by the admin page. Keep this deliberately small and portable so the
      same setting works for the local PWA and the admin console. */
   const TAB_APP_CONFIG_KEY = 'naqisna_tab_app_config';
@@ -3434,7 +3481,7 @@ window.NaqisnaSupabase = (function () {
   const TAB_APP_DEFAULT_OWNER = Object.fromEntries(TAB_APP_ORDER.flatMap(tab => TAB_APP_DEFAULTS[tab].map(id => [id, tab])));
   function tabAppConfig() {
     try {
-      const raw = JSON.parse(localStorage.getItem(TAB_APP_CONFIG_KEY) || 'null');
+      const raw = appSettings().tabApps || legacySetting(TAB_APP_CONFIG_KEY, null);
       const lists = Object.fromEntries(TAB_APP_ORDER.map(tab => [tab, Array.isArray(raw?.[tab]) ? raw[tab] : TAB_APP_DEFAULTS[tab]]));
       const config = Object.fromEntries(TAB_APP_ORDER.map(tab => [tab, []]));
       TAB_APP_IDS.forEach(id => {
@@ -3450,7 +3497,7 @@ window.NaqisnaSupabase = (function () {
       });
       try {
         const normalized = JSON.stringify(config);
-        if (localStorage.getItem(TAB_APP_CONFIG_KEY) !== normalized) localStorage.setItem(TAB_APP_CONFIG_KEY, normalized);
+        appSettings().tabApps = config;
       } catch {}
       return config;
     } catch { return TAB_APP_DEFAULTS; }
@@ -3465,7 +3512,8 @@ window.NaqisnaSupabase = (function () {
     } else {
       cfg[tab] = (cfg[tab] || []).filter(item => item !== id);
     }
-    try { localStorage.setItem(TAB_APP_CONFIG_KEY, JSON.stringify(cfg)); } catch {}
+    appSettings().tabApps = cfg;
+    settingsChanged();
   }
   function applyTabAppVisibility() {
     const tab = state.currentTab === 'settings' ? 'home' : (state.currentTab || 'home');
@@ -3601,7 +3649,8 @@ window.NaqisnaSupabase = (function () {
       TAB_APP_ORDER.filter(otherTab => otherTab !== tab).forEach(otherTab => { cfg[otherTab] = (cfg[otherTab] || []).filter(x => x !== id); });
       cfg[tab].push(id);
     }
-    try { localStorage.setItem(TAB_APP_CONFIG_KEY, JSON.stringify(cfg)); } catch {}
+    appSettings().tabApps = cfg;
+    settingsChanged();
     applyTabAppVisibility();
   }
 
@@ -3611,7 +3660,7 @@ window.NaqisnaSupabase = (function () {
     family: []
   };
   function tabCardConfig() {
-    try { return JSON.parse(localStorage.getItem(TAB_CARD_LAYOUT_KEY) || '{}') || {}; } catch { return {}; }
+    try { return appSettings().tabCards || legacySetting(TAB_CARD_LAYOUT_KEY, {}) || {}; } catch { return {}; }
   }
   function tabCard(tab, id) {
     const custom = customApps().find(app => app.id === id && app.tab === tab);
@@ -3640,13 +3689,15 @@ window.NaqisnaSupabase = (function () {
     const cfg = tabCardConfig(); cfg[tab] = cfg[tab] || { order: [...TAB_CARD_IDS[tab]], settings: {} };
     cfg[tab].settings = cfg[tab].settings || {};
     cfg[tab].settings[id] = { ...(cfg[tab].settings[id] || {}), ...patch };
-    try { localStorage.setItem(TAB_CARD_LAYOUT_KEY, JSON.stringify(cfg)); } catch {}
+    appSettings().tabCards = cfg;
+    settingsChanged();
     render();
   }
   function saveTabCardOrder(tab, order) {
     const cfg = tabCardConfig(); cfg[tab] = cfg[tab] || { settings: {} };
     cfg[tab].order = order; cfg[tab].settings = cfg[tab].settings || {};
-    try { localStorage.setItem(TAB_CARD_LAYOUT_KEY, JSON.stringify(cfg)); } catch {}
+    appSettings().tabCards = cfg;
+    settingsChanged();
     render();
   }
   function applyTabCardSettings() {
@@ -3705,11 +3756,11 @@ window.NaqisnaSupabase = (function () {
   }
   function customApps() {
     try {
-      const raw = JSON.parse(localStorage.getItem(CUSTOM_APPS_KEY) || '[]');
+      const raw = appSettings().customApps || legacySetting(CUSTOM_APPS_KEY, []);
       return Array.isArray(raw) ? raw.filter(a => a && a.id && CUSTOM_APP_TABS[a.tab]) : [];
     } catch { return []; }
   }
-  function saveCustomApps(apps) { try { localStorage.setItem(CUSTOM_APPS_KEY, JSON.stringify(apps)); } catch {} render(); }
+  function saveCustomApps(apps) { appSettings().customApps = Array.isArray(apps) ? apps : []; settingsChanged(); render(); }
   function customAppsForTab(tab) { return customApps().filter(a => a.tab === tab).sort((a, b) => (a.order || 0) - (b.order || 0)); }
   function customAppColor(color) { return /^#[0-9A-F]{6}$/i.test(String(color || '')) ? color : '#1CB0F6'; }
   function customAppLink(value) {
@@ -3779,7 +3830,7 @@ window.NaqisnaSupabase = (function () {
   }
   function renderAdminControls() {
     if (!adminControlsUnlocked()) return `<div class="admin-controls-shell"><div class="settings-card admin-lock-card"><div class="admin-lock-head"><span class="admin-lock-icon">🔐</span><div class="admin-lock-copy"><b>قسم الإدارة</b><small>تحكم كامل في كروت الرئيسية والأسرة وتطبيقاتي والتطبيقات المخصصة</small></div><span class="admin-lock-state">مقفل</span></div><form class="admin-lock-form" id="adminPinForm"><input id="adminPinInput" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="الرقم السري" aria-label="الرقم السري لقسم الإدارة" /><button type="submit">فتح القسم</button></form></div></div>`;
-    return `<div class="admin-controls-shell"><div class="admin-unlocked-head"><b>🔓 قسم الإدارة مفتوح</b><button type="button" class="admin-unlock-close" id="adminLockBtn">قفل القسم</button></div>${renderUnifiedAppSettings()}${renderCustomAppsSettings()}</div>`;
+    return `<div class="admin-controls-shell"><div class="admin-unlocked-head"><b>🔓 قسم الإدارة مفتوح</b><button type="button" class="admin-unlock-close" id="adminLockBtn">قفل القسم</button></div>${renderSettingsPublishCard()}${renderUnifiedAppSettings()}${renderCustomAppsSettings()}</div>`;
   }
 
   function renderTabCardControls() {
@@ -4000,15 +4051,27 @@ window.NaqisnaSupabase = (function () {
       return window.NaqisnaSupabase.pushFullState(state.home.code, cloudPushState());
     } catch { return Promise.resolve(false); }
   }
-  function persist() {
+  function persist(options) {
     state.updatedAt = Date.now();
+    // ترحيل إعدادات الجهاز القديمة إلى حالة البيت المشتركة عند أول حفظ.
+    try {
+      const a = appSettings();
+      if (!a.tabApps) a.tabApps = legacySetting(TAB_APP_CONFIG_KEY, null) || undefined;
+      if (!a.tabCards) a.tabCards = legacySetting(TAB_CARD_LAYOUT_KEY, {}) || {};
+      if (!a.customApps) a.customApps = legacySetting(CUSTOM_APPS_KEY, []) || [];
+    } catch {}
+    const currentSettingsSignature = settingsSignature();
+    if (state._settingsSignature && state._settingsSignature !== currentSettingsSignature) state._settingsPendingApply = true;
+    state._settingsSignature = currentSettingsSignature;
+    if (!state.settingsUpdatedAt) state.settingsUpdatedAt = Date.now();
     Storage.save(state);
     try {
       if (state.home?.code) {
         localStorage.setItem('baytna_home_' + state.home.code, JSON.stringify({ home: state.home, orders: state.orders, expenses: state.expenses, orderLists: state.orderLists, updatedAt: state.updatedAt, _shareExpenses: state._shareExpenses, _shareFin: state._shareFin || null }));
         // لا ترفع للسحابة قبل أول سحب-ودمج: نحمي بيانات الأعضاء من جهاز ببيانات قديمة
         if (!state._syncedOnce) return;
-        if (!_syncLock) pushFinState();
+        // المسودة المحلية لا تدخل مسار الطلبات/المصروفات قبل الضغط على زر التطبيق.
+        if (!options?.skipCloud && !_syncLock && !state._settingsPendingApply) pushFinState();
       }
     } catch {}
   }
@@ -7217,10 +7280,23 @@ window.NaqisnaSupabase = (function () {
     </div>`;
   }
 
+  function renderSettingsPublishCard() {
+    if (!adminControlsUnlocked()) return '';
+    return `<div class="settings-card" style="margin:0 0 12px;border:1px solid rgba(28,176,246,.22);background:linear-gradient(145deg,#F4FCFF,#fff);">
+          <div class="settings-item" style="border-top:0;align-items:center;">
+            <div class="si-icon" style="background:#E1F3FD;color:#0F8AC2;">☁️</div>
+            <div class="si-body"><div class="si-label">تعديلات الإعدادات</div><div class="si-value">تُحفظ محليًا كمسودة ولا تُرفع للمستخدمين إلا عند الضغط</div></div>
+            <button class="btn btn-primary btn-sm" id="applySettingsBtn" style="min-width:150px;white-space:nowrap;">☁️ تطبيق ورفع الإعدادات</button>
+          </div>
+        </div>`;
+  }
+
   function renderSettings() {
     const learnedEntries = Object.entries(state.learnedMap || {}); const totalSavings = sumExpensesInRange('all').savings;
     return `<div class="page settings-page">
-      <div class="settings-control-zone">${renderAdminControls()}${renderBackupSettings()}</div>
+      <div class="settings-control-zone">
+        ${renderAdminControls()}${renderBackupSettings()}
+      </div>
       <div class="topbar"><div class="greeting">التحكم</div></div>
       <div class="page-title">إدارة البيت</div>
       <div class="settings-card"><button class="collapsible-head" id="accountHead"><span class="ch-icon">👨‍👩‍👧</span><span class="ch-texts"><b>الحساب والبيت</b><small>بياناتك • دوس عشان تشوف</small></span><span class="chev ${state._accountOpen ? 'open' : ''}">‹</span></button>
@@ -7736,9 +7812,10 @@ window.NaqisnaSupabase = (function () {
         state.homeCards = { ...(state.homeCards || {}), order: baseOrder, orderVersion: 2 };
         persist();
         const cfg = tabCardConfig(); cfg.home = cfg.home || { settings: {} }; cfg.home.order = order;
-        try { localStorage.setItem(TAB_CARD_LAYOUT_KEY, JSON.stringify(cfg)); } catch {}
+        appSettings().tabCards = cfg;
         const apps = customApps(); order.filter(id => String(id).startsWith('custom_')).forEach((id, index) => { const app = apps.find(item => item.id === id); if (app) app.order = index; });
-        try { localStorage.setItem(CUSTOM_APPS_KEY, JSON.stringify(apps)); } catch {}
+        appSettings().customApps = apps;
+        settingsChanged();
         render();
       };
       cardList.querySelectorAll('[data-homecard-row], [data-homecustom-row]').forEach(row => {
@@ -8109,6 +8186,55 @@ window.NaqisnaSupabase = (function () {
 
   function bindSettings() {
     const b = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
+    const adminHead = document.querySelector('.admin-unlocked-head');
+    if (!adminHead && !adminControlsUnlocked()) {
+      const lockedCard = document.querySelector('.admin-lock-card');
+      const lockedShell = lockedCard?.closest('.admin-controls-shell');
+      if (lockedCard && lockedShell && !document.getElementById('openAdminAccessBtn')) {
+        lockedCard.style.display = 'none';
+        const openAdminButton = document.createElement('button');
+        openAdminButton.type = 'button'; openAdminButton.id = 'openAdminAccessBtn';
+        openAdminButton.className = 'btn btn-secondary btn-sm';
+        openAdminButton.style.cssText = 'width:100%;min-height:46px;font-weight:900;';
+        openAdminButton.textContent = '🔐 فتح قسم الإدارة';
+        openAdminButton.onclick = () => {
+          const pin = window.prompt('أدخل الرقم السري لفتح قسم الإدارة');
+          if (pin === ADMIN_PIN) {
+            try { sessionStorage.setItem('naqisna_admin_unlocked', '1'); } catch {}
+            render(); toast('تم فتح قسم الإدارة ✓', 'success');
+          } else if (pin !== null) toast('الرقم السري غير صحيح', 'warning');
+        };
+        lockedShell.insertBefore(openAdminButton, lockedShell.firstChild);
+      }
+    }
+    b('applySettingsBtn', async () => {
+      if (!adminControlsUnlocked()) return;
+      if (!state._settingsPendingApply) { toast('لا توجد تعديلات جديدة لتطبيقها', 'info'); return; }
+      const committed = sharedSettingsSnapshot(state);
+      state.settingsUpdatedAt = Date.now();
+      state._settingsCommitted = committed;
+      state._settingsPendingApply = false;
+      state._settingsQueued = true;
+      // احفظ محليًا أولًا، ثم ارفع الإعدادات وحدها دون المرور بمسار المالية.
+      persist({ skipCloud: true });
+      if (!state.home?.code || !window.NaqisnaSupabase?.isConfigured() || !window.NaqisnaSupabase.pushSettingsOnly) {
+        toast('تم حفظ الإعدادات على هذا الجهاز — ستُرفع عند الاتصال', 'info');
+        render();
+        return;
+      }
+      const ok = await window.NaqisnaSupabase.pushSettingsOnly(state.home.code, state);
+      if (!ok) {
+        state._settingsPendingApply = true;
+        persist({ skipCloud: true });
+        toast('تعذر رفع الإعدادات — ما زالت محفوظة كمسودة محلية', 'error');
+        render();
+        return;
+      }
+      state._settingsQueued = false;
+      persist({ skipCloud: true });
+      toast('تم تطبيق ورفع الإعدادات على كل الأجهزة المتصلة ✓', 'success');
+      render();
+    });
     b('editUserBtn', () => openEditTextModal({ title: 'تعديل اسمك', label: 'الاسم', value: state.user?.name || '', placeholder: 'اسمك', max: 20, onSave: (v) => { state.user.name = v.trim(); persist(); toast('تمام، الاسم اتغير ✓', 'success'); render(); } }));
     b('copyHomeCode', () => { if (!state.home?.code) { toast('مفيش بيت لسه — اعمل بيت جديد الأول 🏠', 'info'); return; } copyToClipboard(state.home.code).then(ok => toast(ok ? 'الكود اتنسخ' : 'مقدرش أنسخ', ok ? 'success' : 'error')); });
     b('newHomeBtn', () => {
@@ -8231,7 +8357,7 @@ window.NaqisnaSupabase = (function () {
     function applyBackupData(data) {
       const skip = ['app', 'backupV', 'exportedAt', '_forceTop', '_expandedOrder', '_expDraft', '_expandedBasket', '_basketDraft', '_catBrowse', '_shopQuery', '_shopOpen', '_repPickerOpen', '_expPickerOpen', '_expGrpOpen', '_pendingCode', '_pendingName', '_pendingCloud', '_isJoining', '_taskAddOpen', '_taskNewDays', '_taskNewTitle', '_taskDaysOpen', '_apptAddOpen', '_apptRepeat', '_apptDays', '_apptDaysOpen', '_apptDayTimes', '_apptExtraTimes', '_apptRemOpen', '_apptTitle', '_apptDate', '_apptTime', '_apptNotes', '_habitAddOpen', '_habitNewIcon', '_showTasks', '_showHabits', '_syncedOnce', 'searchQuery', 'orderFilter', 'categoryFilter'];
       Object.keys(data).forEach(k => { if (!skip.includes(k)) state[k] = data[k]; });
-      if (Array.isArray(data.customApps)) { try { localStorage.setItem(CUSTOM_APPS_KEY, JSON.stringify(data.customApps)); } catch {} }
+      if (Array.isArray(data.customApps)) { appSettings().customApps = data.customApps; }
       if (!state.home) state.home = { code: genHomeCode(), name: 'بيتنا', createdAt: nowISO() };
       if (!state.user) state.user = { id: uid(), name: 'المستر', role: 'member', whatsapp: '', joinedAt: nowISO() };
       if (!Array.isArray(state.orders)) state.orders = [];
@@ -10161,16 +10287,19 @@ window.NaqisnaSupabase = (function () {
     return merged;
   }
   function syncSig() {
-    try { return JSON.stringify([(state.orders || []).map(o => o.id + ':' + o.status + ':' + (o.updatedAt || '')), (state.expenses || []).map(e => e.id + ':' + e.amount + ':' + (e.updatedAt || '')), (state.orderLists || []).map(l => l.id), state.home && state.home.name, state.deliveryWhatsapp || '', state.deliveryName || '', state.partnerWhatsapp || '']); } catch { return String(Date.now()); }
+    try { return JSON.stringify([(state.orders || []).map(o => o.id + ':' + o.status + ':' + (o.updatedAt || '')), (state.expenses || []).map(e => e.id + ':' + e.amount + ':' + (e.updatedAt || '')), (state.orderLists || []).map(l => l.id), state.home && state.home.name, state.deliveryWhatsapp || '', state.deliveryName || '', state.partnerWhatsapp || '', state.settingsUpdatedAt || 0, state.appSettings || {}]); } catch { return String(Date.now()); }
   }
   function applyRemoteData(remoteData) {
     if (!remoteData) return false;
     const rMs = Number(remoteData.updatedAtMs) || 0;
+    const remoteSettingsAt = Number(remoteData.settingsUpdatedAt) || 0;
+    const localSettingsAt = Number(state.settingsUpdatedAt) || 0;
+    const shouldApplyRemoteSettings = !!(remoteData.settings && typeof remoteData.settings === 'object' && remoteSettingsAt && remoteSettingsAt >= localSettingsAt && remoteSettingsAt !== Number(state._lastAppliedRemoteSettingsAt || 0));
     // تجاهل صدى الكتابة الخاصة بنا: نفس الطابع الزمني ونفس المحتوى
     if (rMs && rMs <= Number(state.updatedAt || 0)) {
       const rs = JSON.stringify([(remoteData.orders || []).map(o => (o.id || '') + ':' + (o.status || ''))]);
       const ls = JSON.stringify([(state.orders || []).map(o => (o.id || '') + ':' + (o.status || ''))]);
-      if (rs === ls) return false;
+      if (rs === ls && !shouldApplyRemoteSettings) return false;
     }
     const before = syncSig();
     _syncLock = true;
@@ -10204,7 +10333,7 @@ window.NaqisnaSupabase = (function () {
       }
       // مزامنة بيانات الديليفري
       try {
-        if (remoteData.deliveryWhatsapp && !getDeliveryInfo().phone) {
+      if (remoteData.deliveryWhatsapp && !getDeliveryInfo().phone) {
           state.deliveryWhatsapp = remoteData.deliveryWhatsapp;
           if (state.home) state.home.deliveryWhatsapp = remoteData.deliveryWhatsapp;
           try { localStorage.setItem('naqisna_delivery_wa', remoteData.deliveryWhatsapp); } catch {}
@@ -10220,6 +10349,24 @@ window.NaqisnaSupabase = (function () {
           try { localStorage.setItem('naqisna_partner_wa', remoteData.partnerWhatsapp); } catch {}
         }
       } catch {}
+      // إعدادات السحابة مرجعية عند الاتصال: تُطبّق على الجهاز ثم تُحفظ محليًا.
+      if (shouldApplyRemoteSettings) {
+        const remoteSettings = remoteData.settings;
+        // دعم الشكل القديم الذي كان يحتوي على appSettings فقط.
+        if (Object.prototype.hasOwnProperty.call(remoteSettings, 'appSettings')) {
+          state.appSettings = remoteSettings.appSettings || {};
+          ['homeCards', 'homeLayout', 'finCustom', 'categoryNames', 'categoryColors', 'categoryIcons', 'productIcons', 'customCats', 'hiddenCats'].forEach(k => {
+            if (remoteSettings[k] !== undefined) state[k] = remoteSettings[k];
+          });
+        } else {
+          state.appSettings = remoteSettings;
+        }
+        state.settingsUpdatedAt = remoteSettingsAt;
+        state._lastAppliedRemoteSettingsAt = remoteSettingsAt;
+        state._settingsSignature = settingsSignature();
+        state._settingsCommitted = sharedSettingsSnapshot(state);
+        state._settingsPendingApply = false;
+      }
       if (syncSig() === before) return false;
       Storage.save(state);
       try { if (state.home?.code) localStorage.setItem('baytna_home_' + state.home.code, JSON.stringify({ home: state.home, orders: state.orders, expenses: state.expenses, orderLists: state.orderLists, updatedAt: state.updatedAt })); } catch {}
@@ -10284,6 +10431,10 @@ window.NaqisnaSupabase = (function () {
           } catch {}
         }
       }
+      if (state._settingsQueued && window.NaqisnaSupabase.pushSettingsOnly) {
+        const settingsUploaded = await window.NaqisnaSupabase.pushSettingsOnly(homeCode, state);
+        if (settingsUploaded) { state._settingsQueued = false; persist({ skipCloud: true }); }
+      }
       if (_syncSubscribed === homeCode) return;
       _syncSubscribed = homeCode;
       window.NaqisnaSupabase.subscribeToHomeChanges(homeCode, async () => {
@@ -10322,6 +10473,10 @@ window.NaqisnaSupabase = (function () {
 
   function init() {
     restore();
+    if (!state._settingsSignature) {
+      state._settingsSignature = settingsSignature();
+      state._settingsCommitted = sharedSettingsSnapshot(state);
+    }
     // لا توجد شاشة ترحيب نهائياً ولا بيت تلقائي: دخول مباشر، والبيت من الإعدادات
     try { autoInitUser(); } catch {}
     // الصفحة الرئيسية هي الافتراضية عند فتح التطبيق في كل مرة
