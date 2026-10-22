@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>بورتفوليو المعلم | EduSmart</title>
-<link rel="icon" type="image/png" href="../logo.png">
+<link rel="icon" type="image/png" href="logo.png">
 <meta name="theme-color" content="#2563eb">
-<link rel="apple-touch-icon" href="../logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -135,19 +135,19 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 <body>
 <div class="wrap">
   <header class="top">
-    <img id="topLogo" src="../logo.png" alt="EduSmart" onerror="this.style.display='none'">
+    <img id="topLogo" src="logo.png" alt="EduSmart" onerror="this.style.display='none'">
     <div><b id="topName">بورتفوليو المعلم 🎓</b><small id="topSub">الصفحة التعريفية + متابعة الطلاب</small></div>
     <div class="sp"></div>
     <button class="theme-btn" id="themeBtn" title="الوضع الليلي / النهاري">🌙</button>
   </header>
 
-  <div id="loadBox" class="loader-page"><div class="lp-logo"><img src="../logo.png" alt="EduSmart"></div><div class="lp-name">EduSmart</div><div class="lp-spin"><span class="ring r1"></span><span class="ring r2"></span><span class="arc"></span><span class="core"></span></div></div>
+  <div id="loadBox" class="loader-page"><div class="lp-logo"><img src="logo.png" alt="EduSmart"></div><div class="lp-name">EduSmart</div><div class="lp-spin"><span class="ring r1"></span><span class="ring r2"></span><span class="arc"></span><span class="core"></span></div></div>
   <div id="errBox" class="card hidden"><h2>تعذر فتح الصفحة</h2><p id="errMsg">الرابط غير مكتمل</p></div>
 
   <div id="profileBox" class="hidden">
     <section class="hero">
       <div class="hero-band"></div>
-      <div class="photo" id="tPhoto"><img src="../logo.png" alt="شعار التطبيق"></div>
+      <div class="photo" id="tPhoto"><img src="logo.png" alt="شعار التطبيق"></div>
       <div class="hero-body">
         <h2 id="tName">—</h2>
         <div class="en" id="tEn">—</div>
@@ -179,7 +179,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
       <h2>اختر الطالب</h2>
       <p id="chooseSub"></p>
       <div id="chooseList" style="text-align:right"></div>
-      <button class="btn btn-ghost" id="backBtn" style="margin-top:6px">العودة إلى التطبيق الأساسي</button>
+      <button class="btn btn-ghost" id="backBtn" style="margin-top:6px">رجوع</button>
     </div>
 
     <div id="stuView" class="hidden">
@@ -264,7 +264,7 @@ function renderProfile(){
   $('tSpec').textContent=t.specialty||'';
   $('tSpec').style.display=t.specialty?'':'none';
   if(t.quote){$('tQuoteBox').classList.remove('hidden');$('tQuote').textContent=t.quote;}else{$('tQuoteBox').classList.add('hidden');}
-  if(t.photo){$('tPhoto').innerHTML='<img src="'+t.photo+'">';}else{$('tPhoto').innerHTML='<img src="../logo.png" alt="شعار التطبيق">';}
+  if(t.photo){$('tPhoto').innerHTML='<img src="'+t.photo+'">';}else{$('tPhoto').innerHTML='<img src="logo.png" alt="شعار التطبيق">';}
   if(t.whatsapp){var w=$('tWa');w.classList.remove('hidden');var ph=String(t.whatsapp).replace(/\D/g,'');var intl=ph;if(ph.length===11&&ph.charAt(0)==='0')intl='20'+ph.slice(1);w.href='https://wa.me/'+intl;}
   if(t.facebook){var f=$('tFb');f.classList.remove('hidden');f.href=t.facebook;}
   try{var ss=$('stStudents');if(ss)ss.textContent=DB.students.length;}catch(e){}
@@ -312,7 +312,7 @@ function openStudent(id){
 $('loginBtn').onclick=doLogin;
 try{var ft=$('followToggle');if(ft)ft.onclick=function(){var b=$('followBody');if(!b)return;b.classList.toggle('hidden');var c=$('followChev');if(c)c.classList.toggle('open',!b.classList.contains('hidden'))};}catch(e){}
 $('phInput').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
-$('backBtn').onclick=function(){window.location.href='../../index.html';};
+$('backBtn').onclick=function(){show('loginView');};
 $('switchBtn').onclick=function(){show('loginView');};
 $('logoutBtn').onclick=function(){try{sessionStorage.removeItem('t_sid');sessionStorage.removeItem('t_phone');}catch(e){}$('phInput').value='';show('loginView');};
 

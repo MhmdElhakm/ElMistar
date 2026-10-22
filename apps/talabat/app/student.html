@@ -7,13 +7,13 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>EduSmart</title>
-<link rel="icon" type="image/png" href="../logo.png">
+<link rel="icon" type="image/png" href="logo.png">
 <meta name="theme-color" content="#3b82f6">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="EduSmart">
-<link rel="apple-touch-icon" href="../logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -482,10 +482,10 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
 </head>
 <body>
 
-<div id="preloader"><div class="pl-logo"><img src="../logo.png" alt="EduSmart"></div><div class="pl-name">EduSmart</div><div class="pl-sub">إدارة الطلاب والمجموعات 🎓</div><div class="pl-bar"><i></i></div></div>
+<div id="preloader"><div class="pl-logo"><img src="logo.png" alt="EduSmart"></div><div class="pl-name">EduSmart</div><div class="pl-sub">إدارة الطلاب والمجموعات 🎓</div><div class="pl-bar"><i></i></div></div>
 
 <header class="topbar">
-  <div class="brand"><div class="brand-badge" style="padding:0;overflow:hidden;background:none"><img src="../logo.png" alt="EduSmart" style="width:40px;height:40px;border-radius:12px;object-fit:cover"></div><span>EduSmart</span></div>
+  <div class="brand"><div class="brand-badge" style="padding:0;overflow:hidden;background:none"><img src="logo.png" alt="EduSmart" style="width:40px;height:40px;border-radius:12px;object-fit:cover"></div><span>EduSmart</span></div>
   <div class="spacer"></div>
   <a href="../index.html" class="icon-btn" title="العودة للرئيسية" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;"><i class='bx bx-home-alt'></i></a>
   <button class="icon-btn" id="settingsBtn" title="الإعدادات"><i class='bx bx-cog'></i></button>
@@ -805,7 +805,7 @@ tbody tr:hover td{background:var(--bg-elevated);color:var(--text-primary)}
         <div id="teacherLocked" class="sheet-link-status">🔒 اربط جوجل شيت أو فايربيز أولاً لإظهار بيانات المعلم</div>
         <div id="teacherForm" style="display:none">
           <div class="t-photo-row">
-            <div class="img-prev" id="tPhotoPrev"><img src="../logo.png" alt="شعار التطبيق"></div>
+            <div class="img-prev" id="tPhotoPrev"><img src="logo.png" alt="شعار التطبيق"></div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px">
                 <label for="tPhotoFile" class="btn btn-outline btn-sm" style="cursor:pointer"><i class="bx bx-image-add"></i> صورة المعلم</label>
@@ -1840,7 +1840,7 @@ function buildTeacherPathLink(){var t=getTeacher();if(!t.username||!isCloudLinke
 var LS_REG='elmistar_teacher_registry';
 function saveTeacherRegistry(){try{var t=getTeacher();if(!t.username)return;var src=teacherSourceParam();if(!src)return;var reg={};try{reg=JSON.parse(localStorage.getItem(LS_REG)||'{}')||{};}catch(e){reg={};}var e={};src.split('&').forEach(function(kv){var i=kv.indexOf('=');if(i>0)e[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1));});reg[t.username]=e;try{localStorage.setItem(LS_REG,JSON.stringify(reg));}catch(e){}}catch(e){}}
 function downloadTeachersJson(){try{var reg={};try{reg=JSON.parse(localStorage.getItem(LS_REG)||'{}')||{};}catch(e){reg={};}var t=getTeacher();if(t.username){var src=teacherSourceParam();if(src){var e={};src.split('&').forEach(function(kv){var i=kv.indexOf('=');if(i>0)e[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1));});reg[t.username]=e;}}var out={teachers:reg};var blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='teachers.json';document.body.appendChild(a);a.click();setTimeout(function(){try{URL.revokeObjectURL(a.href);}catch(e){}try{a.remove();}catch(e){}},500);toast('📥 اتحمّل ملف teachers.json — ارفعه بجانب teacher.html في الاستضافة');}catch(e){toast('تعذر إنشاء الملف','error');}}
-function fillTeacherForm(){var t=getTeacher();var m={tFirstName:t.firstName,tLastName:t.lastName,tEnName:t.enName,tTitle:t.title,tExp:t.exp,tSpecialty:t.specialty,tQuote:t.quote,tWhatsapp:t.whatsapp,tFacebook:t.facebook,tUsername:t.username};for(var k in m){var el=$(k);if(el&&document.activeElement!==el)el.value=m[k];}var pv=$('tPhotoPrev');if(pv){if(t.photo)pv.innerHTML='<img src="'+t.photo+'">';else pv.innerHTML='<img src="../logo.png" alt="شعار التطبيق">';}}
+function fillTeacherForm(){var t=getTeacher();var m={tFirstName:t.firstName,tLastName:t.lastName,tEnName:t.enName,tTitle:t.title,tExp:t.exp,tSpecialty:t.specialty,tQuote:t.quote,tWhatsapp:t.whatsapp,tFacebook:t.facebook,tUsername:t.username};for(var k in m){var el=$(k);if(el&&document.activeElement!==el)el.value=m[k];}var pv=$('tPhotoPrev');if(pv){if(t.photo)pv.innerHTML='<img src="'+t.photo+'">';else pv.innerHTML='<img src="logo.png" alt="شعار التطبيق">';}}
 function refreshTeacherSec(){var linked=isCloudLinked();var lock=$('teacherLocked'),form=$('teacherForm');if(lock)lock.style.display=linked?'none':'';if(form)form.style.display=linked?'':'none';if(!linked)return;fillTeacherForm();var st=$('teacherLinkStatus');if(!st)return;var t=getTeacher();if(!t.username){st.className='sheet-link-status';st.textContent='اكتب يوزر نيم إنجليزي (3 حروف على الأقل) ثم احفظ.';}else{st.className='sheet-link-status';st.style.display='none';}}
 function pushTeacherToFb(silentDone){try{var t=getTeacher();if(!t.username)return;if(!fbGetCfg())return;fbEnsureSdk(function(){var db=fbDb();if(!db)return;try{db.collection('teachers').doc(t.username).set({profile:t,updatedAt:Date.now(),app:'EduSmart',version:2},{merge:true});}catch(e){}try{db.collection('elmistar').doc('main').set({teacher:t},{merge:true});}catch(e){}});}catch(e){}}
 (function initSettings(){
