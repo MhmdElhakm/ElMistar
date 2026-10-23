@@ -30,7 +30,12 @@
       overflow-x: hidden;
     }
 
+    /* اخفِ شريط المتصفح الجانبي مع إبقاء تمرير صفحات المصحف فعالاً */
+    html, body { scrollbar-width: none; -ms-overflow-style: none; }
+    html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
     body.quran-preparing #page { visibility: hidden; }
+    body.quran-preparing { overflow: hidden; }
     .quran-loading {
       position: fixed;
       inset: 0;
@@ -44,46 +49,51 @@
       text-align: center;
       transition: opacity .25s ease, visibility .25s ease;
     }
-    .quran-loading-brand, .quran-loading-text, .quran-loading-track { display: none !important; }
-    .quran-loading-card { width: min(300px, 100%); padding: 28px 24px 24px; }
+    .quran-loading-text, .quran-loading-track { display: none !important; }
+    .quran-loading-card { width: 100vw; min-height: 100vh; padding: 24px; }
     .quran-loading-spinner { margin: 14px 0 0; }
     .quran-loading-title { margin: 0; }
     .quran-loading.is-ready { opacity: 0; visibility: hidden; pointer-events: none; }
     .quran-loading-card {
       display: grid;
       place-items: center;
-      width: min(390px, 100%);
-      padding: 32px 30px 28px;
-      border: 1px solid rgba(29, 115, 88, .14);
-      border-radius: 26px;
-      background: rgba(255, 255, 255, .82);
-      box-shadow: 0 22px 60px rgba(27, 66, 53, .14), 0 2px 8px rgba(27, 66, 53, .05);
-      backdrop-filter: blur(12px);
+      align-content: center;
+      gap: 10px;
+      width: 100vw;
+      min-height: 100vh;
+      padding: 24px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
     }
     .quran-loading-brand {
       display: grid;
       place-items: center;
-      width: 64px;
-      height: 64px;
-      margin-bottom: 16px;
-      border-radius: 20px;
+      width: 112px;
+      height: 112px;
+      margin-bottom: 0;
+      border-radius: 50%;
       color: #fff;
       background: linear-gradient(145deg, #2c8d6c, #155b47);
       box-shadow: 0 10px 22px rgba(29, 115, 88, .24);
-      font-size: 30px;
+      font-size: 0;
     }
     .quran-loading-brand::before { content: '◈'; transform: rotate(45deg); }
+    .quran-loading-brand::before { content: none; }
+    .quran-loading-brand img { display: block; width: 100%; height: 100%; object-fit: cover; }
     .quran-loading-spinner {
       width: 46px;
       height: 46px;
-      margin: 0 0 16px;
+      margin: 0;
       border: 4px solid #dce9e2;
       border-top-color: #1d7358;
       border-radius: 50%;
       animation: quran-spin .8s linear infinite;
     }
     @keyframes quran-spin { to { transform: rotate(360deg); } }
-    .quran-loading-title { display: block; margin-bottom: 7px; font-size: 20px; letter-spacing: -.2px; }
+    .quran-loading-title { display: block; margin: 0; font-size: 20px; letter-spacing: -.2px; }
     .quran-loading-text { display: block; min-height: 24px; color: #6d776f; line-height: 1.7; font-size: 13px; }
     .quran-loading-track { display: block; width: 100%; height: 7px; margin-top: 20px; overflow: hidden; border-radius: 99px; background: #e6eee9; }
     .quran-loading-bar { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #155b47, #3ba47d); transition: width .2s ease; }
@@ -1774,7 +1784,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr auto;
       align-items: end;
-      gap: 8px;
+      gap: 4px;
       margin: 8px 12px;
       padding: 10px;
       border: 1px solid var(--line);
@@ -1786,13 +1796,14 @@
 
     .share-range label {
       display: grid;
-      gap: 3px;
+      gap: 2px;
       color: var(--muted);
       font-size: 12px;
       font-weight: 700;
     }
 
-    .share-range input {
+    .share-range input,
+    .share-range select {
       width: 100%;
       min-width: 0;
       height: 36px;
@@ -1803,7 +1814,75 @@
       background: var(--panel-top);
       font: inherit;
       text-align: center;
+      appearance: auto;
+      font-weight: 700;
     }
+
+    .pro-select { position: relative; min-width: 0; }
+    .pro-select-native { position: absolute !important; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none !important; }
+    .pro-select-button {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-width: 0;
+      height: 34px;
+      padding: 4px 24px 4px 8px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--ink);
+      background: var(--panel-top);
+      box-shadow: none;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .pro-select-button::after {
+      content: '';
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-right: 1.5px solid var(--muted);
+      border-bottom: 1.5px solid var(--muted);
+      transform: translateY(-65%) rotate(45deg);
+      transition: transform .12s ease;
+    }
+    .pro-select.open .pro-select-button { border-color: var(--green); }
+    .pro-select.open .pro-select-button::after { transform: translateY(-25%) rotate(225deg); }
+    .pro-select-menu {
+      position: absolute;
+      z-index: 50;
+      top: calc(100% + 2px);
+      right: 0;
+      left: 0;
+      display: grid;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 2px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-top);
+      box-shadow: 0 4px 10px rgba(23, 61, 50, .08);
+    }
+    .pro-select-menu[hidden] { display: none; }
+    .pro-select-option {
+      min-height: 28px;
+      padding: 4px 7px;
+      border-radius: 5px;
+      color: var(--ink);
+      background: transparent;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .pro-select-option:hover { background: var(--panel); }
+    .pro-select-option.selected { color: var(--green); background: rgba(29, 115, 88, .08); }
 
     .share-range button {
       min-height: 36px;
@@ -2649,15 +2728,16 @@
 
     .recitation-range {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 74px 74px;
-      gap: 7px;
+      grid-template-columns: minmax(0, 1fr) 66px 66px;
+      column-gap: 3px;
+      row-gap: 5px;
     }
 
     .recitation-range label {
       display: grid;
       grid-template-columns: auto 1fr;
       align-items: center;
-      gap: 5px;
+      gap: 3px;
       min-width: 0;
       color: var(--muted);
       font-size: 11px;
@@ -2666,7 +2746,19 @@
 
     .recitation-range label:first-child { display: block; }
     .recitation-range label:first-child select { width: 100%; margin-top: 2px; }
-    .recitation-range input { width: 100%; text-align: center; }
+    .recitation-range label:not(:first-child) {
+      grid-template-columns: 1fr;
+      gap: 2px;
+      text-align: center;
+    }
+    .recitation-range input,
+    .recitation-range select {
+      width: 100%;
+      text-align: center;
+      font-weight: 700;
+    }
+    .recitation-range .pro-select-button { height: 34px; padding-inline: 20px 24px; }
+    .recitation-range .pro-select-button::after { right: 8px; }
 
     .recitation-actions {
       display: flex;
@@ -2777,7 +2869,7 @@
 
     @media (max-width: 360px) {
       .recitation-panel { margin-inline: 8px; width: calc(100% - 16px); padding: 8px; }
-      .recitation-range { grid-template-columns: minmax(0, 1fr) 66px 66px; gap: 5px; }
+      .recitation-range { grid-template-columns: minmax(0, 1fr) 62px 62px; gap: 3px; }
       #reciterSelect { width: 136px; }
     }
 
@@ -2843,7 +2935,7 @@
 
   <div class="quran-loading" id="quranLoading" role="status" aria-live="polite" aria-label="جاري تجهيز المصحف">
     <div class="quran-loading-card">
-      <div class="quran-loading-brand" aria-hidden="true"></div>
+      <div class="quran-loading-brand"><img src="logo.png" alt="Qurany"></div>
       <strong class="quran-loading-title">Qurany</strong>
       <span class="quran-loading-spinner" aria-hidden="true"></span>
       <span class="quran-loading-text" id="quranLoadingText">جاري تجهيز المصحف للعمل بسلاسة وبدون إنترنت</span>
@@ -2987,10 +3079,10 @@
     </div>
     <div class="share-range" id="shareRange" hidden>
       <label for="shareFrom">من آية
-        <input id="shareFrom" type="number" min="1" inputmode="numeric">
+        <select id="shareFrom" aria-label="اختَر الآية الأولى"></select>
       </label>
       <label for="shareTo">إلى آية
-        <input id="shareTo" type="number" min="1" inputmode="numeric">
+        <select id="shareTo" aria-label="اختَر الآية الأخيرة"></select>
       </label>
       <button type="button" id="copyVerseRange">نسخ الآيات</button>
     </div>
@@ -3015,10 +3107,10 @@
           <select id="recitationSurah" aria-label="اختر السورة"></select>
         </label>
         <label for="recitationFrom">من آية
-          <input id="recitationFrom" type="number" min="1" value="1" inputmode="numeric">
+          <select id="recitationFrom" aria-label="اختَر الآية الأولى"></select>
         </label>
         <label for="recitationTo">إلى آية
-          <input id="recitationTo" type="number" min="1" value="1" inputmode="numeric">
+          <select id="recitationTo" aria-label="اختَر الآية الأخيرة"></select>
         </label>
       </div>
       <div class="recitation-actions">
@@ -3523,6 +3615,75 @@
       var recitationStatus = $('recitationStatus'), recitationMarks = $('recitationMarks');
       var recitationPrefs = load('mq.recitationPrefs', {});
       var reciterSelect = $('reciterSelect');
+      function fillAyahSelect(select, count, value) {
+        var selected = Math.max(1, Math.min(count, +value || 1));
+        select.innerHTML = '';
+        for (var i = 1; i <= count; i++) {
+          var option = document.createElement('option');
+          option.value = String(i);
+          option.textContent = ar(i);
+          if (i === selected) option.selected = true;
+          select.appendChild(option);
+        }
+        if (select._refreshProfessionalSelect) select._refreshProfessionalSelect();
+      }
+      function professionalizeSelect(select) {
+        return;
+        if (!select || select.dataset.professionalSelect === 'true') return;
+        select.dataset.professionalSelect = 'true';
+        var wrap = document.createElement('div');
+        wrap.className = 'pro-select';
+        select.parentNode.insertBefore(wrap, select);
+        wrap.appendChild(select);
+        select.classList.add('pro-select-native');
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'pro-select-button';
+        button.setAttribute('aria-haspopup', 'listbox');
+        var menu = document.createElement('div');
+        menu.className = 'pro-select-menu';
+        menu.hidden = true;
+        menu.setAttribute('role', 'listbox');
+        wrap.appendChild(button);
+        wrap.appendChild(menu);
+        function refresh() {
+          var current = String(select.value || '');
+          var option = Array.prototype.find.call(select.options, function (item) { return String(item.value) === current; });
+          button.textContent = option ? option.textContent : 'اختر';
+          menu.innerHTML = '';
+          Array.prototype.forEach.call(select.options, function (item) {
+            var choice = document.createElement('button');
+            choice.type = 'button';
+            choice.className = 'pro-select-option' + (String(item.value) === current ? ' selected' : '');
+            choice.textContent = item.textContent;
+            choice.setAttribute('role', 'option');
+            choice.setAttribute('aria-selected', String(String(item.value) === current));
+            choice.addEventListener('click', function () {
+              select.value = item.value;
+              select.dispatchEvent(new Event('change', { bubbles: true }));
+              menu.hidden = true;
+              wrap.classList.remove('open');
+              refresh();
+            });
+            menu.appendChild(choice);
+          });
+        }
+        button.addEventListener('click', function () {
+          var isOpen = !menu.hidden;
+          document.querySelectorAll('.pro-select-menu').forEach(function (other) { other.hidden = true; });
+          document.querySelectorAll('.pro-select').forEach(function (other) { other.classList.remove('open'); });
+          menu.hidden = isOpen;
+          wrap.classList.toggle('open', !isOpen);
+        });
+        document.addEventListener('click', function (event) {
+          if (wrap.contains(event.target)) return;
+          menu.hidden = true;
+          wrap.classList.remove('open');
+        });
+        select.addEventListener('change', refresh);
+        select._refreshProfessionalSelect = refresh;
+        refresh();
+      }
       var reciterIds = Array.prototype.map.call(reciterSelect.options, function (option) { return option.value; });
       if (reciterIds.indexOf(recitationPrefs.reciter) >= 0) reciterSelect.value = recitationPrefs.reciter;
       var initialSurah = Math.max(1, Math.min(D.surahs.length, +recitationPrefs.surah || 1));
@@ -3534,13 +3695,11 @@
       function updateRecitationBounds(reset) {
         var surah = +recitationSurah.value;
         var count = D.surahs[surah - 1][3];
-        recitationFrom.max = String(count);
-        recitationTo.max = String(count);
         var from = reset ? 1 : Math.max(1, Math.min(count, +recitationFrom.value || 1));
         var to = reset ? from : Math.max(1, Math.min(count, +recitationTo.value || from));
         if (to < from) to = from;
-        recitationFrom.value = String(from);
-        recitationTo.value = String(to);
+        fillAyahSelect(recitationFrom, count, from);
+        fillAyahSelect(recitationTo, count, to);
       }
 
       function saveRecitationPrefs() {
@@ -3712,9 +3871,11 @@
         saveRecitationPrefs();
         navigateToVerse(mark.v);
       });
+      updateRecitationBounds(true);
       recitationFrom.value = String(Math.max(1, Math.min(D.surahs[initialSurah - 1][3], +recitationPrefs.from || 1)));
       recitationTo.value = String(Math.max(+recitationFrom.value, Math.min(D.surahs[initialSurah - 1][3], +recitationPrefs.to || +recitationFrom.value)));
-      updateRecitationBounds(false);
+      professionalizeSelect(recitationFrom);
+      professionalizeSelect(recitationTo);
       renderRecitationMarks();
       var bScreen = $('bScreen');
       function syncScreenButton() {
@@ -3758,10 +3919,10 @@
         var s = Math.floor(sel / 1000), a = sel % 1000;
         $('vTitle').textContent = D.surahs[s - 1][1] + ':' + ar(a);
         var shareFrom = $('shareFrom'), shareTo = $('shareTo');
-        shareFrom.max = String(D.surahs[s - 1][3]);
-        shareTo.max = String(D.surahs[s - 1][3]);
-        shareFrom.value = String(a);
-        shareTo.value = String(a);
+        fillAyahSelect(shareFrom, D.surahs[s - 1][3], a);
+        fillAyahSelect(shareTo, D.surahs[s - 1][3], a);
+        professionalizeSelect(shareFrom);
+        professionalizeSelect(shareTo);
         $('shareRange').hidden = true;
         $('vShare').setAttribute('aria-expanded', 'false');
         fillColors();
@@ -4377,7 +4538,7 @@
 
       /* settings section */
       var settingsToggle = $('settingsToggle'), settingsBody = $('settingsBody');
-      var settingsOpen = store('mq.settingsOpen') === '1';
+      var settingsOpen = false;
       function syncSettings() {
         settingsBody.hidden = !settingsOpen;
         settingsToggle.setAttribute('aria-expanded', String(settingsOpen));
@@ -4445,8 +4606,25 @@
           });
         })).then(function () { return document.fonts.ready; });
       }
+      function preloadAllQuranContent() {
+        var complete = Array.isArray(D.texts) && D.texts.length === 114 && Array.isArray(G) && G.length === 604;
+        if (!complete) return Promise.reject(new Error('Quran text is incomplete'));
+        for (var i = 0; i < D.texts.length; i++) {
+          if (!Array.isArray(D.texts[i]) || !D.texts[i].length) return Promise.reject(new Error('Quran text is incomplete'));
+        }
+        var fonts = ['QCF4_QBSML'];
+        for (var n = 1; n <= 47; n++) fonts.push('QCF4_Hafs_' + (n < 10 ? '0' : '') + n);
+        updateQuranLoading(2, 'جاري التحقق من نص القرآن وتحميل الخطوط كاملة…');
+        var loaded = 0;
+        return Promise.all(fonts.map(function (font) {
+          return document.fonts.load('100px "' + font + '"', 'القرآن').then(function () {
+            loaded++;
+            updateQuranLoading(2 + loaded / fonts.length * 48, 'تم تجهيز النص والخطوط: ' + Math.round(loaded / fonts.length * 100) + '%');
+          });
+        })).then(function () { return document.fonts.ready; });
+      }
       function openQuranWhenReady() {
-        preloadQuranFonts().then(function () {
+        preloadAllQuranContent().then(function () {
           updateQuranLoading(55, 'يتم تجهيز صفحات المصحف قبل العرض…');
           renderInitialPage(cur);
           return renderQueue;
