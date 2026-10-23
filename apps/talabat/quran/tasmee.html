@@ -44,6 +44,13 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
 .tabs{display:flex;background:var(--g50);padding:4px;border-radius:14px;gap:4px;margin-bottom:12px}
 .tabs button{flex:1;border:0;background:transparent;padding:9px 6px;border-radius:11px;font-weight:700;color:var(--mut);cursor:pointer}
 .tabs button.on{background:#fff;color:var(--g700);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.question-card-head{width:100%;padding:0;margin:0;text-align:right;color:var(--g800);display:flex;align-items:center;gap:8px;font:inherit;font-size:1.05rem;font-weight:800}
+.question-add-body{display:grid;grid-template-rows:0fr;opacity:.35;transition:grid-template-rows .35s ease,opacity .25s ease;margin-top:0}
+.question-add-body.open{grid-template-rows:1fr;opacity:1;margin-top:12px}
+.question-add-inner{min-height:0;overflow:hidden}
+.question-method-panel{display:grid;grid-template-rows:0fr;opacity:0;transform:translateY(-6px);pointer-events:none;transition:grid-template-rows .3s ease,opacity .25s ease,transform .3s ease}
+.question-method-panel.active{grid-template-rows:1fr;opacity:1;transform:none;pointer-events:auto}
+.question-method-panel>*{min-height:0;overflow:hidden}
 .info{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--g50);color:var(--g800);font-size:.9rem;border:1px dashed #bcd9ca}
 .info.bad{background:var(--red-l);color:var(--red);border-color:#efc2bd}
 .hint{font-size:.8rem;color:var(--mut);margin-top:8px}
@@ -97,9 +104,9 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
 .paper{background:var(--paper);border-radius:20px;border:1px solid #eadfc0;box-shadow:var(--shadow);padding:18px 16px;margin-top:12px;position:relative}
 .paper::before{content:"";position:absolute;inset:6px;border:1px solid #efe3bf;border-radius:15px;pointer-events:none}
 .lbl{display:inline-block;font-size:.8rem;font-weight:800;color:var(--gold);background:var(--gold-l);border-radius:999px;padding:1px 12px;margin:8px 0 2px}
-.paper .quran{font-size:1.6rem;text-align:center;padding:2px 6px}
-.paper .pre{color:#14281f}
-.ansarea{min-height:90px;border-radius:14px;background:var(--g50);border:1.5px dashed #bcd9ca;margin:6px 0;padding:8px 8px!important}
+.verse{font-size:1.7rem;text-align:justify;text-align-last:right;padding:8px 6px;line-height:2.5;color:#14281f;min-height:120px}
+.gap{color:var(--gold);letter-spacing:3px;white-space:nowrap}
+.gap .caret{margin:0 2px}
 .ph{font-family:'Tajawal',sans-serif;font-size:.9rem;color:#8aa598;display:block;padding-top:22px}
 .dots{color:var(--gold);letter-spacing:2px}
 .w{display:inline}
@@ -133,6 +140,17 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
 .quitrow{text-align:center;margin-top:14px}
 .quitrow button{background:none;border:0;color:var(--mut);text-decoration:underline;cursor:pointer;font-size:.88rem}
 
+/* search */
+.srch{position:relative;margin-bottom:12px}
+.res{margin-top:8px;display:grid;gap:8px}
+.rs{border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:10px}
+.rs{display:block;width:100%;text-align:right;cursor:pointer}
+.rs.sel{border-color:var(--g500);background:var(--g100)}
+.rs .rr{font-weight:700;font-size:.88rem;color:var(--g800)}
+.rs .rq{font-size:1.15rem;line-height:2;color:#333}
+.rs .rb{display:flex;gap:6px;margin-top:6px}
+.rs .rb .btn{flex:1;min-height:38px;font-size:.85rem;padding:6px}
+.or{text-align:center;color:var(--mut);font-size:.8rem;margin:10px 0 8px}
 /* results */
 .score{display:flex;align-items:center;gap:18px}
 .ring{width:110px;height:110px;border-radius:50%;display:grid;place-items:center;flex:none}
@@ -207,11 +225,16 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
       <div class="info" id="scopeInfo"></div>
     </div>
 
-    <div class="card">
-      <h2><span class="num">٢</span> إضافة الأسئلة</h2>
+    <div class="card question-card">
+      <div class="question-card-head" id="questionSectionToggle">
+        <span class="num">٢</span><span>إضافة الأسئلة</span>
+      </div>
+      <div class="question-add-body open" id="questionAddBody">
+       <div class="question-add-inner">
       <div class="tabs" id="qTabs">
         <button data-m="rand">عشوائية متوازنة</button>
-        <button data-m="manual">من اختيار المعلم</button>
+        <button data-m="manual">تحديد الآيات</button>
+        <button data-m="text">كتابة النص</button>
       </div>
 
       <div id="pane-rand">
@@ -231,14 +254,32 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
       </div>
 
       <div id="pane-manual" class="hidden">
+        <div class="question-method-panel" id="verseMethodPanel"><div>
+        <div class="field"><label>اختر السورة والآيات التي تريد إضافتها</label></div>
         <div class="field"><label>السورة</label><select id="ms"></select></div>
         <div class="grid2" style="margin-top:10px">
           <div class="field"><label>من آية</label><select id="ma1"></select></div>
           <div class="field"><label>إلى آية</label><select id="ma2"></select></div>
         </div>
-        <div class="hint">يقرأ الطالب من بداية الآية الأولى حتى نهاية الآية الأخيرة (حتى ٢٥ آية). يمكن اختيار أي سورة مهما كان نطاق الاختبار.</div>
+        <div class="hint">يمكن اختيار أي سورة مهما كان نطاق الاختبار.</div>
         <button class="btn gold block" id="addBtn" style="margin-top:12px">+ إضافة السؤال إلى القائمة</button>
+        </div></div>
       </div>
+      <div id="pane-text" class="question-method-panel"><div>
+        <div class="srch">
+          <div class="field"><label>من قوله تعالى — اكتب بداية الآية (أو المرجع مثل: البقرة 255)</label>
+          <input type="text" id="qfrom" placeholder="مثال: الله لا إله إلا هو" autocomplete="off"></div>
+          <div class="res" id="rfrom"></div>
+          <div class="field" style="margin-top:12px"><label>إلى قوله تعالى — اكتب آية النهاية (اتركه فارغاً لسؤال من آية واحدة)</label>
+          <input type="text" id="qto" placeholder="مثال: وهو العلي العظيم" autocomplete="off"></div>
+          <div class="res" id="rto"></div>
+          <div class="info hidden" id="qprev"></div>
+          <button class="btn gold block" id="addTyped" style="margin-top:10px">+ إضافة السؤال إلى القائمة</button>
+        </div>
+      </div>
+       </div>
+      </div>
+    </div>
     </div>
 
     <div class="card">
@@ -406,7 +447,13 @@ function renderList(){
 /* ============ تهيئة شاشة الإعداد ============ */
 function setTabs(rootId,val){document.querySelectorAll('#'+rootId+' button').forEach(b=>b.classList.toggle('on',b.dataset.m===val));}
 function applyScopeMode(){setTabs('scopeTabs',S.mode);$('pane-juz').classList.toggle('hidden',S.mode!=='juz');$('pane-surah').classList.toggle('hidden',S.mode!=='surah');refreshScope();}
-function applyQMode(){setTabs('qTabs',S.qmode);$('pane-rand').classList.toggle('hidden',S.qmode!=='rand');$('pane-manual').classList.toggle('hidden',S.qmode!=='manual');}
+function applyQMode(){
+  setTabs('qTabs',S.qmode);
+  $('pane-rand').classList.toggle('hidden',S.qmode!=='rand');
+  $('pane-manual').classList.toggle('hidden',S.qmode!=='manual'&&S.qmode!=='text');
+  $('verseMethodPanel').classList.toggle('active',S.qmode==='manual');
+  $('pane-text').classList.toggle('active',S.qmode==='text');
+}
 function applyLevel(){document.querySelectorAll('#lvl button').forEach(b=>b.classList.toggle('on',+b.dataset.l===S.level));}
 
 function initSetup(){
@@ -486,13 +533,9 @@ function renderQ(){
   $('v-quiz').innerHTML=`
     <div class="qhead"><div>السؤال ${AD(Q.idx+1)} من ${AD(Q.list.length)}</div><div class="prog"><i style="width:${pct}%"></i></div></div>
     <div class="paper">
-      <div style="text-align:center"><span class="lbl">أكمل من قوله تعالى</span></div>
-      <div class="quran pre">${b.pre.map(t=>wordHTML(t)).join(' ')} <span class="dots">…</span></div>
-      <div style="text-align:center"><span class="lbl">الإجابة</span></div>
-      <div class="quran ansarea" id="ans"></div>
+      <div style="text-align:center"><span class="lbl">أكمل من قوله تعالى ${b.m?'… إلى قوله تعالى':'… إلى نهاية الآية'}</span></div>
+      <div class="quran verse" id="verse"></div>
       <div class="cnt2" id="cnt2"></div>
-      <div style="text-align:center"><span class="lbl">${b.m?'إلى قوله تعالى':'الحد'}</span></div>
-      <div class="quran">${sufHTML}</div>
       <div class="refline hidden" id="ref">${refText(q)}</div>
     </div>
     <div class="micbar">
@@ -523,16 +566,18 @@ function renderQ(){
   $('nextBtn').onclick=()=>{if(Q.idx<Q.list.length-1){Q.idx++;renderQ();}else showResults();};
 }
 function updateAnswer(prev){
-  const c=Q.cur,mid=Q.b.mid;let n=0;
+  const c=Q.cur,b=Q.b,mid=b.mid;let n=0;
   while(n<c.st.length&&c.st[n]!==0)n++;
-  let h='';
+  let h=b.pre.map(t=>wordHTML(t)).join(' ')+' ';
   for(let i=0;i<n;i++){
     const cls=['','ok','hint','miss'][c.st[i]]+(i>=prev?' pop':'');
     const d=i>=prev?` style="animation-delay:${Math.min((i-prev)*40,1800)}ms"`:'';
     h+=wordHTML(mid[i],cls,d)+' ';
   }
-  if(!c.done)h+='<span class="caret"></span>';
-  $('ans').innerHTML=n?h:(c.done?'':'<span class="ph">ستظهر الآيات هنا عند القراءة الصحيحة…</span>');
+  if(!c.done)h+=`<span class="gap">${n?'':'……… '}<span class="caret"></span></span> `;
+  if(b.m&&!c.done)h+='<span class="dots">…</span> ';
+  h+=b.suf.map(t=>wordHTML(t)).join(' ');
+  $('verse').innerHTML=h;
   $('cnt2').textContent=`الكلمات الظاهرة: ${AD(n)} من ${AD(c.st.length)}`;
   c.shown=n;
 }
@@ -579,30 +624,57 @@ function giveHint(){
 }
 
 /* ---- التعرف على الصوت ---- */
+const PHON={'ث':'س','ص':'س','ذ':'ز','ظ':'ز','ض':'د','ط':'ت','ق':'ك','ح':'ه','ع':'ا','غ':'خ'};
+function pkey(s){return s.replace(/^ال/,'').replace(/[ثصذظضطقحعغ]/g,c=>PHON[c]).replace(/ا/g,'').replace(/(.)\1+/g,'$1');}
+function same(a,b){
+  if(similar(a,b))return true;
+  const x=pkey(a),y=pkey(b);
+  if(x.length<2||y.length<2)return false;
+  if(x===y)return true;
+  return Math.max(x.length,y.length)>=5&&Math.abs(x.length-y.length)<=1&&lev(x,y)<=1;
+}
+/* يُرجع موضع التقدم الجديد وقائمة الكلمات المتخطّاة (إن أسقط التعرف كلمة) */
 function advance(exp,p,words){
-  let pend='';
+  let pend='';const skips=[];
   for(const w of words){
     if(p>=exp.length)break;
     const e=exp[p];
-    if(similar(w,e)){p++;pend='';continue;}
-    if(p+1<exp.length&&similar(w,e+exp[p+1])){p+=2;pend='';continue;}
+    if(same(w,e)||(Math.min(w.length,e.length)>=2&&Math.max(w.length,e.length)<=4&&lev(w,e)<=1&&w[0]===e[0])){p++;pend='';continue;}
+    if(p+1<exp.length&&w.length>=4&&lev(w,e)>1&&same(w,exp[p+1])){skips.push(p);p+=2;pend='';continue;}
+    if(p+1<exp.length&&w.length>=4&&Math.abs(w.length-(e+exp[p+1]).length)<=1&&same(w,e+exp[p+1])){p+=2;pend='';continue;}
     pend+=w;
-    if(similar(pend,e)){p++;pend='';continue;}
-    if(pend.length>e.length+2)pend=w;
+    if(pend.length>=3&&same(pend,e)){p++;pend='';continue;}
+    if(pend.length>e.length+3)pend='';
   }
-  return p;
+  return {p,skips};
 }
-function onHeard(text){
+/* استخراج كلمات الجلسة الحالية مع إزالة التكرار الذي يُنتجه Chrome (نتائج تراكمية) */
+function heardWords(results){
+  const items=[];
+  for(let i=0;i<results.length;i++){
+    const t=(results[i][0].transcript||'').trim();
+    if(t)items.push({t,n:t.split(/\s+/).map(norm).filter(Boolean).join(' ')});
+  }
+  const keep=[];
+  for(let i=0;i<items.length;i++){
+    const nx=items[i+1];
+    if(nx&&(nx.n===items[i].n||nx.n.startsWith(items[i].n+' ')))continue;
+    keep.push(items[i]);
+  }
+  const text=keep.map(x=>x.t).join(' ');
+  return {text,words:text.split(/\s+/).map(norm).filter(Boolean)};
+}
+function onHeard(results){
   const c=Q.cur;if(!c||c.done)return;
-  const all=text.split(/\s+/).map(norm).filter(Boolean);
-  c.lastCount=all.length;
-  const raw=text.trim().split(/\s+/);
-  $('heard').textContent=raw.slice(-7).join(' ');
-  const np=advance(c.exp,c.base,all.slice(c.cursor));
-  if(np>c.p){
+  const {text,words}=heardWords(results);
+  c.lastCount=words.length;
+  $('heard').textContent=text.split(/\s+/).slice(-7).join(' ');
+  const r=advance(c.exp,c.base,words.slice(c.cursor));
+  if(r.p>c.p){
     const prev=c.shown;
-    for(let i=c.p;i<np;i++)if(c.st[i]===0)c.st[i]=1;
-    c.p=np;
+    for(let i=c.p;i<r.p;i++)if(c.st[i]===0)c.st[i]=r.skips.includes(i)?2:1;
+    if(r.skips.some(i=>i>=c.p))c.hints++;
+    c.p=r.p;
     updateAnswer(prev);
     if(c.p>=c.st.length)finish(true);
   }
@@ -619,14 +691,14 @@ function startListen(){
   try{
     rec=new SR();rec.lang=S.lang;rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=1;
     c.base=c.p;c.cursor=0;c.lastCount=0;
-    rec.onresult=e=>{let t='';for(let i=0;i<e.results.length;i++)t+=' '+e.results[i][0].transcript;onHeard(t);};
+    rec.onresult=e=>{onHeard(e.results);};
     rec.onerror=e=>{
       if(e.error==='not-allowed'||e.error==='service-not-allowed'){listening=false;setMicUI(false);toast('لم يُسمح باستخدام الميكروفون. فعّل الإذن من إعدادات المتصفح');}
       else if(e.error==='network'){listening=false;setMicUI(false);toast('خدمة التعرف على الصوت تتطلب اتصالاً بالإنترنت');}
       else if(e.error==='audio-capture'){listening=false;setMicUI(false);toast('لم يتم العثور على ميكروفون');}
     };
     rec.onend=()=>{
-      if(listening&&Q&&Q.cur&&!Q.cur.done){Q.cur.base=Q.cur.p;Q.cur.cursor=0;Q.cur.lastCount=0;try{rec.start();}catch(e){}}
+      if(listening&&Q&&Q.cur&&!Q.cur.done){Q.cur.base=Q.cur.p;Q.cur.cursor=0;Q.cur.lastCount=0;setTimeout(()=>{if(listening&&rec){try{rec.start();}catch(e){}}},200);}
       else setMicUI(false);
     };
     listening=true;rec.start();setMicUI(true);
@@ -676,6 +748,106 @@ function showResults(){
   $('backBtn').onclick=()=>showView('v-setup');
 }
 
+/* ============ البحث والكتابة في وضع المعلم ============ */
+let AYN=null;
+const toLatin=s=>s.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+function parseRef(txt){
+  txt=toLatin(txt).trim();
+  let s,a,b;
+  let m=txt.match(/^(\d{1,3})\s*[:\/]\s*(\d{1,3})(?:\s*(?:-|–|إلى|الى|،)\s*(\d{1,3}))?$/);
+  if(m){s=+m[1];a=+m[2];b=m[3]?+m[3]:a;}
+  else{
+    m=txt.match(/^(.*?[^\d\s])\s*[:\-]?\s*(\d{1,3})(?:\s*(?:-|–|إلى|الى|،|:)\s*(\d{1,3}))?$/);
+    if(!m)return null;
+    const nm=norm(m[1].replace(/^\s*سورة\s*/,''));
+    if(!nm)return null;
+    let idx=SURAHS.findIndex(x=>norm(x)===nm);
+    if(idx<0){const c=SURAHS.map((x,i)=>[x,i]).filter(([x])=>norm(x).startsWith(nm));if(c.length===1)idx=c[0][1];}
+    if(idx<0)return null;
+    s=idx+1;a=+m[2];b=m[3]?+m[3]:a;
+  }
+  if(s<1||s>114||!CNT[s]||a<1||a>CNT[s])return null;
+  if(b<a)[a,b]=[b,a];
+  b=Math.min(b,CNT[s]);
+  return {s,n1:a,n2:b};
+}
+let MF=-1,MT=-1;
+function candidates(txt,kind){
+  txt=txt.trim();if(!txt)return {list:[],msg:''};
+  if(kind==='to'&&MF<0)return {list:[],msg:'اختر آية البداية أولاً'};
+  const ref=parseRef(txt);
+  if(ref){
+    const i=gi(ref.s,kind==='to'?ref.n2:ref.n1);
+    if(kind==='to'&&(i<MF||AY[i].s!==AY[MF].s||i-MF>24))return {list:[],msg:'آية النهاية يجب أن تكون في نفس السورة بعد البداية وبحد أقصى ٢٥ آية'};
+    return {list:[i],msg:''};
+  }
+  const qn=txt.split(/\s+/).map(norm).filter(Boolean).join(' ');
+  if(qn.length<3)return {list:[],msg:'اكتب كلمتين على الأقل من الآية'};
+  if(!AYN)AYN=AY.map(a=>a.norm.join(' '));
+  const list=[];
+  if(kind==='to'){
+    for(let i=MF;i<=MF+24&&i<AY.length&&AY[i].s===AY[MF].s;i++)if(AYN[i].includes(qn))list.push(i);
+    return {list,msg:list.length?'':'لم توجد هذه العبارة في الآيات التالية للبداية (حتى ٢٥ آية) من نفس السورة'};
+  }
+  for(let i=0;i<AYN.length&&list.length<10;i++)if(AYN[i].includes(qn))list.push(i);
+  return {list,msg:list.length?'':'لا توجد نتائج. جرّب كلمات أقل أو اكتب المرجع (مثل: الكهف 10)'};
+}
+function renderChoices(id,kind,list,msg,sel){
+  const box=$(id);
+  if(!list.length){box.innerHTML=msg?`<div class="hint">${msg}</div>`:'';return;}
+  box.innerHTML=(list.length>1?'<div class="hint">اختر الآية المقصودة:</div>':'')+list.map(i=>{
+    const A=AY[i];
+    return `<button type="button" class="rs ${i===sel?'sel':''}" data-k="${kind}" data-i="${i}"><div class="rr">${refText({s:A.s,n1:A.n,n2:A.n})}${i===sel?' ✓':''}</div><div class="rq quran">${A.words.join(' ')}</div></button>`;
+  }).join('');
+}
+function refreshTyped(from,preserve){
+  if(from){
+    const r=candidates($('qfrom').value,'from');
+    if(r.list.length===1)MF=r.list[0];else if(!r.list.includes(MF))MF=-1;
+    if(preserve!=='from')renderChoices('rfrom','from',r.list,r.msg,MF);
+    MT=-1;
+  }
+  const r2=candidates($('qto').value,'to');
+  if(r2.list.length===1)MT=r2.list[0];else if(!r2.list.includes(MT))MT=-1;
+  if(preserve!=='to')renderChoices('rto','to',r2.list,r2.msg,MT);
+  const pv=$('qprev');
+  if(MF<0){pv.classList.add('hidden');return;}
+  const s=AY[MF].s,n1=AY[MF].n,n2=MT>=0?AY[MT].n:n1;
+  const typedTo=$('qto').value.trim();
+  pv.classList.remove('hidden');
+  pv.className='info'+(typedTo&&MT<0?' bad':'');
+  pv.innerHTML=typedTo&&MT<0?'حدّد آية النهاية من النتائج أعلاه':`<b>${refText({s,n1,n2})}</b> — ${AD(n2-n1+1)} آية`;
+}
+function initSearch(){
+  let t1,t2;
+  $('qfrom').oninput=()=>{clearTimeout(t1);t1=setTimeout(()=>refreshTyped(true),250);};
+  $('qto').oninput=()=>{clearTimeout(t2);t2=setTimeout(()=>refreshTyped(false),250);};
+  ['qfrom','qto'].forEach(id=>$(id).onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();refreshTyped(id==='qfrom');}});
+  const pick=e=>{
+    const b=e.target.closest('button.rs');if(!b)return;
+    const i=+b.dataset.i;
+    if(b.dataset.k==='from'){
+      MF=i;MT=-1;
+      renderChoices('rfrom','from',[i],'',MF);
+      refreshTyped(false,'from');
+    }else{
+      MT=i;
+      renderChoices('rto','to',[i],'',MT);
+      refreshTyped(false,'to');
+    }
+  };
+  $('rfrom').onclick=pick;$('rto').onclick=pick;
+  $('addTyped').onclick=()=>{
+    if(MF<0){toast('اكتب بداية الآية واختر الآية المقصودة');return;}
+    if($('qto').value.trim()&&MT<0){toast('حدّد آية النهاية من النتائج');return;}
+    const s=AY[MF].s,n1=AY[MF].n,n2=MT>=0?AY[MT].n:n1;
+    S.questions.push({s,n1,n2});renderList();
+    MF=-1;MT=-1;$('qfrom').value='';$('qto').value='';
+    $('rfrom').innerHTML='';$('rto').innerHTML='';$('qprev').classList.add('hidden');
+    toast('تمت إضافة السؤال إلى القائمة');
+  };
+}
+
 /* ============ التشغيل ============ */
 async function init(){
   showView('v-load');
@@ -685,7 +857,7 @@ async function init(){
     buildData(data);
     if(!CNT[S.ts]||S.ta>CNT[S.ts])S.ta=CNT[S.ts]||1;
     S.questions=(S.questions||[]).filter(q=>CNT[q.s]&&q.n1>=1&&q.n2<=CNT[q.s]&&q.n1<=q.n2);
-    initSetup();
+    initSetup();initSearch();
     showView('v-setup');
   }catch(e){
     $('loadbox').innerHTML='<b style="color:var(--red)">تعذّر تحميل نص المصحف</b><div class="hint" style="margin:8px 0 14px">تأكد من اتصال الإنترنت ثم أعد المحاولة. يلزم الاتصال في أول استخدام فقط.</div><button class="btn pri" id="retryLoad">إعادة المحاولة</button>';

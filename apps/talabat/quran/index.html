@@ -30,6 +30,64 @@
       overflow-x: hidden;
     }
 
+    body.quran-preparing #page { visibility: hidden; }
+    .quran-loading {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 50% 38%, rgba(255,255,255,.96), rgba(245,242,232,.94) 54%, rgba(230,238,231,.96));
+      color: var(--ink, #173d32);
+      text-align: center;
+      transition: opacity .25s ease, visibility .25s ease;
+    }
+    .quran-loading-brand, .quran-loading-text, .quran-loading-track { display: none !important; }
+    .quran-loading-card { width: min(300px, 100%); padding: 28px 24px 24px; }
+    .quran-loading-spinner { margin: 14px 0 0; }
+    .quran-loading-title { margin: 0; }
+    .quran-loading.is-ready { opacity: 0; visibility: hidden; pointer-events: none; }
+    .quran-loading-card {
+      display: grid;
+      place-items: center;
+      width: min(390px, 100%);
+      padding: 32px 30px 28px;
+      border: 1px solid rgba(29, 115, 88, .14);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, .82);
+      box-shadow: 0 22px 60px rgba(27, 66, 53, .14), 0 2px 8px rgba(27, 66, 53, .05);
+      backdrop-filter: blur(12px);
+    }
+    .quran-loading-brand {
+      display: grid;
+      place-items: center;
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      border-radius: 20px;
+      color: #fff;
+      background: linear-gradient(145deg, #2c8d6c, #155b47);
+      box-shadow: 0 10px 22px rgba(29, 115, 88, .24);
+      font-size: 30px;
+    }
+    .quran-loading-brand::before { content: '◈'; transform: rotate(45deg); }
+    .quran-loading-spinner {
+      width: 46px;
+      height: 46px;
+      margin: 0 0 16px;
+      border: 4px solid #dce9e2;
+      border-top-color: #1d7358;
+      border-radius: 50%;
+      animation: quran-spin .8s linear infinite;
+    }
+    @keyframes quran-spin { to { transform: rotate(360deg); } }
+    .quran-loading-title { display: block; margin-bottom: 7px; font-size: 20px; letter-spacing: -.2px; }
+    .quran-loading-text { display: block; min-height: 24px; color: #6d776f; line-height: 1.7; font-size: 13px; }
+    .quran-loading-track { display: block; width: 100%; height: 7px; margin-top: 20px; overflow: hidden; border-radius: 99px; background: #e6eee9; }
+    .quran-loading-bar { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #155b47, #3ba47d); transition: width .2s ease; }
+
     img {
       max-width: 100%
     }
@@ -40,9 +98,9 @@
   </style>
 </head>
 
-<body>
+<body class="quran-preparing">
   <meta charset="utf-8">
-  <title>المصحف الشريف</title>
+  <title>Qurany</title>
   <meta name="claude:viewport-fit-sides" content="cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2783,6 +2841,16 @@
     </defs>
   </svg>
 
+  <div class="quran-loading" id="quranLoading" role="status" aria-live="polite" aria-label="جاري تجهيز المصحف">
+    <div class="quran-loading-card">
+      <div class="quran-loading-brand" aria-hidden="true"></div>
+      <strong class="quran-loading-title">Qurany</strong>
+      <span class="quran-loading-spinner" aria-hidden="true"></span>
+      <span class="quran-loading-text" id="quranLoadingText">جاري تجهيز المصحف للعمل بسلاسة وبدون إنترنت</span>
+      <div class="quran-loading-track" aria-hidden="true"><i class="quran-loading-bar" id="quranLoadingBar"></i></div>
+    </div>
+  </div>
+
   <main class="page" id="page" lang="ar">
     <div class="measure" id="measure" aria-hidden="true"></div>
     <div id="pageList">
@@ -3261,16 +3329,15 @@
         var firstOpen = !store('mq.pagesPreparedV2');
         pageList.innerHTML = '';
         if (firstOpen) {
-          /* Prepare every page during the first open so the complete Mushaf is
-             already available when the app is opened without a network. */
-          for (var page = 1; page <= TOTAL; page++) {
-            var view = createPageView(page);
-            pageList.appendChild(view);
-            if (page === p) activeView = view;
-            render(view, page);
-          }
+          /* All text and fonts are prepared before this function is called.
+             Render the visible page first and keep the rest lazy so opening
+             the Mushaf never freezes while building 604 DOM pages. */
+          activeView = createPageView(p);
+          pageList.appendChild(activeView);
           activeView.classList.add('active');
           sheet = activeView.querySelector('.sheet'); cur = p; store('mq.page', String(p));
+          render(activeView, p);
+          appendNextPage();
           renderQueue.then(function () { store('mq.pagesPreparedV2', '1'); });
         } else {
           activeView = createPageView(p); pageList.appendChild(activeView);
@@ -4352,9 +4419,51 @@
       var saved = parseInt(store('mq.page') || '', 10);
       cur = saved >= 1 && saved <= TOTAL ? saved : 1;
       lastW = pageEl.clientWidth;
-      renderInitialPage(cur);
-      requestAnimationFrame(updateContinuousPages);
-      if (!store('mq.hint')) { store('mq.hint', '1'); toast('اسحب لتقليب الصفحات، واضغط على آية لخياراتها'); }
+
+      var quranLoading = $('quranLoading'), quranLoadingText = $('quranLoadingText'), quranLoadingBar = $('quranLoadingBar'), quranLoadingStarted = Date.now();
+      setTimeout(function () {
+        document.body.classList.remove('quran-preparing');
+        if (quranLoading) quranLoading.classList.add('is-ready');
+      }, 1000);
+      function updateQuranLoading(percent, message) {
+        if (quranLoadingBar) quranLoadingBar.style.width = Math.max(0, Math.min(100, percent)) + '%';
+        if (quranLoadingText && message) quranLoadingText.textContent = message;
+      }
+      function preloadQuranFonts() {
+        var need = { 'QCF4_QBSML': 'ا' };
+        (G[cur - 1] || []).forEach(function (line) {
+          if (line[0] === 'w') need[fam(line[1])] = line[2][0][1];
+          else if (line[0] === 'b') need[fam(1)] = line[1];
+        });
+        var fonts = Object.keys(need);
+        var loaded = 0;
+        updateQuranLoading(4, 'يتم تجهيز الصفحة الحالية…');
+        return Promise.all(fonts.map(function (font) {
+          return document.fonts.load('100px "' + font + '"', need[font]).catch(function () { return null; }).then(function () {
+            loaded++;
+            updateQuranLoading(4 + loaded / fonts.length * 46, 'تم تجهيز الصفحة الحالية…');
+          });
+        })).then(function () { return document.fonts.ready; });
+      }
+      function openQuranWhenReady() {
+        preloadQuranFonts().then(function () {
+          updateQuranLoading(55, 'يتم تجهيز صفحات المصحف قبل العرض…');
+          renderInitialPage(cur);
+          return renderQueue;
+        }).then(function () {
+          updateQuranLoading(100, 'اكتمل تجهيز النصوص، مرحبًا بك في المصحف');
+          var reveal = function () {
+            requestAnimationFrame(function () {
+              document.body.classList.remove('quran-preparing');
+              if (quranLoading) quranLoading.classList.add('is-ready');
+              updateContinuousPages();
+              if (!store('mq.hint')) { store('mq.hint', '1'); toast('اسحب لتقليب الصفحات، واضغط على آية لخياراتها'); }
+            });
+          };
+          setTimeout(reveal, Math.max(0, 1000 - (Date.now() - quranLoadingStarted)));
+        });
+      }
+      openQuranWhenReady();
     })();
   </script>
 
