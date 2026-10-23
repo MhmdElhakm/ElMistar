@@ -4,15 +4,15 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <meta name="theme-color" content="#1CB0F6" />
-<title>ناقصنا ايه | مشتريات البيت</title>
+<title>هدى Huda</title>
 <link rel="icon" type="image/png" href="icon-192.png" />
 <link rel="apple-touch-icon" href="icon-192.png" />
 <link rel="manifest" href="manifest.webmanifest" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="ناقصنا إيه" />
-<meta name="application-name" content="ناقصنا إيه" />
+<meta name="apple-mobile-web-app-title" content="هدى Huda" />
+<meta name="application-name" content="هدى Huda" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -75,9 +75,8 @@
   /* شاشة تحميل احترافية عند فتح التطبيق */
   #preloader { position: fixed; inset: 0; z-index: 99999; background: radial-gradient(600px 420px at 50% 18%, #E1F3FD, #F4FAFE 72%); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; transition: opacity .5s, visibility .5s; }
   #preloader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-  .pl-logo { width: 96px; height: 96px; }
-  .pl-logo img { width: 100%; height: 100%; border-radius: 26px; object-fit: cover; background: #fff; box-shadow: 0 8px 22px rgba(28,176,246,.25); }
-  .pl-name { font-weight: 900; font-size: 24px; color: var(--primary-dark); }
+  .pl-logo { width: 144px; height: 144px; padding: 6px; border-radius: 42px; background: linear-gradient(135deg, #0F8AC2, #38BDF8 52%, #0EA5E9); box-shadow: 0 18px 38px rgba(15,138,194,.28), 0 0 0 1px rgba(255,255,255,.7); }
+  .pl-logo img { display: block; width: 100%; height: 100%; border-radius: 36px; object-fit: cover; background: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.5); }
   .pl-spin { position: relative; width: 72px; height: 72px; margin-top: 2px; }
   .pl-spin .ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(28,176,246,.6); animation: plRipple 1.8s ease-out infinite; }
   .pl-spin .ring.r2 { animation-delay: .6s; }
@@ -436,12 +435,14 @@
   .brand-icon.xl { width: 112px; height: 112px; border-radius: 32px; }
   .brand-icon.xl svg { width: 52px; height: 52px; }
   .app-logo { position: relative; overflow: hidden; padding: 0; }
+  .app-logo::after { content: ''; position: absolute; inset: 4px; z-index: 2; border: 9px solid #1CB0F6; border-radius: 30px; box-shadow: 0 0 0 2px rgba(255,255,255,.9), 0 8px 20px rgba(15,138,194,.25); pointer-events: none; }
   .app-logo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   /* ===== App logo showcase ===== */
   .logo-show { position: relative; width: 136px; height: 136px; margin: 6px auto 18px; animation: logoFloat 3.4s ease-in-out infinite; }
-  .logo-show .logo-ring { position: absolute; inset: 0; border-radius: 40px; background: conic-gradient(from 0deg, #FBBF24, #FF9600, #38BDF8, #14B8A6, #FBBF24); animation: ringSpin 6s linear infinite; filter: saturate(1.2); }
+  .logo-show .logo-ring { position: absolute; inset: 0; border-radius: 40px; background: conic-gradient(from 0deg, #0F8AC2, #1CB0F6, #38BDF8, #0EA5E9, #0F8AC2); animation: ringSpin 6s linear infinite; filter: saturate(1.2); }
   .logo-show .logo-fallback { position: absolute; inset: 5px; border-radius: 35px; background: var(--grad); display: flex; align-items: center; justify-content: center; box-shadow: 0 18px 40px rgba(28,176,246,.4); }
   .logo-show img { position: absolute; inset: 5px; width: calc(100% - 10px); height: calc(100% - 10px); object-fit: cover; border-radius: 35px; box-shadow: 0 18px 40px rgba(28,176,246,.4); }
+  .logo-show::after { content: ''; position: absolute; inset: 9px; z-index: 2; border: 8px solid #1CB0F6; border-radius: 32px; box-shadow: 0 0 0 2px rgba(255,255,255,.9); pointer-events: none; }
   @keyframes logoFloat { 0%,100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-10px) rotate(1.5deg); } }
   .brand-title.grad { font-size: 40px; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 6px; }
   .feat-row { display: flex; gap: 8px; justify-content: center; margin: -22px 0 14px; }
@@ -1383,15 +1384,17 @@
   @keyframes jhRingIn { from { opacity: 0; transform: rotate(-120deg) scale(.7); } to { opacity: 1; transform: none; } }
   /* ===== Duo-style hero (like screenshot) — pro v2 ===== */
   .duo-hero { margin: 14px 16px; border-radius: 24px; overflow: hidden; position: relative; background: linear-gradient(180deg,#A9DCFF 0%,#C9EBFF 42%,#E3F5FF 72%,#E8F6F3 100%); border: none; box-shadow: 0 16px 34px rgba(56,139,253,.20), 0 2px 8px rgba(30,60,90,.08); animation: popIn .4s ease-out; }
-  .duo-main { position: relative; z-index: 3; display: flex; align-items: center; gap: 10px; padding: 20px 18px; }
-  .duo-tx { flex: 1; min-width: 0; text-align: left; padding-bottom: 6px; }
+  .duo-main { position: relative; z-index: 3; display: flex; flex-direction: row-reverse; align-items: center; gap: 10px; padding: 20px 18px; }
+  .duo-tx { flex: 1; min-width: 0; text-align: right; padding-bottom: 6px; }
   .duo-hello { font-family: "Nunito","Cairo",sans-serif; font-size: 24px; font-weight: 900; line-height: 1.3; color: #3B3B3B; letter-spacing: -.2px; }
+  .duo-hello.ayah-hero { font-family: "Cairo","Nunito",sans-serif; font-size: 18px; line-height: 1.7; color: #0F8AC2; letter-spacing: 0; }
   .duo-hello .nm { color: #1CB0F6; unicode-bidi: isolate; }
   .duo-sub { font-size: 12px; font-weight: 700; color: #67748A; margin-top: 6px; line-height: 1.55; font-family: "Nunito","Cairo",sans-serif; }
   .duo-art { width: 148px; flex-shrink: 0; display: flex; align-items: flex-end; justify-content: center; }
   .duo-art svg { width: 148px; height: auto; display: block; filter: drop-shadow(0 10px 12px rgba(30,60,90,.18)); animation: heroFloat 3.2s ease-in-out infinite; }
-  .duo-logo-wrap { width: 140px; height: 140px; border-radius: 38px; overflow: hidden; background: #FFC800; border: 4px solid #fff; box-shadow: 0 14px 26px rgba(30,60,90,.25), 0 3px 8px rgba(30,60,90,.12); animation: heroFloat 3.2s ease-in-out infinite; }
+  .duo-logo-wrap { position: relative; width: 140px; height: 140px; border-radius: 38px; overflow: hidden; background: linear-gradient(135deg, #0F8AC2, #38BDF8 52%, #0EA5E9); border: 4px solid #fff; box-shadow: 0 14px 26px rgba(15,138,194,.28), 0 3px 8px rgba(15,138,194,.16); animation: heroFloat 3.2s ease-in-out infinite; }
   .duo-logo-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .duo-logo-wrap::after { content: ''; position: absolute; inset: 7px; z-index: 2; border: 9px solid #1CB0F6; border-radius: 29px; box-shadow: 0 0 0 2px rgba(255,255,255,.9); pointer-events: none; }
   .duo-cloud { position: absolute; z-index: 1; pointer-events: none; background: rgba(255,255,255,.95); border-radius: 999px; box-shadow: 0 3px 10px rgba(255,255,255,.6); }
   .duo-cloud.c1 { width: 82px; height: 24px; top: 16px; left: 16px; }
   .duo-cloud.c1::before { content: ''; position: absolute; width: 34px; height: 34px; background: rgba(255,255,255,.95); border-radius: 50%; top: -16px; left: 16px; }
@@ -1473,7 +1476,7 @@
   .gate-card.gate-quran::before { height: 4px; background: linear-gradient(90deg, var(--quran-accent), #F1D99B, #75B69A); }
   .gate-card.gate-quran::after { width: 138px; height: 138px; left: -52px; bottom: -67px; opacity: .12; }
   .gate-card.gate-quran .gc-label { color: rgba(245,245,233,.78); }
-  .gate-card.gate-quran .gc-value { color: var(--quran-accent); font-size: clamp(18px, 5vw, 23px); line-height: 1.8; overflow-wrap: anywhere; text-shadow: 0 2px 14px rgba(0,0,0,.2); }
+  .gate-card.gate-quran .gc-value { color: var(--quran-accent); display: block; width: 100%; font-size: 18px; line-height: 1.5; white-space: nowrap; overflow: visible; text-overflow: clip; text-shadow: 0 2px 14px rgba(0,0,0,.2); transform-origin: center; }
   .gate-card.gate-quran .quran-kind { display: inline-flex; width: fit-content; align-items: center; border: 1px solid var(--quran-border); border-radius: 999px; padding: 2px 9px; margin-top: 4px; background: var(--quran-soft); color: var(--quran-accent); font-size: 10px; font-weight: 900; position: relative; z-index: 1; }
   .gate-card.gate-quran .quran-meaning { display: block; margin-top: 5px; color: rgba(245,245,233,.82); font-size: 11.5px; font-weight: 700; line-height: 1.8; position: relative; z-index: 1; }
   .gate-card.gate-quran .quran-ref { display: block; margin-top: 4px; color: var(--quran-accent); font-size: 10.5px; font-weight: 800; position: relative; z-index: 1; }
@@ -1797,6 +1800,24 @@
 .gate-card.gate-quran .quran-meaning { color: #486E5D; }
 .gate-card.gate-quran .gc-sub { color: #5B7C6C; border-top-color: rgba(63, 133, 107, .16); }
 .gate-card.gate-quran .gc-ico { background: linear-gradient(145deg, var(--quran-soft), rgba(255,255,255,.72)); box-shadow: inset 0 0 0 1px var(--quran-border), 0 8px 18px rgba(63,133,107,.12); }
+<style>
+.hero-settings-btn { position:absolute; z-index:8; top:10px; left:10px; width:24px; height:24px; padding:0; display:grid; place-items:center; border:1px solid rgba(15,138,194,.2); border-radius:50%; background:rgba(255,255,255,.72); color:#0F8AC2; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 7px rgba(15,138,194,.12); }
+.hero-settings-btn:hover, .hero-settings-btn[aria-expanded="true"] { background:#1CB0F6; color:#fff; transform:rotate(25deg); }
+.hero-settings-menu { position:absolute; z-index:9; top:42px; left:10px; width:214px; padding:9px; display:grid; gap:7px; border:1px solid rgba(28,176,246,.22); border-radius:18px; background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(244,250,254,.96)); box-shadow:0 14px 32px rgba(15,138,194,.2),0 2px 7px rgba(15,138,194,.08); backdrop-filter:blur(12px); animation:heroMenuIn .18s ease-out; }
+.hero-settings-menu[hidden] { display:none; }
+.hero-settings-menu button { width:100%; min-height:42px; padding:7px 10px; display:flex; align-items:center; gap:9px; border:1px solid rgba(28,176,246,.16); border-radius:12px; background:rgba(255,255,255,.72); color:#1E1B2E; font:700 11.5px Tajawal,system-ui,sans-serif; cursor:pointer; text-align:right; transition:transform .18s,background .18s,border-color .18s,box-shadow .18s; }
+.hero-settings-menu button:hover { background:#E1F3FD; border-color:#1CB0F6; color:#0F8AC2; transform:translateX(-2px); box-shadow:0 5px 12px rgba(28,176,246,.12); }
+.hero-settings-icon { width:29px; height:29px; flex:0 0 29px; display:grid; place-items:center; border-radius:9px; background:#E1F3FD; color:#0F8AC2; }
+.hero-settings-icon svg { width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.hero-settings-menu button:hover .hero-settings-icon { background:#1CB0F6; color:#fff; }
+.hero-settings-arrow { margin-inline-start:auto; color:#75BFE2; font-size:20px; line-height:1; transform:rotate(180deg); transition:transform .18s; }
+.hero-settings-menu button:hover .hero-settings-arrow { transform:rotate(180deg) translateX(-3px); color:#0F8AC2; }
+.hero-settings-menu::before { content:"إعدادات التطبيق"; display:block; padding:2px 5px 5px; color:#0F8AC2; font-size:10px; font-weight:800; letter-spacing:.1px; }
+.hero-settings-menu::after { content:""; position:absolute; top:-6px; left:16px; width:11px; height:11px; background:#fff; border-top:1px solid rgba(28,176,246,.22); border-left:1px solid rgba(28,176,246,.22); transform:rotate(45deg); }
+@keyframes heroMenuIn { from { opacity:0; transform:translateY(-5px) scale(.98); } to { opacity:1; transform:none; } }
+.duo-hero { overflow:visible; z-index:20; }
+.hero-settings-menu input[type="file"] { display:none; }
+</style>
 </style>
 <style>
 /* Strong, high-contrast card typography */
@@ -1820,7 +1841,7 @@
 </style>
 </head>
 <body>
-  <div id="preloader"><div class="pl-logo"><img src="icon-192.png" alt="ناقصنا إيه"></div><div class="pl-name">ناقصنا إيه</div><div class="pl-spin"><span class="ring r1"></span><span class="ring r2"></span><span class="arc"></span><span class="core"></span></div></div>
+  <div id="preloader"><div class="pl-logo"><img src="logo.png" alt=""></div><div class="pl-spin"><span class="ring r1"></span><span class="ring r2"></span><span class="arc"></span><span class="core"></span></div></div>
 <div class="app" id="app"></div>
 <div class="toast-container" id="toastContainer"></div>
 
@@ -3078,7 +3099,7 @@
   function fallbackCopy(text) { try { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); return true; } catch { return false; } }
   function shareHomeCode(code, name) {
     const text = `تعالى انضم لبيتنا 🏠\nكود البيت: ${code}`;
-    if (navigator.share) return navigator.share({ title: 'ناقصنا ايه', text }).then(() => true).catch(() => false);
+    if (navigator.share) return navigator.share({ title: 'هدى Huda', text }).then(() => true).catch(() => false);
     return copyToClipboard(text).then(ok => { toast(ok ? 'الكود اتنسخ ✓' : 'مقدرش أنسخ', ok ? 'success' : 'error'); return ok; });
   }
   function openModal(html, opts) {
@@ -3312,8 +3333,8 @@
     ];
     return `<div class="onboarding wb"><div class="welcome-card">
       <div class="wb-blob b1"></div><div class="wb-blob b2"></div>
-      <div class="logo-show w-anim"><span class="logo-ring"></span><span class="logo-fallback" style="color:#fff;">${svgIcon('home', 54)}</span><img src="logo.png" alt="ناقصنا ايه" onerror="this.remove()" /></div>
-      <div class="brand-title grad w-anim d1">ناقصنا ايه</div>
+      <div class="logo-show w-anim"><span class="logo-ring"></span><span class="logo-fallback" style="color:#fff;">${svgIcon('home', 54)}</span><img src="logo.png" alt="هدى Huda" onerror="this.remove()" /></div>
+      <div class="brand-title grad w-anim d1">هدى Huda</div>
       <div class="brand-desc w-anim d2">مشتريات البيت بقت لعبة ممتعة — مهام ونقاط وشارات لعيلتك كلها</div>
       <div class="feat-row w-anim d3">${feats.map(f => `<div class="feat-pill"><span class="feat-ico" style="background:${f.bg};color:${f.c};">${svgIcon(f.ic, 19)}</span><span>${f.t}</span></div>`).join('')}</div>
       <div class="w-anim d4">${assistantSay('اعمل بيتك وادعي عيلتك عشان تظبطوا المشتريات سوا', null, 'أول مهمة', 'me')}</div>
@@ -3853,25 +3874,25 @@
       }).catch(() => {});
     } catch {}
   }
-  /* ===== كارت القرآن الكريم: كلمة غريبة كل يوم + تشجيع الورد ===== */
+  /* ===== كارت القرآن الكريم: آية اليوم مع تفسير مختصر ===== */
   function eatTodayKey() { const n = new Date(); return n.getFullYear() + '-' + (n.getMonth() + 1) + '-' + n.getDate(); }
   function dayOfYear(d) { try { return Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5); } catch { return 0; } }
   const QURAN_DAILY_ITEMS = [
-    { type: 'word', text: 'أَبًّا', meaning: 'المرعى والكَلأ الذي تأكله الأنعام.', reference: 'عبس • الآية ٣١' },
+    { type: 'ayah', text: 'وَقُلْ رَبِّ زِدْنِي عِلْمًا', meaning: 'دعاء بطلب الزيادة من العلم النافع والهداية.', reference: 'طه • الآية ١١٤' },
     { type: 'ayah', text: 'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا', meaning: 'يبشّر الله نبيّه ﷺ بأن مع الشدة فرجًا ويسرًا.', reference: 'الشرح • الآية ٥' },
-    { type: 'word', text: 'سِجِّين', meaning: 'موضع ضيق ومأوى للعذاب، كُتب فيه مصير الفجّار.', reference: 'المطففين • الآية ٧' },
+    { type: 'ayah', text: 'إِنَّ اللَّهَ مَعَ الصَّابِرِينَ', meaning: 'معية الله للصابرين بالنصر والتوفيق والرعاية.', reference: 'البقرة • الآية ١٥٣' },
     { type: 'ayah', text: 'وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ', meaning: 'وعدٌ للنبي ﷺ بعطاءٍ من الله في الآخرة حتى يرضى.', reference: 'الضحى • الآية ٥' },
-    { type: 'word', text: 'تَسْنِيم', meaning: 'عين مرتفعة في الجنة، يشرب منها المقرّبون.', reference: 'المطففين • الآية ٢٧' },
+    { type: 'ayah', text: 'إِنَّ اللَّهَ لَا يُغَيِّرُ مَا بِقَوْمٍ حَتَّىٰ يُغَيِّرُوا مَا بِأَنْفُسِهِمْ', meaning: 'صلاح الأحوال يبدأ بإصلاح النفس والعمل والطاعة.', reference: 'الرعد • الآية ١١' },
     { type: 'ayah', text: 'ذَٰلِكَ الْكِتَابُ لَا رَيْبَ فِيهِ هُدًى لِلْمُتَّقِينَ', meaning: 'القرآن حقٌّ من عند الله، وهدايةٌ لمن آمن واتقى.', reference: 'البقرة • الآية ٢' },
-    { type: 'word', text: 'أَبَابِيل', meaning: 'جماعات متتابعة؛ ووصفٌ للطير التي أرسلها الله على أصحاب الفيل.', reference: 'الفيل • الآية ٣' },
+    { type: 'ayah', text: 'وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ', meaning: 'من يعتمد على الله بصدق كفاه الله ما أهمّه.', reference: 'الطلاق • الآية ٣' },
     { type: 'ayah', text: 'اللَّهُ الصَّمَدُ', meaning: 'الله الكامل في عظمته، تقصده الخلائق لقضاء حوائجها.', reference: 'الإخلاص • الآية ٢' },
-    { type: 'word', text: 'الْخَنَّاس', meaning: 'الشيطان يوسوس عند الغفلة، ويختفي عند ذكر الله.', reference: 'الناس • الآية ٤' },
+    { type: 'ayah', text: 'وَاذْكُر رَّبَّكَ إِذَا نَسِيتَ', meaning: 'تذكّر الله دائمًا، وارجع إليه إذا غفلت أو نسيت.', reference: 'الكهف • الآية ٢٤' },
     { type: 'ayah', text: 'إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ', meaning: 'أعطى الله نبيّه ﷺ الخير الكثير في الدنيا والآخرة.', reference: 'الكوثر • الآية ١' },
-    { type: 'word', text: 'صَلْصَال', meaning: 'طين يابس إذا نُقر عليه سُمع له صوت.', reference: 'الحجر • الآية ٢٦' },
+    { type: 'ayah', text: 'وَبَشِّرِ الصَّابِرِينَ', meaning: 'بشّر الله الصابرين برحمته وأجره العظيم.', reference: 'البقرة • الآية ١٥٥' },
     { type: 'ayah', text: 'لَيْلَةُ الْقَدْرِ خَيْرٌ مِنْ أَلْفِ شَهْرٍ', meaning: 'العمل الصالح في ليلة القدر خيرٌ من عمل ألف شهرٍ ليس فيها ليلة قدر.', reference: 'القدر • الآية ٣' },
-    { type: 'word', text: 'صَرْصَر', meaning: 'ريح باردة شديدة الهبوب؛ أهلك الله بها عادًا.', reference: 'الحاقة • الآية ٦' },
+    { type: 'ayah', text: 'إِنَّ مَعِيَ رَبِّي سَيَهْدِينِ', meaning: 'ثقة موسى عليه السلام بأن الله سيهديه إلى طريق النجاة.', reference: 'الشعراء • الآية ٦٢' },
     { type: 'ayah', text: 'مَا وَدَّعَكَ رَبُّكَ وَمَا قَلَىٰ', meaning: 'طمأن الله نبيّه ﷺ بأنه لم يتركه ولم يبغضه.', reference: 'الضحى • الآية ٣' },
-    { type: 'word', text: 'عِزِينَ', meaning: 'جماعات متفرقة؛ تصف حالهم في الآية.', reference: 'المعارج • الآية ٣٧' },
+    { type: 'ayah', text: 'فَاذْكُرُونِي أَذْكُرْكُمْ', meaning: 'من يذكر الله بالطاعة واللسان ينل ذكر الله ورحمته.', reference: 'البقرة • الآية ١٥٢' },
     { type: 'ayah', text: 'قَالَ كَلَّا إِنَّ مَعِيَ رَبِّي سَيَهْدِينِ', meaning: 'قال موسى عليه السلام ذلك واثقًا بنصر الله وهدايته إلى النجاة.', reference: 'الشعراء • الآية ٦٢' }
   ];
   const QURAN_DAILY_PALETTES = [
@@ -3881,12 +3902,25 @@
     { accent: '#E9B982', glow: 'rgba(133,91,51,.55)', soft: 'rgba(233,185,130,.12)', border: 'rgba(233,185,130,.36)' },
     { accent: '#C9B1E8', glow: 'rgba(98,75,133,.56)', soft: 'rgba(201,177,232,.12)', border: 'rgba(201,177,232,.36)' }
   ];
-  function quranMiniCache() {
-    try {
-      const c = JSON.parse(localStorage.getItem('naqisna_quran_mini') || 'null');
-      if (c && c.day === eatTodayKey() && c.version === 2 && c.type && c.text && c.meaning && c.reference) return c;
-    } catch {}
-    return null;
+  function quranMiniCache() { return null; }
+  function fitQuranMiniText() {
+    const el = document.getElementById('quranMiniTxt');
+    if (!el) return;
+    let size = 18;
+    el.style.fontSize = size + 'px';
+    el.style.transform = 'none';
+    const textWidth = () => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      return range.getBoundingClientRect().width;
+    };
+    const available = Math.max(1, el.clientWidth - 6);
+    while (textWidth() > available && size > 8) {
+      size -= .5;
+      el.style.fontSize = size + 'px';
+    }
+    const width = textWidth();
+    if (width > available) el.style.transform = `scaleX(${available / width})`;
   }
   function paintQuranMini(d) {
     try {
@@ -3907,27 +3941,18 @@
       meaning.textContent = d.meaning;
       reference.textContent = d.reference;
       sub.textContent = 'من التفسير الميسّر • اضغط لقراءة المزيد';
+      fitQuranMiniText();
       return true;
     } catch {}
     return false;
   }
   function refreshQuranMini() {
     try {
-      const doy = dayOfYear(new Date());
-      const cached = quranMiniCache();
-      if (cached) { paintQuranMini(cached); return; }
-      const item = QURAN_DAILY_ITEMS[doy % QURAN_DAILY_ITEMS.length];
-      const daily = { day: eatTodayKey(), version: 2, type: item.type, text: item.text, meaning: item.meaning, reference: item.reference, paletteIndex: doy % QURAN_DAILY_PALETTES.length };
-      try { localStorage.setItem('naqisna_quran_mini', JSON.stringify(daily)); } catch {}
+      const item = QURAN_DAILY_ITEMS[Math.floor(Math.random() * QURAN_DAILY_ITEMS.length)];
+      const daily = { type: 'ayah', text: item.text, meaning: item.meaning, reference: item.reference, paletteIndex: Math.floor(Math.random() * QURAN_DAILY_PALETTES.length) };
       paintQuranMini(daily);
     } catch {}
   }
-  setInterval(() => {
-    if (!document.hidden && !quranMiniCache()) refreshQuranMini();
-  }, 60000);
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && !quranMiniCache()) refreshQuranMini();
-  });
   /* ===== كارت جُرْعَةُ شِفَاء: وصفة يومية من داخل health.html ===== */
   const HEALTH_CHEERS = ['🍯 الطبيعة فيها شفاك — دوس للفتح', '🌿 عشب اليوم في انتظارك', '💚 صحتك من الطبيعة — ادخل واكتشف', '🍵 مشروب دافئ لصحتك — دوس للفتح', '⭐ وصفة طبيعية جديدة كل يوم'];
   function healthCheer(doy) { try { return HEALTH_CHEERS[doy % HEALTH_CHEERS.length]; } catch { return '🍯 الطبيعة فيها شفاك — دوس للفتح'; } }
@@ -4810,6 +4835,58 @@
       'بالراحة يا جماعة.. الميزانية بتستغيث 😂',
       'آخر طلب بقى.. والنبي 😂'
   ];
+  function exportHudaHomeBackup() {
+    const payload = { app: 'huda', backupV: 1, exportedAt: new Date().toISOString(), storage: Object.fromEntries(Object.entries(localStorage)) };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `huda-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    try { toast('تم حفظ النسخة الاحتياطية ✓', 'success'); } catch {}
+  }
+
+  function importHudaHomeBackup(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const payload = JSON.parse(reader.result);
+        const storage = payload && payload.storage;
+        if (!storage || typeof storage !== 'object') throw new Error('invalid backup');
+        Object.entries(storage).forEach(([key, value]) => localStorage.setItem(key, String(value)));
+        try { toast('تمت استعادة النسخة الاحتياطية ✓', 'success'); } catch {}
+        setTimeout(() => location.reload(), 500);
+      } catch { try { toast('ملف النسخة الاحتياطية غير صالح', 'error'); } catch {} }
+    };
+    reader.readAsText(file);
+  }
+
+  async function installHudaPwa() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      try { await deferredPrompt.userChoice; } catch {}
+      deferredPrompt = null;
+    } else {
+      openInstallHelpModal();
+    }
+  }
+
+  function wireHeroSettings() {
+    const btn = document.getElementById('heroSettingsBtn');
+    const menu = document.getElementById('heroSettingsMenu');
+    if (!btn || !menu) return;
+    btn.onclick = (e) => { e.stopPropagation(); const open = menu.hidden; menu.hidden = !open; btn.setAttribute('aria-expanded', String(open)); };
+    const exportBtn = document.getElementById('heroExportBtn');
+    if (exportBtn) exportBtn.onclick = exportHudaHomeBackup;
+    const importBtn = document.getElementById('heroImportBtn');
+    const importFile = document.getElementById('heroImportFile');
+    if (importBtn && importFile) { importBtn.onclick = () => importFile.click(); importFile.onchange = () => { importHudaHomeBackup(importFile.files?.[0]); importFile.value = ''; }; }
+    const installBtn = document.getElementById('heroInstallBtn');
+    if (installBtn) installBtn.onclick = installHudaPwa;
+  }
+
   function renderHome() {
     try { renewDailyTasks(); } catch {}
     const { pending, done } = statsCounts();
@@ -4818,6 +4895,7 @@
     const shopCount = getCatalog().reduce((a, d) => a + catDeptCount(d), 0);
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'صباح الخير' : hour < 17 ? 'مساء النور' : 'مساء الخير';
+    const heroAyah = QURAN_DAILY_ITEMS[Math.floor(Math.random() * QURAN_DAILY_ITEMS.length)];
     const tp = dayPhase();
     const tpS = TP_STYLE[tp] || TP_STYLE.day;
     const azP = azkarPeriod();
@@ -4840,14 +4918,21 @@
     const roleTag = '';
     return `<div class="page">
       <div class="duo-hero" dir="ltr">
+        <button class="hero-settings-btn" id="heroSettingsBtn" type="button" aria-label="إعدادات التطبيق" aria-expanded="false">⚙</button>
+        <div class="hero-settings-menu" id="heroSettingsMenu" hidden>
+          <button type="button" id="heroExportBtn"><span class="hero-settings-icon" aria-hidden="true">${svgIcon('copy', 18)}</span><span>حفظ نسخة احتياطية</span><span class="hero-settings-arrow" aria-hidden="true">‹</span></button>
+          <button type="button" id="heroImportBtn"><span class="hero-settings-icon" aria-hidden="true">${svgIcon('box', 18)}</span><span>استعادة نسخة</span><span class="hero-settings-arrow" aria-hidden="true">‹</span></button>
+          <input type="file" id="heroImportFile" accept="application/json,.json">
+          <button type="button" id="heroInstallBtn"><span class="hero-settings-icon" aria-hidden="true">${svgIcon('home', 18)}</span><span>تحميل التطبيق كتطبيق ويب</span><span class="hero-settings-arrow" aria-hidden="true">‹</span></button>
+        </div>
         <div class="duo-cloud c1"></div>
         <div class="duo-main">
           <div class="duo-tx">
-            <div class="duo-hello" dir="auto">${greeting}، <span class="nm">${escapeHTML(userName)}!</span> 👋</div>
-            <div class="duo-sub" dir="rtl" style="text-align:left;">${progress >= 100 ? 'خلصت كل مهام اليوم يا بطل 🎉' : (done > 0 ? `فاضل ${pending} ${pending === 1 ? 'مهمة' : pending === 2 ? 'مهمتين' : 'مهام'} وتقفل اليوم 💪` : 'طلب واحد يقربك من هدف بيتك ✨')}</div>
+            <div class="duo-hello ayah-hero" dir="rtl">﴿${escapeHTML(heroAyah.text)}﴾</div>
+            <div class="duo-sub" dir="rtl" style="text-align:right;">${escapeHTML(heroAyah.meaning)}</div>
           </div>
           <div class="duo-art">
-            <div class="duo-logo-wrap"><img src="logo.png" alt="ناقصنا إيه" /></div>
+            <div class="duo-logo-wrap"><img src="logo.png" alt="هدى Huda" /></div>
           </div>
         </div>
       </div>
@@ -5456,7 +5541,7 @@
         <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🚴</div><div class="si-body"><div class="si-label">${escapeHTML(state.deliveryName || state.home?.deliveryName || 'ديليفري')}</div><div class="si-value">بيانات الدليفري بتاعك</div></div><button class="si-wa" id="sendDeliveryBtn" title="ابعت الطلبات واتساب للدليفري">💬</button><button class="si-action" id="editDeliveryBtn">تعديل</button></div>
       </div>
       <div class="settings-card"><div class="settings-title">التطبيق</div>
-        <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span>ناقصنا إيه</span><button class="btn btn-primary btn-sm" id="installAppBtn" style="width:auto;min-height:30px;padding:5px 12px;font-size:11.5px;border-radius:999px;flex-shrink:0;white-space:nowrap;">📲 ثبّت التطبيق</button></div></div></div>
+        <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span>هدى Huda</span><button class="btn btn-primary btn-sm" id="installAppBtn" style="width:auto;min-height:30px;padding:5px 12px;font-size:11.5px;border-radius:999px;flex-shrink:0;white-space:nowrap;">📲 ثبّت التطبيق</button></div></div></div>
       </div>
       <div class="settings-card"><button class="collapsible-head" id="catCustomHead"><span class="ch-icon">${svgIcon('sparkle', 22)}</span><span class="ch-texts"><b>الأقسام والمنتجات</b></span><span class="chev ${state._catOpen ? 'open' : ''}">‹</span></button>
         <div class="collapsible-body ${state._catOpen ? '' : 'hidden'}">
@@ -5730,6 +5815,7 @@
     try { refreshPrayerMini(); } catch {}
     try { refreshHealthMini(); } catch {}
     document.querySelectorAll('[data-goto-tasks]').forEach(b => b.onclick = () => { requestAnimationFrame(() => setTimeout(() => { try { const el = document.getElementById('tasksWrap') || document.getElementById('tasksSection'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {} }, 60)); });
+    wireHeroSettings();
     const qgc = document.getElementById('quranGateCard'); if (qgc) qgc.onclick = () => { try { window.location.href = 'app/index.html'; } catch {} };
     try { refreshQuranMini(); } catch {}
     try { tsbWire(); } catch {}
@@ -6682,7 +6768,7 @@
   }
   function openInstallHelpModal() {
     const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    const html = `<div class="modal-handle"></div><h2>ثبّت ناقصنا إيه</h2><p class="m-sub">${isiOS ? 'على الآيفون من سفاري' : 'على الأندرويد من كروم'}</p>
+    const html = `<div class="modal-handle"></div><h2>ثبّت هدى Huda</h2><p class="m-sub">${isiOS ? 'على الآيفون من سفاري' : 'على الأندرويد من كروم'}</p>
       <div class="help-steps">${isiOS ? '1) دوس زرار المشاركة اللي تحت<br>2) اختار "إضافة للشاشة الرئيسية"<br>3) دوس إضافة' : '1) دوس قايمة النقط ⋮ اللي فوق<br>2) اختار "تثبيت التطبيق" أو "إضافة للشاشة الرئيسية"<br>3) دوس تثبيت'}</div>
       <div class="btn-group" style="margin-top:12px;"><button class="btn btn-primary" id="closeHelpBtn">تمام</button></div>`;
     const m = openModal(html);
@@ -6744,7 +6830,7 @@
       const nt = o.notes ? ` - ${o.notes}` : '';
       return `${i + 1}. ${o.name}${q}${nt}`;
     });
-    return `🚴 أهلاً ${d.name || 'يا بطل'}، طلبات توصيل 🏠\n\n🛒 الطلبات (${list.length}):\n${lines.length ? lines.join('\n') : 'مفيش طلبات معلقة'}\n\n📍 يا ريت التوصيل لعنوان البيت المتسجل. شكرًا 🙏\nتطبيق ناقصنا إيه`;
+    return `🚴 أهلاً ${d.name || 'يا بطل'}، طلبات توصيل 🏠\n\n🛒 الطلبات (${list.length}):\n${lines.length ? lines.join('\n') : 'مفيش طلبات معلقة'}\n\n📍 يا ريت التوصيل لعنوان البيت المتسجل. شكرًا 🙏\nتطبيق هدى Huda`;
   }
   function sendDeliveryWa() {
     const d = getDeliveryInfo();

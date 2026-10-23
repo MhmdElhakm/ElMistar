@@ -784,17 +784,14 @@ function units(){
   var u=[];
   S.words.forEach(function(w,wi){
     if(isVerb(w)){
-      var kd=w.pen?(isIrreg(w)?'فعل شاذ':'فعل منتظم'):'';
-      u.push({wi:wi,f:0,en:w.en,ar:w.ar,tag:'مضارع',kind:kd});
-      if(w.pen)u.push({wi:wi,f:1,en:w.pen,ar:w.par||'',tag:'ماضي',kind:kd});
+      u.push({wi:wi,f:0,en:w.en,ar:w.ar,tag:'مضارع'});
+      if(w.pen)u.push({wi:wi,f:1,en:w.pen,ar:w.par||'',tag:'ماضي'});
     }else u.push({wi:wi,f:0,en:w.en,ar:w.ar,tag:''});
   });
   return (UCACHE=u);
 }
 function tint(i){return 't'+(i%6);}
-function tagHtml(w){return w.tag?'<div class="tagrow"><span class="why">'+w.tag+'</span>'+(w.kind?' <span class="why">'+w.kind+'</span>':'')+'</div>':'';}
-function isIrregEn(en,pen){return !!pen&&normEnS(pen)!==normEnS(pastOf(en,true));}
-function isIrreg(w){return isIrregEn(w.en,w.pen);}
+function tagHtml(w){return w.tag?'<div class="tagrow"><span class="why">'+w.tag+'</span></div>':'';}
 function normEnS(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 /* Egyptian-dialect cheering, so every answer gets a fresh line */
 var PRAISE=['عاش يا وحش!','إيه الجمال ده!','إنت جامد قوي كده ليه؟','مفيش عليك كلام يا باشا!','الله ينور عليك!','كده الواد هيبقى دكتور!','يا سلام عليك يا معلم!','حلاوة! الإنجليزي بقى تحت رجليك','ضربت في الجون!','أمك لو شافتك دلوقتي هتعمل لك محشي!','قفشتها يا بطل!','ده إنت مذاكر بقى!','تحفة! كمّل كده','إيه يا عم الشطارة دي؟','عليك نور، كمّل!'];
@@ -1140,7 +1137,6 @@ var DEX=[
   {k:'choose',t:'اختر الكلمة الصحيحة',d:'من المعنى العربي اختر الكلمة الإنجليزية',ic:'check',need:'تحتاج كلمتين على الأقل',min:2},
   {k:'listen',t:'استمع واختر',d:'اسمع الكلمة ثم اختر كتابتها الصحيحة',ic:'spk',need:'تحتاج كلمتين على الأقل',min:2},
   {k:'vpair',t:'ماضي الفعل',d:'اختر الصيغة الصحيحة لماضي الفعل',ic:'book',need:'تحتاج فعلًا واحدًا',verbs:1},
-  {k:'vreg',t:'منتظم أم شاذ؟',d:'حدّد هل الفعل منتظم أم شاذ',ic:'trophy',need:'تحتاج فعلًا واحدًا',verbs:1},
   {k:'vmatch',t:'توصيل المضارع بالماضي',d:'وصّل كل فعل بماضيه',ic:'list',need:'تحتاج فعلين على الأقل',verbs:2}
 ];
 function dexOn(k){return S.dex[k]!==false;}
@@ -1165,7 +1161,7 @@ function drillItems(){
     if(on.listen)items.push({i:i,mode:'listen',st:null});
   });
   var verbs=[];
-  S.words.forEach(function(w,wi){if(isVerb(w)&&w.pen){verbs.push(wi);if(on.vpair)items.push({v:wi,mode:'vpair',st:null});if(on.vreg)items.push({v:wi,mode:'vreg',st:null});}});
+  S.words.forEach(function(w,wi){if(isVerb(w)&&w.pen){verbs.push(wi);if(on.vpair)items.push({v:wi,mode:'vpair',st:null});}});
   if(on.match)chunk(dw,4).forEach(function(g){items.push({mode:'match',ids:g,st:null});});
   if(on.vmatch)chunk(verbs,4).forEach(function(g){items.push({mode:'vmatch',ids:g,st:null});});
   return items;
@@ -1499,7 +1495,7 @@ function viewInput(){
       return '<li class="wc '+tint(i)+(m?' m':'')+'">'+
         '<button type="button" class="chk" data-act="mtoggle" data-i="'+i+'" aria-label="'+(m?'إلغاء الحفظ':'تم حفظها')+'">'+(m?ic('check',22):(i+1))+'</button>'+
         '<button type="button" class="ico" data-act="wsay" data-i="'+i+'" aria-label="استمع">'+ic('spk',22)+'</button>'+
-        '<div class="wtx"><b><bdi dir="ltr">'+esc(w.en)+(v&&w.pen?' • '+esc(w.pen):'')+'</bdi></b><span>'+(meaning?esc(meaning):'بلا معنى')+(v?' <span class="why">'+(w.pen?(isIrreg(w)?'فعل شاذ':'فعل منتظم'):'فعل')+'</span>':'')+'</span></div>'+
+        '<div class="wtx"><b><bdi dir="ltr">'+esc(w.en)+(v&&w.pen?' • '+esc(w.pen):'')+'</bdi></b><span>'+(meaning?esc(meaning):'بلا معنى')+(v?' <span class="why">فعل</span>':'')+'</span></div>'+
         '<button type="button" class="x" data-act="wedit" data-i="'+i+'" aria-label="تعديل">'+ic('pen',20)+'</button>'+
         '<button type="button" class="x" data-act="wdel" data-i="'+i+'" aria-label="حذف">'+ic('x',22)+'</button></li>';
     }).join('')+'</ul>';
@@ -1544,7 +1540,7 @@ function viewReview(){
         '<button type="button" class="mini2'+(v?' on':'')+'" data-act="rvtype" data-i="'+i+'" aria-pressed="'+(v?'true':'false')+'">فعل</button>'+
         '<button type="button" class="x" data-act="rvdel" data-i="'+i+'" aria-label="حذف السطر">'+ic('x',22)+'</button></div>'+
         '<div class="fld"><input class="inp rvin'+cls+'" id="rvA'+i+'" dir="rtl" value="'+esc(r.ar)+'" placeholder="'+(v?'معنى المضارع (يذهب)':'المعنى بالعربية')+'" aria-label="المعنى بالعربية">'+micBtn('rvA'+i)+'</div>'+
-        (v?'<div class="vrow">'+inpFld('rvP'+i,'rvP'+i,'الماضي (went)',r.pen,cls,' rvin')+inpFld('rvQ'+i,'rvQ'+i,'معنى الماضي (ذهب)',r.par,cls,' rvin')+(r.pen?'<span class="why">'+(isIrregEn(r.en,r.pen)?'شاذ':'منتظم')+'</span>':'')+'</div>':'')+'</li>';
+        (v?'<div class="vrow">'+inpFld('rvP'+i,'rvP'+i,'الماضي (went)',r.pen,cls,' rvin')+inpFld('rvQ'+i,'rvQ'+i,'معنى الماضي (ذهب)',r.par,cls,' rvin')+'</div>':'')+'</li>';
     }).join('')+'</ul>'+
     '<div class="row between"><button type="button" class="btn" data-act="rvcancel">إلغاء</button>'+
     '<button type="button" class="btn primary" data-act="rvconfirm"'+(sel?'':' disabled')+'>أضف المحدد ('+sel+')</button></div></section>';
@@ -2371,38 +2367,28 @@ function matchTap(side,id){
 function makeVerbState(it,w){
   var pool=[w.pen],seen={};seen[normEnS(w.pen)]=1;
   function add(x){var k=normEnS(x);if(x&&!seen[k]){seen[k]=1;pool.push(x);}}
-  add(isIrreg(w)?pastOf(w.en,true):w.en);
+  add(w.en);
+  add(pastOf(w.en,true));
   shuffle(S.words.filter(function(o){return isVerb(o)&&o.pen&&o!==w;})).forEach(function(o){if(pool.length<4)add(o.pen);});
   [w.en+'ed',w.en+'d',w.en+'t'].forEach(function(x){if(pool.length<4)add(x);});
   return {uid:++UID,sel:null,tiles:shuffle(pool.map(function(ch,k){return {id:k,ch:ch};}))};
 }
-function ruleText(w){
-  return isIrreg(w)?
-    'الفعل <b dir="ltr">'+esc(w.en)+'</b> شاذ، ماضيه <b dir="ltr">'+esc(w.pen)+'</b> ويجب حفظه، فلا نضيف ed.':
-    'الفعل <b dir="ltr">'+esc(w.en)+'</b> منتظم، ماضيه <b dir="ltr">'+esc(w.pen)+'</b> بإضافة ed (أو d، أو تغيير y إلى ied).';
-}
 function viewVerbDrill(D,it){
   var w=S.words[it.v];
-  if(!it.st)it.st=it.mode==='vpair'?makeVerbState(it,w):{uid:++UID,sel:null};
+  if(!it.st)it.st=makeVerbState(it,w);
   var st=it.st,pct=Math.round(D.done/D.total*100);
   var h='<section class="panel"><div class="meta"><span>المتبقي '+D.queue.length+' تمرين</span><span>'+pct+'%</span></div>'+
   '<div class="bar"><i style="width:'+pct+'%"></i></div>'+(S.moti?motiHtml(S.moti):'')+
   '<div class="wcard '+tint(it.v)+'"><div class="tagrow"><span class="why">ربط المضارع بالماضي</span></div>'+
-  '<p class="label">'+(it.mode==='vpair'?'اختر ماضي هذا الفعل':'هل هذا الفعل منتظم أم شاذ؟')+'</p>'+
+  '<p class="label">اختر ماضي هذا الفعل</p>'+
   '<div class="prompt" dir="ltr">'+esc(w.en)+'</div><p class="label">'+esc(w.ar)+'</p></div>';
-  if(it.mode==='vpair'){
-    h+='<div class="cells pool" dir="ltr">'+st.tiles.map(function(t){
-      var cls='';
-      if(D.fb){if(normEnS(t.ch)===normEnS(w.pen))cls=' good';else if(st.sel===t.id)cls=' bad';}
-      return '<button type="button" class="tile wd'+cls+'" data-act="gap" data-id="'+t.id+'"'+(D.fb?' disabled':'')+'>'+esc(t.ch)+'</button>';
-    }).join('')+'</div>';
-  }else{
-    var ok=D.fb?isIrreg(w):null;
-    h+='<div class="row mid"><button type="button" class="btn'+(D.fb&&!isIrreg(w)?' primary':'')+'" data-act="vch" data-v="reg"'+(D.fb?' disabled':'')+'>منتظم (نضيف ed)</button>'+
-    '<button type="button" class="btn'+(D.fb&&isIrreg(w)?' primary':'')+'" data-act="vch" data-v="irr"'+(D.fb?' disabled':'')+'>شاذ (له ماضٍ خاص)</button></div>';
-  }
+  h+='<div class="cells pool" dir="ltr">'+st.tiles.map(function(t){
+    var cls='';
+    if(D.fb){if(normEnS(t.ch)===normEnS(w.pen))cls=' good';else if(st.sel===t.id)cls=' bad';}
+    return '<button type="button" class="tile wd'+cls+'" data-act="gap" data-id="'+t.id+'"'+(D.fb?' disabled':'')+'>'+esc(t.ch)+'</button>';
+  }).join('')+'</div>';
   if(D.fb){
-    h+='<div class="note '+(D.fb.ok?'good':'bad')+'">'+esc(D.fb.msg||'')+'<br>'+ruleText(w)+(D.fb.ok?'':'<br>سيعود هذا التمرين لاحقًا.')+'</div>';
+    h+='<div class="note '+(D.fb.ok?'good':'bad')+'">'+esc(D.fb.msg||'')+(D.fb.ok?'':'<br>سيعود هذا التمرين لاحقًا.')+'</div>';
     if(!D.fb.ok)h+='<button type="button" class="btn primary big" data-act="dnext">التالي</button>';
   }
   return h+'</section>';
@@ -2410,8 +2396,8 @@ function viewVerbDrill(D,it){
 function verbCheck(){
   var D=S.drill,it=D.queue[0],st=it.st,w=S.words[it.v],ok;
   if(st.sel===null||st.sel===undefined)return;
-  if(it.mode==='vpair'){var t=st.tiles.filter(function(x){return x.id===st.sel;})[0];ok=!!t&&normEnS(t.ch)===normEnS(w.pen);}
-  else ok=(st.sel==='irr')===isIrreg(w);
+  var t=st.tiles.filter(function(x){return x.id===st.sel;})[0];
+  ok=!!t&&normEnS(t.ch)===normEnS(w.pen);
   D.fb={ok:ok,msg:ok?rnd(PRAISE):rnd(OOPS)};
   if(ok){sfx('correct');buzz(20);award(1);speak(w.en+', '+w.pen,'en-US',0.9);drillTimer=setTimeout(drillNext,2200);}
   else{sfx('wrong');buzz([30,40,30]);}
@@ -3005,7 +2991,7 @@ $stage.addEventListener('click',function(e){
   if(g){sfx('nav');go(+g.getAttribute('data-go'));return;}
   var b=e.target.closest('[data-act]');if(!b||b.disabled)return;
   var a=b.getAttribute('data-act'),P=S.pron;
-  var own={dex:1,dstart:1,mlt:1,mrt:1,sgen:1,sprac:1,cpick:1,cunpick:1,gap:1,vch:1,etoggle:1,rvtype:1,mic:1,dcheck:1,dict:1,dfield:1,selfok:1,pick:1,unpick:1,fsubmit:1,tofinal:1,analyze:1,sample:1,start:1,rvconfirm:1,rvsel:1,slotpick:1,unslot:1,qtrans:1,etrans:1,rvtrans:1,cam:1,gal:1,phsound:1,phblend:1,phword:1,phsyll:1};
+  var own={dex:1,dstart:1,mlt:1,mrt:1,sgen:1,sprac:1,cpick:1,cunpick:1,gap:1,etoggle:1,rvtype:1,mic:1,dcheck:1,dict:1,dfield:1,selfok:1,pick:1,unpick:1,fsubmit:1,tofinal:1,analyze:1,sample:1,start:1,rvconfirm:1,rvsel:1,slotpick:1,unslot:1,qtrans:1,etrans:1,rvtrans:1,cam:1,gal:1,phsound:1,phblend:1,phword:1,phsyll:1};
   if(!own[a])sfx('tap');
   var wi=+b.getAttribute('data-i');
   if(a==='qcam'||a==='qgal'){captureInputs();S.bulkOpen=true;S.addMsg='';render();var qb=document.querySelector('[data-act="'+(a==='qcam'?'cam':'gal')+'"]');if(qb&&!qb.disabled)qb.click();}
@@ -3059,9 +3045,9 @@ $stage.addEventListener('click',function(e){
   else if(a==='mlt')matchTap('L',+b.getAttribute('data-id'));
   else if(a==='mrt')matchTap('R',+b.getAttribute('data-id'));
   else if(a==='lsay'){var lq=S.drill.queue[0];if(lq&&lq.i!==undefined)speak(units()[lq.i].en,'en-US',0.85);}
-  else if(a==='gap'||a==='vch'){
+  else if(a==='gap'){
     var Q=S.stage===4?S.sp:S.drill;if(!Q||Q.fb||!Q.queue.length)return;
-    Q.queue[0].st.sel=a==='vch'?b.getAttribute('data-v'):+b.getAttribute('data-id');
+    Q.queue[0].st.sel=+b.getAttribute('data-id');
     if(S.stage===4)spCheck();else drillCheck();
   }
   else if(a==='pick'){curQ()[0].st.picked.push(+b.getAttribute('data-id'));sfx('pop');render();}
