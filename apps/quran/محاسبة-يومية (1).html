@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>المحاسبة اليومية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  * { font-family: 'Tajawal', sans-serif; box-sizing: border-box; }
+  body { background-color: #030712; color: #e2e8f0; }
+
+  /* Flex-wrap layout: cards size to their text naturally */
+  .cards-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .task-card {
+    background-color: #3a0f14;
+    border: 1px solid rgba(153, 27, 27, 0.5);
+    border-radius: 12px;
+    padding: 10px 14px;
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, transform 0.15s;
+    user-select: none;
+    /* flexible width: at least fit content, but not too wide */
+    flex: 0 0 auto;
+    min-width: 110px;
+    max-width: 220px;
+  }
+  .task-card:hover { background-color: #4a1420; border-color: rgba(220, 38, 38, 0.6); transform: translateY(-2px); }
+  .task-card.done { background-color: #0f2e1a; border-color: rgba(34, 197, 94, 0.5); }
+  .task-card.done .card-title { color: #86efac; }
+  .task-card.done .qmark { display: none; }
+  .task-card.done::after {
+    content: '✓';
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    color: #4ade80;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .qmark {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .points-badge {
+    background-color: rgba(96, 165, 250, 0.15);
+    color: #93c5fd;
+    border-radius: 999px;
+    font-size: 11px;
+    padding: 1px 9px;
+    margin-top: 6px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .card-title {
+    color: #f1f5f9;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .section-container {
+    background-color: #0b1329;
+    border: 1px solid #1e293b;
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .section-title {
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 1rem;
+    letter-spacing: 0.03em;
+  }
+  .progress-track {
+    background-color: #1e293b;
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
+    flex: 1;
+  }
+  .progress-fill {
+    background: linear-gradient(90deg, #ef4444, #f97316);
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+  @media print {
+    body { background: white !important; color: black !important; }
+    .task-card { background: #f8f8f8 !important; border-color: #ccc !important; }
+    .section-container { background: white !important; border-color: #ddd !important; }
+    .print-btn { display: none; }
+    .task-card.done { background-color: #d4f4dd !important; }
+    .task-card.done .card-title { color: #166534 !important; }
+  }
+</style>
+</head>
+<body class="min-h-screen p-4 md:p-6">
+
+<h2 class="sr-only">لوحة المحاسبة اليومية - تتبع العبادات اليومية</h2>
+
+<!-- Header -->
+<div class="max-w-5xl mx-auto mb-6">
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <h1 class="text-2xl md:text-3xl font-bold text-white">المحاسبة اليومية</h1>
+      <p id="dateDisplay" class="text-slate-400 text-sm mt-1"></p>
+    </div>
+    <button onclick="window.print()" class="print-btn flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl px-4 py-2 text-sm font-medium transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      طباعة
+    </button>
+  </div>
+</div>
+
+<!-- Total Progress -->
+<div class="max-w-5xl mx-auto mb-6 section-container">
+  <div class="flex items-center gap-3">
+    <span class="text-sm text-slate-400 font-medium whitespace-nowrap">إجمالي التقدم</span>
+    <div class="progress-track flex-1">
+      <div class="progress-fill" id="totalProgressFill" style="width: 0%"></div>
+    </div>
+    <span id="totalProgressText" class="text-red-400 font-bold text-sm min-w-[3rem] text-left" style="direction:ltr">0%</span>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="max-w-5xl mx-auto space-y-4" id="dashboard">
+
+  <!-- الفجر -->
+  <div class="section-container">
+    <p class="section-title">— الفجر —</p>
+    <div class="cards-wrap">
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">أذكار الاستيقاظ</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">السنة القبلية</span><span class="points-badge">٢</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">الجماعة الأولى</span><span class="points-badge">٢</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">أذكار بعد الصلاة</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">أذكار الصباح</span><span class="points-badge">٢</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">الضحى ٤ ركعات</span><span class="points-badge">٢</span></div>
+    </div>
+  </div>
+
+  <!-- الظهر -->
+  <div class="section-container">
+    <p class="section-title">— الظهر —</p>
+    <div class="cards-wrap">
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">السنة القبلية ٤ ركعات</span><span class="points-badge">٢</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">الجماعة الأولى</span><span class="points-badge">٢</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">أذكار بعد الصلاة</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">السنة البعدية</span><span class="points-badge">٢</span></div>
+    </div>
+  </div>
+
+  <!-- العصر -->
+  <div class="section-container">
+    <p class="section-title">— العصر —</p>
+    <div class="cards-wrap">
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">الجماعة الأولى</span><span class="points-badge">٢</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">أذكار بعد الصلاة</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">أذكار المساء</span><span class="points-badge">٢</span></div>
+    </div>
+  </div>
+
+  <!-- المغرب -->
+  <div class="section-container">
+    <p class="section-title">— المغرب —</p>
+    <div class="cards-wrap">
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">الجماعة الأولى</span><span class="points-badge">٢</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">أذكار بعد الصلاة</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">السنة البعدية</span><span class="points-badge">٢</span></div>
+    </div>
+  </div>
+
+  <!-- العشاء -->
+  <div class="section-container">
+    <p class="section-title">— العشاء —</p>
+    <div class="cards-wrap">
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">الجماعة الأولى</span><span class="points-badge">٢</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">أذكار بعد الصلاة</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">السنة البعدية</span><span class="points-badge">٢</span></div>
+    </div>
+  </div>
+
+  <!-- قيام الليل والوتر -->
+  <div class="section-container">
+    <p class="section-title">— قيام الليل والوتر —</p>
+    <div class="cards-wrap">
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">ركعتان قيام ليل</span><span class="points-badge">٢</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">الورد (ربعين)</span><span class="points-badge">٢</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">الوتر</span><span class="points-badge">٢</span></div>
+    </div>
+  </div>
+
+  <!-- القرآن والصيام -->
+  <div class="section-container">
+    <p class="section-title">— القرآن والصيام —</p>
+    <div class="cards-wrap">
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">حفظ نصف صفحة</span><span class="points-badge">٢</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="2"><span class="qmark">؟</span><span class="card-title">قراءة ستة أربع</span><span class="points-badge">٢</span></div>
+    </div>
+  </div>
+
+  <!-- أذكار متنوعة -->
+  <div class="section-container">
+    <p class="section-title">— أذكار متنوعة —</p>
+    <div class="cards-wrap">
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">الخلاء</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">لبس الثوب وخلعه</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">الوضوء</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">دخول المنزل والخروج</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">المسجد دخول وخروج</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">المشي إلى المسجد</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">الأكل والشرب</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">الركوب</span><span class="points-badge">١</span></div>
+      <div class="task-card" onclick="toggleCard(this)" data-points="1"><span class="qmark">؟</span><span class="card-title">قبل النوم</span><span class="points-badge">١</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="max-w-5xl mx-auto mt-6 text-center text-slate-600 text-xs pb-8">
+  انقر على البطاقة لتحديد الإنجاز · اضغط مرة أخرى للإلغاء
+</div>
+
+<script>
+  const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const now = new Date();
+  document.getElementById('dateDisplay').textContent =
+    days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+
+  function toggleCard(card) {
+    card.classList.toggle('done');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const all = document.querySelectorAll('.task-card');
+    const done = document.querySelectorAll('.task-card.done');
+    const pct = all.length ? Math.round((done.length / all.length) * 100) : 0;
+    const fill = document.getElementById('totalProgressFill');
+    const text = document.getElementById('totalProgressText');
+    fill.style.width = pct + '%';
+    text.textContent = pct + '%';
+    if (pct >= 80) {
+      text.className = 'text-green-400 font-bold text-sm min-w-[3rem] text-left';
+      fill.style.background = 'linear-gradient(90deg, #22c55e, #4ade80)';
+    } else if (pct >= 50) {
+      text.className = 'text-amber-400 font-bold text-sm min-w-[3rem] text-left';
+      fill.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+    } else {
+      text.className = 'text-red-400 font-bold text-sm min-w-[3rem] text-left';
+      fill.style.background = 'linear-gradient(90deg, #ef4444, #f97316)';
+    }
+  }
+</script>
+</body>
+</html>
