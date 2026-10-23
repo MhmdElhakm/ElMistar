@@ -382,6 +382,16 @@ body{background-image:var(--bgimg);background-size:cover;background-repeat:no-re
 .phonics-actions{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin:4px 0 8px}
 .phonics-actions .btn{padding:8px 12px;font-size:.78rem}
 .phonics-note{margin:3px 0 8px;color:var(--muted);font-size:.75rem;text-align:center}
+.syllable-title{margin:12px 0 7px;color:var(--fg);font-size:.92rem;font-weight:900;text-align:center}
+.syllables-read{display:flex;justify-content:center;align-items:center;gap:9px;flex-wrap:wrap;direction:ltr;margin:0 auto 11px;padding:4px 0}
+.syllables-read .syllable{min-width:72px;min-height:54px;padding:11px 15px;border:0;border-radius:16px;background:#6d5ce7;color:#fff;font:900 1.12rem var(--f-ui);cursor:pointer;transition:.15s;box-shadow:0 5px 0 #4638a8}
+.syllables-read .syllable:nth-child(4n+1){background:#6d5ce7;box-shadow:0 5px 0 #4638a8}
+.syllables-read .syllable:nth-child(4n+2){background:#e8799c;box-shadow:0 5px 0 #a74668}
+.syllables-read .syllable:nth-child(4n+3){background:#35b99a;box-shadow:0 5px 0 #20836f}
+.syllables-read .syllable:nth-child(4n){background:#e6a83f;box-shadow:0 5px 0 #a8741e}
+.syllables-read .syllable::after{content:'•';color:var(--muted);margin-inline-start:5px}
+.syllables-read .syllable:last-child::after{display:none}
+.syllables-read .syllable.active{color:#fff;transform:translateY(-3px);filter:brightness(1.16);box-shadow:0 7px 0 rgba(30,24,90,.45),0 0 0 3px rgba(255,255,255,.8)}
 .xp{min-width:58px}
 .panel{background:var(--surface);border:0;border-radius:28px;box-shadow:0 10px 26px rgba(97,85,232,.10);padding:20px}
 .panel.mint{background:linear-gradient(135deg,#F2EFFF,#E6F2FF)}
@@ -945,27 +955,133 @@ function pickVoice(lang){
   try{var v=speechSynthesis.getVoices();
     return v.find(function(x){return x.lang===lang;})||v.find(function(x){return x.lang.toLowerCase().indexOf(lang.slice(0,2))===0;})||null;}catch(e){return null;}
 }
-function speak(text,lang,rate){
+function speak(text,lang,rate,onend){
   try{
     if(!('speechSynthesis' in window))return;
     speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance(text);u.lang=lang;u.rate=rate||0.9;
     var v=pickVoice(lang);if(v)u.voice=v;
+    if(onend){u.onend=onend;u.onerror=onend;}
     speechSynthesis.speak(u);
   }catch(e){}
 }
-var PHONIC_UNITS=['tch','dge','sch','igh','sh','ch','th','ph','wh','ck','ng','qu','ee','oo','ea','ai','ay','oa','ou','ow','ar','er','ir','or','ur'];
-var PHONIC_SOUNDS={a:'ah',e:'eh',i:'ih',o:'aw',u:'uh',y:'yuh',b:'buh',c:'kuh',d:'duh',f:'fff',g:'guh',h:'hhh',j:'juh',k:'kuh',l:'lll',m:'mmm',n:'nnn',p:'puh',r:'rrr',s:'sss',t:'tuh',v:'vvv',w:'wuh',x:'ks',z:'zzz',sh:'shh',ch:'ch',th:'th',ph:'fff',wh:'w',ck:'k',ng:'ng',qu:'kw',tch:'ch',dge:'j',sch:'sk',igh:'eye',ee:'ee',oo:'oo',ea:'ee',ai:'ay',ay:'ay',oa:'oh',ou:'ow',ow:'ow',ar:'ar',er:'er',ir:'er',or:'or',ur:'er'};
-function phonicsChunks(word){
-  var s=String(word||'').toLowerCase().replace(/[^a-z]/g,''),out=[],i=0;
-  while(i<s.length){var found='';for(var n=0;n<PHONIC_UNITS.length;n++){var u=PHONIC_UNITS[n];if(s.slice(i,i+u.length)===u&&(u.length>found.length))found=u;}
-    if(found){out.push(found);i+=found.length;}else{out.push(s.charAt(i));i++;}}
-  return out;
+function stopSpeech(){PHONEME_RUN++;clearTimeout(PHONEME_TIMER);try{if('speechSynthesis' in window)speechSynthesis.cancel();}catch(e){}}
+var PHONEME_CTX=null,PHONEME_TIMER=0,PHONEME_RUN=0;
+function phonemeAudio(u,done,run){
+  if(run!==PHONEME_RUN)return;
+  if(u.kind==='vowel'){speak(u.speech,'en-US',.55,done);return;}
+  var AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC){speak(u.speech,'en-US',.55,done);return;}
+  try{
+    PHONEME_CTX=PHONEME_CTX||new AC();
+    var c=PHONEME_CTX;c.resume();var now=c.currentTime,dur=u.kind==='vowel'?.34:(u.kind==='digraph'?.28:.18),gain=c.createGain();
+    gain.gain.setValueAtTime(.0001,now);gain.gain.linearRampToValueAtTime(.28,now+.025);gain.gain.exponentialRampToValueAtTime(.0001,now+dur);gain.connect(c.destination);
+    var ipa=u.ipa||'',isNoise=/f|s|ʃ|θ|h|w|tʃ|dʒ|[pbtdkg]/.test(ipa),src;
+    if(isNoise){
+      var len=Math.max(1,Math.floor(c.sampleRate*dur)),buf=c.createBuffer(1,len,c.sampleRate),data=buf.getChannelData(0);
+      for(var i=0;i<len;i++)data[i]=(Math.random()*2-1)*(1-i/len);
+      src=c.createBufferSource();src.buffer=buf;var filter=c.createBiquadFilter();filter.type='bandpass';filter.frequency.value=/ʃ/.test(ipa)?2600:(/s/.test(ipa)?5200:1800);filter.Q.value=.7;src.connect(filter);filter.connect(gain);
+    }else{
+      src=c.createOscillator();src.type='sine';var hz=/ă/.test(ipa)?720:/ĕ/.test(ipa)?620:/ĭ/.test(ipa)?520:/ŏ/.test(ipa)?440:/ŭ/.test(ipa)?360:/ē/.test(ipa)?680:/ī/.test(ipa)?760:/ō/.test(ipa)?500:/ū/.test(ipa)?420:145;src.frequency.value=hz;src.connect(gain);
+    }
+    src.start(now);src.stop(now+dur);PHONEME_TIMER=setTimeout(function(){if(run===PHONEME_RUN)done();},dur*1000+35);
+  }catch(e){speak(u.speech,'en-US',.55,done);}
 }
-function spellOut(word){
-  var chunks=phonicsChunks(word),sounds=chunks.map(function(c){return PHONIC_SOUNDS[c]||c;});
-  if(S.pron){S.pron.phonics=chunks;render();}
-  speak(sounds.join(', '),'en-US',.58);
+/* ---------- real English phonics ----------
+   Each item is a grapheme, not a letter name. The speech token is deliberately
+   a clipped sound (mmm/sss/shh) or a short-vowel cue, never "bee/ess/ay". */
+var PHONIC_PATTERNS=[
+  ['tch','/tʃ/','ch','digraph'],['dge','/dʒ/','j','digraph'],['sch','/sk/','sk','digraph'],['igh','/ī/','eye','vowel'],
+  ['sh','/ʃ/','shh','digraph'],['ch','/tʃ/','ch','digraph'],['th','/θ/','th','digraph'],['ph','/f/','fff','digraph'],['wh','/w/','w','digraph'],
+  ['ck','/k/','k','digraph'],['ng','/ŋ/','ng','digraph'],['qu','/kw/','kw','digraph'],['ee','/ē/','ee','vowel'],['oo','/ū/','oo','vowel'],
+  ['ea','/ē/','ee','vowel'],['ai','/ā/','ay','vowel'],['ay','/ā/','ay','vowel'],['oa','/ō/','oh','vowel'],['ou','/ow/','ow','vowel'],
+  ['ow','/ō/','oh','vowel'],['ar','/ɑr/','ar','vowel'],['er','/ər/','er','vowel'],['ir','/ər/','er','vowel'],['or','/ɔr/','or','vowel'],['ur','/ər/','er','vowel'],
+  ['kn','/n/','nnn','silent'],['wr','/r/','rrr','silent'],['mb','/m/','mmm','silent'],['gn','/n/','nnn','silent']
+];
+var PHONIC_LETTER={a:['/ă/','ah','vowel'],e:['/ĕ/','eh','vowel'],i:['/ĭ/','ih','vowel'],o:['/ŏ/','aw','vowel'],u:['/ŭ/','uh','vowel'],y:['/y/','yuh','consonant'],
+  b:['/b/','b','consonant'],c:['/k/','k','consonant'],d:['/d/','d','consonant'],f:['/f/','fff','consonant'],g:['/g/','g','consonant'],h:['/h/','hhh','consonant'],
+  j:['/dʒ/','j','consonant'],k:['/k/','k','consonant'],l:['/l/','lll','consonant'],m:['/m/','mmm','consonant'],n:['/n/','nnn','consonant'],p:['/p/','p','consonant'],
+  r:['/r/','rrr','consonant'],s:['/s/','sss','consonant'],t:['/t/','t','consonant'],v:['/v/','vvv','consonant'],w:['/w/','w','consonant'],x:['/ks/','ks','consonant'],z:['/z/','zzz','consonant']};
+var PHONIC_EXCEPTIONS={
+  one:[['w','/w/','w','consonant'],['o','/ŭ/','uh','vowel'],['n','/n/','nnn','consonant']],
+  two:[['t','/t/','t','consonant'],['w','/ū/','oo','vowel']],
+  said:[['s','/s/','sss','consonant'],['ai','/ĕ/','eh','vowel'],['d','/d/','d','consonant']],
+  does:[['d','/d/','d','consonant'],['o','/ŭ/','uh','vowel'],['e','/z/','zzz','consonant']],
+  was:[['w','/w/','w','consonant'],['a','/ŏ/','aw','vowel'],['s','/z/','zzz','consonant']]
+};
+function phonicsAnalyze(word){
+  var s=String(word||'').toLowerCase().replace(/[^a-z]/g,''),out=[],i=0;
+  if(PHONIC_EXCEPTIONS[s])return PHONIC_EXCEPTIONS[s].map(function(x){return {g:x[0],ipa:x[1],speech:x[2],kind:x[3]};});
+  while(i<s.length){
+    if(i===s.length-1&&s[i]==='e'&&i>1&&/[bcdfghjklmnpqrstvwxyz]/.test(s[i-1])){i++;continue;}
+    var hit=null;
+    for(var n=0;n<PHONIC_PATTERNS.length;n++){var p=PHONIC_PATTERNS[n];if(s.slice(i,i+p[0].length)===p[0]){hit=p;break;}}
+    if(hit){var hp=hit;if(hit[0]==='th'&&/^(the|this|that|these|those|they|them|their|there|then|than|though)/.test(s))hp=['th','/ð/','th','digraph'];out.push({g:hp[0],ipa:hp[1],speech:hp[2],kind:hp[3]});i+=hit[0].length;continue;}
+    var c=s[i],v=PHONIC_LETTER[c]||['/'+c+'/ ',c,'consonant'];
+    if(c==='c'&&/[eiy]/.test(s[i+1]||''))v=['/s/','sss','consonant'];
+    if(c==='g'&&/[eiy]/.test(s[i+1]||''))v=['/dʒ/','j','consonant'];
+    out.push({g:c,ipa:v[0],speech:v[1],kind:v[2]});i++;
+  }
+  return out.length?out:[{g:String(word||''),ipa:'',speech:String(word||''),kind:'word'}];
+}
+var SYLLABLE_EXCEPTIONS={
+  apple:['ap','ple'],little:['lit','tle'],table:['ta','ble'],teacher:['teach','er'],student:['stu','dent'],computer:['com','pu','ter'],banana:['ba','na','na'],
+  elephant:['el','e','phant'],animal:['an','i','mal'],family:['fam','i','ly'],reading:['read','ing'],writing:['writ','ing'],playing:['play','ing'],
+  running:['run','ning'],helping:['help','ing'],together:['to','ge','ther'],important:['im','por','tant'],beautiful:['beau','ti','ful']
+};
+function syllableParts(word){
+  var raw=String(word||'').toLowerCase().replace(/[^a-z]/g,'');
+  if(SYLLABLE_EXCEPTIONS[raw])return SYLLABLE_EXCEPTIONS[raw].slice();
+  var units=phonicsAnalyze(raw),nuc=[];
+  units.forEach(function(u,i){if(u.kind==='vowel')nuc.push(i);});
+  if(nuc.length<=1)return raw?[raw]:[];
+  var parts=[],start=0;
+  for(var k=0;k<nuc.length-1;k++){
+    var left=nuc[k],right=nuc[k+1],split=right;
+    if(right-left>1)split=right-1;
+    var leftText=units.slice(start,split).map(function(u){return u.g;}).join('');
+    if(leftText)parts.push(leftText);
+    start=split;
+  }
+  var tail=units.slice(start).map(function(u){return u.g;}).join('');if(tail)parts.push(tail);
+  return parts.length?parts:[raw];
+}
+function phonicsHtml(word,active){
+  var parts=syllableParts(word),owner=S.pron||((S.drill&&S.drill.queue&&S.drill.queue[0])||null),sactive=owner&&owner.syllableActive;
+  return '<div class="syllable-title">المقاطع الصوتية — اضغط على مقطع لسماعه</div><div class="syllables-read" dir="ltr">'+parts.map(function(p,i){return '<button type="button" class="syllable'+(sactive===i?' active':'')+'" data-act="phsyll" data-sindex="'+i+'">'+esc(p)+'</button>';}).join('')+'</div><div class="phonics-actions"><button type="button" class="btn primary" data-act="phword">اسمع الكلمة</button></div>';
+}
+function playPhonics(word,mode,index){
+  stopSpeech();var run=PHONEME_RUN,units=phonicsAnalyze(word),owner=S.pron;
+  if(!owner&&S.drill&&S.drill.queue.length)owner=S.drill.queue[0];
+  if(owner){owner.phonics=units;owner.phonicActive=mode==='unit'?index:-1;render();}
+  if(mode==='unit'){var one=units[index];if(one)phonemeAudio(one,function(){if(owner&&run===PHONEME_RUN){owner.phonicActive=-1;render();}},run);return;}
+  if(mode==='word'){speak(word,'en-US',.86,function(){if(owner&&run===PHONEME_RUN){owner.phonicActive=-1;render();}});return;}
+  var i=0;
+  function next(){
+    if(run!==PHONEME_RUN)return;
+    if(i>=units.length){speak(word,'en-US',.88,function(){if(owner&&run===PHONEME_RUN){owner.phonicActive=-1;render();}});return;}
+    if(owner){owner.phonicActive=i;render();}
+    phonemeAudio(units[i++],next,run);
+  }
+  next();
+}
+function spellOut(word){playSyllables(word);}
+function playSyllables(word){
+  stopSpeech();var run=PHONEME_RUN,parts=syllableParts(word),owner=S.pron;
+  if(!owner&&S.drill&&S.drill.queue.length)owner=S.drill.queue[0];
+  if(owner){owner.syllableActive=-1;render();}
+  speak(parts.join(' '),'en-US',.72,function(){if(owner&&run===PHONEME_RUN)render();});
+}
+function playSyllable(word,index){
+  stopSpeech();var run=PHONEME_RUN,parts=syllableParts(word),owner=S.pron;
+  if(!owner&&S.drill&&S.drill.queue.length)owner=S.drill.queue[0];
+  if(owner){owner.syllableActive=index;render();}
+  if(parts[index])speak(parts[index],'en-US',.72,function(){if(owner&&run===PHONEME_RUN){owner.syllableActive=-1;render();}});
+}
+function drillPhonicsWord(){
+  var q=S.drill&&S.drill.queue&&S.drill.queue[0];
+  if(!q||q.i===undefined)return '';
+  return units()[q.i].en;
 }
 
 /* ---------- alignment + pronunciation tips ---------- */
@@ -1027,7 +1143,7 @@ function go(n){
   if(n===3)initFinal();
   render();window.scrollTo(0,0);
 }
-function initPron(){S.pron={i:0,tries:[],passed:[],fb:null,phonics:null,listening:false};}
+function initPron(){S.pron={i:0,tries:[],passed:[],fb:null,phonics:null,phonicActive:-1,syllableActive:-1,listening:false};}
 function drillWords(){var U=units();return U.map(function(u,i){return i;}).filter(function(i){return hasMeaning(U[i]);});}
 var DEX=[
   {k:'blank',t:'أكمل الحروف الناقصة',d:'املأ الحروف الغائبة في الكلمة',ic:'pen'},
@@ -1936,8 +2052,8 @@ function viewPron(){
   '<div class="wcard '+tint(w.wi)+'">'+tagHtml(w)+'<div class="word-en" dir="ltr">'+esc(w.en)+'</div>'+(w.ar?'<div class="word-ar">'+esc(w.ar)+'</div>':'')+'</div>'+
   '<div class="row mid"><button type="button" class="btn" data-act="say">'+ic('spk',20)+'استمع</button>'+
   '<button type="button" class="btn" data-act="slow">ببطء</button>'+
-  '<button type="button" class="btn" data-act="spell">تهجئة صوتية</button></div>'+ 
-  (P.phonics?'<div class="phonics-read">'+P.phonics.map(function(c){return '<span>'+esc(c)+'</span>';}).join('')+'</div>':'')+
+  '<button type="button" class="btn" data-act="spell">أصوات الكلمة</button></div>'+ 
+  phonicsHtml(w.en,P.phonicActive)+
   '<p class="label">استمع ثم اضغط الميكروفون وردّد الكلمة</p>'+
   '<button type="button" class="mic'+(P.listening?' live':'')+'" id="micBtn" data-act="mic" aria-label="ابدأ التسجيل"'+(S.mic==='blocked'||S.mic==='unsupported'?' disabled':'')+'>'+ic('mic',40)+'</button>'+
   (P.listening?'<p class="label">أستمع إليك الآن...</p>':'')+
@@ -2148,7 +2264,7 @@ function viewDrillRun(){
   var h='<section class="panel"><div class="meta"><span>المتبقي '+D.queue.length+' تمرين</span><span>'+pct+'%</span></div>'+
   '<div class="bar"><i style="width:'+pct+'%"></i></div>'+(S.moti?motiHtml(S.moti):'')+
   '<div class="wcard '+tint(w.wi)+'">'+tagHtml(w)+'<p class="label">'+(it.mode==='blank'?'أكمل الحروف الناقصة':'رتّب الحروف المبعثرة')+(l==='ar'?' لتكوين المعنى العربي':' لتكوين الكلمة الإنجليزية')+'</p>'+
-  '<div class="prompt" dir="'+dirOf(pl)+'">'+esc(promptOf(w))+'</div></div>';
+  '<div class="prompt" dir="'+dirOf(pl)+'">'+esc(promptOf(w))+'</div></div>'+phonicsHtml(w.en,it.phonicActive);
   if(it.mode==='blank'){
     var nxt=nextEmpty(st),filled=0,total=0;
     h+='<div class="phonics-legend"><span class="vowel"><i></i>حروف متحركة</span><span class="consonant"><i></i>حروف صامتة</span><span class="digraph"><i></i>حروف مركبة</span></div>'+
@@ -2202,7 +2318,7 @@ function viewChoice(D,it){
   var st=it.st,listen=it.mode==='listen';
   var h=drillHead(D)+'<div class="wcard '+tint(w.wi)+'">'+tagHtml(w)+
     '<p class="label">'+(listen?'استمع ثم اختر الكلمة التي سمعتها':'اختر الكلمة الإنجليزية لهذا المعنى')+'</p>'+
-    (listen?'<button type="button" class="lsay" data-act="lsay" aria-label="استمع">'+ic('spk',40)+'</button>':'<div class="prompt" dir="rtl">'+esc(promptOf(w))+'</div>')+'</div>';
+    (listen?'<button type="button" class="lsay" data-act="lsay" aria-label="استمع">'+ic('spk',40)+'</button>':'<div class="prompt" dir="rtl">'+esc(promptOf(w))+'</div>')+'</div>'+phonicsHtml(w.en,it.phonicActive);
   h+='<div class="cells pool" dir="ltr">'+st.tiles.map(function(t){
     var cls='';if(D.fb){if(normEnS(t.ch)===normEnS(w.en))cls=' good';else if(st.sel===t.id)cls=' bad';}
     return '<button type="button" class="tile wd'+cls+'" data-act="gap" data-id="'+t.id+'"'+(D.fb?' disabled':'')+'>'+esc(t.ch)+'</button>';
@@ -2341,6 +2457,7 @@ function drillCheck(){
 }
 function drillNext(){
   clearTimeout(drillTimer);
+  stopSpeech();
   var D=S.drill;if(!D||!D.fb)return;
   var it=D.queue.shift();
   if(D.fb.ok)D.done++;else{it.st=null;D.queue.push(it);}
@@ -2820,7 +2937,7 @@ $stage.addEventListener('click',function(e){
   if(g){sfx('nav');go(+g.getAttribute('data-go'));return;}
   var b=e.target.closest('[data-act]');if(!b||b.disabled)return;
   var a=b.getAttribute('data-act'),P=S.pron;
-  var own={dex:1,dstart:1,mlt:1,mrt:1,sgen:1,sprac:1,cpick:1,cunpick:1,gap:1,vch:1,etoggle:1,rvtype:1,mic:1,dcheck:1,dict:1,dfield:1,selfok:1,pick:1,unpick:1,fsubmit:1,tofinal:1,analyze:1,sample:1,start:1,rvconfirm:1,rvsel:1,slotpick:1,unslot:1,qtrans:1,etrans:1,rvtrans:1,cam:1,gal:1};
+  var own={dex:1,dstart:1,mlt:1,mrt:1,sgen:1,sprac:1,cpick:1,cunpick:1,gap:1,vch:1,etoggle:1,rvtype:1,mic:1,dcheck:1,dict:1,dfield:1,selfok:1,pick:1,unpick:1,fsubmit:1,tofinal:1,analyze:1,sample:1,start:1,rvconfirm:1,rvsel:1,slotpick:1,unslot:1,qtrans:1,etrans:1,rvtrans:1,cam:1,gal:1,phsound:1,phblend:1,phword:1,phsyll:1};
   if(!own[a])sfx('tap');
   var wi=+b.getAttribute('data-i');
   if(a==='qcam'||a==='qgal'){captureInputs();S.bulkOpen=true;S.addMsg='';render();var qb=document.querySelector('[data-act="'+(a==='qcam'?'cam':'gal')+'"]');if(qb&&!qb.disabled)qb.click();}
@@ -2855,18 +2972,22 @@ $stage.addEventListener('click',function(e){
   else if(a==='say')speak(units()[P.i].en,'en-US',0.9);
   else if(a==='slow')speak(units()[P.i].en,'en-US',0.5);
   else if(a==='spell')spellOut(units()[P.i].en);
+  else if(a==='phsound'){var pw=S.stage===1?units()[P.i].en:drillPhonicsWord();if(pw)playPhonics(pw,'unit',+b.getAttribute('data-pindex'));}
+  else if(a==='phblend'){var pb=S.stage===1?units()[P.i].en:drillPhonicsWord();if(pb)playSyllables(pb);}
+  else if(a==='phword'){var pk=S.stage===1?units()[P.i].en:drillPhonicsWord();if(pk)playPhonics(pk,'word');}
+  else if(a==='phsyll'){var ps=S.stage===1?units()[P.i].en:drillPhonicsWord();if(ps)playSyllable(ps,+b.getAttribute('data-sindex'));}
   else if(a==='mic')listen();
   else if(a==='selfok'){P.passed[P.i]=true;P.tries[P.i]=Math.max(P.tries[P.i]||0,1);P.fb=null;sfx('correct');render();}
-  else if(a==='pprev'){stopRec();P.listening=false;P.i=Math.max(0,P.i-1);P.fb=null;P.phonics=null;render();}
+  else if(a==='pprev'){stopSpeech();stopRec();P.listening=false;P.i=Math.max(0,P.i-1);P.fb=null;P.phonics=null;P.phonicActive=-1;P.syllableActive=-1;render();}
   else if(a==='pnext'){
-    stopRec();P.listening=false;
+    stopSpeech();stopRec();P.listening=false;
     if(P.i>=units().length-1){S.done[1]=true;sfx('done');go(2);}
-    else{P.i++;P.fb=null;P.phonics=null;render();}
+    else{P.i++;P.fb=null;P.phonics=null;P.phonicActive=-1;P.syllableActive=-1;render();}
   }
   else if(a==='dex'){var dk=b.getAttribute('data-k');S.dex[dk]=!dexOn(dk);S.drill.msg='';save();sfx('tap');render();}
   else if(a==='dall'){var all=b.getAttribute('data-m')==='all';DEX.forEach(function(d){S.dex[d.k]=all;});S.drill.msg='';save();render();}
   else if(a==='dstart')startDrill();
-  else if(a==='dmenu'){clearTimeout(drillTimer);stopRec();S.drill={phase:'menu',queue:[],total:0,done:0,fb:null,msg:''};render();}
+  else if(a==='dmenu'){clearTimeout(drillTimer);stopSpeech();stopRec();S.drill={phase:'menu',queue:[],total:0,done:0,fb:null,msg:''};render();}
   else if(a==='mlt')matchTap('L',+b.getAttribute('data-id'));
   else if(a==='mrt')matchTap('R',+b.getAttribute('data-id'));
   else if(a==='lsay'){var lq=S.drill.queue[0];if(lq&&lq.i!==undefined)speak(units()[lq.i].en,'en-US',0.85);}
