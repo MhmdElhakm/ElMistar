@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>صحتي الطبيعية</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a1626;--bg2:#0f2036;--card:#112741;--card2:#16314f;--line:#21436a;--txt:#e9f2fc;--mut:#8da6c0;--acc:#4db8ff;--accT:#06233b;--amb:#f6b94a;--pink:#f06ea0;--grn:#4ade80;--red:#ff6b6b;--shadow:0 10px 30px rgba(0,0,0,.35)}
+[data-theme=light]{--bg:#eaf2fa;--bg2:#f4f8fc;--card:#ffffff;--card2:#eef5fc;--line:#cfe0f0;--txt:#0f2a44;--mut:#587291;--acc:#0b8fe0;--accT:#ffffff;--amb:#a96a0b;--pink:#d6336c;--grn:#168a4a;--red:#d63a3a;--shadow:0 8px 24px rgba(30,70,110,.12)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:'Cairo',Tahoma,'Segoe UI',sans-serif;background:radial-gradient(900px 500px at 80% -10%,color-mix(in srgb,var(--acc) 14%,transparent),transparent),var(--bg);color:var(--txt);min-height:100vh;line-height:1.6}
+button{font-family:inherit}
+.app{max-width:480px;margin:auto;padding:18px 16px 170px}
+header.top{display:flex;justify-content:space-between;align-items:flex-start}
+.date{color:var(--mut);font-size:13px}
+h1{margin:2px 0 0;color:var(--acc);font-size:32px;font-weight:800;line-height:1.3}
+.iconbtn{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--acc);font-size:20px;cursor:pointer;box-shadow:var(--shadow)}
+.banner{display:flex;gap:10px;align-items:flex-start;background:color-mix(in srgb,var(--amb) 12%,transparent);border:1px solid color-mix(in srgb,var(--amb) 45%,transparent);color:var(--amb);padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.8;margin:14px 0}
+.banner.red{background:color-mix(in srgb,var(--red) 12%,transparent);border-color:color-mix(in srgb,var(--red) 45%,transparent);color:var(--red)}
+.banner.blue{background:color-mix(in srgb,var(--acc) 10%,transparent);border-color:color-mix(in srgb,var(--acc) 40%,transparent);color:var(--acc)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;position:relative;overflow:hidden}
+.stat::after{content:"";position:absolute;width:120px;height:120px;border-radius:50%;background:color-mix(in srgb,var(--acc) 10%,transparent);inset-inline-start:-40px;bottom:-50px}
+.stat b{display:block;font-size:26px;color:var(--acc);font-weight:800;position:relative;z-index:1}
+.stat span{color:var(--mut);font-size:12px;position:relative;z-index:1}
+.card{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--acc);border-radius:26px;padding:18px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card.redc{border-top-color:var(--red)}
+.card h2{margin:0;font-size:19px}
+.sub{color:var(--mut);font-size:12px}
+.head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.head .grow{flex:1}
+.hico{width:46px;height:46px;border-radius:14px;background:var(--card2);display:grid;place-items:center;font-size:22px;border:1px solid var(--line)}
+.sq{width:46px;height:46px;border-radius:14px;border:0;background:var(--acc);color:var(--accT);font-size:20px;cursor:pointer;box-shadow:0 0 18px color-mix(in srgb,var(--acc) 40%,transparent)}
+.lbl{color:var(--mut);font-size:12px;margin:10px 4px 6px;font-weight:600}
+.seg{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin:0 0 12px;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:1 0 auto;min-width:82px;border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:16px;padding:10px 8px;cursor:pointer;text-align:center}
+.seg button b{display:block;font-size:14px}
+.seg button small{color:var(--mut);font-size:11px}
+.seg button.on{background:var(--acc);color:var(--accT);border-color:var(--acc);box-shadow:0 0 18px color-mix(in srgb,var(--acc) 45%,transparent)}
+.seg button.on small{color:var(--accT);opacity:.8}
+.pills{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none}
+.pill{flex:1 0 auto;border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill.on{background:var(--acc);color:var(--accT);border-color:var(--acc);box-shadow:0 0 18px color-mix(in srgb,var(--acc) 45%,transparent)}
+.search{width:100%;border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:16px;padding:12px 14px;font-family:inherit;font-size:14px;outline:none;margin-bottom:12px}
+.search:focus{border-color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer}
+.chip.on{background:var(--acc);color:var(--accT);border-color:var(--acc);font-weight:700}
+.toggle{display:flex;align-items:center;justify-content:space-between;background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:10px 14px;margin-top:6px;cursor:pointer;font-size:14px}
+.sw{width:42px;height:24px;border-radius:99px;background:var(--line);position:relative;transition:.2s}
+.sw::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--acc)}
+.sw.on::after{inset-inline-start:21px}
+.item{background:var(--card2);border-radius:18px;padding:12px 14px;margin-bottom:10px;border-right:4px solid var(--c)}
+.item .row{display:flex;align-items:center;gap:12px;cursor:pointer}
+.ico{width:44px;height:44px;border-radius:14px;background:var(--bg2);display:grid;place-items:center;font-size:20px;flex:none}
+.item h3{margin:0;font-size:15px}
+.meta{color:var(--mut);font-size:12px}
+.tick{width:30px;height:30px;border-radius:50%;border:2px solid var(--c);background:transparent;cursor:pointer;color:#fff;font-weight:800;flex:none}
+.tick.on{background:var(--c)}
+.det{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);font-size:13.5px;line-height:1.9}
+.item.open .det{display:block}
+.det h4{margin:6px 0 2px;color:var(--acc);font-size:13px}
+.det ul,.det ol{margin:0;padding-inline-start:20px}
+.tip{background:color-mix(in srgb,var(--amb) 12%,transparent);color:var(--amb);padding:8px 10px;border-radius:12px;margin-top:8px;font-size:13px}
+.caut{background:color-mix(in srgb,var(--red) 10%,transparent);color:var(--red);padding:8px 10px;border-radius:12px;margin-top:8px;font-size:13px}
+.empty{text-align:center;color:var(--mut);padding:18px;font-size:14px}
+ul.flags{margin:0;padding-inline-start:20px;font-size:14px;line-height:2}
+.svgbox{background:var(--card2);border-radius:20px;padding:10px;text-align:center;border:1px solid var(--line)}
+.svgbox svg{width:100%;max-width:250px;height:auto}
+.pt{cursor:pointer}
+.pt circle.dot{fill:var(--amb);stroke:#fff;stroke-width:2}
+.pt.on circle.dot{fill:var(--pink)}
+.pt circle.ring{fill:none;stroke:var(--amb);stroke-width:2;transform-box:fill-box;transform-origin:center;animation:pulse 1.6s infinite}
+.pt.on circle.ring{stroke:var(--pink)}
+@keyframes pulse{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.2);opacity:0}}
+.pt text{fill:var(--txt);font-size:11px;font-weight:700;text-anchor:middle;paint-order:stroke;stroke:var(--card2);stroke-width:3px}
+.breath{width:200px;height:200px;margin:8px auto 14px;position:relative;display:grid;place-items:center}
+.bc{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--acc) 85%,#fff),var(--acc) 60%,color-mix(in srgb,var(--acc) 50%,#000));transform:scale(.55);transition:transform 4s linear;box-shadow:0 0 40px color-mix(in srgb,var(--acc) 50%,transparent)}
+.bt{position:relative;z-index:1;text-align:center;color:var(--accT);font-weight:800}
+.bt b{display:block;font-size:22px}
+.bt span{font-size:30px}
+.big{width:100%;border:0;border-radius:16px;padding:13px;background:var(--acc);color:var(--accT);font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 0 18px color-mix(in srgb,var(--acc) 40%,transparent)}
+.big.stop{background:var(--card2);color:var(--txt);box-shadow:none;border:1px solid var(--line)}
+.stretch{display:flex;gap:12px;align-items:center;background:var(--card2);border-radius:18px;padding:10px 12px;margin-bottom:10px}
+.stretch svg{flex:none;background:var(--bg2);border-radius:14px}
+.stretch h3{margin:0 0 2px;font-size:15px}
+.stretch ol{margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.8}
+.cups{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.cup{border:1px solid var(--line);background:var(--card2);border-radius:14px;padding:10px 0;font-size:22px;cursor:pointer;opacity:.5;filter:grayscale(1)}
+.cup.on{opacity:1;filter:none;border-color:var(--acc)}
+.tipcard{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:18px;margin-top:6px;box-shadow:var(--shadow)}
+.tipcard p{margin:0 0 12px;font-weight:700;font-size:15px;line-height:1.8}
+.dots{display:flex;gap:6px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--line);display:block;cursor:pointer}
+.dots i.on{width:22px;border-radius:8px;background:var(--acc)}
+.badge{width:62px;height:62px;border-radius:50%;background:var(--amb);display:grid;place-items:center;font-size:30px;flex:none;box-shadow:0 0 22px color-mix(in srgb,var(--amb) 45%,transparent)}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg2);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 6px 12px;z-index:30}
+.nav button{border:0;background:transparent;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border-radius:16px;cursor:pointer;font-size:12px;font-weight:600;position:relative;min-width:62px}
+.nav button span{font-size:20px}
+.nav button.on{color:var(--acc);background:var(--card2)}
+.nav button.on::after{content:"";position:absolute;bottom:0;width:22px;height:3px;border-radius:3px;background:var(--acc)}
+.foot{color:var(--mut);font-size:11.5px;text-align:center;margin:18px 0 8px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div>
+      <div class="date" id="date"></div>
+      <h1>صحتي الطبيعية 🌿</h1>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <a href="../index.html" class="iconbtn" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;" title="العودة للرئيسية">🏠</a>
+      <button class="iconbtn" id="themeBtn" data-a="theme" aria-label="تبديل المظهر">☀️</button>
+    </div>
+  </header>
+
+  <div class="banner">
+    <span>⚕️</span>
+    <div>تطبيق للتثقيف الصحي العام ولا يغني عن الطبيب. الأعشاب قد تتداخل مع الأدوية، وهو مخصص للأعراض البسيطة فقط. عند الأعراض الشديدة أو المستمرة أو عند الرضع راجع الطبيب. وعند ألم الصدر أو صعوبة التنفس أو فقدان الوعي اتصل بالإسعاف فوراً.</div>
+  </div>
+
+  <main id="view"></main>
+
+  <div class="tipcard" id="tipcard"></div>
+  <div class="foot">تنبيه: الممارسات التقليدية كالضغط بالنقاط والأعشاب أدلتها العلمية متفاوتة، وهي وسائل مساندة لا بديلة عن العلاج الطبي.</div>
+</div>
+
+<nav class="nav" id="nav">
+  <button data-a="nav" data-v="sym"><span>🩺</span>الأعراض</button>
+  <button data-a="nav" data-v="herb"><span>🌿</span>العطار</button>
+  <button data-a="nav" data-v="acu"><span>👆</span>الضغط</button>
+  <button data-a="nav" data-v="ex"><span>🧘</span>التمارين</button>
+  <button data-a="nav" data-v="day"><span>📅</span>يومي</button>
+</nav>
+
+<script>
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const dayKey=new Date().toLocaleDateString('en-CA');
+
+/* ---------- البيانات ---------- */
+const AG=[{n:'رضيع',s:'أقل من سنة'},{n:'طفل',s:'١ – ١٢ سنة'},{n:'مراهق',s:'١٣ – ١٧ سنة'},{n:'بالغ',s:'١٨ – ٥٩ سنة'},{n:'كبير سن',s:'٦٠+ سنة'}];
+const R=(n,t,m,time,ing,st,tip='',pg=1)=>({n,t,m,time,ing:ing.split('|').filter(x=>x&&x!=='—'),st:st.split('|'),tip,pg});
+
+const SY=[
+{id:'headache',n:'صداع',e:'😣',pts:['hegu','taichong'],br:1,stretch:true,
+ rf:['صداع مفاجئ شديد جداً لم تعهده من قبل','صداع مع حرارة وتيبس في الرقبة','صداع بعد ضربة على الرأس','صداع مع ضعف أو تنميل أو اضطراب في الكلام أو الرؤية','صداع جديد يبدأ بعد سن الخمسين'],
+ r:[
+ R('كمادة باردة أو دافئة','l',1,'15 دقيقة','قطعة قماش نظيفة|ماء بارد (للصداع النابض) أو دافئ (لشد الرقبة والكتفين)','بلّل القماش واعصره جيداً|ضعه على الجبهة أو مؤخرة الرقبة 10–15 دقيقة|استلقِ في غرفة هادئة معتمة','لا تضع الثلج مباشرة على الجلد.'),
+ R('كوبان من الماء وراحة قصيرة','l',1,'20 دقيقة','كوبان من الماء','اشرب الماء على مدى 10 دقائق|ارتح بعيداً عن الشاشات|تنفس ببطء وعمق','قلة السوائل وتخطي الوجبات من أسباب الصداع الشائعة.'),
+ R('شاي النعناع','d',2,'10 دقائق','ملعقة صغيرة نعناع مجفف (أو 6 أوراق طازجة)|كوب ماء مغلي','صب الماء المغلي على النعناع|غطِّه 5–7 دقائق|صفِّه واشربه دافئاً على رشفات','يُتجنب عند وجود ارتجاع في المريء.',0),
+ R('شاي الزنجبيل والليمون','d',2,'12 دقيقة','شريحتان من الزنجبيل الطازج|كوب ماء|عصير نصف ليمونة|عسل (اختياري)','اغلِ الزنجبيل في الماء 5 دقائق|أطفئ النار واتركه دقيقتين|أضف الليمون والعسل','استشر طبيبك إن كنت تتناول مميعات الدم.',0),
+ R('شاي البابونج','d',1,'10 دقائق','ملعقة كبيرة زهر بابونج مجفف|كوب ماء مغلي','غطِّ الزهر بالماء المغلي|اتركه 5–10 دقائق|صفِّه واشربه دافئاً','قد يسبب حساسية لمن لديه حساسية من نباتات العائلة النجمية كالأقحوان.',0),
+ R('موزة وحفنة لوز','f',2,'دقيقتان','موزة|حفنة لوز غير مملح','تناولهما ببطء|اشرب كوب ماء معهما','غنيان بالمغنيسيوم والبوتاسيوم.')
+ ]},
+{id:'colon',n:'قولون وانتفاخ',e:'🌀',pts:['neiguan','taichong'],br:2,stretch:false,
+ rf:['وجود دم في البراز أو براز أسود','فقدان وزن غير مفسر','ألم بطن شديد ومستمر أو قيء متكرر','إسهال أو إمساك مستمر أكثر من أسبوعين','حرارة مصاحبة للألم'],
+ r:[
+ R('شاي اليانسون','d',1,'10 دقائق','ملعقة صغيرة يانسون|كوب ماء مغلي','اهرس الحبوب قليلاً|صب عليها الماء المغلي وغطِّ 8 دقائق|صفِّه واشربه دافئاً بعد الأكل','يُتجنب في الحمل والرضاعة.',0),
+ R('شاي الشمر','d',1,'10 دقائق','ملعقة صغيرة بذور شمر|كوب ماء مغلي','اهرس البذور قليلاً|غطِّها بالماء المغلي 10 دقائق|صفِّه واشربه دافئاً','يُتجنب في الحمل والرضاعة.',0),
+ R('شاي النعناع','d',2,'10 دقائق','ملعقة صغيرة نعناع مجفف|كوب ماء مغلي','صب الماء المغلي على النعناع|غطِّه 7 دقائق|اشربه دافئاً بعد الوجبة','قد يزيد الحموضة عند بعض الأشخاص.',0),
+ R('كمادة دافئة على البطن','l',1,'15 دقيقة','كيس ماء دافئ أو منشفة دافئة','ضع الكمادة فوق قماش خفيف على البطن|ابقَ مسترخياً 15 دقيقة','تأكد أنها دافئة وليست ساخنة.'),
+ R('مشي خفيف بعد الأكل','l',1,'10–15 دقيقة','—','امشِ بهدوء بعد الوجبة بنحو 10 دقائق|تنفس بعمق وانتظام','يساعد على تحريك الغازات.'),
+ R('زبادي طبيعي غير محلى','f',1,'دقيقتان','علبة زبادي طبيعي|ملعقة شوفان (اختياري)','تناول كوباً صغيراً يومياً|ابدأ بكمية قليلة وراقب الأعراض','يحتوي على بكتيريا نافعة؛ تجنب النوع المحلى.'),
+ R('أرز مسلوق أو شوربة شوفان','f',1,'20 دقيقة','نصف كوب أرز أو شوفان|كوبان ماء|رشة ملح','اسلق حتى يصبح طرياً|تناوله دافئاً على مهل','وجبة خفيفة تريح الأمعاء أثناء النوبات.'),
+ R('تجنب مسببات الانتفاخ','l',1,'—','المشروبات الغازية|الكرنب والبقوليات بكثرة|العلكة والمحليات الصناعية','قلّل هذه الأطعمة أسبوعاً|دوّن ما يزيد الأعراض عندك','لا تستبعد أطعمة مفيدة نهائياً دون استشارة.'),
+ R('تدليك لطيف لبطن الرضيع','l',0,'5 دقائق','يدان دافئتان','ثنِ ركبتي الرضيع إلى بطنه بلطف|دلّك البطن بحركات دائرية خفيفة مع اتجاه عقارب الساعة|ساعده على التجشؤ بعد كل رضعة','راجع الطبيب إن استمر البكاء الشديد أو ظهرت حرارة أو انتفاخ شديد.')
+ ]},
+{id:'cold',n:'زكام',e:'🤧',pts:['hegu','lieque'],br:0,stretch:false,
+ rf:['حرارة أعلى من 39 درجة أو تستمر أكثر من 3 أيام','ضيق في التنفس أو صفير في الصدر','ألم صدر أو ألم أذن شديد','استمرار الأعراض أكثر من 10 أيام','عند الرضع: أي ارتفاع في الحرارة أو رفض الرضاعة'],
+ r:[
+ R('محلول ملحي للأنف','l',0,'5 دقائق','قطرات أو بخاخ محلول ملحي معقم من الصيدلية','ضع قطرتين في كل فتحة|للرضع: اسحب المخاط بلطف بشفاط أنف|كرر قبل الرضاعة وقبل النوم','استخدم المحلول الجاهز المعقم ولا تحضّره بنسب تقديرية.'),
+ R('ترطيب الهواء والسوائل','l',0,'طوال اليوم','مرطب هواء نظيف|سوائل أو رضعات متكررة','شغّل المرطب في غرفة النوم|قدّم السوائل بانتظام|ابقَ في الراحة','نظّف المرطب يومياً لتجنب العفن.'),
+ R('كوب ماء دافئ بالليمون والعسل','d',1,'5 دقائق','كوب ماء دافئ (ليس مغلياً)|عصير نصف ليمونة|ملعقة صغيرة عسل','اخلط المكونات|اشربه على رشفات','العسل ممنوع تماماً لمن هم أقل من سنة.'),
+ R('شراب الزنجبيل بالعسل','d',2,'12 دقيقة','شريحتان زنجبيل طازج|كوب ماء|ملعقة صغيرة عسل','اغلِ الزنجبيل في الماء 5 دقائق|اتركه يفتر قليلاً|أضف العسل واشرب دافئاً','يُتجنب مع مميعات الدم وفي الحمل بكميات كبيرة.',0),
+ R('حساء الدجاج الدافئ','f',1,'30 دقيقة','قطعة صدر دجاج|جزرة وبصلة|ماء وملح خفيف','اسلق الدجاج مع الخضار 25 دقيقة|تناوله دافئاً','يرطّب ويغذّي ويخفف الاحتقان.'),
+ R('الغرغرة بماء دافئ وملح','l',2,'دقيقتان','نصف ملعقة صغيرة ملح|كوب ماء دافئ','ذوّب الملح في الماء|غرغر 30 ثانية ثم ابصق|كرر 3 مرات','لا تبلعه.'),
+ R('استنشاق البخار','l',3,'10 دقائق','وعاء ماء ساخن (ليس مغلياً)|منشفة','ضع الوعاء على سطح ثابت|اجلس بمسافة آمنة من البخار|تنفس بهدوء 5–10 دقائق','احذر الحروق؛ لا يُستخدم مع الأطفال.'),
+ R('وسادة إضافية أثناء النوم','l',3,'—','وسادة إضافية','ارفع الرأس والكتفين قليلاً|ابقَ الغرفة مهواة ومرطبة','يخفف الاحتقان الليلي.')
+ ]},
+{id:'sleep',n:'أرق',e:'😴',pts:['shenmen','yongquan'],br:0,stretch:false,
+ rf:['أرق يستمر أكثر من 3 أسابيع','شخير شديد مع توقف التنفس أثناء النوم','حزن مستمر أو قلق شديد','نعاس مفرط نهاراً يؤثر على القيادة أو العمل'],
+ r:[
+ R('روتين نوم هادئ','l',0,'30 دقيقة','إضاءة خافتة|حمام دافئ|هدوء','ثبّت موعد النوم يومياً|اخفض الإضاءة قبل النوم بنصف ساعة|للرضع: ضعه على ظهره في سرير خالٍ من الوسائد والألعاب','راجع الطبيب إن كان الرضيع لا ينام أو يبكي بشدة.'),
+ R('إبعاد الشاشات قبل النوم','l',1,'ساعة','—','أغلق الهاتف والتلفاز قبل النوم بساعة|اقرأ كتاباً ورقياً أو استمع لموسيقى هادئة','الضوء الأزرق يؤخر إفراز هرمون النوم.'),
+ R('كوب حليب دافئ','d',1,'5 دقائق','كوب حليب|ملعقة عسل صغيرة (لمن هو أكبر من سنة)','سخّن الحليب دون غليان|اشربه قبل النوم بنصف ساعة','تجنبه لو لديك حساسية من اللاكتوز.'),
+ R('شاي البابونج','d',1,'10 دقائق','ملعقة كبيرة زهر بابونج مجفف|كوب ماء مغلي','غطِّ الزهر بالماء المغلي 8 دقائق|صفِّه واشربه قبل النوم بساعة','قد يسبب حساسية لمن لديه حساسية الأقحوان.',0),
+ R('شاي الترنجان واللافندر','d',3,'10 دقائق','ملعقة صغيرة ترنجان (بلسم الليمون) مجفف|نصف ملعقة صغيرة لافندر مجفف|كوب ماء مغلي','غطِّ الأعشاب بالماء المغلي 8 دقائق|صفِّه واشربه دافئاً','استشر طبيبك مع أدوية الغدة الدرقية أو المنومات.',0),
+ R('حمام قدمين دافئ','l',1,'15 دقيقة','حوض ماء دافئ','املأ الحوض بماء دافئ لا ساخن|انقع القدمين 10–15 دقيقة|جففهما جيداً','اختبر الحرارة بمرفقك؛ ومرضى السكري يتوخون الحذر.'),
+ R('موزة أو شوفان في العشاء','f',1,'10 دقائق','موزة أو نصف كوب شوفان مطبوخ بالحليب','تناول وجبة خفيفة قبل النوم بساعتين|تجنب الوجبات الثقيلة','العشاء الثقيل يعيق النوم.'),
+ R('تنفس 4-7-8','l',2,'5 دقائق','—','اجلس أو استلقِ بوضع مريح|اتبع التمرين المصور في تبويب التمارين','توقف إن شعرت بدوخة.'),
+ R('تقليل الكافيين','l',1,'—','الشاي والقهوة|المشروبات الغازية والطاقة','توقف عن الكافيين بعد الظهر|استبدله بشاي أعشاب','الكافيين يبقى في الجسم ساعات طويلة.')
+ ]},
+{id:'stress',n:'إجهاد وتوتر',e:'😮‍💨',pts:['shenmen','yongquan','taichong'],br:2,stretch:true,
+ rf:['حزن مستمر أو أفكار لإيذاء النفس (اطلب مساعدة عاجلة فوراً)','خفقان شديد أو ألم في الصدر','تعب شديد غير مفسر يستمر أكثر من أسبوعين','نوبات هلع متكررة'],
+ r:[
+ R('تنفس عميق 5 دقائق','l',1,'5 دقائق','—','اجلس باسترخاء|اتبع تمرين التنفس المصور في تبويب التمارين','يخفف التوتر خلال دقائق.'),
+ R('مشي في الهواء الطلق','l',1,'20–30 دقيقة','حذاء مريح','امشِ بخطى معتدلة|ركز على التنفس والمحيط من حولك','يفضل في ضوء النهار.'),
+ R('شاي الترنجان','d',3,'10 دقائق','ملعقة صغيرة ترنجان مجفف|كوب ماء مغلي','غطِّ العشب بالماء المغلي 8 دقائق|صفِّه واشربه دافئاً','يُتجنب في الحمل، وتُستشار الطبيب مع أدوية الغدة الدرقية.',0),
+ R('شاي القرفة والزنجبيل','d',3,'12 دقيقة','عود قرفة صغير|شريحة زنجبيل|كوب ماء','اغلِ المكونات 5 دقائق|اتركه 3 دقائق ثم صفِّه','لا تكثر من القرفة، ومرضى السكري يراقبون السكر.',0),
+ R('تمرتان مع كوب حليب','f',1,'3 دقائق','تمرتان|كوب حليب دافئ','تناولهما ببطء كوجبة خفيفة','طاقة ثابتة؛ ومرضى السكري بكمية أقل.'),
+ R('شرب الماء بانتظام','l',1,'—','زجاجة ماء بجانبك','اشرب كوباً كل ساعتين|خفف المنبهات','الجفاف يزيد الشعور بالتعب والتوتر.'),
+ R('نوم كافٍ','l',1,'7–9 ساعات','—','نم واستيقظ في موعد ثابت|ابتعد عن الشاشات قبل النوم','النوم من أهم أدوية التوتر.'),
+ R('إطالة خفيفة 5 دقائق','l',1,'5 دقائق','—','اتبع تمارين الإطالة المصورة في تبويب التمارين','يخفف شد الرقبة والكتفين.')
+ ]},
+{id:'throat',n:'التهاب الحلق والسعال',e:'😷',pts:['lieque','hegu'],br:0,stretch:false,
+ rf:['صعوبة شديدة في البلع أو سيلان لعاب عند الطفل','سعال يستمر أكثر من 3 أسابيع أو يصاحبه دم','ضيق تنفس أو صفير','حرارة مرتفعة أو بقع بيضاء على اللوزتين'],
+ r:[
+ R('عسل دافئ بالليمون','d',1,'5 دقائق','ملعقة عسل (صغيرة للأطفال)|عصير نصف ليمونة|كوب ماء دافئ ليس مغلياً','اخلط المكونات جيداً|اشربه على رشفات خاصة قبل النوم','العسل ممنوع تماماً لمن هم أقل من سنة (خطر التسمم الوشيقي).'),
+ R('شاي الزعتر','d',1,'10 دقائق','ملعقة صغيرة زعتر مجفف|كوب ماء مغلي','صب الماء المغلي على الزعتر|غطِّه 8 دقائق|صفِّه واشربه دافئاً','يُتجنب بكميات علاجية في الحمل.',0),
+ R('شاي الزنجبيل','d',2,'10 دقائق','شريحتان زنجبيل|كوب ماء|عسل (اختياري)','اغلِ الزنجبيل 5 دقائق|اتركه يفتر قليلاً|أضف العسل','يُتجنب مع مميعات الدم.',0),
+ R('شاي اليانسون','d',1,'10 دقائق','ملعقة صغيرة يانسون|كوب ماء مغلي','اهرس الحبوب قليلاً|غطِّها بالماء المغلي 8 دقائق|اشربه دافئاً','يُتجنب في الحمل والرضاعة.',0),
+ R('غرغرة ماء وملح','l',2,'دقيقتان','نصف ملعقة صغيرة ملح|كوب ماء دافئ','ذوّب الملح|غرغر 30 ثانية ثم ابصق|كرر 3 مرات يومياً','لا تبلعه.'),
+ R('ترطيب الهواء وسوائل دافئة','l',0,'طوال اليوم','مرطب هواء نظيف|سوائل دافئة أو رضعات متكررة','حافظ على رطوبة الغرفة|قدّم السوائل بانتظام','نظّف المرطب يومياً.'),
+ R('حساء دافئ','f',1,'30 دقيقة','خضار مشكلة أو دجاج|ماء وملح خفيف','اسلق المكونات حتى تنضج|تناوله دافئاً غير ساخن','يهدئ الحلق ويرطبه.')
+ ]},
+{id:'nausea',n:'عسر الهضم والغثيان',e:'🤢',pts:['neiguan','hegu'],br:2,stretch:false,
+ rf:['قيء متكرر أو لا يتوقف','ألم شديد أعلى البطن أو في الصدر','قيء بدم أو براز أسود','علامات جفاف: قلة البول، جفاف الفم، دوخة','عند الأطفال: خمول شديد أو رفض الشرب'],
+ r:[
+ R('محلول الإماهة الفموي','d',0,'عند الحاجة','محلول إماهة جاهز من الصيدلية','حضّره حسب تعليمات العبوة|قدّمه رشفات صغيرة متكررة','أهم إجراء عند القيء أو الإسهال خاصة للأطفال.'),
+ R('شاي الزنجبيل','d',2,'10 دقائق','شريحتان زنجبيل طازج|كوب ماء','اغلِ الزنجبيل 5 دقائق|اتركه يفتر|اشربه على رشفات صغيرة','للحوامل: استشيري الطبيب أولاً.',0),
+ R('شاي النعناع','d',2,'10 دقائق','ملعقة صغيرة نعناع مجفف|كوب ماء مغلي','غطِّ النعناع 7 دقائق|اشربه دافئاً بعد الوجبة','يزيد الحموضة عند بعض الأشخاص.',0),
+ R('شاي اليانسون','d',1,'10 دقائق','ملعقة صغيرة يانسون|كوب ماء مغلي','اهرس الحبوب|غطِّها بالماء المغلي 8 دقائق|اشرب دافئاً','يُتجنب في الحمل والرضاعة.',0),
+ R('شاي الكمون','d',3,'10 دقائق','ملعقة صغيرة كمون|كوب ماء مغلي','غطِّ الكمون بالماء المغلي 8 دقائق|صفِّه واشربه دافئاً','يُتجنب بكميات كبيرة في الحمل.',0),
+ R('رشفات ماء صغيرة','d',1,'—','ماء بارد قليلاً','اشرب رشفة كل 5 دقائق|لا تشرب كمية كبيرة دفعة واحدة','يحمي من الجفاف.'),
+ R('بسكويت جاف أو توست','f',1,'5 دقائق','قطعة توست أو بسكويت جاف','تناول قطعة صغيرة ببطء|انتظر قبل الوجبة التالية','طعام لطيف على المعدة.'),
+ R('موز وأرز مسلوق','f',1,'15 دقيقة','موزة|نصف كوب أرز مسلوق','تناولهما بكميات صغيرة|ابتعد عن الدهون والتوابل','يساعد عند اضطراب المعدة.'),
+ R('عادات أكل صحية','l',1,'—','—','كل ببطء وبكميات صغيرة|لا تستلقِ بعد الأكل مباشرة|تجنب الدسم والتوابل الحارة','قلل القهوة والمشروبات الغازية.')
+ ]},
+{id:'muscle',n:'شد عضلي وآلام',e:'💪',pts:['hegu','taichong'],br:1,stretch:true,
+ rf:['ألم بعد إصابة مع تورم أو عدم القدرة على الحركة','ألم في الساق مع تورم واحمرار','ألم صدر أو ضيق تنفس','ضعف أو تنميل مستمر'],
+ r:[
+ R('كمادات دافئة','l',1,'15–20 دقيقة','منشفة أو كيس ماء دافئ','ضعه على العضلة المشدودة|ارفعه بعد 15–20 دقيقة','لا تنم عليه، وتجنب الحرارة الشديدة.'),
+ R('حمام ملح إبسوم دافئ','l',2,'20 دقيقة','حوض ماء دافئ|كوب ملح إبسوم','ذوّب الملح في الماء الدافئ|انقع الجسم 15–20 دقيقة','لا يناسب من لديه أمراض جلدية أو كلى.'),
+ R('تمارين إطالة لطيفة','l',1,'5–10 دقائق','—','اتبع تمارين الإطالة المصورة|ابقَ على كل وضع 20–30 ثانية','لا تمد العضلة حتى الألم الشديد.'),
+ R('شاي الزنجبيل والكركم','d',3,'12 دقيقة','ملعقة صغيرة كركم|شريحتان زنجبيل|رشة فلفل أسود|كوب ماء|عسل','اغلِ المكونات 5 دقائق|أضف العسل بعد أن يفتر','يتداخل مع مميعات الدم؛ ويُتجنب مع حصوات المرارة.',0),
+ R('موز وماء','f',1,'3 دقائق','موزة|كوب ماء','تناولهما بعد التمرين أو عند التقلص','البوتاسيوم والسوائل يخففان التقلصات.'),
+ R('تدليك لطيف بزيت زيتون دافئ','l',1,'10 دقائق','ملعقة زيت زيتون دافئ','دلّك العضلة بحركات دائرية خفيفة|اتجه نحو القلب','تجنب الضغط القوي على مكان الإصابة.')
+ ]}
+];
+SY.forEach(s=>s.r.forEach((r,i)=>r.k=s.id+'_'+i));
+
+const PT={
+hegu:{n:'هيغو',v:'back',x:46,y:118,loc:'اللحم بين عظمتي الإبهام والسبابة على ظهر اليد',use:'الصداع، شد الرقبة، التوتر، بداية الزكام',pg:true},
+lieque:{n:'ليكيه',v:'palm',x:66,y:218,loc:'فوق المعصم من جهة الإبهام بنحو إصبعين عرضاً',use:'السعال، احتقان الأنف والحلق، شد الرقبة',pg:false},
+neiguan:{n:'نيغوان',v:'palm',x:90,y:232,loc:'باطن الساعد، ثلاثة أصابع عرضاً فوق ثنية المعصم بين الوترين',use:'الغثيان، دوار السفر، التوتر والقولون العصبي',pg:false},
+shenmen:{n:'شينمن',v:'palm',x:116,y:202,loc:'ثنية المعصم من جهة الخنصر',use:'الأرق، القلق، الإجهاد',pg:false},
+yongquan:{n:'يونغ تشيوان',v:'sole',x:80,y:108,loc:'باطن القدم في الثلث الأمامي بين الكرة والقوس',use:'الإجهاد، الأرق، تعب القدمين',pg:false},
+taichong:{n:'تاي تشونغ',v:'top',x:88,y:78,loc:'أعلى القدم في التقاء عظمتي الإصبع الكبير والثاني',use:'التوتر، الصداع، الشد العضلي، القولون العصبي',pg:false}
+};
+const PV=[{v:'back',n:'ظهر اليد',s:'اليد'},{v:'palm',n:'باطن اليد',s:'والمعصم'},{v:'sole',n:'باطن القدم',s:'القدم'},{v:'top',n:'أعلى القدم',s:'القدم'}];
+
+const HERBS=[
+{n:'النعناع',e:'🌱',u:'الصداع، الغثيان، الانتفاخ',how:'ملعقة صغيرة مجففة في كوب ماء مغلي، تُغطى 7 دقائق.',c:'لا يُعطى للأطفال دون سنتين، ويزيد ارتجاع المريء، ويُخفف في الحمل.'},
+{n:'البابونج',e:'🌼',u:'التوتر، الأرق، المغص',how:'ملعقة كبيرة من الزهر في كوب ماء مغلي، تُنقع 8 دقائق.',c:'حساسية لمن لديه حساسية الأقحوان، ويُستشار الطبيب في الحمل ومع مميعات الدم.'},
+{n:'الزنجبيل',e:'🫚',u:'الغثيان، الزكام، آلام العضلات',how:'شريحتان طازجتان تُغليان في كوب ماء 5 دقائق.',c:'يتداخل مع مميعات الدم، ويُحذر مع حصوات المرارة وفي الحمل بكميات كبيرة.'},
+{n:'اليانسون',e:'✨',u:'الانتفاخ، السعال، عسر الهضم',how:'ملعقة صغيرة حبوب مهروسة في كوب ماء مغلي 8 دقائق.',c:'يُتجنب في الحمل والرضاعة، وقد يؤثر على من لديه حالات حساسة للإستروجين.'},
+{n:'الشمر',e:'🌿',u:'الغازات والمغص',how:'ملعقة صغيرة بذور في كوب ماء مغلي 10 دقائق.',c:'يُتجنب في الحمل والرضاعة، وللرضع لا يُعطى دون استشارة الطبيب.'},
+{n:'الزعتر',e:'🍃',u:'السعال والتهاب الحلق',how:'ملعقة صغيرة مجففة في كوب ماء مغلي 8 دقائق.',c:'يُتجنب بكميات علاجية في الحمل، وحساسية لبعض من لديه حساسية الشفويات.'},
+{n:'القرفة',e:'🪵',u:'الدفء، تحسين الطعم وتهدئة المعدة',how:'عود صغير يُغلى 5 دقائق مع الماء.',c:'الإكثار منها يضر الكبد، ومرضى السكري يراقبون سكرهم، وتُتجنب بكثرة في الحمل.'},
+{n:'اللافندر',e:'💜',u:'الاسترخاء والنوم',how:'نصف ملعقة صغيرة مجففة مع البابونج في كوب ماء مغلي.',c:'لا يُشرب في الحمل، ولا يُوضع الزيت النقي على الجلد، ولا يُستخدم للأطفال الصغار.'},
+{n:'الترنجان (بلسم الليمون)',e:'🍋',u:'التوتر والأرق الخفيف',how:'ملعقة صغيرة مجففة في كوب ماء مغلي 8 دقائق.',c:'استشر طبيبك مع أدوية الغدة الدرقية والمنومات، ويُتجنب في الحمل.'},
+{n:'العسل',e:'🍯',u:'السعال والتهاب الحلق',how:'ملعقة صغيرة في ماء دافئ مع الليمون.',c:'ممنوع تماماً لمن هم أقل من سنة، ومرضى السكري يتحكمون في الكمية.'},
+{n:'الكركم',e:'🟡',u:'الالتهاب العضلي وتحسين الهضم',how:'ملعقة صغيرة مع رشة فلفل أسود في الماء الساخن أو الحليب.',c:'يتداخل مع مميعات الدم، ويُتجنب مع حصوات المرارة.'},
+{n:'الكمون',e:'🫘',u:'عسر الهضم والانتفاخ',how:'ملعقة صغيرة في كوب ماء مغلي 8 دقائق.',c:'يُتجنب بكميات كبيرة في الحمل، وقد يخفض السكر.'}
+];
+
+const BR=[
+{n:'تنفس 4-7-8',s:'للنوم والتوتر',ph:[['شهيق',4,1],['احبس',7,1],['زفير',8,.55]],cyc:4,note:'شهيق من الأنف 4 ثوانٍ، احبس 7، زفير من الفم 8. ابدأ بدورات قليلة.'},
+{n:'التنفس المربع',s:'للتركيز والصداع',ph:[['شهيق',4,1],['احبس',4,1],['زفير',4,.55],['احبس',4,.55]],cyc:5,note:'أربع مراحل متساوية، كل واحدة 4 ثوانٍ.'},
+{n:'التنفس البطني',s:'للقولون والتوتر',ph:[['شهيق',4,1],['زفير',6,.55]],cyc:6,note:'ضع يداً على بطنك، شهيق من الأنف ينفخ بطنك ثم زفير بطيء من الفم.'},
+{n:'تنفس البالون',s:'للأطفال',ph:[['انفخ البالون',3,1],['افرغ الهواء',5,.55]],cyc:5,note:'للأطفال: تخيّل بالوناً ينتفخ ثم يفرغ ببطء. يُنفذ بإشراف أحد الوالدين.'}
+];
+
+const STR=[
+{n:'إمالة الرقبة جانباً',time:'20 ثانية لكل جهة',pose:{hx:7,hy:1,L:[26,70],R:[46,18]},st:['اجلس مستقيم الظهر','أمل أذنك نحو كتفك بلطف','ساعد بيدك دون ضغط، وبدّل الجهة']},
+{n:'رفع الكتفين',time:'10 مرات',pose:{L:[28,60],R:[52,60],x:'<text x="12" y="38" font-size="16">↑</text><text x="72" y="38" font-size="16">↑</text>'},st:['ارفع كتفيك نحو أذنيك مع الشهيق','ثبّت ثانيتين','أنزلهما مع الزفير ببطء']},
+{n:'دوران الكتفين',time:'10 دورات',pose:{L:[26,66],R:[54,66],x:'<text x="5" y="48" font-size="18">↻</text><text x="78" y="48" font-size="18">↺</text>'},st:['ارفع كتفيك للأمام والأعلى','دوّرهما للخلف في حركة دائرية واسعة','أعد الدورات للأمام']},
+{n:'تمدد الذراعين للأعلى',time:'20 ثانية',pose:{L:[36,4],R:[44,4]},st:['اشبك أصابعك وارفعها فوق رأسك','مدّ ذراعيك واسحب جسمك للأعلى','تنفس بعمق وأرخِ ببطء']},
+{n:'تمدد الصدر',time:'20 ثانية',pose:{L:[20,64],R:[60,64],x:'<text x="4" y="92" font-size="14">←</text><text x="72" y="92" font-size="14">→</text>'},st:['اجمع يديك خلف ظهرك','ارفعهما قليلاً وافتح صدرك','ابقَ ظهرك مستقيماً']},
+{n:'ثني الجذع للأمام',time:'20 ثانية',pose:{a:75,bend:true},st:['قف وركبتاك مرنتان قليلاً','انحنِ بهدوء وأرخِ رأسك وذراعيك','عد ببطء، وتجنبه عند ألم الظهر الحاد']}
+];
+function fig(p){
+ const a=(p.a||0)*Math.PI/180,H=[40,72],S=[H[0]+34*Math.sin(a),H[1]-34*Math.cos(a)];
+ const hd=[S[0]+14*Math.sin(a)+(p.hx||0),S[1]-14*Math.cos(a)+(p.hy||0)];
+ let L=p.L,R=p.R;if(p.bend){L=[S[0]-4,100];R=[S[0]+6,100]}
+ return `<svg viewBox="0 0 110 120" width="92" height="100" fill="none" stroke="var(--acc)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><circle cx="${hd[0]}" cy="${hd[1]}" r="9" fill="var(--bg2)"/><path d="M${H} L${S} M${S} L${L} M${S} L${R} M${H} L32,108 M${H} L48,108"/><g fill="var(--amb)" stroke="none">${p.x||''}</g></svg>`;
+}
+
+const HAB=['مشي 20 دقيقة','5 حصص خضار وفاكهة','تمرين تنفس 5 دقائق','نوم 7 ساعات أو أكثر','وقت بعيداً عن الشاشات'];
+const TIPS=[['💧','ابدأ يومك بكوب ماء قبل القهوة.'],['🚶','عشرون دقيقة مشي يومياً تخفف التوتر وتحسن النوم.'],['🌙','أطفئ الشاشات قبل النوم بساعة.'],['🥗','اجعل نصف طبقك خضراً ملونة.'],['🧘','خذ ثلاثة أنفاس عميقة كلما شعرت بالتوتر.'],['☀️','عرّض وجهك لشمس الصباح 10–15 دقيقة.'],['🍵','استبدل المشروب السكري بكوب شاي أعشاب غير محلى.'],['🪑','قم وتحرك كل ساعة إن كان عملك مكتبياً.'],['🧼','اغسل يديك بالماء والصابون 20 ثانية.'],['🍽️','كُل عند الجوع فقط، ولا تنتظر الموعد.'],['😴','حافظ على موعد نوم ثابت حتى في الإجازة.'],['☕','قلل الكافيين بعد الظهر.'],['🤝','تحدث مع من تحب، فالعلاقات الطيبة تحمي الصحة.'],['🦷','استخدم خيط الأسنان مرة يومياً.']];
+
+/* ---------- الحالة ---------- */
+const S={view:'sym',sym:'headache',age:3,preg:false,flt:'all',open:null,q:'',pt:'hegu',pview:'back',hopen:null,hq:'',br:0,
+ tried:store.get('tried-'+dayKey,{}),day:store.get('day-'+dayKey,{h:[],w:0})};
+let tk=0;
+const doy=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/864e5);
+
+/* ---------- الواجهات ---------- */
+const TY={d:['🍵','مشروب','var(--amb)'],f:['🥣','غذاء','var(--acc)'],l:['🌿','عادة وعلاج منزلي','var(--pink)']};
+const li=a=>a.length?`<ul>${a.map(x=>`<li>${x}</li>`).join('')}</ul>`:'';
+
+function chipsHTML(){
+ const q=S.q.trim();
+ const l=SY.filter(s=>!q||s.n.includes(q));
+ return l.length?l.map(s=>`<button class="chip ${s.id===S.sym?'on':''}" data-a="sym" data-id="${s.id}">${s.e} ${s.n}</button>`).join(''):'<div class="empty">لا يوجد عرض بهذا الاسم</div>';
+}
+function item(r){
+ const t=TY[r.t],on=S.tried[r.k],op=S.open===r.k;
+ return `<div class="item ${op?'open':''}" style="--c:${t[2]}"><div class="row" data-a="open" data-k="${r.k}"><div class="ico">${t[0]}</div><div style="flex:1"><h3>${r.n}</h3><div class="meta">${t[1]} · ⏱ ${r.time}</div></div><button class="tick ${on?'on':''}" data-a="tick" data-k="${r.k}" aria-label="جرّبته">${on?'✓':''}</button></div>
+ <div class="det">${r.ing.length?`<h4>المكونات</h4>${li(r.ing)}`:''}<h4>الطريقة</h4><ol>${r.st.map(x=>`<li>${x}</li>`).join('')}</ol>${S.age===1&&r.t==='d'?'<div class="tip">للطفل: ربع إلى نصف الكمية المذكورة.</div>':''}${r.tip?`<div class="tip">💡 ${r.tip}</div>`:''}</div></div>`;
+}
+function viewSym(){
+ const sy=SY.find(x=>x.id===S.sym);
+ const list=sy.r.filter(r=>S.age>=r.m&&!(S.preg&&r.pg===0));
+ const shown=list.filter(r=>S.flt==='all'||r.t===S.flt);
+ const done=list.filter(r=>S.tried[r.k]).length;
+ let notes='';
+ if(S.age===0)notes+='<div class="banner red"><span>👶</span><div>الرضع (أقل من سنة): لا أعشاب ولا عسل. استشر طبيب الأطفال لأي عرض، وفوراً إن ظهرت حرارة.</div></div>';
+ if(S.age===1)notes+='<div class="banner blue"><span>🧒</span><div>للأطفال: قدّم ربع إلى نصف الكمية، ولا تستمر بالأعشاب أكثر من 3 أيام دون استشارة الطبيب.</div></div>';
+ if(S.age===4)notes+='<div class="banner blue"><span>🧓</span><div>لكبار السن: ابدأ بكميات صغيرة، واسأل طبيبك أو الصيدلي إن كنت تتناول أدوية (ضغط، سكر، سيولة الدم).</div></div>';
+ if(S.preg)notes+='<div class="banner blue"><span>🤰</span><div>الحمل والرضاعة: أخفينا الأعشاب غير المناسبة، ومع ذلك استشيري طبيبك قبل استخدام أي عشبة.</div></div>';
+ return `
+ <div class="card"><div class="head"><div class="hico">🔎</div><div class="grow"><h2>ماذا تشعر؟</h2><div class="sub">اختر العرض والفئة العمرية</div></div></div>
+  <input class="search" id="q" placeholder="ابحث: صداع، أرق، زكام..." value="${S.q}" autocomplete="off">
+  <div class="chips" id="chips">${chipsHTML()}</div>
+  <div class="lbl">الفئة العمرية</div>
+  <div class="seg">${AG.map((a,i)=>`<button class="${i===S.age?'on':''}" data-a="age" data-i="${i}"><b>${a.n}</b><small>${a.s}</small></button>`).join('')}</div>
+  ${S.age>=2?`<div class="toggle" data-a="preg"><span>🤰 حامل أو مرضعة</span><div class="sw ${S.preg?'on':''}"></div></div>`:''}
+ </div>
+ ${notes}
+ <div class="stats"><div class="stat"><b>${sy.n}</b><span>العرض المختار</span></div><div class="stat"><b>${done}/${list.length}</b><span>حلول جرّبتها</span></div></div>
+ <div class="card"><div class="head"><div class="hico">${sy.e}</div><div class="grow"><h2>حلول طبيعية</h2><div class="sub">${sy.n} · ${AG[S.age].n}</div></div><button class="sq" data-a="reset" aria-label="إعادة">↺</button></div>
+  <div class="pills">${[['all','الكل'],['d','🍵 مشروبات'],['f','🥣 أغذية'],['l','🌿 عادات']].map(x=>`<button class="pill ${S.flt===x[0]?'on':''}" data-a="flt" data-f="${x[0]}">${x[1]}</button>`).join('')}</div>
+  ${shown.length?shown.map(item).join(''):`<div class="empty">${list.length?'لا توجد حلول في هذا القسم':'لا توجد حلول منزلية آمنة مناسبة لهذه الفئة. راجع الطبيب أو الصيدلي.'}</div>`}
+ </div>
+ <div class="card"><div class="head"><div class="hico">🤲</div><div class="grow"><h2>مساندة إضافية</h2><div class="sub">ضغط وتمارين تساعد في التخفيف</div></div></div>
+  <div class="chips">${sy.pts.map(p=>`<button class="chip" data-a="goacu" data-p="${p}">👆 نقطة ${PT[p].n}</button>`).join('')}<button class="chip" data-a="goex" data-i="${sy.br}">🫁 ${BR[sy.br].n}</button>${sy.stretch?'<button class="chip" data-a="gost">🤸 تمارين الإطالة</button>':''}</div></div>
+ <div class="card redc"><div class="head"><div class="hico">🚨</div><div class="grow"><h2>متى تراجع الطبيب؟</h2><div class="sub">لا تعتمد على الحلول المنزلية عند:</div></div></div><ul class="flags">${sy.rf.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+}
+function viewHerb(){
+ const q=S.hq.trim();
+ const l=HERBS.filter(h=>!q||h.n.includes(q)||h.u.includes(q));
+ return `<div class="card"><div class="head"><div class="hico">🌿</div><div class="grow"><h2>دليل العطار</h2><div class="sub">أعشاب شائعة وفوائدها وتحذيراتها</div></div></div>
+ <input class="search" id="hq" placeholder="ابحث عن عشبة أو عرض..." value="${S.hq}" autocomplete="off">
+ <div id="hlist">${herbList(l)}</div></div>
+ <div class="card"><div class="head"><div class="hico">🛒</div><div class="grow"><h2>نصائح الشراء والاستخدام</h2></div></div>
+ <ul class="flags"><li>اشترِ من عطار موثوق وفي عبوات نظيفة جافة.</li><li>تأكد من خلو الأعشاب من العفن والرائحة الغريبة.</li><li>لا تخلط أكثر من عشبتين أو ثلاث معاً.</li><li>لا تستمر على عشبة واحدة أسابيع طويلة دون استشارة الطبيب.</li><li>أوقفها فوراً عند ظهور طفح أو حكة أو أي أعراض غير معتادة.</li><li>أخبر طبيبك بالأعشاب التي تتناولها قبل أي عملية أو علاج جديد.</li></ul></div>`;
+}
+function herbList(l){
+ return l.length?l.map(h=>`<div class="item ${S.hopen===h.n?'open':''}" style="--c:var(--grn)"><div class="row" data-a="herb" data-n="${h.n}"><div class="ico">${h.e}</div><div style="flex:1"><h3>${h.n}</h3><div class="meta">${h.u}</div></div></div><div class="det"><h4>طريقة الاستخدام</h4><div>${h.how}</div><div class="caut">⚠️ ${h.c}</div></div></div>`).join(''):'<div class="empty">لا توجد نتائج</div>';
+}
+function handSVG(palm){
+ return `<svg viewBox="0 0 180 290"><g fill="var(--bg2)" stroke="var(--acc)" stroke-width="2"><rect x="55" y="185" width="70" height="100" rx="14"/><rect x="40" y="100" width="100" height="95" rx="22"/><rect x="43" y="30" width="22" height="85" rx="11"/><rect x="70" y="14" width="22" height="100" rx="11"/><rect x="97" y="26" width="22" height="90" rx="11"/><rect x="123" y="52" width="20" height="70" rx="10"/><rect x="19" y="120" width="22" height="72" rx="11" transform="rotate(-35 30 190)"/></g>${palm?'<path d="M55 196 H125" stroke="var(--mut)" stroke-dasharray="4 4" fill="none"/>':''}`;
+}
+function footSVG(){
+ return `<svg viewBox="0 0 160 290"><g fill="var(--bg2)" stroke="var(--acc)" stroke-width="2"><path d="M48 90 C40 40 115 28 116 92 C117 135 106 155 108 195 C110 252 52 262 52 205 C52 155 46 130 48 90Z"/><circle cx="100" cy="30" r="13"/><circle cx="76" cy="24" r="9"/><circle cx="58" cy="32" r="8"/><circle cx="45" cy="46" r="7"/></g>`;
+}
+function viewAcu(){
+ const pts=Object.keys(PT).filter(k=>PT[k].v===S.pview);
+ if(!pts.includes(S.pt))S.pt=pts[0];
+ const p=PT[S.pt];
+ const base=(S.pview==='back'||S.pview==='palm')?handSVG(S.pview==='palm'):footSVG();
+ const dots=pts.map(k=>`<g class="pt ${k===S.pt?'on':''}" data-a="pt" data-p="${k}"><circle class="ring" cx="${PT[k].x}" cy="${PT[k].y}" r="9"/><circle class="dot" cx="${PT[k].x}" cy="${PT[k].y}" r="8"/><text x="${PT[k].x}" y="${PT[k].y+24}">${PT[k].n}</text></g>`).join('');
+ return `<div class="card"><div class="head"><div class="hico">👆</div><div class="grow"><h2>العلاج بالضغط</h2><div class="sub">اختر المنطقة ثم اضغط على النقطة</div></div></div>
+ <div class="seg">${PV.map(v=>`<button class="${v.v===S.pview?'on':''}" data-a="pview" data-v="${v.v}"><b>${v.n}</b><small>${v.s}</small></button>`).join('')}</div>
+ <div class="svgbox">${base}${dots}</svg><div class="sub">رسم تخطيطي تقريبي</div></div></div>
+ <div class="card"><div class="head"><div class="hico">📍</div><div class="grow"><h2>نقطة ${p.n}</h2><div class="sub">${p.use}</div></div></div>
+ <div class="item" style="--c:var(--amb)"><h4 style="margin:0 0 4px;color:var(--acc)">المكان</h4><div style="font-size:14px">${p.loc}</div></div>
+ ${p.pg?'<div class="caut">🤰 لا تضغط هذه النقطة أثناء الحمل.</div>':''}</div>
+ <div class="card"><div class="head"><div class="hico">📋</div><div class="grow"><h2>طريقة الضغط</h2></div></div>
+ <ol style="font-size:14px;line-height:2;padding-inline-start:20px;margin:0"><li>اجلس بوضع مريح وخذ نفساً عميقاً.</li><li>اضغط النقطة بإبهامك بقوة مريحة غير مؤلمة.</li><li>دلّك بحركة دائرية صغيرة أو اضغط ثابتاً 1–2 دقيقة مع التنفس البطيء.</li><li>كرر على الجهة الأخرى، ثم استرح.</li></ol>
+ <div class="tip">للأطفال: ضغط خفيف جداً 20–30 ثانية. وتجنب الضغط على جلد مصاب أو منطقة متورمة.</div></div>`;
+}
+function viewEx(){
+ const b=BR[S.br];
+ return `<div class="card"><div class="head"><div class="hico">🫁</div><div class="grow"><h2>تمارين التنفس</h2><div class="sub">${b.s}</div></div></div>
+ <div class="seg">${BR.map((x,i)=>`<button class="${i===S.br?'on':''}" data-a="brsel" data-i="${i}"><b>${x.n}</b><small>${x.s}</small></button>`).join('')}</div>
+ <div class="breath"><div class="bc" id="bc"></div><div class="bt"><b id="bl">استعد</b><span id="bn">•</span></div></div>
+ <div class="sub" style="text-align:center;margin-bottom:10px" id="bcy">${b.cyc} دورات</div>
+ <button class="big" id="bgo" data-a="brgo">ابدأ التمرين</button>
+ <div class="tip">${b.note}</div><div class="caut">توقف إن شعرت بدوخة أو ضيق. ولا يغني عن علاج نوبات الهلع الشديدة أو مشاكل التنفس.</div></div>
+ <div class="card" id="stretch"><div class="head"><div class="hico">🤸</div><div class="grow"><h2>تمارين الإطالة</h2><div class="sub">خطوات مصورة بسيطة بحركة لطيفة</div></div></div>
+ ${STR.map(s=>`<div class="stretch">${fig(s.pose)}<div><h3>${s.n}</h3><div class="meta">⏱ ${s.time}</div><ol>${s.st.map(x=>`<li>${x}</li>`).join('')}</ol></div></div>`).join('')}
+ <div class="caut">تحرك ببطء ولا تتجاوز حد الألم. استشر الطبيب عند وجود إصابة أو مرض في العمود الفقري أو المفاصل.</div></div>`;
+}
+function viewDay(){
+ const d=S.day,hd=d.h.length;
+ return `<div class="stats"><div class="stat"><b>${hd}/${HAB.length}</b><span>عادات منجزة اليوم</span></div><div class="stat"><b>${d.w}/8</b><span>أكواب الماء</span></div></div>
+ <div class="card"><div class="head"><div class="hico">✅</div><div class="grow"><h2>عادات اليوم</h2><div class="sub">عادات صغيرة تحمي صحتك</div></div></div>
+ ${HAB.map((h,i)=>{const on=d.h.includes(i);return `<div class="item" style="--c:var(--acc)"><div class="row" data-a="hab" data-i="${i}"><div class="ico">${['🚶','🥗','🫁','😴','📵'][i]}</div><div style="flex:1"><h3>${h}</h3></div><button class="tick ${on?'on':''}">${on?'✓':''}</button></div></div>`}).join('')}</div>
+ <div class="card"><div class="head"><div class="hico">💧</div><div class="grow"><h2>الماء</h2><div class="sub">اضغط على الكوب الذي شربته</div></div></div>
+ <div class="cups">${Array.from({length:8},(_,i)=>`<button class="cup ${i<d.w?'on':''}" data-a="water" data-i="${i}">🥛</button>`).join('')}</div></div>
+ <div class="card"><div class="head"><div class="hico">📌</div><div class="grow"><h2>نصائح وقائية</h2></div></div>
+ <ul class="flags">${TIPS.map(t=>`<li>${t[0]} ${t[1]}</li>`).join('')}</ul></div>`;
+}
+const views={sym:viewSym,herb:viewHerb,acu:viewAcu,ex:viewEx,day:viewDay};
+function render(){
+ stopBreath();
+ $('#view').innerHTML=views[S.view]();
+ document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
+}
+
+/* ---------- التنفس ---------- */
+let bT=null,bI=null,bRun=false;
+function stopBreath(){bRun=false;clearTimeout(bT);clearInterval(bI);const g=$('#bgo');if(g){g.textContent='ابدأ التمرين';g.classList.remove('stop')}const c=$('#bc');if(c){c.style.transitionDuration='.6s';c.style.transform='scale(.55)'}}
+function startBreath(){
+ const b=BR[S.br];let ph=0,cy=0;bRun=true;
+ const g=$('#bgo');g.textContent='إيقاف';g.classList.add('stop');
+ const step=()=>{
+  if(!bRun)return;
+  const [lab,sec,sc]=b.ph[ph];
+  const c=$('#bc');c.style.transitionDuration=sec+'s';c.style.transform=`scale(${sc})`;
+  $('#bl').textContent=lab;$('#bcy').textContent=`الدورة ${cy+1} من ${b.cyc}`;
+  let left=sec;$('#bn').textContent=left;
+  clearInterval(bI);bI=setInterval(()=>{left--;if(left>0)$('#bn').textContent=left},1000);
+  bT=setTimeout(()=>{ph++;if(ph>=b.ph.length){ph=0;cy++;if(cy>=b.cyc){stopBreath();$('#bl').textContent='أحسنت 👏';$('#bn').textContent='✓';return}}step()},sec*1000);
+ };
+ step();
+}
+
+/* ---------- النصائح ---------- */
+function setTip(k){
+ tk=k;const t=TIPS[(doy*5+k)%TIPS.length];
+ $('#tipcard').innerHTML=`<div><p>${t[1]}</p><div class="dots">${[0,1,2,3,4].map(i=>`<i class="${i===k?'on':''}" data-a="tipdot" data-i="${i}"></i>`).join('')}</div></div><div class="badge">${t[0]}</div>`;
+}
+
+/* ---------- الأحداث ---------- */
+const A={
+ nav(d){S.view=d.v;render();scrollTo({top:0,behavior:'smooth'})},
+ theme(){const h=document.documentElement;const n=h.dataset.theme==='dark'?'light':'dark';h.dataset.theme=n;$('#themeBtn').textContent=n==='dark'?'☀️':'🌙';store.set('theme',n)},
+ sym(d){S.sym=d.id;S.open=null;S.flt='all';render()},
+ age(d){S.age=+d.i;if(S.age<2)S.preg=false;render()},
+ preg(){S.preg=!S.preg;render()},
+ flt(d){S.flt=d.f;render()},
+ open(d){S.open=S.open===d.k?null:d.k;render()},
+ tick(d){S.tried[d.k]=!S.tried[d.k];if(!S.tried[d.k])delete S.tried[d.k];store.set('tried-'+dayKey,S.tried);render()},
+ reset(){const sy=SY.find(x=>x.id===S.sym);sy.r.forEach(r=>delete S.tried[r.k]);store.set('tried-'+dayKey,S.tried);render()},
+ goacu(d){S.view='acu';S.pt=d.p;S.pview=PT[d.p].v;render();scrollTo({top:0,behavior:'smooth'})},
+ goex(d){S.view='ex';S.br=+d.i;render();scrollTo({top:0,behavior:'smooth'})},
+ gost(){S.view='ex';render();$('#stretch').scrollIntoView({behavior:'smooth'})},
+ herb(d){S.hopen=S.hopen===d.n?null:d.n;const q=S.hq.trim();$('#hlist').innerHTML=herbList(HERBS.filter(h=>!q||h.n.includes(q)||h.u.includes(q)))},
+ pview(d){S.pview=d.v;render()},
+ pt(d){S.pt=d.p;render()},
+ brsel(d){S.br=+d.i;render()},
+ brgo(){bRun?stopBreath():startBreath()},
+ hab(d){const i=+d.i,h=S.day.h;const x=h.indexOf(i);x>=0?h.splice(x,1):h.push(i);store.set('day-'+dayKey,S.day);render()},
+ water(d){const i=+d.i+1;S.day.w=S.day.w===i?i-1:i;store.set('day-'+dayKey,S.day);render()},
+ tipdot(d){setTip(+d.i)}
+};
+document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(t&&A[t.dataset.a])A[t.dataset.a](t.dataset)});
+document.addEventListener('input',e=>{
+ if(e.target.id==='q'){S.q=e.target.value;$('#chips').innerHTML=chipsHTML()}
+ if(e.target.id==='hq'){S.hq=e.target.value;const q=S.hq.trim();$('#hlist').innerHTML=herbList(HERBS.filter(h=>!q||h.n.includes(q)||h.u.includes(q)))}
+});
+
+/* ---------- البدء ---------- */
+$('#date').textContent=new Date().toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const th=store.get('theme','dark');document.documentElement.dataset.theme=th;$('#themeBtn').textContent=th==='dark'?'☀️':'🌙';
+render();setTip(0);
+setInterval(()=>setTip((tk+1)%5),8000);
+</script>
+</body>
+</html>

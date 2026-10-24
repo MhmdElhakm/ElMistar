@@ -1,5 +1,5 @@
-const CACHE_NAME = 'kalimaty-pwa-v1';
-const APP_SHELL = ['./kalimaty.html', './kalimaty.webmanifest', './kalimaty-logo.svg', './logo.png'];
+const CACHE_NAME = 'kalimaty-pwa-v11';
+const APP_SHELL = ['./kalimaty.html', './kalimaty.webmanifest', './kalimaty-logo.png?v=2'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));

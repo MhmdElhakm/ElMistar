@@ -1010,6 +1010,7 @@
   .collapsible-wrap.open { grid-template-rows: 1fr; opacity: 1; transform: none; margin-bottom: 14px; }
   .collapsible-in { overflow: hidden; min-height: 0; }
   .collapsible-in > .category-group { margin-bottom: 0; padding: 0 14px; }
+  #tasksWrap .category-group { padding-inline: 0; }
   .collapsible-wrap.open .task-card { animation: expandCard .55s cubic-bezier(.22,1,.36,1) both; transform-origin: top center; }
   @keyframes expandCard { 0% { opacity: 0; transform: translateY(-16px) scale(.96); } 60% { opacity: 1; transform: translateY(4px) scale(1.005); } 100% { opacity: 1; transform: none; } }
   .collapsible-wrap.open .task-row { animation: staggerIn .45s cubic-bezier(.22,1,.36,1) both; }
@@ -1357,11 +1358,11 @@
   @keyframes jhRingIn { from { opacity: 0; transform: rotate(-120deg) scale(.7); } to { opacity: 1; transform: none; } }
   /* ===== Duo-style hero (like screenshot) — pro v2 ===== */
   .duo-hero { margin: 14px 16px; border-radius: 24px; overflow: hidden; position: relative; background: linear-gradient(180deg,#A9DCFF 0%,#C9EBFF 42%,#E3F5FF 72%,#E8F6F3 100%); border: none; box-shadow: 0 16px 34px rgba(56,139,253,.20), 0 2px 8px rgba(30,60,90,.08); animation: popIn .4s ease-out; }
-  .duo-main { position: relative; z-index: 3; display: flex; align-items: center; gap: 10px; padding: 20px 18px; }
-  .duo-tx { flex: 1; min-width: 0; text-align: left; padding-bottom: 6px; }
+  .duo-main { position: relative; z-index: 3; display: flex; flex-direction: row-reverse; align-items: center; gap: 10px; padding: 20px 18px; }
+  .duo-tx { flex: 1; min-width: 0; text-align: right; padding-bottom: 6px; }
   .duo-hello { font-family: "Nunito","Cairo",sans-serif; font-size: 24px; font-weight: 900; line-height: 1.3; color: #3B3B3B; letter-spacing: -.2px; }
   .duo-hello .nm { color: #1CB0F6; unicode-bidi: isolate; }
-  .duo-sub { font-size: 12px; font-weight: 700; color: #67748A; margin-top: 6px; line-height: 1.55; font-family: "Nunito","Cairo",sans-serif; }
+  .duo-sub { display: inline-block; max-width: 100%; box-sizing: border-box; font-size: 13px; font-weight: 800; color: #38536D; margin-top: 9px; padding: 8px 11px; line-height: 1.7; font-family: "Nunito","Cairo",sans-serif; background: rgba(255,255,255,.78); border: 1px solid rgba(59,130,246,.14); border-inline-start: 3px solid #38BDF8; border-radius: 13px; box-shadow: 0 5px 14px rgba(56,139,253,.10); text-wrap: pretty; }
   .duo-btn { margin-top: 14px; width: 100%; max-width: 230px; background: #1CB0F6; color: #fff; font-weight: 800; font-size: 14px; letter-spacing: .3px; padding: 13px 16px; border-radius: 13px; border: none; border-bottom: 4px solid #1899D6; box-shadow: 0 8px 18px rgba(28,176,246,.35); display: flex; align-items: center; justify-content: center; gap: 8px; font-family: "Nunito","Cairo",sans-serif; transition: transform .12s, filter .12s; }
   .duo-btn:hover { filter: brightness(1.04); }
   .duo-btn:active { transform: translateY(3px); border-bottom-width: 1px; }
@@ -1478,6 +1479,8 @@
   .tsb-hint { display: block; font-size: 10.5px; font-weight: 800; color: var(--text-muted); margin-top: 6px; position: relative; z-index: 1; }
   .gate-card.expandable.open { box-shadow: 0 10px 26px rgba(28,176,246,.22); border-color: rgba(28,176,246,.4); }
   /* ===== بطاقات التطبيقات المدمجة (طيبات اليوم، صحتي، كلماتي، شؤون الطلاب) ===== */
+  .gate-card.gate-shopping { --gc:#0284C7; --gc-soft:#E0F2FE; }
+  .gate-card.gate-expenses { --gc:#E11D48; --gc-soft:#FFE4E6; }
   .gate-card.gate-eat {
     --gc: #EA580C;
     --gc2: #F59E0B;
@@ -1497,27 +1500,6 @@
   }
   .gate-card.gate-eat .gc-value { color: #EA580C; }
 
-  .gate-card.gate-student {
-    --gc: #38BDF8;
-    --gc2: #3B82F6;
-    --gc-soft: rgba(56,189,248,.16);
-    background: linear-gradient(150deg, #1C273C 0%, #0E1626 100%);
-    border-color: rgba(56,189,248,.24);
-    box-shadow: 0 12px 28px rgba(13,21,38,.45);
-    color: #fff;
-  }
-  .gate-card.gate-student:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 16px 34px rgba(56,189,248,.25);
-  }
-  .gate-card.gate-student .gc-label { color: rgba(255,255,255,.82); }
-  .gate-card.gate-student .gc-sub { color: rgba(255,255,255,.62); }
-  .gate-card.gate-student .gc-ico {
-    background: rgba(56,189,248,.14);
-    color: #38BDF8;
-    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.14), 0 6px 16px rgba(0,0,0,.25);
-  }
-  .gate-card.gate-student .gc-value { color: #38BDF8; }
 
   .gate-card.gate-health {
     --gc: #059669;
@@ -1538,24 +1520,6 @@
   }
   .gate-card.gate-health .gc-value { color: #059669; }
 
-  .gate-card.gate-kalimaty {
-    --gc: #7C3AED;
-    --gc2: #A855F7;
-    --gc-soft: #EDE9FE;
-    background: linear-gradient(165deg, #FAF7FF 25%, #F4EEFF 70%, #EAE0FE 100%);
-    border-color: rgba(124,58,237,.24);
-    box-shadow: 0 10px 24px rgba(124,58,237,.12);
-  }
-  .gate-card.gate-kalimaty:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 14px 30px rgba(124,58,237,.22);
-  }
-  .gate-card.gate-kalimaty .gc-ico {
-    background: linear-gradient(135deg, #EDE9FE 0%, #FAF7FF 100%);
-    color: #7C3AED;
-    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.9), 0 6px 14px rgba(124,58,237,.15);
-  }
-  .gate-card.gate-kalimaty .gc-value { color: #7C3AED; }
   /* ===== تثبيت الواجهة ضد الرعشة: إيقاف أنيميشن الدخول بعد أول رسم لكل تبويب ===== */
   .app.fx-off .task-row, .app.fx-off .appt-row, .app.fx-off .task-check, .app.fx-off .task-row.done .task-check,
   .app.fx-off .order-card, .app.fx-off .exp-card, .app.fx-off .exp-grp,
@@ -1685,6 +1649,9 @@
   .wa-row [data-catconfirm] { flex: 1; }
   .category-card-orders { padding: 8px 12px 12px !important; display: flex; flex-direction: column; gap: 8px; }
   .order-card { background: #fff !important; border: 1.5px solid var(--border) !important; border-radius: 16px !important; padding: 13px 14px !important; margin: 0 !important; box-shadow: 0 3px 10px rgba(30,27,46,.06) !important; }
+  .category-card-orders .order-card { padding: 8px 12px !important; }
+  .category-card-orders .order-card .category-card-icon { width: 40px !important; height: 40px !important; }
+  .order-location { display: none !important; }
   .order-card .category-card-icon { width: 44px !important; height: 44px !important; }
   .order-name { font-size: 15.5px !important; font-weight: 900 !important; }
   .qty-inline { font-size: 13px; font-weight: 800; color: var(--primary-dark); white-space: nowrap; }
@@ -2792,7 +2759,7 @@
       <div class="category-card-icon" style="background:${cc}18;font-size:20px;overflow:hidden;">${it.photo ? `<img src="${it.photo}" data-bzoomphoto="${it.id}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in;" />` : productIcon(it.name, it.categoryId)}</div>
       <div class="order-main" data-bexp="${it.id}">
         <div class="order-name">${escapeHTML(it.name)} ${qtyLine} <span class="badge badge-pending">تجهيز</span>${it.priority === 'high' ? ' <span class="badge badge-urgent">🔥 ضروري</span>' : ''}</div>
-        <div class="order-meta"><span class="meta-item">📍 ${escapeHTML(catLocation(it.categoryId))}</span></div>
+        <div class="order-meta order-location"><span class="meta-item">📍 ${escapeHTML(catLocation(it.categoryId))}</span></div>
         ${notesLine}
       </div>
       <span class="ord-chev ${expanded ? 'open' : ''}">‹</span>
@@ -3389,7 +3356,7 @@
       { id: 'home', label: 'الرئيسية', icon: 'home' },
       { id: 'shop', label: 'التسوق', icon: 'basket' },
       { id: 'expenses', label: 'المصروفات', icon: 'wallet' },
-      { id: 'reports', label: 'التقارير', icon: 'chart' },
+      { id: 'reports', label: '\u0627\u0644\u062a\u0642\u0627\u0631\u064a\u0631', icon: 'chart' },
       { id: 'settings', label: 'الإعدادات', icon: 'gear' }
     ];
     return `<nav class="bottom-nav">${tabs.map(tab => `<button class="nav-item ${t === tab.id ? 'active' : ''}" data-tab="${tab.id}"><span class="nav-ico">${svgIcon(tab.icon, 22)}</span><span>${tab.label}</span></button>`).join('')}</nav>`;
@@ -4678,6 +4645,23 @@
       'بالراحة يا جماعة.. الميزانية بتستغيث 😂',
       'آخر طلب بقى.. والنبي 😂'
   ];
+  const HOME_SPENDING_WORDS = [
+    'نفقتك على أهلك أجرٌ ومحبة.. كل جنيه في مكانه يصنع فرقًا ❤️',
+    '«إذا أنفق الرجل على أهله نفقةً يحتسبها فهي له صدقة» — متفق عليه',
+    '«أفضل دينار ينفقه الرجل دينارٌ ينفقه على عياله» — رواه مسلم',
+    '«ابدأ بمن تعول» — رواه البخاري',
+    'الإنفاق على أهل بيتك رعايةٌ وأجر.. بارك الله في رزقك 🌿',
+    'اجعل نفقتك على أسرتك بنية طيبة.. ولك فيها أجر بإذن الله ✨',
+    'كل ما تقدمه لأهلك بمحبة يعود دفئًا وطمأنينةً لبيتك 🏡'
+  ];
+  const homeSpendingWordForVisit = (() => {
+    const previousWord = localStorage.getItem('homeSpendingWordLastVisit');
+    const choices = HOME_SPENDING_WORDS.filter(word => word !== previousWord);
+    const selectedWord = choices[Math.floor(Math.random() * choices.length)];
+    localStorage.setItem('homeSpendingWordLastVisit', selectedWord);
+    return selectedWord;
+  })();
+  function getHomeSpendingWord() { return homeSpendingWordForVisit; }
   function renderHome() {
     try { renewDailyTasks(); } catch {}
     const { pending, done } = statsCounts();
@@ -4712,8 +4696,7 @@
         <div class="duo-main">
           <div class="duo-tx">
             <div class="duo-hello" dir="auto">${greeting}، <span class="nm">${escapeHTML(userName)}!</span> 👋</div>
-            <div class="duo-sub" dir="rtl" style="text-align:left;">${progress >= 100 ? 'خلصت كل مهام اليوم يا بطل 🎉' : (done > 0 ? `فاضل ${pending} ${pending === 1 ? 'مهمة' : pending === 2 ? 'مهمتين' : 'مهام'} وتقفل اليوم 💪` : 'طلب واحد يقربك من هدف بيتك ✨')}</div>
-            <button class="duo-btn" id="duoContinue"><span dir="rtl">تابع طلابك</span> <span style="font-size:16px;line-height:1;">→</span></button>
+            <div class="duo-sub" dir="rtl" style="text-align:right;">${progress >= 100 ? 'خلصت كل مهام اليوم يا بطل 🎉' : (done > 0 ? `فاضل ${pending} ${pending === 1 ? 'مهمة' : pending === 2 ? 'مهمتين' : 'مهام'} وتقفل اليوم 💪` : getHomeSpendingWord())}</div>
           </div>
           <div class="duo-art">
             <div class="duo-logo-wrap"><img src="logo.png" alt="ناقصنا إيه" /></div>
@@ -4722,22 +4705,20 @@
       </div>
       ${adsByPosition('top')}
 
-      <div class="section"><div class="gate-grid">
-        <div class="gate-card gate-prayer" data-prayer-times><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.2 2"/><path d="M8 2.8h8"/></svg></span><span class="gc-label">مواقيت الصلاة</span><span class="gc-value" id="prayerMiniTxt" style="font-size:16px;">...</span><span class="gc-sub" id="prayerMiniSub">اضغط لعرض المواقيت</span></div>
-        <div class="gate-card gate-azkar" data-azkar-toggle style="--gc:#D97706;--gc-soft:#FEF3C7;"><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v2"/><path d="M4.9 5.2l1.4 1.4"/><path d="M3 12h2"/><path d="M19 12h2"/><path d="M17.7 6.6l1.4-1.4"/><path d="M5 19c1.3-2.5 3.7-4 7-4s5.7 1.5 7 4"/><path d="M8 11a4 4 0 1 1 8 0"/></svg></span><span class="gc-label">الأذكار</span><span class="gc-value" style="font-size:16px;">${azP === 'morning' ? 'أذكار الصباح' : 'أذكار المساء'}</span><span class="gc-sub">اضغط لفتح الأذكار</span></div>
-        <div class="gate-card gate-tasbih" id="tsbGateCard" style="--gc:#7C3AED;--gc-soft:#EDE9FE;"><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/><path d="M12 7a5 5 0 1 0 5 5"/><circle cx="12" cy="12" r="1"/><circle cx="20" cy="4" r="1"/><circle cx="17" cy="3" r=".7"/></svg></span><span class="gc-label">السبحة الإلكترونية</span><span class="tsb-dhikr" id="tsbDhikr" title="دوس لتغيير الذكر">سُبْحَانَ الله<small>دوس لتغيير الذكر</small></span><span class="tsb-mot" id="tsbMot">ابدأ الآن — كل تسبيحة تقرّبك خطوة</span><div class="tsb-row"><button class="tsb-tap" id="tsbTap" title="دوس للعد"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5V6a1.8 1.8 0 0 1 3.6 0v5.5"/><path d="M12.6 11a1.8 1.8 0 0 1 3.6.5v2.3a6.5 6.5 0 0 1-6.5 6.5h-.4a6.5 6.5 0 0 1-5.2-2.6l-1.9-2.6a1.7 1.7 0 0 1 2.7-2L7 14.6V9.5a1.8 1.8 0 0 1 3.6 0"/></svg><span class="tsb-num" id="tsbTapNum">0</span></button><button class="tsb-mic" id="tsbMic" title="العد بالصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><line x1="12" y1="17.5" x2="12" y2="21.5"/><line x1="8.5" y1="21.5" x2="15.5" y2="21.5"/></svg></button></div><span class="tsb-hint" id="tsbHint">دوس للعد • أو بالصوت</span></div>
-        <div class="gate-card gate-quran" id="quranGateCard"><span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 6.5C10.2 5.1 7.5 4.5 3.5 5v13c4-.5 6.7.1 8.5 1.5"/><path d="M12 6.5c1.8-1.4 4.5-2 8.5-1.5v13c-4-.5-6.7.1-8.5 1.5"/><path d="M12 6.5v13"/><path d="M6.5 8.5c1.4-.1 2.7.1 3.8.5"/><path d="M17.5 8.5c-1.4-.1-2.7.1-3.8.5"/></svg></span><span class="gc-label">القرآن الكريم</span><span class="quran-kind" id="quranDailyKind">كلمة اليوم</span><span class="gc-value" id="quranMiniTxt">...</span><span class="quran-meaning" id="quranMiniMeaning"></span><span class="quran-ref" id="quranMiniRef"></span><span class="gc-sub" id="quranMiniSub">من التفسير الميسّر • اضغط لقراءة المزيد</span></div>
-      </div></div>
 
-      <div class="section" style="margin-top:14px;">
-        <div class="section-title-row" style="display:flex;align-items:center;justify-content:space-between;margin:0 4px 10px;padding:0 2px;">
-          <span style="font-size:14px;font-weight:900;color:var(--text);display:flex;align-items:center;gap:7px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg>
-            تطبيقات وخدمات البيت
-          </span>
-          <span style="font-size:11px;font-weight:800;color:var(--text-muted);background:rgba(28,176,246,.08);padding:3px 9px;border-radius:99px;">4 تطبيقات مدمجة</span>
-        </div>
-        <div class="gate-grid">
+      <div class="section" style="margin-top:14px;margin-bottom:16px;">
+<div class="gate-grid">
+          <button type="button" class="gate-card gate-shopping" data-home-tab="shop" title="فتح التسوق">
+            <span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 1.9-1.4L22 9H6"/><circle cx="10" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg></span>
+            <span class="gc-label">التسوق</span><span class="gc-value" style="font-size:18px;">قائمة مشتريات البيت</span>
+            <span class="gc-sub">نظّم الطلبات وتابع ما تم شراؤه &#128722;</span>
+          </button>
+          <button type="button" class="gate-card gate-expenses" data-home-tab="expenses" title="فتح المصروفات">
+            <span class="gc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 9h18M7 15h3"/><path d="M7 5V3h10v2"/></svg></span>
+            <span class="gc-label">المصروفات</span><span class="gc-value" style="font-size:18px;">تابع ميزانية البيت</span>
+            <span class="gc-sub">سجّل المصروفات وراقب إجمالي الإنفاق &#128184;</span>
+          </button>
+
           <!-- 1. طيبات اليوم: app/eat.html -->
           <div class="gate-card gate-eat" data-app-url="app/eat.html" title="فتح طيبات اليوم">
             <span class="gc-ico" aria-hidden="true">
@@ -4747,18 +4728,7 @@
             <span class="gc-value" style="font-size:18px;">وجبات ومطبخ</span>
             <span class="gc-sub">أفكار صحية وتغذية متوازنة 🍲</span>
           </div>
-
-          <!-- 2. شؤون الطلاب EduSmart: app/student.html -->
-          <div class="gate-card gate-student" data-app-url="app/student.html" title="فتح شؤون الطلاب EduSmart">
-            <span class="gc-ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/></svg>
-            </span>
-            <span class="gc-label">شؤون الطلاب</span>
-            <span class="gc-value" style="font-size:18px;">الدروس والحصص</span>
-            <span class="gc-sub">متابعة وواجبات وحضور 🎓</span>
-          </div>
-
-          <!-- 3. صحتي الطبيعية: app/health.html -->
+<!-- 3. صحتي الطبيعية: app/health.html -->
           <div class="gate-card gate-health" data-app-url="app/health.html" title="فتح صحتي الطبيعية">
             <span class="gc-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M2 22s2.5-1.5 5-2c5-1 14-7 15-18-11 1-17 10-18 15-.5 2.5-2 5-2 5z"/><path d="M9 15l6-6"/></svg>
@@ -4768,21 +4738,11 @@
             <span class="gc-sub" id="healthMiniSub">علاجات وتمارين تنفس 🌿</span>
           </div>
 
-          <!-- 4. تطبيق كلماتي: app/kalimaty.html -->
-          <div class="gate-card gate-kalimaty" data-app-url="app/kalimaty.html" title="فتح تطبيق كلماتي">
-            <span class="gc-ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="13" y2="11"/></svg>
-            </span>
-            <span class="gc-label">تطبيق كلماتي</span>
-            <span class="gc-value" style="font-size:18px;">تعلّم الإنجليزية</span>
-            <span class="gc-sub">مراحل ومفردات تفاعلية 📚</span>
-          </div>
-        </div>
       </div>
 
       ${adsByPosition('middle')}
 
-      <div class="collapsible-wrap open" id="tasksWrap"><div class="collapsible-in">${renderTasksSection()}</div></div>
+      <div class="collapsible-wrap open" id="tasksWrap" style="margin-top:20px;"><div class="collapsible-in">${renderTasksSection()}</div></div>
 
       ${nouraCardHTML()}
       ${adsByPosition('bottom')}
@@ -4834,7 +4794,7 @@
       <div class="category-card-icon" style="background:${cc}18;font-size:22px;overflow:hidden;">${o.photo ? `<img src="${o.photo}" data-zoomphoto="${o.id}" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in;" />` : productIcon(o.name, o.categoryId)}</div>
       <div class="order-main" data-exp="${o.id}">
         <div class="order-name ${purchased ? 'purchased-name' : ''}">${escapeHTML(o.name)} ${qtyLine} <span class="badge ${purchased ? 'badge-done' : 'badge-pending'}">${purchased ? 'اتشترى' : 'مطلوب'}</span>${isUrg ? ' <span class="badge badge-urgent">🔥 ضروري</span>' : ''}</div>
-        <div class="order-meta">${locLine}</div>
+        <div class="order-meta order-location">${locLine}</div>
         ${notesLine}
         ${pinfo}
       </div>
@@ -5280,8 +5240,8 @@
     });
     const maxExp = Math.max(1, ...cmp.map(c => c.exp));
     return `<div class="page">
-      <div class="topbar"><div class="greeting">لوحة الإنجازات</div></div>
-      <div class="page-title">إحصائيات البيت</div>
+      <div class="topbar"><div class="greeting">???? ?????????</div></div>
+      <div class="page-title">\u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a \u0627\u0644\u0628\u064a\u062a</div>
       ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-title">مفيش بيانات كفاية</div><div class="empty-desc">اشتري طلبات أو ضيف مصاريف وهتظهرلك الإحصائيات</div></div>` : `
       <div class="rep-card"><div class="rep-head"><span class="rep-ico" style="background:#E0F2FE;">📅</span><b>تقرير النهاردة</b><small>${day.count} مشتريات</small></div><div class="rep-grid">
         <div class="rep-tile" style="background:#E1F3FD;"><span class="t-ico">🛒</span><span class="t-tx"><small>عدد المشتريات</small><b>${day.count}</b></span></div>
@@ -5373,7 +5333,7 @@
         </div>
       </div>
       <div class="settings-card"><div class="settings-title">الدليفري 🛵</div>
-        <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🚴</div><div class="si-body"><div class="si-label">${escapeHTML(state.deliveryName || state.home?.deliveryName || 'ديليفري')}</div><div class="si-value">بيانات الدليفري بتاعك</div></div><button class="si-wa" id="sendDeliveryBtn" title="ابعت الطلبات واتساب للدليفري">💬</button><button class="si-action" id="editDeliveryBtn">تعديل</button></div>
+        <div class="settings-item" id="deliverySettingsItem" role="button" tabindex="0" aria-label="إدارة بيانات الدليفري"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🚴</div><div class="si-body"><div class="si-label">${escapeHTML(state.deliveryName || state.home?.deliveryName || 'ديليفري')}</div><div class="si-value">بيانات الدليفري بتاعك</div></div><button class="si-wa" id="sendDeliveryBtn" title="ابعت الطلبات واتساب للدليفري">💬</button></div>
       </div>
       <div class="settings-card"><div class="settings-title">التطبيق</div>
         <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span>ناقصنا إيه</span><button class="btn btn-primary btn-sm" id="installAppBtn" style="width:auto;min-height:30px;padding:5px 12px;font-size:11.5px;border-radius:999px;flex-shrink:0;white-space:nowrap;">📲 ثبّت التطبيق</button></div></div></div>
@@ -5639,7 +5599,7 @@
     const gl = document.querySelector('[data-gotab="orders"]'); if (gl) gl.onclick = (e) => { e.preventDefault(); setTab('orders'); };
     const fab = document.getElementById('fabBtn'); if (fab) fab.onclick = openAddOrderModal;
     const ha = document.getElementById('heroAddOrder'); if (ha) ha.onclick = openAddOrderModal;
-    const dc = document.getElementById('duoContinue'); if (dc) dc.onclick = () => { try { window.location.href = 'app/student.html'; } catch {} };
+    document.querySelectorAll('[data-home-tab]').forEach(b => { b.onclick = () => setTab(b.dataset.homeTab); });
     document.querySelectorAll('[data-app-url]').forEach(b => {
       b.onclick = () => {
         const u = b.dataset.appUrl;
@@ -5937,8 +5897,16 @@
       });
     });
     b('joinHomeBtn', () => { openJoinHomeModal(); });
-    b('editDeliveryBtn', () => openDeliveryModal());
-    b('sendDeliveryBtn', () => sendDeliveryWa());
+    const deliveryItem = document.getElementById('deliverySettingsItem');
+    if (deliveryItem) {
+      deliveryItem.style.cursor = 'pointer';
+      deliveryItem.onclick = () => openDeliveryModal();
+      deliveryItem.onkeydown = (event) => {
+        if (event.target.closest('#sendDeliveryBtn')) return;
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openDeliveryModal(); }
+      };
+    }
+    b('sendDeliveryBtn', (event) => { event.stopPropagation(); sendDeliveryWa(); });
     b('editPartnerWaBtn', () => openPartnerModal());
     const ib = document.getElementById('installAppBtn');
     if (ib) {
@@ -8102,6 +8070,12 @@
      ============================= */
   function init() {
     restore();
+    // Clear the tasks already saved by existing users once, then preserve future tasks.
+    if (!state._tasksClearedV1) {
+      state._tasks = [];
+      state._tasksClearedV1 = true;
+      persist();
+    }
     // لا توجد شاشة ترحيب نهائياً ولا بيت تلقائي: دخول مباشر، والبيت من الإعدادات
     try { autoInitUser(); } catch {}
     // الصفحة الرئيسية هي الافتراضية عند فتح التطبيق في كل مرة
