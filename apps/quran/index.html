@@ -13,10 +13,20 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="هدى Huda" />
 <meta name="application-name" content="هدى Huda" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
+	  /* تحميل Cairo مباشرة للغة العربية؛ هذا أكثر ثباتًا على Android و iOS */
+	  @font-face {
+	    font-family: "CairoLocal";
+	    font-style: normal;
+	    font-weight: 100 900;
+	    font-display: swap;
+	    src: url("https://fonts.gstatic.com/s/cairo/v31/SLXVc1nY6HkvangtZmpQdkhzfH5lkSscQyyS4J0.woff2") format("woff2");
+	    unicode-range: U+0600-06FF, U+0750-077F, U+0870-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+	  }
+
   :root {
     --bg: #F4FAFE;
     --bg-paper: #FFFFFF;
@@ -55,7 +65,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
   body {
-    font-family: "Cairo", "Tajawal", sans-serif;
+	    font-family: "CairoLocal", "Cairo", "Tajawal", Tahoma, Arial, sans-serif;
     background: var(--bg);
     background-image: radial-gradient(600px 320px at 85% -60px, #D6EEFB 0%, transparent 60%), radial-gradient(500px 300px at 0% 0%, #FFEED3 0%, transparent 55%), radial-gradient(700px 420px at 50% 110%, #CDEAFB 0%, transparent 60%);
     background-attachment: fixed;
@@ -71,8 +81,8 @@
     font-weight: 700;
     color: var(--text);
   }
-  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; font-weight: 700; }
-  input, select, textarea { font-family: inherit; font-size: 15px; font-weight: 600; }
+	  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; font-weight: 700; }
+	  input, select, textarea { font-family: inherit; font-size: 15px; font-weight: 600; }
   .hidden { display: none !important; }
 
   /* شاشة تحميل احترافية عند فتح التطبيق */
@@ -5721,7 +5731,7 @@
           <div><h2 class="other-apps-title" id="otherAppsTitle">تطبيقاتنا الأخرى</h2><div class="other-apps-subtitle">اكتشف مشاريعنا القادمة — تطبيقات تحت التطوير</div></div>
         </div>
         <div class="other-apps-grid">
-          <a class="other-app-card" href="app/apps/Me/student.html" style="--app-color:#7c5ce7;--app-tint:#f0ebff" aria-label="فتح منصة Me التعليمية">
+          <a class="other-app-card" href="app/apps/Me/student.html" data-protected="true" style="--app-color:#7c5ce7;--app-tint:#f0ebff" aria-label="فتح منصة Me التعليمية">
             <div class="other-app-top"><span class="other-app-icon">${svgIcon('target', 19)}</span><span class="other-app-badge">تحت التطوير</span></div><div class="other-app-name">منصة Me التعليمية</div><div class="other-app-desc">مساحة تعليمية لمتابعة الطلاب والدروس والتقدم الدراسي.</div>
           </a>
           <a class="other-app-card" href="app/apps/talabat/index.html" style="--app-color:#e58b2a;--app-tint:#fff1df" aria-label="فتح تطبيق ناقصنا إيه">
@@ -5954,7 +5964,12 @@
     document.querySelectorAll('.other-app-card[href]').forEach(card => {
       card.onclick = (event) => {
         event.preventDefault();
-        openProtectedAppPrompt(card.href, card.querySelector('.other-app-name')?.textContent?.trim() || 'التطبيق');
+        const appName = card.querySelector('.other-app-name')?.textContent?.trim() || 'التطبيق';
+        if (card.dataset.protected === 'true') {
+          openProtectedAppPrompt(card.href, appName);
+        } else {
+          window.location.assign(card.href);
+        }
       };
     });
 
