@@ -5719,11 +5719,13 @@
       <div class="settings-card"><div class="settings-title">الدليفري 🛵</div>
         <div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🚴</div><div class="si-body"><div class="si-label">${escapeHTML(state.deliveryName || state.home?.deliveryName || 'ديليفري')}</div><div class="si-value">بيانات الدليفري بتاعك</div></div><button class="si-wa" id="sendDeliveryBtn" title="ابعت الطلبات واتساب للدليفري">💬</button><button class="si-action" id="editDeliveryBtn">تعديل</button></div>
       </div>
-      <div class="settings-card"><div class="settings-title">التطبيق</div>
+      <div class="settings-card"><button class="collapsible-head" id="appHead" onclick="this.parentElement.querySelector('.collapsible-body').classList.toggle('hidden'); this.querySelector('.chev').classList.toggle('open');"><span class="ch-icon">📱</span><span class="ch-texts"><b>التطبيق</b><small>النسخ الاحتياطية والتثبيت</small></span><span class="chev ${state._appOpen ? 'open' : ''}">‹</span></button>
+        <div class="collapsible-body ${state._appOpen ? '' : 'hidden'}">
         <div class="settings-item"><div class="si-icon app-mini-ico">${svgIcon('home', 18)}<img src="logo.png" alt="" onerror="this.remove()" /></div><div class="si-body"><div class="si-label">هدى Huda</div><div class="si-value">إدارة النسخ الاحتياطية وتثبيت التطبيق</div></div></div>
         <div class="settings-item"><div class="si-icon" style="background:#E1F3FD;color:#168bc5;">${svgIcon('copy', 18)}</div><div class="si-body"><div class="si-label">حفظ نسخة احتياطية</div><div class="si-value">احفظ بيانات التطبيق على جهازك</div></div><button class="si-action" id="settingsHomeExportBtn">حفظ</button></div>
         <div class="settings-item"><div class="si-icon" style="background:#E1F3FD;color:#168bc5;">${svgIcon('box', 18)}</div><div class="si-body"><div class="si-label">استعادة نسخة</div><div class="si-value">استعد بياناتك من ملف نسخة احتياطية</div></div><button class="si-action" id="settingsHomeImportBtn">استعادة</button><input type="file" id="settingsHomeImportFile" accept="application/json,.json" hidden /></div>
         <div class="settings-item"><div class="si-icon" style="background:#E1F3FD;color:#168bc5;">${svgIcon('home', 18)}</div><div class="si-body"><div class="si-label">تثبيت التطبيق</div><div class="si-value">استخدمه كتطبيق ويب على جهازك</div></div><button class="si-action" id="settingsHomeInstallBtn">تثبيت</button></div>
+        </div>
       </div>
       <section class="other-apps" aria-labelledby="otherAppsTitle">
         <div class="other-apps-head">
@@ -5737,7 +5739,7 @@
           <a class="other-app-card" href="app/apps/talabat/index.html" style="--app-color:#e58b2a;--app-tint:#fff1df" aria-label="فتح تطبيق ناقصنا إيه">
             <div class="other-app-top"><span class="other-app-icon">${svgIcon('cart', 19)}</span><span class="other-app-badge">تحت التطوير</span></div><div class="other-app-name">ناقصنا إيه؟</div><div class="other-app-desc">نظّم احتياجات البيت وقائمة المشتريات بسهولة.</div>
           </a>
-          <a class="other-app-card" href="app/apps/teacher/teacher.html" style="--app-color:#159b86;--app-tint:#e2f7f2" aria-label="فتح EduSmart للمعلمين">
+          <a class="other-app-card" href="app/apps/teacher/student.html" style="--app-color:#159b86;--app-tint:#e2f7f2" aria-label="فتح EduSmart للمعلمين">
             <div class="other-app-top"><span class="other-app-icon">${svgIcon('book', 19)}</span><span class="other-app-badge">تحت التطوير</span></div><div class="other-app-name">EduSmart للمعلمين</div><div class="other-app-desc">أدوات للمعلم لإدارة ملفه ومتابعة طلابه.</div>
           </a>
           <a class="other-app-card" href="app/apps/kalimaty/kalimaty.html" style="--app-color:#8060d8;--app-tint:#f0ebff" aria-label="فتح تطبيق كلماتي">
@@ -6381,7 +6383,18 @@
     if (meIn) meIn.onchange = (e) => handlePhotoUpload('me', e.target.files[0]);
     document.querySelectorAll('[data-rmphoto]').forEach(btn => btn.onclick = () => { if (!state.photos) state.photos = { me: '' }; state.photos[btn.dataset.rmphoto] = ''; persist(); render(); });
     const scrollToId = (id) => { requestAnimationFrame(() => { const h = document.getElementById(id); if (h) h.scrollIntoView({ block: 'start', behavior: 'smooth' }); }); };
-    const accKeys = ['_accountOpen', '_catOpen', '_learnedOpen', '_dataOpen'];
+    const appCard = [...document.querySelectorAll('.settings-card')].find(card => card.querySelector('.settings-title')?.textContent.trim() === 'التطبيق');
+    if (appCard) {
+      const appTitle = appCard.querySelector('.settings-title');
+      const appRows = [...appCard.children].filter(child => child !== appTitle);
+      appTitle.classList.add('collapsible-head');
+      appTitle.style.cursor = 'pointer';
+      appTitle.setAttribute('role', 'button');
+      appTitle.setAttribute('aria-expanded', state._appOpen ? 'true' : 'false');
+      appRows.forEach(row => row.classList.toggle('hidden', !state._appOpen));
+      appTitle.onclick = () => { state._appOpen = !state._appOpen; persist(); render(); };
+    }
+    const accKeys = ['_accountOpen', '_catOpen', '_learnedOpen', '_dataOpen', '_appOpen'];
     const toggleAcc = (key, id) => {
       const willOpen = !state[key];
       accKeys.forEach(k => { state[k] = (k === key ? willOpen : false); });
@@ -6391,6 +6404,7 @@
     const cth = document.getElementById('catsTuneHead'); if (cth) cth.onclick = () => { state._catsTuneOpen = !state._catsTuneOpen; persist(); render(); };
     const lnh = document.getElementById('learnedHead'); if (lnh) lnh.onclick = () => toggleAcc('_learnedOpen', 'learnedHead');
     const ach = document.getElementById('accountHead'); if (ach) ach.onclick = () => toggleAcc('_accountOpen', 'accountHead');
+    const aph = document.getElementById('appHead'); if (aph) aph.onclick = () => toggleAcc('_appOpen', 'appHead');
     const dth = document.getElementById('dataHead'); if (dth) dth.onclick = () => toggleAcc('_dataOpen', 'dataHead');
     document.querySelectorAll('[data-iconcat]').forEach(btn => btn.onclick = () => openIconPickerModal(btn.dataset.iconcat));
     document.querySelectorAll('[data-catrow]').forEach(row => row.onclick = () => { const id = row.dataset.catrow; state._catOpenId = (state._catOpenId === id) ? null : id; persist(); render(); });
@@ -8517,7 +8531,7 @@
      INIT
      ============================= */
   function init() {
-    restore();
+    restore(); state._appOpen = false;
     // لا توجد شاشة ترحيب نهائياً ولا بيت تلقائي: دخول مباشر، والبيت من الإعدادات
     try { autoInitUser(); } catch {}
     // الصفحة الرئيسية هي الافتراضية عند فتح التطبيق في كل مرة
