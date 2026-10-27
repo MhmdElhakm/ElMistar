@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تسميع القرآن الكريم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g900:#0b3d2e;--g800:#0f5039;--g700:#14634a;--g500:#1f8a65;--g100:#e3f1ea;--g50:#f1f8f4;
+  --gold:#b8892b;--gold-l:#f5ead0;--paper:#fffdf7;--bg:#f1eee4;--ink:#1c2924;--mut:#6a7a72;
+  --line:#e2dcc9;--red:#b3372f;--red-l:#fbe9e7;--amber:#a86a0c;--amber-l:#fdf1d9;
+  --shadow:0 1px 2px rgba(11,61,46,.06),0 6px 20px rgba(11,61,46,.07);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:'Tajawal',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;font-size:16px;min-height:100vh}
+.quran{font-family:'Amiri Quran','Scheherazade New','Traditional Arabic',serif;line-height:2.1}
+.hidden{display:none!important}
+button,select,input{font-family:inherit;font-size:1rem;color:inherit}
+
+/* header */
+.top{background:linear-gradient(135deg,var(--g900),var(--g700));color:#fff;padding:18px 16px 22px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden}
+.top::after{content:"";position:absolute;inset:auto -40px -60px auto;width:180px;height:180px;border-radius:50%;border:26px solid rgba(255,255,255,.05)}
+.logo{width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.12);display:grid;place-items:center;flex:none;border:1px solid rgba(255,255,255,.2)}
+.top h1{margin:0;font-size:1.3rem;font-weight:800}
+.top p{margin:0;font-size:.85rem;opacity:.85}
+main{max-width:760px;margin:-10px auto 0;padding:0 12px 120px}
+.view{animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* cards */
+.card{background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:16px;margin-top:14px;border:1px solid #efeadb}
+.card h2{margin:0 0 12px;font-size:1.05rem;font-weight:800;color:var(--g800);display:flex;align-items:center;gap:8px}
+.card h2 .num{width:26px;height:26px;border-radius:50%;background:var(--g100);color:var(--g700);display:grid;place-items:center;font-size:.9rem}
+.card h2 .badge{margin-inline-start:auto;background:var(--gold-l);color:var(--gold);border-radius:999px;font-size:.8rem;padding:1px 10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:.82rem;color:var(--mut);font-weight:500}
+select,input[type=text]{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;min-height:44px}
+select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 3px rgba(31,138,101,.15)}
+.tabs{display:flex;background:var(--g50);padding:4px;border-radius:14px;gap:4px;margin-bottom:12px}
+.tabs button{flex:1;border:0;background:transparent;padding:9px 6px;border-radius:11px;font-weight:700;color:var(--mut);cursor:pointer}
+.tabs button.on{background:#fff;color:var(--g700);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.question-card-head{width:100%;padding:0;margin:0;text-align:right;color:var(--g800);display:flex;align-items:center;gap:8px;font:inherit;font-size:1.05rem;font-weight:800}
+.question-add-body{display:grid;grid-template-rows:0fr;opacity:.35;transition:grid-template-rows .35s ease,opacity .25s ease;margin-top:0}
+.question-add-body.open{grid-template-rows:1fr;opacity:1;margin-top:12px}
+.question-add-inner{min-height:0;overflow:hidden}
+.question-method-panel{display:grid;grid-template-rows:0fr;opacity:0;transform:translateY(-6px);pointer-events:none;transition:grid-template-rows .3s ease,opacity .25s ease,transform .3s ease}
+.question-method-panel.active{grid-template-rows:1fr;opacity:1;transform:none;pointer-events:auto}
+.question-method-panel>*{min-height:0;overflow:hidden}
+.info{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--g50);color:var(--g800);font-size:.9rem;border:1px dashed #bcd9ca}
+.info.bad{background:var(--red-l);color:var(--red);border-color:#efc2bd}
+.hint{font-size:.8rem;color:var(--mut);margin-top:8px}
+
+/* buttons */
+.btn{border:0;border-radius:14px;padding:12px 16px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;transition:transform .08s,filter .15s}
+.btn:active{transform:scale(.98)}
+.btn.pri{background:var(--g700);color:#fff}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.gold{background:var(--gold);color:#fff}
+.btn.ghost{background:var(--g50);color:var(--g700);border:1.5px solid #cfe5d8}
+.btn.warn{background:var(--amber-l);color:var(--amber)}
+.btn.danger{background:var(--red-l);color:var(--red)}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.stepper{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;min-height:44px}
+.stepper button{width:44px;align-self:stretch;border:0;background:var(--g50);font-size:1.3rem;color:var(--g700);cursor:pointer}
+.stepper span{flex:1;text-align:center;font-weight:800}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;padding:10px 4px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-weight:700;cursor:pointer;color:var(--mut)}
+.seg button.on{border-color:var(--g500);background:var(--g100);color:var(--g700)}
+.chk{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:.92rem;color:var(--mut)}
+.chk input{width:18px;height:18px;accent-color:var(--g700)}
+
+/* question list */
+.qi{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:14px;margin-bottom:8px;background:var(--paper)}
+.qi .no{width:30px;height:30px;border-radius:50%;background:var(--g700);color:#fff;display:grid;place-items:center;font-weight:800;font-size:.85rem;flex:none}
+.qi .qb{flex:1;min-width:0}
+.qi .qref{font-weight:700;font-size:.92rem;color:var(--g800)}
+.qi .qref .cnt{color:var(--mut);font-weight:400;font-size:.8rem}
+.qi .qtxt{font-size:1.08rem;line-height:1.9;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qi .qa{display:flex;flex-direction:column;gap:2px}
+.qi .qa button{width:30px;height:26px;border:0;border-radius:8px;background:#f1efe6;color:var(--mut);cursor:pointer;font-size:.9rem}
+.qi .qa button.del{background:var(--red-l);color:var(--red)}
+.empty{text-align:center;color:var(--mut);padding:18px;border:2px dashed var(--line);border-radius:14px;font-size:.92rem}
+.rowbtns{display:flex;gap:8px;margin-top:6px}
+.rowbtns .btn{flex:1;min-height:40px;font-size:.88rem}
+
+.sticky{position:fixed;inset:auto 0 0 0;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 70%,rgba(241,238,228,0));z-index:20}
+.sticky .btn{max-width:736px;margin:0 auto;display:flex;font-size:1.05rem;min-height:52px;box-shadow:0 8px 24px rgba(20,99,74,.35)}
+
+/* loading */
+.loadbox{text-align:center;padding:50px 20px}
+.spin{width:44px;height:44px;border-radius:50%;border:4px solid var(--g100);border-top-color:var(--g700);margin:0 auto 14px;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* quiz */
+.qhead{display:flex;align-items:center;gap:12px;margin-top:14px;font-weight:700;color:var(--g800)}
+.prog{flex:1;height:8px;background:#ddd8c6;border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--g500),var(--gold));border-radius:99px;transition:width .4s}
+.paper{background:var(--paper);border-radius:20px;border:1px solid #eadfc0;box-shadow:var(--shadow);padding:18px 16px;margin-top:12px;position:relative}
+.paper::before{content:"";position:absolute;inset:6px;border:1px solid #efe3bf;border-radius:15px;pointer-events:none}
+.lbl{display:inline-block;font-size:.8rem;font-weight:800;color:var(--gold);background:var(--gold-l);border-radius:999px;padding:1px 12px;margin:8px 0 2px}
+.verse{font-size:1.7rem;text-align:justify;text-align-last:right;padding:8px 6px;line-height:2.5;color:#14281f;min-height:120px}
+.gap{color:var(--gold);letter-spacing:3px;white-space:nowrap}
+.gap .caret{margin:0 2px}
+.ph{font-family:'Tajawal',sans-serif;font-size:.9rem;color:#8aa598;display:block;padding-top:22px}
+.dots{color:var(--gold);letter-spacing:2px}
+.w{display:inline}
+.w.ok{color:var(--g700)}
+.w.hint{color:var(--amber)}
+.w.miss{color:var(--red)}
+.w.pop{animation:pop .45s both}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.9)}to{opacity:1;transform:none}}
+.ae{font-size:1.1rem;color:var(--gold);margin:0 3px}
+.caret{display:inline-block;width:3px;height:1.2em;background:var(--g500);vertical-align:middle;animation:bl 1s steps(2) infinite;margin-inline-start:4px}
+@keyframes bl{50%{opacity:0}}
+.refline{margin-top:10px;text-align:center;font-weight:700;color:var(--g800);background:var(--g100);border-radius:12px;padding:6px}
+.cnt2{font-size:.78rem;color:var(--mut);text-align:center;margin-top:2px}
+
+.micbar{display:flex;align-items:center;gap:14px;background:#fff;border-radius:18px;padding:12px 14px;margin-top:12px;box-shadow:var(--shadow);border:1px solid #efeadb}
+.mic{width:64px;height:64px;border-radius:50%;border:0;background:var(--g700);color:#fff;display:grid;place-items:center;cursor:pointer;flex:none;position:relative}
+.mic.on{background:var(--red)}
+.mic.on::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:3px solid rgba(179,55,47,.45);animation:pulse 1.2s infinite}
+@keyframes pulse{from{transform:scale(.9);opacity:1}to{transform:scale(1.25);opacity:0}}
+.mictxt{flex:1;min-width:0}
+.mictxt b{display:block;font-size:.98rem}
+.heard{font-size:.82rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:1.4em}
+.actions{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;margin-top:10px}
+.actions .btn{padding:10px 6px;font-size:.92rem}
+.judge{background:#fff;border-radius:18px;padding:14px;margin-top:12px;box-shadow:var(--shadow);border:1px solid #efeadb}
+.judge .t{font-weight:800;margin-bottom:8px;color:var(--g800)}
+.judge .seg button.s-correct.on{background:var(--g100);border-color:var(--g500);color:var(--g700)}
+.judge .seg button.s-hint.on{background:var(--amber-l);border-color:var(--amber);color:var(--amber)}
+.judge .seg button.s-wrong.on{background:var(--red-l);border-color:var(--red);color:var(--red)}
+.judge .btn{margin-top:10px}
+.quitrow{text-align:center;margin-top:14px}
+.quitrow button{background:none;border:0;color:var(--mut);text-decoration:underline;cursor:pointer;font-size:.88rem}
+
+/* search */
+.srch{position:relative;margin-bottom:12px}
+.res{margin-top:8px;display:grid;gap:8px}
+.rs{border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:10px}
+.rs{display:block;width:100%;text-align:right;cursor:pointer}
+.rs.sel{border-color:var(--g500);background:var(--g100)}
+.rs .rr{font-weight:700;font-size:.88rem;color:var(--g800)}
+.rs .rq{font-size:1.15rem;line-height:2;color:#333}
+.rs .rb{display:flex;gap:6px;margin-top:6px}
+.rs .rb .btn{flex:1;min-height:38px;font-size:.85rem;padding:6px}
+.or{text-align:center;color:var(--mut);font-size:.8rem;margin:10px 0 8px}
+/* results */
+.score{display:flex;align-items:center;gap:18px}
+.ring{width:110px;height:110px;border-radius:50%;display:grid;place-items:center;flex:none}
+.ring div{width:84px;height:84px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:800;font-size:1.5rem;color:var(--g800)}
+.score h3{margin:0;font-size:1.2rem}
+.score p{margin:2px 0 0;color:var(--mut);font-size:.9rem}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.stat{text-align:center;border-radius:12px;padding:8px 4px;font-size:.82rem}
+.stat b{display:block;font-size:1.3rem}
+.stat.c{background:var(--g100);color:var(--g700)}
+.stat.h{background:var(--amber-l);color:var(--amber)}
+.stat.w{background:var(--red-l);color:var(--red)}
+.ri{display:flex;gap:10px;align-items:center;padding:9px 4px;border-bottom:1px solid #f0ecdd}
+.ri:last-child{border:0}
+.ri .st{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;flex:none}
+.ri .st.correct{background:var(--g500)}.ri .st.hint{background:var(--amber)}.ri .st.wrong{background:var(--red)}
+.ri .rt{flex:1;min-width:0;font-size:.92rem}
+.ri .rt small{display:block;color:var(--mut)}
+
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:#1c2924;color:#fff;padding:10px 18px;border-radius:99px;font-size:.9rem;opacity:0;pointer-events:none;transition:.3s;z-index:50;max-width:92vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+
+@media print{
+  .top,.sticky,.btn,.rowbtns,#toast{display:none!important}
+  body{background:#fff}.card{box-shadow:none}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="logo">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5z"/><path d="M12 6.5v13"/></svg>
+  </div>
+  <div>
+    <h1>تسميع القرآن الكريم</h1>
+    <p>أكمل من قوله تعالى … إلى قوله تعالى</p>
+  </div>
+</header>
+
+<main>
+  <!-- loading -->
+  <section id="v-load" class="view">
+    <div class="card loadbox" id="loadbox">
+      <div class="spin"></div>
+      <b>جارٍ تحميل نص المصحف…</b>
+      <div class="hint">يتم التحميل مرة واحدة فقط ثم يُحفظ على الجهاز</div>
+    </div>
+  </section>
+
+  <!-- setup -->
+  <section id="v-setup" class="view hidden">
+    <div class="card">
+      <h2><span class="num">١</span> نطاق الاختبار</h2>
+      <div class="tabs" id="scopeTabs">
+        <button data-m="juz">بالأجزاء</button>
+        <button data-m="surah">بالسور والآيات</button>
+      </div>
+      <div id="pane-juz">
+        <div class="grid2">
+          <div class="field"><label>من الجزء</label><select id="fj"></select></div>
+          <div class="field"><label>إلى الجزء</label><select id="tj"></select></div>
+        </div>
+      </div>
+      <div id="pane-surah" class="hidden">
+        <div class="grid2">
+          <div class="field"><label>من سورة</label><select id="fs"></select></div>
+          <div class="field"><label>من آية</label><select id="fa"></select></div>
+          <div class="field"><label>إلى سورة</label><select id="ts"></select></div>
+          <div class="field"><label>إلى آية</label><select id="ta"></select></div>
+        </div>
+      </div>
+      <div class="info" id="scopeInfo"></div>
+    </div>
+
+    <div class="card question-card">
+      <div class="question-card-head" id="questionSectionToggle">
+        <span class="num">٢</span><span>إضافة الأسئلة</span>
+      </div>
+      <div class="question-add-body open" id="questionAddBody">
+       <div class="question-add-inner">
+      <div class="tabs" id="qTabs">
+        <button data-m="rand">عشوائية متوازنة</button>
+        <button data-m="manual">تحديد الآيات</button>
+        <button data-m="text">كتابة النص</button>
+      </div>
+
+      <div id="pane-rand">
+        <div class="grid2">
+          <div class="field">
+            <label>عدد الأسئلة</label>
+            <div class="stepper"><button id="qnMinus" aria-label="إنقاص">−</button><span id="qnVal">10</span><button id="qnPlus" aria-label="زيادة">+</button></div>
+          </div>
+          <div class="field">
+            <label>طول المقطع المطلوب (آيات)</label>
+            <div class="grid2" style="gap:6px"><select id="lmin" aria-label="الأدنى"></select><select id="lmax" aria-label="الأقصى"></select></div>
+          </div>
+        </div>
+        <label class="chk"><input type="checkbox" id="append"> إضافة إلى الأسئلة الحالية بدل استبدالها</label>
+        <div class="hint">تُقسَّم آيات النطاق إلى مقاطع متساوية ويُؤخذ سؤال واحد من كل مقطع، فتتوزع الأسئلة على كامل النطاق دون تكرار أو تركّز، مع توزيع متوازن لأطوال المقاطع.</div>
+        <button class="btn pri block" id="genBtn" style="margin-top:12px">توليد الأسئلة</button>
+      </div>
+
+      <div id="pane-manual" class="hidden">
+        <div class="question-method-panel" id="verseMethodPanel"><div>
+        <div class="field"><label>اختر السورة والآيات التي تريد إضافتها</label></div>
+        <div class="field"><label>السورة</label><select id="ms"></select></div>
+        <div class="grid2" style="margin-top:10px">
+          <div class="field"><label>من آية</label><select id="ma1"></select></div>
+          <div class="field"><label>إلى آية</label><select id="ma2"></select></div>
+        </div>
+        <div class="hint">يمكن اختيار أي سورة مهما كان نطاق الاختبار.</div>
+        <button class="btn gold block" id="addBtn" style="margin-top:12px">+ إضافة السؤال إلى القائمة</button>
+        </div></div>
+      </div>
+      <div id="pane-text" class="question-method-panel"><div>
+        <div class="srch">
+          <div class="field"><label>من قوله تعالى — اكتب بداية الآية (أو المرجع مثل: البقرة 255)</label>
+          <input type="text" id="qfrom" placeholder="مثال: الله لا إله إلا هو" autocomplete="off"></div>
+          <div class="res" id="rfrom"></div>
+          <div class="field" style="margin-top:12px"><label>إلى قوله تعالى — اكتب آية النهاية (اتركه فارغاً لسؤال من آية واحدة)</label>
+          <input type="text" id="qto" placeholder="مثال: وهو العلي العظيم" autocomplete="off"></div>
+          <div class="res" id="rto"></div>
+          <div class="info hidden" id="qprev"></div>
+          <button class="btn gold block" id="addTyped" style="margin-top:10px">+ إضافة السؤال إلى القائمة</button>
+        </div>
+      </div>
+       </div>
+      </div>
+    </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">٣</span> قائمة الأسئلة <span class="badge" id="qcount">٠</span></h2>
+      <div id="qlist"></div>
+      <div class="rowbtns">
+        <button class="btn ghost" id="shuffleBtn">خلط الترتيب</button>
+        <button class="btn danger" id="clearBtn">مسح الكل</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">٤</span> إعدادات التسميع</h2>
+      <div class="field"><label>اسم الطالب (اختياري)</label><input type="text" id="sname" placeholder="مثال: أحمد محمد"></div>
+      <div class="field" style="margin-top:12px">
+        <label>مستوى السؤال (عدد الكلمات الظاهرة في البداية والنهاية)</label>
+        <div class="seg" id="lvl"><button data-l="0">سهل</button><button data-l="1">متوسط</button><button data-l="2">صعب</button></div>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label>لهجة التعرف على الصوت</label>
+        <select id="lang">
+          <option value="ar-SA">العربية — السعودية</option>
+          <option value="ar-EG">العربية — مصر</option>
+          <option value="ar-AE">العربية — الإمارات</option>
+          <option value="ar-JO">العربية — الأردن</option>
+          <option value="ar-MA">العربية — المغرب</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sticky"><button class="btn pri block" id="startBtn">ابدأ التسميع</button></div>
+  </section>
+
+  <section id="v-quiz" class="view hidden"></section>
+  <section id="v-res" class="view hidden"></section>
+</main>
+<div id="toast"></div>
+
+<script>
+/* ============ بيانات ثابتة ============ */
+const SURAHS="الفاتحة,البقرة,آل عمران,النساء,المائدة,الأنعام,الأعراف,الأنفال,التوبة,يونس,هود,يوسف,الرعد,إبراهيم,الحجر,النحل,الإسراء,الكهف,مريم,طه,الأنبياء,الحج,المؤمنون,النور,الفرقان,الشعراء,النمل,القصص,العنكبوت,الروم,لقمان,السجدة,الأحزاب,سبأ,فاطر,يس,الصافات,ص,الزمر,غافر,فصلت,الشورى,الزخرف,الدخان,الجاثية,الأحقاف,محمد,الفتح,الحجرات,ق,الذاريات,الطور,النجم,القمر,الرحمن,الواقعة,الحديد,المجادلة,الحشر,الممتحنة,الصف,الجمعة,المنافقون,التغابن,الطلاق,التحريم,الملك,القلم,الحاقة,المعارج,نوح,الجن,المزمل,المدثر,القيامة,الإنسان,المرسلات,النبأ,النازعات,عبس,التكوير,الانفطار,المطففين,الانشقاق,البروج,الطارق,الأعلى,الغاشية,الفجر,البلد,الشمس,الليل,الضحى,الشرح,التين,العلق,القدر,البينة,الزلزلة,العاديات,القارعة,التكاثر,العصر,الهمزة,الفيل,قريش,الماعون,الكوثر,الكافرون,النصر,المسد,الإخلاص,الفلق,الناس".split(',');
+const JUZ_START=[[1,1],[2,142],[2,253],[3,93],[4,24],[4,148],[5,82],[6,111],[7,88],[8,41],[9,93],[11,6],[12,53],[15,1],[17,1],[18,75],[21,1],[23,1],[25,21],[27,56],[29,46],[33,31],[36,28],[39,32],[41,47],[46,1],[51,31],[58,1],[67,1],[78,1]];
+const LEVELS=[[5,3],[3,2],[2,1]];
+const LEVEL_NAMES=['سهل','متوسط','صعب'];
+
+/* ============ أدوات ============ */
+const $=id=>document.getElementById(id);
+const AD=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const DIAC=/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640\u08D3-\u08FF\u200c\u200d]/g;
+function norm(s){return s.replace(DIAC,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/ء/g,'').replace(/[^\u0621-\u063A\u0641-\u064A]/g,'');}
+function lev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let prev=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++){cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));}prev=cur;}return prev[n];}
+function similar(a,b){if(!a||!b)return false;if(a===b)return true;const m=Math.max(a.length,b.length);const th=m<=3?0:m<=5?1:m<=8?2:3;return Math.abs(a.length-b.length)<=th&&lev(a,b)<=th;}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let toastT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3200);}
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('hidden',v.id!==id));window.scrollTo(0,0);}
+const opts=(n,from=1,fmt=x=>AD(x))=>Array.from({length:n},(_,i)=>`<option value="${from+i}">${fmt(from+i)}</option>`).join('');
+
+/* ============ تحميل المصحف ============ */
+let AY=[],SI=[],CNT=[];
+async function fetchJSON(url){const c=new AbortController();const t=setTimeout(()=>c.abort(),30000);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}finally{clearTimeout(t);}}
+async function fromQuranCom(){const j=await fetchJSON('https://api.quran.com/api/v4/quran/verses/uthmani');return j.verses.map(v=>{const [s,n]=v.verse_key.split(':').map(Number);return [s,n,v.text_uthmani];});}
+async function fromAlQuranCloud(){const j=await fetchJSON('https://api.alquran.cloud/v1/quran/quran-uthmani');return j.data.surahs.flatMap(sr=>sr.ayahs.map(a=>[sr.number,a.numberInSurah,a.text]));}
+async function loadQuran(){
+  const c=store.get('tq_quran_v1',null);
+  if(c&&c.length===6236)return c;
+  let data;
+  try{data=await fromQuranCom();}catch(e){data=await fromAlQuranCloud();}
+  if(!data||data.length!==6236)throw new Error('بيانات غير مكتملة');
+  store.set('tq_quran_v1',data);
+  return data;
+}
+function buildData(data){
+  AY=[];SI=[];CNT=[];
+  data.forEach(([s,n,text],idx)=>{
+    let t=String(text).replace(/[۞۩]/g,'').replace(/\s+/g,' ').trim();
+    let toks=t.split(' ');
+    if(n===1&&s!==1&&s!==9&&toks.length>4&&norm(toks[0])==='بسم')toks=toks.slice(4);
+    const words=[];
+    toks.forEach(tk=>{if(norm(tk)===''){if(words.length)words[words.length-1]+=' '+tk;}else words.push(tk);});
+    AY.push({s,n,words,norm:words.map(norm)});
+    if(n===1)SI[s]=idx;
+    CNT[s]=n;
+  });
+}
+const gi=(s,n)=>SI[s]+n-1;
+
+/* ============ الحالة ============ */
+let S=Object.assign({mode:'juz',qmode:'rand',fj:30,tj:30,fs:2,fa:1,ts:2,ta:286,qn:10,lmin:2,lmax:4,level:1,lang:'ar-SA',name:'',ms:1,ma1:1,ma2:1,append:false,questions:[]},store.get('tq_state_v1',{}));
+const save=()=>store.set('tq_state_v1',S);
+
+/* ============ نطاق الاختبار ============ */
+function poolRange(){
+  if(S.mode==='juz'){
+    const a=Math.min(S.fj,S.tj),b=Math.max(S.fj,S.tj);
+    const i1=gi(...JUZ_START[a-1]);
+    const i2=b===30?AY.length-1:gi(...JUZ_START[b])-1;
+    return [i1,i2];
+  }
+  return [gi(S.fs,S.fa),gi(S.ts,S.ta)];
+}
+function refreshScope(){
+  const [i1,i2]=poolRange();const info=$('scopeInfo');
+  if(i2<i1){info.className='info bad';info.textContent='نهاية النطاق قبل بدايته، يرجى تعديل الاختيار.';return false;}
+  const cnt=i2-i1+1;
+  let txt;
+  if(S.mode==='juz'){const a=Math.min(S.fj,S.tj),b=Math.max(S.fj,S.tj);txt=a===b?`الجزء ${AD(a)}`:`من الجزء ${AD(a)} إلى الجزء ${AD(b)}`;}
+  else txt=`من سورة ${SURAHS[S.fs-1]} آية ${AD(S.fa)} إلى سورة ${SURAHS[S.ts-1]} آية ${AD(S.ta)}`;
+  info.className='info';info.innerHTML=`<b>${txt}</b> — ${AD(cnt)} آية`;
+  return true;
+}
+function setAyahSel(el,s,val){el.innerHTML=opts(CNT[s]);el.value=Math.min(Math.max(val,1),CNT[s]);return +el.value;}
+
+/* ============ بناء السؤال ============ */
+function buildQ(q,level){
+  const i1=gi(q.s,q.n1),i2=gi(q.s,q.n2),toks=[];
+  for(let i=i1;i<=i2;i++){const A=AY[i];A.words.forEach((w,k)=>toks.push({w,nm:A.norm[k],end:k===A.words.length-1?A.n:0}));}
+  let [k,m]=LEVELS[level];
+  if(i1===i2)m=0;
+  k=Math.min(k,toks.length-1);
+  if(k+m>=toks.length)m=Math.max(0,toks.length-k-1);
+  return {toks,k,m,pre:toks.slice(0,k),mid:toks.slice(k,toks.length-m),suf:toks.slice(toks.length-m),single:i1===i2};
+}
+const wordHTML=(t,cls='',st='')=>`<span class="w ${cls}"${st}>${t.w}</span>${t.end?`<span class="ae">﴿${AD(t.end)}﴾</span>`:''}`;
+const refText=q=>`سورة ${SURAHS[q.s-1]} · ${q.n1===q.n2?'آية '+AD(q.n1):'الآيات '+AD(q.n1)+' – '+AD(q.n2)}`;
+
+/* ============ توليد الأسئلة العشوائية المتوازنة ============ */
+function genRandom(){
+  const [a,b]=poolRange();const total=b-a+1;
+  let minL=S.lmin,maxL=Math.max(S.lmax,S.lmin);
+  let N=Math.max(1,Math.min(S.qn,Math.floor(total/minL)));
+  const seg=total/N;
+  const span=maxL-minL+1;
+  const lens=shuffle(Array.from({length:N},(_,i)=>minL+(i%span)));
+  const out=[];
+  for(let i=0;i<N;i++){
+    const w0=Math.floor(a+i*seg),w1=Math.floor(a+(i+1)*seg)-1;
+    const cap=Math.max(1,w1-w0+1);
+    const L=Math.min(lens[i],cap);
+    const start=w0+Math.floor(Math.random()*(cap-L+1));
+    let end=start+L-1;
+    const s=AY[start].s;
+    if(AY[end].s!==s)end=gi(s,CNT[s]);
+    out.push({s,n1:AY[start].n,n2:AY[end].n});
+  }
+  return {list:shuffle(out),reduced:N<S.qn};
+}
+
+/* ============ قائمة الأسئلة ============ */
+function renderList(){
+  $('qcount').textContent=AD(S.questions.length);
+  const box=$('qlist');
+  if(!S.questions.length){box.innerHTML='<div class="empty">لا توجد أسئلة بعد. ولّد أسئلة عشوائية أو أضف أسئلتك بنفسك.</div>';}
+  else box.innerHTML=S.questions.map((q,i)=>{
+    const b=buildQ(q,S.level);
+    const pre=b.pre.map(t=>t.w).join(' ');
+    const suf=b.m?' إلى '+b.suf.map(t=>t.w).join(' '):'';
+    return `<div class="qi"><div class="no">${AD(i+1)}</div><div class="qb"><div class="qref">${refText(q)} <span class="cnt">(${AD(q.n2-q.n1+1)} آية)</span></div><div class="qtxt quran">${pre} …${suf}</div></div><div class="qa"><button data-mv="${i}" data-d="-1" aria-label="أعلى">↑</button><button data-mv="${i}" data-d="1" aria-label="أسفل">↓</button><button class="del" data-del="${i}" aria-label="حذف">×</button></div></div>`;
+  }).join('');
+  $('startBtn').disabled=!S.questions.length;
+  $('startBtn').textContent=S.questions.length?`ابدأ التسميع — ${AD(S.questions.length)} ${S.questions.length>10?'سؤالاً':'أسئلة'}`:'أضف أسئلة للبدء';
+  save();
+}
+
+/* ============ تهيئة شاشة الإعداد ============ */
+function setTabs(rootId,val){document.querySelectorAll('#'+rootId+' button').forEach(b=>b.classList.toggle('on',b.dataset.m===val));}
+function applyScopeMode(){setTabs('scopeTabs',S.mode);$('pane-juz').classList.toggle('hidden',S.mode!=='juz');$('pane-surah').classList.toggle('hidden',S.mode!=='surah');refreshScope();}
+function applyQMode(){
+  setTabs('qTabs',S.qmode);
+  $('pane-rand').classList.toggle('hidden',S.qmode!=='rand');
+  $('pane-manual').classList.toggle('hidden',S.qmode!=='manual'&&S.qmode!=='text');
+  $('verseMethodPanel').classList.toggle('active',S.qmode==='manual');
+  $('pane-text').classList.toggle('active',S.qmode==='text');
+}
+function applyLevel(){document.querySelectorAll('#lvl button').forEach(b=>b.classList.toggle('on',+b.dataset.l===S.level));}
+
+function initSetup(){
+  const juzOpts=opts(30,1,x=>'الجزء '+AD(x));
+  $('fj').innerHTML=juzOpts;$('tj').innerHTML=juzOpts;$('fj').value=S.fj;$('tj').value=S.tj;
+  const sOpts=SURAHS.map((nm,i)=>`<option value="${i+1}">${AD(i+1)} — ${nm}</option>`).join('');
+  ['fs','ts','ms'].forEach(id=>$(id).innerHTML=sOpts);
+  $('fs').value=S.fs;$('ts').value=S.ts;$('ms').value=S.ms;
+  S.fa=setAyahSel($('fa'),S.fs,S.fa);S.ta=setAyahSel($('ta'),S.ts,S.ta);
+  S.ma1=setAyahSel($('ma1'),S.ms,S.ma1);S.ma2=setAyahSel($('ma2'),S.ms,S.ma2);
+  $('lmin').innerHTML=opts(10,1,x=>'من '+AD(x));$('lmax').innerHTML=opts(10,1,x=>'إلى '+AD(x));
+  $('lmin').value=S.lmin;$('lmax').value=S.lmax;
+  $('qnVal').textContent=AD(S.qn);$('append').checked=!!S.append;
+  $('sname').value=S.name||'';$('lang').value=S.lang;
+  applyScopeMode();applyQMode();applyLevel();renderList();
+
+  $('scopeTabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.mode=b.dataset.m;applyScopeMode();save();};
+  $('qTabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.qmode=b.dataset.m;applyQMode();save();};
+  $('fj').onchange=()=>{S.fj=+$('fj').value;refreshScope();save();};
+  $('tj').onchange=()=>{S.tj=+$('tj').value;refreshScope();save();};
+  $('fs').onchange=()=>{S.fs=+$('fs').value;S.fa=setAyahSel($('fa'),S.fs,1);if(S.ts<S.fs){S.ts=S.fs;$('ts').value=S.ts;S.ta=setAyahSel($('ta'),S.ts,CNT[S.ts]);}refreshScope();save();};
+  $('fa').onchange=()=>{S.fa=+$('fa').value;refreshScope();save();};
+  $('ts').onchange=()=>{S.ts=+$('ts').value;S.ta=setAyahSel($('ta'),S.ts,CNT[S.ts]);refreshScope();save();};
+  $('ta').onchange=()=>{S.ta=+$('ta').value;refreshScope();save();};
+  $('ms').onchange=()=>{S.ms=+$('ms').value;S.ma1=setAyahSel($('ma1'),S.ms,1);S.ma2=setAyahSel($('ma2'),S.ms,Math.min(CNT[S.ms],3));save();};
+  $('ma1').onchange=()=>{S.ma1=+$('ma1').value;if(+$('ma2').value<S.ma1){S.ma2=S.ma1;$('ma2').value=S.ma2;}save();};
+  $('ma2').onchange=()=>{S.ma2=+$('ma2').value;save();};
+  $('lmin').onchange=()=>{S.lmin=+$('lmin').value;if(S.lmax<S.lmin){S.lmax=S.lmin;$('lmax').value=S.lmax;}save();};
+  $('lmax').onchange=()=>{S.lmax=+$('lmax').value;if(S.lmax<S.lmin){S.lmin=S.lmax;$('lmin').value=S.lmin;}save();};
+  $('qnMinus').onclick=()=>{S.qn=Math.max(1,S.qn-1);$('qnVal').textContent=AD(S.qn);save();};
+  $('qnPlus').onclick=()=>{S.qn=Math.min(50,S.qn+1);$('qnVal').textContent=AD(S.qn);save();};
+  $('append').onchange=()=>{S.append=$('append').checked;save();};
+  $('sname').oninput=()=>{S.name=$('sname').value;save();};
+  $('lang').onchange=()=>{S.lang=$('lang').value;save();};
+  $('lvl').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.level=+b.dataset.l;applyLevel();renderList();};
+
+  $('genBtn').onclick=()=>{
+    if(!refreshScope()){toast('نطاق الاختبار غير صحيح');return;}
+    const {list,reduced}=genRandom();
+    S.questions=S.append?S.questions.concat(list):list;
+    renderList();
+    toast(reduced?`تم توليد ${AD(list.length)} أسئلة (النطاق لا يتسع لأكثر)`:`تم توليد ${AD(list.length)} أسئلة متوازنة`);
+    $('qlist').scrollIntoView({behavior:'smooth',block:'center'});
+  };
+  $('addBtn').onclick=()=>{
+    const q={s:S.ms,n1:+$('ma1').value,n2:+$('ma2').value};
+    if(q.n2<q.n1){toast('آية النهاية قبل آية البداية');return;}
+    if(q.n2-q.n1+1>25){toast('الحد الأقصى ٢٥ آية للسؤال الواحد');return;}
+    S.questions.push(q);renderList();toast('تمت إضافة السؤال');
+  };
+  $('qlist').onclick=e=>{
+    const d=e.target.closest('[data-del]');
+    if(d){S.questions.splice(+d.dataset.del,1);renderList();return;}
+    const m=e.target.closest('[data-mv]');
+    if(m){const i=+m.dataset.mv,j=i+(+m.dataset.d);if(j<0||j>=S.questions.length)return;[S.questions[i],S.questions[j]]=[S.questions[j],S.questions[i]];renderList();}
+  };
+  $('shuffleBtn').onclick=()=>{S.questions=shuffle(S.questions);renderList();};
+  $('clearBtn').onclick=()=>{if(!S.questions.length)return;if(confirm('مسح كل الأسئلة؟')){S.questions=[];renderList();}};
+  $('startBtn').onclick=()=>startQuiz(S.questions.map(q=>({...q})));
+}
+
+/* ============ التسميع ============ */
+let Q=null,rec=null,listening=false;
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+
+function startQuiz(list){
+  if(!list.length)return;
+  Q={list,idx:0,res:new Array(list.length).fill(null),cur:null,b:null};
+  renderQ();
+}
+function renderQ(){
+  stopListen();
+  const q=Q.list[Q.idx],b=buildQ(q,S.level);Q.b=b;
+  Q.cur={exp:b.mid.map(t=>t.nm),st:new Array(b.mid.length).fill(0),p:0,base:0,cursor:0,lastCount:0,hints:0,done:false,shown:0};
+  const pct=Math.round(Q.idx/Q.list.length*100);
+  const sufHTML=b.m?`<span class="dots">…</span> ${b.suf.map(t=>wordHTML(t)).join(' ')}`:'<span style="font-family:Tajawal,sans-serif;font-size:1rem;color:var(--mut)">إلى نهاية الآية</span>';
+  $('v-quiz').innerHTML=`
+    <div class="qhead"><div>السؤال ${AD(Q.idx+1)} من ${AD(Q.list.length)}</div><div class="prog"><i style="width:${pct}%"></i></div></div>
+    <div class="paper">
+      <div style="text-align:center"><span class="lbl">أكمل من قوله تعالى ${b.m?'… إلى قوله تعالى':'… إلى نهاية الآية'}</span></div>
+      <div class="quran verse" id="verse"></div>
+      <div class="cnt2" id="cnt2"></div>
+      <div class="refline hidden" id="ref">${refText(q)}</div>
+    </div>
+    <div class="micbar">
+      <button class="mic" id="micBtn" aria-label="الميكروفون">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      </button>
+      <div class="mictxt"><b id="micTxt"></b><div class="heard" id="heard"></div></div>
+    </div>
+    <div class="actions">
+      <button class="btn pri" id="okBtn">✓ قراءة صحيحة</button>
+      <button class="btn warn" id="hintBtn">تلقين كلمة</button>
+      <button class="btn ghost" id="showBtn">إظهار الإجابة</button>
+    </div>
+    <div class="judge hidden" id="judge">
+      <div class="t">تقييم الإجابة</div>
+      <div class="seg" id="jseg"><button class="s-correct" data-r="correct">صحيحة</button><button class="s-hint" data-r="hint">بتلقين</button><button class="s-wrong" data-r="wrong">خاطئة</button></div>
+      <button class="btn pri block" id="nextBtn"></button>
+    </div>
+    <div class="quitrow"><button id="quitBtn">إنهاء الاختبار والعودة للإعداد</button></div>`;
+  showView('v-quiz');
+  setMicUI(false);updateAnswer(0);
+  $('micBtn').onclick=()=>listening?stopListen():startListen();
+  $('okBtn').onclick=markAllCorrect;
+  $('hintBtn').onclick=giveHint;
+  $('showBtn').onclick=revealAll;
+  $('quitBtn').onclick=()=>{if(confirm('إنهاء الاختبار والعودة؟')){stopListen();showView('v-setup');}};
+  $('jseg').onclick=e=>{const bt=e.target.closest('button');if(!bt)return;Q.res[Q.idx]=bt.dataset.r;paintJudge();};
+  $('nextBtn').onclick=()=>{if(Q.idx<Q.list.length-1){Q.idx++;renderQ();}else showResults();};
+}
+function updateAnswer(prev){
+  const c=Q.cur,b=Q.b,mid=b.mid;let n=0;
+  while(n<c.st.length&&c.st[n]!==0)n++;
+  let h=b.pre.map(t=>wordHTML(t)).join(' ')+' ';
+  for(let i=0;i<n;i++){
+    const cls=['','ok','hint','miss'][c.st[i]]+(i>=prev?' pop':'');
+    const d=i>=prev?` style="animation-delay:${Math.min((i-prev)*40,1800)}ms"`:'';
+    h+=wordHTML(mid[i],cls,d)+' ';
+  }
+  if(!c.done)h+=`<span class="gap">${n?'':'……… '}<span class="caret"></span></span> `;
+  if(b.m&&!c.done)h+='<span class="dots">…</span> ';
+  h+=b.suf.map(t=>wordHTML(t)).join(' ');
+  $('verse').innerHTML=h;
+  $('cnt2').textContent=`الكلمات الظاهرة: ${AD(n)} من ${AD(c.st.length)}`;
+  c.shown=n;
+}
+function paintJudge(){
+  document.querySelectorAll('#jseg button').forEach(b=>b.classList.toggle('on',b.dataset.r===Q.res[Q.idx]));
+}
+function finish(auto){
+  const c=Q.cur;c.done=true;stopListen();
+  if(auto||!Q.res[Q.idx])Q.res[Q.idx]=auto?(c.hints?'hint':'correct'):'wrong';
+  updateAnswer(c.shown);
+  $('ref').classList.remove('hidden');
+  $('judge').classList.remove('hidden');
+  $('nextBtn').textContent=Q.idx<Q.list.length-1?'السؤال التالي ←':'عرض النتيجة النهائية';
+  ['okBtn','hintBtn','showBtn'].forEach(id=>$(id).disabled=true);
+  paintJudge();
+  setMicUI(false);
+  setTimeout(()=>$('judge').scrollIntoView({behavior:'smooth',block:'nearest'}),300);
+}
+function bulkReveal(state){
+  const c=Q.cur,prev=c.shown;
+  for(let i=c.p;i<c.st.length;i++)c.st[i]=state;
+  c.p=c.st.length;
+  c.done=true;stopListen();
+  updateAnswer(prev);
+}
+function markAllCorrect(){
+  const c=Q.cur;if(c.done)return;
+  bulkReveal(1);
+  finish(true);
+}
+function revealAll(){
+  const c=Q.cur;if(c.done)return;
+  bulkReveal(3);
+  Q.res[Q.idx]='wrong';
+  finish(false);
+}
+function giveHint(){
+  const c=Q.cur;if(c.done||c.p>=c.st.length)return;
+  const prev=c.shown;
+  c.st[c.p]=2;c.p++;c.hints++;
+  c.base=c.p;c.cursor=c.lastCount;
+  updateAnswer(prev);
+  if(c.p>=c.st.length)finish(true);
+}
+
+/* ---- التعرف على الصوت ---- */
+const PHON={'ث':'س','ص':'س','ذ':'ز','ظ':'ز','ض':'د','ط':'ت','ق':'ك','ح':'ه','ع':'ا','غ':'خ'};
+function pkey(s){return s.replace(/^ال/,'').replace(/[ثصذظضطقحعغ]/g,c=>PHON[c]).replace(/ا/g,'').replace(/(.)\1+/g,'$1');}
+function same(a,b){
+  if(similar(a,b))return true;
+  const x=pkey(a),y=pkey(b);
+  if(x.length<2||y.length<2)return false;
+  if(x===y)return true;
+  return Math.max(x.length,y.length)>=5&&Math.abs(x.length-y.length)<=1&&lev(x,y)<=1;
+}
+/* يُرجع موضع التقدم الجديد وقائمة الكلمات المتخطّاة (إن أسقط التعرف كلمة) */
+function advance(exp,p,words){
+  let pend='';const skips=[];
+  for(const w of words){
+    if(p>=exp.length)break;
+    const e=exp[p];
+    if(same(w,e)||(Math.min(w.length,e.length)>=2&&Math.max(w.length,e.length)<=4&&lev(w,e)<=1&&w[0]===e[0])){p++;pend='';continue;}
+    if(p+1<exp.length&&w.length>=4&&lev(w,e)>1&&same(w,exp[p+1])){skips.push(p);p+=2;pend='';continue;}
+    if(p+1<exp.length&&w.length>=4&&Math.abs(w.length-(e+exp[p+1]).length)<=1&&same(w,e+exp[p+1])){p+=2;pend='';continue;}
+    pend+=w;
+    if(pend.length>=3&&same(pend,e)){p++;pend='';continue;}
+    if(pend.length>e.length+3)pend='';
+  }
+  return {p,skips};
+}
+/* استخراج كلمات الجلسة الحالية مع إزالة التكرار الذي يُنتجه Chrome (نتائج تراكمية) */
+function heardWords(results){
+  const items=[];
+  for(let i=0;i<results.length;i++){
+    const t=(results[i][0].transcript||'').trim();
+    if(t)items.push({t,n:t.split(/\s+/).map(norm).filter(Boolean).join(' ')});
+  }
+  const keep=[];
+  for(let i=0;i<items.length;i++){
+    const nx=items[i+1];
+    if(nx&&(nx.n===items[i].n||nx.n.startsWith(items[i].n+' ')))continue;
+    keep.push(items[i]);
+  }
+  const text=keep.map(x=>x.t).join(' ');
+  return {text,words:text.split(/\s+/).map(norm).filter(Boolean)};
+}
+function onHeard(results){
+  const c=Q.cur;if(!c||c.done)return;
+  const {text,words}=heardWords(results);
+  c.lastCount=words.length;
+  $('heard').textContent=text.split(/\s+/).slice(-7).join(' ');
+  const r=advance(c.exp,c.base,words.slice(c.cursor));
+  if(r.p>c.p){
+    const prev=c.shown;
+    for(let i=c.p;i<r.p;i++)if(c.st[i]===0)c.st[i]=r.skips.includes(i)?2:1;
+    if(r.skips.some(i=>i>=c.p))c.hints++;
+    c.p=r.p;
+    updateAnswer(prev);
+    if(c.p>=c.st.length)finish(true);
+  }
+}
+function setMicUI(on){
+  const b=$('micBtn');if(!b)return;
+  b.classList.toggle('on',on);
+  $('micTxt').textContent=on?'جارٍ الاستماع… اقرأ الآن':(Q&&Q.cur&&Q.cur.done?'تمت الإجابة':'اضغط على الميكروفون لبدء التسميع');
+  if(!on&&!(Q&&Q.cur&&Q.cur.done))$('heard').textContent=SR?'':'المتصفح لا يدعم التعرف على الصوت — استخدم زر «قراءة صحيحة» (يفضّل Chrome)';
+}
+function startListen(){
+  if(!SR){toast('المتصفح لا يدعم التعرف على الصوت. استخدم Chrome أو اعتمد «قراءة صحيحة» يدوياً');return;}
+  const c=Q.cur;if(c.done)return;
+  try{
+    rec=new SR();rec.lang=S.lang;rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=1;
+    c.base=c.p;c.cursor=0;c.lastCount=0;
+    rec.onresult=e=>{onHeard(e.results);};
+    rec.onerror=e=>{
+      if(e.error==='not-allowed'||e.error==='service-not-allowed'){listening=false;setMicUI(false);toast('لم يُسمح باستخدام الميكروفون. فعّل الإذن من إعدادات المتصفح');}
+      else if(e.error==='network'){listening=false;setMicUI(false);toast('خدمة التعرف على الصوت تتطلب اتصالاً بالإنترنت');}
+      else if(e.error==='audio-capture'){listening=false;setMicUI(false);toast('لم يتم العثور على ميكروفون');}
+    };
+    rec.onend=()=>{
+      if(listening&&Q&&Q.cur&&!Q.cur.done){Q.cur.base=Q.cur.p;Q.cur.cursor=0;Q.cur.lastCount=0;setTimeout(()=>{if(listening&&rec){try{rec.start();}catch(e){}}},200);}
+      else setMicUI(false);
+    };
+    listening=true;rec.start();setMicUI(true);
+  }catch(e){listening=false;setMicUI(false);toast('تعذّر تشغيل الميكروفون');}
+}
+function stopListen(){
+  listening=false;
+  if(rec){try{rec.onend=null;rec.stop();}catch(e){}rec=null;}
+  setMicUI(false);
+}
+
+/* ============ النتيجة ============ */
+function showResults(){
+  stopListen();
+  const N=Q.list.length;let sc=0,ok=0,hn=0,wr=0;
+  Q.res.forEach(r=>{if(r==='correct'){sc++;ok++;}else if(r==='hint'){sc+=.5;hn++;}else wr++;});
+  const pct=Math.round(sc/N*100);
+  const grade=pct>=90?'ممتاز — بارك الله فيه':pct>=75?'جيد جداً':pct>=60?'جيد':'يحتاج إلى مزيد من المراجعة';
+  const col=pct>=75?'var(--g500)':pct>=60?'var(--gold)':'var(--red)';
+  const name=(S.name||'').trim();
+  const sc2=Number.isInteger(sc)?AD(sc):AD(sc.toFixed(1));
+  const rows=Q.list.map((q,i)=>{
+    const r=Q.res[i]||'wrong';const b=buildQ(q,S.level);
+    return `<div class="ri"><div class="st ${r}">${r==='correct'?'✓':r==='hint'?'!':'✗'}</div><div class="rt"><b>${AD(i+1)}. ${refText(q)}</b><small class="quran" style="font-size:1rem;line-height:1.8">${b.pre.map(t=>t.w).join(' ')} …</small></div></div>`;
+  }).join('');
+  const retry=Q.list.filter((q,i)=>Q.res[i]!=='correct');
+  $('v-res').innerHTML=`
+    <div class="card">
+      <h2>نتيجة التسميع${name?' — '+name.replace(/</g,'&lt;'):''}</h2>
+      <div class="score">
+        <div class="ring" style="background:conic-gradient(${col} ${pct*3.6}deg,#e8e4d5 0)"><div>${AD(pct)}٪</div></div>
+        <div><h3>${grade}</h3><p>${sc2} من ${AD(N)} · ${new Date().toLocaleDateString('ar-EG')}</p></div>
+      </div>
+      <div class="stats"><div class="stat c"><b>${AD(ok)}</b>صحيحة</div><div class="stat h"><b>${AD(hn)}</b>بتلقين</div><div class="stat w"><b>${AD(wr)}</b>خاطئة</div></div>
+    </div>
+    <div class="card"><h2>تفصيل الأسئلة</h2>${rows}</div>
+    <div class="card" style="display:grid;gap:8px">
+      ${retry.length?`<button class="btn gold" id="retryBtn">إعادة الأسئلة غير الصحيحة (${AD(retry.length)})</button>`:''}
+      <button class="btn pri" id="againBtn">إعادة الاختبار كاملاً</button>
+      <button class="btn ghost" id="printBtn">طباعة النتيجة</button>
+      <button class="btn ghost" id="backBtn">العودة إلى الإعداد</button>
+    </div>`;
+  showView('v-res');
+  if($('retryBtn'))$('retryBtn').onclick=()=>startQuiz(retry.map(q=>({...q})));
+  $('againBtn').onclick=()=>startQuiz(Q.list.map(q=>({...q})));
+  $('printBtn').onclick=()=>window.print();
+  $('backBtn').onclick=()=>showView('v-setup');
+}
+
+/* ============ البحث والكتابة في وضع المعلم ============ */
+let AYN=null;
+const toLatin=s=>s.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+function parseRef(txt){
+  txt=toLatin(txt).trim();
+  let s,a,b;
+  let m=txt.match(/^(\d{1,3})\s*[:\/]\s*(\d{1,3})(?:\s*(?:-|–|إلى|الى|،)\s*(\d{1,3}))?$/);
+  if(m){s=+m[1];a=+m[2];b=m[3]?+m[3]:a;}
+  else{
+    m=txt.match(/^(.*?[^\d\s])\s*[:\-]?\s*(\d{1,3})(?:\s*(?:-|–|إلى|الى|،|:)\s*(\d{1,3}))?$/);
+    if(!m)return null;
+    const nm=norm(m[1].replace(/^\s*سورة\s*/,''));
+    if(!nm)return null;
+    let idx=SURAHS.findIndex(x=>norm(x)===nm);
+    if(idx<0){const c=SURAHS.map((x,i)=>[x,i]).filter(([x])=>norm(x).startsWith(nm));if(c.length===1)idx=c[0][1];}
+    if(idx<0)return null;
+    s=idx+1;a=+m[2];b=m[3]?+m[3]:a;
+  }
+  if(s<1||s>114||!CNT[s]||a<1||a>CNT[s])return null;
+  if(b<a)[a,b]=[b,a];
+  b=Math.min(b,CNT[s]);
+  return {s,n1:a,n2:b};
+}
+let MF=-1,MT=-1;
+function candidates(txt,kind){
+  txt=txt.trim();if(!txt)return {list:[],msg:''};
+  if(kind==='to'&&MF<0)return {list:[],msg:'اختر آية البداية أولاً'};
+  const ref=parseRef(txt);
+  if(ref){
+    const i=gi(ref.s,kind==='to'?ref.n2:ref.n1);
+    if(kind==='to'&&(i<MF||AY[i].s!==AY[MF].s||i-MF>24))return {list:[],msg:'آية النهاية يجب أن تكون في نفس السورة بعد البداية وبحد أقصى ٢٥ آية'};
+    return {list:[i],msg:''};
+  }
+  const qn=txt.split(/\s+/).map(norm).filter(Boolean).join(' ');
+  if(qn.length<3)return {list:[],msg:'اكتب كلمتين على الأقل من الآية'};
+  if(!AYN)AYN=AY.map(a=>a.norm.join(' '));
+  const list=[];
+  if(kind==='to'){
+    for(let i=MF;i<=MF+24&&i<AY.length&&AY[i].s===AY[MF].s;i++)if(AYN[i].includes(qn))list.push(i);
+    return {list,msg:list.length?'':'لم توجد هذه العبارة في الآيات التالية للبداية (حتى ٢٥ آية) من نفس السورة'};
+  }
+  for(let i=0;i<AYN.length&&list.length<10;i++)if(AYN[i].includes(qn))list.push(i);
+  return {list,msg:list.length?'':'لا توجد نتائج. جرّب كلمات أقل أو اكتب المرجع (مثل: الكهف 10)'};
+}
+function renderChoices(id,kind,list,msg,sel){
+  const box=$(id);
+  if(!list.length){box.innerHTML=msg?`<div class="hint">${msg}</div>`:'';return;}
+  box.innerHTML=(list.length>1?'<div class="hint">اختر الآية المقصودة:</div>':'')+list.map(i=>{
+    const A=AY[i];
+    return `<button type="button" class="rs ${i===sel?'sel':''}" data-k="${kind}" data-i="${i}"><div class="rr">${refText({s:A.s,n1:A.n,n2:A.n})}${i===sel?' ✓':''}</div><div class="rq quran">${A.words.join(' ')}</div></button>`;
+  }).join('');
+}
+function refreshTyped(from,preserve){
+  if(from){
+    const r=candidates($('qfrom').value,'from');
+    if(r.list.length===1)MF=r.list[0];else if(!r.list.includes(MF))MF=-1;
+    if(preserve!=='from')renderChoices('rfrom','from',r.list,r.msg,MF);
+    MT=-1;
+  }
+  const r2=candidates($('qto').value,'to');
+  if(r2.list.length===1)MT=r2.list[0];else if(!r2.list.includes(MT))MT=-1;
+  if(preserve!=='to')renderChoices('rto','to',r2.list,r2.msg,MT);
+  const pv=$('qprev');
+  if(MF<0){pv.classList.add('hidden');return;}
+  const s=AY[MF].s,n1=AY[MF].n,n2=MT>=0?AY[MT].n:n1;
+  const typedTo=$('qto').value.trim();
+  pv.classList.remove('hidden');
+  pv.className='info'+(typedTo&&MT<0?' bad':'');
+  pv.innerHTML=typedTo&&MT<0?'حدّد آية النهاية من النتائج أعلاه':`<b>${refText({s,n1,n2})}</b> — ${AD(n2-n1+1)} آية`;
+}
+function initSearch(){
+  let t1,t2;
+  $('qfrom').oninput=()=>{clearTimeout(t1);t1=setTimeout(()=>refreshTyped(true),250);};
+  $('qto').oninput=()=>{clearTimeout(t2);t2=setTimeout(()=>refreshTyped(false),250);};
+  ['qfrom','qto'].forEach(id=>$(id).onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();refreshTyped(id==='qfrom');}});
+  const pick=e=>{
+    const b=e.target.closest('button.rs');if(!b)return;
+    const i=+b.dataset.i;
+    if(b.dataset.k==='from'){
+      MF=i;MT=-1;
+      renderChoices('rfrom','from',[i],'',MF);
+      refreshTyped(false,'from');
+    }else{
+      MT=i;
+      renderChoices('rto','to',[i],'',MT);
+      refreshTyped(false,'to');
+    }
+  };
+  $('rfrom').onclick=pick;$('rto').onclick=pick;
+  $('addTyped').onclick=()=>{
+    if(MF<0){toast('اكتب بداية الآية واختر الآية المقصودة');return;}
+    if($('qto').value.trim()&&MT<0){toast('حدّد آية النهاية من النتائج');return;}
+    const s=AY[MF].s,n1=AY[MF].n,n2=MT>=0?AY[MT].n:n1;
+    S.questions.push({s,n1,n2});renderList();
+    MF=-1;MT=-1;$('qfrom').value='';$('qto').value='';
+    $('rfrom').innerHTML='';$('rto').innerHTML='';$('qprev').classList.add('hidden');
+    toast('تمت إضافة السؤال إلى القائمة');
+  };
+}
+
+/* ============ التشغيل ============ */
+async function init(){
+  showView('v-load');
+  $('loadbox').innerHTML='<div class="spin"></div><b>جارٍ تحميل نص المصحف…</b><div class="hint">يتم التحميل مرة واحدة فقط ثم يُحفظ على الجهاز</div>';
+  try{
+    const data=await loadQuran();
+    buildData(data);
+    if(!CNT[S.ts]||S.ta>CNT[S.ts])S.ta=CNT[S.ts]||1;
+    S.questions=(S.questions||[]).filter(q=>CNT[q.s]&&q.n1>=1&&q.n2<=CNT[q.s]&&q.n1<=q.n2);
+    initSetup();initSearch();
+    showView('v-setup');
+  }catch(e){
+    $('loadbox').innerHTML='<b style="color:var(--red)">تعذّر تحميل نص المصحف</b><div class="hint" style="margin:8px 0 14px">تأكد من اتصال الإنترنت ثم أعد المحاولة. يلزم الاتصال في أول استخدام فقط.</div><button class="btn pri" id="retryLoad">إعادة المحاولة</button>';
+    $('retryLoad').onclick=init;
+  }
+}
+init();
+</script>
+</body>
+</html>
