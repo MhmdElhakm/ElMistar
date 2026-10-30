@@ -4,9 +4,7 @@
   var services = global.QuranIntegratedServiceData;
   if (!services) throw new Error('بيانات الخدمات المدمجة غير محمّلة');
   var SERVICE_TITLES = {
-    radio: 'إذاعة القرآن الكريم',
-    fiqh: 'فقه ميسّر',
-    stories: 'قصص القرآن للأطفال'
+    radio: 'إذاعة القرآن الكريم'
   };
   var CAIRO_FONT_FACES = (services.radio.css.match(
     /@font-face\s*\{[^}]*font-family:\s*['"]Cairo['"][^}]*\}/g
@@ -44,29 +42,10 @@
       scopedStyles(service.css) +
       '.integrated-service-root{position:relative;width:100%;min-height:100%}' +
       ':host .integrated-service-root,:host .integrated-service-root *{font-family:"Cairo","Segoe UI",Tahoma,Arial,sans-serif!important}' +
-      (key === 'fiqh' ? ':host .feats{grid-template-columns:1fr}' : '') +
-      (key === 'stories'
-        ? ':host{--bg:var(--panel,#f7f7f3);--bg1:var(--panel-top,#fff);--bg2:var(--panel,#f7f7f3);--bg3:var(--panel,#f7f7f3);--card:var(--panel-top,#fff);--soft:color-mix(in srgb,var(--green,#14634a) 6%,var(--panel,#fff));--line:inherit;--ink:inherit;--muted:inherit;--pri:var(--green,#14634a);--pri2:var(--g900,#0b3d2e);--pri-soft:color-mix(in srgb,var(--green,#14634a) 12%,var(--panel,#fff));--shadow:0 6px 20px rgba(20,50,40,.08)}' +
-          ':host .integrated-service-root{background:linear-gradient(160deg,var(--bg1),var(--bg));color:inherit}' +
-          ':host .integrated-service-root>.app{max-width:560px;padding:18px 14px 112px}' +
-          ':host .integrated-service-root .hello{padding:14px 16px;border:1px solid var(--line);border-radius:20px;background:var(--card);box-shadow:var(--shadow)}' +
-          ':host .integrated-service-root .streak{border:1px solid var(--line);border-top:3px solid var(--green,#14634a);border-radius:20px;box-shadow:var(--shadow);background:var(--card)}' +
-          ':host .integrated-service-root .day.on .dc,:host .integrated-service-root .day.today .dc{background:var(--green,#14634a);color:var(--on-green,#fff)}' +
-          ':host .integrated-service-root .tiles{gap:10px}' +
-          ':host .integrated-service-root .tile{min-height:138px;padding:14px;border:1px solid var(--line);border-radius:20px;background:var(--card);color:var(--ink);box-shadow:var(--shadow)}' +
-          ':host .integrated-service-root .tile .ti{display:grid;place-items:center;width:42px;height:42px;margin-bottom:8px;border-radius:13px;background:color-mix(in srgb,var(--green,#14634a) 12%,var(--panel,#fff));color:var(--green,#14634a)}' +
-          ':host .integrated-service-root .tile .ti svg{width:26px;height:26px}' +
-          ':host .integrated-service-root .tile h3{color:var(--ink)}:host .integrated-service-root .tile p{color:var(--muted)}' +
-          ':host .integrated-service-root .cont{border:1px solid var(--line);border-radius:18px;background:var(--card);box-shadow:var(--shadow)}' +
-          ':host .integrated-service-root .cont .bar{background:color-mix(in srgb,var(--green,#14634a) 14%,var(--panel,#fff))}' +
-          ':host .integrated-service-root .cont .bar i{background:var(--green,#14634a)}' +
-          ':host .integrated-service-root .nav{border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;box-shadow:0 -6px 20px rgba(20,50,40,.08)}' +
-          ':host .integrated-service-root .ni.on{color:var(--green,#14634a)}'
-        : '') +
       (key === 'radio'
-        ? ':host{display:flex;justify-content:center;align-items:center}' +
-          ':host .integrated-service-root{display:flex;justify-content:center;align-items:center}' +
-          ':host .integrated-service-root>.app{width:min(100%,430px);margin-inline:auto}'
+        ? ':host{display:flex;justify-content:center;align-items:center;width:100%;max-width:100%;min-width:0}' +
+          ':host .integrated-service-root{display:grid;place-items:center;width:100%;min-width:0}' +
+          ':host .integrated-service-root>.app{width:min(100%,430px);margin:0 auto}'
         : '') +
       (key === 'radio'
         ? ':host{--bg:var(--panel,#f5f8fb);--ink:inherit;--muted:inherit;--line:inherit;--blue:var(--green,#14634a);--blue2:color-mix(in srgb,var(--green,#14634a) 78%,#123);--blue-soft:color-mix(in srgb,var(--green,#14634a) 12%,var(--panel,#fff));}' +
@@ -77,10 +56,7 @@
           ':host .logo rect:nth-of-type(2){fill:var(--green,#14634a)}:host .logo #lg stop:first-child{stop-color:var(--green,#14634a)}:host .logo #lg stop:last-child{stop-color:var(--g900,#0b3d2e)}' +
           ':host .mini{background:var(--green,#14634a);color:var(--on-green,#fff)}:host .mini .mp svg{fill:var(--on-green,#fff)}'
         : '') +
-      (key === 'fiqh' ? '.integrated-service-root{padding-bottom:120px}' : '') +
-      (key === 'fiqh'
-        ? ':host{background-color:var(--bg)!important;background-image:linear-gradient(165deg,var(--bg1) 0%,var(--bg2) 38%,var(--bg3) 100%)!important;color:var(--fg)!important}'
-        : ':host{background-color:var(--bg)!important;color:var(--ink)!important}') +
+      ':host{background-color:var(--bg)!important;color:var(--ink)!important}' +
       ':host,:host([data-theme="dark"]){--blue:var(--green,#14634a);--blue2:color-mix(in srgb,var(--green,#14634a) 78%,#123);' +
       '--blue-soft:color-mix(in srgb,var(--green,#14634a) 12%,#fff);--pri:var(--green,#14634a);' +
       '--pri2:color-mix(in srgb,var(--green,#14634a) 78%,#123);--pri-soft:color-mix(in srgb,var(--green,#14634a) 12%,#fff)}';
@@ -89,10 +65,6 @@
     var content = document.createElement('div');
     content.className = 'integrated-service-root';
     content.innerHTML = service.markup;
-    if (key === 'fiqh') {
-      var leaderboardTab = content.querySelector('#nav [data-a="board"]');
-      if (leaderboardTab) leaderboardTab.remove();
-    }
     root.appendChild(content);
 
     var listeners = [];

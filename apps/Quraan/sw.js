@@ -1,4 +1,4 @@
-var CACHE_NAME = 'quran-pro-app-v56';
+var CACHE_NAME = 'quran-pro-app-v68';
 var APP_SHELL = [
   './index.html',
   './tajweed-font-data.js',

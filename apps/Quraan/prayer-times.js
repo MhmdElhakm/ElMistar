@@ -39,6 +39,7 @@
     { id: 'qena', name: 'قنا', lat: 26.1642, lng: 32.7267 },
     { id: 'gps', name: 'موقعي الحالي (GPS)', lat: null, lng: null }
   ];
+  var DEFAULT_CITY = CITIES.find(function (city) { return city.id === 'aswan'; }) || CITIES[0];
   var CACHE_KEY = 'quran_prayer_cache_v1';
   var CITY_KEY = 'quran_prayer_city_v1';
   var activeContainer = null;
@@ -60,9 +61,9 @@
   }
 
   function selectedCity() {
-    var id = 'cairo';
+    var id = DEFAULT_CITY.id;
     try { id = localStorage.getItem(CITY_KEY) || id; } catch (error) {}
-    return CITIES.find(function (city) { return city.id === id; }) || CITIES[0];
+    return CITIES.find(function (city) { return city.id === id; }) || DEFAULT_CITY;
   }
 
   function readCache() {
@@ -271,9 +272,9 @@
           lng = cache.lng;
           place = cache.place || place;
         } else {
-          lat = CITIES[0].lat;
-          lng = CITIES[0].lng;
-          place = CITIES[0].name;
+          lat = DEFAULT_CITY.lat;
+          lng = DEFAULT_CITY.lng;
+          place = DEFAULT_CITY.name;
         }
       }
       var now = new Date();
