@@ -1826,14 +1826,9 @@ function badges(){
 const TIPS=['قال النبي ﷺ: «من يُرد الله به خيرًا يفقّهه في الدين».','ابدأ بدرس واحد كل يوم، فالقليل الدائم خير من كثير منقطع.','راجع الباب قبل اختباره، فالمراجعة تثبّت المعلومة.','إذا اختلف العلماء في مسألة فارجع إلى عالم موثوق في بلدك.'];
 
 /* متصدرون افتراضيون للتجربة */
-const BOARD=[
- {n:'ياسر ك.',c:97,s:29,p:2140},{n:'ليلى أ.',c:93,s:26,p:1980},{n:'عمر ح.',c:90,s:21,p:1760},
- {n:'مريم س.',c:87,s:18,p:1620},{n:'خالد ن.',c:83,s:15,p:1410}
-];
-
 /* ---------- العرض ---------- */
 const app=document.getElementById('app');
-let V={name:'home'};            // home | chapter | review | exam | lesson | board | profile
+let V={name:'home'};            // home | chapter | review | exam | lesson | profile
 let Q=null;                     // حالة الاختبار
 let confirmReset=false;
 let SQ='';
@@ -1885,7 +1880,7 @@ function lessonRow(l,withCh){
 }
 
 function viewHome(){
-  const sl=secL(),done=sl.filter(l=>rec(l).done).length,total=sl.length,p=done/total*100,act=nextAction();
+  const sl=secL(),done=sl.filter(l=>rec(l).done).length,act=nextAction();
   let h=header()+'<main>';
   h+='<h1 class="greet">'+(S.name?'السلام عليكم، '+esc(S.name)+' 👋':'السلام عليكم ورحمة الله 👋')+'<small>'+(done===0?SECS[SEC].sub:'أنجزت '+n(done)+' من '+n(total)+' درسًا في '+SECS[SEC].t)+'</small></h1>';
   h+='<div class="seg" role="group" aria-label="القسم">'+Object.keys(SECS).map(k=>'<button data-a="sec" data-s="'+k+'" aria-pressed="'+(SEC===k)+'">'+SECS[k].e+' '+SECS[k].t+'</button>').join('')+'</div>';
@@ -1893,7 +1888,6 @@ function viewHome(){
   if(act&&act.k==='lesson')h+='<button class="feat navy" data-a="lesson" data-id="'+act.l.id+'"><span class="fl">'+(done?'تابع الدرس':'ابدأ بالدرس')+'</span><span class="ft">'+act.l.t+'</span><span class="fd">باب '+act.c.t+'</span></button>';
   else if(act)h+='<button class="feat navy" data-a="chapter" data-id="'+act.c.id+'"><span class="fl">حان وقت الاختبار</span><span class="ft">اختبار باب '+act.c.t+'</span><span class="fd">النجاح من '+n(PASS_PCT)+'٪</span></button>';
   else h+='<button class="feat navy" data-a="profile"><span class="fl">ما شاء الله</span><span class="ft">أتممت القسم</span><span class="fd">بارك الله في علمك</span></button>';
-  h+='<button class="feat lav" data-a="profile"><span class="fl">تقدّمك</span><span class="ft">'+pc(p)+'</span><span class="fd">'+n(done)+' من '+n(total)+' درسًا</span></button>';
   h+='</div>';
   h+='<section class="panel"><div class="ph"><span class="tile">'+SECS[SEC].e+'</span><div class="tx"><h2>'+SECS[SEC].ti+'</h2><p>أنهِ الباب باختباره لتفتح الباب التالي</p></div><button class="sbtn" data-a="togsearch" aria-label="بحث" aria-expanded="'+showSearch+'">'+ic('search')+'</button></div>';
   if(showSearch)h+='<div class="search"><span class="s-ic">'+ic('search')+'</span><input id="search" type="search" placeholder="ابحث عن مسألة أو درس…" autocomplete="off" aria-label="بحث في الدروس" value="'+esc(SQ)+'"></div>';
@@ -2005,23 +1999,6 @@ function viewLesson(){
   }
   return h+'</main>';
 }
-function viewBoard(){
-  const me={n:S.name||'أنت',c:commit(),s:streak(),p:points(),you:true};
-  const all=BOARD.map(x=>Object.assign({},x)).concat([me]).sort((a,b)=>b.c-a.c||b.s-a.s||b.p-a.p);
-  const rank=all.indexOf(me)+1;
-  const hue=[85,230,45];
-  let h=header()+'<main><h1 class="greet">المتصدرون<small>الأعلى التزامًا بالتعلّم خلال آخر ٣٠ يومًا</small></h1>';
-  h+='<section class="sumcard"><div class="r1"><b class="big">'+n(me.c)+'٪</b><span>نسبة التزامك</span></div><p>ترتيبك '+n(rank)+' من '+n(all.length)+(me.c===0?' · تعلّم اليوم لتبدأ في الصعود':' · '+n(me.s)+' يومًا متتاليًا')+'</p></section>';
-  const top=all.slice(0,3),order=[1,0,2];
-  h+='<div class="podium">'+order.map(i=>{const e=top[i];if(!e)return '';return '<div class="pod chap'+(i===0?' first':'')+'" style="--h:'+hue[i]+'"><div class="md">'+['🥇','🥈','🥉'][i]+'</div><div class="av" aria-hidden="true">'+esc(e.n.charAt(0))+'</div><div class="nm">'+esc(e.n)+(e.you&&S.name?' (أنت)':'')+'</div><div class="pc">'+n(e.c)+'٪</div><small>🔥 '+n(e.s)+' يومًا</small></div>';}).join('')+'</div>';
-  h+='<div class="sec-title"><h2>أفضل ٥ متصدرين</h2><small>نسبة الالتزام</small></div>';
-  const row=(e,i)=>'<div class="brow chap'+(e.you?' me':'')+'" style="--h:'+(e.you?215:(150+i*17)%360)+'"><span class="rk">'+n(i+1)+'</span><span class="av" aria-hidden="true">'+esc(e.n.charAt(0))+'</span><span class="tx"><b>'+esc(e.n)+(e.you&&S.name?' (أنت)':'')+'</b><span>🔥 '+n(e.s)+' يومًا · ⭐ '+n(e.p)+' نقطة</span><div class="bar"><i style="width:'+e.c+'%"></i></div></span><span class="pcn">'+n(e.c)+'٪</span></div>';
-  all.slice(0,5).forEach((e,i)=>{h+=row(e,i);});
-  if(rank>5)h+='<p class="demo">ترتيبك الحالي</p>'+row(me,rank-1);
-  h+='<p class="demo">أسماء المتصدرين وبياناتهم افتراضية للتجربة، وتُحسب بياناتك أنت من نشاطك الفعلي.</p>';
-  h+='<p class="fine">نسبة الالتزام = عدد الأيام التي أنهيت فيها اختبارًا من آخر ٣٠ يومًا.</p></main>';
-  return h;
-}
 function viewProfile(){
   const p=points(),lv=level(p),done=doneCount(),nxL=LEVELS[lv+1];
   let h=header()+'<main>';
@@ -2042,8 +2019,8 @@ function viewProfile(){
   h+='</div><p class="fine">يُحفظ تقدمك في هذا المتصفح على هذا الجهاز.</p></main>';
   return h;
 }
-const VIEWS={home:viewHome,chapter:viewChapter,review:viewReview,exam:viewExam,lesson:viewLesson,board:viewBoard,profile:viewProfile};
-const TABOF={home:'home',chapter:'home',review:'home',exam:'home',lesson:'home',board:'board',profile:'profile'};
+const VIEWS={home:viewHome,chapter:viewChapter,review:viewReview,exam:viewExam,lesson:viewLesson,profile:viewProfile};
+const TABOF={home:'home',chapter:'home',review:'home',exam:'home',lesson:'home',profile:'profile'};
 function render(keepScroll){
   const y=window.scrollY;
   app.innerHTML=VIEWS[V.name]();
@@ -2132,7 +2109,7 @@ app.addEventListener('click',e=>{
 });
 document.getElementById('nav').addEventListener('click',e=>{
   const b=e.target.closest('[data-a]');if(!b)return;
-  go({name:b.dataset.a==='profile'?'profile':b.dataset.a==='board'?'board':'home'});
+  go({name:b.dataset.a==='profile'?'profile':'home'});
 });
 app.addEventListener('input',e=>{
   if(e.target.id==='search'){SQ=e.target.value;renderList();}
@@ -2684,16 +2661,15 @@ function starsFor(sc, n) { var r = sc / n; return r >= 0.8 ? 3 : r >= 0.5 ? 2 : 
 
 /* ================= واجهة التطبيق ================= */
 var app = document.getElementById("app");
-var K = { stars: "qs-stars-v1", size: "qs-size-v1", theme: "qs-theme-v1", days: "qs-days-v1", name: "qs-name-v1", onb: "qs-onb-v1" };
+var K = { stars: "qs-stars-v1", size: "qs-size-v1", theme: "qs-theme-v1", days: "qs-days-v1", name: "qs-name-v1" };
 function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 var stars = {}; try { stars = JSON.parse(lsGet(K.stars, "{}")) || {}; } catch (e) { stars = {}; }
 var days = {}; try { days = JSON.parse(lsGet(K.days, "{}")) || {}; } catch (e) { days = {}; }
 var scale = parseFloat(lsGet(K.size, "1")) || 1;
 var userName = lsGet(K.name, "");
-var seenOnb = lsGet(K.onb, "") === "1";
 var themePref = lsGet(K.theme, "auto");
-var view = seenOnb ? "home" : "onb", from = "home", cur = 0, qi = 0, score = 0, marks = [], done = false, sel = -1, curOpts = [], curRight = "", search = "", resetAsk = false, speaking = false;
+var view = "home", from = "home", cur = 0, qi = 0, score = 0, marks = [], done = false, sel = -1, curOpts = [], curRight = "", search = "", resetAsk = false, speaking = false;
 
 function applySize() { document.documentElement.style.setProperty("--read", (1.3 * scale).toFixed(2) + "rem"); }
 function applyTheme() { if (themePref === "dark" || themePref === "light") document.documentElement.setAttribute("data-theme", themePref); else document.documentElement.removeAttribute("data-theme"); }
@@ -2792,15 +2768,6 @@ function kClass(i) { return "k-" + S[i].c[0]; }
 function thumb(i) { return '<span class="cthumb ' + kClass(i) + '">' + emblem(S[i].c[0]) + "</span>"; }
 
 /* ---------- الصفحات ---------- */
-function viewOnb() {
-  return '<div class="app bare"><div class="onb"><div><button class="skip" data-a="skip">تخطَّ</button>' +
-    '<h1 class="h-d" style="margin-top:6px">قصص جميلة<br><em>تبدأ من هنا</em></h1>' +
-    '<p class="sub">تطبيق ممتع يعلّمك قصص القرآن الكريم، ويساعدك على تعلّم القيم والأخلاق وزيادة الإيمان.</p></div>' +
-    '<div class="onb-art"><div class="blob"></div><span class="onb-note">عقول فضولية<br>وقلوب مؤمنة</span>' + bird() +
-    '<svg class="sp" style="top:30px;inset-inline-end:14px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2 6.3 20.3l1.2-6.4L2.8 9.5l6.4-.8z" fill="#ffd24a" stroke="#e7a50a" stroke-width="1.6" stroke-linejoin="round"/></svg></div>' +
-    '<div><label class="lbl" for="nm">ما اسمك؟ (اختياري)</label><input id="nm" class="nameBox" type="text" maxlength="20" autocomplete="off" value="' + esc(userName) + '" placeholder="اكتب اسمك هنا"><div style="height:14px"></div>' +
-    '<button class="btn" data-a="start"><span>هيا نبدأ</span>' + ic("chev") + "</button></div></div></div>";
-}
 function weekStrip() {
   var names = ["سبت", "أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة"], t = new Date(), off = (t.getDay() + 1) % 7, h = "";
   var start = new Date(t.getFullYear(), t.getMonth(), t.getDate() - off);
@@ -2902,8 +2869,7 @@ function navBar() {
 function setupQ() { var q = S[cur].q[qi]; curRight = q[1]; curOpts = shuffle([q[1], q[2], q[3]]); sel = -1; }
 function render() {
   var h;
-  if (view === "onb") h = viewOnb();
-  else if (view === "home") h = viewHome() + navBar();
+  if (view === "home") h = viewHome() + navBar();
   else if (view === "explore") h = viewExplore() + navBar();
   else if (view === "rewards") h = viewRewards() + navBar();
   else if (view === "profile") h = viewProfile() + navBar();
@@ -2915,14 +2881,10 @@ function go(v, keep) { if (v !== "story") speak(false); view = v; render(); if (
 function openStory(i, f) { cur = i; from = f || (view === "story" || view === "quiz" ? from : view); markToday(); speak(false); go("story"); }
 function startQuiz() { qi = 0; score = 0; marks = []; done = false; setupQ(); go("quiz"); }
 function stepStory(d) { var L = nav(), p = L.indexOf(cur) + d; if (p >= 0 && p < L.length) { cur = L[p]; markToday(); go("story"); } }
-function finishOnb() { var el = document.getElementById("nm"); if (el) { userName = el.value.trim(); lsSet(K.name, userName); } seenOnb = true; lsSet(K.onb, "1"); go("home"); }
-
 app.addEventListener("click", function (e) {
   var t = e.target.closest("[data-a]"); if (!t || !app.contains(t)) return;
   var a = t.getAttribute("data-a"), v = t.getAttribute("data-v");
-  if (a === "start") finishOnb();
-  else if (a === "skip") { seenOnb = true; lsSet(K.onb, "1"); go("home"); }
-  else if (a === "tab") { if (v === "explore") { filter = "all"; search = ""; } resetAsk = false; go(v); }
+  if (a === "tab") { if (v === "explore") { filter = "all"; search = ""; } resetAsk = false; go(v); }
   else if (a === "cat") { filter = v; search = ""; go("explore"); }
   else if (a === "filter") { filter = v; render(); }
   else if (a === "open") openStory(+v, view);

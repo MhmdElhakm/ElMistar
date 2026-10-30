@@ -1,10 +1,11 @@
-var CACHE_NAME = 'quran-pro-app-v29';
+var CACHE_NAME = 'quran-pro-app-v46';
 var APP_SHELL = [
   './index.html',
   './tajweed-font-data.js',
   './worship-data.js',
   './worship-ui.js',
   './integrated-services-data.js',
+  './ruqya-ui.js',
   './integrated-services.js',
   './prayer-times.js',
   './manifest.webmanifest',

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Qurany</title>
-  <meta name="theme-color" content="#07852a">
+  <meta name="theme-color" content="#fdf8f0">
   <meta name="description" content="مصحف قرآن كريم مع ألوان التجويد والتلاوة">
   <link rel="icon" type="image/png" href="./logo.png">
   <link rel="apple-touch-icon" href="./logo.png">
@@ -1999,6 +1999,7 @@
     }
 
     .recitation-play { min-height: 42px; border-radius: 12px; }
+    .recitation-copy:disabled { opacity: .55; cursor: wait; }
 
     .recitation-status {
       grid-column: 1 / -1;
@@ -2479,10 +2480,12 @@
 
     .d-body {
       flex: 1;
+      min-height: 0;
       overflow-y: auto;
       overscroll-behavior: contain;
       scrollbar-width: none;
       -ms-overflow-style: none;
+      -webkit-overflow-scrolling: touch;
     }
 
     .d-body[hidden] {
@@ -2490,11 +2493,14 @@
     }
 
     .worship-content { padding: 12px; display: grid; align-content: start; gap: 11px; }
-    .worship-switch { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px; padding: 4px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-top); }
+    .worship-switch { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 5px; padding: 4px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-top); }
     .worship-switch button { min-height: 40px; border: 1px solid transparent; border-radius: 10px; color: var(--muted); font: inherit; font-size: 12px; font-weight: 800; background: transparent; transition: background .18s, transform .15s; }
     .worship-switch button:active { transform: scale(.97); }
     .worship-switch button[aria-pressed="true"] { color: var(--green); background: var(--panel); border-color: color-mix(in srgb,var(--green) 35%,var(--line)); box-shadow: 0 3px 10px rgba(0,0,0,.07); }
     .worship-card { min-width: 0; padding: 13px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(155deg,var(--panel-top),var(--panel) 70%); box-shadow: 0 9px 24px rgba(0,0,0,.06); }
+    #worshipRuqya { display: block; }
+    #worshipRuqya[hidden] { display: none; }
+    .worship-ruqya-host { display: block; min-width: 0; }
     .worship-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
     .worship-heading-icon { display: grid; flex: none; width: 42px; height: 42px; place-items: center; border-radius: 14px; color: #fff; background: linear-gradient(135deg,#38BDF8,#0F8AC2); font-size: 21px; box-shadow: 0 7px 16px rgba(15,138,194,.25); }
     .worship-heading h3 { margin: 0; color: var(--ink); font-size: 14px; font-weight: 900; }
@@ -2562,6 +2568,14 @@
     #worshipAzkar.is-evening .worship-azkar-item.is-active { border-color: #F59E0B; background: #FFFBEB; box-shadow: 0 8px 18px rgba(245,158,11,.14); }
     #worshipAzkar.is-evening .worship-azkar-item.is-active .worship-azkar-number,
     #worshipAzkar.is-evening .worship-azkar-item.is-active .worship-azkar-action { background: linear-gradient(135deg,#FFB020,#FF7A00); }
+    :root[data-theme="dark"] #worshipAzkar.is-evening .worship-azkar-item.is-active { background: color-mix(in srgb,#F59E0B 15%,var(--panel)); }
+    :root[data-theme="dark"] #worshipAzkar.is-evening .worship-azkar-item.is-active .worship-azkar-number,
+    :root[data-theme="dark"] #worshipAzkar.is-evening .worship-azkar-item.is-active .worship-azkar-action { color: #241705; }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) #worshipAzkar.is-evening .worship-azkar-item.is-active { background: color-mix(in srgb,#F59E0B 15%,var(--panel)); }
+      :root:not([data-theme="light"]) #worshipAzkar.is-evening .worship-azkar-item.is-active .worship-azkar-number,
+      :root:not([data-theme="light"]) #worshipAzkar.is-evening .worship-azkar-item.is-active .worship-azkar-action { color: #241705; }
+    }
     @media (prefers-reduced-motion: reduce) { .azkar-categories-wrap,.worship-azkar-item,.tasbeeh-mic { transition: none !important; animation: none !important; } }
 
     .srow {
@@ -3031,6 +3045,18 @@
       line-height: 1.3;
       white-space: nowrap;
     }
+    .wp-word-head { justify-content: flex-start; direction: rtl; }
+    .wp-word-ayah-number {
+      display: inline-grid;
+      place-items: center;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 5px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--green);
+      font: 700 12px/1 "Cairo","Segoe UI",Tahoma,Arial,sans-serif;
+    }
     .wp-ayah-head {
       justify-content: flex-start;
       min-height: 46px;
@@ -3090,9 +3116,10 @@
     }
 
     .wp-v b {
+      display: block;
       color: var(--sub);
       font-weight: 700;
-      margin-inline-end: 4px;
+      margin-bottom: 3px;
     }
 
     .wp-mark {
@@ -3716,6 +3743,7 @@
 
     .recitation-actions {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 9px;
       padding-top: 8px;
@@ -3734,7 +3762,7 @@
 
     .recitation-status {
       min-width: 0;
-      flex: 1;
+      flex: 1 1 100%;
       color: var(--muted);
       font-size: 12px;
       font-weight: 600;
@@ -4060,9 +4088,10 @@
     <div class="d-body" id="paneSurahs" hidden></div>
     <div class="d-body" id="paneWorship" hidden>
       <div class="worship-content">
-        <div class="worship-switch" role="group" aria-label="اختر المسبحة أو الأذكار">
-          <button type="button" data-worship-view="tasbeeh" aria-pressed="true">📿 المسبحة</button>
-          <button type="button" data-worship-view="azkar" aria-pressed="false">🤲 الأذكار</button>
+        <div class="worship-switch" role="group" aria-label="اختر المسبحة أو الأذكار أو الرقية الشرعية">
+          <button type="button" data-worship-view="tasbeeh" aria-pressed="false">📿 المسبحة</button>
+          <button type="button" data-worship-view="azkar" aria-pressed="true">🤲 الأذكار</button>
+          <button type="button" data-worship-view="ruqya" aria-pressed="false">📖 الرقية</button>
         </div>
         <section id="worshipTasbeeh" aria-label="المسبحة الإلكترونية">
           <div class="worship-card">
@@ -4103,6 +4132,9 @@
             </div>
           </div>
           <div class="worship-azkar-list" id="worshipAzkarList"></div>
+        </section>
+        <section id="worshipRuqya" aria-label="الرقية الشرعية" hidden>
+          <div class="worship-ruqya-host" id="worshipRuqyaHost"></div>
         </section>
       </div>
     </div>
@@ -4222,7 +4254,7 @@
             <span class="recitation-title-icon" aria-hidden="true">♫</span>
             <span class="recitation-title-copy"><strong>تشغيل الآيات</strong><small>استمع للقرآن الكريم آيةً آية</small></span>
           </div>
-          <details class="reciter-details" hidden>
+          <details class="reciter-details">
             <summary><span>القارئ الصوتي</span><strong id="reciterSummary">مشاري العفاسي</strong></summary>
             <div class="reciter-picker">
               <label for="reciterSearch">ابحث باسم القارئ</label>
@@ -4320,7 +4352,8 @@
           <div class="recitation-actions">
             <button type="button" class="recitation-play" id="recitationPlay" aria-pressed="false">استماع</button>
             <button type="button" class="recitation-copy" id="copyRecitationRange">نسخ الآيات</button>
-            <span class="recitation-status" id="recitationStatus" role="status" aria-live="polite">اختر نطاق الآيات للاستماع أو النسخ</span>
+            <button type="button" class="recitation-copy" id="downloadRecitation">تنزيل المقطع</button>
+            <span class="recitation-status" id="recitationStatus" role="status" aria-live="polite">اختر نطاق الآيات للاستماع أو النسخ أو التنزيل</span>
           </div>
         </section>
 
@@ -6791,7 +6824,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           var chunkUrl = './fonts/tajweed/' + chunkName + '.woff2';
           function requestChunk(retry) {
             var cachedChunk = 'caches' in window
-                ? caches.open('quran-pro-app-v29').then(function (cache) { return cache.match(chunkUrl); })
+                ? caches.open('quran-pro-app-v46').then(function (cache) { return cache.match(chunkUrl); })
               : Promise.resolve(null);
             return cachedChunk.then(function (response) {
               if (response) return response.arrayBuffer();
@@ -6800,7 +6833,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
                 var copy = networkResponse.clone();
                 return networkResponse.arrayBuffer().then(function (buffer) {
                   if ('caches' in window) {
-                    return caches.open('quran-pro-app-v29').then(function (cache) {
+                    return caches.open('quran-pro-app-v46').then(function (cache) {
                       return cache.put(chunkUrl, copy).then(function () { return buffer; });
                     });
                   }
@@ -7285,6 +7318,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       var recitationAudio = new Audio(), recitationRange = null, recitationAyah = 0, recitationRepeatCurrent = 1;
       var recitationSurah = $('recitationSurah'), recitationFrom = $('recitationFrom');
       var recitationTo = $('recitationTo'), recitationPlay = $('recitationPlay');
+      var recitationDownload = $('downloadRecitation'), recitationDownloadGeneration = 0;
       var recitationRepeat = $('recitationRepeat');
       var recitationStatus = $('recitationStatus');
       var recitationPrefs = load('mq.recitationPrefs', {});
@@ -7452,14 +7486,16 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         recitationPlay.setAttribute('aria-pressed', String(playing));
       }
 
-      function recitationUrl(surah, ayah) {
+      function recitationUrl(surah, ayah, reciter) {
         var surahNumber = ('00' + surah).slice(-3);
         var ayahNumber = ('00' + ayah).slice(-3);
-        return 'https://everyayah.com/data/' + encodeURIComponent(reciterSelect.value) + '/' + surahNumber + ayahNumber + '.mp3';
+        return 'https://everyayah.com/data/' + encodeURIComponent(reciter || reciterSelect.value) + '/' + surahNumber + ayahNumber + '.mp3';
       }
 
       var recitationWordGroups = [], activeRecitationWord = null;
       function stopRecitation(message) {
+        recitationDownloadGeneration += 1;
+        recitationDownload.disabled = false;
         recitationAudio.pause();
         recitationAudio.removeAttribute('src');
         recitationAudio.load();
@@ -7537,6 +7573,54 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         }
       }
 
+      async function downloadRecitationClip() {
+        var surah = +recitationSurah.value;
+        var from = +recitationFrom.value;
+        var to = +recitationTo.value;
+        if (!surah || !from || !to || from > to) {
+          toast('حدد نطاقًا صحيحًا للآيات');
+          return;
+        }
+
+        stopRecitation('جارٍ تحضير المقطع للتنزيل…');
+        var generation = ++recitationDownloadGeneration;
+        var reciter = reciterSelect.value;
+        recitationDownload.disabled = true;
+        try {
+          var chunks = [];
+          var totalBytes = 0;
+          for (var ayah = from; ayah <= to; ayah++) {
+            if (generation !== recitationDownloadGeneration) return;
+            recitationStatus.textContent = 'جارٍ تحميل الآية ' + ar(ayah - from + 1) + ' من ' + ar(to - from + 1) + '…';
+            var response = await fetch(recitationUrl(surah, ayah, reciter));
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            var chunk = await response.arrayBuffer();
+            totalBytes += chunk.byteLength;
+            if (totalBytes > 50 * 1024 * 1024) throw new Error('SIZE_LIMIT');
+            chunks.push(chunk);
+          }
+          if (generation !== recitationDownloadGeneration) return;
+          var blob = new Blob(chunks, { type: 'audio/mpeg' });
+          var objectUrl = URL.createObjectURL(blob);
+          var link = document.createElement('a');
+          var surahName = D.surahs[surah - 1][1].replace(/[\\/:*?"<>|]/g, '-');
+          link.href = objectUrl;
+          link.download = 'تلاوة-' + surahName + '-' + from + '-' + to + '.mp3';
+          link.click();
+          setTimeout(function () { URL.revokeObjectURL(objectUrl); }, 60000);
+          recitationStatus.textContent = 'تم تنزيل المقطع الصوتي المحدد';
+        } catch (error) {
+          if (generation !== recitationDownloadGeneration) return;
+          console.error('تعذر تنزيل المقطع الصوتي:', error);
+          recitationStatus.textContent = error.message === 'SIZE_LIMIT'
+            ? 'النطاق كبير جدًا لملف واحد؛ قلّل عدد الآيات ثم حاول مجددًا'
+            : 'تعذر تنزيل المقطع؛ تحقق من اتصال الإنترنت وحاول مجددًا';
+          toast(recitationStatus.textContent);
+        } finally {
+          if (generation === recitationDownloadGeneration) recitationDownload.disabled = false;
+        }
+      }
+
       recitationAudio.preload = 'none';
       recitationAudio.addEventListener('timeupdate', function () {
         if (!recitationRange || !recitationWordGroups.length || !isFinite(recitationAudio.duration) || recitationAudio.duration <= 0) return;
@@ -7593,6 +7677,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         stopRecitation('تم تغيير عدد مرات التكرار؛ ابدأ الاستماع');
         saveRecitationPrefs();
       });
+      recitationDownload.addEventListener('click', downloadRecitationClip);
       recitationPlay.addEventListener('click', function () {
         if (!recitationAudio.paused) {
           recitationAudio.pause();
@@ -7821,6 +7906,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       });
       syncScrollControls();
       function openD() {
+        if (body.classList.contains('open')) return;
         stopAutoScroll();
         closeV(); body.classList.add('open'); drawer.setAttribute('aria-hidden', 'false');
         show('settings');
@@ -8006,7 +8092,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         $('search').hidden = k !== 'surahs';
         $('searchMode').hidden = k !== 'surahs';
         body.classList.toggle('titled', k !== 'surahs');
-        $('dTitleT').textContent = k === 'settings' ? 'الرئيسية' : (k === 'worship' ? 'الأذكار والمسبحة' : (k === 'tasks' ? 'المهام والمواعيد' : ''));
+        $('dTitleT').textContent = k === 'settings' ? 'الرئيسية' : (k === 'worship' ? 'الأذكار والمسبحة والرقية' : (k === 'tasks' ? 'المهام والمواعيد' : ''));
         $('dTitleT').hidden = k === 'surahs';
         if (k === 'tasks') {
           var currentPage = window.MushafRuntime && window.MushafRuntime.getCurrentPage();
@@ -8104,7 +8190,11 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
       function normArabic(s) { return String(s).replace(/[ً-ٰٟۖ-ۭـ]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه'); }
       function wordMeaningArabic(s, a, pos, tafsir) {
-        var word = verseText(s, a).split(/\s+/)[pos - 1] || '', key = normArabic(word);
+        var verseWords = verseText(s, a).split(/\s+/);
+        var word = verseWords[pos - 1] || '', key = normArabic(word);
+        if (s === 72 && a === 14 && key === normArabic('ٱلۡقَٰسِطُونَ')) {
+          return 'الجائرون الظالمون الذين حادوا عن طريق الحق';
+        }
         if (key.length > 2 && tafsir) {
           var clauses = tafsir.split(/[،؛.!؟]/), fallback = '';
           for (var i = 0; i < clauses.length; i++) {
@@ -8114,7 +8204,39 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
             if (/﴿[^﴿﴾]*﴾/.test(clause)) return clause.replace(/﴿[^﴿﴾]*﴾/g, '').trim() || clause;
           }
           if (fallback) return fallback;
+          var tafsirWords = tafsir.split(/\s+/).map(function (part) {
+            return { text: part, key: normArabic(part).replace(/[^\u0621-\u064A]/g, '') };
+          }).filter(function (part) { return part.key; });
+          var particles = 'أن أو به بها بهما بهم بهن في من عن على إلى هو هي هم هن هذا هذه ذلك الذي التي الذين اللاتي وهو وهي وهم وهن'.split(/\s+/).map(normArabic);
+          for (var distance = 1; distance <= 1; distance++) {
+            var anchors = [pos - 1 - distance, pos - 1 + distance];
+            for (var side = 0; side < anchors.length; side++) {
+              var verseIndex = anchors[side];
+              if (verseIndex < 0 || verseIndex >= verseWords.length) continue;
+              var anchor = normArabic(verseWords[verseIndex]).replace(/[^\u0621-\u064A]/g, '');
+              if (anchor.length < 3 || particles.indexOf(anchor) >= 0) continue;
+              if (verseWords.filter(function (part) {
+                return normArabic(part).replace(/[^\u0621-\u064A]/g, '') === anchor;
+              }).length !== 1 || tafsirWords.filter(function (part) { return part.key === anchor; }).length !== 1) continue;
+              var direction = verseIndex < pos - 1 ? 1 : -1;
+              for (var tafsirIndex = 0; tafsirIndex < tafsirWords.length; tafsirIndex++) {
+                if (tafsirWords[tafsirIndex].key !== anchor) continue;
+                for (var step = 1; step <= 2; step++) {
+                  var candidate = tafsirWords[tafsirIndex + direction * step];
+                  if (!candidate || candidate.key.length < 3 || particles.indexOf(candidate.key) >= 0) continue;
+                  if (candidate.key !== key) {
+                    return candidate.text.replace(/^[،؛.!؟:()[\]{}«»]+|[،؛.!؟:()[\]{}«»]+$/g, '');
+                  }
+                }
+              }
+            }
+          }
         }
+        return '';
+      }
+      function verseMeaningArabic(s, a, tafsir) {
+        var meaning = wordMeaningArabic(s, a, 1, tafsir);
+        if (meaning || !tafsir) return meaning;
         var context = String(tafsir || '').split(/[.!؟]/)[0].trim();
         return context.length > 150 ? context.slice(0, 150) + '…' : context;
       }
@@ -8163,13 +8285,15 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         function draw() {
           var tf = MU && MU[s - 1] ? MU[s - 1][a - 1] : '';
           var h = '';
+          var selectedWord = pos > 0 ? (verseText(s, a).split(/\s+/)[pos - 1] || glyph) : '';
           if (pos <= 0) h += '<section class="wp-marks"><div class="wp-marks-head"><strong>علامات الآية</strong><button type="button" id="wpMarksEdit">' + (editing ? 'تم' : 'تحرير') + '</button></div><div class="wp-marks-list" id="wpMarksList"></div></section>';
           if (pos <= 0) {
             h += '<div class="wp-h wp-ayah-head">' + glyphMarkup + '</div>';
-            if (!hideAyahTafsir) h += '<div class="wp-m"><small>معنى الآية</small>' + (tf ? esc(wordMeaningArabic(s, a, 1, tf)) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div>';
+            if (!hideAyahTafsir) h += '<div class="wp-m"><small>معنى الآية</small>' + (tf ? esc(verseMeaningArabic(s, a, tf)) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div>';
           } else {
-            h += '<div class="wp-h">' + glyphMarkup + '</div>';
-            if (!hideAyahTafsir) h += '<div class="wp-m"><small>المعنى في سياق الآية</small>' + (tf ? esc(wordMeaningArabic(s, a, pos, tf)) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div>';
+            h += '<div class="wp-h wp-word-head">' + glyphMarkup + '<span class="wp-word-ayah-number" aria-label="رقم الآية ' + ar(a) + '">' + ar(a) + '</span></div>';
+            var wordMeaning = tf ? wordMeaningArabic(s, a, pos, tf) : '';
+            h += '<div class="wp-m"><small>المعنى في سياق الآية</small>' + esc(wordMeaning || selectedWord) + '</div>';
           }
           if (!hideAyahTafsir) h += '<div class="wp-d"></div><div class="wp-v"><b>التفسير المختصر للآية:</b> <span class="wp-ayah-inline-marker">' + markerMarkup + '</span> ' + (tf ? esc(tf) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div>';
           if (pos <= 0) {
@@ -8185,7 +8309,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
               (savedVerseNote ? '<button type="button" class="wp-note-delete" id="wpNoteDelete">حذف</button>' : '') +
               '</div></div></details>';
           }
-          h += '<div class="wp-f">' + (tf && !hideAyahTafsir ? '<button type="button" id="wpMore">' + (wp.classList.contains('open') ? 'عرض أقل' : 'التفسير') + '</button>' : '') + '<button type="button" id="wpAnnotEdit">تعديل الصفحات</button><button type="button" class="x" id="wpX">إغلاق</button></div>';
+          h += '<div class="wp-f">' + (tf && !hideAyahTafsir ? '<button type="button" id="wpMore">' + (wp.classList.contains('open') ? 'عرض أقل' : 'التفسير') + '</button>' : '') + '<button type="button" class="x" id="wpX">إغلاق</button></div>';
           h += '<div class="wp-mark"><span>تظليل ' + (pos <= 0 ? 'الآية' : 'الكلمة') + '</span><div class="wp-colors" aria-label="اختيار لون التظليل">' + ANNOT_PALETTE.map(function (c) {
             return '<button type="button" data-wp-color="' + c + '" aria-label="' + COL[c][1] + '" title="' + COL[c][1] + '" style="background:' + COL[c][0] + '"></button>';
           }).join('') + '</div></div>';
@@ -8258,12 +8382,6 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           return;
         }
         if (e.target.closest('#wpX')) { closeWp(); return; }
-        if (e.target.closest('#wpAnnotEdit') && popWord) {
-          var targetView = popWord.closest('.page-view');
-          showAnnotControlsAt(popWord, targetView && +targetView.getAttribute('data-page'));
-          closeWp();
-          return;
-        }
         var editMarks = e.target.closest('#wpMarksEdit');
         if (editMarks) {
           editing = !editing;
@@ -8330,6 +8448,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           else markFromTap(w, +view.getAttribute('data-page'));
           e.preventDefault(); return;
         }
+        if (w && +w.getAttribute('data-v')) { closeWp(); openD(); return; }
         if (!wp.hidden) { closeWp(); if (!w) return; }
         var s = window.getSelection && String(window.getSelection()); if (s) return;
       });
@@ -8343,7 +8462,21 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         if (e.target.closest('.w, .wp, .run, .hdr, .bis, .foot, button, input, label')) return;
         openD();
       });
-      $('bMenu').addEventListener('click', openD);
+      var bMenu = $('bMenu'), menuPointerHandled = false;
+      bMenu.addEventListener('pointerup', function (event) {
+        if (event.pointerType !== 'touch') return;
+        menuPointerHandled = true;
+        openD();
+        setTimeout(function () { menuPointerHandled = false; }, 0);
+      });
+      bMenu.addEventListener('click', function (event) {
+        if (menuPointerHandled) {
+          menuPointerHandled = false;
+          event.preventDefault();
+          return;
+        }
+        openD();
+      });
       $('scrim').addEventListener('click', function () { closeD(); closeV(); });
       $('bNext').addEventListener('click', function () { goTo(cur + 1); });
       $('bPrev').addEventListener('click', function () { goTo(cur - 1); });
@@ -8651,6 +8784,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
   </script>
 
   <script src="./integrated-services-data.js"></script>
+  <script src="./ruqya-ui.js"></script>
   <script src="./integrated-services.js"></script>
   <script src="./prayer-times.js"></script>
   <script src="./worship-ui.js"></script>
@@ -8662,7 +8796,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       if (!runtime) throw new Error('Mushaf runtime is unavailable');
       var $ = runtime.$, store = runtime.store, D = runtime.data;
       var toast = runtime.toast;
-      var CACHE = 'quran-pro-app-v29', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '12';
+      var CACHE = 'quran-pro-app-v46', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '13';
       function ar(n) { return String(n).replace(/\d/g, function (d) { return AR[d]; }); }
       var urls = (function () {
         var a = [
@@ -8671,6 +8805,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           './worship-data.js',
           './worship-ui.js',
           './integrated-services-data.js',
+          './ruqya-ui.js',
           './integrated-services.js',
           './prayer-times.js',
           './manifest.webmanifest',

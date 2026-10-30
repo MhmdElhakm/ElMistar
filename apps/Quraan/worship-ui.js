@@ -141,7 +141,30 @@
   var categoryWrap = $('worshipAzkarCategories');
   var categoryList = $('worshipAzkarCategoryList');
   var azkarList = $('worshipAzkarList');
+  var ruqyaHost = $('worshipRuqyaHost');
   var categoryCloseTimer = 0;
+  var ruqyaCleanup = null;
+  var activeWorshipView = 'azkar';
+
+  function mountRuqya() {
+    if (ruqyaCleanup || !ruqyaHost) return;
+    if (!window.QuranIntegratedServices) {
+      ruqyaHost.textContent = 'تعذر تحميل قسم الرقية الشرعية. أعد تحميل التطبيق.';
+      return;
+    }
+    try {
+      ruqyaCleanup = window.QuranIntegratedServices.mount('ruqya', ruqyaHost);
+    } catch (error) {
+      console.error('تعذر فتح الرقية الشرعية', error);
+      ruqyaHost.textContent = 'تعذر فتح الرقية الشرعية. أعد المحاولة.';
+    }
+  }
+  function unmountRuqya() {
+    if (!ruqyaCleanup) return;
+    try { ruqyaCleanup(); }
+    catch (error) { console.error('تعذر إغلاق الرقية الشرعية', error); }
+    ruqyaCleanup = null;
+  }
 
   function paintCategoryOptions() {
     categoryList.innerHTML = data.categories.map(function (category) {
@@ -378,28 +401,38 @@
 
   function setWorshipView(view) {
     var isAzkar = view === 'azkar';
+    var isRuqya = view === 'ruqya';
+    activeWorshipView = view;
     $('worshipAzkar').hidden = !isAzkar;
-    $('worshipTasbeeh').hidden = isAzkar;
+    $('worshipTasbeeh').hidden = isAzkar || isRuqya;
+    $('worshipRuqya').hidden = !isRuqya;
     document.querySelectorAll('[data-worship-view]').forEach(function (button) {
       button.setAttribute('aria-pressed', String(button.getAttribute('data-worship-view') === view));
     });
     writeStoredText('mq.worshipView', view);
-    if (isAzkar && micWanted) {
+    syncRuqyaVisibility();
+    if ((isAzkar || isRuqya) && micWanted) {
       micWanted = false;
       stopVoiceCount();
-      hint.textContent = 'أوقفنا الميكروفون عند فتح الأذكار.';
+      hint.textContent = 'أوقفنا الميكروفون عند فتح ' + (isRuqya ? 'الرقية الشرعية.' : 'الأذكار.');
     }
   }
   document.querySelector('.worship-switch').addEventListener('click', function (event) {
     var button = event.target.closest('[data-worship-view]');
     if (button) setWorshipView(button.getAttribute('data-worship-view'));
   });
+  function syncRuqyaVisibility() {
+    var visible = !$('paneWorship').hidden && document.body.classList.contains('open');
+    if (visible && activeWorshipView === 'ruqya') mountRuqya();
+    else unmountRuqya();
+  }
   var paneObserver = new MutationObserver(function () {
     if ($('paneWorship').hidden && micWanted) {
       micWanted = false;
       stopVoiceCount();
       hint.textContent = 'أوقفنا الميكروفون عند مغادرة قسم الأذكار.';
     }
+    syncRuqyaVisibility();
   });
   paneObserver.observe($('paneWorship'), { attributes: true, attributeFilter: ['hidden'] });
   var drawerObserver = new MutationObserver(function () {
@@ -408,6 +441,7 @@
       stopVoiceCount();
       hint.textContent = 'أوقفنا الميكروفون عند إغلاق القائمة.';
     }
+    syncRuqyaVisibility();
   });
   drawerObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
   document.addEventListener('visibilitychange', function () {
@@ -420,9 +454,11 @@
   window.addEventListener('pagehide', function () {
     micWanted = false;
     stopVoiceCount();
+    unmountRuqya();
   });
 
   paintTasbeeh();
   paintAzkar();
-  setWorshipView(readStoredText('mq.worshipView') === 'azkar' ? 'azkar' : 'tasbeeh');
+  var savedView = readStoredText('mq.worshipView');
+  setWorshipView(savedView === 'tasbeeh' || savedView === 'ruqya' ? savedView : 'azkar');
 })();
