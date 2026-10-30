@@ -134,83 +134,84 @@
       /* COLRv1 color fonts display native Tajweed colors */
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
-      -webkit-text-stroke: calc(var(--quran-stroke, 0px) + 0.35px) currentColor;
-      paint-order: stroke fill;
     }
 
-    /* شريط مفتاح ألوان التجويد السريع */
+    /* دليل ألوان التجويد المدمج أسفل كل صفحة */
     .tajweed-legend-bar {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      display: flex;
-      justify-content: center;
-      padding: 6px 12px;
+      --tajweed-legend-line: color-mix(in srgb, var(--green) 45%, var(--line));
+      width: min(920px, 100%);
+      margin: 0 auto 3cqw;
+      overflow: hidden;
+      border: 1px solid var(--tajweed-legend-line);
+      border-radius: 5px;
       background: var(--card);
-      border-bottom: 1px solid var(--line);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-      transition: opacity .25s ease, transform .25s ease;
     }
     .tajweed-legend-bar[hidden] {
       display: none !important;
     }
     .tajweed-legend-items {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 6px 10px;
-      max-width: 900px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      direction: rtl;
     }
     .tajweed-legend-item {
       display: inline-flex;
       align-items: center;
+      justify-content: flex-start;
       gap: 5px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 11.5px;
-      font-weight: 500;
+      min-width: 0;
+      min-height: 25px;
+      padding: 3px 5px;
+      border: 0;
+      border-left: 1px solid var(--tajweed-legend-line);
+      border-bottom: 1px solid var(--tajweed-legend-line);
+      border-radius: 0;
+      font-size: 10px;
+      font-weight: 600;
       color: var(--ink);
-      background: var(--chip);
-      border: 1px solid transparent;
+      text-align: right;
+      line-height: 1.2;
+      background: transparent;
       cursor: pointer;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      transition: background .15s ease;
     }
     .tajweed-legend-item:hover {
-      transform: translateY(-1px);
-      border-color: var(--frame-line);
-      background: var(--band);
+      background: color-mix(in srgb, var(--green) 8%, var(--card));
+    }
+    .tajweed-legend-item:active {
+      background: color-mix(in srgb, var(--green) 14%, var(--card));
+    }
+    .tajweed-legend-item:nth-child(4n) {
+      border-left: 0;
+    }
+    .tajweed-legend-item:nth-child(n + 5) {
+      border-bottom: 0;
+    }
+    .tajweed-legend-item[data-rule="tafkhim"] {
+      cursor: default;
     }
     .tajweed-dot {
-      width: 9px;
-      height: 9px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       display: inline-block;
       flex-shrink: 0;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+      box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent);
     }
-    .tajweed-legend-info-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--green);
-      background: rgba(11, 122, 59, 0.1);
-      border: 1px solid rgba(11, 122, 59, 0.25);
-      cursor: pointer;
-      transition: all .15s ease;
+    :root[data-theme="dark"] .tajweed-legend-bar {
+      --tajweed-legend-line: color-mix(in srgb, var(--green) 40%, var(--line));
     }
-    .tajweed-legend-info-btn svg {
-      width: 13px;
-      height: 13px;
-      fill: currentColor;
-    }
-    .tajweed-legend-info-btn:hover {
-      background: var(--green);
-      color: #fff;
+    @media (max-width: 560px) {
+      .tajweed-legend-bar {
+        width: 100%;
+        margin-bottom: 3cqw;
+      }
+      .tajweed-legend-item {
+        min-height: 24px;
+        gap: 4px;
+        padding: 3px 4px;
+        font-size: 9px;
+      }
     }
 
     /* زر التجويد في الشريط السفلي */
@@ -307,37 +308,28 @@
       transform: scale(1.05);
     }
     .app-modal-nav {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      display: block;
       padding: 10px 20px;
       background: var(--panel);
       border-bottom: 1px solid var(--line);
-      overflow-x: auto;
-      scrollbar-width: none;
     }
-    .app-modal-nav::-webkit-scrollbar { display: none; }
-    .app-modal-tab {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
-      border-radius: 999px;
+    .app-modal-filter {
+      display: block;
+      width: min(100%, 420px);
+      min-height: 42px;
+      margin-inline: auto;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
       font-size: 13px;
       font-weight: 600;
-      background: var(--chip);
-      color: var(--muted);
-      border: 1px solid transparent;
+      background: var(--card);
+      color: var(--ink);
       cursor: pointer;
-      white-space: nowrap;
-      transition: all .15s ease;
-    }
-    .app-modal-tab.active, .app-modal-tab[aria-selected="true"] {
-      background: var(--green);
-      color: var(--on-green);
-      border-color: var(--green);
+      color-scheme: light;
     }
     .app-modal-body {
+      min-height: 0;
       padding: 20px;
       overflow-y: auto;
       flex: 1;
@@ -349,20 +341,62 @@
 
     /* بطاقات أحكام التجويد */
     .tajweed-rule-card {
+      flex-shrink: 0;
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: 16px;
-      padding: 18px;
-      transition: transform .15s ease, border-color .15s ease;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      overflow: hidden;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
     }
     .tajweed-rule-card:hover {
       border-color: var(--frame-line);
       transform: translateY(-1px);
     }
+    .tajweed-rule-card[open] {
+      border-color: var(--frame-line);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .07);
+    }
+    .tajweed-rule-card > summary {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 62px;
+      padding: 14px 18px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .tajweed-rule-card > summary::-webkit-details-marker { display: none; }
+    .tajweed-rule-card > summary:focus-visible {
+      outline: 2px solid color-mix(in srgb, var(--green) 65%, transparent);
+      outline-offset: -3px;
+      border-radius: 15px;
+    }
+    .tajweed-rule-card[open] > summary {
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel-top) 66%, transparent);
+    }
+    .tajweed-rule-chevron {
+      width: 9px;
+      height: 9px;
+      margin-inline-start: auto;
+      flex: none;
+      border-inline-end: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform .18s ease;
+    }
+    .tajweed-rule-card[open] .tajweed-rule-chevron {
+      transform: rotate(225deg) translate(-2px, -1px);
+    }
+    .tajweed-rule-content {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px 18px 18px;
+    }
     .tajweed-rule-head {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -493,6 +527,8 @@
     }
 
   </style>
+  <script src="./tajweed-font-data.js"></script>
+  <script src="./worship-data.js"></script>
 </head>
 
 <body class="quran-preparing">
@@ -850,41 +886,47 @@
     }
 
     :root {
-      --quran-stroke: 0px;
-      --quran-weight: 700;
     }
 
     :root[data-theme="dark"] .tajweed-active,
-    :root[data-theme="dark"] .sheet.tajweed-active,
-    :root[data-theme="dark"] .sheet.tajweed-active .w,
-    :root[data-theme="dark"] .wp-g,
+    :root[data-theme="dark"] .tajweed-example-word {
+      font-palette: --tajweed-dark !important;
+    }
+
+    :root[data-theme="dark"] .tajweed-active,
     :root[data-theme="dark"] .tajweed-example-word {
       font-palette: --tajweed-dark !important;
     }
 
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) .tajweed-active,
-      :root:not([data-theme="light"]) .sheet.tajweed-active,
-      :root:not([data-theme="light"]) .sheet.tajweed-active .w,
-      :root:not([data-theme="light"]) .wp-g,
       :root:not([data-theme="light"]) .tajweed-example-word {
         font-palette: --tajweed-dark !important;
       }
     }
 
-    :root[data-theme="dark"] .tajweed-legend-bar {
-      background: #1c1813;
-      border-bottom-color: #30281c;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    .sheet.tajweed-active .w,
+    .wp-g.tajweed-page-font {
+      font-palette: var(--tajweed-light-palette) !important;
     }
+
+    :root[data-theme="dark"] .sheet.tajweed-active .w,
+    :root[data-theme="dark"] .wp-g.tajweed-page-font {
+      font-palette: var(--tajweed-dark-palette) !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .sheet.tajweed-active .w,
+      :root:not([data-theme="light"]) .wp-g.tajweed-page-font {
+        font-palette: var(--tajweed-dark-palette) !important;
+      }
+    }
+
     :root[data-theme="dark"] .tajweed-legend-item {
-      background: #25201a;
       color: #f1e7d5;
-      border-color: #332a1e;
     }
     :root[data-theme="dark"] .tajweed-legend-item:hover {
-      background: #322b22;
-      border-color: var(--frame-line);
+      background: color-mix(in srgb, var(--green) 14%, var(--card));
     }
 
     :root[data-theme="dark"] .app-modal-shell {
@@ -896,16 +938,8 @@
       background: #201b15;
       border-bottom-color: #30281c;
     }
-    :root[data-theme="dark"] .app-modal-tab {
-      background: #231e17;
-      color: #a99d8c;
-      border-color: transparent;
-    }
-    :root[data-theme="dark"] .app-modal-tab.active,
-    :root[data-theme="dark"] .app-modal-tab[aria-selected="true"] {
-      background: #2e261d;
-      color: var(--green);
-      border-color: var(--green);
+    :root[data-theme="dark"] .app-modal-filter {
+      color-scheme: dark;
     }
     :root[data-theme="dark"] .tajweed-rule-card {
       background: #201b15;
@@ -1202,11 +1236,10 @@
     .hdr .hn {
       position: relative;
       font-family: "QCF4_QBSML";
-      font-weight: 700;
+      font-weight: 400;
       line-height: 1;
       white-space: nowrap;
       color: var(--ink);
-      -webkit-text-stroke: var(--quran-stroke, 0px) currentColor;
     }
 
 .bis {
@@ -1216,11 +1249,10 @@
       align-items: center;
       justify-content: center;
       font-family: "QCF4_Hafs_01";
-      font-weight: 700;
+      font-weight: 400;
       line-height: 1;
       white-space: nowrap;
       color: var(--ink);
-      -webkit-text-stroke: var(--quran-stroke, 0px) currentColor;
     }
 
     .ln {
@@ -1264,13 +1296,19 @@
       z-index: 1;
     }
 
-    .w { flex: none; cursor: pointer; font-weight: var(--quran-weight, 700); -webkit-text-stroke: var(--quran-stroke, 0px) currentColor;
+    .w { flex: none; cursor: pointer; font-weight: 400;
       position: relative;
       z-index: 2;
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
       touch-action: manipulation;
+    }
+
+    body.quran-bold .sheet .ln,
+    body.quran-bold .sheet .bis,
+    body.quran-bold .sheet .hn {
+      filter: url(#quranFontBold);
     }
 
     .w.pop {
@@ -1369,6 +1407,8 @@
 
     .foot {
       display: flex;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
       padding: 5cqw 0 6cqw;
     }
@@ -2140,6 +2180,81 @@
       display: none;
     }
 
+    .worship-content { padding: 12px; display: grid; align-content: start; gap: 11px; }
+    .worship-switch { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px; padding: 4px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-top); }
+    .worship-switch button { min-height: 40px; border: 1px solid transparent; border-radius: 10px; color: var(--muted); font: inherit; font-size: 12px; font-weight: 800; background: transparent; transition: background .18s, transform .15s; }
+    .worship-switch button:active { transform: scale(.97); }
+    .worship-switch button[aria-pressed="true"] { color: var(--green); background: var(--panel); border-color: color-mix(in srgb,var(--green) 35%,var(--line)); box-shadow: 0 3px 10px rgba(0,0,0,.07); }
+    .worship-card { min-width: 0; padding: 13px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(155deg,var(--panel-top),var(--panel) 70%); box-shadow: 0 9px 24px rgba(0,0,0,.06); }
+    .worship-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .worship-heading-icon { display: grid; flex: none; width: 42px; height: 42px; place-items: center; border-radius: 14px; color: #fff; background: linear-gradient(135deg,#38BDF8,#0F8AC2); font-size: 21px; box-shadow: 0 7px 16px rgba(15,138,194,.25); }
+    .worship-heading h3 { margin: 0; color: var(--ink); font-size: 14px; font-weight: 900; }
+    .worship-heading p { margin: 3px 0 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .worship-heading-title { display: block; margin: 0; color: var(--ink); font-size: 14px; font-weight: 900; }
+    .worship-heading-subtitle { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .tasbeeh-display { display: grid; justify-items: center; gap: 8px; padding: 4px 2px 2px; text-align: center; }
+    .tasbeeh-phrase { width: 100%; padding: 9px 8px; border-radius: 14px; color: #155B7C; background: #E8F6FC; font: inherit; font-size: 16px; font-weight: 900; line-height: 1.8; cursor: pointer; }
+    .tasbeeh-phrase small { display: block; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .tasbeeh-motivation { min-height: 34px; color: var(--muted); font-size: 11px; font-weight: 800; line-height: 1.8; }
+    .tasbeeh-row { display: flex; align-items: center; gap: 9px; width: 100%; }
+    .tasbeeh-count-button { display: flex; flex: 1; min-height: 54px; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: 16px; color: #fff; background: linear-gradient(135deg,#38BDF8,#0F8AC2); box-shadow: inset 0 1px 0 rgba(255,255,255,.4),0 9px 20px rgba(15,138,194,.3); font: inherit; cursor: pointer; transition: transform .12s; touch-action: manipulation; }
+    .tasbeeh-count-button:active { transform: scale(.96); }
+    .tasbeeh-count { min-width: 30px; font-size: 24px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+    .tasbeeh-count-hint { font-size: 10px; font-weight: 800; }
+    .tasbeeh-mic { display: grid; flex: none; width: 52px; height: 52px; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: #155B7C; background: linear-gradient(160deg,#fff,#EAF4FB); box-shadow: 0 6px 14px rgba(30,27,46,.1); transition: transform .12s,background .15s; }
+    .tasbeeh-mic svg { width: 23px; height: 23px; }
+    .tasbeeh-mic:active { transform: scale(.9); }
+    .tasbeeh-mic.on { color: #fff; background: linear-gradient(135deg,#FBBF24,#D97706); animation: worshipMicPulse 1.2s ease-in-out infinite; }
+    .tasbeeh-mic.speaking { color: #fff; background: linear-gradient(135deg,#34D399,#059669); }
+    @keyframes worshipMicPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(217,119,6,.4); } 50% { box-shadow: 0 0 0 8px rgba(217,119,6,0); } }
+    .tasbeeh-hint { min-height: 30px; align-self: stretch; color: var(--muted); font-size: 10px; font-weight: 700; line-height: 1.7; text-align: right; }
+    .worship-secondary-button { min-height: 38px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 11px; color: var(--muted); background: var(--panel); font: inherit; font-size: 11px; font-weight: 800; }
+    .worship-secondary-button:active { color: var(--green); background: var(--panel-top); }
+    .azkar-header { display: grid; gap: 9px; }
+    .azkar-heading-trigger { width: 100%; padding: 0 0 10px; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: right; cursor: pointer; }
+    .azkar-heading-trigger .worship-heading { margin: 0; }
+    .azkar-heading-trigger .worship-heading-icon { flex: none; }
+    .azkar-heading-copy { flex: 1; min-width: 0; }
+    .azkar-heading-trigger:focus-visible { outline: 2px solid color-mix(in srgb,var(--green) 45%,transparent); outline-offset: 3px; border-radius: 8px; }
+    .azkar-categories-wrap { overflow: hidden; max-height: 0; opacity: 0; transform: translateY(-6px); transition: max-height .3s ease,opacity .2s ease,transform .25s ease; }
+    .azkar-categories-wrap.open { max-height: 340px; opacity: 1; transform: none; }
+    .azkar-categories { display: grid; gap: 5px; padding: 7px; border: 1px solid var(--line); border-radius: 15px; background: var(--panel); box-shadow: 0 10px 25px rgba(0,0,0,.08); }
+    .azkar-category-option { display: flex; align-items: center; gap: 9px; min-height: 42px; padding: 6px 9px; border: 1px solid transparent; border-radius: 11px; color: var(--muted); background: transparent; font: inherit; font-size: 11px; font-weight: 800; text-align: right; }
+    .azkar-category-option > span:first-child { font-size: 16px; }
+    .azkar-category-option small { margin-inline-start: auto; color: var(--muted); font-size: 10px; }
+    .azkar-category-option[aria-pressed="true"] { color: var(--green); border-color: color-mix(in srgb,var(--green) 22%,var(--line)); background: color-mix(in srgb,var(--green) 8%,var(--panel)); }
+    .worship-azkar-list { display: grid; gap: 9px; }
+    .worship-azkar-item { position: relative; overflow: hidden; padding: 11px; border: 1px solid var(--line); border-radius: 17px; background: var(--panel); box-shadow: 0 4px 12px rgba(0,0,0,.045); cursor: pointer; transition: transform .12s,border-color .2s,background .2s,box-shadow .2s; }
+    .worship-azkar-item:active { transform: scale(.985); }
+    .worship-azkar-item.is-active { border-color: color-mix(in srgb,#0F8AC2 55%,var(--line)); background: color-mix(in srgb,#38BDF8 8%,var(--panel)); box-shadow: 0 8px 18px rgba(15,138,194,.12); }
+    .worship-azkar-item.is-complete { border-color: color-mix(in srgb,#10B981 50%,var(--line)); background: color-mix(in srgb,#10B981 8%,var(--panel)); }
+    .worship-azkar-top { display: flex; align-items: center; gap: 8px; min-height: 30px; margin-bottom: 7px; }
+    .worship-azkar-number { display: grid; flex: none; width: 30px; height: 30px; place-items: center; border-radius: 50%; color: var(--green); background: color-mix(in srgb,var(--green) 13%,var(--panel)); font-size: 11px; font-weight: 900; }
+    .is-active .worship-azkar-number { color: #fff; background: linear-gradient(135deg,#38BDF8,#0F8AC2); }
+    .is-complete .worship-azkar-number { color: #fff; background: linear-gradient(135deg,#34D399,#059669); }
+    .worship-azkar-remaining { margin-inline-start: auto; padding: 4px 8px; border-radius: 99px; color: var(--green); background: color-mix(in srgb,var(--green) 10%,var(--panel)); font-size: 9px; font-weight: 800; }
+    .worship-azkar-text { color: var(--ink); font-size: 13px; font-weight: 800; line-height: 2; text-align: right; }
+    .worship-azkar-benefit { flex: 1; min-width: 0; color: var(--muted); font-size: 10px; font-weight: 700; line-height: 1.8; }
+    .worship-azkar-footer { display: flex; align-items: center; gap: 8px; margin-top: 9px; padding-top: 8px; border-top: 1px dashed var(--line); }
+    .worship-azkar-count { min-width: 42px; color: var(--muted); font-size: 9px; font-weight: 800; white-space: nowrap; }
+    .worship-azkar-action { display: grid; flex: none; min-width: 44px; height: 38px; place-items: center; padding: 0 12px; border: 0; border-radius: 99px; color: #fff; background: linear-gradient(135deg,#38BDF8,#0F8AC2); box-shadow: 0 5px 12px rgba(15,138,194,.25); font: inherit; font-size: 15px; font-weight: 900; }
+    .is-complete .worship-azkar-action { background: linear-gradient(135deg,#34D399,#059669); }
+    .worship-azkar-skip { min-height: 35px; padding: 0 10px; border: 1px dashed var(--line); border-radius: 99px; color: var(--muted); background: var(--panel); font: inherit; font-size: 9px; font-weight: 800; white-space: nowrap; }
+    .worship-complete { padding: 16px 12px; border: 1px solid color-mix(in srgb,#10B981 30%,var(--line)); border-radius: 16px; color: #087A53; background: color-mix(in srgb,#10B981 9%,var(--panel)); font-size: 13px; font-weight: 900; line-height: 1.9; text-align: center; }
+    .worship-empty { padding: 26px 12px; color: var(--muted); text-align: center; font-size: 12px; font-weight: 700; }
+    #worshipAzkar .worship-card { padding: 9px 11px; }
+    #worshipAzkar .azkar-heading-trigger { padding-bottom: 5px; }
+    #worshipAzkar .worship-heading { gap: 8px; }
+    #worshipAzkar .worship-heading-icon { width: 36px; height: 36px; border-radius: 12px; font-size: 18px; }
+    #worshipAzkar .worship-heading-title { font-size: 13px; }
+    #worshipAzkar .worship-heading-subtitle { margin-top: 1px; font-size: 9px; }
+    #worshipAzkar.is-evening .azkar-heading-trigger .worship-heading-icon { background: linear-gradient(135deg,#FFB020,#FF7A00); }
+    #worshipAzkar.is-evening .azkar-category-option[aria-pressed="true"] { color: #965B00; border-color: #F2D28F; background: #FFF4DA; }
+    #worshipAzkar.is-evening .worship-azkar-item.is-active { border-color: #F59E0B; background: #FFFBEB; box-shadow: 0 8px 18px rgba(245,158,11,.14); }
+    #worshipAzkar.is-evening .worship-azkar-item.is-active .worship-azkar-number,
+    #worshipAzkar.is-evening .worship-azkar-item.is-active .worship-azkar-action { background: linear-gradient(135deg,#FFB020,#FF7A00); }
+    @media (prefers-reduced-motion: reduce) { .azkar-categories-wrap,.worship-azkar-item,.tasbeeh-mic { transition: none !important; animation: none !important; } }
+
     .srow {
       display: flex;
       align-items: center;
@@ -2607,6 +2722,14 @@
       line-height: 1.3;
       white-space: nowrap;
     }
+    .wp-ayah-head {
+      justify-content: flex-start;
+      min-height: 46px;
+      padding: 2px 4px 8px;
+      border-bottom: 1px solid var(--line);
+    }
+    .wp-ayah-inline-marker { display: inline-flex; vertical-align: middle; margin-inline: 3px; }
+    .wp-ayah-inline-marker .wp-g { font-size: 22px; line-height: 1; }
 
     .wp-t {
       color: var(--sub);
@@ -3381,6 +3504,9 @@
 
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
     <defs>
+      <filter id="quranFontBold" x="-2%" y="-12%" width="104%" height="124%">
+        <feMorphology id="quranFontMorphology" operator="dilate" radius="0" />
+      </filter>
       <pattern id="arab" width="60" height="112" patternUnits="userSpaceOnUse">
         <path class="p-line"
           d="M0 28 C16 8 30 8 30 28 C30 44 14 44 14 30 C14 20 24 20 24 28 M30 28 C30 48 46 52 60 28 M0 84 C16 104 30 104 30 84 C30 68 14 68 14 82 C14 92 24 92 24 84 M30 84 C30 64 46 60 60 84 M30 56 C40 42 52 46 54 56 C52 66 40 70 30 56 M30 56 C20 42 8 46 6 56 C8 66 20 70 30 56" />
@@ -3423,7 +3549,7 @@
         <div class="foot"><button type="button" class="badge" aria-label="فتح فهرس السور"></button></div>
       </section>
     </div>
-    <div class="wp" id="wp" role="dialog" aria-label="معنى الكلمة" hidden></div>
+    <div class="wp" id="wp" role="dialog" aria-label="تفسير الآية وعلاماتها" hidden></div>
     <div id="marksPopupHome" hidden><div id="paneMarks"></div></div>
   </main>
 
@@ -3474,35 +3600,39 @@
 
   
   <!-- شريط مفتاح ألوان التجويد -->
-  <div class="tajweed-legend-bar" id="tajweedLegendBar" aria-label="مفتاح ألوان التجويد">
+  <div class="tajweed-legend-bar" id="tajweedLegendBar" aria-label="مفتاح ألوان التجويد" hidden>
     <div class="tajweed-legend-items">
-      <button type="button" class="tajweed-legend-item" data-rule="madd_lazim" title="المد اللازم (6 حركات)">
+      <button type="button" class="tajweed-legend-item" data-rule="madd_lazim" title="المد اللازم: ٦ حركات لزوماً">
         <span class="tajweed-dot" style="background:#c8283a"></span>
         <span>مد لازم ٦</span>
       </button>
-      <button type="button" class="tajweed-legend-item" data-rule="madd_wajib" title="المد الواجب والمتصل والمنفصل (4-5 حركات)">
+      <button type="button" class="tajweed-legend-item" data-rule="madd_wajib" title="المد الواجب المتصل: ٤ أو ٥ حركات">
         <span class="tajweed-dot" style="background:#e05666"></span>
-        <span>مد ٤-٥</span>
+        <span>واجب ٤-٥</span>
       </button>
-      <button type="button" class="tajweed-legend-item" data-rule="madd_aarid" title="المد العارض للسكون (2-4-6 حركات)">
+      <button type="button" class="tajweed-legend-item" data-rule="madd_jaiz" title="المد الجائز المنفصل: ٤ أو ٥ حركات جوازاً">
         <span class="tajweed-dot" style="background:#f39c12"></span>
+        <span>جائز ٤-٥</span>
+      </button>
+      <button type="button" class="tajweed-legend-item" data-rule="madd_aarid" title="المد العارض للسكون واللين: ٢ أو ٤ أو ٦ حركات عند الوقف">
+        <span class="tajweed-dot" style="background:#e6b527"></span>
         <span>عارض ٢-٤-٦</span>
       </button>
-      <button type="button" class="tajweed-legend-item" data-rule="idgham_ghunnah" title="الإدغام والإخفاء والغنة (حركتان)">
+      <button type="button" class="tajweed-legend-item" data-rule="ikhfa" title="الإخفاء الحقيقي والشفوي ومواقع الغنة: حركتان">
         <span class="tajweed-dot" style="background:#27ae60"></span>
-        <span>غنة وإدغام وإخفاء</span>
+        <span>إخفاء وغنة</span>
       </button>
-      <button type="button" class="tajweed-legend-item" data-rule="qalqalah" title="القلقلة (قطب جد)">
-        <span class="tajweed-dot" style="background:#2980b9"></span>
-        <span>قلقلة</span>
-      </button>
-      <button type="button" class="tajweed-legend-item" data-rule="silent_letters" title="حروف لا تلفظ (همزة وصل، لام شمسية، ألف فارقة)">
+      <button type="button" class="tajweed-legend-item" data-rule="idgham_no_ghunnah" title="الإدغام بغير غنة وما لا يلفظ">
         <span class="tajweed-dot" style="background:#95a5a6"></span>
-        <span>لا يُلفظ</span>
+        <span>إدغام</span>
       </button>
-      <button type="button" class="tajweed-legend-info-btn" id="openTajweedGuideBtn" title="فتح دليل أحكام التجويد الملون">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-        <span>دليل التجويد</span>
+      <button type="button" class="tajweed-legend-item" data-rule="tafkhim" title="تفخيم الحروف">
+        <span class="tajweed-dot" style="background:#176c91"></span>
+        <span>تفخيم</span>
+      </button>
+      <button type="button" class="tajweed-legend-item" data-rule="qalqalah" title="القلقلة في حروف قطب جد">
+        <span class="tajweed-dot" style="background:#39b9ed"></span>
+        <span>قلقلة</span>
       </button>
     </div>
   </div>
@@ -3517,14 +3647,16 @@
         </div>
         <button type="button" class="app-modal-close" id="closeTajweedModal" aria-label="إغلاق دليل التجويد">×</button>
       </header>
-      <nav class="app-modal-nav" id="tajweedTabs" role="tablist">
-        <button type="button" class="app-modal-tab active" data-tab="all" role="tab" aria-selected="true">جميع الأحكام</button>
-        <button type="button" class="app-modal-tab" data-tab="madd" role="tab" aria-selected="false">🔴 أحكام المدود</button>
-        <button type="button" class="app-modal-tab" data-tab="noon" role="tab" aria-selected="false">🟢 النون والميم الساكنة</button>
-        <button type="button" class="app-modal-tab" data-tab="ghunnah" role="tab" aria-selected="false">🟩 الغنن والمشدد</button>
-        <button type="button" class="app-modal-tab" data-tab="qalqalah" role="tab" aria-selected="false">🔵 القلقلة (قطب جد)</button>
-        <button type="button" class="app-modal-tab" data-tab="silent" role="tab" aria-selected="false">⚪ الحروف التي لا تلفظ</button>
-      </nav>
+      <div class="app-modal-nav">
+        <select class="app-modal-filter" id="tajweedTabs" aria-label="تصفية أحكام التجويد">
+          <option value="all">عرض جميع الأحكام</option>
+          <option value="madd">🔴 أحكام المدود</option>
+          <option value="noon">🟢 النون والميم الساكنة</option>
+          <option value="ghunnah">🟩 الغنن والمشدد</option>
+          <option value="qalqalah">🔵 القلقلة (قطب جد)</option>
+          <option value="silent">⚪ الحروف التي لا تلفظ</option>
+        </select>
+      </div>
       <div class="app-modal-body" id="tajweedBody">
         <!-- Rendered by JS -->
       </div>
@@ -3538,6 +3670,7 @@
       <div class="seg" role="tablist">
         <button type="button" role="tab" id="tabSettings" aria-selected="false">الإعدادات</button>
         <button type="button" role="tab" id="tabS" aria-selected="true">السور</button>
+        <button type="button" role="tab" id="tabWorship" aria-selected="false">أذكار</button>
       </div>
       <input class="search" id="search" type="search" placeholder="سورة أو رقم صفحة" autocomplete="off"
         aria-label="ابحث عن سورة أو رقم صفحة">
@@ -3550,6 +3683,55 @@
       </div>
     </div>
     <div class="d-body" id="paneSurahs"></div>
+    <div class="d-body" id="paneWorship" hidden>
+      <div class="worship-content">
+        <div class="worship-switch" role="group" aria-label="اختر المسبحة أو الأذكار">
+          <button type="button" data-worship-view="tasbeeh" aria-pressed="true">📿 المسبحة</button>
+          <button type="button" data-worship-view="azkar" aria-pressed="false">🤲 الأذكار</button>
+        </div>
+        <section id="worshipTasbeeh" aria-label="المسبحة الإلكترونية">
+          <div class="worship-card">
+            <div class="worship-heading">
+              <span class="worship-heading-icon" aria-hidden="true">📿</span>
+              <div><h3>المسبحة الإلكترونية</h3><p>اضغط الذكر لتغييره، أو استخدم العدّ اليدوي أو الصوتي</p></div>
+            </div>
+            <div class="tasbeeh-display">
+              <button type="button" class="tasbeeh-phrase" id="worshipDhikrPhrase" aria-label="تغيير الذكر"></button>
+              <div class="tasbeeh-motivation" id="worshipTasbeehMotivation" aria-live="polite"></div>
+              <div class="tasbeeh-row">
+                <button type="button" class="tasbeeh-count-button" id="worshipCountButton" aria-label="زيادة عدّ المسبحة">
+                  <span class="tasbeeh-count" id="worshipTasbeehCount">٠</span>
+                  <span class="tasbeeh-count-hint">اضغط للتسبيح</span>
+                </button>
+                <button type="button" class="tasbeeh-mic" id="worshipTasbeehMic" aria-label="تشغيل العدّ الصوتي" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="tasbeeh-hint" id="worshipTasbeehHint" aria-live="polite">اضغط الميكروفون وقل الذكر مع وقفة قصيرة بين التسبيحات.</div>
+              <button type="button" class="worship-secondary-button" id="worshipTasbeehReset">تصفير العداد</button>
+            </div>
+          </div>
+        </section>
+        <section id="worshipAzkar" aria-label="الأذكار" hidden>
+          <div class="worship-card">
+            <div class="azkar-header">
+              <button type="button" class="azkar-heading-trigger" id="worshipAzkarCategoryTrigger" aria-expanded="false" aria-controls="worshipAzkarCategories" aria-label="اختيار مجموعة الأذكار">
+                <span class="worship-heading">
+                  <span class="worship-heading-icon" aria-hidden="true">🤲</span>
+                  <span class="azkar-heading-copy"><span class="worship-heading-title">الأذكار والأدعية</span><span class="worship-heading-subtitle">أذكار الصباح والمساء وأذكار اليوم والليلة</span></span>
+                </span>
+              </button>
+              <div class="azkar-categories-wrap" id="worshipAzkarCategories" hidden>
+                <div class="azkar-categories" id="worshipAzkarCategoryList"></div>
+              </div>
+            </div>
+          </div>
+          <div class="worship-azkar-list" id="worshipAzkarList"></div>
+        </section>
+      </div>
+    </div>
     <div class="d-body" id="paneSettings" hidden>
       <section class="settings" aria-label="الإعدادات">
         <div class="settings-body" id="settingsBody">
@@ -3603,6 +3785,19 @@
           </div>
         </div>
 
+        <div class="settings-card">
+          <div class="settings-card-head">
+            <span aria-hidden="true">🎨</span>
+            <span>مفتاح الأحكام أعلى رقم الصفحة:</span>
+            <span class="st-val" id="tajweedLegendVisibilityLabel">ظاهر</span>
+          </div>
+          <div class="settings-toggle-group">
+            <button type="button" class="st-btn active" id="btnTajweedLegendVisibility" aria-pressed="true">
+              <span>إظهار مفتاح الألوان</span>
+            </button>
+          </div>
+        </div>
+
         <!-- خيار التحكم في سمك خط المصحف -->
         <div class="settings-card">
           <div class="settings-card-head">
@@ -3611,27 +3806,10 @@
             <span class="st-val" id="strokeValLabel">عادي</span>
           </div>
           <div class="settings-toggle-group" id="fontStrokeGroup">
-            <button type="button" class="st-btn active" data-stroke="0" data-label="عادي">عادي</button>
-            <button type="button" class="st-btn" data-stroke="0.3" data-label="متوسط">متوسط</button>
-            <button type="button" class="st-btn" data-stroke="0.6" data-label="عريض">عريض</button>
+            <button type="button" class="st-btn active" data-stroke="0" data-label="عادي" aria-pressed="true">عادي</button>
+            <button type="button" class="st-btn" data-stroke="0.6" data-label="متوسط" aria-pressed="false">متوسط</button>
+            <button type="button" class="st-btn" data-stroke="1.2" data-label="عريض" aria-pressed="false">عريض</button>
           </div>
-        </div>
-
-        <div class="settings-card" aria-label="دليل ألوان التجويد">
-          <details class="tajweed-guide-details">
-            <summary><span aria-hidden="true">🎨</span><span>دليل ألوان التجويد</span></summary>
-            <div class="tajweed-guide-content">
-              <div class="tajweed-color-guide">
-                <span><i style="background:#c8283a"></i>المد اللازم</span>
-                <span><i style="background:#e05666"></i>المد الواجب والمتصل والمنفصل</span>
-                <span><i style="background:#f39c12"></i>المد العارض للسكون</span>
-                <span><i style="background:#27ae60"></i>الغنة والإدغام والإخفاء</span>
-                <span><i style="background:#2980b9"></i>القلقلة</span>
-                <span><i style="background:#95a5a6"></i>حروف لا تُلفظ</span>
-              </div>
-              <button type="button" class="tajweed-legend-info-btn" id="settingsTajweedGuideBtn">شرح أحكام التجويد</button>
-            </div>
-          </details>
         </div>
 
         <div class="settings-card" aria-label="التمرير التلقائي">
@@ -4135,33 +4313,96 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
 
       /* ---------- إدارة خطوط التجويد الملون لمجمع الملك فهد لكل صفحة ---------- */
       var tajweedOn = load('mq.tajweed', true);
+      var tajweedLegendVisible = load('mq.tajweedLegendVisible', true);
       var tajweedLoaded = {};
+      var tajweedFontData = window.MushafTajweedData;
+      var tajweedFontIndex = tajweedFontData && tajweedFontData.fonts;
+      if (tajweedFontIndex && !Array.isArray(tajweedFontIndex)) tajweedFontIndex = tajweedFontIndex.value;
+      var tajweedGlyphsByPage = {};
+      var tajweedChunkPromises = {};
+      var tajweedFontPromises = {};
+      var tajweedPaletteStyle = document.createElement('style');
+      document.head.appendChild(tajweedPaletteStyle);
+      var tajweedFallbackNoticeShown = false;
 
-      function getPageDiff(p) {
-        var lines = G[p - 1];
-        if (!lines) return 0;
-        for (var i = 0; i < lines.length; i++) {
-          if (lines[i][0] === 'w' && lines[i][2] && lines[i][2][0]) {
-            return 0xfc41 - lines[i][2][0][1].charCodeAt(0);
-          }
+      function getPageTajweedGlyphs(p) {
+        if (tajweedGlyphsByPage[p]) return tajweedGlyphsByPage[p];
+        var glyphText = tajweedFontData && tajweedFontData.glyphs && tajweedFontData.glyphs[p - 1];
+        if (typeof glyphText !== 'string') throw new Error('بيانات رموز التجويد غير متوفرة للصفحة ' + p);
+        var glyphs = glyphText.split('\u0000');
+        var lines = G[p - 1] || [], expected = 0;
+        lines.forEach(function (line) { if (line[0] === 'w') expected += line[2].length; });
+        if (glyphs.length !== expected) {
+          throw new Error('عدد رموز التجويد لا يطابق كلمات الصفحة ' + p);
         }
-        return 0;
+        tajweedGlyphsByPage[p] = glyphs;
+        return glyphs;
+      }
+
+      function loadTajweedChunk(chunkIndex) {
+        if (!tajweedChunkPromises[chunkIndex]) {
+          var chunkName = 'c' + (chunkIndex < 10 ? '0' : '') + chunkIndex;
+          var chunkUrl = './fonts/tajweed/' + chunkName + '.woff2';
+          function requestChunk(retry) {
+            return fetch(chunkUrl, retry ? { cache: 'reload' } : undefined).then(function (response) {
+              if (!response.ok) throw new Error('تعذر تحميل ملف الخط ' + chunkName + ' (HTTP ' + response.status + ')');
+              return response.arrayBuffer();
+            }).then(function (buffer) {
+              if (!buffer.byteLength) throw new Error('ملف الخط ' + chunkName + ' فارغ');
+              return buffer;
+            }).catch(function (error) {
+              if (!retry) return new Promise(function (resolve) { setTimeout(resolve, 250); }).then(function () { return requestChunk(true); });
+              throw error;
+            });
+          }
+          tajweedChunkPromises[chunkIndex] = requestChunk(false).catch(function (error) {
+            delete tajweedChunkPromises[chunkIndex];
+            throw error;
+          });
+        }
+        return tajweedChunkPromises[chunkIndex];
+      }
+
+      function registerTajweedPalettes(p, family) {
+        var lightPalette = '--tjl' + p, darkPalette = '--tjd' + p;
+        tajweedPaletteStyle.appendChild(document.createTextNode(
+          '@font-palette-values ' + lightPalette + '{font-family:"' + family + '";base-palette:0;override-colors:10 #b79f7c,11 #f3eadb,12 #f3eadb}' +
+          '@font-palette-values ' + darkPalette + '{font-family:"' + family + '";base-palette:1;override-colors:10 #8d7550,11 #2b251b,12 #2b251b}'
+        ));
+        return { light: lightPalette, dark: darkPalette };
       }
 
       function loadTajweedFont(p) {
         if (!p || p < 1 || p > TOTAL) return Promise.resolve(null);
-        if (tajweedLoaded[p]) return Promise.resolve('QCF_Tajweed_P' + p);
-        var famName = 'QCF_Tajweed_P' + p;
-        var fontUrl = 'https://verses.quran.foundation/fonts/quran/hafs/v4/colrv1/woff2/p' + p + '.woff2';
-        var fontFace = new FontFace(famName, 'url(' + fontUrl + ')', { format: 'woff2' });
-        return fontFace.load().then(function (loaded) {
-          document.fonts.add(loaded);
-          tajweedLoaded[p] = true;
-          return famName;
-        }).catch(function (e) {
-          console.warn('تعذر تحميل خط التجويد للصفحة ' + p, e);
-          return null;
-        });
+        if (tajweedLoaded[p]) return Promise.resolve('TJ' + p);
+        if (tajweedFontPromises[p]) return tajweedFontPromises[p];
+        try {
+          getPageTajweedGlyphs(p);
+          if (!Array.isArray(tajweedFontIndex) || !Array.isArray(tajweedFontIndex[p - 1])) {
+            throw new Error('فهرس خط التجويد غير متوفر للصفحة ' + p);
+          }
+          var fontInfo = tajweedFontIndex[p - 1];
+          var chunkIndex = fontInfo[0], offset = fontInfo[1], length = fontInfo[2];
+          if (!Number.isInteger(chunkIndex) || !Number.isInteger(offset) || !Number.isInteger(length) ||
+              chunkIndex < 0 || offset < 0 || length <= 0) {
+            throw new Error('فهرس خط التجويد غير صالح للصفحة ' + p);
+          }
+          var family = 'TJ' + p;
+          tajweedFontPromises[p] = loadTajweedChunk(chunkIndex).then(function (buffer) {
+            if (offset + length > buffer.byteLength) throw new Error('بيانات خط التجويد غير مكتملة للصفحة ' + p);
+            return new FontFace(family, buffer.slice(offset, offset + length)).load();
+          }).then(function (loaded) {
+            document.fonts.add(loaded);
+            tajweedLoaded[p] = registerTajweedPalettes(p, family);
+            return family;
+          }).catch(function (error) {
+            delete tajweedFontPromises[p];
+            throw error;
+          });
+          return tajweedFontPromises[p];
+        } catch (error) {
+          return Promise.reject(error);
+        }
       }
 
       function ensureFonts(lines, p) {
@@ -4172,7 +4413,14 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         });
         var proms = Object.keys(need).map(function (f) { return document.fonts.load('100px "' + f + '"', need[f]).catch(function () { }); });
         if (tajweedOn && p) {
-          proms.push(loadTajweedFont(p).catch(function () { }));
+          proms.push(loadTajweedFont(p).catch(function (error) {
+            console.error('تعذر تجهيز خط التجويد للصفحة ' + p, error);
+            if (!tajweedFallbackNoticeShown) {
+              tajweedFallbackNoticeShown = true;
+              toast('تعذر تحميل خط التجويد للصفحة ' + p + ': ' + (error.message || error));
+            }
+            return null;
+          }));
         }
         return Promise.all(proms);
       }
@@ -4208,8 +4456,24 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         }
       }
 
+      function ensureTajweedLegend(view) {
+        if (view.querySelector('.tajweed-legend-bar')) return;
+        var template = $('tajweedLegendBar');
+        var foot = view.querySelector('.foot');
+        if (!template || !foot) return;
+        var legend = template.cloneNode(true);
+        legend.removeAttribute('id');
+        legend.hidden = !(tajweedOn && tajweedLegendVisible);
+        legend.querySelectorAll('[id]').forEach(function (element) { element.removeAttribute('id'); });
+        foot.insertBefore(legend, foot.querySelector('.badge'));
+      }
+
       function activatePage(view) {
-        if (!view || view === activeView) return;
+        if (!view) return;
+        var viewPage = +view.getAttribute('data-page');
+        var renderedMode = view.querySelector('.sheet').getAttribute('data-tajweed-mode');
+        if (renderedMode !== (tajweedOn ? 'on' : 'off')) render(view, viewPage);
+        if (view === activeView) return;
         if (activeView) activeView.classList.remove('active');
         view.classList.add('active');
         activeView = view; sheet = view.querySelector('.sheet');
@@ -4227,6 +4491,8 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       function render(view, p) {
         p = p || cur; view = view || activeView;
         var lines = G[p - 1], targetSheet = view.querySelector('.sheet');
+        ensureTajweedLegend(view);
+        targetSheet.setAttribute('data-tajweed-mode', tajweedOn ? 'on' : 'off');
         view.classList.toggle('opening', p <= 2);
         syncPageStatus(view, p);
         renderQueue = renderQueue.then(function () { return ensureFonts(lines, p); }).then(function () {
@@ -4244,8 +4510,16 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           if (p <= 2) fs *= 0.85;
           var spaced = p > 2, html = '';
           var useTajweed = tajweedOn && tajweedLoaded[p];
-          var diff = useTajweed ? getPageDiff(p) : 0;
+          var tajweedGlyphs = useTajweed ? getPageTajweedGlyphs(p) : null;
+          var tajweedWordIndex = 0;
           targetSheet.classList.toggle('tajweed-active', !!useTajweed);
+          if (useTajweed) {
+            targetSheet.style.setProperty('--tajweed-light-palette', tajweedLoaded[p].light);
+            targetSheet.style.setProperty('--tajweed-dark-palette', tajweedLoaded[p].dark);
+          } else {
+            targetSheet.style.removeProperty('--tajweed-light-palette');
+            targetSheet.style.removeProperty('--tajweed-dark-palette');
+          }
 
           lines.forEach(function (l, i) {
             if (l[0] === 'h') {
@@ -4256,11 +4530,11 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
               html += '<div class="bis" style="font-size:' + bs.toFixed(2) + 'px">' + l[1] + '</div>';
             } else {
               var full = spaced && info[i].em >= 0.84 * M, vs = {};
-              var fontFam = useTajweed ? ('QCF_Tajweed_P' + p) : fam(l[1]);
-              var inner = l[2].map(function (it) { 
+              var fontFam = useTajweed ? ('TJ' + p) : fam(l[1]);
+              var inner = l[2].map(function (it, wordIndex) { 
                 if (it[0]) vs[it[0]] = 1; 
-                var char = useTajweed ? String.fromCharCode(it[1].charCodeAt(0) + diff) : it[1];
-                return '<span class="w" data-v="' + it[0] + '" data-p="' + (it[2] || 0) + '" style="font-family:' + fontFam + '">' + char + '</span>'; 
+                var char = useTajweed ? tajweedGlyphs[tajweedWordIndex++] : it[1], wordFont = fontFam;
+                return '<span class="w" data-v="' + it[0] + '" data-p="' + (it[2] || 0) + '" style="font-family:' + wordFont + '">' + char + '</span>'; 
               }).join('');
               html += '<div class="ln ' + (full ? 'full' : 'cen') + '" data-vs="' + Object.keys(vs).join(',') + '" style="font-size:' + fs.toFixed(2) + 'px">' + inner + '</div>';
             }
@@ -4378,7 +4652,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
               i.style.left = (lo - lr.left - pad).toFixed(1) + 'px';
               i.style.width = (hi - lo + pad * 2).toFixed(1) + 'px';
               var r = parseInt(col.slice(1, 3), 16), g = parseInt(col.slice(3, 5), 16), b = parseInt(col.slice(5, 7), 16);
-              i.style.background = 'rgba(' + r + ', ' + g + ', ' + b + ', 0.62)';
+              i.style.background = 'rgba(' + r + ', ' + g + ', ' + b + ', 0.07)';
               el.insertBefore(i, el.firstChild);
             });
           });
@@ -4418,7 +4692,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
                 }
                 band.style.left = (left - lineRect.left - 2).toFixed(1) + 'px';
                 band.style.width = (right - left + 4).toFixed(1) + 'px';
-                band.style.background = 'color-mix(in srgb, ' + color + ' 24%, transparent)';
+                band.style.background = 'color-mix(in srgb, ' + color + ' 45%, transparent)';
               } else w.classList.add('annot-highlight');
             } else if (mark.t === 'underline') w.classList.add('annot-underline');
           });
@@ -4431,28 +4705,35 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         if (!verse) return;
         page = page || cur;
         var marks = pageAnnotations[page] || (pageAnnotations[page] = []);
+        var existing = marks.find(function (mark) {
+          return mark.v === verse && mark.p === null && mark.t === 'highlight';
+        });
+        if (existing && existing.c === annotPrefs.color) {
+          pageAnnotations[page] = marks.filter(function (mark) { return mark !== existing; });
+          saveAnnotations(); paintAnnotations();
+          return true;
+        }
         marks = marks.filter(function (m) { return m.v !== verse; });
         marks.push({ v: verse, p: null, c: annotPrefs.color, t: 'highlight' });
         pageAnnotations[page] = marks;
         saveAnnotations(); paintAnnotations();
-        return verse;
+        return false;
       }
       function togglePopupMark(w, page, color) {
-        var verse = +w.getAttribute('data-v'), pos = +w.getAttribute('data-p'), whole = pos <= 0;
+        var verse = +w.getAttribute('data-v');
         if (!verse) return false;
         page = page || cur;
         var marks = pageAnnotations[page] || (pageAnnotations[page] = []), found = -1;
         marks.forEach(function (m, i) {
-          if (m.v === verse && (whole ? m.p === null : m.p === pos)) found = i;
+          if (m.v === verse && m.p === null && m.t === 'highlight') found = i;
         });
         if (found >= 0 && marks[found].c === color && marks[found].t === 'highlight') {
-          marks.splice(found, 1);
-          pageAnnotations[page] = marks;
+          pageAnnotations[page] = marks.filter(function (mark) { return mark.v !== verse; });
           saveAnnotations(); paintAnnotations();
           return true;
         }
-        marks = marks.filter(function (m) { return !(m.v === verse && (whole ? m.p === null : m.p === pos)); });
-        marks.push({ v: verse, p: whole ? null : pos, c: color, t: 'highlight' });
+        marks = marks.filter(function (mark) { return mark.v !== verse; });
+        marks.push({ v: verse, p: null, c: color, t: 'highlight' });
         pageAnnotations[page] = marks;
         saveAnnotations(); paintAnnotations();
         return false;
@@ -5184,25 +5465,28 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       buildMarks();
 
       var paneSettings = $('paneSettings');
-      var panes = { settings: paneSettings, surahs: paneS };
-      var tabSettings = $('tabSettings'), tabS = $('tabS');
+      var paneWorship = $('paneWorship');
+      var panes = { settings: paneSettings, surahs: paneS, worship: paneWorship };
+      var tabSettings = $('tabSettings'), tabS = $('tabS'), tabWorship = $('tabWorship');
       function show(k) {
         tabS.setAttribute('aria-selected', String(k === 'surahs'));
         tabSettings.setAttribute('aria-selected', String(k === 'settings'));
+        tabWorship.setAttribute('aria-selected', String(k === 'worship'));
         Object.keys(panes).forEach(function (n) { panes[n].hidden = n !== k; });
         $('search').hidden = k !== 'surahs';
         $('searchMode').hidden = k !== 'surahs';
-        body.classList.toggle('titled', k === 'settings');
-        $('dTitleT').textContent = k === 'settings' ? 'الإعدادات' : '';
-        $('dTitleT').hidden = k !== 'settings';
+        body.classList.toggle('titled', k !== 'surahs');
+        $('dTitleT').textContent = k === 'settings' ? 'الإعدادات' : (k === 'worship' ? 'الأذكار والمسبحة' : '');
+        $('dTitleT').hidden = k === 'surahs';
       }
       tabS.addEventListener('click', function () { show('surahs'); });
       tabSettings.addEventListener('click', function () { show('settings'); });
+      tabWorship.addEventListener('click', function () { show('worship'); });
 
       /* ---------- controls ---------- */
       var bar = $('bar');
       function toggleBar(on) { bar.classList.toggle('on', on === undefined ? !bar.classList.contains('on') : on); }
-      /* word meaning: long press on a word */
+      /* Verse details open only when the ayah number is held. */
       var wp = $('wp'), marksPopupHome = $('marksPopupHome'), MU = window.MUYASSAR_DATA || null, wmLoading = null, meaningLoadFailed = false, popWord = null, lpT = 0, lpX = 0, lpY = 0, lpFired = false;
       function fetchJson(url) { return fetch(url).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
       function loadMeanings() { return Promise.resolve(MU); }
@@ -5247,19 +5531,37 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         marksPopupHome.hidden = true;
         var s = Math.floor(v / 1000), a = v % 1000;
         if (popWord) popWord.classList.remove('pop');
-        wp.classList.toggle('open', pos <= 0);
+        wp.classList.remove('open');
         if (pos <= 0) { sel = v; paintSel(); }
         popWord = w; w.classList.add('pop');
         var ff = w.style.fontFamily, glyph = w.textContent;
+        var pageFont = /^TJ([0-9]+)$/.exec(ff);
+        var glyphClasses = 'wp-g' + (pageFont ? ' tajweed-page-font' : '');
+        var glyphStyle = 'font-family:' + ff;
+        if (pageFont) glyphStyle += ';--tajweed-light-palette:--tjl' + pageFont[1] + ';--tajweed-dark-palette:--tjd' + pageFont[1];
+        var glyphMarkup = '<span class="' + glyphClasses + '" style="' + glyphStyle + '">' + esc(glyph) + '</span>';
+        var markerWord = pos === -1 ? w : w.closest('.page-view').querySelector('.w[data-v="' + v + '"][data-p="-1"]');
+        var markerMarkup = markerWord ? (function () {
+          var markerFont = markerWord.style.fontFamily || ff;
+          var markerPageFont = /^TJ([0-9]+)$/.exec(markerFont);
+          var markerStyle = 'font-family:' + markerFont + ';font-size:22px';
+          if (markerPageFont) markerStyle += ';--tajweed-light-palette:--tjl' + markerPageFont[1] + ';--tajweed-dark-palette:--tjd' + markerPageFont[1];
+          return '<span class="' + glyphClasses + '" style="' + markerStyle + '">' + esc(markerWord.textContent) + '</span>';
+        })() : '<span class="wp-ayah-tafsir-number">' + ar(a) + '</span>';
+        var hideAyahTafsir = a === 15;
         function draw() {
           var tf = MU && MU[s - 1] ? MU[s - 1][a - 1] : '';
           var h = '';
           if (pos <= 0) h += '<section class="wp-marks"><div class="wp-marks-head"><strong>علامات الآية</strong><button type="button" id="wpMarksEdit">' + (editing ? 'تم' : 'تحرير') + '</button></div><div class="wp-marks-list" id="wpMarksList"></div></section>';
-          h += '<div class="wp-h"><span class="wp-g" style="font-family:' + ff + '">' + esc(glyph) + '</span></div>';
-          if (pos <= 0) h += '<div class="wp-m"><small>تفسير الآية</small> ' + ar(a) + '</div>';
-          else h += '<div class="wp-m"><small>المعنى في سياق الآية</small>' + (tf ? esc(wordMeaningArabic(s, a, pos, tf)) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div>';
-          h += '<div class="wp-d"></div><div class="wp-v">' + (tf ? '<b>التفسير المختصر للآية:</b> ' + esc(tf) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div>';
-          h += '<div class="wp-f">' + (tf ? '<button type="button" id="wpMore">' + (wp.classList.contains('open') ? 'عرض أقل' : 'المزيد') + '</button>' : '') + '<button type="button" id="wpAnnotEdit">تعديل الصفحات</button><button type="button" class="x" id="wpX">إغلاق</button></div>';
+          if (pos <= 0) {
+            h += '<div class="wp-h wp-ayah-head">' + glyphMarkup + '</div>';
+            if (!hideAyahTafsir) h += '<div class="wp-m"><small>معنى الآية</small>' + (tf ? esc(wordMeaningArabic(s, a, 1, tf)) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div>';
+          } else {
+            h += '<div class="wp-h">' + glyphMarkup + '</div>';
+            if (!hideAyahTafsir) h += '<div class="wp-m"><small>المعنى في سياق الآية</small>' + (tf ? esc(wordMeaningArabic(s, a, pos, tf)) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div>';
+          }
+          if (!hideAyahTafsir) h += '<div class="wp-d"></div><div class="wp-v"><b>التفسير المختصر للآية:</b> <span class="wp-ayah-inline-marker">' + markerMarkup + '</span> ' + (tf ? esc(tf) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div>';
+          h += '<div class="wp-f">' + (tf && !hideAyahTafsir ? '<button type="button" id="wpMore">' + (wp.classList.contains('open') ? 'عرض أقل' : 'التفسير') + '</button>' : '') + '<button type="button" id="wpAnnotEdit">تعديل الصفحات</button><button type="button" class="x" id="wpX">إغلاق</button></div>';
           h += '<div class="wp-mark"><span>تظليل ' + (pos <= 0 ? 'الآية' : 'الكلمة') + '</span><div class="wp-colors" aria-label="اختيار لون التظليل">' + ANNOT_PALETTE.map(function (c) {
             return '<button type="button" data-wp-color="' + c + '" aria-label="' + COL[c][1] + '" title="' + COL[c][1] + '" style="background:' + COL[c][0] + '"></button>';
           }).join('') + '</div></div>';
@@ -5274,7 +5576,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           placeWp(w);
         }
         draw();
-        if (!MU) loadMeanings().then(function () { if (popWord === w) draw(); });
+        if (!MU && !hideAyahTafsir) loadMeanings().then(function () { if (popWord === w) draw(); });
       }
       function openVerseDrawer(v) {
         sel = v;
@@ -5305,15 +5607,15 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           annotPrefs.type = 'highlight';
           var view = popWord.closest('.page-view');
           var markPage = view && +view.getAttribute('data-page');
-          if (+popWord.getAttribute('data-p') > 0) annotPrefs.mode = 'word';
           var removed = togglePopupMark(popWord, markPage, annotPrefs.color);
+          popWord.classList.remove('pop');
           annotEnabled = false; annotTransient = false; annotTarget = null;
           saveAnnotPrefs(); syncAnnotControls();
-          toast(removed ? 'تم محو التظليل' : 'تم تظليل ' + (+popWord.getAttribute('data-p') > 0 ? 'الكلمة' : 'الآية'));
+          toast(removed ? 'تم محو تظليل الآية' : 'تم تظليل الآية');
           return;
         }
         var m = e.target.closest('#wpMore');
-        if (m) { var on = wp.classList.toggle('open'); m.textContent = on ? 'عرض أقل' : 'المزيد'; if (popWord) placeWp(popWord); }
+        if (m) { var on = wp.classList.toggle('open'); m.textContent = on ? 'عرض أقل' : 'التفسير'; if (popWord) placeWp(popWord); }
       });
       function lpCancel() { clearTimeout(lpT); lpT = 0; }
       pageList.addEventListener('pointerdown', function (e) {
@@ -5565,12 +5867,23 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         data: D,
         toast: toast,
         isTajweedOn: function () { return tajweedOn; },
+        isTajweedLegendVisible: function () { return tajweedLegendVisible; },
+        setTajweedLegendVisible: function (visible) {
+          tajweedLegendVisible = !!visible;
+          save('mq.tajweedLegendVisible', tajweedLegendVisible);
+          document.querySelectorAll('.page-view .tajweed-legend-bar').forEach(function (legend) {
+            legend.hidden = !(tajweedOn && tajweedLegendVisible);
+          });
+        },
         setTajweed: function (enabled) {
           tajweedOn = enabled;
           save('mq.tajweed', tajweedOn);
           document.querySelectorAll('.page-view').forEach(function (view) {
             var p = +view.getAttribute('data-page');
-            if (p) render(view, p);
+            if (!p) return;
+            var bounds = view.getBoundingClientRect();
+            var nearViewport = bounds.bottom >= -window.innerHeight && bounds.top <= window.innerHeight * 2;
+            if (view === activeView || nearViewport) render(view, p);
           });
         },
         closeDrawer: closeD,
@@ -5578,12 +5891,16 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         body: body,
         tabS: tabS,
         tabSettings: tabSettings,
+        tabWorship: tabWorship,
         paneS: paneS,
         paneSettings: paneSettings,
+        paneWorship: paneWorship,
         paneM: paneM
       };
     })();
   </script>
+
+  <script src="./worship-ui.js"></script>
 
   <script>
     /* ---------- offline: on first open, download every Quran text/font so the Mushaf works without internet ---------- */
@@ -5803,23 +6120,43 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           btnOff.setAttribute('aria-pressed', String(!runtime.isTajweedOn()));
         }
         if (lbl) lbl.textContent = runtime.isTajweedOn() ? 'مفعّلة (ملوّن)' : 'معطّلة (عادي)';
+        var legendVisible = runtime.isTajweedLegendVisible();
+        var legendButton = $('btnTajweedLegendVisibility');
+        var legendLabel = $('tajweedLegendVisibilityLabel');
+        if (legendButton) {
+          legendButton.classList.toggle('active', legendVisible);
+          legendButton.setAttribute('aria-pressed', String(legendVisible));
+          legendButton.textContent = legendVisible ? 'إخفاء مفتاح الألوان' : 'إظهار مفتاح الألوان';
+        }
+        if (legendLabel) legendLabel.textContent = legendVisible ? 'ظاهر' : 'مخفي';
         var barEl = $('tajweedLegendBar');
-        if (barEl) barEl.hidden = !runtime.isTajweedOn();
+        if (barEl) barEl.hidden = true;
+        document.querySelectorAll('.page-view .tajweed-legend-bar').forEach(function (legend) {
+          legend.hidden = !(runtime.isTajweedOn() && legendVisible);
+        });
       }
 
       /* التحكم في سمك خط المصحف */
+      var currentFontStroke = 0;
+
+      function applyFontStroke(num) {
+        currentFontStroke = num;
+        var morphology = $('quranFontMorphology');
+        var pageWidth = $('page').clientWidth || window.innerWidth || 400;
+        if (morphology) morphology.setAttribute('radius', (num * 0.625 * pageWidth / 400).toFixed(2));
+        document.body.classList.toggle('quran-bold', num > 0);
+      }
+
       function setFontStroke(strokeVal, label) {
-        var num = parseFloat(strokeVal) || 0;
-        if (num > 0.6) {
-          num = 0.6;
-          label = 'عريض';
-        }
-        document.documentElement.style.setProperty('--quran-stroke', num > 0 ? (num + 'px') : '0px');
-        document.documentElement.style.setProperty('--quran-weight', '700');
+        var parsed = parseFloat(strokeVal);
+        var num = isFinite(parsed) ? Math.max(0, Math.min(1.5, parsed)) : 0;
+        num = Math.round(num * 10) / 10;
+        label = num === 0 ? 'عادي' : (num <= 0.6 ? 'متوسط' : 'عريض');
+        applyFontStroke(num);
         store('mq.stroke', String(num));
-        if (label) store('mq.strokeLabel', label);
+        store('mq.strokeLabel', label);
         var lbl = $('strokeValLabel');
-        if (lbl) lbl.textContent = label || (num === 0 ? 'عادي' : (num + 'px'));
+        if (lbl) lbl.textContent = label + (num ? ' · ' + ar(num.toFixed(1)) + 'px' : '');
         document.querySelectorAll('#fontStrokeGroup .st-btn').forEach(function (b) {
           var s = parseFloat(b.getAttribute('data-stroke')) || 0;
           var match = Math.abs(s - num) < 0.05;
@@ -5827,6 +6164,10 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           b.setAttribute('aria-pressed', String(match));
         });
       }
+
+      window.addEventListener('resize', function () {
+        applyFontStroke(currentFontStroke);
+      });
 
       function toggleTajweed(force) {
         runtime.setTajweed(typeof force === 'boolean' ? force : !runtime.isTajweedOn());
@@ -5845,6 +6186,8 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         tajweedModal.setAttribute('aria-hidden', 'false');
         if (ruleId && window.TajweedGuide && window.TajweedGuide.rules[ruleId]) {
           currentTajweedTab = window.TajweedGuide.rules[ruleId].category || 'all';
+        } else if (ruleId) {
+          currentTajweedTab = 'all';
         }
         renderTajweedGuide(currentTajweedTab, ruleId);
       }
@@ -5857,11 +6200,8 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
 
       function renderTajweedGuide(tabKey, targetRuleId) {
         if (!tajweedBody || !window.TajweedGuide) return;
-        document.querySelectorAll('#tajweedTabs .app-modal-tab').forEach(function (tab) {
-          var isCur = tab.getAttribute('data-tab') === tabKey;
-          tab.classList.toggle('active', isCur);
-          tab.setAttribute('aria-selected', String(isCur));
-        });
+        var tajweedFilter = $('tajweedTabs');
+        if (tajweedFilter && tajweedFilter.value !== tabKey) tajweedFilter.value = tabKey;
 
         var rulesObj = window.TajweedGuide.rules;
         var ruleKeys = Object.keys(rulesObj);
@@ -5872,14 +6212,16 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         tajweedBody.innerHTML = ruleKeys.map(function (k) {
           var r = rulesObj[k];
           var isHighlight = targetRuleId === k;
-          return '<article class="tajweed-rule-card ' + (isHighlight ? 'highlighted' : '') + '" id="ruleCard_' + r.id + '" style="' + (isHighlight ? 'border-color:' + r.color + ';box-shadow:0 0 0 2px ' + r.color : '') + '">' +
+          return '<details class="tajweed-rule-card ' + (isHighlight ? 'highlighted' : '') + '" id="ruleCard_' + r.id + '" ' + (isHighlight ? 'open ' : '') + 'style="' + (isHighlight ? 'border-color:' + r.color + ';' : '') + '">' +
+            '<summary aria-label="' + r.name + '، ' + r.harakat + '">' +
             '<div class="tajweed-rule-head">' +
               '<div class="tajweed-rule-title">' +
                 '<span class="tajweed-rule-swatch" style="background:' + r.color + '"></span>' +
                 '<span>' + r.name + '</span>' +
               '</div>' +
               '<span class="tajweed-rule-harakat">' + r.harakat + '</span>' +
-            '</div>' +
+            '</div><span class="tajweed-rule-chevron" aria-hidden="true"></span>' +
+            '</summary><div class="tajweed-rule-content">' +
             '<div class="tajweed-rule-desc">' + r.desc + '</div>' +
             (r.types && r.types.length ? '<div class="tajweed-rule-types">' + r.types.map(function (t) { return '<span class="tajweed-rule-type-pill">' + t + '</span>'; }).join('') + '</div>' : '') +
             (r.examples && r.examples.length ? '<div class="tajweed-rule-examples">' +
@@ -5891,8 +6233,9 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
                 '</div>';
               }).join('') +
             '</div>' : '') +
-          '</article>';
+          '</div></details>';
         }).join('');
+        tajweedBody.scrollTop = 0;
 
         if (targetRuleId) {
           setTimeout(function () {
@@ -5908,6 +6251,12 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       var btnTOn = $('btnTajweedOn'), btnTOff = $('btnTajweedOff');
       if (btnTOn) btnTOn.addEventListener('click', function () { toggleTajweed(true); });
       if (btnTOff) btnTOff.addEventListener('click', function () { toggleTajweed(false); });
+      var btnLegendVisibility = $('btnTajweedLegendVisibility');
+      if (btnLegendVisibility) btnLegendVisibility.addEventListener('click', function () {
+        runtime.setTajweedLegendVisible(!runtime.isTajweedLegendVisible());
+        updateTajweedUI();
+        toast(runtime.isTajweedLegendVisible() ? 'تم إظهار مفتاح ألوان التجويد أعلى رقم الصفحة' : 'تم إخفاء مفتاح ألوان التجويد');
+      });
 
       var strokeGroup = $('fontStrokeGroup');
       if (strokeGroup) {
@@ -5915,19 +6264,15 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           var btn = e.target.closest('.st-btn');
           if (!btn) return;
           var stroke = btn.getAttribute('data-stroke') || '0';
-          var label = btn.getAttribute('data-label') || btn.textContent.trim();
-          setFontStroke(stroke, label);
-          toast('تم ضبط سُمْك الخط: ' + label);
+          setFontStroke(stroke);
+          toast('تم ضبط سُمْك الخط: ' + $('strokeValLabel').textContent);
         });
       }
       var initStroke = store('mq.stroke') || '0';
-      var initStrokeLbl = store('mq.strokeLabel') || 'عادي';
-      setFontStroke(initStroke, initStrokeLbl);
+      setFontStroke(initStroke);
 
       var btnOpenGuide = $('openTajweedGuideBtn');
       if (btnOpenGuide) btnOpenGuide.addEventListener('click', function () { openTajweedGuide(); });
-      var btnSettingsGuide = $('settingsTajweedGuideBtn');
-      if (btnSettingsGuide) btnSettingsGuide.addEventListener('click', function () { openTajweedGuide(); });
 
       var btnCloseT = $('closeTajweedModal');
       if (btnCloseT) btnCloseT.addEventListener('click', closeTajweedGuide);
@@ -5938,22 +6283,23 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         });
       }
 
-      // أزرار التبويب داخل نافذة التجويد
+      // تصفية أحكام التجويد حسب التصنيف
       var tajweedTabsEl = $('tajweedTabs');
       if (tajweedTabsEl) {
-        tajweedTabsEl.addEventListener('click', function (e) {
-          var tabBtn = e.target.closest('[data-tab]');
-          if (tabBtn) {
-            currentTajweedTab = tabBtn.getAttribute('data-tab');
-            renderTajweedGuide(currentTajweedTab);
-          }
+        tajweedTabsEl.addEventListener('change', function () {
+          currentTajweedTab = tajweedTabsEl.value;
+          renderTajweedGuide(currentTajweedTab);
         });
       }
 
-      // النقر على عناصر شريط مفتاح ألوان التجويد
-      var barLegend = $('tajweedLegendBar');
+      // النقر على عناصر دليل ألوان التجويد أسفل صفحات المصحف
+      var barLegend = $('pageList');
       if (barLegend) {
         barLegend.addEventListener('click', function (e) {
+          if (e.target.closest('.tajweed-legend-info-btn')) {
+            openTajweedGuide();
+            return;
+          }
           var item = e.target.closest('[data-rule]');
           if (item) {
             var ruleId = item.getAttribute('data-rule');

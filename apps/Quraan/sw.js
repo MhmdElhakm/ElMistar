@@ -1,6 +1,9 @@
-var CACHE_NAME = 'quran-pro-app-v1';
+var CACHE_NAME = 'quran-pro-app-v5';
 var APP_SHELL = [
   './index.html',
+  './tajweed-font-data.js',
+  './worship-data.js',
+  './worship-ui.js',
   './manifest.webmanifest',
   './logo.png',
   './icons/icon-192.png',
@@ -46,7 +49,7 @@ self.addEventListener('fetch', function (event) {
 
   event.respondWith(
     caches.match(request).then(function (cached) {
-      if (cached) return cached;
+      if (cached && request.cache !== 'reload') return cached;
       return fetch(request).then(function (response) {
         if (response.ok) {
           var copy = response.clone();
