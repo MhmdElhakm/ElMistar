@@ -6,70 +6,154 @@
 <title>صحتي الطبيعية</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a1626;--bg2:#0f2036;--card:#112741;--card2:#16314f;--line:#21436a;--txt:#e9f2fc;--mut:#8da6c0;--acc:#4db8ff;--accT:#06233b;--amb:#f6b94a;--pink:#f06ea0;--grn:#4ade80;--red:#ff6b6b;--shadow:0 10px 30px rgba(0,0,0,.35)}
-[data-theme=light]{--bg:#eaf2fa;--bg2:#f4f8fc;--card:#ffffff;--card2:#eef5fc;--line:#cfe0f0;--txt:#0f2a44;--mut:#587291;--acc:#0b8fe0;--accT:#ffffff;--amb:#a96a0b;--pink:#d6336c;--grn:#168a4a;--red:#d63a3a;--shadow:0 8px 24px rgba(30,70,110,.12)}
+:root{--bg:#150f3d;--bg2:#1c1550;--card:#241b63;--card2:#2c2374;--line:rgba(255,255,255,.09);--txt:#f2f0ff;--mut:#a7a2d6;--acc:#8f80ff;--accT:#ffffff;--navOn:#cfc8ff;--amb:#ffd070;--pink:#ff8f9a;--grn:#6fe0b0;--red:#ff7b7b;--shadow:0 14px 34px rgba(5,2,30,.45)}
+[data-theme=light]{--bg:#f1efff;--bg2:#ffffff;--card:#ffffff;--card2:#f3f1ff;--line:rgba(70,50,160,.12);--txt:#1c1450;--mut:#6b65a0;--acc:#6a58f0;--accT:#ffffff;--navOn:#5a48e0;--amb:#a86a00;--pink:#d6455d;--grn:#17895a;--red:#d33a3a;--shadow:0 12px 28px rgba(70,50,160,.14)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0}
-body{font-family:'Cairo',Tahoma,'Segoe UI',sans-serif;background:radial-gradient(900px 500px at 80% -10%,color-mix(in srgb,var(--acc) 14%,transparent),transparent),var(--bg);color:var(--txt);min-height:100vh;line-height:1.6}
-button{font-family:inherit}
-.app{max-width:480px;margin:auto;padding:18px 16px 170px}
-header.top{display:flex;justify-content:space-between;align-items:flex-start}
-.date{color:var(--mut);font-size:13px}
-h1{margin:2px 0 0;color:var(--acc);font-size:32px;font-weight:800;line-height:1.3}
-.iconbtn{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--acc);font-size:20px;cursor:pointer;box-shadow:var(--shadow)}
-.banner{display:flex;gap:10px;align-items:flex-start;background:color-mix(in srgb,var(--amb) 12%,transparent);border:1px solid color-mix(in srgb,var(--amb) 45%,transparent);color:var(--amb);padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.8;margin:14px 0}
-.banner.red{background:color-mix(in srgb,var(--red) 12%,transparent);border-color:color-mix(in srgb,var(--red) 45%,transparent);color:var(--red)}
-.banner.blue{background:color-mix(in srgb,var(--acc) 10%,transparent);border-color:color-mix(in srgb,var(--acc) 40%,transparent);color:var(--acc)}
+body{font-family:'Cairo',Tahoma,'Segoe UI',sans-serif;background:radial-gradient(800px 420px at 90% -5%,color-mix(in srgb,var(--acc) 22%,transparent),transparent),var(--bg);color:var(--txt);min-height:100vh;line-height:1.6}
+button{font-family:inherit;color:inherit}
+.i{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:middle}
+.app{max-width:480px;margin:auto;padding:16px 16px 190px}
+header.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.date{color:var(--mut);font-size:12.5px}
+.brand{font-size:23px;font-weight:800;color:var(--acc);display:flex;align-items:center;gap:8px}
+.iconbtn{width:44px;height:44px;border-radius:15px;border:1px solid var(--line);background:var(--card);color:var(--acc);cursor:pointer;display:grid;place-items:center;box-shadow:var(--shadow)}
+
+/* hero */
+.hero{background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 38%,var(--card)),var(--card) 70%);border:1px solid var(--line);border-radius:30px;padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden;margin-bottom:14px;cursor:pointer}
+.hero::before{content:"";position:absolute;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.07);top:-70px;inset-inline-start:-30px}
+.hrow{display:flex;align-items:center;gap:12px;position:relative}
+.hav{width:62px;height:62px;border-radius:50%;border:3px solid var(--amb);background:var(--bg2);display:grid;place-items:center;color:var(--grn);flex:none}
+.hgrow{flex:1}
+.hgrow small{color:var(--mut);font-size:13px}
+.hgrow h2{margin:0;font-size:24px;font-weight:800}
+.hpill{background:rgba(255,255,255,.1);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;display:flex;gap:6px;align-items:center;white-space:nowrap;color:var(--txt)}
+.hpill .i{color:var(--amb)}
+.hmsg{margin:14px 0;background:color-mix(in srgb,var(--bg) 65%,transparent);border-radius:18px;padding:13px 14px;text-align:center;font-weight:700;font-size:14.5px;position:relative}
+.week{display:flex;align-items:flex-start;justify-content:space-between;gap:4px;position:relative}
+.week::before{content:"";position:absolute;top:21px;inset-inline:22px;height:3px;background:var(--line)}
+.wd{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;font-size:10px;color:var(--mut);font-weight:600;flex:1}
+.wc{width:42px;height:42px;border-radius:50%;background:var(--bg);display:grid;place-items:center;color:#fff;border:2px solid transparent}
+.wc.done{background:var(--acc);box-shadow:0 0 16px color-mix(in srgb,var(--acc) 55%,transparent)}
+.wc.today{border-color:var(--acc);box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 25%,transparent)}
+.wd.fl{flex:none;color:var(--amb);padding-top:5px}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.tile{border:0;border-radius:28px;height:168px;padding:16px;position:relative;overflow:hidden;cursor:pointer;color:#fff;text-align:start;box-shadow:var(--shadow)}
+.tile::before{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.14);top:-40px;inset-inline-end:-30px}
+.tile.purple{background:linear-gradient(150deg,#a595ff,#7461f2)}
+.tile.green{background:linear-gradient(150deg,#78e3b2,#3fbf86)}
+.tile.coral{background:linear-gradient(150deg,#ffa3a0,#f2686f)}
+.tile.yellow{background:linear-gradient(150deg,#ffdc82,#f4be3f);color:#3a2a00}
+.ticon{width:54px;height:54px;border-radius:18px;background:rgba(255,255,255,.25);display:grid;place-items:center;position:absolute;top:16px;inset-inline-start:16px;right:auto}
+.ticon{inset-inline-start:auto;inset-inline-end:16px}
+.ttxt{position:absolute;bottom:16px;inset-inline-end:16px;text-align:end;max-width:calc(100% - 66px)}
+.ttxt b{display:block;font-size:21px;font-weight:800;line-height:1.3}
+.ttxt span{font-size:12.5px;opacity:.9}
+.tarr{position:absolute;bottom:16px;inset-inline-start:14px;width:42px;height:42px;border-radius:50%;background:#fff;display:grid;place-items:center}
+.tile.purple .tarr{color:#6a58f0}.tile.green .tarr{color:#1f8e60}.tile.coral .tarr{color:#d84a55}.tile.yellow .tarr{color:#8a6100}
+.wide{width:100%;border:1px solid var(--line);background:var(--card);border-radius:24px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:14px;box-shadow:var(--shadow);text-align:start}
+.wide b{display:block;font-size:16px}.wide span.s{color:var(--mut);font-size:12.5px}
+.wide .tarr{position:static;background:var(--acc);color:#fff}
+
+.banner{display:flex;gap:10px;align-items:flex-start;background:color-mix(in srgb,var(--amb) 12%,transparent);border:1px solid color-mix(in srgb,var(--amb) 40%,transparent);color:var(--amb);padding:12px 14px;border-radius:18px;font-size:13px;line-height:1.8;margin:12px 0}
+.banner.red{background:color-mix(in srgb,var(--red) 12%,transparent);border-color:color-mix(in srgb,var(--red) 40%,transparent);color:var(--red)}
+.banner.blue{background:color-mix(in srgb,var(--acc) 14%,transparent);border-color:color-mix(in srgb,var(--acc) 40%,transparent);color:var(--navOn)}
+.banner .i{margin-top:5px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;position:relative;overflow:hidden}
-.stat::after{content:"";position:absolute;width:120px;height:120px;border-radius:50%;background:color-mix(in srgb,var(--acc) 10%,transparent);inset-inline-start:-40px;bottom:-50px}
-.stat b{display:block;font-size:26px;color:var(--acc);font-weight:800;position:relative;z-index:1}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:18px;position:relative;overflow:hidden}
+.stat::after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;background:color-mix(in srgb,var(--acc) 14%,transparent);inset-inline-start:-35px;bottom:-45px}
+.stat b{display:block;font-size:24px;color:var(--acc);font-weight:800;position:relative;z-index:1}
 .stat span{color:var(--mut);font-size:12px;position:relative;z-index:1}
-.card{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--acc);border-radius:26px;padding:18px;margin-bottom:16px;box-shadow:var(--shadow)}
-.card.redc{border-top-color:var(--red)}
-.card h2{margin:0;font-size:19px}
-.sub{color:var(--mut);font-size:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card h2{margin:0;font-size:19px;font-weight:800}
+.sub{color:var(--mut);font-size:12.5px}
 .head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
 .head .grow{flex:1}
-.hico{width:46px;height:46px;border-radius:14px;background:var(--card2);display:grid;place-items:center;font-size:22px;border:1px solid var(--line)}
-.sq{width:46px;height:46px;border-radius:14px;border:0;background:var(--acc);color:var(--accT);font-size:20px;cursor:pointer;box-shadow:0 0 18px color-mix(in srgb,var(--acc) 40%,transparent)}
-.lbl{color:var(--mut);font-size:12px;margin:10px 4px 6px;font-weight:600}
-.seg{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin:0 0 12px;scrollbar-width:none}
+.hico{width:46px;height:46px;border-radius:15px;background:color-mix(in srgb,var(--acc) 18%,transparent);color:var(--acc);display:grid;place-items:center;flex:none}
+.hico.red{background:color-mix(in srgb,var(--red) 16%,transparent);color:var(--red)}
+.hico.grn{background:color-mix(in srgb,var(--grn) 16%,transparent);color:var(--grn)}
+.hico.amb{background:color-mix(in srgb,var(--amb) 16%,transparent);color:var(--amb)}
+.sq{width:46px;height:46px;border-radius:15px;border:0;background:var(--acc);color:#fff;cursor:pointer;display:grid;place-items:center;box-shadow:0 8px 20px color-mix(in srgb,var(--acc) 45%,transparent);flex:none}
+.lbl{color:var(--mut);font-size:12px;margin:12px 4px 6px;font-weight:700}
+.seg{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;margin:0 0 10px;scrollbar-width:none}
 .seg::-webkit-scrollbar{display:none}
-.seg button{flex:1 0 auto;min-width:82px;border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:16px;padding:10px 8px;cursor:pointer;text-align:center}
+.seg button{flex:1 0 auto;min-width:84px;border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:18px;padding:10px 8px;cursor:pointer;text-align:center}
 .seg button b{display:block;font-size:14px}
 .seg button small{color:var(--mut);font-size:11px}
-.seg button.on{background:var(--acc);color:var(--accT);border-color:var(--acc);box-shadow:0 0 18px color-mix(in srgb,var(--acc) 45%,transparent)}
-.seg button.on small{color:var(--accT);opacity:.8}
+.seg button.on{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 8px 20px color-mix(in srgb,var(--acc) 45%,transparent)}
+.seg button.on small{color:#fff;opacity:.85}
 .pills{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none}
-.pill{flex:1 0 auto;border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap}
-.pill.on{background:var(--acc);color:var(--accT);border-color:var(--acc);box-shadow:0 0 18px color-mix(in srgb,var(--acc) 45%,transparent)}
-.search{width:100%;border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:16px;padding:12px 14px;font-family:inherit;font-size:14px;outline:none;margin-bottom:12px}
-.search:focus{border-color:var(--acc)}
+.pill{flex:1 0 auto;border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:10px 16px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:6px}
+.pill.on{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 8px 20px color-mix(in srgb,var(--acc) 45%,transparent)}
+.srow{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.field{flex:1;display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:0 14px;height:56px;color:var(--mut)}
+.field input{flex:1;border:0;background:transparent;color:var(--txt);font-family:inherit;font-size:15px;outline:none;min-width:0}
+.field:focus-within{border-color:var(--acc)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer}
-.chip.on{background:var(--acc);color:var(--accT);border-color:var(--acc);font-weight:700}
-.toggle{display:flex;align-items:center;justify-content:space-between;background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:10px 14px;margin-top:6px;cursor:pointer;font-size:14px}
-.sw{width:42px;height:24px;border-radius:99px;background:var(--line);position:relative;transition:.2s}
-.sw::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.dd{position:relative;margin-bottom:6px}
+.ddb{width:100%;display:flex;align-items:center;gap:12px;background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:10px 14px;cursor:pointer;text-align:start;min-height:60px;transition:.15s}
+.ddb:hover{border-color:color-mix(in srgb,var(--acc) 50%,transparent)}
+.dd.open .ddb{border-color:var(--acc);box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 20%,transparent)}
+.ddi{width:38px;height:38px;border-radius:12px;background:color-mix(in srgb,var(--acc) 18%,transparent);color:var(--acc);display:grid;place-items:center;flex:none}
+.ddv{flex:1;display:flex;flex-direction:column;line-height:1.35;min-width:0}
+.ddv b{font-size:15px;font-weight:700}
+.ddv small{color:var(--mut);font-size:12px}
+.ddc{color:var(--mut);transition:transform .2s;display:grid}
+.dd.open .ddc{transform:rotate(180deg);color:var(--acc)}
+.ddp{display:none;position:absolute;top:calc(100% + 8px);inset-inline:0;background:var(--bg2);border:1px solid var(--line);border-radius:22px;box-shadow:0 22px 50px rgba(5,2,30,.55);z-index:25;padding:8px;animation:ddin .16s ease-out}
+.dd.open .ddp{display:block}
+@keyframes ddin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.ddsearch{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:0 12px;height:44px;color:var(--mut);margin-bottom:6px}
+.ddsearch input{flex:1;border:0;background:transparent;color:var(--txt);font-family:inherit;font-size:14px;outline:none;min-width:0}
+.ddl{max-height:280px;overflow-y:auto;scrollbar-width:thin}
+.ddo{width:100%;display:flex;align-items:center;gap:12px;background:transparent;border:0;border-radius:14px;padding:8px 10px;cursor:pointer;text-align:start;color:var(--txt)}
+.ddo:hover{background:color-mix(in srgb,var(--acc) 12%,transparent)}
+.ddo.on{background:color-mix(in srgb,var(--acc) 20%,transparent);color:var(--navOn)}
+.ddo.on .i:last-child{color:var(--acc)}
+.chip{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.chip .i{color:var(--acc)}
+.chip.on{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:700}
+.chip.on .i{color:#fff}
+.toggle{display:flex;align-items:center;justify-content:space-between;background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:11px 14px;margin-top:6px;cursor:pointer;font-size:14px}
+.toggle span{display:flex;gap:8px;align-items:center}
+.sw{width:44px;height:25px;border-radius:99px;background:var(--line);position:relative;transition:.2s}
+.sw::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:19px;height:19px;border-radius:50%;background:#fff;transition:.2s}
 .sw.on{background:var(--acc)}
-.sw.on::after{inset-inline-start:21px}
-.item{background:var(--card2);border-radius:18px;padding:12px 14px;margin-bottom:10px;border-right:4px solid var(--c)}
+.sw.on::after{inset-inline-start:22px}
+.item{background:var(--card2);border-radius:22px;padding:12px 14px;margin-bottom:10px;border-right:4px solid var(--c)}
 .item .row{display:flex;align-items:center;gap:12px;cursor:pointer}
-.ico{width:44px;height:44px;border-radius:14px;background:var(--bg2);display:grid;place-items:center;font-size:20px;flex:none}
-.item h3{margin:0;font-size:15px}
-.meta{color:var(--mut);font-size:12px}
-.tick{width:30px;height:30px;border-radius:50%;border:2px solid var(--c);background:transparent;cursor:pointer;color:#fff;font-weight:800;flex:none}
+.ico{width:46px;height:46px;border-radius:15px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c);display:grid;place-items:center;flex:none}
+.item h3{margin:0;font-size:15px;font-weight:700}
+.meta{color:var(--mut);font-size:12px;display:flex;align-items:center;gap:4px}
+.tick{width:32px;height:32px;border-radius:50%;border:2px solid var(--c);background:transparent;cursor:pointer;color:#fff;display:grid;place-items:center;flex:none}
 .tick.on{background:var(--c)}
+.chev{color:var(--mut);transition:.2s}
+.item.open .chev{transform:rotate(180deg)}
 .det{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);font-size:13.5px;line-height:1.9}
 .item.open .det{display:block}
 .det h4{margin:6px 0 2px;color:var(--acc);font-size:13px}
 .det ul,.det ol{margin:0;padding-inline-start:20px}
-.tip{background:color-mix(in srgb,var(--amb) 12%,transparent);color:var(--amb);padding:8px 10px;border-radius:12px;margin-top:8px;font-size:13px}
-.caut{background:color-mix(in srgb,var(--red) 10%,transparent);color:var(--red);padding:8px 10px;border-radius:12px;margin-top:8px;font-size:13px}
+.tip{background:color-mix(in srgb,var(--amb) 13%,transparent);color:var(--amb);padding:9px 11px;border-radius:14px;margin-top:8px;font-size:13px;display:flex;gap:8px;align-items:flex-start}
+.tip .i{margin-top:5px}
+.caut{background:color-mix(in srgb,var(--red) 11%,transparent);color:var(--red);padding:9px 11px;border-radius:14px;margin-top:8px;font-size:13px;display:flex;gap:8px;align-items:flex-start}
+.caut .i{margin-top:5px}
 .empty{text-align:center;color:var(--mut);padding:18px;font-size:14px}
 ul.flags{margin:0;padding-inline-start:20px;font-size:14px;line-height:2}
-.svgbox{background:var(--card2);border-radius:20px;padding:10px;text-align:center;border:1px solid var(--line)}
+ul.tl{list-style:none;margin:0;padding:0}
+ul.tl li{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px}
+ul.tl li:last-child{border:0}
+ul.tl .i{color:var(--acc)}
+.minis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.mini{border-radius:26px;padding:16px;min-height:150px;border:1px solid var(--line);cursor:pointer;text-align:start;display:flex;flex-direction:column;justify-content:space-between}
+.mini.blue{background:linear-gradient(160deg,#1f3a6e,#193056);color:#d9e8ff}
+.mini.maroon{background:linear-gradient(160deg,#5a2236,#43192a);color:#ffd9e0;cursor:default}
+[data-theme=light] .mini.blue{background:linear-gradient(160deg,#dbe8ff,#c9dcff);color:#17356b}
+[data-theme=light] .mini.maroon{background:linear-gradient(160deg,#ffe0e6,#ffd0d9);color:#7a1f36}
+.mini b{display:block;font-size:17px;font-weight:800;margin-top:10px}
+.mini span{font-size:12.5px;opacity:.85;line-height:1.7}
+.svgbox{background:var(--card2);border-radius:22px;padding:10px;text-align:center;border:1px solid var(--line)}
 .svgbox svg{width:100%;max-width:250px;height:auto}
 .pt{cursor:pointer}
 .pt circle.dot{fill:var(--amb);stroke:#fff;stroke-width:2}
@@ -78,77 +162,120 @@ ul.flags{margin:0;padding-inline-start:20px;font-size:14px;line-height:2}
 .pt.on circle.ring{stroke:var(--pink)}
 @keyframes pulse{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.2);opacity:0}}
 .pt text{fill:var(--txt);font-size:11px;font-weight:700;text-anchor:middle;paint-order:stroke;stroke:var(--card2);stroke-width:3px}
-.breath{width:200px;height:200px;margin:8px auto 14px;position:relative;display:grid;place-items:center}
-.bc{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--acc) 85%,#fff),var(--acc) 60%,color-mix(in srgb,var(--acc) 50%,#000));transform:scale(.55);transition:transform 4s linear;box-shadow:0 0 40px color-mix(in srgb,var(--acc) 50%,transparent)}
-.bt{position:relative;z-index:1;text-align:center;color:var(--accT);font-weight:800}
-.bt b{display:block;font-size:22px}
-.bt span{font-size:30px}
-.big{width:100%;border:0;border-radius:16px;padding:13px;background:var(--acc);color:var(--accT);font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 0 18px color-mix(in srgb,var(--acc) 40%,transparent)}
+.bwrap{background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--acc) 16%,transparent),transparent 70%),var(--bg);border:1px solid var(--line);border-radius:26px;padding:18px 12px 16px;margin-bottom:14px;text-align:center}
+.breath{--pc:var(--acc);width:250px;height:250px;margin:0 auto;position:relative;display:grid;place-items:center}
+.brs{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.brs .tr{fill:none;stroke:var(--line);stroke-width:6}
+.brs .pg{fill:none;stroke:var(--pc);stroke-width:6;stroke-linecap:round;stroke-dasharray:691.15;stroke-dashoffset:691.15;filter:drop-shadow(0 0 6px var(--pc));transition:stroke .4s}
+.halo{position:absolute;width:176px;height:176px;border-radius:50%;background:var(--pc);opacity:.18;filter:blur(18px);transform:scale(.62);transition:transform 4s linear,background .4s}
+.bc{position:absolute;width:176px;height:176px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff8,transparent 42%),radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--pc) 70%,#fff),var(--pc) 62%,color-mix(in srgb,var(--pc) 60%,#000));transform:scale(.62);transition:transform 4s linear,background .4s;box-shadow:0 0 40px color-mix(in srgb,var(--pc) 45%,transparent),inset 0 -10px 24px rgba(0,0,0,.18)}
+.breath.idle .bc,.breath.idle .halo{animation:idle 3.2s ease-in-out infinite}
+@keyframes idle{50%{transform:scale(.68)}}
+.bt{position:relative;z-index:1;color:#fff;display:flex;flex-direction:column;align-items:center;line-height:1.1;text-shadow:0 2px 10px rgba(0,0,0,.25)}
+.bt .bl{font-size:17px;font-weight:700;opacity:.95;margin-bottom:4px}
+.bt .bn{font-size:54px;font-weight:800;font-variant-numeric:tabular-nums;min-height:60px;display:grid;place-items:center}
+.bsteps{display:flex;justify-content:center;gap:8px;margin:14px 0 10px;flex-wrap:wrap}
+.bstep{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card2);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;color:var(--mut);transition:.25s}
+.bstep i{font-style:normal;font-variant-numeric:tabular-nums}
+.bstep.on{color:#fff;background:var(--c);border-color:var(--c);box-shadow:0 6px 16px color-mix(in srgb,var(--c) 45%,transparent)}
+.bcyc{display:flex;justify-content:center;gap:6px;margin-bottom:6px}
+.bcyc i{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.3s}
+.bcyc i.done{background:var(--acc)}
+.bcyc i.cur{background:var(--acc);box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 28%,transparent)}
+.big{width:100%;border:0;border-radius:20px;padding:14px;background:var(--acc);color:#fff;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 10px 24px color-mix(in srgb,var(--acc) 45%,transparent)}
 .big.stop{background:var(--card2);color:var(--txt);box-shadow:none;border:1px solid var(--line)}
-.stretch{display:flex;gap:12px;align-items:center;background:var(--card2);border-radius:18px;padding:10px 12px;margin-bottom:10px}
-.stretch svg{flex:none;background:var(--bg2);border-radius:14px}
+.stretch{display:flex;gap:12px;align-items:center;background:var(--card2);border-radius:22px;padding:10px 12px;margin-bottom:10px}
+.stretch svg{flex:none;background:var(--bg);border-radius:16px}
 .stretch h3{margin:0 0 2px;font-size:15px}
 .stretch ol{margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.8}
 .cups{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
-.cup{border:1px solid var(--line);background:var(--card2);border-radius:14px;padding:10px 0;font-size:22px;cursor:pointer;opacity:.5;filter:grayscale(1)}
-.cup.on{opacity:1;filter:none;border-color:var(--acc)}
-.tipcard{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:18px;margin-top:6px;box-shadow:var(--shadow)}
+.cup{border:1px solid var(--line);background:var(--card2);border-radius:16px;padding:12px 0;cursor:pointer;color:var(--mut);display:grid;place-items:center}
+.cup.on{color:var(--acc);border-color:var(--acc);background:color-mix(in srgb,var(--acc) 16%,transparent)}
+.tipcard{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:var(--shadow)}
 .tipcard p{margin:0 0 12px;font-weight:700;font-size:15px;line-height:1.8}
 .dots{display:flex;gap:6px}
 .dots i{width:7px;height:7px;border-radius:50%;background:var(--line);display:block;cursor:pointer}
 .dots i.on{width:22px;border-radius:8px;background:var(--acc)}
-.badge{width:62px;height:62px;border-radius:50%;background:var(--amb);display:grid;place-items:center;font-size:30px;flex:none;box-shadow:0 0 22px color-mix(in srgb,var(--amb) 45%,transparent)}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg2);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 6px 12px;z-index:30}
-.nav button{border:0;background:transparent;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border-radius:16px;cursor:pointer;font-size:12px;font-weight:600;position:relative;min-width:62px}
-.nav button span{font-size:20px}
-.nav button.on{color:var(--acc);background:var(--card2)}
-.nav button.on::after{content:"";position:absolute;bottom:0;width:22px;height:3px;border-radius:3px;background:var(--acc)}
-.foot{color:var(--mut);font-size:11.5px;text-align:center;margin:18px 0 8px;line-height:1.8}
+.badge{width:62px;height:62px;border-radius:50%;background:var(--amb);display:grid;place-items:center;flex:none;color:#3a2a00;box-shadow:0 0 22px color-mix(in srgb,var(--amb) 45%,transparent)}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg2);border:1px solid var(--line);border-bottom:0;border-radius:30px 30px 0 0;display:flex;justify-content:space-around;padding:10px 10px 14px;z-index:30;box-shadow:0 -10px 30px rgba(5,2,30,.35)}
+.nav button{border:0;background:transparent;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;border-radius:20px;cursor:pointer;font-size:12px;font-weight:700;flex:1;max-width:84px}
+.nav button.on{color:var(--navOn);background:color-mix(in srgb,var(--acc) 22%,transparent)}
+.foot{color:var(--mut);font-size:11.5px;text-align:center;margin:16px 0 8px;line-height:1.8}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="sprite"></defs></svg>
 <div class="app">
   <header class="top">
     <div>
       <div class="date" id="date"></div>
-      <h1>صحتي الطبيعية 🌿</h1>
+      <div class="brand" id="brand"></div>
     </div>
-    <div style="display:flex;gap:8px;">
-      <a href="../index.html" class="iconbtn" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;" title="العودة للرئيسية">🏠</a>
-      <button class="iconbtn" id="themeBtn" data-a="theme" aria-label="تبديل المظهر">☀️</button>
-    </div>
+    <button class="iconbtn" id="themeBtn" data-a="theme" aria-label="تبديل المظهر"></button>
   </header>
-
-  <div class="banner">
-    <span>⚕️</span>
-    <div>تطبيق للتثقيف الصحي العام ولا يغني عن الطبيب. الأعشاب قد تتداخل مع الأدوية، وهو مخصص للأعراض البسيطة فقط. عند الأعراض الشديدة أو المستمرة أو عند الرضع راجع الطبيب. وعند ألم الصدر أو صعوبة التنفس أو فقدان الوعي اتصل بالإسعاف فوراً.</div>
-  </div>
-
   <main id="view"></main>
-
-  <div class="tipcard" id="tipcard"></div>
-  <div class="foot">تنبيه: الممارسات التقليدية كالضغط بالنقاط والأعشاب أدلتها العلمية متفاوتة، وهي وسائل مساندة لا بديلة عن العلاج الطبي.</div>
+  <div class="foot">للتثقيف الصحي العام ولا يغني عن الطبيب. الممارسات التقليدية كالأعشاب والضغط بالنقاط أدلتها العلمية متفاوتة، وهي وسائل مساندة لا بديلة عن العلاج الطبي.</div>
 </div>
-
-<nav class="nav" id="nav">
-  <button data-a="nav" data-v="sym"><span>🩺</span>الأعراض</button>
-  <button data-a="nav" data-v="herb"><span>🌿</span>العطار</button>
-  <button data-a="nav" data-v="acu"><span>👆</span>الضغط</button>
-  <button data-a="nav" data-v="ex"><span>🧘</span>التمارين</button>
-  <button data-a="nav" data-v="day"><span>📅</span>يومي</button>
-</nav>
+<nav class="nav" id="nav"></nav>
 
 <script>
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const dayKey=new Date().toLocaleDateString('en-CA');
 
+/* ---------- الأيقونات (SVG) ---------- */
+const ICONS={
+search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+'arrow-left':'<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+check:'<path d="M20 6 9 17l-5-5"/>',
+refresh:'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+sprout:'<path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/>',
+droplet:'<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>',
+coffee:'<path d="M10 2v2M14 2v2M6 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/>',
+utensils:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+soup:'<path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M7 21h10"/><path d="M19.5 12 22 6"/><path d="M16.25 3c.27.1.8.53.75 1.36-.06.83-.93 1.2-1 2.02-.05.78.34 1.24.73 1.62"/><path d="M11.25 3c.27.1.8.53.74 1.36-.05.83-.93 1.2-.98 2.02-.06.78.33 1.24.72 1.62"/><path d="M6.25 3c.27.1.8.53.75 1.36-.06.83-.93 1.2-1 2.02-.05.78.34 1.24.74 1.62"/>',
+alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+hand:'<path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>',
+wind:'<path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>',
+calendar:'<path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/>',
+stethoscope:'<path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/>',
+activity:'<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>',
+zap:'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+thermo:'<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>',
+dumbbell:'<path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/>',
+waves:'<path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>',
+walk:'<circle cx="12" cy="5" r="1"/><path d="m9 20 3-6 3 6"/><path d="m6 8 6 2 6-2"/><path d="M12 10v4"/>',
+smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/>',
+users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+bed:'<path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/>',
+phone2:'<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>',
+shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>',
+heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+bulb:'<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+sparkles:'<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4M22 5h-4M4 17v2M5 18H3"/>',
+flower:'<circle cx="12" cy="12" r="3"/><path d="M12 16.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 1 1 12 7.5a4.5 4.5 0 1 1 4.5 4.5 4.5 4.5 0 1 1-4.5 4.5"/><path d="M12 7.5V9M7.5 12H9M16.5 12H15M12 16.5V15M8 8l1.88 1.88M14.12 9.88 16 8M8 16l1.88-1.88M14.12 14.12 16 16"/>',
+glass:'<path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z"/><path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0"/>',
+chev:'<path d="m6 9 6 6 6-6"/>',
+home:'<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+pregnant:'<circle cx="12" cy="5" r="2"/><path d="M10 22v-6.5a3 3 0 0 1 0-6h2.5a2.5 2.5 0 0 1 2.5 2.5V22"/>'
+};
+$('#sprite').innerHTML=Object.keys(ICONS).map(k=>`<symbol id="i-${k}" viewBox="0 0 24 24">${ICONS[k]}</symbol>`).join('');
+const ic=(n,s=20)=>`<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+
 /* ---------- البيانات ---------- */
 const AG=[{n:'رضيع',s:'أقل من سنة'},{n:'طفل',s:'١ – ١٢ سنة'},{n:'مراهق',s:'١٣ – ١٧ سنة'},{n:'بالغ',s:'١٨ – ٥٩ سنة'},{n:'كبير سن',s:'٦٠+ سنة'}];
 const R=(n,t,m,time,ing,st,tip='',pg=1)=>({n,t,m,time,ing:ing.split('|').filter(x=>x&&x!=='—'),st:st.split('|'),tip,pg});
 
 const SY=[
-{id:'headache',n:'صداع',e:'😣',pts:['hegu','taichong'],br:1,stretch:true,
+{id:'headache',n:'صداع',e:'zap',pts:['hegu','taichong'],br:1,stretch:true,
  rf:['صداع مفاجئ شديد جداً لم تعهده من قبل','صداع مع حرارة وتيبس في الرقبة','صداع بعد ضربة على الرأس','صداع مع ضعف أو تنميل أو اضطراب في الكلام أو الرؤية','صداع جديد يبدأ بعد سن الخمسين'],
  r:[
  R('كمادة باردة أو دافئة','l',1,'15 دقيقة','قطعة قماش نظيفة|ماء بارد (للصداع النابض) أو دافئ (لشد الرقبة والكتفين)','بلّل القماش واعصره جيداً|ضعه على الجبهة أو مؤخرة الرقبة 10–15 دقيقة|استلقِ في غرفة هادئة معتمة','لا تضع الثلج مباشرة على الجلد.'),
@@ -158,7 +285,7 @@ const SY=[
  R('شاي البابونج','d',1,'10 دقائق','ملعقة كبيرة زهر بابونج مجفف|كوب ماء مغلي','غطِّ الزهر بالماء المغلي|اتركه 5–10 دقائق|صفِّه واشربه دافئاً','قد يسبب حساسية لمن لديه حساسية من نباتات العائلة النجمية كالأقحوان.',0),
  R('موزة وحفنة لوز','f',2,'دقيقتان','موزة|حفنة لوز غير مملح','تناولهما ببطء|اشرب كوب ماء معهما','غنيان بالمغنيسيوم والبوتاسيوم.')
  ]},
-{id:'colon',n:'قولون وانتفاخ',e:'🌀',pts:['neiguan','taichong'],br:2,stretch:false,
+{id:'colon',n:'قولون وانتفاخ',e:'waves',pts:['neiguan','taichong'],br:2,stretch:false,
  rf:['وجود دم في البراز أو براز أسود','فقدان وزن غير مفسر','ألم بطن شديد ومستمر أو قيء متكرر','إسهال أو إمساك مستمر أكثر من أسبوعين','حرارة مصاحبة للألم'],
  r:[
  R('شاي اليانسون','d',1,'10 دقائق','ملعقة صغيرة يانسون|كوب ماء مغلي','اهرس الحبوب قليلاً|صب عليها الماء المغلي وغطِّ 8 دقائق|صفِّه واشربه دافئاً بعد الأكل','يُتجنب في الحمل والرضاعة.',0),
@@ -171,7 +298,7 @@ const SY=[
  R('تجنب مسببات الانتفاخ','l',1,'—','المشروبات الغازية|الكرنب والبقوليات بكثرة|العلكة والمحليات الصناعية','قلّل هذه الأطعمة أسبوعاً|دوّن ما يزيد الأعراض عندك','لا تستبعد أطعمة مفيدة نهائياً دون استشارة.'),
  R('تدليك لطيف لبطن الرضيع','l',0,'5 دقائق','يدان دافئتان','ثنِ ركبتي الرضيع إلى بطنه بلطف|دلّك البطن بحركات دائرية خفيفة مع اتجاه عقارب الساعة|ساعده على التجشؤ بعد كل رضعة','راجع الطبيب إن استمر البكاء الشديد أو ظهرت حرارة أو انتفاخ شديد.')
  ]},
-{id:'cold',n:'زكام',e:'🤧',pts:['hegu','lieque'],br:0,stretch:false,
+{id:'cold',n:'زكام',e:'thermo',pts:['hegu','lieque'],br:0,stretch:false,
  rf:['حرارة أعلى من 39 درجة أو تستمر أكثر من 3 أيام','ضيق في التنفس أو صفير في الصدر','ألم صدر أو ألم أذن شديد','استمرار الأعراض أكثر من 10 أيام','عند الرضع: أي ارتفاع في الحرارة أو رفض الرضاعة'],
  r:[
  R('محلول ملحي للأنف','l',0,'5 دقائق','قطرات أو بخاخ محلول ملحي معقم من الصيدلية','ضع قطرتين في كل فتحة|للرضع: اسحب المخاط بلطف بشفاط أنف|كرر قبل الرضاعة وقبل النوم','استخدم المحلول الجاهز المعقم ولا تحضّره بنسب تقديرية.'),
@@ -183,7 +310,7 @@ const SY=[
  R('استنشاق البخار','l',3,'10 دقائق','وعاء ماء ساخن (ليس مغلياً)|منشفة','ضع الوعاء على سطح ثابت|اجلس بمسافة آمنة من البخار|تنفس بهدوء 5–10 دقائق','احذر الحروق؛ لا يُستخدم مع الأطفال.'),
  R('وسادة إضافية أثناء النوم','l',3,'—','وسادة إضافية','ارفع الرأس والكتفين قليلاً|ابقَ الغرفة مهواة ومرطبة','يخفف الاحتقان الليلي.')
  ]},
-{id:'sleep',n:'أرق',e:'😴',pts:['shenmen','yongquan'],br:0,stretch:false,
+{id:'sleep',n:'أرق',e:'moon',pts:['shenmen','yongquan'],br:0,stretch:false,
  rf:['أرق يستمر أكثر من 3 أسابيع','شخير شديد مع توقف التنفس أثناء النوم','حزن مستمر أو قلق شديد','نعاس مفرط نهاراً يؤثر على القيادة أو العمل'],
  r:[
  R('روتين نوم هادئ','l',0,'30 دقيقة','إضاءة خافتة|حمام دافئ|هدوء','ثبّت موعد النوم يومياً|اخفض الإضاءة قبل النوم بنصف ساعة|للرضع: ضعه على ظهره في سرير خالٍ من الوسائد والألعاب','راجع الطبيب إن كان الرضيع لا ينام أو يبكي بشدة.'),
@@ -196,7 +323,7 @@ const SY=[
  R('تنفس 4-7-8','l',2,'5 دقائق','—','اجلس أو استلقِ بوضع مريح|اتبع التمرين المصور في تبويب التمارين','توقف إن شعرت بدوخة.'),
  R('تقليل الكافيين','l',1,'—','الشاي والقهوة|المشروبات الغازية والطاقة','توقف عن الكافيين بعد الظهر|استبدله بشاي أعشاب','الكافيين يبقى في الجسم ساعات طويلة.')
  ]},
-{id:'stress',n:'إجهاد وتوتر',e:'😮‍💨',pts:['shenmen','yongquan','taichong'],br:2,stretch:true,
+{id:'stress',n:'إجهاد وتوتر',e:'activity',pts:['shenmen','yongquan','taichong'],br:2,stretch:true,
  rf:['حزن مستمر أو أفكار لإيذاء النفس (اطلب مساعدة عاجلة فوراً)','خفقان شديد أو ألم في الصدر','تعب شديد غير مفسر يستمر أكثر من أسبوعين','نوبات هلع متكررة'],
  r:[
  R('تنفس عميق 5 دقائق','l',1,'5 دقائق','—','اجلس باسترخاء|اتبع تمرين التنفس المصور في تبويب التمارين','يخفف التوتر خلال دقائق.'),
@@ -208,7 +335,7 @@ const SY=[
  R('نوم كافٍ','l',1,'7–9 ساعات','—','نم واستيقظ في موعد ثابت|ابتعد عن الشاشات قبل النوم','النوم من أهم أدوية التوتر.'),
  R('إطالة خفيفة 5 دقائق','l',1,'5 دقائق','—','اتبع تمارين الإطالة المصورة في تبويب التمارين','يخفف شد الرقبة والكتفين.')
  ]},
-{id:'throat',n:'التهاب الحلق والسعال',e:'😷',pts:['lieque','hegu'],br:0,stretch:false,
+{id:'throat',n:'التهاب الحلق والسعال',e:'wind',pts:['lieque','hegu'],br:0,stretch:false,
  rf:['صعوبة شديدة في البلع أو سيلان لعاب عند الطفل','سعال يستمر أكثر من 3 أسابيع أو يصاحبه دم','ضيق تنفس أو صفير','حرارة مرتفعة أو بقع بيضاء على اللوزتين'],
  r:[
  R('عسل دافئ بالليمون','d',1,'5 دقائق','ملعقة عسل (صغيرة للأطفال)|عصير نصف ليمونة|كوب ماء دافئ ليس مغلياً','اخلط المكونات جيداً|اشربه على رشفات خاصة قبل النوم','العسل ممنوع تماماً لمن هم أقل من سنة (خطر التسمم الوشيقي).'),
@@ -219,7 +346,7 @@ const SY=[
  R('ترطيب الهواء وسوائل دافئة','l',0,'طوال اليوم','مرطب هواء نظيف|سوائل دافئة أو رضعات متكررة','حافظ على رطوبة الغرفة|قدّم السوائل بانتظام','نظّف المرطب يومياً.'),
  R('حساء دافئ','f',1,'30 دقيقة','خضار مشكلة أو دجاج|ماء وملح خفيف','اسلق المكونات حتى تنضج|تناوله دافئاً غير ساخن','يهدئ الحلق ويرطبه.')
  ]},
-{id:'nausea',n:'عسر الهضم والغثيان',e:'🤢',pts:['neiguan','hegu'],br:2,stretch:false,
+{id:'nausea',n:'عسر الهضم والغثيان',e:'droplet',pts:['neiguan','hegu'],br:2,stretch:false,
  rf:['قيء متكرر أو لا يتوقف','ألم شديد أعلى البطن أو في الصدر','قيء بدم أو براز أسود','علامات جفاف: قلة البول، جفاف الفم، دوخة','عند الأطفال: خمول شديد أو رفض الشرب'],
  r:[
  R('محلول الإماهة الفموي','d',0,'عند الحاجة','محلول إماهة جاهز من الصيدلية','حضّره حسب تعليمات العبوة|قدّمه رشفات صغيرة متكررة','أهم إجراء عند القيء أو الإسهال خاصة للأطفال.'),
@@ -232,7 +359,7 @@ const SY=[
  R('موز وأرز مسلوق','f',1,'15 دقيقة','موزة|نصف كوب أرز مسلوق','تناولهما بكميات صغيرة|ابتعد عن الدهون والتوابل','يساعد عند اضطراب المعدة.'),
  R('عادات أكل صحية','l',1,'—','—','كل ببطء وبكميات صغيرة|لا تستلقِ بعد الأكل مباشرة|تجنب الدسم والتوابل الحارة','قلل القهوة والمشروبات الغازية.')
  ]},
-{id:'muscle',n:'شد عضلي وآلام',e:'💪',pts:['hegu','taichong'],br:1,stretch:true,
+{id:'muscle',n:'شد عضلي وآلام',e:'dumbbell',pts:['hegu','taichong'],br:1,stretch:true,
  rf:['ألم بعد إصابة مع تورم أو عدم القدرة على الحركة','ألم في الساق مع تورم واحمرار','ألم صدر أو ضيق تنفس','ضعف أو تنميل مستمر'],
  r:[
  R('كمادات دافئة','l',1,'15–20 دقيقة','منشفة أو كيس ماء دافئ','ضعه على العضلة المشدودة|ارفعه بعد 15–20 دقيقة','لا تنم عليه، وتجنب الحرارة الشديدة.'),
@@ -256,18 +383,18 @@ taichong:{n:'تاي تشونغ',v:'top',x:88,y:78,loc:'أعلى القدم في 
 const PV=[{v:'back',n:'ظهر اليد',s:'اليد'},{v:'palm',n:'باطن اليد',s:'والمعصم'},{v:'sole',n:'باطن القدم',s:'القدم'},{v:'top',n:'أعلى القدم',s:'القدم'}];
 
 const HERBS=[
-{n:'النعناع',e:'🌱',u:'الصداع، الغثيان، الانتفاخ',how:'ملعقة صغيرة مجففة في كوب ماء مغلي، تُغطى 7 دقائق.',c:'لا يُعطى للأطفال دون سنتين، ويزيد ارتجاع المريء، ويُخفف في الحمل.'},
-{n:'البابونج',e:'🌼',u:'التوتر، الأرق، المغص',how:'ملعقة كبيرة من الزهر في كوب ماء مغلي، تُنقع 8 دقائق.',c:'حساسية لمن لديه حساسية الأقحوان، ويُستشار الطبيب في الحمل ومع مميعات الدم.'},
-{n:'الزنجبيل',e:'🫚',u:'الغثيان، الزكام، آلام العضلات',how:'شريحتان طازجتان تُغليان في كوب ماء 5 دقائق.',c:'يتداخل مع مميعات الدم، ويُحذر مع حصوات المرارة وفي الحمل بكميات كبيرة.'},
-{n:'اليانسون',e:'✨',u:'الانتفاخ، السعال، عسر الهضم',how:'ملعقة صغيرة حبوب مهروسة في كوب ماء مغلي 8 دقائق.',c:'يُتجنب في الحمل والرضاعة، وقد يؤثر على من لديه حالات حساسة للإستروجين.'},
-{n:'الشمر',e:'🌿',u:'الغازات والمغص',how:'ملعقة صغيرة بذور في كوب ماء مغلي 10 دقائق.',c:'يُتجنب في الحمل والرضاعة، وللرضع لا يُعطى دون استشارة الطبيب.'},
-{n:'الزعتر',e:'🍃',u:'السعال والتهاب الحلق',how:'ملعقة صغيرة مجففة في كوب ماء مغلي 8 دقائق.',c:'يُتجنب بكميات علاجية في الحمل، وحساسية لبعض من لديه حساسية الشفويات.'},
-{n:'القرفة',e:'🪵',u:'الدفء، تحسين الطعم وتهدئة المعدة',how:'عود صغير يُغلى 5 دقائق مع الماء.',c:'الإكثار منها يضر الكبد، ومرضى السكري يراقبون سكرهم، وتُتجنب بكثرة في الحمل.'},
-{n:'اللافندر',e:'💜',u:'الاسترخاء والنوم',how:'نصف ملعقة صغيرة مجففة مع البابونج في كوب ماء مغلي.',c:'لا يُشرب في الحمل، ولا يُوضع الزيت النقي على الجلد، ولا يُستخدم للأطفال الصغار.'},
-{n:'الترنجان (بلسم الليمون)',e:'🍋',u:'التوتر والأرق الخفيف',how:'ملعقة صغيرة مجففة في كوب ماء مغلي 8 دقائق.',c:'استشر طبيبك مع أدوية الغدة الدرقية والمنومات، ويُتجنب في الحمل.'},
-{n:'العسل',e:'🍯',u:'السعال والتهاب الحلق',how:'ملعقة صغيرة في ماء دافئ مع الليمون.',c:'ممنوع تماماً لمن هم أقل من سنة، ومرضى السكري يتحكمون في الكمية.'},
-{n:'الكركم',e:'🟡',u:'الالتهاب العضلي وتحسين الهضم',how:'ملعقة صغيرة مع رشة فلفل أسود في الماء الساخن أو الحليب.',c:'يتداخل مع مميعات الدم، ويُتجنب مع حصوات المرارة.'},
-{n:'الكمون',e:'🫘',u:'عسر الهضم والانتفاخ',how:'ملعقة صغيرة في كوب ماء مغلي 8 دقائق.',c:'يُتجنب بكميات كبيرة في الحمل، وقد يخفض السكر.'}
+{n:'النعناع',e:'leaf',u:'الصداع، الغثيان، الانتفاخ',how:'ملعقة صغيرة مجففة في كوب ماء مغلي، تُغطى 7 دقائق.',c:'لا يُعطى للأطفال دون سنتين، ويزيد ارتجاع المريء، ويُخفف في الحمل.'},
+{n:'البابونج',e:'flower',u:'التوتر، الأرق، المغص',how:'ملعقة كبيرة من الزهر في كوب ماء مغلي، تُنقع 8 دقائق.',c:'حساسية لمن لديه حساسية الأقحوان، ويُستشار الطبيب في الحمل ومع مميعات الدم.'},
+{n:'الزنجبيل',e:'flame',u:'الغثيان، الزكام، آلام العضلات',how:'شريحتان طازجتان تُغليان في كوب ماء 5 دقائق.',c:'يتداخل مع مميعات الدم، ويُحذر مع حصوات المرارة وفي الحمل بكميات كبيرة.'},
+{n:'اليانسون',e:'sparkles',u:'الانتفاخ، السعال، عسر الهضم',how:'ملعقة صغيرة حبوب مهروسة في كوب ماء مغلي 8 دقائق.',c:'يُتجنب في الحمل والرضاعة، وقد يؤثر على من لديه حالات حساسة للإستروجين.'},
+{n:'الشمر',e:'sprout',u:'الغازات والمغص',how:'ملعقة صغيرة بذور في كوب ماء مغلي 10 دقائق.',c:'يُتجنب في الحمل والرضاعة، وللرضع لا يُعطى دون استشارة الطبيب.'},
+{n:'الزعتر',e:'leaf',u:'السعال والتهاب الحلق',how:'ملعقة صغيرة مجففة في كوب ماء مغلي 8 دقائق.',c:'يُتجنب بكميات علاجية في الحمل، وحساسية لبعض من لديه حساسية الشفويات.'},
+{n:'القرفة',e:'flame',u:'الدفء، تحسين الطعم وتهدئة المعدة',how:'عود صغير يُغلى 5 دقائق مع الماء.',c:'الإكثار منها يضر الكبد، ومرضى السكري يراقبون سكرهم، وتُتجنب بكثرة في الحمل.'},
+{n:'اللافندر',e:'flower',u:'الاسترخاء والنوم',how:'نصف ملعقة صغيرة مجففة مع البابونج في كوب ماء مغلي.',c:'لا يُشرب في الحمل، ولا يُوضع الزيت النقي على الجلد، ولا يُستخدم للأطفال الصغار.'},
+{n:'الترنجان (بلسم الليمون)',e:'leaf',u:'التوتر والأرق الخفيف',how:'ملعقة صغيرة مجففة في كوب ماء مغلي 8 دقائق.',c:'استشر طبيبك مع أدوية الغدة الدرقية والمنومات، ويُتجنب في الحمل.'},
+{n:'العسل',e:'droplet',u:'السعال والتهاب الحلق',how:'ملعقة صغيرة في ماء دافئ مع الليمون.',c:'ممنوع تماماً لمن هم أقل من سنة، ومرضى السكري يتحكمون في الكمية.'},
+{n:'الكركم',e:'sparkles',u:'الالتهاب العضلي وتحسين الهضم',how:'ملعقة صغيرة مع رشة فلفل أسود في الماء الساخن أو الحليب.',c:'يتداخل مع مميعات الدم، ويُتجنب مع حصوات المرارة.'},
+{n:'الكمون',e:'sprout',u:'عسر الهضم والانتفاخ',how:'ملعقة صغيرة في كوب ماء مغلي 8 دقائق.',c:'يُتجنب بكميات كبيرة في الحمل، وقد يخفض السكر.'}
 ];
 
 const BR=[
@@ -279,41 +406,75 @@ const BR=[
 
 const STR=[
 {n:'إمالة الرقبة جانباً',time:'20 ثانية لكل جهة',pose:{hx:7,hy:1,L:[26,70],R:[46,18]},st:['اجلس مستقيم الظهر','أمل أذنك نحو كتفك بلطف','ساعد بيدك دون ضغط، وبدّل الجهة']},
-{n:'رفع الكتفين',time:'10 مرات',pose:{L:[28,60],R:[52,60],x:'<text x="12" y="38" font-size="16">↑</text><text x="72" y="38" font-size="16">↑</text>'},st:['ارفع كتفيك نحو أذنيك مع الشهيق','ثبّت ثانيتين','أنزلهما مع الزفير ببطء']},
-{n:'دوران الكتفين',time:'10 دورات',pose:{L:[26,66],R:[54,66],x:'<text x="5" y="48" font-size="18">↻</text><text x="78" y="48" font-size="18">↺</text>'},st:['ارفع كتفيك للأمام والأعلى','دوّرهما للخلف في حركة دائرية واسعة','أعد الدورات للأمام']},
+{n:'رفع الكتفين',time:'10 مرات',pose:{L:[28,60],R:[52,60],x:'<path d="M12 44V30M7 35l5-5 5 5M68 44V30M63 35l5-5 5 5"/>'},st:['ارفع كتفيك نحو أذنيك مع الشهيق','ثبّت ثانيتين','أنزلهما مع الزفير ببطء']},
+{n:'دوران الكتفين',time:'10 دورات',pose:{L:[26,66],R:[54,66],x:'<path d="M10 52a9 9 0 0 1 9-9M19 43l-1-6M19 43h6"/><path d="M70 52a9 9 0 0 0-9-9M61 43l1-6M61 43h-6"/>'},st:['ارفع كتفيك للأمام والأعلى','دوّرهما للخلف في حركة دائرية واسعة','أعد الدورات للأمام']},
 {n:'تمدد الذراعين للأعلى',time:'20 ثانية',pose:{L:[36,4],R:[44,4]},st:['اشبك أصابعك وارفعها فوق رأسك','مدّ ذراعيك واسحب جسمك للأعلى','تنفس بعمق وأرخِ ببطء']},
-{n:'تمدد الصدر',time:'20 ثانية',pose:{L:[20,64],R:[60,64],x:'<text x="4" y="92" font-size="14">←</text><text x="72" y="92" font-size="14">→</text>'},st:['اجمع يديك خلف ظهرك','ارفعهما قليلاً وافتح صدرك','ابقَ ظهرك مستقيماً']},
+{n:'تمدد الصدر',time:'20 ثانية',pose:{L:[20,64],R:[60,64],x:'<path d="M14 92H4M8 88l-4 4 4 4M66 92h10M72 88l4 4-4 4"/>'},st:['اجمع يديك خلف ظهرك','ارفعهما قليلاً وافتح صدرك','ابقَ ظهرك مستقيماً']},
 {n:'ثني الجذع للأمام',time:'20 ثانية',pose:{a:75,bend:true},st:['قف وركبتاك مرنتان قليلاً','انحنِ بهدوء وأرخِ رأسك وذراعيك','عد ببطء، وتجنبه عند ألم الظهر الحاد']}
 ];
 function fig(p){
  const a=(p.a||0)*Math.PI/180,H=[40,72],S=[H[0]+34*Math.sin(a),H[1]-34*Math.cos(a)];
  const hd=[S[0]+14*Math.sin(a)+(p.hx||0),S[1]-14*Math.cos(a)+(p.hy||0)];
  let L=p.L,R=p.R;if(p.bend){L=[S[0]-4,100];R=[S[0]+6,100]}
- return `<svg viewBox="0 0 110 120" width="92" height="100" fill="none" stroke="var(--acc)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><circle cx="${hd[0]}" cy="${hd[1]}" r="9" fill="var(--bg2)"/><path d="M${H} L${S} M${S} L${L} M${S} L${R} M${H} L32,108 M${H} L48,108"/><g fill="var(--amb)" stroke="none">${p.x||''}</g></svg>`;
+ return `<svg viewBox="0 0 110 120" width="92" height="100" fill="none" stroke="var(--acc)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><circle cx="${hd[0]}" cy="${hd[1]}" r="9" fill="var(--bg2)"/><path d="M${H} L${S} M${S} L${L} M${S} L${R} M${H} L32,108 M${H} L48,108"/><g stroke="var(--amb)" stroke-width="2.5" fill="none">${p.x||''}</g></svg>`;
 }
 
-const HAB=['مشي 20 دقيقة','5 حصص خضار وفاكهة','تمرين تنفس 5 دقائق','نوم 7 ساعات أو أكثر','وقت بعيداً عن الشاشات'];
-const TIPS=[['💧','ابدأ يومك بكوب ماء قبل القهوة.'],['🚶','عشرون دقيقة مشي يومياً تخفف التوتر وتحسن النوم.'],['🌙','أطفئ الشاشات قبل النوم بساعة.'],['🥗','اجعل نصف طبقك خضراً ملونة.'],['🧘','خذ ثلاثة أنفاس عميقة كلما شعرت بالتوتر.'],['☀️','عرّض وجهك لشمس الصباح 10–15 دقيقة.'],['🍵','استبدل المشروب السكري بكوب شاي أعشاب غير محلى.'],['🪑','قم وتحرك كل ساعة إن كان عملك مكتبياً.'],['🧼','اغسل يديك بالماء والصابون 20 ثانية.'],['🍽️','كُل عند الجوع فقط، ولا تنتظر الموعد.'],['😴','حافظ على موعد نوم ثابت حتى في الإجازة.'],['☕','قلل الكافيين بعد الظهر.'],['🤝','تحدث مع من تحب، فالعلاقات الطيبة تحمي الصحة.'],['🦷','استخدم خيط الأسنان مرة يومياً.']];
+const HAB=[['walk','مشي 20 دقيقة'],['leaf','5 حصص خضار وفاكهة'],['wind','تمرين تنفس 5 دقائق'],['bed','نوم 7 ساعات أو أكثر'],['phone2','وقت بعيداً عن الشاشات']];
+const TIPS=[['droplet','ابدأ يومك بكوب ماء قبل القهوة.'],['walk','عشرون دقيقة مشي يومياً تخفف التوتر وتحسن النوم.'],['moon','أطفئ الشاشات قبل النوم بساعة.'],['leaf','اجعل نصف طبقك خضراً ملونة.'],['wind','خذ ثلاثة أنفاس عميقة كلما شعرت بالتوتر.'],['sun','عرّض وجهك لشمس الصباح 10–15 دقيقة.'],['coffee','استبدل المشروب السكري بكوب شاي أعشاب غير محلى.'],['activity','قم وتحرك كل ساعة إن كان عملك مكتبياً.'],['sparkles','اغسل يديك بالماء والصابون 20 ثانية.'],['utensils','كُل عند الجوع فقط، ولا تنتظر الموعد.'],['bed','حافظ على موعد نوم ثابت حتى في الإجازة.'],['coffee','قلل الكافيين بعد الظهر.'],['users','تحدث مع من تحب، فالعلاقات الطيبة تحمي الصحة.'],['smile','استخدم خيط الأسنان مرة يومياً.']];
+const MSGS=['ابدأ بعادة صحية واحدة اليوم','اشرب الماء قبل أن تعطش','النوم الجيد نصف العلاج','تنفس بعمق، فالهدوء دواء','الخروج للهواء الطلق صديق صحتك','خطوات صغيرة كل يوم أفضل من علاج متأخر','عافيتك أمانة، فاعتنِ بها'];
 
 /* ---------- الحالة ---------- */
-const S={view:'sym',sym:'headache',age:3,preg:false,flt:'all',open:null,q:'',pt:'hegu',pview:'back',hopen:null,hq:'',br:0,
+const S={view:'home',dd:null,dq:'',sym:'headache',age:3,preg:false,flt:'all',open:null,q:'',pt:'hegu',pview:'back',hopen:null,hq:'',br:0,
  tried:store.get('tried-'+dayKey,{}),day:store.get('day-'+dayKey,{h:[],w:0})};
-let tk=0;
 const doy=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/864e5);
 
-/* ---------- الواجهات ---------- */
-const TY={d:['🍵','مشروب','var(--amb)'],f:['🥣','غذاء','var(--acc)'],l:['🌿','عادة وعلاج منزلي','var(--pink)']};
+/* ---------- مكونات ---------- */
+const TY={d:['coffee','مشروب','var(--amb)'],f:['soup','غذاء','var(--acc)'],l:['sprout','عادة وعلاج منزلي','var(--pink)']};
 const li=a=>a.length?`<ul>${a.map(x=>`<li>${x}</li>`).join('')}</ul>`:'';
-
-function chipsHTML(){
+const chead=(icon,t,s,cls='',extra='')=>`<div class="head"><div class="hico ${cls}">${ic(icon,22)}</div><div class="grow"><h2>${t}</h2>${s?`<div class="sub">${s}</div>`:''}</div>${extra}</div>`;
+const banner=(cls,icon,t)=>`<div class="banner ${cls}">${ic(icon,18)}<div>${t}</div></div>`;
+function chipsHTML(act){
  const q=S.q.trim();
  const l=SY.filter(s=>!q||s.n.includes(q));
- return l.length?l.map(s=>`<button class="chip ${s.id===S.sym?'on':''}" data-a="sym" data-id="${s.id}">${s.e} ${s.n}</button>`).join(''):'<div class="empty">لا يوجد عرض بهذا الاسم</div>';
+ return l.length?l.map(s=>`<button class="chip ${act==='sym'&&s.id===S.sym?'on':''}" data-a="${act}" data-id="${s.id}">${ic(s.e,16)} ${s.n}</button>`).join(''):'<div class="empty">لا يوجد عرض بهذا الاسم</div>';
 }
 function item(r){
  const t=TY[r.t],on=S.tried[r.k],op=S.open===r.k;
- return `<div class="item ${op?'open':''}" style="--c:${t[2]}"><div class="row" data-a="open" data-k="${r.k}"><div class="ico">${t[0]}</div><div style="flex:1"><h3>${r.n}</h3><div class="meta">${t[1]} · ⏱ ${r.time}</div></div><button class="tick ${on?'on':''}" data-a="tick" data-k="${r.k}" aria-label="جرّبته">${on?'✓':''}</button></div>
- <div class="det">${r.ing.length?`<h4>المكونات</h4>${li(r.ing)}`:''}<h4>الطريقة</h4><ol>${r.st.map(x=>`<li>${x}</li>`).join('')}</ol>${S.age===1&&r.t==='d'?'<div class="tip">للطفل: ربع إلى نصف الكمية المذكورة.</div>':''}${r.tip?`<div class="tip">💡 ${r.tip}</div>`:''}</div></div>`;
+ return `<div class="item ${op?'open':''}" style="--c:${t[2]}"><div class="row" data-a="open" data-k="${r.k}"><div class="ico">${ic(t[0],22)}</div><div style="flex:1"><h3>${r.n}</h3><div class="meta">${t[1]} · ${ic('clock',12)} ${r.time}</div></div><button class="tick ${on?'on':''}" data-a="tick" data-k="${r.k}" aria-label="جرّبته">${on?ic('check',16):''}</button><span class="chev">${ic('chev',18)}</span></div>
+ <div class="det">${r.ing.length?`<h4>المكونات</h4>${li(r.ing)}`:''}<h4>الطريقة</h4><ol>${r.st.map(x=>`<li>${x}</li>`).join('')}</ol>${S.age===1&&r.t==='d'?`<div class="tip">${ic('info',16)}<div>للطفل: ربع إلى نصف الكمية المذكورة.</div></div>`:''}${r.tip?`<div class="tip">${ic('bulb',16)}<div>${r.tip}</div></div>`:''}</div></div>`;
+}
+function histGet(){return store.get('hist',{})}
+function dayInfo(n){const d=new Date(Date.now()-n*864e5);return{k:d.toLocaleDateString('en-CA'),nm:d.toLocaleDateString('ar-EG',{weekday:'long'})}}
+function streak(){const h=histGet();h[dayKey]=S.day.h.length;let c=0;for(let i=0;i<60;i++){const k=dayInfo(i).k;if((h[k]||0)>=3)c++;else if(i>0)break}return c}
+function greet(){const h=new Date().getHours();return h<5?'مساء الخير':h<12?'صباح الخير':h<18?'طاب يومك':'مساء الخير'}
+
+/* ---------- الصفحات ---------- */
+function viewHome(){
+ const h=histGet();h[dayKey]=S.day.h.length;
+ const tile=(v,cls,icon,t,s)=>`<button class="tile ${cls}" data-a="nav" data-v="${v}"><div class="ticon">${ic(icon,28)}</div><div class="ttxt"><b>${t}</b><span>${s}</span></div><div class="tarr">${ic('arrow-left',20)}</div></button>`;
+ return `
+ <div class="tiles">
+  ${tile('sym','purple','stethoscope','الأعراض','حسب العرض والعمر')}
+  ${tile('herb','green','leaf','العطار','أعشاب وتحذيراتها')}
+  ${tile('ex','coral','wind','التمارين','تنفس وإطالة')}
+  ${tile('acu','yellow','hand','الضغط','نقاط اليد والقدم')}
+ </div>
+ <button class="wide" data-a="nav" data-v="day"><div class="hico">${ic('calendar',22)}</div><div style="flex:1"><b>عادات اليوم والماء</b><span class="s">${S.day.h.length}/${HAB.length} عادات · ${S.day.w}/8 أكواب</span></div><div class="tarr">${ic('arrow-left',20)}</div></button>
+ <div class="minis">
+  <button class="mini blue" data-a="nav" data-v="day"><div>${ic('shield',30)}<b>الوقاية اليومية</b></div><span>نصائح قصيرة وعادات تحمي صحتك</span></button>
+  <div class="mini maroon"><div>${ic('phone',30)}<b>الطوارئ</b></div><span>ألم الصدر أو ضيق التنفس أو فقدان الوعي: اتصل بالإسعاف فوراً.</span></div>
+ </div>
+ ${banner('','stethoscope','هذا التطبيق للتثقيف الصحي العام ولا يغني عن الطبيب، وهو مخصص للأعراض البسيطة فقط. الأعشاب قد تتداخل مع الأدوية. عند الأعراض الشديدة أو المستمرة أو عند الرضع راجع الطبيب.')}`;
+}
+function dd2(id,lbl,cur,opts){
+ return `${lbl?`<div class="lbl">${lbl}</div>`:''}<div class="dd ${S.dd===id?'open':''}"><button class="ddb" data-a="dd" data-id="${id}" aria-haspopup="listbox" aria-expanded="${S.dd===id}"><span class="ddi">${ic(cur.icon,20)}</span><span class="ddv"><b>${cur.n}</b>${cur.s?`<small>${cur.s}</small>`:''}</span><span class="ddc">${ic('chev',20)}</span></button><div class="ddp" role="listbox"><div class="ddl">${opts.map(o=>`<button class="ddo ${o.on?'on':''}" data-a="${o.a}" ${o.d} role="option">${o.icon?`<span class="ddi">${ic(o.icon,18)}</span>`:''}<span class="ddv"><b>${o.n}</b>${o.s?`<small>${o.s}</small>`:''}</span>${o.on?ic('check',18):''}</button>`).join('')}</div></div></div>`;
+}
+const FLT=[['all','الكل','sparkles'],['d','مشروبات','coffee'],['f','أغذية','soup'],['l','عادات','sprout']];
+const PVI=['hand','hand','pin','pin'];
+function symOpts(){
+ const q=S.dq.trim();
+ const l=SY.filter(s=>!q||s.n.includes(q));
+ return l.length?l.map(s=>`<button class="ddo ${s.id===S.sym?'on':''}" data-a="picksym" data-id="${s.id}" role="option"><span class="ddi">${ic(s.e,18)}</span><span class="ddv"><b>${s.n}</b></span>${s.id===S.sym?ic('check',18):''}</button>`).join(''):'<div class="empty">لا يوجد عرض بهذا الاسم</div>';
 }
 function viewSym(){
  const sy=SY.find(x=>x.id===S.sym);
@@ -321,39 +482,45 @@ function viewSym(){
  const shown=list.filter(r=>S.flt==='all'||r.t===S.flt);
  const done=list.filter(r=>S.tried[r.k]).length;
  let notes='';
- if(S.age===0)notes+='<div class="banner red"><span>👶</span><div>الرضع (أقل من سنة): لا أعشاب ولا عسل. استشر طبيب الأطفال لأي عرض، وفوراً إن ظهرت حرارة.</div></div>';
- if(S.age===1)notes+='<div class="banner blue"><span>🧒</span><div>للأطفال: قدّم ربع إلى نصف الكمية، ولا تستمر بالأعشاب أكثر من 3 أيام دون استشارة الطبيب.</div></div>';
- if(S.age===4)notes+='<div class="banner blue"><span>🧓</span><div>لكبار السن: ابدأ بكميات صغيرة، واسأل طبيبك أو الصيدلي إن كنت تتناول أدوية (ضغط، سكر، سيولة الدم).</div></div>';
- if(S.preg)notes+='<div class="banner blue"><span>🤰</span><div>الحمل والرضاعة: أخفينا الأعشاب غير المناسبة، ومع ذلك استشيري طبيبك قبل استخدام أي عشبة.</div></div>';
+ if(S.age===0)notes+=banner('red','alert','الرضع (أقل من سنة): لا أعشاب ولا عسل. استشر طبيب الأطفال لأي عرض، وفوراً إن ظهرت حرارة.');
+ if(S.age===1)notes+=banner('blue','info','للأطفال: قدّم ربع إلى نصف الكمية، ولا تستمر بالأعشاب أكثر من 3 أيام دون استشارة الطبيب.');
+ if(S.age===4)notes+=banner('blue','info','لكبار السن: ابدأ بكميات صغيرة، واسأل طبيبك أو الصيدلي إن كنت تتناول أدوية (ضغط، سكر، سيولة الدم).');
+ if(S.preg)notes+=banner('blue','heart','الحمل والرضاعة: أخفينا الأعشاب غير المناسبة، ومع ذلك استشيري طبيبك قبل استخدام أي عشبة.');
  return `
- <div class="card"><div class="head"><div class="hico">🔎</div><div class="grow"><h2>ماذا تشعر؟</h2><div class="sub">اختر العرض والفئة العمرية</div></div></div>
-  <input class="search" id="q" placeholder="ابحث: صداع، أرق، زكام..." value="${S.q}" autocomplete="off">
-  <div class="chips" id="chips">${chipsHTML()}</div>
+ <div class="card">${chead('search','ماذا تشعر؟','اختر العرض والفئة العمرية')}
+  <div class="lbl">العرض</div>
+  <div class="dd ${S.dd==='sym'?'open':''}">
+   <button class="ddb" data-a="dd" data-id="sym" aria-haspopup="listbox" aria-expanded="${S.dd==='sym'}"><span class="ddi">${ic(sy.e,20)}</span><span class="ddv"><b>${sy.n}</b></span><span class="ddc">${ic('chev',20)}</span></button>
+   <div class="ddp" role="listbox"><div class="ddsearch">${ic('search',18)}<input id="dq" placeholder="ابحث عن عرض..." value="${S.dq}" autocomplete="off"></div><div class="ddl" id="ddl">${symOpts()}</div></div>
+  </div>
   <div class="lbl">الفئة العمرية</div>
-  <div class="seg">${AG.map((a,i)=>`<button class="${i===S.age?'on':''}" data-a="age" data-i="${i}"><b>${a.n}</b><small>${a.s}</small></button>`).join('')}</div>
-  ${S.age>=2?`<div class="toggle" data-a="preg"><span>🤰 حامل أو مرضعة</span><div class="sw ${S.preg?'on':''}"></div></div>`:''}
+  <div class="dd ${S.dd==='age'?'open':''}">
+   <button class="ddb" data-a="dd" data-id="age" aria-haspopup="listbox" aria-expanded="${S.dd==='age'}"><span class="ddi">${ic('users',20)}</span><span class="ddv"><b>${AG[S.age].n}</b><small>${AG[S.age].s}</small></span><span class="ddc">${ic('chev',20)}</span></button>
+   <div class="ddp" role="listbox"><div class="ddl">${AG.map((a,i)=>`<button class="ddo ${i===S.age?'on':''}" data-a="pickage" data-i="${i}" role="option"><span class="ddv"><b>${a.n}</b><small>${a.s}</small></span>${i===S.age?ic('check',18):''}</button>`).join('')}</div></div>
+  </div>
+  ${S.age>=2?`<div class="toggle" data-a="preg"><span>${ic('heart',18)} حامل أو مرضعة</span><div class="sw ${S.preg?'on':''}"></div></div>`:''}
  </div>
  ${notes}
  <div class="stats"><div class="stat"><b>${sy.n}</b><span>العرض المختار</span></div><div class="stat"><b>${done}/${list.length}</b><span>حلول جرّبتها</span></div></div>
- <div class="card"><div class="head"><div class="hico">${sy.e}</div><div class="grow"><h2>حلول طبيعية</h2><div class="sub">${sy.n} · ${AG[S.age].n}</div></div><button class="sq" data-a="reset" aria-label="إعادة">↺</button></div>
-  <div class="pills">${[['all','الكل'],['d','🍵 مشروبات'],['f','🥣 أغذية'],['l','🌿 عادات']].map(x=>`<button class="pill ${S.flt===x[0]?'on':''}" data-a="flt" data-f="${x[0]}">${x[1]}</button>`).join('')}</div>
+ <div class="card">${chead(sy.e,'حلول طبيعية',`${sy.n} · ${AG[S.age].n}`,'',`<button class="sq" data-a="reset" aria-label="إعادة">${ic('refresh',20)}</button>`)}
+  ${(()=>{const c=FLT.find(x=>x[0]===S.flt);return dd2('flt','نوع الحل',{icon:c[2],n:c[1]},FLT.map(x=>({a:'pickflt',d:`data-f="${x[0]}"`,n:x[1],icon:x[2],on:x[0]===S.flt})))})()}<div style="height:14px"></div>
   ${shown.length?shown.map(item).join(''):`<div class="empty">${list.length?'لا توجد حلول في هذا القسم':'لا توجد حلول منزلية آمنة مناسبة لهذه الفئة. راجع الطبيب أو الصيدلي.'}</div>`}
  </div>
- <div class="card"><div class="head"><div class="hico">🤲</div><div class="grow"><h2>مساندة إضافية</h2><div class="sub">ضغط وتمارين تساعد في التخفيف</div></div></div>
-  <div class="chips">${sy.pts.map(p=>`<button class="chip" data-a="goacu" data-p="${p}">👆 نقطة ${PT[p].n}</button>`).join('')}<button class="chip" data-a="goex" data-i="${sy.br}">🫁 ${BR[sy.br].n}</button>${sy.stretch?'<button class="chip" data-a="gost">🤸 تمارين الإطالة</button>':''}</div></div>
- <div class="card redc"><div class="head"><div class="hico">🚨</div><div class="grow"><h2>متى تراجع الطبيب؟</h2><div class="sub">لا تعتمد على الحلول المنزلية عند:</div></div></div><ul class="flags">${sy.rf.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+ <div class="card">${chead('hand','مساندة إضافية','ضغط وتمارين تساعد في التخفيف','grn')}
+  <div class="chips">${sy.pts.map(p=>`<button class="chip" data-a="goacu" data-p="${p}">${ic('pin',16)} نقطة ${PT[p].n}</button>`).join('')}<button class="chip" data-a="goex" data-i="${sy.br}">${ic('wind',16)} ${BR[sy.br].n}</button>${sy.stretch?`<button class="chip" data-a="gost">${ic('activity',16)} تمارين الإطالة</button>`:''}</div></div>
+ <div class="card">${chead('alert','متى تراجع الطبيب؟','لا تعتمد على الحلول المنزلية عند:','red')}<ul class="flags">${sy.rf.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
 }
 function viewHerb(){
  const q=S.hq.trim();
  const l=HERBS.filter(h=>!q||h.n.includes(q)||h.u.includes(q));
- return `<div class="card"><div class="head"><div class="hico">🌿</div><div class="grow"><h2>دليل العطار</h2><div class="sub">أعشاب شائعة وفوائدها وتحذيراتها</div></div></div>
- <input class="search" id="hq" placeholder="ابحث عن عشبة أو عرض..." value="${S.hq}" autocomplete="off">
+ return `<div class="card">${chead('leaf','دليل العطار','أعشاب شائعة وفوائدها وتحذيراتها','grn')}
+ <div class="field" style="margin-bottom:12px">${ic('search',20)}<input id="hq" placeholder="ابحث عن عشبة أو عرض..." value="${S.hq}" autocomplete="off"></div>
  <div id="hlist">${herbList(l)}</div></div>
- <div class="card"><div class="head"><div class="hico">🛒</div><div class="grow"><h2>نصائح الشراء والاستخدام</h2></div></div>
+ <div class="card">${chead('shield','نصائح الشراء والاستخدام','','amb')}
  <ul class="flags"><li>اشترِ من عطار موثوق وفي عبوات نظيفة جافة.</li><li>تأكد من خلو الأعشاب من العفن والرائحة الغريبة.</li><li>لا تخلط أكثر من عشبتين أو ثلاث معاً.</li><li>لا تستمر على عشبة واحدة أسابيع طويلة دون استشارة الطبيب.</li><li>أوقفها فوراً عند ظهور طفح أو حكة أو أي أعراض غير معتادة.</li><li>أخبر طبيبك بالأعشاب التي تتناولها قبل أي عملية أو علاج جديد.</li></ul></div>`;
 }
 function herbList(l){
- return l.length?l.map(h=>`<div class="item ${S.hopen===h.n?'open':''}" style="--c:var(--grn)"><div class="row" data-a="herb" data-n="${h.n}"><div class="ico">${h.e}</div><div style="flex:1"><h3>${h.n}</h3><div class="meta">${h.u}</div></div></div><div class="det"><h4>طريقة الاستخدام</h4><div>${h.how}</div><div class="caut">⚠️ ${h.c}</div></div></div>`).join(''):'<div class="empty">لا توجد نتائج</div>';
+ return l.length?l.map(h=>`<div class="item ${S.hopen===h.n?'open':''}" style="--c:var(--grn)"><div class="row" data-a="herb" data-n="${h.n}"><div class="ico">${ic(h.e,22)}</div><div style="flex:1"><h3>${h.n}</h3><div class="meta">${h.u}</div></div><span class="chev">${ic('chev',18)}</span></div><div class="det"><h4>طريقة الاستخدام</h4><div>${h.how}</div><div class="caut">${ic('alert',16)}<div>${h.c}</div></div></div></div>`).join(''):'<div class="empty">لا توجد نتائج</div>';
 }
 function handSVG(palm){
  return `<svg viewBox="0 0 180 290"><g fill="var(--bg2)" stroke="var(--acc)" stroke-width="2"><rect x="55" y="185" width="70" height="100" rx="14"/><rect x="40" y="100" width="100" height="95" rx="22"/><rect x="43" y="30" width="22" height="85" rx="11"/><rect x="70" y="14" width="22" height="100" rx="11"/><rect x="97" y="26" width="22" height="90" rx="11"/><rect x="123" y="52" width="20" height="70" rx="10"/><rect x="19" y="120" width="22" height="72" rx="11" transform="rotate(-35 30 190)"/></g>${palm?'<path d="M55 196 H125" stroke="var(--mut)" stroke-dasharray="4 4" fill="none"/>':''}`;
@@ -367,103 +534,135 @@ function viewAcu(){
  const p=PT[S.pt];
  const base=(S.pview==='back'||S.pview==='palm')?handSVG(S.pview==='palm'):footSVG();
  const dots=pts.map(k=>`<g class="pt ${k===S.pt?'on':''}" data-a="pt" data-p="${k}"><circle class="ring" cx="${PT[k].x}" cy="${PT[k].y}" r="9"/><circle class="dot" cx="${PT[k].x}" cy="${PT[k].y}" r="8"/><text x="${PT[k].x}" y="${PT[k].y+24}">${PT[k].n}</text></g>`).join('');
- return `<div class="card"><div class="head"><div class="hico">👆</div><div class="grow"><h2>العلاج بالضغط</h2><div class="sub">اختر المنطقة ثم اضغط على النقطة</div></div></div>
- <div class="seg">${PV.map(v=>`<button class="${v.v===S.pview?'on':''}" data-a="pview" data-v="${v.v}"><b>${v.n}</b><small>${v.s}</small></button>`).join('')}</div>
+ return `<div class="card">${chead('hand','العلاج بالضغط','اختر المنطقة ثم اضغط على النقطة','amb')}
+ ${(()=>{const i=PV.findIndex(v=>v.v===S.pview),c=PV[i];return dd2('pview','المنطقة',{icon:PVI[i],n:c.n,s:c.s},PV.map((v,j)=>({a:'pickview',d:`data-v="${v.v}"`,n:v.n,s:v.s,icon:PVI[j],on:v.v===S.pview})))})()}<div style="height:12px"></div>
  <div class="svgbox">${base}${dots}</svg><div class="sub">رسم تخطيطي تقريبي</div></div></div>
- <div class="card"><div class="head"><div class="hico">📍</div><div class="grow"><h2>نقطة ${p.n}</h2><div class="sub">${p.use}</div></div></div>
+ <div class="card">${chead('pin','نقطة '+p.n,p.use)}
  <div class="item" style="--c:var(--amb)"><h4 style="margin:0 0 4px;color:var(--acc)">المكان</h4><div style="font-size:14px">${p.loc}</div></div>
- ${p.pg?'<div class="caut">🤰 لا تضغط هذه النقطة أثناء الحمل.</div>':''}</div>
- <div class="card"><div class="head"><div class="hico">📋</div><div class="grow"><h2>طريقة الضغط</h2></div></div>
+ ${p.pg?`<div class="caut">${ic('alert',16)}<div>لا تضغط هذه النقطة أثناء الحمل.</div></div>`:''}</div>
+ <div class="card">${chead('check','طريقة الضغط','','grn')}
  <ol style="font-size:14px;line-height:2;padding-inline-start:20px;margin:0"><li>اجلس بوضع مريح وخذ نفساً عميقاً.</li><li>اضغط النقطة بإبهامك بقوة مريحة غير مؤلمة.</li><li>دلّك بحركة دائرية صغيرة أو اضغط ثابتاً 1–2 دقيقة مع التنفس البطيء.</li><li>كرر على الجهة الأخرى، ثم استرح.</li></ol>
- <div class="tip">للأطفال: ضغط خفيف جداً 20–30 ثانية. وتجنب الضغط على جلد مصاب أو منطقة متورمة.</div></div>`;
+ <div class="tip">${ic('info',16)}<div>للأطفال: ضغط خفيف جداً 20–30 ثانية. وتجنب الضغط على جلد مصاب أو منطقة متورمة.</div></div></div>`;
 }
 function viewEx(){
  const b=BR[S.br];
- return `<div class="card"><div class="head"><div class="hico">🫁</div><div class="grow"><h2>تمارين التنفس</h2><div class="sub">${b.s}</div></div></div>
- <div class="seg">${BR.map((x,i)=>`<button class="${i===S.br?'on':''}" data-a="brsel" data-i="${i}"><b>${x.n}</b><small>${x.s}</small></button>`).join('')}</div>
- <div class="breath"><div class="bc" id="bc"></div><div class="bt"><b id="bl">استعد</b><span id="bn">•</span></div></div>
- <div class="sub" style="text-align:center;margin-bottom:10px" id="bcy">${b.cyc} دورات</div>
+ return `<div class="card">${chead('wind','تمارين التنفس',b.s)}
+ ${dd2('br','التمرين',{icon:'wind',n:b.n,s:b.s},BR.map((x,i)=>({a:'pickbr',d:`data-i="${i}"`,n:x.n,s:x.s,icon:'wind',on:i===S.br})))}
+ <div class="bwrap"><div class="breath idle" id="breath"><svg class="brs" viewBox="0 0 250 250"><circle class="tr" cx="125" cy="125" r="110"/><circle class="pg" id="bpg" cx="125" cy="125" r="110"/></svg><div class="halo" id="bhalo"></div><div class="bc" id="bc"></div><div class="bt"><span class="bl" id="bl">جاهز</span><span class="bn" id="bn">${ic('wind',44)}</span></div></div>
+ <div class="bsteps" id="bsteps">${b.ph.map((x,i)=>`<span class="bstep" data-i="${i}" style="--c:${phC(x[0])}">${x[0]} <i>${x[1]}ث</i></span>`).join('')}</div>
+ <div class="bcyc" id="bcyc">${Array.from({length:b.cyc},()=>'<i></i>').join('')}</div>
+ <div class="sub" id="bcy">${b.cyc} دورات · نحو ${Math.round(b.ph.reduce((t,x)=>t+x[1],0)*b.cyc/60*10)/10} دقيقة</div></div>
  <button class="big" id="bgo" data-a="brgo">ابدأ التمرين</button>
- <div class="tip">${b.note}</div><div class="caut">توقف إن شعرت بدوخة أو ضيق. ولا يغني عن علاج نوبات الهلع الشديدة أو مشاكل التنفس.</div></div>
- <div class="card" id="stretch"><div class="head"><div class="hico">🤸</div><div class="grow"><h2>تمارين الإطالة</h2><div class="sub">خطوات مصورة بسيطة بحركة لطيفة</div></div></div>
- ${STR.map(s=>`<div class="stretch">${fig(s.pose)}<div><h3>${s.n}</h3><div class="meta">⏱ ${s.time}</div><ol>${s.st.map(x=>`<li>${x}</li>`).join('')}</ol></div></div>`).join('')}
- <div class="caut">تحرك ببطء ولا تتجاوز حد الألم. استشر الطبيب عند وجود إصابة أو مرض في العمود الفقري أو المفاصل.</div></div>`;
+ <div class="tip">${ic('bulb',16)}<div>${b.note}</div></div><div class="caut">${ic('alert',16)}<div>توقف إن شعرت بدوخة أو ضيق. ولا يغني عن علاج نوبات الهلع الشديدة أو مشاكل التنفس.</div></div></div>
+ <div class="card" id="stretch">${chead('activity','تمارين الإطالة','خطوات مصورة بسيطة بحركة لطيفة','grn')}
+ ${STR.map(s=>`<div class="stretch">${fig(s.pose)}<div><h3>${s.n}</h3><div class="meta">${ic('clock',12)} ${s.time}</div><ol>${s.st.map(x=>`<li>${x}</li>`).join('')}</ol></div></div>`).join('')}
+ <div class="caut">${ic('alert',16)}<div>تحرك ببطء ولا تتجاوز حد الألم. استشر الطبيب عند وجود إصابة أو مرض في العمود الفقري أو المفاصل.</div></div></div>`;
 }
 function viewDay(){
  const d=S.day,hd=d.h.length;
  return `<div class="stats"><div class="stat"><b>${hd}/${HAB.length}</b><span>عادات منجزة اليوم</span></div><div class="stat"><b>${d.w}/8</b><span>أكواب الماء</span></div></div>
- <div class="card"><div class="head"><div class="hico">✅</div><div class="grow"><h2>عادات اليوم</h2><div class="sub">عادات صغيرة تحمي صحتك</div></div></div>
- ${HAB.map((h,i)=>{const on=d.h.includes(i);return `<div class="item" style="--c:var(--acc)"><div class="row" data-a="hab" data-i="${i}"><div class="ico">${['🚶','🥗','🫁','😴','📵'][i]}</div><div style="flex:1"><h3>${h}</h3></div><button class="tick ${on?'on':''}">${on?'✓':''}</button></div></div>`}).join('')}</div>
- <div class="card"><div class="head"><div class="hico">💧</div><div class="grow"><h2>الماء</h2><div class="sub">اضغط على الكوب الذي شربته</div></div></div>
- <div class="cups">${Array.from({length:8},(_,i)=>`<button class="cup ${i<d.w?'on':''}" data-a="water" data-i="${i}">🥛</button>`).join('')}</div></div>
- <div class="card"><div class="head"><div class="hico">📌</div><div class="grow"><h2>نصائح وقائية</h2></div></div>
- <ul class="flags">${TIPS.map(t=>`<li>${t[0]} ${t[1]}</li>`).join('')}</ul></div>`;
+ <div class="card">${chead('calendar','عادات اليوم','أنجز 3 عادات أو أكثر لتزيد سلسلتك')}
+ ${HAB.map((h,i)=>{const on=d.h.includes(i);return `<div class="item" style="--c:var(--acc)"><div class="row" data-a="hab" data-i="${i}"><div class="ico">${ic(h[0],22)}</div><div style="flex:1"><h3>${h[1]}</h3></div><button class="tick ${on?'on':''}">${on?ic('check',16):''}</button></div></div>`}).join('')}</div>
+ <div class="card">${chead('droplet','الماء','اضغط على الكوب الذي شربته','')}
+ <div class="cups">${Array.from({length:8},(_,i)=>`<button class="cup ${i<d.w?'on':''}" data-a="water" data-i="${i}" aria-label="كوب ${i+1}">${ic('glass',26)}</button>`).join('')}</div></div>
+ <div class="card">${chead('shield','نصائح وقائية','','amb')}
+ <ul class="tl">${TIPS.map(t=>`<li>${ic(t[0],20)}<span>${t[1]}</span></li>`).join('')}</ul></div>`;
 }
-const views={sym:viewSym,herb:viewHerb,acu:viewAcu,ex:viewEx,day:viewDay};
+const views={home:viewHome,sym:viewSym,herb:viewHerb,acu:viewAcu,ex:viewEx,day:viewDay};
+const NAV=[['home','الرئيسية','home'],['sym','الأعراض','stethoscope'],['herb','العطار','leaf'],['acu','الضغط','hand'],['ex','التمارين','wind']];
+$('#nav').innerHTML=NAV.map(n=>`<button data-a="nav" data-v="${n[0]}">${ic(n[2],24)}${n[1]}</button>`).join('');
 function render(){
  stopBreath();
  $('#view').innerHTML=views[S.view]();
- document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
+ document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view||(S.view==='day'&&b.dataset.v==='home')));
 }
 
 /* ---------- التنفس ---------- */
 let bT=null,bI=null,bRun=false;
-function stopBreath(){bRun=false;clearTimeout(bT);clearInterval(bI);const g=$('#bgo');if(g){g.textContent='ابدأ التمرين';g.classList.remove('stop')}const c=$('#bc');if(c){c.style.transitionDuration='.6s';c.style.transform='scale(.55)'}}
+const phC=l=>/احبس/.test(l)?'var(--amb)':/زفير|افرغ/.test(l)?'var(--grn)':'var(--acc)';
+const CIRC=691.15;
+function resetBreathUI(label,html){
+ const br=$('#breath');if(!br)return;
+ br.classList.add('idle');br.style.removeProperty('--pc');
+ ['#bc','#bhalo'].forEach(q=>{const e=$(q);e.style.transitionDuration='.6s';e.style.transform=''});
+ const pg=$('#bpg');pg.style.transition='none';pg.style.strokeDashoffset=CIRC;
+ $('#bl').textContent=label;$('#bn').innerHTML=html;
+ document.querySelectorAll('.bstep').forEach(x=>x.classList.remove('on'));
+ document.querySelectorAll('#bcyc i').forEach(x=>x.className='');
+}
+function stopBreath(){bRun=false;clearTimeout(bT);clearInterval(bI);const g=$('#bgo');if(g){g.textContent='ابدأ التمرين';g.classList.remove('stop');resetBreathUI('جاهز',ic('wind',44))}}
 function startBreath(){
  const b=BR[S.br];let ph=0,cy=0;bRun=true;
  const g=$('#bgo');g.textContent='إيقاف';g.classList.add('stop');
+ $('#breath').classList.remove('idle');
  const step=()=>{
   if(!bRun)return;
-  const [lab,sec,sc]=b.ph[ph];
-  const c=$('#bc');c.style.transitionDuration=sec+'s';c.style.transform=`scale(${sc})`;
-  $('#bl').textContent=lab;$('#bcy').textContent=`الدورة ${cy+1} من ${b.cyc}`;
+  const [lab,sec,sc]=b.ph[ph],col=phC(lab);
+  const br=$('#breath');br.style.setProperty('--pc',col);
+  const k=.62+(sc-.55)/.45*.38;
+  ['#bc','#bhalo'].forEach(q=>{const e=$(q);e.style.transitionDuration=sec+'s';e.style.transform=`scale(${k})`});
+  const pg=$('#bpg');pg.style.transition='none';pg.style.strokeDashoffset=CIRC;void pg.getBoundingClientRect();
+  pg.style.transition=`stroke-dashoffset ${sec}s linear,stroke .4s`;pg.style.strokeDashoffset=0;
+  $('#bl').textContent=lab;
+  document.querySelectorAll('.bstep').forEach((x,i)=>x.classList.toggle('on',i===ph));
+  document.querySelectorAll('#bcyc i').forEach((x,i)=>x.className=i<cy?'done':i===cy?'cur':'');
+  $('#bcy').textContent=`الدورة ${cy+1} من ${b.cyc}`;
   let left=sec;$('#bn').textContent=left;
   clearInterval(bI);bI=setInterval(()=>{left--;if(left>0)$('#bn').textContent=left},1000);
-  bT=setTimeout(()=>{ph++;if(ph>=b.ph.length){ph=0;cy++;if(cy>=b.cyc){stopBreath();$('#bl').textContent='أحسنت 👏';$('#bn').textContent='✓';return}}step()},sec*1000);
+  bT=setTimeout(()=>{ph++;if(ph>=b.ph.length){ph=0;cy++;if(cy>=b.cyc){bRun=false;clearInterval(bI);const g2=$('#bgo');g2.textContent='ابدأ التمرين';g2.classList.remove('stop');resetBreathUI('أحسنت',ic('check',48));document.querySelectorAll('#bcyc i').forEach(x=>x.className='done');$('#bcy').textContent='اكتمل التمرين';return}}step()},sec*1000);
  };
  step();
 }
 
-/* ---------- النصائح ---------- */
-function setTip(k){
- tk=k;const t=TIPS[(doy*5+k)%TIPS.length];
- $('#tipcard').innerHTML=`<div><p>${t[1]}</p><div class="dots">${[0,1,2,3,4].map(i=>`<i class="${i===k?'on':''}" data-a="tipdot" data-i="${i}"></i>`).join('')}</div></div><div class="badge">${t[0]}</div>`;
-}
-
 /* ---------- الأحداث ---------- */
+const goTop=()=>scrollTo({top:0,behavior:'smooth'});
+const saveDay=()=>{store.set('day-'+dayKey,S.day);const h=histGet();h[dayKey]=S.day.h.length;store.set('hist',h)};
+const refreshHerb=()=>{const q=S.hq.trim();$('#hlist').innerHTML=herbList(HERBS.filter(h=>!q||h.n.includes(q)||h.u.includes(q)))};
 const A={
- nav(d){S.view=d.v;render();scrollTo({top:0,behavior:'smooth'})},
- theme(){const h=document.documentElement;const n=h.dataset.theme==='dark'?'light':'dark';h.dataset.theme=n;$('#themeBtn').textContent=n==='dark'?'☀️':'🌙';store.set('theme',n)},
+ nav(d){S.view=d.v;render();goTop()},
+ theme(){const h=document.documentElement;const n=h.dataset.theme==='dark'?'light':'dark';h.dataset.theme=n;$('#themeBtn').innerHTML=ic(n==='dark'?'sun':'moon',22);store.set('theme',n)},
  sym(d){S.sym=d.id;S.open=null;S.flt='all';render()},
+ gosym(d){S.sym=d.id;S.open=null;S.flt='all';S.view='sym';render();goTop()},
+ hsearch(){const q=S.q.trim();const m=SY.find(s=>!q||s.n.includes(q));if(m)A.gosym({id:m.id})},
  age(d){S.age=+d.i;if(S.age<2)S.preg=false;render()},
+ dd(d){S.dd=S.dd===d.id?null:d.id;S.dq='';render();if(S.dd==='sym'){const i=$('#dq');i&&i.focus({preventScroll:true})}},
+ picksym(d){S.sym=d.id;S.open=null;S.flt='all';S.dd=null;S.dq='';render()},
+ pickage(d){S.age=+d.i;if(S.age<2)S.preg=false;S.dd=null;render()},
  preg(){S.preg=!S.preg;render()},
  flt(d){S.flt=d.f;render()},
  open(d){S.open=S.open===d.k?null:d.k;render()},
  tick(d){S.tried[d.k]=!S.tried[d.k];if(!S.tried[d.k])delete S.tried[d.k];store.set('tried-'+dayKey,S.tried);render()},
  reset(){const sy=SY.find(x=>x.id===S.sym);sy.r.forEach(r=>delete S.tried[r.k]);store.set('tried-'+dayKey,S.tried);render()},
- goacu(d){S.view='acu';S.pt=d.p;S.pview=PT[d.p].v;render();scrollTo({top:0,behavior:'smooth'})},
- goex(d){S.view='ex';S.br=+d.i;render();scrollTo({top:0,behavior:'smooth'})},
+ goacu(d){S.view='acu';S.pt=d.p;S.pview=PT[d.p].v;render();goTop()},
+ goex(d){S.view='ex';S.br=+d.i;render();goTop()},
  gost(){S.view='ex';render();$('#stretch').scrollIntoView({behavior:'smooth'})},
- herb(d){S.hopen=S.hopen===d.n?null:d.n;const q=S.hq.trim();$('#hlist').innerHTML=herbList(HERBS.filter(h=>!q||h.n.includes(q)||h.u.includes(q)))},
+ herb(d){S.hopen=S.hopen===d.n?null:d.n;refreshHerb()},
  pview(d){S.pview=d.v;render()},
+ pickview(d){S.pview=d.v;S.dd=null;render()},
+ pickflt(d){S.flt=d.f;S.dd=null;render()},
+ pickbr(d){S.br=+d.i;S.dd=null;render()},
  pt(d){S.pt=d.p;render()},
  brsel(d){S.br=+d.i;render()},
  brgo(){bRun?stopBreath():startBreath()},
- hab(d){const i=+d.i,h=S.day.h;const x=h.indexOf(i);x>=0?h.splice(x,1):h.push(i);store.set('day-'+dayKey,S.day);render()},
- water(d){const i=+d.i+1;S.day.w=S.day.w===i?i-1:i;store.set('day-'+dayKey,S.day);render()},
- tipdot(d){setTip(+d.i)}
+ hab(d){const i=+d.i,h=S.day.h;const x=h.indexOf(i);x>=0?h.splice(x,1):h.push(i);saveDay();render()},
+ water(d){const i=+d.i+1;S.day.w=S.day.w===i?i-1:i;saveDay();render()},
 };
-document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(t&&A[t.dataset.a])A[t.dataset.a](t.dataset)});
+document.addEventListener('click',e=>{
+ if(S.dd&&!e.target.closest('.dd')){S.dd=null;render();return}
+ const t=e.target.closest('[data-a]');if(t&&A[t.dataset.a])A[t.dataset.a](t.dataset)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S.dd){S.dd=null;render()}});
 document.addEventListener('input',e=>{
- if(e.target.id==='q'){S.q=e.target.value;$('#chips').innerHTML=chipsHTML()}
- if(e.target.id==='hq'){S.hq=e.target.value;const q=S.hq.trim();$('#hlist').innerHTML=herbList(HERBS.filter(h=>!q||h.n.includes(q)||h.u.includes(q)))}
+ if(e.target.id==='dq'){S.dq=e.target.value;$('#ddl').innerHTML=symOpts()}
+ if(e.target.id==='hq2'){S.q=e.target.value;$('#hchips').innerHTML=chipsHTML('gosym')}
+ if(e.target.id==='hq'){S.hq=e.target.value;refreshHerb()}
 });
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='hq2')A.hsearch()});
 
 /* ---------- البدء ---------- */
+$('#brand').innerHTML=ic('leaf',24)+' صحتي الطبيعية';
 $('#date').textContent=new Date().toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-const th=store.get('theme','dark');document.documentElement.dataset.theme=th;$('#themeBtn').textContent=th==='dark'?'☀️':'🌙';
-render();setTip(0);
-setInterval(()=>setTip((tk+1)%5),8000);
+const th=store.get('theme','dark');document.documentElement.dataset.theme=th;$('#themeBtn').innerHTML=ic(th==='dark'?'sun':'moon',22);
+render();
 </script>
 </body>
 </html>

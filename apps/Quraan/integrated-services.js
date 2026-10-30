@@ -6,8 +6,7 @@
   var SERVICE_TITLES = {
     radio: 'إذاعة القرآن الكريم',
     fiqh: 'فقه ميسّر',
-    stories: 'قصص القرآن للأطفال',
-    ruqya: 'الرقية الشرعية'
+    stories: 'قصص القرآن للأطفال'
   };
   var CAIRO_FONT_FACES = (services.radio.css.match(
     /@font-face\s*\{[^}]*font-family:\s*['"]Cairo['"][^}]*\}/g
@@ -26,7 +25,7 @@
   }
 
   function mount(key, host) {
-    var service = key === 'ruqya' ? global.QuranRuqyaService : services[key];
+    var service = services[key];
     if (!service) throw new Error('الخدمة المطلوبة غير معروفة: ' + key);
     if (!host || typeof host.attachShadow !== 'function') throw new Error('حاوية الخدمة غير صالحة');
 
@@ -34,21 +33,16 @@
     host.setAttribute('aria-label', SERVICE_TITLES[key] || 'محتوى الخدمة');
     host.tabIndex = 0;
     host.style.setProperty('overflow-x', 'hidden', 'important');
-    host.style.setProperty('overflow-y', key === 'ruqya' ? 'visible' : 'auto', 'important');
-    host.style.setProperty('touch-action', key === 'ruqya' ? 'auto' : 'pan-y', 'important');
-    host.style.setProperty('overscroll-behavior-y', key === 'ruqya' ? 'auto' : 'contain', 'important');
-    if (key === 'ruqya') {
-      host.style.setProperty('flex', '0 0 auto', 'important');
-      host.style.setProperty('min-height', 'auto', 'important');
-      host.style.setProperty('height', 'auto', 'important');
-    }
+    host.style.setProperty('overflow-y', 'auto', 'important');
+    host.style.setProperty('touch-action', 'pan-y', 'important');
+    host.style.setProperty('overscroll-behavior-y', 'contain', 'important');
     var root = host.shadowRoot || host.attachShadow({ mode: 'open' });
     root.replaceChildren();
     var style = document.createElement('style');
     style.textContent = CAIRO_FONT_FACES +
-      ':host{display:block;flex:' + (key === 'ruqya' ? '0 0 auto' : '1') + ';min-height:' + (key === 'ruqya' ? 'auto' : '0') + ';overflow-x:hidden;overflow-y:' + (key === 'ruqya' ? 'visible' : 'auto') + ';overscroll-behavior-y:' + (key === 'ruqya' ? 'auto' : 'contain') + ';-webkit-overflow-scrolling:touch;touch-action:' + (key === 'ruqya' ? 'auto' : 'pan-y') + ';padding:0!important}' +
+      ':host{display:block;flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:0!important}' +
       scopedStyles(service.css) +
-      '.integrated-service-root{position:relative;width:100%;min-height:' + (key === 'ruqya' ? '0' : '100%') + '}' +
+      '.integrated-service-root{position:relative;width:100%;min-height:100%}' +
       ':host .integrated-service-root,:host .integrated-service-root *{font-family:"Cairo","Segoe UI",Tahoma,Arial,sans-serif!important}' +
       (key === 'fiqh' ? ':host .feats{grid-template-columns:1fr}' : '') +
       (key === 'stories'
