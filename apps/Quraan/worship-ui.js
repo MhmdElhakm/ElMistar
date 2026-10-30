@@ -102,11 +102,6 @@
       state.count = 0;
     });
   });
-  $('worshipTasbeehReset').addEventListener('click', function () {
-    if (!window.confirm('هل تريد تصفير عدّ المسبحة لهذا الذكر؟')) return;
-    updateTasbeeh(function (state) { state.count = 0; });
-  });
-
   function getAzkarList(categoryId) {
     return data.azkar[categoryId] || data.extra[categoryId] || [];
   }
@@ -125,6 +120,14 @@
       progress.counts[categoryId] = counts;
     }
     return counts;
+  }
+  function syncAzkarTask(list, counts) {
+    var completed = list.length > 0 && list.every(function (item, index) {
+      return counts[index] >= Math.max(1, Number(item.c) || 1);
+    });
+    window.dispatchEvent(new CustomEvent('quran:azkar-progress', {
+      detail: { categoryId: categoryId, completed: completed, day: todayKey() }
+    }));
   }
   function selectedCategoryId() {
     var saved = readStoredText('mq.worshipAzkarCategory');
@@ -168,6 +171,7 @@
 
     if (!list.length) {
       azkarList.innerHTML = '<div class="worship-empty">لا توجد أذكار في هذه المجموعة.</div>';
+      syncAzkarTask(list, counts);
       return;
     }
 
@@ -197,6 +201,7 @@
       ? '<div class="worship-complete">🤲 تقبّل الله منك — أتممت ' +
         escapeHTML(category ? category.title : 'الأذكار') +
         '<br><small>اللهم أعنا على ذكرك وشكرك وحسن عبادتك</small></div>' : '');
+    syncAzkarTask(list, counts);
   }
 
   categoryTrigger.addEventListener('click', function () {
