@@ -1,4 +1,4 @@
-var CACHE_NAME = 'quran-pro-app-v76';
+var CACHE_NAME = 'quran-pro-app-v82';
 var APP_SHELL = [
   './index.html',
   './word-data-worker.js',

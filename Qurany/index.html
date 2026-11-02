@@ -121,6 +121,73 @@
     .quran-loading-text { display: block; width: 240px; min-height: 48px; color: #42634a; line-height: 1.7; font-size: 13px; font-weight: 700; }
     .quran-loading-track { display: none; }
     .quran-loading-bar { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #056c20, #1c9a42); transition: width .2s ease; }
+    .quran-text-notice {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 1100;
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      width: min(390px, calc(100vw - 36px));
+      padding: 28px 22px 22px;
+      border: 1px solid color-mix(in srgb, var(--green) 26%, var(--line));
+      border-radius: 24px;
+      background: linear-gradient(155deg, var(--panel-top), var(--panel) 46%);
+      color: var(--ink);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .24), 0 0 0 100vmax rgba(18, 30, 21, .22);
+      direction: rtl;
+      text-align: center;
+      transform: translate(-50%, -50%);
+      animation: quran-notice-in .24s cubic-bezier(.2, .8, .2, 1) both;
+    }
+    @keyframes quran-notice-in {
+      from { opacity: 0; transform: translate(-50%, -47%) scale(.97); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    .quran-notice-icon {
+      display: grid;
+      width: 58px;
+      height: 58px;
+      place-items: center;
+      border: 1px solid color-mix(in srgb, var(--green) 22%, transparent);
+      border-radius: 19px;
+      color: var(--green);
+      background: color-mix(in srgb, var(--green) 10%, var(--panel));
+    }
+    .quran-notice-icon svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .quran-notice-title { margin: 0; color: var(--ink); font-size: 17px; font-weight: 900; }
+    .quran-text-notice p { margin: 0; color: var(--muted); font-size: 13px; font-weight: 600; line-height: 1.8; }
+    .quran-text-notice #quranTextDownload { width: 100%; min-height: 46px; }
+    .quran-text-notice[hidden] { display: none !important; }
+    .quran-text-notice button {
+      min-height: 40px;
+      padding: 8px 14px;
+      border: 1px solid var(--green);
+      border-radius: 12px;
+      background: var(--green);
+      color: var(--on-green);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .quran-text-notice button:disabled { opacity: .65; cursor: wait; }
+    .quran-text-notice .quran-text-notice-close {
+      position: absolute;
+      top: 9px;
+      left: 9px;
+      display: grid;
+      place-items: center;
+      min-width: 32px;
+      min-height: 32px;
+      padding: 0;
+      border-color: var(--line);
+      background: var(--panel-top);
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1;
+    }
 
     img {
       max-width: 100%
@@ -1201,6 +1268,28 @@
     .sheet {
       min-height: 150cqw;
     }
+    .sheet.text-fallback { min-height: 0; padding: 2cqw 1cqw 5cqw; }
+    .ln.fallback-ln {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-height: 0;
+      margin-block: .2em;
+      overflow-wrap: anywhere;
+      white-space: normal;
+      text-align: justify;
+      font-family: "Noto Naskh Arabic", "Amiri", "Traditional Arabic", serif;
+      font-size: clamp(21px, 5.2cqw, 31px) !important;
+      line-height: 2;
+    }
+    .fallback-ayah-end {
+      display: inline-block;
+      margin-inline: .25em;
+      color: var(--head);
+      font-family: Arial, sans-serif;
+      font-size: .56em;
+      white-space: nowrap;
+    }
 
     .sheet.fade {
       animation: in .18s ease-out;
@@ -1746,7 +1835,7 @@
       align-items: center;
       gap: 9px;
     }
-    .d-top > .seg,
+    .d-top > .d-top-toolbar,
     .d-top > .search,
     .d-top > .search-mode,
     .d-top > .d-title {
@@ -1754,22 +1843,25 @@
       max-width: 360px;
       box-sizing: border-box;
     }
-    .d-top > .seg {
+    .d-top-toolbar {
+      display: flex;
+    }
+    .d-top-toolbar > .seg {
+      width: 100%;
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 2px;
       padding: 3px;
     }
-    .d-top > .seg button {
+    .d-top-toolbar > .seg button {
       min-width: 0;
       min-height: 36px;
       padding: 6px 2px;
-      font-size: clamp(10px, 3.2vw, 12px);
+      font-size: clamp(10px, 3vw, 12px);
       line-height: 1.25;
       white-space: normal;
       overflow-wrap: anywhere;
     }
-
     .settings {
       flex: none;
       border-top: 0;
@@ -2461,6 +2553,158 @@
       display: none;
     }
 
+    .sections-content {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      padding: 12px 12px 6px;
+    }
+    .sections-index-switch {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel-top);
+    }
+    .sections-index-switch button {
+      min-height: 38px;
+      padding: 6px 3px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      color: var(--muted);
+      background: transparent;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .sections-index-switch button[aria-pressed="true"] {
+      border-color: color-mix(in srgb, var(--green) 35%, var(--line));
+      color: var(--green);
+      background: var(--panel);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, .06);
+    }
+    .sections-summary {
+      position: relative;
+      overflow: hidden;
+      padding: 16px;
+      border: 1px solid color-mix(in srgb, var(--green) 24%, var(--line));
+      border-radius: 20px;
+      background: linear-gradient(145deg, color-mix(in srgb, var(--green) 12%, var(--panel-top)), var(--panel));
+      box-shadow: 0 8px 22px rgba(0, 0, 0, .06);
+    }
+    .sections-summary::after {
+      content: '';
+      position: absolute;
+      width: 112px;
+      height: 112px;
+      left: -38px;
+      bottom: -62px;
+      border: 1px solid color-mix(in srgb, var(--green) 15%, transparent);
+      border-radius: 50%;
+      box-shadow: 0 0 0 12px color-mix(in srgb, var(--green) 5%, transparent), 0 0 0 25px color-mix(in srgb, var(--green) 4%, transparent);
+      pointer-events: none;
+    }
+    .sections-summary-label {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .sections-summary-current {
+      display: block;
+      margin-top: 5px;
+      color: var(--green);
+      font-size: 17px;
+      font-weight: 900;
+    }
+    .sections-summary-meta {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .sections-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .section-juz-card,
+    .section-rub-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+      min-height: 66px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      color: var(--ink);
+      background: var(--panel);
+      text-align: right;
+      cursor: pointer;
+      transition: border-color .18s, background .18s, transform .15s, box-shadow .18s;
+    }
+    .section-juz-card:active,
+    .section-rub-card:active { transform: scale(.97); }
+    .section-juz-card.is-current,
+    .section-rub-card.is-current {
+      border-color: color-mix(in srgb, var(--green) 58%, var(--line));
+      background: color-mix(in srgb, var(--green) 8%, var(--panel));
+      box-shadow: 0 5px 14px color-mix(in srgb, var(--green) 12%, transparent);
+    }
+    .section-card-number {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border-radius: 12px;
+      color: var(--green);
+      background: color-mix(in srgb, var(--green) 11%, var(--panel-top));
+      font-size: 13px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+    .is-current .section-card-number {
+      color: var(--on-green);
+      background: linear-gradient(145deg, var(--green), color-mix(in srgb, var(--green) 72%, #164b2a));
+    }
+    .section-card-copy { display: grid; min-width: 0; gap: 3px; }
+    .section-card-title {
+      overflow: hidden;
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 900;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .section-card-meta {
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sections-grid.rub-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+    .rub-grid .section-rub-card {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      gap: 5px;
+      min-height: 69px;
+      padding: 8px 4px;
+      text-align: center;
+    }
+    .rub-grid .section-card-number { width: 30px; height: 30px; border-radius: 10px; font-size: 11px; }
+    .rub-grid .section-card-copy { width: 100%; }
+    .rub-grid .section-card-title { font-size: 10px; }
+    .rub-grid .section-card-meta { font-size: 8px; }
+
     .worship-content { padding: 12px; display: grid; align-content: start; gap: 11px; }
     .worship-switch { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px; padding: 4px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-top); }
     .worship-switch button { min-height: 40px; border: 1px solid transparent; border-radius: 10px; color: var(--muted); font: inherit; font-size: 12px; font-weight: 800; background: transparent; transition: background .18s, transform .15s; }
@@ -3086,47 +3330,6 @@
       max-height: 38svh;
       overflow-y: auto;
     }
-
-    .wp-reflections {
-      display: grid;
-      gap: 7px;
-      margin-top: 10px;
-    }
-
-    .wp-reflections > summary {
-      color: var(--sub);
-      font-size: 12.5px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .wp-reflections-content {
-      display: grid;
-      gap: 8px;
-      max-height: 38svh;
-      overflow-y: auto;
-      font-size: 13px;
-      line-height: 1.7;
-    }
-
-    .wp-reflection {
-      padding: 8px 10px;
-      border-inline-start: 3px solid var(--green);
-      border-radius: 8px;
-      background: var(--panel-top);
-    }
-
-    .wp-reflection p {
-      margin: 0;
-      white-space: pre-line;
-    }
-
-    .wp-reflection-author {
-      color: var(--muted);
-      font-size: 10.5px;
-    }
-
-    .wp-reflection-author { display: block; margin-top: 4px; }
 
     .wp-lamasat {
       display: grid;
@@ -3907,6 +4110,15 @@
       <span class="quran-loading-text" id="quranLoadingText">جاري تجهيز المصحف...</span>
     </div>
   </div>
+  <div class="quran-text-notice" id="quranTextNotice" role="alert" aria-live="polite" hidden>
+    <span class="quran-notice-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"></path><path d="M5 17a3 3 0 0 1 3-3h9M9 8h4M9 11h4"></path><path d="m18.5 4 .5 1.5L20.5 6l-1.5.5-.5 1.5L18 6.5 16.5 6l1.5-.5z"></path></svg>
+    </span>
+    <h2 class="quran-notice-title">ملفات المصحف غير مكتملة</h2>
+    <p id="quranTextNoticeMessage">تعذّر تحميل ملفات المصحف. يمكنك المتابعة بالنص العربي، ويُرجى تنزيل النصوص والخطوط داخل التطبيق لعرض المصحف كاملًا.</p>
+    <button type="button" id="quranTextDownload">تنزيل الملفات</button>
+    <button type="button" class="quran-text-notice-close" id="quranTextNoticeClose" aria-label="إخفاء التنبيه">×</button>
+  </div>
 
   <main class="page" id="page" lang="ar">
     <div class="measure" id="measure" aria-hidden="true"></div>
@@ -4048,11 +4260,13 @@
 
   <aside class="drawer" id="drawer" aria-label="فهرس المصحف" aria-hidden="true">
     <div class="d-top">
-      <div class="seg" role="tablist">
-        <button type="button" role="tab" id="tabSettings" aria-selected="true">الرئيسية</button>
-        <button type="button" role="tab" id="tabS" aria-selected="false">السور</button>
-        <button type="button" role="tab" id="tabWorship" aria-selected="false">أذكار</button>
-        <button type="button" role="tab" id="tabTasks" aria-selected="false">مهامي</button>
+      <div class="d-top-toolbar">
+        <div class="seg" role="tablist">
+          <button type="button" role="tab" id="tabSettings" aria-selected="true">الرئيسية</button>
+          <button type="button" role="tab" id="tabS" aria-selected="false">السور</button>
+          <button type="button" role="tab" id="tabWorship" aria-selected="false">أذكار</button>
+          <button type="button" role="tab" id="tabTasks" aria-selected="false">مهامي</button>
+        </div>
       </div>
       <input class="search" id="search" type="search" placeholder="سورة أو رقم صفحة" autocomplete="off"
         aria-label="ابحث عن سورة أو رقم صفحة">
@@ -7216,7 +7430,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       /* ---------- drawing ---------- */
       var pageEl = $('page'), pageList = $('pageList'), mEl = $('measure');
       var activeView = pageList.querySelector('.page-view'), sheet = activeView.querySelector('.sheet');
-      var cur = 1, sel = 0, widths = {}, renderQueue = Promise.resolve();
+      var cur = 1, sel = 0, widths = {}, renderQueue = Promise.resolve(), quranTextFallbackMode = false;
       var loadingPrevious = false;
       var scrollMode = 'vertical';
       store('mq.scrollMode', 'vertical');
@@ -7277,7 +7491,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           var chunkUrl = './fonts/tajweed/' + chunkName + '.woff2';
           function requestChunk(retry) {
             var cachedChunk = 'caches' in window
-                ? caches.open('quran-pro-app-v76').then(function (cache) { return cache.match(chunkUrl); })
+                ? caches.open('quran-pro-app-v82').then(function (cache) { return cache.match(chunkUrl); })
               : Promise.resolve(null);
             return cachedChunk.then(function (response) {
               if (response) return response.arrayBuffer();
@@ -7286,7 +7500,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
                 var copy = networkResponse.clone();
                 return networkResponse.arrayBuffer().then(function (buffer) {
                   if ('caches' in window) {
-                    return caches.open('quran-pro-app-v76').then(function (cache) {
+                    return caches.open('quran-pro-app-v82').then(function (cache) {
                       return cache.put(chunkUrl, copy).then(function () { return buffer; });
                     });
                   }
@@ -7415,6 +7629,43 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         foot.insertBefore(legend, foot.querySelector('.badge'));
       }
 
+      function renderFallbackText(view, page) {
+        var targetSheet = view.querySelector('.sheet');
+        var firstAyah = +D.pages[page - 1];
+        var lastAyah = page < TOTAL ? +D.pages[page] - 1 :
+          START[START.length - 1] + D.surahs[D.surahs.length - 1][3] - 1;
+        if (!Array.isArray(D.texts) || !firstAyah || lastAyah < firstAyah) {
+          throw new Error('النص العربي المضمّن للمصحف غير متوفر');
+        }
+        var html = '';
+        for (var ayahId = firstAyah; ayahId <= lastAyah; ayahId++) {
+          var location = locate(ayahId), surah = location[0], ayah = location[1];
+          var verseId = surah * 1000 + ayah;
+          var text = D.texts[surah - 1] && D.texts[surah - 1][ayah - 1];
+          if (typeof text !== 'string' || !text.trim()) continue;
+          var words = text.trim().split(/\s+/);
+          var wordHtml = words.map(function (word, index) {
+            return '<span class="w" data-v="' + verseId + '" data-p="' + (index + 1) + '">' +
+              escapeHtml(word) + '</span>';
+          }).join(' ');
+          html += '<div class="ln fallback-ln" data-vs="' + verseId + '">' + wordHtml +
+            '<span class="fallback-ayah-end" aria-label="نهاية الآية ' + ar(ayah) + '">﴿' + ar(ayah) + '﴾</span></div>';
+        }
+        if (!html) throw new Error('لا توجد نصوص لصفحة المصحف ' + page);
+        targetSheet.classList.add('text-fallback');
+        targetSheet.classList.remove('tajweed-active');
+        targetSheet.style.removeProperty('--tajweed-light-palette');
+        targetSheet.style.removeProperty('--tajweed-dark-palette');
+        targetSheet.setAttribute('data-tajweed-mode', tajweedOn ? 'on' : 'off');
+        targetSheet.innerHTML = html;
+        var legend = view.querySelector('.tajweed-legend-bar');
+        if (legend) legend.hidden = true;
+        paintSel(targetSheet, page);
+        paintSlots(targetSheet, page);
+        paintAnnotations(targetSheet, page);
+        if (activeView === view) sheet = targetSheet;
+      }
+
       function activatePage(view) {
         if (!view) return;
         var viewPage = +view.getAttribute('data-page');
@@ -7442,8 +7693,16 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         targetSheet.setAttribute('data-tajweed-mode', tajweedOn ? 'on' : 'off');
         view.classList.toggle('opening', p <= 2);
         syncPageStatus(view, p);
-        renderQueue = renderQueue.then(function () { return ensureFonts(lines, p); }).then(function () {
+        renderQueue = renderQueue.catch(function (error) {
+          console.error('تعذر تجهيز الصفحة السابقة للمصحف:', error);
+        }).then(function () {
+          if (quranTextFallbackMode) {
+            if (view.isConnected) renderFallbackText(view, p);
+            return;
+          }
+          return ensureFonts(lines, p).then(function () {
           if (!view.isConnected) return;
+          targetSheet.classList.remove('text-fallback');
           var W = view.clientWidth, Wc = W * 0.968;
           var gapMin = 0.13, M = 0, info = [];
           lines.forEach(function (l, i) {
@@ -7490,6 +7749,13 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           paintSel(targetSheet, p); paintSlots(targetSheet, p); paintAnnotations(targetSheet, p);
           if (activeView === view) sheet = targetSheet;
           prefetch(p);
+          }).catch(function (error) {
+            console.error('تعذر تحميل خطوط صفحة المصحف ' + p + ':', error);
+            quranTextFallbackMode = true;
+            document.body.classList.add('quran-text-fallback');
+            showQuranTextNotice();
+            if (view.isConnected) renderFallbackText(view, p);
+          });
         });
       }
 
@@ -7497,9 +7763,8 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         var firstOpen = !store('mq.pagesPreparedV2');
         pageList.innerHTML = '';
         if (firstOpen) {
-          /* All text and fonts are prepared before this function is called.
-             Render the visible page first and keep the rest lazy so opening
-             the Mushaf never freezes while building 604 DOM pages. */
+          /* Render the visible page first and keep the rest lazy; render() uses
+             embedded Arabic text whenever the Quran fonts are unavailable. */
           activeView = createPageView(p);
           pageList.appendChild(activeView);
           activeView.classList.add('active');
@@ -7766,6 +8031,60 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
 
       /* ---------- verse sheet ---------- */
       var body = document.body;
+      var screenWakeLock = null, screenWakeLockPending = false, screenWakeLockPageHidden = false,
+        screenWakeLockRequestDenied = false;
+      function requestScreenWakeLock() {
+        if (!navigator.wakeLock || document.visibilityState !== 'visible' ||
+            screenWakeLockPageHidden || screenWakeLockPending || screenWakeLockRequestDenied ||
+            (screenWakeLock && !screenWakeLock.released)) return;
+        screenWakeLockPending = true;
+        navigator.wakeLock.request('screen').then(function (lock) {
+          if (screenWakeLockPageHidden || document.visibilityState !== 'visible') {
+            return lock.release();
+          }
+          screenWakeLock = lock;
+          lock.addEventListener('release', function () {
+            if (screenWakeLock !== lock) return;
+            screenWakeLock = null;
+            if (document.visibilityState === 'visible' && !screenWakeLockPageHidden) {
+              setTimeout(requestScreenWakeLock, 250);
+            }
+          });
+        }).catch(function (error) {
+          screenWakeLockRequestDenied = true;
+          console.warn('تعذر إبقاء شاشة الجهاز مضاءة:', error);
+        }).then(function () {
+          screenWakeLockPending = false;
+        });
+      }
+      function releaseScreenWakeLockForPageHide() {
+        screenWakeLockPageHidden = true;
+        var lock = screenWakeLock;
+        screenWakeLock = null;
+        if (lock && !lock.released) {
+          lock.release().catch(function (error) {
+            console.warn('تعذر تحرير قفل إبقاء الشاشة نشطة:', error);
+          });
+        }
+      }
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') screenWakeLockRequestDenied = false;
+        requestScreenWakeLock();
+      });
+      document.addEventListener('pointerdown', function () {
+        if (!screenWakeLockRequestDenied) return;
+        screenWakeLockRequestDenied = false;
+        requestScreenWakeLock();
+      }, { passive: true });
+      window.addEventListener('pageshow', function () {
+        if (screenWakeLockPageHidden) {
+          screenWakeLockPageHidden = false;
+          screenWakeLockRequestDenied = false;
+        }
+        requestScreenWakeLock();
+      });
+      window.addEventListener('pagehide', releaseScreenWakeLockForPageHide);
+      requestScreenWakeLock();
       var toastEl = $('toast'), tt;
       function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove('show'); }, 2200); }
       var recitationAudio = new Audio(), recitationRange = null, recitationAyah = 0, recitationRepeatCurrent = 1;
@@ -8337,7 +8656,8 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       var scrollSpeed = scrollSpeedOptions.reduce(function (closest, speed) {
         return Math.abs(speed - savedScrollSpeed) < Math.abs(closest - savedScrollSpeed) ? speed : closest;
       }, scrollSpeedOptions[0]);
-      var autoScrollFrame = 0, autoScrollTime = 0, autoScrollPosition = 0, autoScrollHeld = false;
+      var autoScrollFrame = 0, autoScrollTime = 0, autoScrollPosition = 0, autoScrollHeld = false,
+        autoScrollInteractionActive = false, autoScrollResumeTimer = 0;
       var scrollToggle = $('scrollToggle'), scrollSpeedOptionsEl = $('scrollSpeedOptions');
       function syncScrollControls() {
         var running = !!autoScrollFrame;
@@ -8355,10 +8675,24 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       function pauseAutoScrollForInteraction() {
         if (!autoScrollFrame) return;
         autoScrollHeld = true;
+        autoScrollInteractionActive = true;
+        clearTimeout(autoScrollResumeTimer);
+        autoScrollResumeTimer = 0;
         stopAutoScroll();
+      }
+      function scheduleAutoScrollResume() {
+        if (!autoScrollHeld) return;
+        autoScrollInteractionActive = false;
+        clearTimeout(autoScrollResumeTimer);
+        autoScrollResumeTimer = setTimeout(function () {
+          autoScrollResumeTimer = 0;
+          resumeAutoScrollAfterInteraction();
+        }, 220);
       }
       function resumeAutoScrollAfterInteraction() {
         if (!autoScrollHeld) return;
+        clearTimeout(autoScrollResumeTimer);
+        autoScrollResumeTimer = 0;
         autoScrollHeld = false;
         if (!body.classList.contains('open') && !body.classList.contains('vs') && scrollMode === 'vertical') startAutoScroll();
       }
@@ -8404,17 +8738,32 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         var target = e.target instanceof Element ? e.target : null;
         if (target && target.closest('#pageList, .page-view, .sheet')) pauseAutoScrollForInteraction();
       }, true);
-      ['touchend', 'touchcancel', 'pointerup', 'pointercancel'].forEach(function (type) {
+      ['touchend', 'touchcancel', 'pointerup'].forEach(function (type) {
         document.addEventListener(type, function (e) {
           var target = e.target instanceof Element ? e.target : null;
-          if ((target && target.closest('#pageList, .page-view, .sheet')) || autoScrollHeld) resumeAutoScrollAfterInteraction();
+          if ((target && target.closest('#pageList, .page-view, .sheet')) || autoScrollHeld) scheduleAutoScrollResume();
         }, { passive: true });
       });
+      document.addEventListener('pointercancel', function (event) {
+        if (event.pointerType !== 'touch') scheduleAutoScrollResume();
+      }, { passive: true });
+      window.addEventListener('scroll', function () {
+        if (autoScrollHeld && !autoScrollInteractionActive) scheduleAutoScrollResume();
+      }, { passive: true });
+      window.addEventListener('wheel', function () {
+        if (autoScrollFrame) {
+          autoScrollHeld = true;
+          autoScrollInteractionActive = false;
+          stopAutoScroll();
+        }
+        if (autoScrollHeld && !autoScrollInteractionActive) scheduleAutoScrollResume();
+      }, { passive: true });
       syncScrollControls();
       function openD() {
         if (body.classList.contains('open')) return;
         stopAutoScroll();
         closeV(); body.classList.add('open'); drawer.setAttribute('aria-hidden', 'false');
+        syncSectionsSummary();
         show('settings');
         var h = document.querySelector('#paneSurahs .srow.here');
         if (h && !$('paneSurahs').hidden) setTimeout(function () { h.scrollIntoView({ block: 'center' }); }, 30);
@@ -8423,9 +8772,21 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       function norm(s) { return s.replace(/[ً-ٰٟۖ-ۭـ]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي'); }
 
       var paneS = $('paneSurahs');
-      paneS.innerHTML = '<button type="button" class="srow page-hit" id="pageHit" data-page="" hidden><span class="num"></span><span><div class="sname"></div><div class="smeta">انتقال مباشر إلى الصفحة</div></span></button>' + D.surahs.map(function (s) {
+      paneS.innerHTML = '<div class="sections-content" id="sectionsContent">' +
+        '<div class="sections-index-switch" role="group" aria-label="فهرس المصحف">' +
+        '<button type="button" data-section-view="surahs" aria-pressed="true">السور</button>' +
+        '<button type="button" data-section-view="juz" aria-pressed="false">الأجزاء</button>' +
+        '<button type="button" data-section-view="rub" aria-pressed="false">الأرباع</button></div>' +
+        '<div class="sections-summary" id="sectionsSummary" aria-live="polite" hidden>' +
+        '<span class="sections-summary-label">موضعك الحالي في المصحف</span>' +
+        '<strong class="sections-summary-current" id="sectionsCurrentTitle"></strong>' +
+        '<span class="sections-summary-meta" id="sectionsCurrentMeta"></span></div>' +
+        '<div class="sections-grid" id="sectionsGrid" hidden></div></div>' +
+        '<button type="button" class="srow page-hit" id="pageHit" data-page="" hidden><span class="num"></span><span><div class="sname"></div><div class="smeta">انتقال مباشر إلى الصفحة</div></span></button>' + D.surahs.map(function (s) {
         return '<button type="button" class="srow" data-s="' + s[0] + '" data-n="' + norm(s[1]) + '"><span class="num">' + ar(s[0]) + '</span><span><div class="sname">' + s[1] + '</div><div class="smeta">الصفحة ' + ar(s[4]) + ' - آياتها ' + ar(s[3]) + ' - ' + (s[2] ? 'مكية' : 'مدنية') + '</div></span></button>';
       }).join('') + '<div class="empty" id="noHit" hidden>لا توجد سورة بهذا الاسم.</div>';
+      var sectionsGrid = $('sectionsGrid'), sectionsSummary = $('sectionsSummary'),
+        sectionsContent = $('sectionsContent'), sectionMode = 'surahs';
       var rows = paneS.querySelectorAll('.srow[data-s]');
       var verseSearchResults = document.createElement('div');
       verseSearchResults.id = 'verseSearchResults';
@@ -8478,10 +8839,12 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         }
         drawVerseResults(true);
         verseSearchResults.hidden = false;
+        sectionsContent.hidden = true;
       }
       searchModeButtons.forEach(function (button) {
         button.addEventListener('click', function () {
           searchMode = button.getAttribute('data-search-mode');
+          sectionsContent.hidden = searchMode === 'verses';
           syncSearchMode();
           $('search').dispatchEvent(new Event('input'));
           $('search').focus();
@@ -8490,6 +8853,17 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       syncSearchMode();
       paneS.addEventListener('click', function (e) {
         if (e.target.closest('[data-search-more]')) { drawVerseResults(false); return; }
+        var viewButton = e.target.closest('[data-section-view]');
+        if (viewButton) {
+          setSurahIndexMode(viewButton.getAttribute('data-section-view'));
+          return;
+        }
+        var sectionButton = e.target.closest('[data-section-page]');
+        if (sectionButton) {
+          closeD();
+          goTo(+sectionButton.getAttribute('data-section-page'));
+          return;
+        }
         var verseButton = e.target.closest('[data-verse]');
         if (verseButton) { closeD(); navigateToVerse(+verseButton.getAttribute('data-verse')); return; }
         var pageButton = e.target.closest('.page-hit[data-page]');
@@ -8497,16 +8871,103 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         var b = e.target.closest('.srow[data-s]'); if (!b) return;
         closeD(); goTo(D.surahs[+b.getAttribute('data-s') - 1][4]);
       });
+      function currentSectionIndex(starts) {
+        var currentAyah = +D.pages[cur - 1] || 1, index = 0;
+        while (index + 1 < starts.length && starts[index + 1] <= currentAyah) index++;
+        return index;
+      }
+      function syncSectionsSummary() {
+        if (sectionMode === 'surahs') return;
+        var currentAyah = +D.pages[cur - 1] || 1, location = locate(currentAyah);
+        var sectionIndex = currentSectionIndex(sectionMode === 'rub' ? D.rub : D.juz);
+        var sectionName = sectionMode === 'juz'
+          ? 'الجزء ' + ar(sectionIndex + 1)
+          : 'الربع ' + ar((sectionIndex % 4) + 1) + ' من الحزب ' + ar(Math.floor(sectionIndex / 4) + 1);
+        $('sectionsCurrentTitle').textContent = sectionName;
+        $('sectionsCurrentMeta').textContent = D.surahs[location[0] - 1][1] + ' · الآية ' + ar(location[1]) + ' · الصفحة ' + ar(cur);
+        sectionsGrid.querySelectorAll('[data-section-start]').forEach(function (card) {
+          var isCurrent = currentAyah >= +card.getAttribute('data-section-start') &&
+            currentAyah < +card.getAttribute('data-section-end');
+          card.classList.toggle('is-current', isCurrent);
+          card.setAttribute('aria-current', String(isCurrent));
+        });
+      }
+      function renderSectionCards(mode) {
+        sectionMode = mode;
+        var starts = mode === 'juz' ? D.juz : D.rub;
+        var nextAyah = D.texts.reduce(function (count, surah) { return count + surah.length; }, 1);
+        sectionsGrid.classList.toggle('rub-grid', mode === 'rub');
+        sectionsGrid.innerHTML = starts.map(function (start, index) {
+          var location = locate(start), surah = D.surahs[location[0] - 1];
+          var page = pageOfId(start), end = starts[index + 1] || nextAyah;
+          var current = +D.pages[cur - 1] || 1;
+          var isCurrent = current >= start && current < end;
+          var title, meta, cardClass;
+          if (mode === 'juz') {
+            title = 'الجزء ' + ar(index + 1);
+            meta = surah[1] + ' · آية ' + ar(location[1]) + ' · ص ' + ar(page);
+            cardClass = 'section-juz-card';
+          } else {
+            title = 'الربع ' + ar((index % 4) + 1) + ' · الحزب ' + ar(Math.floor(index / 4) + 1);
+            meta = 'الجزء ' + ar(Math.floor(index / 8) + 1) + ' · ' + surah[1] + ' ' + ar(location[1]);
+            cardClass = 'section-rub-card';
+          }
+          return '<button type="button" class="' + cardClass + (isCurrent ? ' is-current' : '') +
+            '" data-section-page="' + page + '" data-section-start="' + start + '" data-section-end="' + end +
+            '" aria-current="' + String(isCurrent) + '" aria-label="' + title + '، يبدأ من سورة ' +
+            escapeHtml(surah[1]) + ' الآية ' + ar(location[1]) + '، الصفحة ' + ar(page) + '">' +
+            '<span class="section-card-number">' + ar(index + 1) + '</span><span class="section-card-copy">' +
+            '<span class="section-card-title">' + title + '</span><span class="section-card-meta">' +
+            escapeHtml(meta) + '</span></span></button>';
+        }).join('');
+        sectionsGrid.hidden = false;
+        sectionsSummary.hidden = false;
+        paneS.querySelectorAll('[data-section-view]').forEach(function (button) {
+          button.setAttribute('aria-pressed', String(button.getAttribute('data-section-view') === mode));
+        });
+        $('search').hidden = true;
+        $('searchMode').hidden = true;
+        body.classList.add('titled');
+        $('dTitleT').textContent = mode === 'juz' ? 'أجزاء المصحف' : 'أرباع المصحف';
+        $('dTitleT').hidden = false;
+        syncSectionsSummary();
+      }
+      function setSurahIndexMode(mode) {
+        if (mode === 'surahs') {
+          sectionMode = 'surahs';
+          paneS.querySelectorAll('[data-section-view]').forEach(function (button) {
+            button.setAttribute('aria-pressed', String(button.getAttribute('data-section-view') === mode));
+          });
+          sectionsContent.hidden = searchMode === 'verses';
+          sectionsGrid.hidden = true;
+          sectionsSummary.hidden = true;
+          if (!paneS.hidden) {
+            $('search').hidden = false;
+            $('searchMode').hidden = false;
+            body.classList.remove('titled');
+            $('dTitleT').hidden = true;
+          }
+          $('search').dispatchEvent(new Event('input'));
+          return;
+        }
+        verseSearchResults.hidden = true;
+        $('pageHit').hidden = true;
+        $('noHit').hidden = true;
+        rows.forEach(function (row) { row.hidden = true; });
+        renderSectionCards(mode);
+      }
       $('search').addEventListener('input', function () {
         var raw = this.value.trim(), q = norm(raw), numeric = /^[\d٠-٩]+$/.test(raw), num = numeric ? parseNum(raw) : NaN;
         var pageHit = $('pageHit');
         if (searchMode === 'verses') {
+          sectionsContent.hidden = true;
           pageHit.hidden = true;
           rows.forEach(function (r) { r.hidden = true; });
           $('noHit').hidden = true;
           searchVerses(raw);
           return;
         }
+        sectionsContent.hidden = false;
         verseSearchResults.hidden = true;
         var hasPage = numeric && num >= 1 && num <= TOTAL, any = hasPage;
         pageHit.hidden = !hasPage;
@@ -8590,15 +9051,19 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       var panes = { settings: paneSettings, surahs: paneS, worship: paneWorship, tasks: paneTasks };
       var tabSettings = $('tabSettings'), tabS = $('tabS'), tabWorship = $('tabWorship'), tabTasks = $('tabTasks');
       function show(k) {
+        if (k === 'surahs') setSurahIndexMode('surahs');
         tabS.setAttribute('aria-selected', String(k === 'surahs'));
         tabSettings.setAttribute('aria-selected', String(k === 'settings'));
         tabWorship.setAttribute('aria-selected', String(k === 'worship'));
         tabTasks.setAttribute('aria-selected', String(k === 'tasks'));
         Object.keys(panes).forEach(function (n) { panes[n].hidden = n !== k; });
-        $('search').hidden = k !== 'surahs';
-        $('searchMode').hidden = k !== 'surahs';
+        $('search').hidden = k !== 'surahs' || sectionMode !== 'surahs';
+        $('searchMode').hidden = k !== 'surahs' || sectionMode !== 'surahs';
         body.classList.toggle('titled', k !== 'surahs');
-        $('dTitleT').textContent = k === 'settings' ? 'الرئيسية' : (k === 'worship' ? 'الأذكار والمسبحة' : (k === 'tasks' ? 'المهام والمواعيد' : ''));
+        $('dTitleT').textContent = k === 'settings' ? 'الرئيسية' :
+          (k === 'surahs' && sectionMode === 'juz' ? 'أجزاء المصحف' :
+            (k === 'surahs' && sectionMode === 'rub' ? 'أرباع المصحف' :
+              (k === 'worship' ? 'الأذكار والمسبحة' : (k === 'tasks' ? 'المهام والمواعيد' : ''))));
         $('dTitleT').hidden = k === 'surahs';
         if (k === 'tasks') {
           var currentPage = window.MushafRuntime && window.MushafRuntime.getCurrentPage();
@@ -8696,45 +9161,8 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       var gharibMeanings = Object.create(null), gharibMeaningRequests = Object.create(null),
         gharibLoadFailed = false, refreshActiveWordMeaning = null;
       var wordDataWorker = null, wordDataRequestId = 0, wordDataRequests = Object.create(null);
-      var reflectionDataset = null, reflectionsByAyah = Object.create(null), reflectionLoadPromise = null;
-      function fetchJson(url) { return fetch(url).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
       function loadMeanings() { return Promise.resolve(MU); }
       function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-      function loadReflections() {
-        if (reflectionDataset) return Promise.resolve(reflectionDataset);
-        if (reflectionLoadPromise) return reflectionLoadPromise;
-        reflectionLoadPromise = fetch('./json/notes.json').then(function (response) {
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          return response.json();
-        }).then(function (dataset) {
-          if (!dataset || !dataset.license || !Array.isArray(dataset.data)) {
-            throw new Error('تنسيق ملف الوقفات التدبرية غير صالح');
-          }
-          reflectionDataset = dataset;
-          dataset.data.forEach(function (entry) {
-            if (entry && Number.isInteger(entry.surah) && Number.isInteger(entry.ayah) && Array.isArray(entry.notes)) {
-              reflectionsByAyah[entry.surah + ':' + entry.ayah] = entry.notes.filter(function (note) {
-                return note && note.category && note.category.name === 'وقفات مع سور وآيات' &&
-                  typeof note.ar_note === 'string' && note.ar_note.trim();
-              });
-            }
-          });
-          return dataset;
-        }).catch(function (error) {
-          reflectionLoadPromise = null;
-          throw error;
-        });
-        return reflectionLoadPromise;
-      }
-      function renderReflections(surah, ayah) {
-        var notes = reflectionsByAyah[surah + ':' + ayah] || [];
-        if (!notes.length) return '<p>لا توجد وقفات تدبرية مسجلة لهذه الآية.</p>';
-        var items = notes.map(function (note) {
-          return '<article class="wp-reflection"><p>' + esc(note.ar_note.trim()) + '</p>' +
-            (note.author ? '<small class="wp-reflection-author">' + esc(note.author) + '</small>' : '') + '</article>';
-        }).join('');
-        return items;
-      }
       function renderLamasat(matches, author) {
         if (!matches.length) return '';
         return matches.map(function (match) {
@@ -8909,7 +9337,8 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         if (pageFont) glyphStyle += ';--tajweed-light-palette:--tjl' + pageFont[1] + ';--tajweed-dark-palette:--tjd' + pageFont[1];
         var glyphMarkup = '<span class="' + glyphClasses + '" style="' + glyphStyle + '">' + esc(glyph) + '</span>';
         var hideAyahTafsir = a === 15;
-        var recitationDetailsWasOpen = false;
+        var recitationDetailsWasOpen = false, lamasatDetailsWasOpen = false,
+          lamasatResult = null, lamasatError = false;
         function draw() {
           var tf = MU && MU[s - 1] ? MU[s - 1][a - 1] : '';
           var h = '';
@@ -8925,28 +9354,36 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
                 (gharibLoadFailed ? (tf ? wordMeaningArabic(s, a, pos, tf) : 'تعذر تحميل مصدر المعاني.') : 'جارٍ تحميل معنى الكلمة من المصدر المختار…'));
             if (wordMeaning) {
               h += '<div class="wp-m">' +
-                (gharibMeaning ? '<small>' + esc(gharibMeaning.book || gharibBookName(+gharibBookId)) + '</small>' : '') +
+                (gharibMeaning && gharibMeaning.book !== 'السراج في بيان غريب القرآن'
+                  ? '<small>' + esc(gharibMeaning.book || gharibBookName(+gharibBookId)) + '</small>'
+                  : '') +
                 esc(wordMeaning) + '</div>';
             }
             if (!hideAyahTafsir) h += '<details class="wp-v"><summary>التفسير المختصر للآية</summary><div class="wp-v-content">' + (tf ? esc(tf) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div></details>';
           }
           if (pos <= 0 && !hideAyahTafsir) h += '<details class="wp-v"><summary>التفسير المختصر للآية</summary><div class="wp-v-content">' + (tf ? esc(tf) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div></details>';
-          h += '<details class="wp-reflections" id="wpReflections" data-verse-key="' + s + ':' + a + '">' +
-            '<summary>وقفات تدبرية</summary>' +
-            '<div class="wp-reflections-content" id="wpReflectionsContent"><p>افتح القسم لعرض الوقفات التدبرية.</p></div></details>';
-          h += '<details class="wp-lamasat" id="wpLamasat" data-verse-key="' + s + ':' + a + '" hidden>' +
+          var lamasatContent = lamasatError
+            ? '<p>تعذر تحميل اللمسات البيانية. تحقق من الاتصال ثم أعد فتح القسم.</p>'
+            : lamasatResult
+              ? (renderLamasat(lamasatResult.matches, lamasatResult.author) || '<p>لا توجد لمسات بيانية مسجلة لهذه الآية.</p>')
+              : '<p>جارٍ تحميل اللمسات البيانية…</p>';
+          h += '<details class="wp-lamasat" id="wpLamasat">' +
             '<summary>لمسات بيانية</summary>' +
-            '<div class="wp-lamasat-content" id="wpLamasatContent"></div></details>';
+            '<div class="wp-lamasat-content" id="wpLamasatContent">' + lamasatContent + '</div></details>';
           h += '<div class="wp-mark"><span>تظليل ' + (pos <= 0 ? 'الآية' : 'الكلمة') + '</span><div class="wp-colors" aria-label="اختيار لون التظليل">' + ANNOT_PALETTE.map(function (c) {
             return '<button type="button" data-wp-color="' + c + '" aria-label="' + COL[c][1] + '" title="' + COL[c][1] + '" style="background:' + COL[c][0] + '"></button>';
           }).join('') + '</div></div>';
           h += '<details class="wp-recitation"><summary>تشغيل الآيات</summary><div class="wp-recitation-mount"></div></details>';
           var previousRecitationDetails = wp.querySelector('.wp-recitation');
+          var previousLamasatDetails = wp.querySelector('#wpLamasat');
           recitationDetailsWasOpen = !!(previousRecitationDetails && previousRecitationDetails.open);
+          lamasatDetailsWasOpen = !!(previousLamasatDetails && previousLamasatDetails.open);
           wp.innerHTML = h;
           if (recitationPanel) wp.querySelector('.wp-recitation-mount').appendChild(recitationPanel);
           var recitationDetails = wp.querySelector('.wp-recitation');
+          var lamasatDetails = wp.querySelector('#wpLamasat');
           if (recitationDetails) recitationDetails.open = recitationDetailsWasOpen;
+          if (lamasatDetails) lamasatDetails.open = lamasatDetailsWasOpen;
           if (pos <= 0) {
             buildMarks();
             wp.querySelector('#wpMarksList').appendChild(paneM);
@@ -8960,20 +9397,13 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           ayah: a
         }).then(function (result) {
           if (popWord !== w) return;
-          var lamasatSection = wp.querySelector('#wpLamasat');
-          if (!lamasatSection) return;
-          var lamasatHtml = renderLamasat(result.matches, result.author);
-          if (!lamasatHtml) {
-            lamasatSection.remove();
-            return;
-          }
-          lamasatSection.querySelector('#wpLamasatContent').innerHTML = lamasatHtml;
-          lamasatSection.hidden = false;
-          placeWp(w);
+          lamasatResult = result;
+          draw();
         }).catch(function (error) {
           console.error('تعذر تحميل ملف اللمسات البيانية:', error);
-          var lamasatSection = popWord === w && wp.querySelector('#wpLamasat');
-          if (lamasatSection) lamasatSection.remove();
+          if (popWord !== w) return;
+          lamasatError = true;
+          draw();
         });
         refreshActiveWordMeaning = function () { if (popWord === w) draw(); };
         if (pos > 0) {
@@ -8994,28 +9424,6 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         openD();
       }
       wp.addEventListener('click', function (e) {
-        var reflectionsToggle = e.target.closest('#wpReflections > summary');
-        if (reflectionsToggle) {
-          var reflectionsSection = reflectionsToggle.parentNode;
-          requestAnimationFrame(function () {
-            if (!reflectionsSection.open || reflectionsSection.getAttribute('data-loaded') === 'true') return;
-            var reflectionsContent = reflectionsSection.querySelector('#wpReflectionsContent');
-            reflectionsContent.innerHTML = '<p>جارٍ تحميل الوقفات التدبرية…</p>';
-            loadReflections().then(function () {
-              if (!reflectionsSection.isConnected) return;
-              reflectionsContent.innerHTML = renderReflections.apply(null,
-                reflectionsSection.getAttribute('data-verse-key').split(':').map(Number));
-              reflectionsSection.setAttribute('data-loaded', 'true');
-              if (popWord) placeWp(popWord);
-            }).catch(function (error) {
-              console.error('تعذر تحميل الوقفات التدبرية:', error);
-              if (!reflectionsSection.isConnected) return;
-              reflectionsContent.innerHTML = '<p>تعذر تحميل الوقفات التدبرية. تحقق من الاتصال ثم أعد فتح القسم.</p>';
-              if (popWord) placeWp(popWord);
-            });
-          });
-          return;
-        }
         var recitationToggle = e.target.closest('.wp-recitation > summary');
         if (recitationToggle) {
           requestAnimationFrame(function () { if (popWord) placeWp(popWord); });
@@ -9062,7 +9470,23 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       pageList.addEventListener('pointermove', function (e) { if (lpT && (Math.abs(e.clientX - lpX) > 10 || Math.abs(e.clientY - lpY) > 10)) lpCancel(); });
       ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { pageList.addEventListener(n, lpCancel); });
       pageList.addEventListener('contextmenu', function (e) { if (e.target.closest('.w')) e.preventDefault(); });
-      document.addEventListener('pointerdown', function (e) { if (!wp.hidden && !e.target.closest('#wp') && !e.target.closest('.w')) closeWp(); }, true);
+      var suppressPopupDismissClick = false;
+      document.addEventListener('pointerdown', function (event) {
+        var target = event.target instanceof Element ? event.target : null;
+        if (wp.hidden || (target && target.closest('#wp'))) return;
+        suppressPopupDismissClick = true;
+        closeWp();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (!suppressPopupDismissClick) return;
+        suppressPopupDismissClick = false;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }, true);
+      document.addEventListener('pointerup', function () {
+        requestAnimationFrame(function () { suppressPopupDismissClick = false; });
+      }, true);
+      document.addEventListener('pointercancel', function () { suppressPopupDismissClick = false; }, true);
       var continuousUpdateFrame = 0;
       function scheduleContinuousPages() {
         if (continuousUpdateFrame) return;
@@ -9241,6 +9665,19 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       lastW = pageEl.clientWidth;
 
       var quranLoading = $('quranLoading'), quranLoadingText = $('quranLoadingText'), quranLoadingBar = $('quranLoadingBar'), quranLoadingStarted = Date.now();
+      var quranTextNotice = $('quranTextNotice'), quranTextNoticeMessage = $('quranTextNoticeMessage');
+      function showQuranTextNotice(message) {
+        if (quranTextNoticeMessage && message) quranTextNoticeMessage.textContent = message;
+        if (quranTextNotice) quranTextNotice.hidden = false;
+      }
+      function hideQuranTextNotice() {
+        if (quranTextNotice) quranTextNotice.hidden = true;
+      }
+      function revealQuran() {
+        document.body.classList.remove('quran-preparing');
+        if (quranLoading) quranLoading.classList.add('is-ready');
+        requestAnimationFrame(updateContinuousPages);
+      }
       function updateQuranLoading(percent, message) {
         if (quranLoadingBar) quranLoadingBar.style.width = Math.max(0, Math.min(100, percent)) + '%';
         if (quranLoadingText && message) {
@@ -9348,34 +9785,39 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         });
       }
       function openQuranWhenReady(assetsReady) {
-        Promise.resolve(assetsReady).then(function () {
+        return Promise.resolve(assetsReady).then(function () {
           updateQuranLoading(1, 'يتم تنزيل النصوص والخطوط المطلوبة…');
           return preloadAllQuranContent();
         }).then(function () {
           updateQuranLoading(55, 'يتم تجهيز صفحات المصحف قبل العرض…');
+          quranTextFallbackMode = false;
+          document.body.classList.remove('quran-text-fallback');
           renderInitialPage(cur);
           return renderQueue;
         }).then(function () {
+          if (quranTextFallbackMode) {
+            revealQuran();
+            return false;
+          }
+          hideQuranTextNotice();
           updateQuranLoading(100, 'اكتمل تجهيز النصوص، مرحبًا بك في المصحف');
-          var reveal = function () {
-            requestAnimationFrame(function () {
-              document.body.classList.remove('quran-preparing');
-              if (quranLoading) quranLoading.classList.add('is-ready');
-              updateContinuousPages();
-              if (!store('mq.hint')) { store('mq.hint', '1'); toast('اسحب لتقليب الصفحات، واضغط على آية لخياراتها'); }
-            });
-          };
-          setTimeout(reveal, Math.max(0, 1000 - (Date.now() - quranLoadingStarted)));
+          setTimeout(revealQuran, Math.max(0, 1000 - (Date.now() - quranLoadingStarted)));
+          if (!store('mq.hint')) { store('mq.hint', '1'); toast('اسحب لتقليب الصفحات، واضغط على آية لخياراتها'); }
+          return true;
         }).catch(function (error) {
           console.error('Unable to prepare the Quran text and fonts:', error);
-          quranLoadingText.textContent = 'لم يفتح المصحف لأن تجهيز النصوص والخطوط لم يكتمل. ' +
-            (error && error.message ? error.message : 'تحقق من الاتصال ومساحة التخزين ثم أعد المحاولة.');
-          var retryButton = document.createElement('button');
-          retryButton.type = 'button';
-          retryButton.textContent = 'إعادة المحاولة';
-          retryButton.style.cssText = 'border:0;border-radius:12px;padding:12px 22px;background:#07852a;color:#fff;font:700 14px -apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer';
-          retryButton.addEventListener('click', function () { location.reload(); });
-          quranLoadingText.parentNode.appendChild(retryButton);
+          quranTextFallbackMode = true;
+          document.body.classList.add('quran-text-fallback');
+          showQuranTextNotice('لم يكتمل تنزيل ملفات المصحف. يمكنك المتابعة بالنص العربي، ويُرجى تنزيل النصوص والخطوط داخل التطبيق لعرض المصحف كاملًا.');
+          renderInitialPage(cur);
+          return renderQueue.then(function () {
+            revealQuran();
+            return false;
+          }).catch(function (renderError) {
+            console.error('تعذر عرض النص العربي الاحتياطي للمصحف:', renderError);
+            revealQuran();
+            return false;
+          });
         });
       }
 
@@ -9432,7 +9874,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       if (!runtime) throw new Error('Mushaf runtime is unavailable');
       var $ = runtime.$, store = runtime.store, D = runtime.data;
       var toast = runtime.toast;
-      var CACHE = 'quran-pro-app-v76', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '32';
+      var CACHE = 'quran-pro-app-v82', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '38';
       function ar(n) { return String(n).replace(/\d/g, function (d) { return AR[d]; }); }
       var urls = (function () {
         var a = [
@@ -9442,7 +9884,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           './worship-data.js',
           './worship-ui.js',
           './json/meanings.json',
-          './json/lamasat_bayani_words.json',
+          './json/lamasat.json',
           './integrated-services-data.js',
           './integrated-services.js',
           './prayer-times.js',
@@ -9462,6 +9904,15 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       var chip = document.getElementById('dlChip'), bar = document.getElementById('dlBar'),
         pct = document.getElementById('dlPct'), lbl = document.getElementById('dlLabel');
       var done = 0, running = false, runningPromise = null, failed = [], firstError = '';
+      function showQuranTextNotice(message) {
+        var notice = $('quranTextNotice'), noticeMessage = $('quranTextNoticeMessage');
+        if (noticeMessage && message) noticeMessage.textContent = message;
+        if (notice) notice.hidden = false;
+      }
+      function hideQuranTextNotice() {
+        var notice = $('quranTextNotice');
+        if (notice) notice.hidden = true;
+      }
 
       function markDone() { try { localStorage.setItem(DONE_KEY, VER); } catch (e) { } }
       function update() {
@@ -9633,6 +10084,27 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         }
       });
       syncInstallButton();
+      var quranTextDownload = $('quranTextDownload'), quranTextNoticeClose = $('quranTextNoticeClose');
+      quranTextDownload.addEventListener('click', function () {
+        if (quranTextDownload.disabled) return;
+        quranTextDownload.disabled = true;
+        quranTextDownload.textContent = 'جارٍ التنزيل…';
+        runtime.openWhenReady(run()).then(function (ready) {
+          if (ready) {
+            hideQuranTextNotice();
+            toast('اكتمل تنزيل ملفات المصحف');
+            return;
+          }
+          showQuranTextNotice('لم يكتمل تنزيل ملفات المصحف. تحقق من الاتصال ثم اضغط «تنزيل الملفات» للمحاولة مجددًا.');
+        }).catch(function (error) {
+          console.error('تعذر إعادة تنزيل ملفات المصحف:', error);
+          showQuranTextNotice('تعذر تنزيل ملفات المصحف. تحقق من الاتصال ثم حاول مرة أخرى.');
+        }).then(function () {
+          quranTextDownload.disabled = false;
+          quranTextDownload.textContent = 'تنزيل الملفات';
+        });
+      });
+      quranTextNoticeClose.addEventListener('click', hideQuranTextNotice);
       if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
         navigator.serviceWorker.register('./sw.js').catch(function (error) {
           console.error('Unable to register the Qurany service worker:', error);

@@ -59,25 +59,35 @@ function findMeaning(request) {
       return item && item.surah === request.surah && item.ayah === request.ayah;
     });
     var books = entry && Array.isArray(entry.meanings) ? entry.meanings : [];
-    var book = books.find(function (item) {
-      return item && item.book_info && +item.book_info.id === +request.bookId;
-    });
     var selectedKey = normalizeWord(request.word);
-    if (!book || !selectedKey || !Array.isArray(book.words)) return '';
-    var match = book.words.find(function (item) {
-      if (!item || !item.text || !item.meaning) return false;
-      var entryKey = normalizeWord(item.text);
-      var entryWords = item.text.split(/\s+/).map(normalizeWord);
-      return entryKey === selectedKey || entryWords.indexOf(selectedKey) >= 0 ||
-        (selectedKey.length >= 4 && entryKey.indexOf(selectedKey) >= 0);
+    if (!selectedKey) return '';
+    var supportedBookIds = [491, 327, 1424];
+    var availableBooks = books.filter(function (book) {
+      return book && book.book_info && supportedBookIds.indexOf(+book.book_info.id) >= 0 &&
+        Array.isArray(book.words);
     });
-    return match ? { text: match.meaning, word: match.text, book: book.book_info.name } : '';
+    availableBooks.sort(function (a, b) {
+      return (+a.book_info.id === +request.bookId ? -1 : 0) -
+        (+b.book_info.id === +request.bookId ? -1 : 0);
+    });
+    for (var i = 0; i < availableBooks.length; i++) {
+      var book = availableBooks[i];
+      var match = book.words.find(function (item) {
+        if (!item || !item.text || !item.meaning) return false;
+        var entryKey = normalizeWord(item.text);
+        var entryWords = item.text.split(/\s+/).map(normalizeWord);
+        return entryKey === selectedKey || entryWords.indexOf(selectedKey) >= 0 ||
+          (selectedKey.length >= 4 && entryKey.indexOf(selectedKey) >= 0);
+      });
+      if (match) return { text: match.meaning, word: match.text, book: book.book_info.name };
+    }
+    return '';
   });
 }
 
 function loadLamasat() {
   if (!lamasatPromise) {
-    lamasatPromise = fetch('./json/lamasat_bayani_words.json').then(function (response) {
+    lamasatPromise = fetch('./json/lamasat.json').then(function (response) {
       if (!response.ok) throw new Error('HTTP ' + response.status);
       return response.json();
     }).then(function (dataset) {
