@@ -121,6 +121,63 @@
     }
     return counts;
   }
+  function playAzkarCompletionFeedback() {
+    if (typeof navigator.vibrate === 'function') {
+      try {
+        if (navigator.vibrate(18)) return;
+      } catch (error) {
+        console.warn('تعذر تشغيل الاهتزاز عند إكمال الذكر.', error);
+      }
+    }
+
+    var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    var context;
+    try {
+      context = new AudioContextClass();
+      var oscillator = context.createOscillator();
+      var gain = context.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.value = 660;
+      gain.gain.setValueAtTime(0.035, context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.09);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.onended = function () {
+        context.close().catch(function (error) {
+          console.error('تعذر إغلاق مؤثر إكمال الذكر الصوتي.', error);
+        });
+      };
+      context.resume().then(function () {
+        oscillator.start();
+        oscillator.stop(context.currentTime + 0.09);
+      }).catch(function (error) {
+        console.error('تعذر تشغيل مؤثر إكمال الذكر الصوتي.', error);
+        context.close().catch(function (closeError) {
+          console.error('تعذر إغلاق مؤثر إكمال الذكر الصوتي.', closeError);
+        });
+      });
+    } catch (error) {
+      console.error('تعذر تجهيز مؤثر إكمال الذكر الصوتي.', error);
+      if (context && context.state !== 'closed') {
+        context.close().catch(function (closeError) {
+          console.error('تعذر إغلاق مؤثر إكمال الذكر الصوتي.', closeError);
+        });
+      }
+    }
+  }
+  function animateAzkarCount(index, completed) {
+    var item = azkarList.querySelector('[data-worship-azkar-item="' + index + '"]');
+    var button = item && item.querySelector('.worship-azkar-action');
+    if (!item || !button) return;
+    button.classList.add('is-counting');
+    window.setTimeout(function () { button.classList.remove('is-counting'); }, 350);
+    if (completed) {
+      item.classList.add('just-completed');
+      window.setTimeout(function () { item.classList.remove('just-completed'); }, 650);
+      playAzkarCompletionFeedback();
+    }
+  }
   function syncAzkarTask(list, counts) {
     var completed = list.length > 0 && list.every(function (item, index) {
       return counts[index] >= Math.max(1, Number(item.c) || 1);
@@ -142,6 +199,8 @@
   var categoryList = $('worshipAzkarCategoryList');
   var azkarList = $('worshipAzkarList');
   var categoryCloseTimer = 0;
+  var azkarTouchStart = null;
+  var azkarSwipeClickBlock = null;
   function paintCategoryOptions() {
     categoryList.innerHTML = data.categories.map(function (category) {
       return '<button type="button" class="azkar-category-option" data-worship-category="' +
@@ -226,7 +285,57 @@
     categoryCloseTimer = window.setTimeout(function () { categoryWrap.hidden = true; }, 300);
     paintAzkar();
   });
+  azkarList.addEventListener('touchstart', function (event) {
+    if (event.touches.length !== 1) {
+      azkarTouchStart = null;
+      return;
+    }
+    var target = event.target;
+    var card = target.closest('[data-worship-azkar-item]');
+    if (!card || target.closest('button')) {
+      azkarTouchStart = null;
+      return;
+    }
+    azkarTouchStart = {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY,
+      card: card
+    };
+  }, { passive: true });
+  azkarList.addEventListener('touchend', function (event) {
+    if (!azkarTouchStart || event.changedTouches.length !== 1) {
+      azkarTouchStart = null;
+      return;
+    }
+    var start = azkarTouchStart;
+    azkarTouchStart = null;
+    var touch = event.changedTouches[0];
+    var deltaY = start.y - touch.clientY;
+    var deltaX = Math.abs(start.x - touch.clientX);
+    if (deltaY < 34 || deltaX > 56) return;
+
+    var nextCard = start.card.nextElementSibling;
+    if (!nextCard || !nextCard.matches('[data-worship-azkar-item]')) return;
+    azkarSwipeClickBlock = { cards: [start.card, nextCard], until: Date.now() + 250 };
+    nextCard.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      block: 'nearest'
+    });
+    nextCard.classList.remove('is-swipe-target');
+    void nextCard.offsetWidth;
+    nextCard.classList.add('is-swipe-target');
+    window.setTimeout(function () { nextCard.classList.remove('is-swipe-target'); }, 500);
+  }, { passive: true });
+  azkarList.addEventListener('touchcancel', function () { azkarTouchStart = null; }, { passive: true });
   azkarList.addEventListener('click', function (event) {
+    var clickedCard = event.target.closest('[data-worship-azkar-item]');
+    if (azkarSwipeClickBlock && Date.now() < azkarSwipeClickBlock.until &&
+        event.detail > 0 && azkarSwipeClickBlock.cards.indexOf(clickedCard) !== -1) {
+      azkarSwipeClickBlock = null;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     var skip = event.target.closest('[data-worship-azkar-skip]');
     var action = event.target.closest('[data-worship-azkar-count]');
     var card = event.target.closest('[data-worship-azkar-item]');
@@ -238,11 +347,13 @@
     var progress = readAzkarProgress();
     var counts = countsFor(categoryId, list, progress);
     var target = Math.max(1, Number(list[index].c) || 1);
+    var completedByPress = !skip && counts[index] < target && counts[index] + 1 >= target;
     if (skip) counts[index] = target;
     else if (counts[index] >= target) counts[index] = 0;
     else counts[index]++;
     writeStored('mq.worshipAzkarProgress', progress);
     paintAzkar();
+    if (action) animateAzkarCount(index, completedByPress);
   });
   function stopVoiceCount() {
     if (voiceTimer) window.clearInterval(voiceTimer);

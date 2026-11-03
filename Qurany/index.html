@@ -184,7 +184,6 @@
     .tajweed-active .w {
       /* COLRv1 color fonts display native Tajweed colors */
       text-rendering: optimizeLegibility;
-      -webkit-font-smoothing: antialiased;
     }
 
     /* دليل ألوان التجويد المدمج أسفل كل صفحة */
@@ -1378,10 +1377,10 @@
       touch-action: manipulation;
     }
 
-    body.quran-bold .sheet .ln,
+    body.quran-bold .sheet .w,
     body.quran-bold .sheet .bis,
     body.quran-bold .sheet .hn {
-      filter: url(#quranFontBold);
+      -webkit-text-stroke: var(--quran-font-stroke, 0px) currentColor;
     }
 
     .w.pop {
@@ -2459,6 +2458,38 @@
     .qpt-row-name { font-size: 14px; font-weight: 900; }
     .qpt-row-time { direction: ltr; white-space: nowrap; font-size: 15px; font-weight: 900; font-variant-numeric: tabular-nums; }
     .qpt-row-time small { margin-left: 4px; color: var(--muted); font-size: 10px; }
+    .qpt-bell { display: grid; width: 30px; height: 34px; flex: 0 0 30px; place-items: center; padding: 0; color: var(--muted); background: transparent; }
+    .qpt-bell.is-enabled { color: var(--green); }
+    .qpt-bell:disabled { opacity: .5; }
+    .qpt-bell svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .qpt-bell .qpt-bell-slash { stroke-width: 2.2; }
+    .qpt-alerts { display: block; overflow: hidden; margin-top: 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+    .qpt-alert-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 54px; padding: 10px 14px; cursor: pointer; list-style: none; }
+    .qpt-alert-summary::-webkit-details-marker { display: none; }
+    .qpt-alert-summary > span { display: grid; gap: 2px; min-width: 0; }
+    .qpt-alert-summary b { color: var(--green); font-size: 14px; font-weight: 900; }
+    .qpt-alert-summary small { overflow: hidden; color: var(--muted); font-size: 10px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .qpt-alert-summary i { width: 9px; height: 9px; flex: 0 0 9px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform .18s ease; }
+    .qpt-alerts[open] .qpt-alert-summary { border-bottom: 1px solid var(--line); }
+    .qpt-alerts[open] .qpt-alert-summary i { transform: rotate(225deg) translate(-2px, -1px); }
+    .qpt-alert-content { display: grid; gap: 12px; padding: 14px; }
+    .qpt-alerts input[type="checkbox"] { width: 18px; height: 18px; margin: 0; accent-color: var(--green); }
+    .qpt-alert-option, .qpt-alert-toggle, .qpt-notification-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12px; font-weight: 800; }
+    .qpt-alert-option select { max-width: 150px; border: 1px solid var(--line); border-radius: 10px; padding: 7px 9px; color: var(--ink); background: var(--panel); font: inherit; }
+    .qpt-audio-info { justify-self: end; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .qpt-audio-info summary { width: 20px; height: 20px; border: 1px solid var(--line); border-radius: 50%; text-align: center; line-height: 18px; cursor: pointer; list-style: none; }
+    .qpt-audio-info summary::-webkit-details-marker { display: none; }
+    .qpt-audio-info > div { padding-top: 5px; }
+    .qpt-audio-info a { color: inherit; text-decoration: underline; }
+    .qpt-alert-toggle { justify-content: flex-start; }
+    .qpt-notification-row { padding-top: 10px; border-top: 1px solid var(--line); }
+    .qpt-notification-row[hidden] { display: none; }
+    .qpt-notification-button { flex: 0 0 auto; border: 1px solid color-mix(in srgb, var(--green) 30%, var(--line)); border-radius: 999px; padding: 7px 11px; color: var(--green); background: var(--panel); font: 800 11px -apple-system, BlinkMacSystemFont, sans-serif; }
+    .qpt-notification-button[hidden] { display: none; }
+    .qpt-alert-status { min-height: 0; margin: 0; color: var(--muted); font-size: 10px; font-weight: 800; }
+    .qpt-alert-status:empty { display: none; }
+    .qpt-alert-status[data-kind="warning"] { color: var(--sub); }
+    .qpt-alert-status[data-kind="error"] { color: var(--red); }
     .qpt-actions { display: flex; justify-content: center; padding: 12px 0 4px; }
     .qpt-retry { border-radius: 999px; padding: 10px 20px; background: linear-gradient(135deg,var(--green),color-mix(in srgb,var(--green) 72%,var(--sub))); color: var(--on-green); font: 800 13px -apple-system, BlinkMacSystemFont, sans-serif; }
     .qpt-note { margin: 10px 4px 0; color: var(--muted); font-size: 10px; text-align: center; }
@@ -2543,6 +2574,35 @@
       gap: 10px;
       padding: 12px 12px 6px;
     }
+    .quran-index-switch {
+      display: flex;
+      width: min(100% - 24px, 360px);
+      margin: 10px auto 0;
+    }
+    .quran-index-switch[hidden] { display: none; }
+    .sections-content[hidden] { display: none; }
+    .quarter-index-content { gap: 4px; }
+    .juz-index-row {
+      min-height: 38px;
+      margin-top: 7px;
+      padding: 4px 8px;
+      border: 1px solid color-mix(in srgb, var(--green) 38%, var(--line));
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--green) 9%, var(--panel));
+    }
+    .juz-index-row .num {
+      width: 25px;
+      height: 25px;
+      background: var(--green);
+      color: var(--on-green);
+      font-size: 10px;
+    }
+    .juz-index-row .sname { color: var(--green); font-size: 11px; }
+    .juz-index-row .smeta { margin-top: 0; font-size: 9px; }
+    .quarter-index-row { min-height: 32px; padding: 2px 7px; gap: 7px; }
+    .quarter-index-row .num { width: 21px; height: 21px; font-size: 9px; }
+    .quarter-index-row .sname { font-size: 10px; line-height: 1.2; }
+    .quarter-index-row .smeta { margin-top: 0; font-size: 8px; line-height: 1.25; }
     .worship-content { padding: 12px; display: grid; align-content: start; gap: 11px; }
     .worship-switch { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px; padding: 4px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-top); }
     .worship-switch button { min-height: 40px; border: 1px solid transparent; border-radius: 10px; color: var(--muted); font: inherit; font-size: 12px; font-weight: 800; background: transparent; transition: background .18s, transform .15s; }
@@ -2591,6 +2651,7 @@
     .worship-azkar-item:active { transform: scale(.985); }
     .worship-azkar-item.is-active { border-color: color-mix(in srgb,#0F8AC2 55%,var(--line)); background: color-mix(in srgb,#38BDF8 8%,var(--panel)); box-shadow: 0 8px 18px rgba(15,138,194,.12); }
     .worship-azkar-item.is-complete { border-color: color-mix(in srgb,#10B981 50%,var(--line)); background: color-mix(in srgb,#10B981 8%,var(--panel)); }
+    .worship-azkar-item.is-swipe-target { animation: azkarSwipeArrive .38s cubic-bezier(.2,.8,.2,1); }
     .worship-azkar-top { display: flex; align-items: center; gap: 8px; min-height: 30px; margin-bottom: 7px; }
     .worship-azkar-number { display: grid; flex: none; width: 30px; height: 30px; place-items: center; border-radius: 50%; color: var(--green); background: color-mix(in srgb,var(--green) 13%,var(--panel)); font-size: 11px; font-weight: 900; }
     .is-active .worship-azkar-number { color: #fff; background: linear-gradient(135deg,#38BDF8,#0F8AC2); }
@@ -2601,6 +2662,11 @@
     .worship-azkar-footer { display: flex; align-items: center; gap: 8px; margin-top: 9px; padding-top: 8px; border-top: 1px dashed var(--line); }
     .worship-azkar-count { min-width: 42px; color: var(--muted); font-size: 9px; font-weight: 800; white-space: nowrap; }
     .worship-azkar-action { display: grid; flex: none; min-width: 44px; height: 38px; place-items: center; padding: 0 12px; border: 0; border-radius: 99px; color: #fff; background: linear-gradient(135deg,#38BDF8,#0F8AC2); box-shadow: 0 5px 12px rgba(15,138,194,.25); font: inherit; font-size: 15px; font-weight: 900; }
+    .worship-azkar-action.is-counting { animation: azkarCountTap .28s cubic-bezier(.2,.8,.2,1); }
+    .worship-azkar-item.just-completed { animation: azkarCompleteGlow .55s ease-out; }
+    @keyframes azkarCountTap { 45% { transform: scale(1.16); box-shadow: 0 0 0 7px color-mix(in srgb,#38BDF8 20%,transparent); } }
+    @keyframes azkarCompleteGlow { 35% { transform: scale(1.012); box-shadow: 0 0 0 4px color-mix(in srgb,#10B981 18%,transparent),0 8px 18px rgba(16,185,129,.2); } }
+    @keyframes azkarSwipeArrive { 45% { transform: translateY(-4px); box-shadow: 0 9px 20px rgba(15,138,194,.16); } }
     .is-complete .worship-azkar-action { background: linear-gradient(135deg,#34D399,#059669); }
     .worship-azkar-skip { min-height: 35px; padding: 0 10px; border: 1px dashed var(--line); border-radius: 99px; color: var(--muted); background: var(--panel); font: inherit; font-size: 9px; font-weight: 800; white-space: nowrap; }
     .worship-complete { padding: 16px 12px; border: 1px solid color-mix(in srgb,#10B981 30%,var(--line)); border-radius: 16px; color: #087A53; background: color-mix(in srgb,#10B981 9%,var(--panel)); font-size: 13px; font-weight: 900; line-height: 1.9; text-align: center; }
@@ -2624,7 +2690,7 @@
       :root:not([data-theme="light"]) #worshipAzkar.is-evening .worship-azkar-item.is-active .worship-azkar-number,
       :root:not([data-theme="light"]) #worshipAzkar.is-evening .worship-azkar-item.is-active .worship-azkar-action { color: #241705; }
     }
-    @media (prefers-reduced-motion: reduce) { .azkar-categories-wrap,.worship-azkar-item,.tasbeeh-mic { transition: none !important; animation: none !important; } }
+    @media (prefers-reduced-motion: reduce) { .azkar-categories-wrap,.worship-azkar-item,.worship-azkar-action,.tasbeeh-mic { transition: none !important; animation: none !important; } }
 
     .srow {
       display: flex;
@@ -3919,9 +3985,6 @@
 
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
     <defs>
-      <filter id="quranFontBold" x="-2%" y="-12%" width="104%" height="124%">
-        <feMorphology id="quranFontMorphology" operator="dilate" radius="0" />
-      </filter>
       <pattern id="arab" width="60" height="112" patternUnits="userSpaceOnUse">
         <path class="p-line"
           d="M0 28 C16 8 30 8 30 28 C30 44 14 44 14 30 C14 20 24 20 24 28 M30 28 C30 48 46 52 60 28 M0 84 C16 104 30 104 30 84 C30 68 14 68 14 82 C14 92 24 92 24 84 M30 84 C30 64 46 60 60 84 M30 56 C40 42 52 46 54 56 C52 66 40 70 30 56 M30 56 C20 42 8 46 6 56 C8 66 20 70 30 56" />
@@ -4102,7 +4165,7 @@
           <button type="button" role="tab" id="tabSettings" aria-selected="true">الرئيسية</button>
           <button type="button" role="tab" id="tabS" aria-selected="false">السور</button>
           <button type="button" role="tab" id="tabWorship" aria-selected="false">أذكار</button>
-          <button type="button" role="tab" id="tabTasks" aria-selected="false">مهامي</button>
+          <button type="button" role="tab" id="tabTasks" aria-selected="false">الإعدادات</button>
         </div>
       </div>
       <input class="search" id="search" type="search" placeholder="سورة أو رقم صفحة" autocomplete="off"
@@ -4164,10 +4227,10 @@
         </section>
       </div>
     </div>
-    <div class="d-body" id="paneTasks" hidden>
+    <div class="d-body" id="paneTasks" aria-label="الإعدادات" hidden>
       <div id="tasksApp" aria-label="المهام والملف الشخصي"></div>
     </div>
-    <div class="d-body" id="paneSettings">
+    <div class="d-body" id="paneSettings" aria-label="الرئيسية">
       <section class="integrated-services" id="integratedServices" aria-label="خدمات المصحف">
         <div class="integrated-services-head"><span aria-hidden="true">✦</span><div><b>مساحتك للعبادة والتعلّم</b><small>خدمات مدمجة ضمن تجربة المصحف</small></div></div>
         <div class="integrated-services-grid">
@@ -4175,7 +4238,7 @@
           <button type="button" class="integrated-service-card" data-app-service="radio"><span class="integrated-service-icon" aria-hidden="true">📻</span><span class="integrated-service-copy"><b>إذاعة القرآن</b><small>بث ومحطات وتسجيلات</small></span></button>
         </div>
       </section>
-      <section class="settings" aria-label="الرئيسية">
+      <section class="settings" aria-label="الإعدادات">
         <div class="settings-body" id="settingsBody">
         <div class="settings-card install-app-card">
           <div class="settings-card-head">
@@ -4261,8 +4324,8 @@
           </div>
           <div class="settings-toggle-group" id="fontStrokeGroup">
             <button type="button" class="st-btn active" data-stroke="0" data-label="عادي" aria-pressed="true">عادي</button>
-            <button type="button" class="st-btn" data-stroke="0.6" data-label="متوسط" aria-pressed="false">متوسط</button>
-            <button type="button" class="st-btn" data-stroke="1.2" data-label="عريض" aria-pressed="false">عريض</button>
+            <button type="button" class="st-btn" data-stroke="0.4" data-label="متوسط" aria-pressed="false">متوسط</button>
+            <button type="button" class="st-btn" data-stroke="0.6" data-label="عريض" aria-pressed="false">عريض</button>
           </div>
         </div>
 
@@ -4798,10 +4861,10 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
         ['الجماعة الأولى', 2], ['أذكار بعد الصلاة', 1], ['السنة البعدية', 2]
       ] },
       { key: 'qiyam', category: 'قيام الليل والوتر', icon: 'moon', tasks: [
-        ['ركعتان قيام ليل', 2], ['الورد اليومي — جزء كامل', 2], ['الوتر', 2]
+        ['ركعتان قيام ليل', 2], ['الوتر', 2]
       ] },
       { key: 'quran', category: 'الفجر', icon: 'book', tasks: [
-        ['حفظ نصف صفحة', 2], ['قراءة ستة أرباع', 2]
+        ['حفظ نصف صفحة', 2], ['الورد اليومي', 2]
       ] }
     ];
     const defaultTasks = defaultTaskSections.flatMap(section => section.tasks.map((task, index) => ({
@@ -4827,6 +4890,32 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
       ['trophy', '🏆', 'إنجاز'], ['ban', '🚭', 'إقلاع'], ['flame', '🔥', 'حماس'],
       ['bolt', '⚡', 'طاقة'], ['star', '⭐', 'عام'], ['check', '✅', 'تم'], ['home', '🏠', 'بيت']
     ];
+    const taskIconPaths = {
+      mosque: '<path d="M3 20h18M5 20V10h14v10M8 10V7l4-3 4 3v3M10 20v-5h4v5M3 10l9-6 9 6"/>',
+      sparkle: '<path d="M12 3 14 9l6 3-6 2-2 7-2-7-6-2 6-3 2-6Z"/><path d="m19 3 .7 2.3L22 6l-2.3.7L19 9l-.7-2.3L16 6l2.3-.7L19 3Z"/>',
+      drop: '<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11Z"/><path d="M9 15a3 3 0 0 0 3 3"/>',
+      activity: '<path d="M3 12h4l3-7 4 14 3-7h4"/>',
+      dumbbell: '<path d="M6 9v6M3 10v4M18 9v6M21 10v4M6 12h12"/>',
+      walk: '<circle cx="14" cy="5" r="2"/><path d="m12 9-3 4 3 2 1 5M12 10l4 3 3 1M9 13l-4 5M13 15l4 4"/>',
+      book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M4 17.5A2.5 2.5 0 0 1 6.5 15H20M8 7h8M8 10h6"/>',
+      moon: '<path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/>',
+      sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>',
+      leaf: '<path d="M20 4c-9 0-15 3-15 10a6 6 0 0 0 6 6c7 0 10-7 9-16Z"/><path d="M5 20c3-5 7-8 12-11"/>',
+      apple: '<path d="M12 8c-2-3-7-2-8 2-1 5 2 11 6 11 1 0 1.5-.5 2-.5s1 .5 2 .5c4 0 7-6 6-11-1-4-6-5-8-2Z"/><path d="M12 8c0-3 1-5 4-6-1 3-2 5-4 6Z"/>',
+      pill: '<path d="M4.8 19.2a5 5 0 0 1 0-7.1l7.3-7.3a5 5 0 0 1 7.1 7.1l-7.3 7.3a5 5 0 0 1-7.1 0Z"/><path d="m8.3 8.6 7.1 7.1"/>',
+      heart: '<path d="M20.8 8.8c0 5-8.8 11-8.8 11s-8.8-6-8.8-11A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z"/>',
+      smile: '<path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',
+      target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><path d="m14 10 6-6m-4 0h4v4"/>',
+      trophy: '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4ZM7 6H4v2a4 4 0 0 0 4 4m9-6h3v2a4 4 0 0 1-4 4"/>',
+      ban: '<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>',
+      flame: '<path d="M13 3c1 4-2 5-1 8 1-2 3-3 4-5 3 3 5 7 3 11a7.5 7.5 0 0 1-14-1c-1-4 1-8 5-11 0 4 1 5 2 6 1-3 2-5 1-8Z"/><path d="M10 17a2 2 0 0 0 4 0c0-1-1-2-2-3-1 1-2 2-2 3Z"/>',
+      bolt: '<path d="m13 2-9 12h7l-1 8 10-13h-7l1-7Z"/>',
+      star: '<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/>',
+      check: '<path d="m5 12 4 4L19 6"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10"/>',
+      home: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z"/>'
+    };
+    const taskIconSvg = (name, className) =>
+      `<svg class="${className}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${taskIconPaths[name] || taskIconPaths.star}</svg>`;
     const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     })[ch]);
@@ -5066,18 +5155,17 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
       if (!schedule.fresh || !schedule.timings) return '';
       const now = new Date();
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      const prayerMinutes = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء']
-        .map(category => prayerMinutesForTask({ category: category }, schedule))
-        .filter(minutes => minutes != null);
-      if (!prayerMinutes.length) return '';
-      let activeCategory = 'العشاء';
-      let latestMinutes = -1;
-      ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء'].forEach(category => {
-        const minutes = prayerMinutesForTask({ category: category }, schedule);
-        if (minutes != null && minutes <= currentMinutes && minutes > latestMinutes) {
-          activeCategory = category;
-          latestMinutes = minutes;
-        }
+      const prayers = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء']
+        .map(category => ({
+          category,
+          minutes: prayerMinutesForTask({ category: category }, schedule)
+        }))
+        .filter(prayer => prayer.minutes != null)
+        .sort((a, b) => a.minutes - b.minutes);
+      if (!prayers.length) return '';
+      let activeCategory = prayers[prayers.length - 1].category;
+      prayers.forEach(prayer => {
+        if (prayer.minutes <= currentMinutes) activeCategory = prayer.category;
       });
       return activeCategory;
     }
@@ -5141,7 +5229,7 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
       if (changed) save();
     }
     function seedDefaultTasks() {
-      if (state.defaultTasksVersion >= 3) return;
+      if (state.defaultTasksVersion >= 4) return;
       if (state.defaultTasksVersion < 1) {
         const taskIds = new Set(state.tasks.map(task => task.id));
         const today = todayKey();
@@ -5157,6 +5245,25 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
           && !String(task.id).startsWith('daily-default-azkar-')
         );
       }
+      state.tasks = state.tasks.filter(task =>
+        task.title !== 'مهمة اختبار غير مصنفة'
+        && task.title !== 'قراءة ستة أرباع'
+      );
+      const dailyWird = defaultTasks.find(task => task.id === 'daily-default-quran-1');
+      const previousDailyWird = state.tasks.find(task =>
+        task.id === 'daily-default-qiyam-1' || (task.defaultTask && task.title === 'الورد اليومي — جزء كامل')
+      );
+      if (previousDailyWird && dailyWird) {
+        Object.assign(previousDailyWird, {
+          id: dailyWird.id,
+          title: dailyWird.title,
+          points: dailyWird.points,
+          category: dailyWird.category,
+          icon: dailyWird.icon,
+          defaultTask: true,
+          daily: true
+        });
+      }
       const defaultsById = new Map(defaultTasks.map(task => [task.id, task]));
       state.tasks = state.tasks.map(task => {
         const updated = task.defaultTask && defaultsById.get(task.id);
@@ -5166,7 +5273,16 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
           icon: updated.icon
         }) : task;
       });
-      state.defaultTasksVersion = 3;
+      if (dailyWird) {
+        let keptDailyWird = false;
+        state.tasks = state.tasks.filter(task => {
+          if (task.id !== dailyWird.id) return true;
+          if (keptDailyWird) return false;
+          keptDailyWird = true;
+          return true;
+        });
+      }
+      state.defaultTasksVersion = 4;
       save();
     }
     function taskVisible(task) {
@@ -5329,16 +5445,11 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
       const prayerSchedule = readPrayerSchedule();
       const activePrayer = currentPrayerCategory(prayerSchedule);
       const scheduledTasks = state.tasks.filter(taskVisible);
-      const shownTasks = activePrayer
-        ? scheduledTasks.filter(task => task.category === activePrayer ||
-          (activePrayer === 'العشاء' && task.category === 'قيام الليل والوتر'))
-        : [];
-      const pendingTasks = shownTasks.filter(task => !task.done);
-      const completedTasks = shownTasks.filter(task => task.done);
+      const pendingTasks = scheduledTasks.filter(task => !task.done);
+      const completedTasks = scheduledTasks.filter(task => task.done);
       const earnedPoints = completedTasks.reduce((total, task) => total + (Number(task.points) || 0), 0);
-      const availablePoints = shownTasks.reduce((total, task) => total + (Number(task.points) || 0), 0);
-      const scheduledHidden = state.tasks.length - shownTasks.length;
-      const prayerHidden = Math.max(0, scheduledTasks.length - shownTasks.length);
+      const availablePoints = scheduledTasks.reduce((total, task) => total + (Number(task.points) || 0), 0);
+      const scheduledHidden = state.tasks.length - scheduledTasks.length;
       const taskDays = validDays(state.taskDraft.days);
       const currentIcon = icons.find(icon => icon[0] === state.taskDraft.icon) || icons[icons.length - 1];
       const taskDraftCategory = taskPrayerCategories.includes(state.taskDraft.category) ? state.taskDraft.category : (activePrayer || 'الفجر');
@@ -5350,18 +5461,17 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
           <select id="taskPrayerCategory" name="category">${taskPrayerCategories.map(category => `<option value="${esc(category)}" ${taskDraftCategory === category ? 'selected' : ''}>${esc(category)}</option>`).join('')}</select>
           <label class="field-label" for="taskPoints">النقاط عند الإنجاز</label>
           <input id="taskPoints" name="points" type="number" min="0" max="100" step="1" inputmode="numeric" value="${Number.isInteger(Number(state.taskDraft.points)) ? Number(state.taskDraft.points) : 1}">
-          <div class="option-row"><button type="button" class="chip ${state.taskDraft.daily ? 'selected' : ''}" data-action="daily">🔁 مهمة يومية</button><button type="button" class="chip ${taskDays.length ? 'selected' : ''}" data-action="task-days">📅 ${taskDays.length ? 'تحديد الأيام' : 'كل الأيام'}</button></div>
+          <div class="option-row"><button type="button" class="chip ${state.taskDraft.daily ? 'selected' : ''}" data-action="daily" aria-pressed="${state.taskDraft.daily}"><svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M19 12a7 7 0 0 0-12-5L4 10M4 17v-5h5"/><path d="M5 12a7 7 0 0 0 12 5l3-3"/></svg><span>مهمة يومية</span></button><button type="button" class="chip ${taskDays.length ? 'selected' : ''}" data-action="task-days" aria-pressed="${taskDays.length > 0}"><svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/></svg><span>${taskDays.length ? 'تحديد الأيام' : 'كل الأيام'}</span></button></div>
           ${state.taskDraft.daysOpen ? `<div class="days-grid">${days.map(day => `<button type="button" class="day-chip ${taskDays.includes(day.value) ? 'selected' : ''}" data-action="task-day" data-day="${day.value}">${day.label}</button>`).join('')}</div>` : ''}
           ${taskDays.length ? `<div class="hint">ستظهر في: ${esc(taskDays.length === 7 ? 'كل يوم' : days.filter(day => taskDays.includes(day.value)).map(day => day.label).join('، '))}</div>` : ''}
-          <div class="icon-grid">${icons.map(icon => `<button type="button" class="icon-choice ${currentIcon[0] === icon[0] ? 'selected' : ''}" title="${icon[2]}" aria-label="${icon[2]}" data-action="task-icon" data-icon="${icon[0]}">${icon[1]}</button>`).join('')}</div>
+          <div class="icon-grid" role="group" aria-label="أيقونة المهمة">${icons.map(icon => `<button type="button" class="icon-choice ${currentIcon[0] === icon[0] ? 'selected' : ''}" title="${icon[2]}" aria-label="${icon[2]}" aria-pressed="${currentIcon[0] === icon[0]}" data-action="task-icon" data-icon="${icon[0]}">${taskIconSvg(icon[0], 'task-icon-svg')}</button>`).join('')}</div>
         </form>`;
-      const taskCards = sortTasksByPrayerTime(pendingTasks, prayerSchedule)
-        .concat(sortTasksByPrayerTime(completedTasks, prayerSchedule)).map(task => {
+      function renderTaskCard(task) {
         const icon = icons.find(item => item[0] === task.icon) || icons[icons.length - 1];
         const scheduled = taskDayLabel(task);
         return `<article class="item-card ${task.done ? 'is-done' : ''}">
           <button class="check-button" type="button" data-action="toggle-task" data-id="${esc(task.id)}" aria-label="${task.done ? 'إلغاء إكمال' : 'إكمال'} ${esc(task.title)}">${task.done ? '✓' : ''}</button>
-          <span class="item-icon" aria-hidden="true">${icon[1]}</span><div class="item-copy"><strong>${esc(task.title)}</strong>
+          <span class="item-icon" aria-hidden="true">${taskIconSvg(icon[0], 'task-icon-svg')}</span><div class="item-copy"><strong>${esc(task.title)}</strong>
           <span class="item-meta">
             ${task.category ? `<span class="task-category">🕒 ${esc(taskTimeLabel(task, prayerSchedule))}</span>` : ''}
             ${Number(task.points) > 0 ? `<span class="task-points">⭐ ${Number(task.points)} ${Number(task.points) === 1 ? 'نقطة' : 'نقاط'}</span>` : ''}
@@ -5370,7 +5480,36 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
           </span></div>
           <button class="delete-button" type="button" data-action="delete-task" data-id="${esc(task.id)}" aria-label="حذف ${esc(task.title)}">×</button>
         </article>`;
+      }
+      const prayerTaskGroups = [
+        { category: 'الفجر', categories: ['الفجر'] },
+        { category: 'الظهر', categories: ['الظهر'] },
+        { category: 'العصر', categories: ['العصر'] },
+        { category: 'المغرب', categories: ['المغرب'] },
+        { category: 'العشاء', categories: ['العشاء', 'قيام الليل والوتر'] }
+      ];
+      const taskSections = prayerTaskGroups
+        .filter(group => !activePrayer || group.category === activePrayer)
+        .map(group => {
+        const groupTasks = scheduledTasks.filter(task => group.categories.includes(task.category));
+        const cards = sortTasksByPrayerTime(groupTasks.filter(task => !task.done), prayerSchedule)
+          .concat(sortTasksByPrayerTime(groupTasks.filter(task => task.done), prayerSchedule))
+          .map(renderTaskCard).join('');
+        return `<section class="prayer-task-group" aria-label="مهام صلاة ${esc(group.category)}">
+          <div class="prayer-task-group-head"><h4>صلاة ${esc(group.category)}</h4><span>${groupTasks.length} مهمة</span></div>
+          ${cards || '<div class="prayer-task-empty">لا توجد مهام لهذه الصلاة اليوم.</div>'}
+        </section>`;
       }).join('');
+      const uncategorizedTasks = scheduledTasks.filter(task => !taskPrayerCategories.includes(task.category));
+      const uncategorizedCards = sortTasksByPrayerTime(uncategorizedTasks.filter(task => !task.done), prayerSchedule)
+        .concat(sortTasksByPrayerTime(uncategorizedTasks.filter(task => task.done), prayerSchedule))
+        .map(renderTaskCard).join('');
+      const uncategorizedSection = uncategorizedTasks.length
+        ? `<section class="prayer-task-group" aria-label="مهام غير مرتبطة بصلاة">
+            <div class="prayer-task-group-head"><h4>مهام أخرى</h4><span>${uncategorizedTasks.length} مهمة</span></div>
+            ${uncategorizedCards}
+          </section>`
+        : '';
       const leaderboardEntries = defaultLeaderboard.concat(
         state.profile.name || state.profile.totalPoints
           ? [{ name: state.profile.name || 'ملفك الشخصي', points: state.profile.totalPoints, avatar: state.profile.avatar || './logo.png', isYou: true }]
@@ -5446,6 +5585,8 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
           h3,h4,p{margin:0}.hero h3{font-size:16px}.hero p{margin-top:3px;color:var(--muted);font-size:12px}
           .switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:4px;gap:4px;border:1px solid var(--line);border-radius:12px;background:var(--panel-top)}
           button{cursor:pointer} .switch button,.chip,.day-chip{border:1px solid transparent;border-radius:9px;padding:8px 6px;background:transparent;color:var(--muted);font-size:12px;font-weight:800}
+          .switch button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:40px}
+          .switch-icon{width:17px;height:17px;flex:none}
           .switch button[aria-pressed=true],.chip.selected,.day-chip.selected{background:color-mix(in srgb,var(--green) 12%,var(--panel));border-color:color-mix(in srgb,var(--green) 35%,var(--line));color:var(--green)}
           .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.stat{padding:9px 5px;text-align:center;border:1px solid var(--line);border-radius:11px;background:var(--card)}
           .stat b{display:block;color:var(--green);font-size:17px;line-height:1.2}.stat span{color:var(--muted);font-size:10px}
@@ -5457,13 +5598,25 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
           input:focus,textarea:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 2px color-mix(in srgb,var(--green) 14%,transparent)}
           textarea{resize:vertical}.field-label,.date-row label span,.time-row span{font-size:11px;font-weight:800;color:var(--muted)}
           .input-row{display:flex;gap:7px}.input-row input{flex:1}.icon-only{width:42px;flex:none;font-size:22px;padding:2px}
-          .option-row{display:flex;gap:6px;flex-wrap:wrap}.chip{border-color:var(--line);background:var(--card)}
+          .option-row{display:flex;gap:6px;flex-wrap:wrap}.chip{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-color:var(--line);background:var(--card);transition:color .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease}
+          .chip-icon{width:15px;height:15px;flex:none}
+          .chip:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+          .chip.selected{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--green) 12%,transparent)}
           .days-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.day-chip{border-color:var(--line);background:var(--card);padding:7px 3px}
-          .hint{color:var(--muted);font-size:11px}.icon-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
-          .icon-choice{min-height:34px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-size:17px}
-          .icon-choice.selected{border-color:var(--green);background:color-mix(in srgb,var(--green) 12%,var(--panel))}
+          .hint{color:var(--muted);font-size:11px}.icon-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+          .icon-choice{display:grid;place-items:center;aspect-ratio:1;min-width:0;padding:0;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--muted);transition:color .16s ease,background .16s ease,border-color .16s ease,transform .16s ease,box-shadow .16s ease}
+          .icon-choice:hover{border-color:color-mix(in srgb,var(--green) 45%,var(--line));color:var(--green);transform:translateY(-1px)}
+          .icon-choice:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+          .icon-choice.selected{border-color:var(--green);background:color-mix(in srgb,var(--green) 11%,var(--panel));color:var(--green);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--green) 14%,transparent)}
+          .task-icon-svg{display:block;width:20px;height:20px;flex:none}
           .item-list{display:grid;gap:5px}.item-card{display:flex;align-items:center;gap:6px;min-height:54px;padding:5px 7px;border:1px solid var(--line);border-radius:11px;background:var(--card)}
-          .item-card.is-done{opacity:.72}.item-icon{width:26px;text-align:center;font-size:16px;flex:none}
+          .prayer-task-groups{display:grid;gap:14px}.prayer-task-group{display:grid;gap:6px;min-width:0}
+          .prayer-task-group-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 2px 4px;border-bottom:1px solid var(--line)}
+          .prayer-task-group-head h4{margin:0;color:var(--green);font-size:13px;font-weight:900}
+          .prayer-task-group-head span{color:var(--muted);font-size:10px;font-weight:700}
+          .prayer-task-empty{padding:7px 4px;color:var(--muted);font-size:10px}
+          .item-card.is-done{opacity:.72}.item-icon{display:grid;place-items:center;width:34px;height:34px;flex:none;border:1px solid color-mix(in srgb,var(--green) 14%,var(--line));border-radius:11px;background:color-mix(in srgb,var(--green) 8%,var(--panel));color:var(--green)}
+          .item-icon .task-icon-svg{width:19px;height:19px}
           .item-copy{min-width:0;flex:1;display:grid;gap:3px}.item-copy strong{overflow-wrap:anywhere;font-size:12px;line-height:1.35}.item-copy small{color:var(--muted);font-size:10px;overflow-wrap:anywhere}
           .item-meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;min-width:0}
           .task-category,.task-points{display:inline-flex;align-items:center;gap:3px;padding:1px 5px;border-radius:6px;font-size:10px;font-weight:800;line-height:1.4;white-space:nowrap}
@@ -5529,25 +5682,25 @@ select:focus,input:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 
         <main class="app">
           <header class="hero"><div class="hero-title"><span class="hero-icon">🌿</span><div><h3>رتّب يومك واطمئن</h3><p>خطوات صغيرة، وأوقات مباركة</p></div></div></header>
           <div class="switch" role="tablist" aria-label="المهام والملف الشخصي">
-            <button type="button" role="tab" data-action="view" data-view="tasks" aria-pressed="${state.view === 'tasks'}">✅ المهام</button>
-            <button type="button" role="tab" data-action="view" data-view="profile" aria-pressed="${state.view === 'profile'}">👤 الملف الشخصي</button>
+            <button type="button" role="tab" data-action="view" data-view="tasks" aria-pressed="${state.view === 'tasks'}"><svg class="switch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M8.5 12l2.2 2.2 4.8-4.8M8.5 17h7"/></svg><span>المهام</span></button>
+            <button type="button" role="tab" data-action="view" data-view="profile" aria-pressed="${state.view === 'profile'}"><svg class="switch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg><span>الملف الشخصي</span></button>
           </div>
           ${state.view === 'profile' ? profileView : `
             <div class="stats"><div class="stat"><b>${pendingTasks.length}</b><span>متبقية اليوم</span></div><div class="stat"><b>${completedTasks.length}</b><span>مكتملة اليوم</span></div><div class="stat"><b>${earnedPoints} / ${availablePoints}</b><span>النقاط المحققة</span></div></div>
-          <p class="prayer-schedule-note" role="status">${prayerSchedule.fresh
-            ? `تعرض الآن مهام ${esc(activePrayer)} فقط، وتتغير القائمة عند دخول الصلاة التالية.`
+          <p class="prayer-schedule-note" role="status">${prayerSchedule.fresh && activePrayer
+            ? `تُعرض الآن مهام صلاة ${esc(activePrayer)} حسب مواقيت اليوم.`
             : prayerSchedule.error
-              ? 'تعذرت قراءة مواقيت الصلاة. أعد فتح مواقيت الصلاة من قسم الرئيسية لتحديث الجدول.'
-              : 'افتح مواقيت الصلاة من قسم الرئيسية لتحديث المواقيت وإظهار مهام الصلاة الحالية.'}</p>
-          <div class="section-head"><h4>مهام ${esc(activePrayer || 'الصلاة الحالية')} · ${shownTasks.length} مهمة</h4><button type="button" class="add-toggle" data-action="toggle-form">＋ مهمة جديدة</button></div>
+              ? 'تعذرت قراءة مواقيت الصلاة؛ تظهر كل المهام مجمّعة حسب الصلاة حتى تحديث الجدول.'
+              : prayerSchedule.fresh
+                ? 'لم تتوفر مواقيت صحيحة لتحديد الصلاة الحالية؛ تظهر كل المهام مجمّعة حسب الصلاة.'
+                : 'تظهر كل المهام مجمّعة حسب الصلاة حتى تحديث مواقيت اليوم من قسم الرئيسية.'}</p>
+          <div class="section-head"><h4>مهام اليوم · ${scheduledTasks.length} مهمة</h4><button type="button" class="add-toggle" data-action="toggle-form">＋ مهمة جديدة</button></div>
           ${state.formOpen ? form : ''}
-            ${shownTasks.length ? `<div class="item-list">${taskCards}</div>` : `<div class="empty">${!prayerSchedule.fresh
-              ? 'تظهر مهام الصلاة بعد تحديث مواقيت الصلاة من قسم الرئيسية.'
-              : prayerHidden
-                ? `لا توجد مهام متبقية لهذه الصلاة. ${prayerHidden} مهمة أخرى تظهر في أوقاتها.`
-                : scheduledHidden
-                  ? `لا توجد مهام مجدولة لهذا اليوم. لديك ${scheduledHidden} مهام في أيام أخرى.`
-                  : 'لا توجد مهام لهذا الوقت. أضف مهمة وحدد وقت إنجازها.'}</div>`}
+            ${scheduledTasks.length
+              ? `<div class="prayer-task-groups">${taskSections}${uncategorizedSection}</div>`
+              : `<div class="empty">${scheduledHidden
+                ? `لا توجد مهام مجدولة لهذا اليوم. لديك ${scheduledHidden} مهام في أيام أخرى.`
+                : 'لا توجد مهام مجدولة لليوم. أضف مهمة وحدد الصلاة المناسبة.'}</div>`}
           ${storageError ? `<div class="error" role="alert">${esc(storageError)}</div>` : ''}
           `}
         </main>`;
@@ -6574,7 +6727,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
 
       var TOTAL = D.pages.length - 1;
       var JUZ = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن', 'التاسع', 'العاشر', 'الحادي عشر', 'الثاني عشر', 'الثالث عشر', 'الرابع عشر', 'الخامس عشر', 'السادس عشر', 'السابع عشر', 'الثامن عشر', 'التاسع عشر', 'العشرون', 'الحادي والعشرون', 'الثاني والعشرون', 'الثالث والعشرون', 'الرابع والعشرون', 'الخامس والعشرون', 'السادس والعشرون', 'السابع والعشرون', 'الثامن والعشرون', 'التاسع والعشرون', 'الثلاثون'];
-      var QLABEL = ['الحزب', 'ربع الحزب', 'نصف الحزب', 'ثلاثة أرباع الحزب'];
+      var QUARTER_NAMES = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن'];
 
       var START = []; (function () { var a = 1; D.surahs.forEach(function (s) { START.push(a); a += s[3]; }); })();
       function locate(id) { var lo = 0, hi = 113; while (lo < hi) { var m = (lo + hi + 1) >> 1; if (START[m] <= id) lo = m; else hi = m - 1; } return [lo + 1, id - START[lo] + 1]; }
@@ -6585,7 +6738,6 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       function fam(n) { return 'QCF4_Hafs_' + (n < 10 ? '0' : '') + n; }
       function hdrChar(s) { return String.fromCharCode(0xF100 + s - 1); }
       function vk(v) { return Math.floor(v / 1000) + ':' + (v % 1000); }
-
       /* ---------- saved state ---------- */
       var COL = { red: ['#c8283a', 'الأحمر'], yellow: ['#d9a21b', 'الأصفر'], green: ['#3aa24a', 'الأخضر'], blue: ['#1f7fc4', 'الأزرق'], purple: ['#8a4fc7', 'البنفسجي'], orange: ['#e8782a', 'البرتقالي'], pink: ['#d94f8c', 'الوردي'], teal: ['#159a9a', 'الفيروزي'] };
       var ANNOT_PALETTE = ['purple', 'blue', 'green', 'yellow', 'red'];
@@ -6705,7 +6857,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           var chunkUrl = './fonts/tajweed/' + chunkName + '.woff2';
           function requestChunk(retry) {
             var cachedChunk = 'caches' in window
-                ? caches.open('quran-pro-app-v83').then(function (cache) { return cache.match(chunkUrl); })
+                ? caches.open('quran-pro-app-v108').then(function (cache) { return cache.match(chunkUrl); })
               : Promise.resolve(null);
             return cachedChunk.then(function (response) {
               if (response) return response.arrayBuffer();
@@ -6714,7 +6866,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
                 var copy = networkResponse.clone();
                 return networkResponse.arrayBuffer().then(function (buffer) {
                   if ('caches' in window) {
-                    return caches.open('quran-pro-app-v83').then(function (cache) {
+                    return caches.open('quran-pro-app-v108').then(function (cache) {
                       return cache.put(chunkUrl, copy).then(function () { return buffer; });
                     });
                   }
@@ -6827,8 +6979,23 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           $('pgTotal').textContent = '/ ' + ar(TOTAL);
           $('bPrev').disabled = p <= 1; $('bNext').disabled = p >= TOTAL;
           updateBm();
-          document.querySelectorAll('#paneSurahs .srow').forEach(function (r) { r.classList.toggle('here', secs.indexOf(+r.getAttribute('data-s')) >= 0); });
+          document.querySelectorAll('#paneSurahs .srow[data-s]').forEach(function (r) { r.classList.toggle('here', secs.indexOf(+r.getAttribute('data-s')) >= 0); });
+          syncIndexHighlights(p);
         }
+      }
+
+      function syncIndexHighlights(page) {
+        var currentAyahId = sel && pageOfV(sel) === page
+          ? idOf(Math.floor(sel / 1000), sel % 1000)
+          : D.pages[page - 1];
+        var currentQuarter = 0;
+        while (currentQuarter < D.rub.length - 1 && D.rub[currentQuarter + 1] <= currentAyahId) currentQuarter++;
+        document.querySelectorAll('#quartersContent [data-index-juz]').forEach(function (row) {
+          row.classList.toggle('here', +row.getAttribute('data-index-juz') === juzOfId(currentAyahId));
+        });
+        document.querySelectorAll('#quartersContent [data-index-quarter]').forEach(function (row) {
+          row.classList.toggle('here', +row.getAttribute('data-index-quarter') === currentQuarter + 1);
+        });
       }
 
       function ensureTajweedLegend(view) {
@@ -6897,7 +7064,8 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         sheet.querySelectorAll('.w[data-v]').forEach(function (w) {
           var v = +w.getAttribute('data-v'); if (v) seen[Math.floor(v / 1000)] = 1;
         });
-        document.querySelectorAll('#paneSurahs .srow').forEach(function (r) { r.classList.toggle('here', !!seen[+r.getAttribute('data-s')]); });
+        document.querySelectorAll('#paneSurahs .srow[data-s]').forEach(function (r) { r.classList.toggle('here', !!seen[+r.getAttribute('data-s')]); });
+        syncIndexHighlights(cur);
       }
 
       function render(view, p) {
@@ -6951,10 +7119,10 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
             } else {
               var full = spaced && info[i].em >= 0.84 * M, vs = {};
               var fontFam = useTajweed ? ('TJ' + p) : fam(l[1]);
-              var inner = l[2].map(function (it, wordIndex) { 
+              var inner = l[2].map(function (it) {
                 if (it[0]) vs[it[0]] = 1; 
-                var char = useTajweed ? tajweedGlyphs[tajweedWordIndex++] : it[1], wordFont = fontFam;
-                return '<span class="w" data-v="' + it[0] + '" data-p="' + (it[2] || 0) + '" style="font-family:' + wordFont + '">' + char + '</span>'; 
+                var char = useTajweed ? tajweedGlyphs[tajweedWordIndex++] : it[1];
+                return '<span class="w" data-v="' + it[0] + '" data-p="' + (it[2] || 0) + '" style="font-family:' + fontFam + '">' + char + '</span>'; 
               }).join('');
               html += '<div class="ln ' + (full ? 'full' : 'cen') + '" data-vs="' + Object.keys(vs).join(',') + '" style="font-size:' + fs.toFixed(2) + 'px">' + inner + '</div>';
             }
@@ -7479,6 +7647,19 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         fillAyahSelect(recitationTo, count, to);
       }
 
+      function setRecitationVerse(verseId) {
+        var surah = Math.floor(verseId / 1000), ayah = verseId % 1000;
+        if (!D.surahs[surah - 1] || ayah < 1 || ayah > D.surahs[surah - 1][3]) return;
+        stopRecitation('تم تحديد الآية المختارة للاستماع');
+        recitationSurah.value = String(surah);
+        updateRecitationBounds(true);
+        recitationFrom.value = String(ayah);
+        recitationTo.value = String(ayah);
+        recitationFrom._refreshProfessionalSelect();
+        recitationTo._refreshProfessionalSelect();
+        saveRecitationPrefs();
+      }
+
       function saveRecitationPrefs() {
         save('mq.recitationPrefs', {
           surah: +recitationSurah.value,
@@ -7981,15 +8162,48 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         if (h && !$('paneSurahs').hidden) setTimeout(function () { h.scrollIntoView({ block: 'center' }); }, 30);
       }
       function closeD() { body.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true'); }
-      function norm(s) { return s.replace(/[ً-ٰٟۖ-ۭـ]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي'); }
+      function norm(s) {
+        return s.replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u08D3-\u08FF\u0640]/g, '')
+          .replace(/[أإآٱ]/g, 'ا').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي').replace(/ء/g, '')
+          .replace(/ة/g, 'ه').replace(/ى/g, 'ي');
+      }
 
       var paneS = $('paneSurahs');
-      paneS.innerHTML = '<div class="sections-content" id="sectionsContent">' +
+      paneS.innerHTML = '<div class="seg quran-index-switch" id="quranIndexSwitch" role="group" aria-label="عرض فهرس المصحف">' +
+        '<button type="button" data-index-view="surahs" aria-pressed="true">السور</button>' +
+        '<button type="button" data-index-view="quarters" aria-pressed="false">الأرباع</button></div>' +
+        '<div class="sections-content" id="sectionsContent">' +
         '<button type="button" class="srow page-hit" id="pageHit" data-page="" hidden><span class="num"></span><span><div class="sname"></div><div class="smeta">انتقال مباشر إلى الصفحة</div></span></button>' +
         D.surahs.map(function (s) {
           return '<button type="button" class="srow" data-s="' + s[0] + '" data-n="' + norm(s[1]) + '"><span class="num">' + ar(s[0]) + '</span><span><div class="sname">' + s[1] + '</div><div class="smeta">الصفحة ' + ar(s[4]) + ' - آياتها ' + ar(s[3]) + ' - ' + (s[2] ? 'مكية' : 'مدنية') + '</div></span></button>';
-        }).join('') + '<div class="empty" id="noHit" hidden>لا توجد سورة بهذا الاسم.</div></div>';
+        }).join('') + '<div class="empty" id="noHit" hidden>لا توجد سورة بهذا الاسم.</div></div>' +
+        '<div class="sections-content quarter-index-content" id="quartersContent" hidden>' +
+        D.juz.map(function (startId, juzIndex) {
+          var start = locate(startId), startSurah = D.surahs[start[0] - 1];
+          var juzVerseId = start[0] * 1000 + start[1];
+          var heading = '<button type="button" class="srow juz-index-row" data-verse="' + juzVerseId +
+            '" data-index-juz="' + (juzIndex + 1) + '"><span class="num">' + ar(juzIndex + 1) +
+            '</span><span><div class="sname">الجزء ' + JUZ[juzIndex] +
+            '</div><div class="smeta">' + escapeHtml(startSurah[1]) + ' · الآية ' + ar(start[1]) +
+            ' · الصفحة ' + ar(pageOfId(startId)) + '</div></span></button>';
+          var quarterRows = D.rub.slice(juzIndex * 8, (juzIndex + 1) * 8).map(function (quarterId, quarterIndex) {
+            var position = locate(quarterId), surah = D.surahs[position[0] - 1];
+            var verseId = position[0] * 1000 + position[1];
+            var quarterNumber = juzIndex * 8 + quarterIndex + 1;
+            return '<button type="button" class="srow quarter-index-row" data-verse="' + verseId +
+              '" data-index-quarter="' + quarterNumber + '"><span class="num">' + ar(quarterNumber) +
+              '</span><span><div class="sname">الربع ' + QUARTER_NAMES[quarterIndex] +
+              '</div><div class="smeta">الجزء ' + JUZ[juzIndex] + ' · ' + escapeHtml(surah[1]) +
+              ' · الآية ' + ar(position[1]) + ' · الصفحة ' + ar(pageOfId(quarterId)) +
+              '</div></span></button>';
+          }).join('');
+          return heading + quarterRows;
+        }).join('') + '</div>';
       var sectionsContent = $('sectionsContent');
+      var quartersContent = $('quartersContent');
+      var indexSwitch = $('quranIndexSwitch');
+      var indexView = 'surahs';
+      var indexViewButtons = indexSwitch.querySelectorAll('[data-index-view]');
       var rows = paneS.querySelectorAll('.srow[data-s]');
       var verseSearchResults = document.createElement('div');
       verseSearchResults.id = 'verseSearchResults';
@@ -7998,12 +8212,29 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       var searchMode = 'surahs', matchingVerses = [], renderedVerseCount = 0;
       var verseBatchSize = 100;
       var searchModeButtons = document.querySelectorAll('[data-search-mode]');
+      function syncIndexView() {
+        var searchingVerses = searchMode === 'verses';
+        indexSwitch.hidden = searchingVerses;
+        sectionsContent.hidden = searchingVerses || indexView !== 'surahs';
+        quartersContent.hidden = searchingVerses || indexView !== 'quarters';
+        indexViewButtons.forEach(function (button) {
+          button.setAttribute('aria-pressed', String(button.getAttribute('data-index-view') === indexView));
+        });
+      }
+      indexViewButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          indexView = button.getAttribute('data-index-view');
+          syncIndexView();
+          paneS.scrollTop = 0;
+        });
+      });
       function syncSearchMode() {
         searchModeButtons.forEach(function (button) {
           button.setAttribute('aria-pressed', String(button.getAttribute('data-search-mode') === searchMode));
         });
         $('search').placeholder = searchMode === 'verses' ? 'اكتب كلمة أو عبارة من آية' : 'سورة أو رقم صفحة';
         $('search').setAttribute('aria-label', $('search').placeholder);
+        syncIndexView();
       }
       function drawVerseResults(reset) {
         if (reset) {
@@ -8047,7 +8278,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       searchModeButtons.forEach(function (button) {
         button.addEventListener('click', function () {
           searchMode = button.getAttribute('data-search-mode');
-          sectionsContent.hidden = searchMode === 'verses';
+        syncIndexView();
           syncSearchMode();
           $('search').dispatchEvent(new Event('input'));
           $('search').focus();
@@ -8061,20 +8292,20 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         var pageButton = e.target.closest('.page-hit[data-page]');
         if (pageButton && pageButton.getAttribute('data-page')) { closeD(); goTo(+pageButton.getAttribute('data-page')); return; }
         var b = e.target.closest('.srow[data-s]'); if (!b) return;
-        closeD(); goTo(D.surahs[+b.getAttribute('data-s') - 1][4]);
+        closeD(); navigateToVerse(+b.getAttribute('data-s') * 1000 + 1);
       });
       $('search').addEventListener('input', function () {
         var raw = this.value.trim(), q = norm(raw), numeric = /^[\d٠-٩]+$/.test(raw), num = numeric ? parseNum(raw) : NaN;
         var pageHit = $('pageHit');
         if (searchMode === 'verses') {
-          sectionsContent.hidden = true;
+          syncIndexView();
           pageHit.hidden = true;
           rows.forEach(function (r) { r.hidden = true; });
           $('noHit').hidden = true;
           searchVerses(raw);
           return;
         }
-        sectionsContent.hidden = false;
+        syncIndexView();
         verseSearchResults.hidden = true;
         var hasPage = numeric && num >= 1 && num <= TOTAL, any = hasPage;
         pageHit.hidden = !hasPage;
@@ -8155,6 +8386,8 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       var paneSettings = $('paneSettings');
       var paneWorship = $('paneWorship');
       var paneTasks = $('paneTasks');
+      paneSettings.appendChild($('tasksApp'));
+      paneTasks.appendChild(paneSettings.querySelector('.settings'));
       var panes = { settings: paneSettings, surahs: paneS, worship: paneWorship, tasks: paneTasks };
       var tabSettings = $('tabSettings'), tabS = $('tabS'), tabWorship = $('tabWorship'), tabTasks = $('tabTasks');
       function show(k) {
@@ -8171,7 +8404,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         $('searchMode').hidden = k !== 'surahs';
         body.classList.toggle('titled', k !== 'surahs');
         $('dTitleT').textContent = k === 'settings' ? 'الرئيسية' :
-          (k === 'worship' ? 'الأذكار والمسبحة' : (k === 'tasks' ? 'المهام والملف الشخصي' : ''));
+          (k === 'worship' ? 'الأذكار والمسبحة' : (k === 'tasks' ? 'الإعدادات' : ''));
         $('dTitleT').hidden = k === 'surahs';
       }
       tabS.addEventListener('click', function () { show('surahs'); });
@@ -8486,7 +8719,13 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           if (recitationPanel) wp.querySelector('.wp-recitation-mount').appendChild(recitationPanel);
           var recitationDetails = wp.querySelector('.wp-recitation');
           var lamasatDetails = wp.querySelector('#wpLamasat');
-          if (recitationDetails) recitationDetails.open = recitationDetailsWasOpen;
+          if (recitationDetails) {
+            recitationDetails.addEventListener('toggle', function () {
+              if (recitationDetails.open) setRecitationVerse(v);
+            });
+            recitationDetails.open = recitationDetailsWasOpen;
+            if (recitationDetailsWasOpen) setRecitationVerse(v);
+          }
           if (lamasatDetails) lamasatDetails.open = lamasatDetailsWasOpen;
           if (pos <= 0) {
             buildMarks();
@@ -8574,23 +8813,50 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       pageList.addEventListener('pointermove', function (e) { if (lpT && (Math.abs(e.clientX - lpX) > 10 || Math.abs(e.clientY - lpY) > 10)) lpCancel(); });
       ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { pageList.addEventListener(n, lpCancel); });
       pageList.addEventListener('contextmenu', function (e) { if (e.target.closest('.w')) e.preventDefault(); });
-      var suppressPopupDismissClick = false;
+      var popupDismissPointer = null;
+      var popupDismissPointerTimer = 0;
       document.addEventListener('pointerdown', function (event) {
+        window.clearTimeout(popupDismissPointerTimer);
+        popupDismissPointerTimer = 0;
+        if (wp.hidden) { popupDismissPointer = null; return; }
         var target = event.target instanceof Element ? event.target : null;
-        if (wp.hidden || (target && target.closest('#wp'))) return;
-        suppressPopupDismissClick = true;
-        closeWp();
+        popupDismissPointer = {
+          inside: !!(target && target.closest('#wp')),
+          x: event.clientX,
+          y: event.clientY,
+          moved: false
+        };
+      }, true);
+      document.addEventListener('pointermove', function (event) {
+        if (!popupDismissPointer || popupDismissPointer.moved) return;
+        if (Math.abs(event.clientX - popupDismissPointer.x) > 10 ||
+            Math.abs(event.clientY - popupDismissPointer.y) > 10) popupDismissPointer.moved = true;
       }, true);
       document.addEventListener('click', function (event) {
-        if (!suppressPopupDismissClick) return;
-        suppressPopupDismissClick = false;
+        window.clearTimeout(popupDismissPointerTimer);
+        popupDismissPointerTimer = 0;
+        if (lpFired) { popupDismissPointer = null; return; }
+        var target = event.target instanceof Element ? event.target : null;
+        var pointer = popupDismissPointer;
+        popupDismissPointer = null;
+        if (wp.hidden || (target && target.closest('#wp')) ||
+            (event.detail > 0 && pointer && (pointer.inside || pointer.moved))) return;
+        closeWp();
         event.preventDefault();
         event.stopImmediatePropagation();
       }, true);
       document.addEventListener('pointerup', function () {
-        requestAnimationFrame(function () { suppressPopupDismissClick = false; });
+        window.clearTimeout(popupDismissPointerTimer);
+        popupDismissPointerTimer = window.setTimeout(function () {
+          popupDismissPointer = null;
+          popupDismissPointerTimer = 0;
+        }, 500);
       }, true);
-      document.addEventListener('pointercancel', function () { suppressPopupDismissClick = false; }, true);
+      document.addEventListener('pointercancel', function () {
+        window.clearTimeout(popupDismissPointerTimer);
+        popupDismissPointerTimer = 0;
+        popupDismissPointer = null;
+      }, true);
       var continuousUpdateFrame = 0;
       function scheduleContinuousPages() {
         if (continuousUpdateFrame) return;
@@ -8968,7 +9234,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       if (!runtime) throw new Error('Mushaf runtime is unavailable');
       var $ = runtime.$, store = runtime.store, D = runtime.data;
       var toast = runtime.toast;
-      var CACHE = 'quran-pro-app-v83', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '39';
+      var CACHE = 'quran-pro-app-v108', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '54';
       function ar(n) { return String(n).replace(/\d/g, function (d) { return AR[d]; }); }
       var urls = (function () {
         var a = [
@@ -9246,9 +9512,8 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
 
       function applyFontStroke(num) {
         currentFontStroke = num;
-        var morphology = $('quranFontMorphology');
         var pageWidth = $('page').clientWidth || window.innerWidth || 400;
-        if (morphology) morphology.setAttribute('radius', (num * 0.625 * pageWidth / 400).toFixed(2));
+        document.body.style.setProperty('--quran-font-stroke', (num * 1.25 * pageWidth / 400).toFixed(2) + 'px');
         document.body.classList.toggle('quran-bold', num > 0);
       }
 
@@ -9256,7 +9521,9 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         var parsed = parseFloat(strokeVal);
         var num = isFinite(parsed) ? Math.max(0, Math.min(1.5, parsed)) : 0;
         num = Math.round(num * 10) / 10;
-        label = num === 0 ? 'عادي' : (num <= 0.6 ? 'متوسط' : 'عريض');
+        var selectedButton = document.querySelector('#fontStrokeGroup .st-btn[data-stroke="' + num + '"]');
+        label = label || (selectedButton && selectedButton.getAttribute('data-label')) ||
+          (num === 0 ? 'عادي' : (num <= 0.4 ? 'متوسط' : 'عريض'));
         applyFontStroke(num);
         store('mq.stroke', String(num));
         store('mq.strokeLabel', label);
@@ -9369,11 +9636,13 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           var btn = e.target.closest('.st-btn');
           if (!btn) return;
           var stroke = btn.getAttribute('data-stroke') || '0';
-          setFontStroke(stroke);
+          setFontStroke(stroke, btn.getAttribute('data-label'));
           toast('تم ضبط سُمْك الخط: ' + $('strokeValLabel').textContent);
         });
       }
       var initStroke = store('mq.stroke') || '0';
+      if (initStroke === '0.6') initStroke = '0.4';
+      else if (initStroke === '1.2' || initStroke === '0.5') initStroke = '0.6';
       setFontStroke(initStroke);
 
       var btnOpenGuide = $('openTajweedGuideBtn');

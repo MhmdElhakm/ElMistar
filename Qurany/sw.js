@@ -1,4 +1,4 @@
-var CACHE_NAME = 'quran-pro-app-v82';
+var CACHE_NAME = 'quran-pro-app-v108';
 var APP_SHELL = [
   './index.html',
   './word-data-worker.js',
@@ -30,6 +30,20 @@ self.addEventListener('activate', function (event) {
         if (key.indexOf('quran-pro-app-') === 0 && key !== CACHE_NAME) return caches.delete(key);
       }));
     }).then(function () { return self.clients.claim(); })
+  );
+});
+
+self.addEventListener('notificationclick', function (event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (windows) {
+      for (var i = 0; i < windows.length; i++) {
+        if (new URL(windows[i].url).origin === self.location.origin) {
+          return windows[i].focus();
+        }
+      }
+      return clients.openWindow(event.notification.data && event.notification.data.url || './');
+    })
   );
 });
 

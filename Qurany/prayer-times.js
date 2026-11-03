@@ -42,9 +42,36 @@
   var DEFAULT_CITY = CITIES.find(function (city) { return city.id === 'aswan'; }) || CITIES[0];
   var CACHE_KEY = 'quran_prayer_cache_v1';
   var CITY_KEY = 'quran_prayer_city_v1';
+  var ALERTS_KEY = 'quran_prayer_alerts_v1';
+  var ALERT_CACHE = 'quran-prayer-audio-v1';
+  var AUDIO_PATH = './audio-cache/';
+  var ALERT_PRAYERS = PRAYERS.slice();
+  var ADHAN_VOICE_ID = 'adhan-makkah';
+  var ADHAN_VOICES = {
+    'adhan-makkah': {
+      label: 'أذان المسجد الحرام · مكة',
+      url: 'https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a7/Adhan%2C_Great_Mosque_of_Mecca_-_Jan_21%2C_2013.webm/Adhan%2C_Great_Mosque_of_Mecca_-_Jan_21%2C_2013.webm.360p.mpeg4.mov',
+      extension: 'mpeg4.mov',
+      page: 'https://commons.wikimedia.org/wiki/File:Adhan,_Great_Mosque_of_Mecca_-_Jan_21,_2013.webm',
+      credit: 'Seyfula Islam',
+      licenseName: 'CC BY 3.0',
+      license: 'https://creativecommons.org/licenses/by/3.0/'
+    }
+  };
+  var DEFAULT_ALERTS = {
+    enabled: { Fajr: false, Sunrise: false, Dhuhr: false, Asr: false, Maghrib: false, Isha: false },
+    sound: true,
+    voice: ADHAN_VOICE_ID,
+    advance: 0,
+    notifications: false
+  };
   var activeContainer = null;
   var activeStatus = null;
   var countdownTimer = null;
+  var alertTimer = null;
+  var adhanAudio = new Audio();
+  var audioLoadPromises = Object.create(null);
+  var firedAlertKeys = Object.create(null);
   var requestController = null;
   var activeRequestId = 0;
   var cacheReadFailed = false;
@@ -52,6 +79,33 @@
   function todayKey(date) {
     date = date || new Date();
     return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+  }
+
+  function prayerBellButton(prayer, enabled) {
+    var label = (enabled ? 'إيقاف تنبيه صلاة ' : 'تفعيل تنبيه صلاة ') + prayer.name;
+    return '<button type="button" class="qpt-bell' + (enabled ? ' is-enabled' : '') +
+      '" data-qpt-prayer-toggle="' + prayer.id + '" aria-label="' + label +
+      '" aria-pressed="' + enabled + '">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>' +
+      (enabled ? '' : '<path class="qpt-bell-slash" d="M4 4l16 16"/>') + '</svg></button>';
+  }
+
+  function togglePrayerAlert(button) {
+    var prayerId = button.getAttribute('data-qpt-prayer-toggle');
+    if (!prayerId) return;
+    var prayer = ALERT_PRAYERS.find(function (item) { return item.id === prayerId; });
+    if (!prayer) return;
+    var alerts = readAlerts();
+    alerts.enabled[prayerId] = !alerts.enabled[prayerId];
+    if (!saveAlerts(alerts)) return;
+    var updatedButton = prayerBellButton(prayer, alerts.enabled[prayerId]);
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = updatedButton;
+    button.replaceWith(wrapper.firstChild);
+    setAlertStatus(alerts.enabled[prayerId]
+      ? 'تم تفعيل تنبيه صلاة ' + prayer.name + '.'
+      : 'تم إيقاف تنبيه صلاة ' + prayer.name + '.', 'success');
+    startAlertScheduler();
   }
 
   function escapeHtml(value) {
@@ -99,6 +153,280 @@
     } catch (error) {
       return false;
     }
+  }
+
+  function readAlerts() {
+    try {
+      var raw = localStorage.getItem(ALERTS_KEY);
+      if (!raw) return JSON.parse(JSON.stringify(DEFAULT_ALERTS));
+      var saved = JSON.parse(raw);
+      if (!saved || typeof saved !== 'object' || Array.isArray(saved)) throw new Error('إعدادات التنبيه غير صالحة');
+      return {
+        enabled: ALERT_PRAYERS.reduce(function (enabled, prayer) {
+          enabled[prayer.id] = saved.enabled && typeof saved.enabled[prayer.id] === 'boolean'
+            ? saved.enabled[prayer.id] : DEFAULT_ALERTS.enabled[prayer.id];
+          return enabled;
+        }, {}),
+        sound: typeof saved.sound === 'boolean' ? saved.sound : DEFAULT_ALERTS.sound,
+        voice: ADHAN_VOICE_ID,
+        advance: [0, 5, 10, 15].indexOf(Number(saved.advance)) !== -1 ? Number(saved.advance) : 0,
+        notifications: saved.notifications === true
+      };
+    } catch (error) {
+      console.error('تعذر قراءة إعدادات تنبيهات الصلاة.', error);
+      setAlertStatus('تعذرت قراءة إعدادات التنبيه؛ عُرضت الإعدادات الافتراضية.', 'warning');
+      return JSON.parse(JSON.stringify(DEFAULT_ALERTS));
+    }
+  }
+
+  function saveAlerts(alerts) {
+    try {
+      localStorage.setItem(ALERTS_KEY, JSON.stringify(alerts));
+      return true;
+    } catch (error) {
+      console.error('تعذر حفظ إعدادات تنبيهات الصلاة.', error);
+      setAlertStatus('تعذر حفظ الإعدادات على هذا الجهاز. تحقق من مساحة التخزين.', 'error');
+      return false;
+    }
+  }
+
+  function setAlertStatus(message, kind) {
+    if (!activeContainer) return;
+    var status = activeContainer.querySelector('[data-qpt-alert-status]');
+    if (status) {
+      status.textContent = kind === 'success' || kind === 'info' ? '' : message;
+      status.dataset.kind = kind || 'info';
+    }
+  }
+
+  function audioCacheUrl(voiceId) {
+    var voice = ADHAN_VOICES[voiceId];
+    var extension = voice && voice.extension || (voice && voice.url.split('?')[0].split('.').pop()) || 'ogg';
+    return new URL(AUDIO_PATH + voiceId + '.' + extension, window.location.href).toString();
+  }
+
+  function loadAdhanVoice(voiceId) {
+    var voice = ADHAN_VOICES[voiceId];
+    if (!voice) return Promise.reject(new Error('صوت الأذان المختار غير معروف'));
+    if (audioLoadPromises[voiceId]) return audioLoadPromises[voiceId];
+
+    var localUrl = audioCacheUrl(voiceId);
+    audioLoadPromises[voiceId] = (async function () {
+      if ('caches' in window) {
+        var cache = await caches.open(ALERT_CACHE);
+        var cached = await cache.match(localUrl);
+        if (cached) return localUrl;
+        var response = await fetch(voice.url, { mode: 'cors', cache: 'force-cache' });
+        if (!response.ok || response.type === 'opaque') {
+          throw new Error('تعذر تنزيل التسجيل المرخّص. تحقق من اتصال الإنترنت ثم أعد المحاولة.');
+        }
+        await cache.put(localUrl, response.clone());
+        return localUrl;
+      }
+      return voice.url;
+    })().catch(function (error) {
+      delete audioLoadPromises[voiceId];
+      throw error;
+    });
+    return audioLoadPromises[voiceId];
+  }
+
+  function removeUnusedAdhanCacheEntries() {
+    if (!('caches' in window)) return Promise.resolve();
+    return caches.open(ALERT_CACHE).then(function (cache) {
+      var selectedUrl = audioCacheUrl(ADHAN_VOICE_ID);
+      return cache.keys().then(function (keys) {
+        return Promise.all(keys.filter(function (request) {
+          return request.url !== selectedUrl;
+        }).map(function (request) {
+          return cache.delete(request);
+        }));
+      });
+    });
+  }
+
+  function playSelectedAdhan() {
+    loadAdhanVoice(ADHAN_VOICE_ID).then(function (url) {
+      adhanAudio.src = url;
+      adhanAudio.currentTime = 0;
+      return adhanAudio.play();
+    }).catch(function (error) {
+      console.error('تعذر تشغيل الأذان عند موعد الصلاة.', error);
+      setAlertStatus('تعذر تشغيل تسجيل الأذان تلقائيًا. افتح التطبيق وتحقق من اتصال الإنترنت.', 'warning');
+    });
+  }
+
+  function sendNotification(prayer, isAdvance) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    var title = isAdvance ? 'اقترب موعد صلاة ' + prayer.name : 'حان الآن وقت صلاة ' + prayer.name;
+    var options = {
+      body: isAdvance ? 'باقي ' + readAlerts().advance + ' دقائق على الصلاة.' : 'حيّ على الصلاة.',
+      icon: './icons/icon-192.png',
+      badge: './icons/icon-192.png',
+      tag: 'quran-prayer-' + prayer.id + (isAdvance ? '-reminder' : ''),
+      renotify: false,
+      vibrate: [180, 90, 180],
+      data: { url: './' }
+    };
+    var notification;
+    try {
+      notification = navigator.serviceWorker && navigator.serviceWorker.ready
+        ? navigator.serviceWorker.ready.then(function (registration) {
+          if (!registration.showNotification) throw new Error('إشعارات عامل الخدمة غير مدعومة');
+          return registration.showNotification(title, options);
+        })
+        : Promise.resolve(new Notification(title, options));
+    } catch (error) {
+      notification = Promise.reject(error);
+    }
+    notification.catch(function (error) {
+      console.error('تعذر عرض إشعار الصلاة.', error);
+      setAlertStatus('تعذر عرض الإشعار. تحقق من إعدادات إشعارات المتصفح.', 'warning');
+    });
+  }
+
+  function checkPrayerAlerts() {
+    var alerts = readAlerts();
+    var cityId = selectedCity().id;
+    var cache = readCache()[cityId];
+    if (!cache || !cache.timings || cache.day !== todayKey()) return;
+
+    var now = new Date();
+    var today = todayKey(now);
+    ALERT_PRAYERS.forEach(function (prayer) {
+      if (!alerts.enabled[prayer.id]) return;
+      var at = timeDate(cache.timings[prayer.id], now);
+      if (!at) return;
+      [
+        { minutes: alerts.advance, isAdvance: true },
+        { minutes: 0, isAdvance: false }
+      ].forEach(function (item) {
+        if (item.isAdvance && !item.minutes) return;
+        var target = new Date(at.getTime() - item.minutes * 60000);
+        var elapsed = now.getTime() - target.getTime();
+        if (elapsed < 0 || elapsed > 90000) return;
+        var key = 'quran_prayer_alert_fired_' + cityId + '_' + today + '_' +
+          prayer.id + (item.isAdvance ? '_before' : '');
+        if (firedAlertKeys[key]) return;
+        try {
+          if (localStorage.getItem(key)) return;
+          localStorage.setItem(key, '1');
+        } catch (error) {
+          console.error('تعذر تسجيل تنبيه الصلاة لمنع تكراره.', error);
+          setAlertStatus('تعذر حفظ سجل التنبيه؛ سيعمل منع التكرار حتى إغلاق الصفحة فقط.', 'warning');
+        }
+        firedAlertKeys[key] = true;
+        if (alerts.sound) playSelectedAdhan();
+        if (alerts.notifications) sendNotification(prayer, item.isAdvance);
+        if (!alerts.notifications && !alerts.sound) {
+          setAlertStatus('حان وقت صلاة ' + prayer.name + '.', 'info');
+        } else {
+          setAlertStatus(item.isAdvance
+            ? 'تذكير: بقي ' + item.minutes + ' دقائق على صلاة ' + prayer.name + '.'
+            : 'حان وقت صلاة ' + prayer.name + '.', 'success');
+        }
+      });
+    });
+  }
+
+  function startAlertScheduler() {
+    if (alertTimer) return;
+    checkPrayerAlerts();
+    alertTimer = setInterval(checkPrayerAlerts, 15000);
+  }
+
+  function renderAlertSettings() {
+    var alerts = readAlerts();
+    var settings = activeContainer && activeContainer.querySelector('[data-qpt-alerts]');
+    if (!settings) return;
+    settings.innerHTML =
+      '<summary class="qpt-alert-summary"><span><b>إعدادات الأذان والتنبيهات</b>' +
+      '<small>' + ADHAN_VOICES[ADHAN_VOICE_ID].label +
+      '</small></span><i aria-hidden="true"></i></summary>' +
+      '<div class="qpt-alert-content">' +
+      '<details class="qpt-audio-info"><summary aria-label="معلومات مصدر الأذان وترخيصه" title="معلومات مصدر الأذان وترخيصه">ⓘ</summary>' +
+      '<div>التسجيل: <a href="' + ADHAN_VOICES[ADHAN_VOICE_ID].page +
+      '" target="_blank" rel="noopener noreferrer">' + ADHAN_VOICES[ADHAN_VOICE_ID].credit +
+      '</a> · الترخيص: <a href="' + ADHAN_VOICES[ADHAN_VOICE_ID].license +
+      '" target="_blank" rel="noopener noreferrer">' + ADHAN_VOICES[ADHAN_VOICE_ID].licenseName + '</a></div></details>' +
+      '<label class="qpt-alert-option"><span>التذكير قبل الصلاة</span><select data-qpt-advance>' +
+      [[0, 'وقت الصلاة فقط'], [5, 'قبلها بـ٥ دقائق'], [10, 'قبلها بـ١٠ دقائق'], [15, 'قبلها بـ١٥ دقيقة']].map(function (option) {
+        return '<option value="' + option[0] + '"' + (alerts.advance === option[0] ? ' selected' : '') +
+          '>' + option[1] + '</option>';
+      }).join('') + '</select></label>' +
+      '<label class="qpt-alert-toggle"><input type="checkbox" data-qpt-sound' +
+      (alerts.sound ? ' checked' : '') + '><span>تشغيل أذان المسجد الحرام عند التنبيه</span></label>' +
+      '<div class="qpt-notification-row"><span data-qpt-notification-label></span>' +
+      '<button type="button" class="qpt-notification-button" data-qpt-notifications></button></div>' +
+      '<p class="qpt-alert-status" data-qpt-alert-status role="status" aria-live="polite"></p></div>';
+    settings.open = false;
+    updateNotificationButton();
+    settings.querySelectorAll('[data-qpt-advance], [data-qpt-sound]').forEach(function (input) {
+      input.addEventListener('change', function () {
+        var next = readAlerts();
+        if (input.hasAttribute('data-qpt-advance')) next.advance = Number(input.value);
+        if (input.hasAttribute('data-qpt-sound')) next.sound = input.checked;
+        if (saveAlerts(next)) setAlertStatus('حُفظت إعدادات التنبيه على هذا الجهاز.', 'success');
+        startAlertScheduler();
+      });
+    });
+    settings.querySelector('[data-qpt-notifications]').addEventListener('click', enableNotifications);
+  }
+
+  function updateNotificationButton() {
+    if (!activeContainer) return;
+    var button = activeContainer.querySelector('[data-qpt-notifications]');
+    var label = activeContainer.querySelector('[data-qpt-notification-label]');
+    if (!button || !label) return;
+    var row = activeContainer.querySelector('.qpt-notification-row');
+    if (!('Notification' in window) || Notification.permission === 'denied') {
+      if (row) row.hidden = true;
+      return;
+    }
+    if (row) row.hidden = false;
+    button.hidden = false;
+    var alerts = readAlerts();
+    if (Notification.permission === 'granted' && alerts.notifications) {
+      label.textContent = 'إشعارات النظام مفعّلة';
+      button.textContent = 'إيقاف الإشعارات';
+    } else if (Notification.permission === 'granted') {
+      label.textContent = '';
+      button.textContent = 'تفعيل الإشعارات';
+    } else {
+      label.textContent = '';
+      button.textContent = 'تفعيل الإشعارات';
+    }
+  }
+
+  function enableNotifications() {
+    if (!('Notification' in window)) {
+      setAlertStatus('المتصفح لا يدعم إشعارات النظام.', 'warning');
+      return;
+    }
+    var current = readAlerts();
+    if (Notification.permission === 'granted' && current.notifications) {
+      current.notifications = false;
+      if (saveAlerts(current)) {
+        updateNotificationButton();
+      }
+      return;
+    }
+    if (Notification.permission === 'denied') {
+      setAlertStatus('السماح محظور. غيّر إذن الإشعارات من إعدادات المتصفح لهذا الموقع.', 'warning');
+      return;
+    }
+    (Notification.permission === 'granted'
+      ? Promise.resolve('granted')
+      : Notification.requestPermission()).then(function (permission) {
+      current = readAlerts();
+      current.notifications = permission === 'granted';
+      if (!saveAlerts(current)) return;
+      updateNotificationButton();
+      startAlertScheduler();
+    }).catch(function (error) {
+      console.error('تعذر طلب إذن إشعارات الصلاة.', error);
+      setAlertStatus('تعذر طلب إذن الإشعارات من المتصفح.', 'error');
+    });
   }
 
   function timeDate(value, date) {
@@ -173,11 +501,13 @@
     var hijri = activeContainer.querySelector('[data-qpt-hijri]');
     if (!list) return;
 
+    var alerts = readAlerts();
     list.innerHTML = PRAYERS.map(function (prayer) {
       var formatted = formatTime(data.timings[prayer.id]);
       return '<div class="qpt-row"><span class="qpt-row-name">' + prayer.name +
         '</span><span class="qpt-row-time">' + escapeHtml(formatted.time) +
-        '<small>' + escapeHtml(formatted.period) + '</small></span></div>';
+        '<small>' + escapeHtml(formatted.period) + '</small></span>' +
+        prayerBellButton(prayer, Boolean(alerts.enabled[prayer.id])) + '</div>';
     }).join('');
 
     var month = data.hijri && data.hijri.month ? data.hijri.month.ar : '';
@@ -335,6 +665,10 @@
     cacheReadFailed = false;
     activeContainer = container;
     activeStatus = onStatus || function () {};
+    removeUnusedAdhanCacheEntries().catch(function (error) {
+      console.error('تعذر حذف تسجيلات الأذان غير المختارة من التخزين المؤقت.', error);
+      setAlertStatus('تعذر حذف التسجيلات الصوتية القديمة من هذا الجهاز.', 'warning');
+    });
     var city = selectedCity();
     container.innerHTML = '<section class="qpt" aria-label="مواقيت الصلاة">' +
       '<header class="qpt-head"><div class="qpt-head-copy"><h2>صلواتي</h2><div class="qpt-date" data-qpt-date></div></div>' +
@@ -345,6 +679,7 @@
       '<div class="qpt-remaining">الوقت المتبقي للصلاة القادمة</div><div class="qpt-hijri" data-qpt-hijri></div></div>' +
       '<div class="qpt-status" data-qpt-status role="status" aria-live="polite"></div>' +
       '<div class="qpt-list" data-qpt-list aria-label="مواقيت الصلاة"></div>' +
+      '<details class="qpt-alerts" data-qpt-alerts aria-label="إعدادات تنبيهات الأذان"></details>' +
       '<div class="qpt-actions"><button type="button" class="qpt-retry" data-qpt-retry>تحديث المواقيت</button></div>' +
       '<p class="qpt-note">طريقة الحساب: الهيئة المصرية العامة للمساحة — قد تختلف المواقيت باختلاف الموقع المحلي.</p>' +
       '</section>';
@@ -368,8 +703,16 @@
     container.querySelector('[data-qpt-retry]').addEventListener('click', function () {
       loadTimes(true);
     });
+    container.querySelector('[data-qpt-list]').addEventListener('click', function (event) {
+      var button = event.target.closest('[data-qpt-prayer-toggle]');
+      if (button) togglePrayerAlert(button);
+    });
+    renderAlertSettings();
+    startAlertScheduler();
     loadTimes(false);
   }
+
+  startAlertScheduler();
 
   function close() {
     activeRequestId++;
