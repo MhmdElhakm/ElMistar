@@ -1377,10 +1377,50 @@
       touch-action: manipulation;
     }
 
+    .sheet .w.ayah-end {
+      display: inline-grid;
+      width: 1.05em;
+      height: 1.05em;
+      margin-inline: .03em;
+      place-items: center;
+      color: var(--green);
+      vertical-align: middle;
+    }
+
+    .ayah-number,
+    .fallback-ayah-end {
+      display: inline-grid;
+      width: 1.7em;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1.5px solid color-mix(in srgb, var(--green) 82%, var(--head));
+      border-radius: 50%;
+      outline: 1px solid color-mix(in srgb, var(--head) 55%, transparent);
+      outline-offset: 2px;
+      background: color-mix(in srgb, var(--green) 9%, var(--panel));
+      color: var(--green);
+      font-family: Arial, "Helvetica Neue", sans-serif;
+      font-size: .55em;
+      font-weight: 800;
+      line-height: 1;
+      text-shadow: none;
+      -webkit-text-stroke: 0 transparent;
+    }
+
+    .fallback-ayah-end {
+      margin-inline: .35em;
+      vertical-align: middle;
+    }
+
     body.quran-bold .sheet .w,
     body.quran-bold .sheet .bis,
     body.quran-bold .sheet .hn {
       -webkit-text-stroke: var(--quran-font-stroke, 0px) currentColor;
+    }
+
+    body.quran-bold .sheet.tajweed-active .w {
+      -webkit-text-stroke: 0 transparent;
+      text-shadow: var(--quran-font-stroke-shadow, none);
     }
 
     .w.pop {
@@ -3429,25 +3469,63 @@
       background: transparent;
     }
 
-    .wp-marks .mk-card > .srow + .srow {
+    .mk-slot + .mk-slot {
       border-top: 1px solid var(--line);
     }
 
-    .wp-marks .mk-card > .srow {
+    .mk-slot-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .mk-slot-row .srow {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mk-go {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 34px;
+      padding: 5px 7px;
+      border: 1px solid color-mix(in srgb, var(--green) 28%, var(--line));
+      border-radius: 9px;
+      color: var(--green);
+      background: var(--panel);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .mk-go:active {
+      background: color-mix(in srgb, var(--green) 10%, var(--panel));
+    }
+
+    .mk-go:focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 2px;
+    }
+
+    .wp-marks .mk-slot-row .srow {
       min-height: 42px;
       padding: 6px 8px;
       border-radius: 8px;
       font-size: 12px;
     }
 
-    .wp-marks .mk-card > .srow.selected {
+    .wp-marks .mk-slot-row .srow.selected {
       color: var(--green);
       background: color-mix(in srgb, var(--green) 10%, var(--panel));
     }
 
-    .wp-marks .mk-card > .srow.selected .sname { color: var(--green); }
+    .wp-marks .mk-slot-row .srow.selected .sname { color: var(--green); }
 
-    .wp-marks .mk-card > .srow > svg {
+    .wp-marks .mk-slot-row .srow > svg {
       width: 20px;
       height: 20px;
     }
@@ -6857,7 +6935,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           var chunkUrl = './fonts/tajweed/' + chunkName + '.woff2';
           function requestChunk(retry) {
             var cachedChunk = 'caches' in window
-                ? caches.open('quran-pro-app-v108').then(function (cache) { return cache.match(chunkUrl); })
+                ? caches.open('quran-pro-app-v112').then(function (cache) { return cache.match(chunkUrl); })
               : Promise.resolve(null);
             return cachedChunk.then(function (response) {
               if (response) return response.arrayBuffer();
@@ -6866,7 +6944,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
                 var copy = networkResponse.clone();
                 return networkResponse.arrayBuffer().then(function (buffer) {
                   if ('caches' in window) {
-                    return caches.open('quran-pro-app-v108').then(function (cache) {
+                    return caches.open('quran-pro-app-v112').then(function (cache) {
                       return cache.put(chunkUrl, copy).then(function () { return buffer; });
                     });
                   }
@@ -7030,7 +7108,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
               escapeHtml(word) + '</span>';
           }).join(' ');
           html += '<div class="ln fallback-ln" data-vs="' + verseId + '">' + wordHtml +
-            '<span class="fallback-ayah-end" aria-label="نهاية الآية ' + ar(ayah) + '">﴿' + ar(ayah) + '﴾</span></div>';
+            '<span class="fallback-ayah-end" aria-label="نهاية الآية ' + ar(ayah) + '">' + ar(ayah) + '</span></div>';
         }
         if (!html) throw new Error('لا توجد نصوص لصفحة المصحف ' + page);
         targetSheet.classList.add('text-fallback');
@@ -7122,7 +7200,9 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
               var inner = l[2].map(function (it) {
                 if (it[0]) vs[it[0]] = 1; 
                 var char = useTajweed ? tajweedGlyphs[tajweedWordIndex++] : it[1];
-                return '<span class="w" data-v="' + it[0] + '" data-p="' + (it[2] || 0) + '" style="font-family:' + fontFam + '">' + char + '</span>'; 
+                var verseEnd = it[2] === -1;
+                var content = verseEnd ? '<span class="ayah-number">' + ar(it[0] % 1000) + '</span>' : char;
+                return '<span class="w' + (verseEnd ? ' ayah-end' : '') + '" data-v="' + it[0] + '" data-p="' + (it[2] || 0) + '" style="font-family:' + fontFam + '">' + content + '</span>'; 
               }).join('');
               html += '<div class="ln ' + (full ? 'full' : 'cen') + '" data-vs="' + Object.keys(vs).join(',') + '" style="font-size:' + fs.toFixed(2) + 'px">' + inner + '</div>';
             }
@@ -8329,11 +8409,14 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       var newDrawerMarkColor = PALETTE[0], newDrawerMarkName = '';
       function buildMarks() {
         var h = slots.map(function (s) {
-          var row = '<button type="button" class="srow' + (s.v === sel ? ' selected' : '') + '" data-id="' + s.id + '" aria-pressed="' + (s.v === sel) + '">' + bmSvg(s.c, !!s.v) + '<span><div class="sname" data-mark-name="' + s.id + '">' + escapeHtml(slotName(s)) + '</div>' + (s.v ? '<div class="smeta">' + slotSub(s) + '</div>' : '') + '</span></button>';
+          var row = '<div class="mk-slot"><div class="mk-slot-row"><button type="button" class="srow' + (s.v === sel ? ' selected' : '') + '" data-id="' + s.id + '" aria-pressed="' + (s.v === sel) + '">' + bmSvg(s.c, !!s.v) + '<span><div class="sname" data-mark-name="' + s.id + '">' + escapeHtml(slotName(s)) + '</div>' + (s.v ? '<div class="smeta">' + slotSub(s) + '</div>' : '') + '</span></button>' +
+            (s.v ? '<button type="button" class="mk-go" data-goto-slot="' + s.id + '" aria-label="الانتقال إلى ' + escapeHtml(label(s.v)) + '" title="الانتقال إلى ' + escapeHtml(label(s.v)) + '">انتقال</button>' : '') +
+            '</div>';
           if (editing) {
             var swatches = PALETTE.map(function (c) { return '<button type="button" data-slot-color="' + s.id + '" data-color="' + c + '" aria-label="' + COL[c][1] + '" title="' + COL[c][1] + '" aria-pressed="' + (s.c === c) + '" style="background:' + COL[c][0] + '"></button>'; }).join('');
             row += '<div class="mk-edit"><input type="text" value="' + escapeHtml(s.nm || '') + '" placeholder="' + escapeHtml(slotName(s)) + '" data-nm="' + s.id + '" aria-label="اسم العلامة"><div class="sw">' + swatches + '</div>' + (s.v ? '<button type="button" data-clr="' + s.id + '">مسح الموضع</button>' : '') + '<button type="button" data-rm="' + s.id + '">حذف العلامة</button></div>';
           }
+          row += '</div>';
           return row;
         }).join('');
         var add = editing ? '<div class="mk-add"><label class="mk-add-name">اسم العلامة<input type="text" maxlength="40" value="' + escapeHtml(newDrawerMarkName) + '" data-new-mark-name placeholder="اكتب اسمًا واضحًا للعلامة" autocomplete="off"></label><span>اختر لون العلامة</span><div class="sw">' + PALETTE.map(function (c) { return '<button type="button" data-new-mark-color="' + c + '" aria-pressed="' + (c === newDrawerMarkColor) + '" style="background:' + COL[c][0] + '" aria-label="' + COL[c][1] + '" title="' + COL[c][1] + '"></button>'; }).join('') + '</div><button type="button" class="mark-create-submit" data-create-mark>إضافة العلامة</button></div>' : '';
@@ -8341,6 +8424,14 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         paneM.innerHTML = '<div class="mk-card">' + h + add + empty + '</div>';
       }
       paneM.addEventListener('click', function (e) {
+        var go = e.target.closest('[data-goto-slot]');
+        if (go) {
+          var destination = slotById(go.getAttribute('data-goto-slot'));
+          if (!destination || !destination.v) return;
+          if (typeof wp !== 'undefined' && wp.contains(paneM)) closeWp();
+          closeD(); navigateToVerse(destination.v);
+          return;
+        }
         var a = e.target.closest('[data-create-mark]'), c = e.target.closest('[data-clr]'), r = e.target.closest('[data-rm]'), color = e.target.closest('[data-slot-color]'), newColor = e.target.closest('[data-new-mark-color]');
         if (a) {
           var name = newDrawerMarkName.trim();
@@ -8386,8 +8477,10 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       var paneSettings = $('paneSettings');
       var paneWorship = $('paneWorship');
       var paneTasks = $('paneTasks');
+      var homeRecitationPanel = paneSettings.querySelector('.recitation-panel');
       paneSettings.appendChild($('tasksApp'));
       paneTasks.appendChild(paneSettings.querySelector('.settings'));
+      if (homeRecitationPanel) paneSettings.appendChild(homeRecitationPanel);
       var panes = { settings: paneSettings, surahs: paneS, worship: paneWorship, tasks: paneTasks };
       var tabSettings = $('tabSettings'), tabS = $('tabS'), tabWorship = $('tabWorship'), tabTasks = $('tabTasks');
       function show(k) {
@@ -9234,7 +9327,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       if (!runtime) throw new Error('Mushaf runtime is unavailable');
       var $ = runtime.$, store = runtime.store, D = runtime.data;
       var toast = runtime.toast;
-      var CACHE = 'quran-pro-app-v108', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '54';
+      var CACHE = 'quran-pro-app-v112', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '58';
       function ar(n) { return String(n).replace(/\d/g, function (d) { return AR[d]; }); }
       var urls = (function () {
         var a = [
@@ -9513,7 +9606,11 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       function applyFontStroke(num) {
         currentFontStroke = num;
         var pageWidth = $('page').clientWidth || window.innerWidth || 400;
-        document.body.style.setProperty('--quran-font-stroke', (num * 1.25 * pageWidth / 400).toFixed(2) + 'px');
+        var strokeWidth = num * 1.25 * pageWidth / 400;
+        var stroke = strokeWidth.toFixed(2) + 'px';
+        document.body.style.setProperty('--quran-font-stroke', stroke);
+        document.body.style.setProperty('--quran-font-stroke-shadow',
+          stroke + ' 0 currentColor, -' + stroke + ' 0 currentColor, 0 ' + stroke + ' currentColor, 0 -' + stroke + ' currentColor');
         document.body.classList.toggle('quran-bold', num > 0);
       }
 
