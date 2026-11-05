@@ -1236,6 +1236,29 @@ html[data-mode=light] .kx-pill.hot{background:#fff3c8;color:#8a5a00}
 .kx-hint b{display:block;font-size:15px}.kx-hint small{color:var(--muted);font-weight:600;font-size:12.5px}
 .kx-hint.warn{border-color:var(--orange);background:var(--orange-bg)}.kx-hint.warn>span{background:var(--orange);color:#3a2000}
 .kx-hint.ok>span{background:var(--good);color:#06301c}
+
+.kt-scene{position:relative}
+.kx-mic{position:absolute;left:10px;bottom:10px;z-index:5;display:flex;align-items:center;gap:6px;border:0;border-radius:99px;padding:8px 13px 8px 11px;background:linear-gradient(135deg,#7c5cff,#b05cff);color:#fff;font:800 13.5px inherit;font-family:inherit;box-shadow:0 6px 16px rgba(60,30,160,.45);cursor:pointer}
+.kx-mic svg{width:18px;height:18px}
+.kx-mic.on{background:linear-gradient(135deg,#ff5d73,#ff8a5c);animation:kxmic 1.4s ease-in-out infinite}
+@keyframes kxmic{50%{box-shadow:0 0 0 8px rgba(255,93,115,.18),0 6px 16px rgba(255,93,115,.4)}}
+.kx-tk{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 0;padding:10px 12px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+.kx-tk .dot{width:12px;height:12px;border-radius:50%;background:#4fdc9c;box-shadow:0 0 0 4px rgba(79,220,156,.2);flex:none}
+.kx-tk[data-st=hear] .dot{background:#ffb347;box-shadow:0 0 0 6px rgba(255,179,71,.25)}
+.kx-tk[data-st=say] .dot{background:#ff5d73;box-shadow:0 0 0 6px rgba(255,93,115,.25)}
+.kx-tk b{font-size:14px;flex:1;min-width:120px}
+.kx-tk .vc{display:flex;gap:6px}
+.kx-tk .vc button{border:1px solid var(--line);background:var(--card2);color:inherit;border-radius:99px;padding:5px 11px;font:700 12.5px inherit;font-family:inherit;cursor:pointer}
+.kx-tk .vc button.on{background:var(--violet,#7c5cff);color:#fff;border-color:transparent}
+.kx-sp .mv{display:none!important}
+.seg[aria-label="طريقة الإضافة"]{grid-template-columns:1fr 1fr}
+.seg[aria-label="طريقة الإضافة"] button{white-space:nowrap;font-size:clamp(12px,3.6vw,14.5px);padding:0 6px;min-height:44px}
+.gx-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.gx-tags span{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:99px;background:var(--card2);color:var(--muted);border:1px solid var(--line)}
+.gx-tags .k-imp{background:rgba(255,179,71,.16);color:#ffb347;border-color:transparent}
+.gx-tags .k-dec{background:rgba(79,220,156,.14);color:#4fdc9c;border-color:transparent}
+.gx-tags .k-yn,.gx-tags .k-wh{background:rgba(124,92,255,.18);color:#b9a6ff;border-color:transparent}
+.gx-tags .g{background:rgba(255,93,115,.14);color:#ff8fa0;border-color:transparent}
 </style></head><body>
 <div id="app">
   <div id="view"></div>
@@ -5617,7 +5640,7 @@ function kxTrainPet(full){
     style=`--s1:${it.s1};--s2:${it.s2};--g1:${it.g1};--g2:${it.g2};--sm:${it.sm};--smg:${it.smg};--so:${it.so}`;
   return `<section class="kt-pet"><div class="kt-scene pscene" style="${style}"><div class="starsbg"></div><div class="sunmoon" style="width:40px;height:40px;top:16px"></div>
     <div class="pbub" style="font-size:13.5px;max-width:62%">${esc(kxTrainMsg())}</div>
-    <button class="petbtn" data-act="p_tap" aria-label="العب مع ${esc(p.name)}" style="padding-bottom:14px">${petSvg({sp:p.sp,color:p.color,stage:sg,exp:petBase(),eq:p.eq,w:full?270:230})}</button></div>
+    <button class="petbtn" data-act="p_tap" aria-label="العب مع ${esc(p.name)}" style="padding-bottom:14px">${petSvg({sp:p.sp,color:p.color,stage:sg,exp:petBase(),eq:p.eq,w:full?270:230})}</button>${kxMicBtn()}</div>${kxTalkBar()}
    <div class="kt-body">
     <div class="kt-top"><div class="kt-ring" style="--p:${into}"><div><b>${lvl}</b></div></div>
      <div class="kt-id"><h3>${esc(p.name)} <span class="kx-tag">${PSTAGE[sg][0]}</span></h3><small>${lvTitle(lvl)} · ${S.xp} خبرة</small></div>
@@ -5864,6 +5887,814 @@ document.addEventListener('click',e=>{
   const k=b.dataset.id;if(!kxLocked(k))return;
   e.stopPropagation();toast('يفتح هذا النشاط عند المستوى '+KX_UNL[k]);
 },true);
+
+
+/* ============ talking pet: repeats what you say in a funny voice ============ */
+const TK={on:false,st:'idle',ctx:null,stream:null,src:null,proc:null,pre:[],buf:[],speech:false,sp:0,sil:0,voiced:0,floor:.01,cal:0,busy:false,lv:0,raf:0,n:0,lfo:null};
+const KX_VOICES=[{k:'chip',n:'سنجاب',r:1.75},{k:'toon',n:'كرتوني',r:1.4},{k:'big',n:'عملاق',r:.78}];
+const kxVoice=()=>KX_VOICES.find(v=>v.k===S.kxVoice)||KX_VOICES[0];
+KI.mic='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+function kxMicBtn(){return `<button class="kx-mic ${TK.on?'on':''}" data-act="gx_talk" aria-label="${TK.on?'إيقاف التحدث مع الحيوان':'تحدّث مع حيوانك'}">${KI.mic}<span>${TK.on?'إيقاف':'تحدّث معي'}</span></button>`;}
+function kxTalkBar(){
+  if(!TK.on)return '';
+  return `<div class="kx-tk"><span class="dot"></span><b id="kxTs">${kxTalkTxt()}</b><div class="vc">${KX_VOICES.map(v=>`<button class="${kxVoice().k===v.k?'on':''}" data-act="gx_voice" data-v="${v.k}">${v.n}</button>`).join('')}</div></div>`;
+}
+function kxTalkTxt(){return TK.st==='hear'?'أسمعك…':TK.st==='say'?'دوري الآن!':'قل شيئًا وسأقلّدك…';}
+function kxTalkSt(s){TK.st=s;const e=document.getElementById('kxTs');if(e)e.textContent=kxTalkTxt();const b=document.querySelector('.kx-tk');if(b)b.dataset.st=s;}
+function kxMouth(lv,show){
+  const svg=document.querySelector('.kt-pet .petbtn svg');if(!svg)return;
+  let g=svg.querySelector('#kxm');
+  if(!g){const ref=svg.querySelector('.m-smile');if(!ref)return;
+    g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='kxm';
+    g.innerHTML='<ellipse class="a" cx="100" cy="116" rx="9" ry="2" fill="#42202f"/><ellipse class="b" cx="100" cy="118" rx="5" ry="1" fill="#ff7a8c"/>';
+    ref.parentNode.insertBefore(g,ref);}
+  if(!show){svg.classList.remove('kx-sp');g.style.display='none';const pb=svg.closest('.petbtn');if(pb)pb.style.transform='';return;}
+  svg.classList.add('kx-sp');g.style.display='inline';
+  const ry=1.6+lv*13,rx=8+lv*4,a=g.querySelector('.a'),b=g.querySelector('.b');
+  a.setAttribute('rx',rx.toFixed(1));a.setAttribute('ry',ry.toFixed(1));a.setAttribute('cy',(110+ry).toFixed(1));
+  b.setAttribute('rx',(rx*.6).toFixed(1));b.setAttribute('ry',(ry>5?ry*.34:0).toFixed(1));b.setAttribute('cy',(110+ry*1.6).toFixed(1));
+  const pb=svg.closest('.petbtn');if(pb){pb.style.transformOrigin='50% 100%';pb.style.transform=`scale(${(1+lv*.05).toFixed(3)},${(1-lv*.045).toFixed(3)}) rotate(${((Math.sin(performance.now()/90))*lv*2.2).toFixed(2)}deg)`;}
+}
+async function kxTalkStart(){
+  if(TK.on)return;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('المتصفح لا يدعم الميكروفون');return;}
+  try{TK.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});}
+  catch(e){toast('اسمح باستخدام الميكروفون لتتحدّث مع حيوانك');return;}
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;TK.ctx=new AC();if(TK.ctx.resume)await TK.ctx.resume();
+    TK.src=TK.ctx.createMediaStreamSource(TK.stream);TK.proc=TK.ctx.createScriptProcessor(2048,1,1);
+    const mute=TK.ctx.createGain();mute.gain.value=0;TK.src.connect(TK.proc);TK.proc.connect(mute);mute.connect(TK.ctx.destination);
+    TK.proc.onaudioprocess=kxTalkIn;
+  }catch(e){kxTalkStop();toast('تعذّر تشغيل الميكروفون');return;}
+  Object.assign(TK,{on:true,st:'idle',pre:[],buf:[],speech:false,sp:0,sil:0,voiced:0,cal:0,floor:.01,busy:false,lv:0});
+  render();
+}
+function kxTalkStop(re){
+  const was=TK.on;cancelAnimationFrame(TK.raf);
+  try{TK.proc&&(TK.proc.onaudioprocess=null,TK.proc.disconnect());TK.src&&TK.src.disconnect();}catch(e){}
+  try{TK.stream&&TK.stream.getTracks().forEach(t=>t.stop());}catch(e){}
+  try{TK.ctx&&TK.ctx.close();}catch(e){}
+  try{TK.play&&TK.play.stop();}catch(e){}
+  TK.ctx=TK.stream=TK.src=TK.proc=TK.play=null;TK.on=false;TK.busy=false;TK.st='idle';
+  kxMouth(0,false);
+  if(was&&re!==false)render();
+}
+function kxTalkIn(e){
+  if(!TK.on||TK.busy)return;
+  const d=e.inputBuffer.getChannelData(0),c=new Float32Array(d);let s=0;for(let i=0;i<c.length;i++)s+=c[i]*c[i];
+  const rms=Math.sqrt(s/c.length),dur=c.length/TK.ctx.sampleRate;
+  if(TK.cal<10){TK.floor=(TK.floor*TK.cal+rms)/(TK.cal+1);TK.cal++;return;}
+  const thr=Math.max(.035,TK.floor*3.2);
+  if(!TK.speech){
+    TK.pre.push(c);if(TK.pre.length>8)TK.pre.shift();
+    TK.sp=rms>thr?TK.sp+1:0;
+    if(TK.sp>=2){TK.speech=true;TK.buf=TK.pre.slice();TK.pre=[];TK.sil=0;TK.voiced=0;kxTalkSt('hear');}
+    else{TK.floor=TK.floor*.98+rms*.02;}
+    return;
+  }
+  TK.buf.push(c);
+  if(rms>thr*.7){TK.sil=0;TK.voiced+=dur;}else TK.sil+=dur;
+  const tot=TK.buf.length*dur;
+  if(TK.sil>.85||tot>12)kxTalkDone(dur);
+}
+function kxTalkDone(dur){
+  const buf=TK.buf,voiced=TK.voiced,sil=TK.sil;TK.buf=[];TK.speech=false;TK.sp=0;
+  if(voiced<.3){kxTalkSt('idle');return;}
+  const cut=Math.max(0,Math.floor((sil-.15)/dur)),use=buf.slice(0,Math.max(1,buf.length-cut));
+  let n=0;use.forEach(a=>n+=a.length);const f=new Float32Array(n);let o=0;use.forEach(a=>{f.set(a,o);o+=a.length;});
+  TK.busy=true;kxTalkSt('say');kxTalkPlay(f);
+}
+function kxTalkPlay(f){
+  const ctx=TK.ctx;if(!ctx)return;
+  const ab=ctx.createBuffer(1,f.length,ctx.sampleRate);ab.copyToChannel(f,0);
+  const s=ctx.createBufferSource();s.buffer=ab;const v=kxVoice();s.playbackRate.value=v.r;
+  const lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=6.5;lg.gain.value=v.r*.035;lfo.connect(lg);lg.connect(s.playbackRate);lfo.start();
+  const g=ctx.createGain();g.gain.value=1.7;const an=ctx.createAnalyser();an.fftSize=512;const cp=ctx.createDynamicsCompressor();
+  s.connect(g);g.connect(an);an.connect(cp);cp.connect(ctx.destination);
+  const arr=new Uint8Array(an.fftSize);TK.play=s;TK.n++;
+  const loop=()=>{
+    if(!TK.on||TK.play!==s)return;
+    an.getByteTimeDomainData(arr);let m=0;for(let i=0;i<arr.length;i++){const x=(arr[i]-128)/128;m+=x*x;}
+    const t=Math.min(1,Math.sqrt(m/arr.length)*5);TK.lv+=(t-TK.lv)*(t>TK.lv?.65:.28);
+    kxMouth(TK.lv,true);TK.raf=requestAnimationFrame(loop);
+  };
+  s.onended=()=>{try{lfo.stop();}catch(e){}TK.play=null;cancelAnimationFrame(TK.raf);kxMouth(0,false);
+    if(S.pet&&S.pet.sp){S.pet.joy=Math.min(100,(S.pet.joy||0)+1);save();}
+    setTimeout(()=>{if(!TK.on)return;TK.pre=[];TK.busy=false;kxTalkSt('idle');},500);};
+  s.start();loop();
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('[data-act="gx_talk"],[data-act="gx_voice"]');if(!b)return;
+  e.stopPropagation();
+  if(b.dataset.act==='gx_voice'){S.kxVoice=b.dataset.v;save();render();return;}
+  TK.on?kxTalkStop():kxTalkStart();
+},true);
+setInterval(()=>{if(TK.on&&!document.querySelector('.kx-mic'))kxTalkStop(false);},800);
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&TK.on)kxTalkStop();});
+
+/* ====================================================================
+   kx5: grammar engine — all tenses, all sentence types, be / have / can
+   ==================================================================== */
+const GX=(function(){
+  const V=SE.V,TAGS=SE.TAGS,AR=SE.AR,has=SE.has,lookup=SE.lookup,plural=SE.plural;
+  const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+  const aan=w=>/^(a|e|i|o|u|hour|honest)/.test(w)&&!/^(uni|use|eu|one)/.test(w)?'an':'a';
+  const defAr=ar=>/\s/.test(ar)||/^ال/.test(ar)?ar:'ال'+ar;
+  const collAr=ar=>ar.replace(/ة$/,'');
+  const MASS=new Set('bread rice cheese meat sugar salt soup honey butter pasta chocolate jam yogurt flour water milk juice tea coffee lemonade soda music grass sand rain snow wind hair english math science arabic art'.split(' '));
+  const PLONLY=new Set('shoes socks pants trousers gloves glasses jeans shorts boots sandals scissors'.split(' '));
+  const NOART=new Set('football basketball tennis volleyball chess hockey baseball english math science arabic art music'.split(' '));
+  const FEMEN=new Set('girl woman queen mother mom sister grandmother grandma aunt daughter nurse'.split(' '));
+  const FEMAR=new Set('شمس عين أذن يد رجل قدم سماء أرض نار'.split(' '));
+  const ADJ=[];SE_ADJ.trim().split('\n').forEach(l=>{const p=l.split('|');if(p.length<4)return;ADJ.push({en:p[0],m:p[1],f:p[2]||(p[1]+'ة'),c:p[3].split(' '),col:p[4]==='C',sw:p[3]==='SW'});});
+  const MARK={present:['every day','كل يوم'],past:['yesterday','أمس'],prog:['now','الآن'],pastprog:["at five o'clock",'في الساعة الخامسة'],future:['tomorrow','غدًا']};
+  const MARKB={present:['now','الآن'],past:['yesterday','أمس'],future:['tomorrow','غدًا']};
+  const TN=['present','past','prog','pastprog','future'];
+  const TNAR={present:'المضارع البسيط',past:'الماضي البسيط',prog:'المضارع المستمر',pastprog:'الماضي المستمر',future:'المستقبل'};
+  const KNAR={imp:'جملة أمرية',dec:'جملة خبرية',yn:'استفهامية بـ «هل»',wh:'استفهامية بأداة استفهام'};
+  const WHAR={what:'ماذا',who:'من',where:'أين',when:'متى',why:'لماذا',how:'كيف'};
+  /* ---------- Arabic verb machinery ---------- */
+  function arPres(vh,pers){
+    const st=vh.slice(1);
+    if(pers==='he')return vh;
+    if(pers==='she'||pers==='you')return 'ت'+st;
+    if(pers==='I')return /^يأ/.test(vh)?'آ'+vh.slice(2):'أ'+st;
+    if(pers==='we')return 'ن'+st;
+    if(pers==='they'){let s=vh;if(/[يى]$/.test(s))s=s.slice(0,-1);if(/أ$/.test(s))s=s.slice(0,-1)+'ؤ';return s+'ون';}
+    return vh;
+  }
+  function arPast(vp,type,pers){
+    if(pers==='he')return vp;
+    const hol=/^h:/.test(type)?type.slice(2):'',dky=type==='d'||type==='y';
+    if(pers==='she'){if(dky)return vp.replace(/[ىاي]$/,'')+'ت';return vp+'ت';}
+    if(pers==='they'){if(dky)return vp.replace(/[ىاي]$/,'')+'وا';if(/أ$/.test(vp))return vp.slice(0,-1)+'ؤوا';return vp+'وا';}
+    const sfx=pers==='we'?'نا':'ت';
+    if(hol)return hol+sfx;if(dky)return vp.replace(/[ىاي]$/,'ي')+sfx;return vp+sfx;
+  }
+  const SPEC={see:{I:'رأيت',you:'رأيت',we:'رأينا',she:'رأت',they:'رأوا'}};
+  const arPastX=(v,pers)=>(SPEC[v.en]&&SPEC[v.en][pers])||arPast(v.vp,v.type,pers);
+  function arSub(vh,pers){let s=arPres(vh,pers);if(pers==='they')s=s.replace(/ون$/,'وا');return s;}
+  function arJus(vh,pers,type){
+    const hol=/^h:/.test(type)?type.slice(2):'';
+    if(hol){const pf={he:'ي',she:'ت',you:'ت',I:'أ',we:'ن',they:'ي'}[pers];return pf+hol+(pers==='they'?'وا':'');}
+    let s=arPres(vh,pers);
+    if(pers==='they')return s.replace(/ون$/,'وا');
+    if((type==='d'||type==='y')&&/ي$/.test(s))s=s.slice(0,-1);
+    return s;
+  }
+  const KANA={he:'كان',she:'كانت',I:'كنت',you:'كنت',we:'كنا',they:'كانوا'};
+  const YJ={he:'يكن',she:'تكن',I:'أكن',you:'تكن',we:'نكن',they:'يكونوا'};
+  const YS={he:'يكون',she:'تكون',I:'أكون',you:'تكون',we:'نكون',they:'يكونوا'};
+  const YP={he:'يكون',she:'تكون',I:'أكون',you:'تكون',we:'نكون',they:'يكونون'};
+  const LAYS={he:'ليس',she:'ليست',I:'لست',you:'لست',we:'لسنا',they:'ليسوا'};
+  const LDY={I:'لدي',you:'لديك',he:'لديه',she:'لديها',we:'لدينا',they:'لديهم'};
+  const MODP={he:'يستطيع',she:'تستطيع',I:'أستطيع',you:'تستطيع',we:'نستطيع',they:'يستطيعون'};
+  const MODS={he:'يستطيع',she:'تستطيع',I:'أستطيع',you:'تستطيع',we:'نستطيع',they:'يستطيعوا'};
+  const nasb=w=>/[ةت]$/.test(w)&&false?w:/ة$/.test(w)?w+'ً':/[ءىا]$/.test(w)?w:w+'ًا';
+  const IMPAR={eat:'كل',drink:'اشرب',read:'اقرأ',write:'اكتب',draw:'ارسم',paint:'ارسم',go:'اذهب',visit:'زر',see:'انظر إلى',buy:'اشترِ',wash:'اغسل',clean:'نظّف',open:'افتح',close:'أغلق',run:'اركض',walk:'امشِ',jump:'اقفز',swim:'اسبح',fly:'طِر',sleep:'نم',sit:'اجلس',stand:'قف',sing:'غنِّ',dance:'ارقص',cook:'اطبخ',bake:'اخبز',make:'اصنع',play:'العب',watch:'شاهد',listen:'استمع',ride:'اركب',drive:'قد',wear:'ارتدِ',find:'جد',carry:'احمل',hold:'امسك',kick:'اركل',throw:'ارمِ',catch:'امسك',climb:'تسلّق',plant:'ازرع',feed:'أطعم',help:'ساعد',study:'ادرس',teach:'علّم',work:'اعمل',wait:'انتظر',brush:'نظّف',hear:'اسمع',use:'استخدم',cut:'اقطع',put:'ضع',give:'أعطِ',bring:'أحضر',take:'خذ',pick:'اقطف',push:'ادفع',pull:'اسحب',smell:'شمّ',speak:'تكلّم',wake:'استيقظ'};
+  /* ---------- English verb forms ---------- */
+  const IRRING={run:'running',sit:'sitting',swim:'swimming',stop:'stopping',get:'getting',put:'putting',cut:'cutting',begin:'beginning',shop:'shopping',hit:'hitting',jog:'jogging',plan:'planning',drop:'dropping',chat:'chatting'};
+  function ing(v){
+    if(IRRING[v])return IRRING[v];
+    if(/ie$/.test(v))return v.slice(0,-2)+'ying';
+    if(/[^e]e$/.test(v))return v.slice(0,-1)+'ing';
+    if(/^[^aeiou]+[aeiou][^aeiouwxy]$/.test(v)&&v.length<=4)return v+v.slice(-1)+'ing';
+    return v+'ing';
+  }
+  const s3=v=>v==='have'?'has':/(s|x|z|ch|sh|o)$/.test(v)?v+'es':/[^aeiou]y$/.test(v)?v.slice(0,-1)+'ies':v+'s';
+  const regPast=v=>/e$/.test(v)?v+'d':/[^aeiou]y$/.test(v)?v.slice(0,-1)+'ied':v+'ed';
+  /* ---------- noun phrases ---------- */
+  function np(w,d,ar0){
+    let en,ar;const mass=MASS.has(w),pl=PLONLY.has(w);if(w==='tv'&&d==='a')d='the';
+    if(w==='tooth'&&d==='my')return {en:'my teeth',ar:'أسناني'};
+    if(d==='pl'){if(mass||pl){en=w;ar=ar0&&defAr(ar0);}else{en=plural(w);ar=ar0&&defAr(collAr(ar0));}}
+    else if(d==='the'||d==='on'){en=(NOART.has(w)?'':'the ')+w;ar=ar0&&(NOART.has(w)?ar0:defAr(ar0));}
+    else if(d==='my'){en='my '+w;ar=ar0&&(ar0.replace(/ة$/,'ت')+'ي');}
+    else if(d==='n'||mass||pl||NOART.has(w)){en=w;ar=ar0;if(d==='a'&&pl){en='the '+w;ar=ar0&&defAr(ar0);}}
+    else{en=aan(w)+' '+w;ar=ar0;}
+    return {en,ar:ar||''};
+  }
+  const isFemAr=(ar,en)=>/ة$/.test(ar)||FEMAR.has((ar||'').split(' ')[0])||FEMEN.has(en);
+  /* ---------- subjects ---------- */
+  const PR={I:{en:'I',ar:'أنا',pers:'I',third:false,pron:true},you:{en:'you',ar:'أنت',pers:'you',third:false,pron:true},we:{en:'we',ar:'نحن',pers:'we',third:false,pron:true},they:{en:'they',ar:'هم',pers:'they',third:false,pron:true},he:{en:'he',ar:'هو',pers:'he',third:true,pron:true},she:{en:'she',ar:'هي',pers:'she',third:true,pron:true}};
+  const NAMES=[{en:'Ali',ar:'علي',pers:'he'},{en:'Omar',ar:'عمر',pers:'he'},{en:'Sara',ar:'سارة',pers:'she'},{en:'Mona',ar:'منى',pers:'she'}].map(n=>Object.assign(n,{third:true,name:true,fem:n.pers==='she'}));
+  const KIDS=[{en:'the boy',ar:'الولد',pers:'he'},{en:'the girl',ar:'البنت',pers:'she'}].map(n=>Object.assign(n,{third:true,noun:true,fem:n.pers==='she'}));
+  const beEn=(s,t)=>t==='future'?'will be':t==='past'?(s.pers==='you'||s.pers==='we'||s.pers==='they'?'were':'was'):(s.pers==='I'?'am':s.third?'is':'are');
+  /* ---------- helpers for output ---------- */
+  const K=(tag,t)=>'\u0001'+tag+'|'+t+'\u0001';
+  function fin(en,blank){
+    let ans=null,tag=null;
+    en=en.replace(/\u0001(\w+)\|([^\u0001]*)\u0001/g,(m,tg,t)=>{if(blank&&tg===blank&&ans===null){ans=t;tag=tg;return '_____';}return t;});
+    en=en.replace(/\s+/g,' ').replace(/ ([.!?,])/g,'$1').trim();
+    return {en:cap(en),ans,tag};
+  }
+  const J=a=>a.filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
+  /* ---------- action-verb clause ---------- */
+  function actRender(cl,tn,pol,kind,wh,blank){
+    const s=cl.s,v=cl.v,pers=s.pers,third=s.third;
+    if(!v.vh)return null;
+    if((tn==='past')&&!v.vp)return null;
+    const aux={present:third?'does':'do',past:'did',prog:beEn(s,'present'),pastprog:beEn(s,'past'),future:'will'}[tn];
+    const bare=(tn==='prog'||tn==='pastprog')?v.ing:v.en;
+    const vf=tn==='present'?(third?v.s3:v.en):tn==='past'?v.pastEn:null;
+    let o=cl.o,tail=cl.tail,useM=true;
+    const placeTail=tail&&/^(in|at|on|near) /.test(tail.en);
+    if(kind==='wh'){
+      if(wh==='what'){if(!o||o.pre)return null;o=null;}
+      else if(wh==='where'){if(placeTail)tail=null;else if(o&&o.pre&&/^(to|in|on)$/.test(o.pre))o=null;else return null;}
+      else if(wh==='when'){if(tn==='prog')return null;useM=false;}
+      else if(wh==='who'&&s.pron)return null;
+      else if((wh==='why'||wh==='how')&&(s.pron&&false))return null;
+    }
+    const oE=o?o.en:'',oA=o?o.ar:'',tE=tail?tail.en:'',tA=tail?tail.ar:'';
+    const mE=useM?MARK[tn][0]:'',mA=useM?MARK[tn][1]:'';
+    let en,ar;
+    const P=arPres(v.vh,pers),Pj=arJus(v.vh,pers,v.type),Ps=arSub(v.vh,pers),pa=v.vp?arPastX(v,pers):'';
+    const K0=KANA[pers],KJ=YJ[pers];
+    const sj=s.ar,sq=s.pron?'':s.ar;
+    if(kind==='dec'){
+      if(pol==='aff'){
+        en=(tn==='present'||tn==='past')?J([s.en,K('form',vf),oE,tE,mE]):J([s.en,K('aux',aux),bare,oE,tE,mE]);
+        ar=({present:[sj,P],past:[sj,pa],prog:[sj,P],pastprog:[sj,K0,P],future:[sj,'سوف',P]}[tn]);
+      }else{
+        en=J([s.en,K('aux',aux),'not',bare,oE,tE,mE]);
+        ar=({present:[sj,'لا',P],past:[sj,'لم',Pj],prog:[sj,'لا',P],pastprog:[sj,'لم',KJ,P],future:[sj,'لن',Ps]}[tn]);
+      }
+      ar=J(ar.concat([oA,tA,mA]));return {en:fin(en+'.',blank),ar};
+    }
+    // questions: Arabic verb-first part
+    const vpart={present:[P],past:[pa],prog:[P],pastprog:[K0,sq,P],future:['س'+P]}[tn];
+    if(kind==='yn'){
+      en=J([K('aux',cap(aux)),s.en,bare,oE,tE,mE]);
+      ar=J(['هل'].concat(tn==='pastprog'?vpart:vpart.concat([sq]),[oA,tA,mA]));
+      return {en:fin(en+'?',blank),ar:ar+'؟'};
+    }
+    if(kind==='wh'){
+      const W=cap(wh),WK=K('wh',W),wa=WHAR[wh];
+      if(wh==='who'){
+        const e0={present:K('form',s3(v.en)),past:K('form',v.pastEn),prog:J([K('aux','is'),v.ing]),pastprog:J([K('aux','was'),v.ing]),future:J([K('aux','will'),v.en])}[tn];
+        en=J([WK,e0,oE,tE,mE]);
+        const Ph=arPres(v.vh,'he'),ph=v.vp||'';
+        const vp2={present:[Ph],past:[ph],prog:[Ph],pastprog:['كان',Ph],future:['س'+Ph]}[tn];
+        ar=J([wa].concat(vp2,[oA,tA,mA]));return {en:fin(en+'?',blank),ar:ar+'؟'};
+      }
+      en=J([WK,K('aux',aux),s.en,bare,oE,tE,mE]);
+      ar=J([wa].concat(tn==='pastprog'?vpart:vpart.concat([sq]),[oA,tA,mA]));
+      return {en:fin(en+'?',blank),ar:ar+'؟'};
+    }
+    return null;
+  }
+  function impRender(cl,mode,blank){
+    const v=cl.v;if(!IMPAR[v.en]||!v.vh)return null;
+    const o=cl.o,tail=cl.tail,oE=o?o.en:'',oA=o?o.ar:'',tE=tail?tail.en:'',tA=tail?tail.ar:'';
+    let en,ar;
+    const im=IMPAR[v.en];
+    if(mode==='neg'){en=J([K('aux',"Don't"),v.en,oE,tE])+'!';ar=J(['لا',arJus(v.vh,'you',v.type),oA,tA]);}
+    else if(mode==='lets'){en=J([K('aux',"Let's"),v.en,oE,tE])+'!';ar=J(['هيا',arSub(v.vh,'we'),oA,tA]);}
+    else if(mode==='please'){en=J([K('aux','Please,'),v.en,oE,tE])+'!';ar=J(['من فضلك',im,oA,tA]);}
+    else{en=J([v.en,oE,tE])+'!';ar=J([im,oA,tA]);}
+    return {en:fin(en,blank),ar:ar+'!'};
+  }
+  /* ---------- be clause ---------- */
+  function beRender(cl,tn,pol,kind,wh,blank){
+    if(tn!=='present'&&tn!=='past'&&tn!=='future')return null;
+    const s=cl.s,p=cl.p,pers=s.pers,mk=MARKB[tn];
+    const be=beEn(s,tn),isF=tn==='future';
+    const K0=KANA[pers],lays=LAYS[pers],pn=p.arN||p.ar;
+    const sj=s.ar,sq=s.pron?'':s.ar,mE=mk[0],mA=mk[1];
+    if(p.kind==='there'){
+      const f=p.fem,exA={present:f?'توجد':'يوجد',past:f?'كانت هناك':'كان هناك',future:f?'ستكون هناك':'سيكون هناك'}[tn];
+      const exJ={present:f?'توجد':'يوجد',past:f?'تكن هناك':'يكن هناك',future:f?'تكون هناك':'يكون هناك'}[tn];
+      const tb=isF?'will be':tn==='past'?'was':'is';
+      const mm=tn==='present'?'':mE,ma=tn==='present'?'':mA;
+      if(kind==='dec'){
+        if(pol==='aff')return {en:fin(J(['There',K('be',tb),p.en,p.loc.en,mm])+'.',blank),ar:J([exA,p.ar,p.loc.ar,ma])};
+        const neg={present:'لا '+exA,past:'لم '+exJ,future:'لن '+exJ}[tn];
+        return {en:fin(J(['There',K('be',isF?'will be':tb),'no '+p.noun,p.loc.en,mm])+'.',blank),ar:J([neg,p.ar,p.loc.ar,ma])};
+      }
+      if(kind==='yn'){
+        return {en:fin(J([K('be',cap(isF?'will':tb)),'there',isF?'be':'',p.en,p.loc.en,mm])+'?',blank),ar:J(['هل',exA,p.ar,p.loc.ar,ma])+'؟'};
+      }
+      if(kind==='wh'&&wh==='what'){
+        return {en:fin(J([K('wh','What'),K('be',isF?'will':tb),isF?'be':'',p.loc.en,mm])+'?',blank),ar:J(['ماذا',tn==='present'?'يوجد':tn==='past'?'كان':'سيكون',p.loc.ar,ma])+'؟'};
+      }
+      return null;
+    }
+    const mm=mE;
+    if(kind==='dec'){
+      if(pol==='aff'){
+        const en=J([s.en,K('be',be),p.en,mm])+'.';
+        const ar=tn==='present'?J([sj,p.ar,mA]):tn==='past'?J([sj,K0,pn,mA]):J([sj,'سوف',YP[pers],pn,mA]);
+        return {en:fin(en,blank),ar};
+      }
+      const en=J([s.en,K('be',isF?'will not be':be+' not'),p.en,mm])+'.';
+      const ar=tn==='present'?J([sj,lays,pn,mA]):tn==='past'?J([sj,'لم',YJ[pers],pn,mA]):J([sj,'لن',YS[pers],pn,mA]);
+      return {en:fin(en,blank),ar};
+    }
+    if(kind==='yn'){
+      const en=J([K('be',cap(isF?'will':be)),s.en,isF?'be':'',p.en,mm])+'?';
+      const ar=tn==='present'?J(['هل',s.ar,p.ar,mA]):tn==='past'?J(['هل',K0,sq,pn,mA]):J(['هل','س'+YP[pers],sq,pn,mA]);
+      return {en:fin(en,blank),ar:ar+'؟'};
+    }
+    if(kind==='wh'){
+      const bw=isF?'will':be;
+      if(wh==='where'&&p.kind==='loc'){
+        return {en:fin(J([K('wh','Where'),K('be',bw),s.en,isF?'be':'',mm])+'?',blank),ar:J(['أين',tn==='present'?'':tn==='past'?K0:'س'+YP[pers],s.ar,mA])+'؟'};
+      }
+      if(wh==='how'&&p.kind==='adj'&&p.feel){
+        const hh=tn==='present'?{you:'حالك',I:'حالي',he:'حاله',she:'حالها',we:'حالنا',they:'حالهم'}[pers]:'';
+        const ar=tn==='present'?J(['كيف',hh&&!s.noun&&!s.name?hh:'حال '+s.ar,mA]):tn==='past'?J(['كيف',K0,sq,mA]):J(['كيف','س'+YP[pers],sq,mA]);
+        return {en:fin(J([K('wh','How'),K('be',bw),s.en,isF?'be':'',mm])+'?',blank),ar:ar+'؟'};
+      }
+      if(wh==='why'&&p.kind==='adj'){
+        const ar=tn==='present'?J(['لماذا',s.ar,p.ar,mA]):tn==='past'?J(['لماذا',K0,sq,pn,mA]):J(['لماذا','س'+YP[pers],sq,pn,mA]);
+        return {en:fin(J([K('wh','Why'),K('be',bw),s.en,isF?'be':'',p.en,mm])+'?',blank),ar:ar+'؟'};
+      }
+      if(wh==='who'&&p.kind==='noun'&&tn==='present'&&s.pron&&s.pers!=='they'&&s.pers!=='we'){
+        return {en:fin(J([K('wh','Who'),K('be',be),s.en])+'?',blank),ar:J(['من',s.ar])+'؟'};
+      }
+    }
+    return null;
+  }
+  /* ---------- have clause ---------- */
+  function haveRender(cl,tn,pol,kind,wh,blank){
+    if(tn!=='present'&&tn!=='past'&&tn!=='future')return null;
+    const s=cl.s,o=cl.o,pers=s.pers,third=s.third,isF=tn==='future';
+    const mk=tn==='present'?['today','اليوم']:MARKB[tn];
+    const kn=o.fem?(tn==='past'?'كانت':'سيكون'.replace('سيكون','ستكون')):(tn==='past'?'كان':'سيكون');
+    const kj=o.fem?'تكن':'يكن',kf=o.fem?'تكون':'يكون';
+    const ldy=s.pron?LDY[pers]:'لدى '+s.ar;
+    const ldq=ldy;
+    const pre={present:[],past:[kn],future:[kn]}[tn];
+    const aux={present:third?'does':'do',past:'did',future:'will'}[tn];
+    const hv={present:third?'has':'have',past:'had',future:'will have'}[tn];
+    const oE=o.en,oA=o.ar;
+    if(kind==='dec'){
+      if(pol==='aff'){
+        const en=tn==='future'?J([s.en,K('have','will have'),oE,mk[0]]):J([s.en,K('have',hv),oE,tn==='present'?mk[0]:mk[0]]);
+        return {en:fin(en+'.',blank),ar:J(pre.concat([ldy,oA,mk[1]]))};
+      }
+      const neg=tn==='future'?'will not have':aux+' not have';
+      const ar={present:['ليس',ldy],past:['لم',kj,ldy],future:['لن',kf,ldy]}[tn];
+      return {en:fin(J([s.en,K('have',neg),oE,mk[0]])+'.',blank),ar:J(ar.concat([oA,mk[1]]))};
+    }
+    if(kind==='yn'){
+      return {en:fin(J([K('have',cap(aux)),s.en,'have',oE,mk[0]])+'?',blank),ar:J(['هل'].concat(tn==='present'?[]:[tn==='past'?kn:kn],[ldy,oA,mk[1]]))+'؟'};
+    }
+    if(kind==='wh'){
+      if(wh==='what'){
+        return {en:fin(J([K('wh','What'),K('have',aux),s.en,'have',mk[0]])+'?',blank),ar:J(['ماذا'].concat(tn==='present'?[]:[tn==='past'?'كان':'سيكون'],[ldy,mk[1]]))+'؟'};
+      }
+      if(wh==='who'&&!s.pron){return null;}
+      if(wh==='who'){
+        const he=LDY.he,en=tn==='present'?K('have','has'):tn==='past'?K('have','had'):K('have','will have');
+        return {en:fin(J([K('wh','Who'),en,oE,mk[0]])+'?',blank),ar:J(['من'].concat(tn==='present'?[]:[kn],[he,oA,mk[1]]))+'؟'};
+      }
+      if(wh==='how'&&o.count){
+        const q=['كم',nasb(o.ar0)].concat(tn==='present'?[]:[tn==='past'?'كان':'سيكون'],[ldy,mk[1]]);
+        return {en:fin(J([K('wh','How many'),o.plEn,K('have',aux),s.en,'have',mk[0]])+'?',blank),ar:J(q)+'؟'};
+      }
+    }
+    return null;
+  }
+  /* ---------- can clause ---------- */
+  function canRender(cl,tn,pol,kind,wh,blank){
+    if(tn!=='present'&&tn!=='past'&&tn!=='future')return null;
+    const s=cl.s,v=cl.v,pers=s.pers,mk=MARKB[tn];
+    if(!v.vh)return null;
+    let o=cl.o,tail=cl.tail;
+    const placeTail=tail&&/^(in|at|on|near) /.test(tail.en);
+    if(kind==='wh'){
+      if(wh==='what'){if(!o||o.pre)return null;o=null;}
+      else if(wh==='where'){if(placeTail)tail=null;else if(o&&o.pre&&/^(to|in|on)$/.test(o.pre))o=null;else return null;}
+      else if(wh==='who'&&s.pron)return null;
+      else if(wh!=='how'&&wh!=='who')return null;
+    }
+    const oE=o?o.en:'',oA=o?o.ar:'',tE=tail?tail.en:'',tA=tail?tail.ar:'';
+    const Vs=arSub(v.vh,pers),M=MODP[pers],MS=MODS[pers],sj=s.ar,sq=s.pron?'':s.ar;
+    const K0=KANA[pers],KJ=YJ[pers];
+    const ex=[oA,tA,mk[1]];
+    if(kind==='dec'){
+      if(pol==='aff'){
+        const m={present:'can',past:'could',future:'will be able to'}[tn];
+        const ar={present:[sj,M,'أن',Vs],past:[sj,K0,M,'أن',Vs],future:[sj,'سوف',M,'أن',Vs]}[tn];
+        return {en:fin(J([s.en,K('can',m),v.en,oE,tE,mk[0]])+'.',blank),ar:J(ar.concat(ex))};
+      }
+      const m={present:'cannot',past:'could not',future:'will not be able to'}[tn];
+      const ar={present:[sj,'لا',M,'أن',Vs],past:[sj,'لم',KJ,M,'أن',Vs],future:[sj,'لن',MS,'أن',Vs]}[tn];
+      return {en:fin(J([s.en,K('can',m),v.en,oE,tE,mk[0]])+'.',blank),ar:J(ar.concat(ex))};
+    }
+    const aw={present:'can',past:'could',future:'will'}[tn];
+    const mid=tn==='future'?['be able to',v.en]:[v.en];
+    const qa={present:[M,sq],past:[K0,sq,M],future:['س'+M,sq]}[tn];
+    if(kind==='yn'){
+      return {en:fin(J([K('can',cap(aw)),s.en].concat(mid,[oE,tE,mk[0]]))+'?',blank),ar:J(['هل'].concat(qa,['أن',Vs],ex))+'؟'};
+    }
+    if(kind==='wh'){
+      if(wh==='who'){
+        const mh={present:MODP.he,past:'كان '+MODP.he,future:'س'+MODP.he}[tn];
+        return {en:fin(J([K('wh','Who'),K('can',aw)].concat(mid,[oE,tE,mk[0]]))+'?',blank),ar:J(['من',mh,'أن',arSub(v.vh,'he')].concat(ex))+'؟'};
+      }
+      return {en:fin(J([K('wh',cap(wh)),K('can',aw),s.en].concat(mid,[oE,tE,mk[0]]))+'?',blank),ar:J([WHAR[wh]].concat(qa,['أن',Vs],ex))+'؟'};
+    }
+    return null;
+  }
+  const RENDER={act:actRender,be:beRender,have:haveRender,can:canRender};
+  /* ---------- vocabulary ---------- */
+  const rng=seed=>{let s=(seed>>>0)||1;return()=>{s^=s<<13;s>>>=0;s^=s>>>17;s^=s<<5;s>>>=0;return s/4294967296;};};
+  const nounAr=(w,it)=>it&&it.a&&/^[\u0600-\u06FF\s]+$/.test(it.a.trim())&&it.a.trim().split(/\s+/).length<=2?it.a.trim():AR[w]||'';
+  function verbEntry(k,it){
+    const e=V[k];
+    if(e)return {en:k,pastEn:e[0],vh:e[1],vp:e[2],type:e[3],frames:e[4].filter(f=>/^h/.test(f.s)&&!/morning|night/.test(f.tail||'')),user:!!it,s3:s3(k),ing:ing(k)};
+    const ph=it&&(it.a||'').trim();
+    if(!ph||!/^[\u0600-\u06FF]+$/.test(ph)||ph[0]!=='ي')return null;
+    return {en:k,pastEn:(it&&it.p)||regPast(k),vh:ph,vp:'',type:'r',frames:[{s:'h',o:null,tail:'',art:''}],user:true,s3:s3(k),ing:ing(k)};
+  }
+  const BUILTIN_V='eat drink read write draw go play watch open close wash clean cook sing dance swim run walk jump sit sleep help study listen buy make take give'.split(' ');
+  function ctxOf(items){
+    const uw={},uv={};
+    (items||[]).forEach(it=>{if(it.t==='s'||!it.en)return;const k=lookup(it.en);if(!k)return;if(it.t==='v')uv[k]=it;else uw[k]=it;});
+    Object.keys(uw).forEach(k=>{if(V[k]&&!TAGS[k]){uv[k]=uw[k];delete uw[k];}});
+    const verbs=[];Object.keys(uv).forEach(k=>{const e=verbEntry(k,uv[k]);if(e)verbs.push(e);});
+    const uvAny=verbs.length>0;
+    const bverbs=BUILTIN_V.map(k=>verbEntry(k,null)).filter(Boolean);
+    const unouns=Object.keys(uw).filter(w=>TAGS[w]&&nounAr(w,uw[w]));
+    const unk=Object.keys(uw).filter(w=>!TAGS[w]&&!ADJ.some(a=>a.en===w)&&/^[a-z]+$/.test(w)&&!(/s$/.test(w)&&!/ss$/.test(w))&&!/(ness|ity|tion|sion|ment|ship|age|dom|ism|ance|ence|ure|th|ing)$/.test(w)&&nounAr(w,uw[w])&&nounAr(w,uw[w]).split(' ').length<=2);
+    const uadj=Object.keys(uw).map(k=>ADJ.find(a=>a.en===k)).filter(Boolean);
+    const allNouns=Object.keys(TAGS).filter(w=>AR[w]&&!ADJ.some(a=>a.en===w));
+    return {uw,uv,verbs,uvAny,bverbs,unouns,unk,uadj,allNouns};
+  }
+  /* ---------- clause factories ---------- */
+  function mkGen(items,seed){
+    const C=ctxOf(items),rnd=rng(seed||Date.now());
+    const pick=a=>a[Math.floor(rnd()*a.length)];
+    const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+    const arOf=w=>nounAr(w,C.uw[w])||AR[w]||'';
+    const nounSubj=w=>{const ar=arOf(w);return {en:'the '+w,ar:defAr(ar),pers:isFemAr(ar,w)?'she':'he',third:true,noun:true,fem:isFemAr(ar,w),user:C.uw[w]?w:null};};
+    const persons=C.unouns.filter(w=>TAGS[w].has('pe'));
+    function subject(pool){
+      const a=pool||'pron';
+      const L=[PR.I,PR.you,PR.we,PR.they,PR.he,PR.she].concat(NAMES,KIDS);
+      if(persons.length&&rnd()<.3)return nounSubj(pick(persons));
+      return pick(L);
+    }
+    function frameObj(fr){
+      if(!fr.o)return {o:null,hl:[]};
+      const un=C.unouns.filter(w=>has(w,fr.o)&&arOf(w));
+      let w,user=false;
+      if(un.length&&rnd()<.9){w=pick(un);user=true;}
+      else{const hp=C.allNouns.filter(x=>has(x,fr.o));if(!hp.length)return null;w=pick(hp);}
+      const n=np(w,fr.d||'a',arOf(w));if(!n.ar)return null;
+      let en=n.en,ar=n.ar;
+      if(fr.pre){en=fr.pre+' '+en;ar=fr.arp+' '+ar;if(fr.arp==='بـ')ar='ب'+defAr(arOf(w));}
+      return {o:{en,ar,pre:fr.pre||''},hl:user?[w]:[]};
+    }
+    function actClause(grp){
+      const pool=C.uvAny&&rnd()<.88?C.verbs:(C.uvAny&&grp!=='act'?C.verbs:C.bverbs);
+      for(let k=0;k<12;k++){
+        const v=pick(pool);if(!v.frames.length)continue;
+        const fr=pick(v.frames),ob=frameObj(fr);if(!ob)continue;
+        const s=subject();
+        if(v.en==='eat'&&ob.o&&/grass/.test(ob.o.en))continue;
+        const tail=fr.tail?{en:fr.tail,ar:fr.art}:null;
+        const hl=[v.user?v.en:''].concat(ob.hl,[s.user||'']).filter(Boolean);
+        return {type:grp==='can'?'can':'act',s,v,o:ob.o,tail,hl};
+      }
+      return null;
+    }
+    const placesP=[['at school','في المدرسة'],['at home','في البيت'],['in the garden','في الحديقة'],['in the kitchen','في المطبخ'],['in the park','في الحديقة العامة']];
+    const placesT=[['on the table','على الطاولة'],['in the bag','في الحقيبة'],['on the chair','على الكرسي'],['in the room','في الغرفة'],['on the desk','على المكتب'],['on the bed','على السرير']];
+    const placesA=[['in the garden','في الحديقة'],['in the house','في البيت'],['on the sofa','على الأريكة'],['in the yard','في الفناء']];
+    const thingTags='fr ve fo fm bk pn wr ty ob fu dm';
+    const things=C.unouns.filter(w=>has(w,thingTags)&&!PLONLY.has(w)&&!TAGS[w].has('pl'));
+    const fbThings=['book','pen','ball','apple','cup','bag','toy','cake','hat'].filter(w=>AR[w]);
+    function beClause(){
+      for(let k=0;k<12;k++){
+        const t=rnd();
+        if(t<.3){ // feeling adjective for a person
+          const pool=C.uadj.filter(a=>a.c.includes('pe')||a.c.includes('fa')).concat(ADJ.filter(a=>SE_FEEL.has(a.en)));
+          const a=(C.uadj.length&&rnd()<.5)?pick(C.uadj.filter(x=>x.c.includes('pe')||x.c.includes('an'))||pool):pick(pool);
+          if(!a)continue;
+          const s=pick([PR.I,PR.you,PR.he,PR.she].concat(NAMES,KIDS)),f=s.pers==='she'||s.fem;
+          return {type:'be',s,p:{kind:'adj',feel:SE_FEEL.has(a.en),en:a.en,ar:f?a.f:a.m,arN:nasb(f?a.f:a.m)},hl:C.uw[a.en]?[a.en]:[]};
+        }
+        if(t<.55){ // adjective of a thing
+          const w=things.length&&rnd()<.9?pick(things):pick(fbThings);
+          const ar=arOf(w),f=isFemAr(ar,w);if(!ar)continue;
+          const opts=[];const nc=SE_NC[w];
+          if(nc){const a=ADJ.find(x=>x.en===nc.split(' ')[0]);if(a)opts.push(a);}
+          ['big','small','new','old'].forEach(n=>{const a=ADJ.find(x=>x.en===n);if(a&&a.c.some(c=>TAGS[w]&&TAGS[w].has(c)))opts.push(a);});
+          if(!opts.length)continue;
+          const a=pick(opts),s={en:'the '+w,ar:defAr(ar),pers:f?'she':'he',third:true,noun:true,fem:f};
+          if(MASS.has(w)&&['big','small'].includes(a.en))continue;
+          return {type:'be',s,p:{kind:'adj',en:a.en,ar:f?a.f:a.m,arN:nasb(f?a.f:a.m)},hl:C.uw[w]?[w]:[]};
+        }
+        if(t<.75){ // location
+          const r=rnd();
+          if(r<.4){const s=pick([PR.I,PR.you,PR.he,PR.she].concat(NAMES,KIDS)),pl=pick(placesP);return {type:'be',s,p:{kind:'loc',en:pl[0],ar:pl[1]},hl:[]};}
+          const w=things.length&&rnd()<.85?pick(things):pick(fbThings);const ar=arOf(w);if(!ar)continue;const pl=pick(placesT);
+          return {type:'be',s:{en:'the '+w,ar:defAr(ar),pers:isFemAr(ar,w)?'she':'he',third:true,noun:true,fem:isFemAr(ar,w)},p:{kind:'loc',en:pl[0],ar:pl[1]},hl:C.uw[w]?[w]:[]};
+        }
+        if(t<.88){ // profession / family
+          const pe=C.unouns.filter(w=>TAGS[w].has('pe')&&arOf(w).split(' ').length===1);
+          const fa=C.unouns.filter(w=>TAGS[w].has('fa')&&arOf(w).split(' ').length===1);
+          if(pe.length&&(!fa.length||rnd()<.6)){
+            const w=pick(pe),ar=arOf(w),s=pick([PR.I,PR.you,PR.he,PR.she].concat(NAMES)),f=s.pers==='she';
+            if(FEMEN.has(w)&&!f||(!FEMEN.has(w)&&f&&['girl','woman','queen'].includes(w)))continue;
+            const arx=f&&!/ة$/.test(ar)&&!FEMEN.has(w)?ar+'ة':ar;
+            return {type:'be',s,p:{kind:'noun',en:aan(w)+' '+w,ar:arx,arN:nasb(arx)},hl:[w]};
+          }
+          if(fa.length){
+            const w=pick(fa),ar=arOf(w),f=FEMEN.has(w)||/^(mom|grandma)$/.test(w);
+            const s=pick(f?[PR.she,NAMES[2],NAMES[3]]:[PR.he,NAMES[0],NAMES[1]]);
+            const pa=ar.replace(/ة$/,'ت')+'ي';
+            return {type:'be',s,p:{kind:'noun',en:'my '+w,ar:pa,arN:pa},hl:[w]};
+          }
+          continue;
+        }
+        { // there is/are
+          const w=things.length&&rnd()<.9?pick(things):pick(fbThings);const ar=arOf(w);if(!ar)continue;const pl=pick(placesT);
+          const en=MASS.has(w)?w:aan(w)+' '+w;
+          return {type:'be',s:{en:'there',ar:'',pers:'he',third:true},p:{kind:'there',en,noun:w,ar,fem:isFemAr(ar,w),loc:{en:pl[0],ar:pl[1]}},hl:C.uw[w]?[w]:[]};
+        }
+      }
+      return null;
+    }
+    function haveClause(){
+      const pool=C.unouns.filter(w=>!PLONLY.has(w)&&!TAGS[w].has('pl')).concat(C.unk);
+      for(let k=0;k<10;k++){
+        const w=pool.length&&rnd()<.92?pick(pool):pick(fbThings);const ar=arOf(w);if(!ar||ar.split(' ').length>2)continue;
+        const s=pick([PR.I,PR.you,PR.we,PR.they,PR.he,PR.she].concat(NAMES,KIDS));
+        const mass=MASS.has(w)||NOART.has(w);
+        const o={en:mass?w:aan(w)+' '+w,ar,ar0:ar,fem:isFemAr(ar,w),count:!mass,plEn:mass?'':plural(w)};
+        return {type:'have',s,o,hl:C.uw[w]?[w]:[]};
+      }
+      return null;
+    }
+    return {C,rnd,pick,shuf,actClause,beClause,haveClause,subject};
+  }
+  /* ---------- sentence generation ---------- */
+  const KINDS=['dec','yn','wh'];
+  const WHS={act:['what','who','where','when','why','how'],be:['where','how','why','who','what'],have:['what','who','how'],can:['what','who','where','how']};
+  function build(G,grp){
+    let cl=null;
+    if(grp==='act')cl=G.actClause('act');
+    else if(grp==='can')cl=G.actClause('can');
+    else if(grp==='be')cl=G.beClause();
+    else if(grp==='have')cl=G.haveClause();
+    if(!cl)return null;
+    cl.grp=grp;return cl;
+  }
+  function out(cl,tn,pol,kind,wh,blank){
+    let r;
+    if(kind==='imp'){r=cl.type==='act'?impRender(cl,pol,blank):null;if(!r)return null;
+      return {en:r.en.en,a:r.ar,ans:r.en.ans,tag:r.en.tag,tn:null,pol,kind:'imp',wh:null,grp:'act',hl:cl.hl,cl};}
+    r=RENDER[cl.type](cl,tn,pol,kind,wh,blank);
+    if(!r)return null;
+    return {en:r.en.en,a:r.ar,ans:r.en.ans,tag:r.en.tag,tn,pol,kind,wh:kind==='wh'?wh:null,grp:cl.grp,hl:cl.hl,cl};
+  }
+  /* o: {tense, kind, grp, seed, n, blank} */
+  function gen(items,o){
+    o=o||{};const G=mkGen(items,o.seed||Date.now()),rnd=G.rnd,pick=G.pick;
+    const res=[],seen=new Set(),n=o.n||8;
+    const tenseSel=o.tense&&o.tense!=='mix'?o.tense:null,kindSel=o.kind&&o.kind!=='mix'?o.kind:null,grpSel=o.grp&&o.grp!=='mix'?o.grp:null;
+    const contT=tenseSel==='prog'||tenseSel==='pastprog';
+    for(let tries=0;tries<n*60&&res.length<n;tries++){
+      let grp=grpSel;
+      if(!grp){const r=rnd();grp=contT?'act':(r<.5?'act':r<.68?'be':r<.84?'have':'can');}
+      if(contT&&grp!=='act')return res;
+      let kind=kindSel==='neg'?'dec':kindSel;
+      if(!kind){const r=rnd();kind=r<.34?'dec':r<.52?'yn':r<.86?'wh':(grp==='act'?'imp':'dec');}
+      let pol='aff';
+      if(kindSel==='neg')pol='neg';else if(kind==='dec'&&!kindSel)pol=rnd()<.3?'neg':'aff';
+      if(kind==='imp'&&grp!=='act')continue;
+      const cl=build(G,grp);if(!cl)continue;
+      let tn=tenseSel||pick(grp==='act'?TN:['present','past','future']);
+      if(grp!=='act'&&(tn==='prog'||tn==='pastprog'))tn='present';
+      let wh=null;
+      if(kind==='wh'){wh=pick(WHS[grp]);}
+      if(kind==='imp'){pol=pick(['aff','aff','neg','lets','please']);}
+      const r=out(cl,tn,pol,kind,wh,o.blank);
+      if(!r||!r.a||/undefined|NaN/.test(r.en+r.a))continue;
+      const key=r.en.toLowerCase();if(seen.has(key))continue;seen.add(key);
+      res.push(r);
+    }
+    return res;
+  }
+  return {gen,out,TN,TNAR,KNAR,WHAR,ing,s3,ADJ,beEn};
+})();
+
+/* ====================================================================
+   kx6: smart sentence generator UI + grammar exercises
+   ==================================================================== */
+GEN.kind=GEN.kind||'mix';GEN.grp=GEN.grp||'mix';
+const GX_T=[['mix','كل الأزمنة (متنوعة)'],['present','المضارع البسيط (Present Simple)'],['past','الماضي البسيط (Past Simple)'],['prog','المضارع المستمر (Present Continuous)'],['pastprog','الماضي المستمر (Past Continuous)'],['future','المستقبل (Future with will)']];
+const GX_K=[['mix','كل أنواع الجمل'],['imp','أمرية (Imperative)'],['dec','خبرية مثبتة'],['neg','خبرية منفية'],['yn','استفهامية بـ «هل» (Yes / No)'],['wh','استفهامية بأداة استفهام (Wh-)']];
+const GX_G=[['mix','كل الأفعال'],['be','فعل الكينونة (to be)'],['have','فعل الملكية (have / has)'],['can','القدرة (can / could)']];
+const GX_KTAG={imp:'أمر',dec:'خبرية',yn:'سؤال بـ هل',wh:'سؤال بأداة'};
+const GX_GTAG={be:'to be',have:'have',can:'can'};
+{const _gf=genForms;genForms=function(h){const s=_gf(h);try{s.add(GX.ing(h));s.add(GX.s3(h));}catch(e){}return s;};}
+function genRun(){
+  if(!genCount()){toast('أضف كلمات أو أفعالًا أولًا');return;}
+  if((GEN.tense==='prog'||GEN.tense==='pastprog')&&GEN.grp!=='mix'){GEN.list=[];toast('الزمن المستمر لا يُستخدم مع to be و have و can');render(true);return;}
+  GEN.seed=(GEN.seed||Date.now())+7919;GEN.ai=false;
+  let list=[];
+  try{list=GX.gen(S.items,{tense:GEN.tense,kind:GEN.kind,grp:GEN.grp,seed:GEN.seed,n:8});}catch(e){console.error(e);}
+  const have=new Set(sents().map(i=>i.en.toLowerCase()));
+  GEN.list=list.filter(x=>!have.has(x.en.toLowerCase())).map(x=>({en:x.en,a:x.a,hl:x.hl,tn:x.tn,kind:x.kind,grp:x.grp}));
+  if(!GEN.list.length)toast('لا توجد جمل مناسبة، جرّب اختيارات أخرى أو أضف كلمات');
+  render(true);
+}
+async function genAi(){
+  if(!SAMPLE||GEN.busy)return;GEN.busy=true;render(true);
+  const w=S.items.filter(i=>i.t==='w').sort((a,b)=>a.m-b.m).slice(0,12).map(x=>x.en),v=S.items.filter(i=>i.t==='v').sort((a,b)=>a.m-b.m).slice(0,8).map(x=>x.en);
+  const TT={mix:'a mix of present simple, past simple, present continuous, past continuous and future with will',present:'present simple',past:'past simple',prog:'present continuous',pastprog:'past continuous',future:'future with will'};
+  const KK={mix:'a mix of affirmative statements, negative statements, imperatives (commands), yes/no questions and wh-questions',imp:'imperatives (commands, affirmative and negative)',dec:'affirmative statements',neg:'negative statements',yn:'yes/no questions',wh:'wh-questions (what, who, where, when, why, how)'};
+  const GG={mix:'',be:' Every sentence must use the verb to be.',have:' Every sentence must use have/has/had.',can:' Every sentence must use can/could.'};
+  try{const res=await SAMPLE.json('Write 6 very simple, grammatically correct and logical English sentences for a young learner (4 to 8 words each, everyday real-life meaning, nothing silly). Tense: '+TT[GEN.tense||'mix']+'. Sentence type: '+KK[GEN.kind||'mix']+'.'+GG[GEN.grp||'mix']+' Each sentence must use one or two of these words and verbs: words '+JSON.stringify(w)+', verbs '+JSON.stringify(v)+'. Give a natural Arabic translation of each. Also give "w": the list of the given vocabulary words you used. Reply with a JSON array of {"en":"...","a":"...","w":["..."]} only.',{modelTier:'quick',cache:false});
+    const L=(Array.isArray(res)?res:[]).filter(x=>x&&typeof x.en==='string'&&typeof x.a==='string'&&x.en.trim().split(/\s+/).length<=10).slice(0,6).map(x=>({en:x.en.trim(),a:x.a.trim(),hl:(Array.isArray(x.w)?x.w:[]).map(q=>String(q).toLowerCase()),ai:true}));
+    if(L.length){GEN.list=L;GEN.ai=true;}else toast('لم أحصل على جمل، حاول مرة أخرى');}
+  catch(e){toast(errMsg(e));}
+  GEN.busy=false;render(true);
+}
+function gxSel(id,label,arr,cur){
+  return `<label class="help" for="${id}" style="margin:0">${label}</label><div class="selw"><select id="${id}" class="inp sel" aria-label="${label}">${arr.map(t=>`<option value="${t[0]}" ${cur===t[0]?'selected':''}>${t[1]}</option>`).join('')}</select>${ic('chev')}</div>`;
+}
+function genCard(){
+  const n=genCount();
+  return `<div class="addcard gencard"><h3>${ic('spark')} ولّد جمل ذكية</h3>
+   <p class="help">يكوّن التطبيق جملًا صحيحة من كلماتك وأفعالك في كل الأزمنة وكل أنواع الجمل (أمر، خبر، استفهام) مع to be و have و can.${n?'':' أضف كلمات أو أفعالًا أولًا.'}</p>
+   ${gxSel('genSel','زمن الجمل',GX_T,GEN.tense)}
+   ${gxSel('genKind','نوع الجملة',GX_K,GEN.kind)}
+   ${gxSel('genGrp','الفعل',GX_G,GEN.grp)}
+   <div class="pair" style="flex-wrap:wrap"><button class="btn" data-act="gen" ${n?'':'disabled'} style="min-height:50px;flex:1 1 150px;white-space:nowrap">${ic('spark')}<span>${GEN.list.length&&!GEN.ai?'جمل أخرى':'ولّد الجمل'}</span></button>
+   ${SAMPLE?`<button class="btn ghost" data-act="genai" ${n&&!GEN.busy?'':'disabled'} style="min-height:50px;flex:1 1 150px;white-space:nowrap">${ic('translate')}<span>${GEN.busy?'جارٍ التوليد...':'بذكاء Claude'}</span></button>`:''}</div>
+   ${GEN.list.length?GEN.list.map((x,k)=>`<div class="row gen"><button class="spk2" data-act="speak" data-t="${esc(x.en)}" aria-label="استمع">${ic('speaker')}</button>
+     <div class="sug"><div class="e en" dir="ltr" style="font-weight:600;font-size:17px">${genHtml(x)}</div><div class="a">${esc(x.a)||'<i style="opacity:.6">أضف المعنى عند المراجعة</i>'}</div>
+     ${x.tn||x.kind?`<div class="gx-tags">${x.kind?`<span class="k-${x.kind}">${GX_KTAG[x.kind]}</span>`:''}${x.tn?`<span>${GX.TNAR[x.tn]}</span>`:''}${GX_GTAG[x.grp]?`<span class="g">${GX_GTAG[x.grp]}</span>`:''}</div>`:''}</div>
+     <button class="pill" style="min-height:40px" data-act="genadd" data-k="${k}" aria-label="إضافة">${ic('plus')}</button></div>`).join('')
+     +`<button class="btn ghost" data-act="genall" style="min-height:46px">إضافة الكل (${GEN.list.length})</button>`:''}
+  </div>`;
+}
+document.addEventListener('change',e=>{
+  const t=e.target;if(!t||!/^gen(Sel|Kind|Grp)$/.test(t.id))return;
+  e.stopPropagation();
+  if(t.id==='genSel')GEN.tense=t.value;else if(t.id==='genKind')GEN.kind=t.value;else GEN.grp=t.value;
+  GEN.list=[];render(true);
+},true);
+
+/* ---------------- grammar exercises ---------------- */
+const GXE=[
+ ['gtype','نوع الجملة','حدّد إن كانت الجملة أمرية أم خبرية أم استفهامية'],
+ ['gtense','زمن الجملة','حدّد زمن الجملة: مضارع، ماضٍ، مستمر، مستقبل'],
+ ['gaux','الفعل المساعد وصيغة الفعل','اختر do / does / did / is / was / will أو صيغة الفعل الصحيحة'],
+ ['gbe','فعل الكينونة (to be)','am / is / are / was / were / will be'],
+ ['ghave','فعل الملكية (have)','have / has / had / will have في المثبت والمنفي والسؤال'],
+ ['gcan','القدرة (can)','can / cannot / could / will be able to'],
+ ['gwh','أدوات الاستفهام','What / Who / Where / When / Why / How'],
+ ['gimp','الأمر والنهي','Eat! / Don’t eat! / Let’s eat! / Please, eat!'],
+ ['gtrans','اختر الترجمة الصحيحة','اختر الجملة التي تطابق المعنى العربي في الزمن والنوع'],
+ ['gord','رتّب الجملة أو السؤال','رتّب الكلمات لتكوين جملة أو سؤال صحيح'],
+ ['gall','تدريب شامل للقواعد','يخلط كل تدريبات القواعد في جولة واحدة']
+];
+{const i=SX.findIndex(x=>x[0]==='sall');SX.splice(i<0?SX.length:i,0,...GXE.map(x=>[x[0],x[1],x[2],0]));}
+const GXS=new Set(GXE.map(x=>x[0]));
+const gxOne=(o,check)=>{
+  for(let t=0;t<40;t++){
+    const r=GX.gen(S.items,Object.assign({n:1,seed:(Math.random()*4e9)|0},o))[0];
+    if(r&&(!check||check(r)))return r;
+  }
+  return null;
+};
+const gxCapIf=(ans,list)=>/^[A-Z]/.test(ans)?list.map(x=>x.charAt(0).toUpperCase()+x.slice(1)):list;
+const gxOpts=(ans,pool)=>{
+  const low=ans.charAt(0).toLowerCase()+ans.slice(1);
+  const bad=shuffle(pool.filter(x=>x.toLowerCase()!==ans.toLowerCase())).slice(0,3);
+  return shuffle([ans,...gxCapIf(ans,bad)]);
+};
+const gxMC=(r,prompt,opts,title)=>({type:'mc',prompt,word:r.en,wl:'en',sub:r.a,correct:r.ans,opts,ol:'en',state:'ask',ttl:title});
+function gxAuxOpts(r){
+  const tn=r.tn;
+  if(r.tag==='form'){
+    const v=r.cl.v,l=[v.en,v.s3,v.pastEn,v.ing].filter((x,i,a)=>a.indexOf(x)===i);
+    if(l.length<4)l.push('will '+v.en);
+    const bad=shuffle(l.filter(x=>x!==r.ans)).slice(0,3);return shuffle([r.ans,...bad]);
+  }
+  const P={present:['do','does','did','is'],past:['do','does','did','was'],prog:['am','is','are','do'],pastprog:['was','were','is','did'],future:['will','is','did','was']}[tn]||['do','does','did','is'];
+  const a=r.ans.toLowerCase();
+  if(a==="don't"||a==="let's"||/please/.test(a))return null;
+  return gxOpts(r.ans,P);
+}
+function gxBlankOpts(tag,r){
+  const a=r.ans,low=a.toLowerCase(),tn=r.tn;
+  if(tag==='be'){
+    if(/^[A-Z]/.test(a)){return gxOpts(a,{present:['Am','Is','Are','Was'],past:['Was','Were','Is','Will'],future:['Will','Is','Was','Are']}[tn]);}
+    if(/ not$/.test(low)||/will not be/.test(low)){const base={present:['am not','is not','are not','was not'],past:['was not','were not','is not','will not be'],future:['will not be','is not','was not','are not']}[tn];return gxOpts(a,base);}
+    return gxOpts(a,{present:['am','is','are','was'],past:['was','were','is','will be'],future:['will be','is','was','are']}[tn]);
+  }
+  if(tag==='have'){
+    if(/^(do|does|did|will)$/i.test(a))return gxOpts(a,['do','does','did','will']);
+    if(/not have$/.test(low))return gxOpts(a,['do not have','does not have','did not have','will not have']);
+    return gxOpts(a,{present:['have','has','had','will have'],past:['had','has','have','will have'],future:['will have','has','had','have']}[tn]);
+  }
+  if(tag==='can'){
+    if(/^(can|could|will)$/i.test(a))return gxOpts(a,['can','could','will']);
+    if(/not/.test(low))return gxOpts(a,['cannot','could not','will not be able to']);
+    return gxOpts(a,['can','could','will be able to']);
+  }
+  return null;
+}
+const GXP={be:'اختر صيغة فعل الكينونة (to be) المناسبة',have:'اختر صيغة have المناسبة',can:'اختر صيغة can المناسبة'};
+function gxMkBlank(tag,grp,title){
+  const r=gxOne({grp,blank:tag,tense:Math.random()<.4?'present':'mix'},x=>x.ans);
+  if(!r)return null;
+  const opts=gxBlankOpts(tag,r);if(!opts||opts.length<3)return null;
+  return gxMC(r,GXP[tag],opts,title);
+}
+const GXQ={
+  gtype(){
+    const kinds=['imp','dec','dec','yn','yn','wh','wh'];const r=gxOne({kind:kinds[rand(kinds.length)]});if(!r)return null;
+    const order=['imp','dec','yn','wh'],c=GX.KNAR[r.kind];
+    return {type:'mc',prompt:'ما نوع هذه الجملة؟',word:r.en,wl:'en',sub:r.a,correct:c,opts:order.map(k=>GX.KNAR[k]),ol:'ar',state:'ask',ttl:'نوع الجملة'};
+  },
+  gtense(){
+    const r=gxOne({kind:['dec','yn','wh'][rand(3)],tense:GX.TN[rand(5)]});if(!r||!r.tn)return null;
+    const c=GX.TNAR[r.tn],bad=shuffle(GX.TN.filter(t=>t!==r.tn)).slice(0,3).map(t=>GX.TNAR[t]);
+    return {type:'mc',prompt:'ما زمن هذه الجملة؟',word:r.en,wl:'en',sub:r.a,correct:c,opts:shuffle([c,...bad]),ol:'ar',state:'ask',ttl:'زمن الجملة'};
+  },
+  gaux(){
+    for(let t=0;t<30;t++){
+      const r=gxOne({grp:'act',kind:['dec','yn','dec','wh'][rand(4)],blank:Math.random()<.4?'form':'aux'},x=>x.ans);
+      if(!r)continue;const o=gxAuxOpts(r);if(!o||o.length<3)continue;
+      return gxMC(r,r.tag==='form'?'اختر صيغة الفعل الصحيحة':'اختر الفعل المساعد المناسب',o,'الفعل المساعد وصيغة الفعل');
+    }return null;
+  },
+  gbe(){return gxMkBlank('be','be','فعل الكينونة (to be)');},
+  ghave(){return gxMkBlank('have','have','فعل الملكية (have)');},
+  gcan(){return gxMkBlank('can','can','القدرة (can)');},
+  gwh(){
+    const r=gxOne({kind:'wh',blank:'wh'},x=>x.ans);if(!r)return null;
+    const all=['What','Who','Where','When','Why','How','How many'];
+    return gxMC(r,'اختر أداة الاستفهام المناسبة',gxOpts(r.ans,all),'أدوات الاستفهام');
+  },
+  gimp(){
+    const r=gxOne({kind:'imp'});if(!r)return null;
+    const modes=['aff','neg','lets','please'],cur=r.pol;
+    const vs=modes.map(m=>GX.out(r.cl,null,m,'imp',null,null)).filter(Boolean);
+    if(vs.length<3)return null;
+    const c=r.en,opts=shuffle(vs.map(x=>x.en)).slice(0,4);if(!opts.includes(c))opts[0]=c;
+    return {type:'mc',prompt:'اختر الجملة الأمرية المناسبة للمعنى',word:r.a,wl:'ar',correct:c,opts:shuffle([...new Set(opts)]),ol:'en',state:'ask',ttl:'الأمر والنهي'};
+  },
+  gtrans(){
+    const r=gxOne({kind:['dec','dec','yn','wh'][rand(4)]});if(!r||!r.tn)return null;
+    const cands=[];
+    const tns=r.grp==='act'?GX.TN:['present','past','future'];
+    tns.forEach(t=>{if(t!==r.tn){const x=GX.out(r.cl,t,r.pol,r.kind,r.wh,null);if(x)cands.push(x.en);}});
+    if(r.kind==='dec'){const x=GX.out(r.cl,r.tn,r.pol==='aff'?'neg':'aff','dec',null,null);if(x)cands.push(x.en);}
+    else{const k2=r.kind==='yn'?'dec':'yn';const x=GX.out(r.cl,r.tn,'aff',k2,null,null);if(x)cands.push(x.en);}
+    const bad=shuffle([...new Set(cands)].filter(e=>e!==r.en)).slice(0,2);if(bad.length<2)return null;
+    return {type:'mc',prompt:'اختر الترجمة الصحيحة للجملة',word:r.a,wl:'ar',correct:r.en,opts:shuffle([r.en,...bad]),ol:'en',state:'ask',ttl:'اختر الترجمة'};
+  },
+  gord(){
+    const r=gxOne({kind:['dec','yn','wh','wh','imp'][rand(5)]});if(!r)return null;
+    return mkBuild({id:'gx'+Date.now()+rand(999),t:'s',en:r.en,a:r.a,m:3});
+  }
+};
+function gxBuildEx(k){
+  const out=[];
+  const keys=k==='gall'?['gtype','gtense','gaux','gbe','ghave','gcan','gwh','gimp','gtrans','gord']:[k];
+  const n=k==='gall'?10:6;
+  for(let i=0,t=0;out.length<n&&t<n*6;t++,i++){
+    const f=GXQ[keys[i%keys.length]];let q=null;try{q=f();}catch(e){console.error(e);}
+    if(q)out.push(q);
+  }
+  return k==='gall'?shuffle(out):out;
+}
+{const _sb=sxBuild;sxBuild=function(){return GXS.has(SXK)?gxBuildEx(SXK):_sb();};}
+function sxCard(){
+  const cur=SX.find(x=>x[0]===SXK)||SX[0],ns=sents().length,nw=words().length,isG=GXS.has(cur[0]);
+  const need=isG?false:cur[0]==='compose'?nw<1:cur[0]==='sall'?ns<1:ns<Math.max(1,cur[3]);
+  const msg=cur[0]==='compose'?'أضف كلمة واحدة على الأقل':cur[3]>1?'أضف '+cur[3]+' جمل على الأقل لهذا التدريب':'أضف جملة واحدة على الأقل';
+  const opt=x=>`<option value="${x[0]}" ${x[0]===SXK?'selected':''}>${x[1]}</option>`;
+  return `<div class="addcard"><h3>${ic('pencil')} تدريب</h3>
+   <label class="help" for="sxSel" style="margin:0">اختر نوع التدريب</label>
+   <div class="selw"><select id="sxSel" class="inp sel" aria-label="نوع التدريب"><optgroup label="تدريبات على جملك المحفوظة">${SX.filter(x=>!GXS.has(x[0])).map(opt).join('')}</optgroup><optgroup label="قواعد الجمل (أزمنة وأنواع الجمل)">${SX.filter(x=>GXS.has(x[0])).map(opt).join('')}</optgroup></select>${ic('chev')}</div>
+   <p class="help" style="margin:0">${esc(cur[2])}</p>
+   ${isG?'<p class="help" style="margin:0">تُبنى الأسئلة من كلماتك وأفعالك، ولا تحتاج إلى جمل محفوظة.</p>':''}
+   ${need?`<div class="note">${msg}</div>`:''}
+   <button class="btn" data-act="sxgo" ${need?'disabled':''}>ابدأ التدريب ${ic('arrow','fwd')}</button></div>`;
+}
+
+/* ---- matching exercise: a distinct colour for every matched pair ---- */
+const KX_MC=['#4fdc9c','#6ec6ff','#ffb347','#ff8fa0','#b9a6ff','#ffd45a','#5eead4','#fb923c','#a3e635','#f472b6'];
+function kxMatchColors(){
+  document.querySelectorAll('.mb.ok').forEach(b=>{
+    const c=KX_MC[(+b.dataset.i||0)%KX_MC.length],st=b.style;
+    st.setProperty('border-color',c,'important');st.setProperty('color',c,'important');
+    st.setProperty('background','color-mix(in srgb,'+c+' 16%,transparent)','important');
+  });
+}
+{const _r=render;render=function(){const x=_r.apply(this,arguments);try{kxMatchColors();}catch(e){}return x;};}
 
 </script>
 </body></html>

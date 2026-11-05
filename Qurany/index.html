@@ -1377,41 +1377,6 @@
       touch-action: manipulation;
     }
 
-    .sheet .w.ayah-end {
-      display: inline-grid;
-      width: 1.05em;
-      height: 1.05em;
-      margin-inline: .03em;
-      place-items: center;
-      color: var(--green);
-      vertical-align: middle;
-    }
-
-    .ayah-number,
-    .fallback-ayah-end {
-      display: inline-grid;
-      width: 1.7em;
-      aspect-ratio: 1;
-      place-items: center;
-      border: 1.5px solid color-mix(in srgb, var(--green) 82%, var(--head));
-      border-radius: 50%;
-      outline: 1px solid color-mix(in srgb, var(--head) 55%, transparent);
-      outline-offset: 2px;
-      background: color-mix(in srgb, var(--green) 9%, var(--panel));
-      color: var(--green);
-      font-family: Arial, "Helvetica Neue", sans-serif;
-      font-size: .55em;
-      font-weight: 800;
-      line-height: 1;
-      text-shadow: none;
-      -webkit-text-stroke: 0 transparent;
-    }
-
-    .fallback-ayah-end {
-      margin-inline: .35em;
-      vertical-align: middle;
-    }
-
     body.quran-bold .sheet .w,
     body.quran-bold .sheet .bis,
     body.quran-bold .sheet .hn {
@@ -4394,7 +4359,7 @@
         </div>
 
         <!-- خيار التحكم في سمك خط المصحف -->
-        <div class="settings-card">
+        <div class="settings-card" id="fontStrokeCard" hidden>
           <div class="settings-card-head">
             <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
             <span>سُمْك الخط في المصحف:</span>
@@ -6935,7 +6900,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           var chunkUrl = './fonts/tajweed/' + chunkName + '.woff2';
           function requestChunk(retry) {
             var cachedChunk = 'caches' in window
-                ? caches.open('quran-pro-app-v112').then(function (cache) { return cache.match(chunkUrl); })
+                ? caches.open('quran-pro-app-v115').then(function (cache) { return cache.match(chunkUrl); })
               : Promise.resolve(null);
             return cachedChunk.then(function (response) {
               if (response) return response.arrayBuffer();
@@ -6944,7 +6909,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
                 var copy = networkResponse.clone();
                 return networkResponse.arrayBuffer().then(function (buffer) {
                   if ('caches' in window) {
-                    return caches.open('quran-pro-app-v112').then(function (cache) {
+                    return caches.open('quran-pro-app-v115').then(function (cache) {
                       return cache.put(chunkUrl, copy).then(function () { return buffer; });
                     });
                   }
@@ -7108,7 +7073,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
               escapeHtml(word) + '</span>';
           }).join(' ');
           html += '<div class="ln fallback-ln" data-vs="' + verseId + '">' + wordHtml +
-            '<span class="fallback-ayah-end" aria-label="نهاية الآية ' + ar(ayah) + '">' + ar(ayah) + '</span></div>';
+            '<span class="fallback-ayah-end" aria-label="نهاية الآية ' + ar(ayah) + '">﴿' + ar(ayah) + '﴾</span></div>';
         }
         if (!html) throw new Error('لا توجد نصوص لصفحة المصحف ' + page);
         targetSheet.classList.add('text-fallback');
@@ -7200,9 +7165,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
               var inner = l[2].map(function (it) {
                 if (it[0]) vs[it[0]] = 1; 
                 var char = useTajweed ? tajweedGlyphs[tajweedWordIndex++] : it[1];
-                var verseEnd = it[2] === -1;
-                var content = verseEnd ? '<span class="ayah-number">' + ar(it[0] % 1000) + '</span>' : char;
-                return '<span class="w' + (verseEnd ? ' ayah-end' : '') + '" data-v="' + it[0] + '" data-p="' + (it[2] || 0) + '" style="font-family:' + fontFam + '">' + content + '</span>'; 
+                return '<span class="w" data-v="' + it[0] + '" data-p="' + (it[2] || 0) + '" style="font-family:' + fontFam + '">' + char + '</span>'; 
               }).join('');
               html += '<div class="ln ' + (full ? 'full' : 'cen') + '" data-vs="' + Object.keys(vs).join(',') + '" style="font-size:' + fs.toFixed(2) + 'px">' + inner + '</div>';
             }
@@ -7732,6 +7695,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         if (!D.surahs[surah - 1] || ayah < 1 || ayah > D.surahs[surah - 1][3]) return;
         stopRecitation('تم تحديد الآية المختارة للاستماع');
         recitationSurah.value = String(surah);
+        recitationSurah._refreshProfessionalSelect();
         updateRecitationBounds(true);
         recitationFrom.value = String(ayah);
         recitationTo.value = String(ayah);
@@ -9327,7 +9291,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       if (!runtime) throw new Error('Mushaf runtime is unavailable');
       var $ = runtime.$, store = runtime.store, D = runtime.data;
       var toast = runtime.toast;
-      var CACHE = 'quran-pro-app-v112', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '58';
+      var CACHE = 'quran-pro-app-v115', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '61';
       function ar(n) { return String(n).replace(/\d/g, function (d) { return AR[d]; }); }
       var urls = (function () {
         var a = [
@@ -9570,6 +9534,12 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
 
       /* ==================== دوال التحكم بالتجويد ==================== */
       function updateTajweedUI() {
+        var coloredMushaf = runtime.isTajweedOn();
+        var fontStrokeCard = $('fontStrokeCard');
+        if (fontStrokeCard) fontStrokeCard.hidden = coloredMushaf;
+        if (coloredMushaf && (currentFontStroke > 0 || parseFloat(store('mq.stroke')) > 0)) {
+          setFontStroke('0', 'عادي');
+        }
         var btn = $('bTajweedToggle');
         if (btn) {
           btn.classList.toggle('active', runtime.isTajweedOn());
