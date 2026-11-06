@@ -197,7 +197,7 @@
     }
     .tasmee-window-header {
       position: absolute;
-      top: 8px;
+      top: 4px;
       right: 12px;
       left: 12px;
       display: flex;
@@ -2372,6 +2372,15 @@ window.QuranWorshipData = { azkar: {
       background: color-mix(in srgb, var(--green) 6%, var(--panel-top));
       font-size: 13px;
       font-weight: 800;
+    }
+    .tasmee-window .tasmee-range .pro-select-value {
+      overflow: visible;
+      text-overflow: clip;
+      white-space: nowrap;
+    }
+    .tasmee-window .tasmee-range .pro-select-option {
+      overflow: visible;
+      white-space: nowrap;
     }
     .tasmee-window .tasmee-range .pro-select-button::after { left: 10px; }
     .tasmee-window .tasmee-actions {
@@ -5310,6 +5319,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       function slotById(id) { for (var i = 0; i < slots.length; i++) if (slots[i].id === id) return slots[i]; return null; }
       function slotName(s) { if (s.nm) return s.nm; if (s.v) return 'سورة ' + D.surahs[Math.floor(s.v / 1000) - 1][1]; return COL[s.c][1]; }
       function escapeHtml(value) { return String(value).replace(/[&<>"']/g, function (char) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]; }); }
+      var esc = escapeHtml;
       function addMarkSlot(color, name, verse) {
         var id = 'x' + Date.now();
         while (slotById(id)) id += 'x';
@@ -6816,8 +6826,8 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         syncTasmeeControls();
       });
       var tasmeeDrag = null;
-      tasmeeWindowHeader.addEventListener('pointerdown', function (event) {
-        if (event.target.closest('button, select, input, textarea, a, .pro-select-menu')) return;
+      tasmeeSection.addEventListener('pointerdown', function (event) {
+        if (event.target.closest('button, select, input, textarea, a, .pro-select, .pro-select-menu')) return;
         var rect = tasmeeSection.getBoundingClientRect();
         tasmeeSection.style.right = 'auto';
         tasmeeSection.style.left = rect.left + 'px';
@@ -6825,10 +6835,10 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         tasmeeSection.style.bottom = 'auto';
         tasmeeSection.style.transform = 'none';
         tasmeeDrag = { pointerId: event.pointerId, offsetX: event.clientX - rect.left, offsetY: event.clientY - rect.top };
-        tasmeeWindowHeader.setPointerCapture(event.pointerId);
+        tasmeeSection.setPointerCapture(event.pointerId);
         event.preventDefault();
       });
-      tasmeeWindowHeader.addEventListener('pointermove', function (event) {
+      tasmeeSection.addEventListener('pointermove', function (event) {
         if (!tasmeeDrag || event.pointerId !== tasmeeDrag.pointerId) return;
         var maxLeft = Math.max(0, window.innerWidth - tasmeeSection.offsetWidth);
         var maxTop = Math.max(0, window.innerHeight - Math.min(tasmeeSection.offsetHeight, window.innerHeight));
@@ -6838,9 +6848,10 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       function endTasmeeDrag(event) {
         if (!tasmeeDrag || event.pointerId !== tasmeeDrag.pointerId) return;
         tasmeeDrag = null;
+        try { tasmeeSection.releasePointerCapture(event.pointerId); } catch (x) { }
       }
-      tasmeeWindowHeader.addEventListener('pointerup', endTasmeeDrag);
-      tasmeeWindowHeader.addEventListener('pointercancel', endTasmeeDrag);
+      tasmeeSection.addEventListener('pointerup', endTasmeeDrag);
+      tasmeeSection.addEventListener('pointercancel', endTasmeeDrag);
 
       tasmeeToggle.addEventListener('click', function () {
         if (!tasmeeEnabled) return;
@@ -7959,6 +7970,10 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         var view = e.target.closest('.page-view'); if (view) activatePage(view);
         var w = e.target.closest('.w'); lpFired = false; lpCancel();
         if (!w || !+w.getAttribute('data-v') || (e.pointerType === 'mouse' && e.button !== 0)) return;
+        if (e.pointerType === 'touch') {
+          e.preventDefault();
+          try { pageList.setPointerCapture(e.pointerId); } catch (x) { }
+        }
         lpX = e.clientX; lpY = e.clientY;
         lpT = setTimeout(function () {
           lpFired = true; lpT = 0;
@@ -7968,7 +7983,14 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         }, 420);
       });
       pageList.addEventListener('pointermove', function (e) { if (lpT && (Math.abs(e.clientX - lpX) > 10 || Math.abs(e.clientY - lpY) > 10)) lpCancel(); });
-      ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { pageList.addEventListener(n, lpCancel); });
+      ['pointerup', 'pointercancel'].forEach(function (n) {
+        pageList.addEventListener(n, function (e) {
+          lpCancel();
+          if (n === 'pointerup') {
+            try { pageList.releasePointerCapture(e.pointerId); } catch (x) { }
+          }
+        });
+      });
       pageList.addEventListener('contextmenu', function (e) { if (e.target.closest('.w')) e.preventDefault(); });
       var popupDismissPointer = null;
       var popupDismissPointerTimer = 0;
@@ -7992,7 +8014,13 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       document.addEventListener('click', function (event) {
         window.clearTimeout(popupDismissPointerTimer);
         popupDismissPointerTimer = 0;
-        if (lpFired) { popupDismissPointer = null; return; }
+        if (lpFired) {
+          lpFired = false;
+          popupDismissPointer = null;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
         var target = event.target instanceof Element ? event.target : null;
         var pointer = popupDismissPointer;
         popupDismissPointer = null;

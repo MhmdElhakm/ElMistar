@@ -8377,6 +8377,20 @@ img {
 /* FIX: Prevent horizontal scroll globally */
 body { overflow-x: hidden; }
 
+/* Make the document itself the vertical scroll container on mobile browsers. */
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+body {
+    min-height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 /* ============================================
    NOTEBOOK MODAL STYLES (New Premium Design)
    ============================================ */
@@ -10269,11 +10283,17 @@ body { overflow-x: hidden; }
     .summer-courses-grid,
     .ew-cards-grid,
     .apps-grid {
+        /* Keep the horizontal carousel inside the viewport on touch devices. */
+        width: calc(100% + 40px);
+        max-width: calc(100vw + 40px);
+        box-sizing: border-box;
         display: flex;
         flex-wrap: nowrap;
         overflow-x: auto;
         overflow-y: hidden;
         scroll-snap-type: x mandatory;
+        overscroll-behavior-x: contain;
+        touch-action: pan-x pan-y pinch-zoom;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         gap: 16px;
@@ -10291,7 +10311,9 @@ body { overflow-x: hidden; }
     .ew-cards-grid > *,
     .apps-grid > * {
         flex: 0 0 78%;
-        max-width: 340px;
+        width: 78%;
+        max-width: min(340px, calc(100vw - 64px));
+        min-width: 0;
         scroll-snap-align: center;
         scroll-snap-stop: always;
         transition: transform 0.35s ease, opacity 0.35s ease;
