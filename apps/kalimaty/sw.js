@@ -1,5 +1,5 @@
 /* Kalimaty service worker: offline app shell + safe updates */
-const VER='kalimaty-v4';
+const VER='kalimaty-v5';
 const SHELL=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/icon-maskable-512.png','./icons/apple-touch-icon.png','./icons/favicon-32.png'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(VER).then(c=>Promise.allSettled(SHELL.map(u=>c.add(u)))).then(()=>self.skipWaiting()));

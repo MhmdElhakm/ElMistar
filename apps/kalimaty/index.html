@@ -5203,7 +5203,7 @@ function vLevelMain(){
   const lb=`<section class="kx-sec"><div class="kx-sh"><h3>المتصدرون</h3><button class="kx-more" data-lv="board">عرض الكل</button></div>
     <div class="kx-lb">${us.slice(0,3).map((u,i)=>`<div class="kx-lr ${u.me?'me':''}"><span class="rk">${i+1}</span>${av(u.p,40)}<div class="bt"><b>${esc(u.p.name)}${u.me?' (أنت)':''}</b><small>${GRADES[u.p.grade]||''}</small></div><span class="bv">${u.score}</span></div>`).join('')}</div></section>`;
   const go=`<button class="kx-more" style="align-self:center" data-act="tab" data-t="train">${S.pet.sp?'حيوانك وألعابك ومغامرتك في قسم التدريب':'اختر حيوانك من قسم التدريب'}</button>`;
-  return `<div class="screen"><div class="ph"><div><h2>المستوى</h2><small>تقدّمك وإنجازاتك</small></div></div>${kxProfile()}${hero}${stats}${lb}${go}</div>`;
+  return `<div class="screen"><div class="ph"><div><h2>المستوى</h2><small>تقدّمك وإنجازاتك</small></div></div>${hero}${stats}${lb}${go}</div>`;
 }
 
 /* ============ GAME HUB ============ */
@@ -5581,7 +5581,6 @@ function vAdv(){
       <button class="btn" data-act="adv_start" ${a.tok<1||lk?'disabled':''}>${ic('spark')} ابدأ التحدي (طاقة 1)</button>
       ${lk?`<p class="help" style="text-align:center">${lk}</p>`:a.tok<1?'<p class="help" style="text-align:center">أجب إجابات صحيحة في التدريب لتكسب طاقة المغامرة.</p>':''}</div>`;
   return `<div class="screen"><div class="ph"><div><h2>مغامرة ${esc(p.name)}</h2><small>اكسب النجوم وافتح الفصول</small></div><button class="pill" data-act="p_back" style="min-height:42px">رجوع</button></div>
-   ${kxProfile()}
    <div class="ax-hero" style="--c1:${c1};--c2:${c2}"><div class="ax-ht"><small>الفصل ${ci0+1} من ${CHAPS.length}</small><h2>${esc(C.n)}</h2><p>${esc(C.st.replace('{n}',p.name))}</p></div>
     <div class="ax-hr" style="--p:${done5*20}"><div><b>${done5}</b><small>من 5</small></div></div></div>
    <div class="ax-stats"><div><span>${ICO.bolt}</span><b>${a.tok}</b><small>طاقة</small></div><div><span>${KI.star(true)}</span><b>${stars}</b><small>نجوم</small></div><div><span>${ICO.coin}</span><b>${p.coins}</b><small>عملات</small></div></div>
@@ -5686,7 +5685,7 @@ function vTrain(){
   if(PV==='adv')return vAdv();
   if(PV!=='main')return vPet();
   const sel=S.sel.filter(k=>EX.some(e=>e.k===k)),tip=TIPS[Math.floor(Date.now()/864e5)%TIPS.length],p=S.pet,st=p.sp?petStage():0;
-  return `<div class="screen">${kxProfile()}${kxLevelHero()}${kxTrainPet(true)}${memCard()}<div class="sheetcard">
+  return `<div class="screen">${kxLevelHero()}${kxTrainPet(true)}${memCard()}<div class="sheetcard">
     <button class="kx-fold" data-act="gx_extog" aria-expanded="${KXEX}"><span class="sec-h" style="flex:1"><h3>اختر تمرينك</h3><small>${sel.length} ${sel.length===1?'تمرين محدد':'تمارين محددة'}</small></span><span class="kx-chev ${KXEX?'open':''}">${ic('chev')}</span></button>
     ${KXEX?`<div class="tip">${starS()}<span>${esc(tip)}</span></div>
     <p class="help">فعّل نوع تمرين أو أكثر ثم ابدأ. كل إجابة صحيحة تُطعم حيوانك وتزيد خبرتك.</p>
@@ -5733,8 +5732,7 @@ function teacherCard(){
   return h.slice(0,i+m.length)+`<button class="btn ghost" style="min-height:46px;font-size:16px" data-act="rgedit">${ic('pencil')} تعديل الملف الشخصي</button>`+h.slice(i+m.length);
 };}
 function vMe(){
-  return `<div class="screen"><div class="pagehead" style="display:flex;justify-content:space-between;align-items:center"><div><h2>حسابي</h2><small>${S.badges.length} من ${BADGES.length} شارات</small></div>${av(S.profile,54)}</div>
-    ${profileCards()}
+  return `<div class="screen"><div class="pagehead" style="display:flex;justify-content:space-between;align-items:center"><div><h2>حسابي</h2><small>${S.badges.length} من ${BADGES.length} شارات</small></div>${av(S.profile,54)}</div>${kxProfile()}
     <div class="bgrid">${BADGES.map(b=>{const on=S.badges.includes(b.id);return `<div class="bcard ${on?'':'lock'}"><span class="bi ${on?b.g:''}">${badgeIcon(b)}</span><div><b>${esc(b.n)}</b><small>${esc(b.d)}</small></div></div>`;}).join('')}</div>
     ${kxInstallCard()}
     ${themeCard()}
@@ -5810,7 +5808,7 @@ function boardSec(){
   const list=all.slice(0,5),meI=CL?(CL.rank>5?CL.rank-1:-1):all.findIndex(u=>u.me),sub=u=>`${u.score} نقطة`;
   const pod=list.slice(0,3),order=[pod[1],pod[0],pod[2]],medal=['#ffd45a','#d4dcff','#ffae7a'];
   const row=(u,r)=>`<div class="brow ${u.me?'me':''}" data-act="bpet" data-id="${u.id}" role="button" tabindex="0"><span class="rk en">${r+1}</span>${av(u.p,44)}<div class="bt"><b>${esc(u.p.name)}${u.me?' (أنت)':''}</b><small>${GRADES[u.p.grade]||''}</small></div><span class="bv en">${sub(u)}</span></div>`;
-  const html=`<div class="boardsec"><div class="ph"><div><h2 style="font-size:22px">المتصدرون</h2><small>أفضل 5 طلاب</small></div></div>
+  const html=`<div class="boardsec"><div class="ph"><div><h2 style="font-size:22px">المتصدرون</h2><small>${CL?'قاعدة البيانات · أفضل 5 طلاب':'على هذا الجهاز · أفضل 5 طلاب'}</small></div></div>
    ${list.length?`<div class="podium">${order.map(u=>{if(!u)return '<div></div>';const r=list.indexOf(u);return `<div class="pcol ${u.me?'me':''}" data-act="bpet" data-id="${u.id}" role="button" tabindex="0"><div class="pav">${av(u.p,r===0?64:52)}${r===0?'<span class="crown"><svg viewBox="0 0 32 24"><path d="M3 20L1 6l8 6 7-10 7 10 8-6-2 14z" fill="#ffd45a" stroke="#e0a21e" stroke-width="2" stroke-linejoin="round"/></svg></span>':''}</div><b>${esc(u.p.name)}</b><small class="en">${sub(u)}</small><div class="pbase" style="height:${r===0?92:r===1?68:52}px;background:${medal[r]}"><span class="en">${r+1}</span></div></div>`;}).join('')}</div>`:''}
    <div class="blist">${list.slice(3).map((u,k)=>row(u,k+3)).join('')}${meI>=5?`<p class="help" style="text-align:center;margin:4px 0">ترتيبك الحالي</p>${row(CL?CL.meRow:all[meI],meI)}`:''}</div>
    ${CL?'':'<p class="help" style="text-align:center">اضغط على أي طالب لترى حيوانه وإكسسواراته.</p>'}</div>`;
@@ -5848,7 +5846,7 @@ function vTrain(){
   if(PV==='adv')return vAdv();
   if(PV!=='main')return vPet();
   const p=S.pet,n=words().length,sel=S.sel.filter(k=>EX.some(e=>e.k===k));
-  return `<div class="screen">${kxProfile()}${kxLevelHero()}${kxTrainPet(true)}
+  return `<div class="screen">${kxLevelHero()}${kxTrainPet(true)}
    <div class="kx-tb"><div class="kx-tbh"><span class="ki">${ic('spark')}</span><div style="flex:1;min-width:0"><b>التدريب والألعاب</b><small>حفظ الكلمات · ${sel.length} تمارين · ${WGAMES.length} ألعاب · ${ACTS.length} أنشطة</small></div></div>
      <div class="kx-tbb"><button class="btn" data-act="game" data-k="train" ${sel.length?'':'disabled'}>ابدأ التدريب</button><button class="btn ghost" data-act="p_games">مركز الألعاب</button></div></div>
    ${kxMissions()}${kxInstallBanner()}${p.sp?'<button class="btn ghost" data-act="p_change">تغيير الحيوان</button>':''}</div>`;
@@ -6716,7 +6714,7 @@ function kxMatchColors(){
    (plain fetch, no library; uses only the PUBLISHABLE key)
    ==================================================================== */
 const SB={url:'https://fuocyaddfypuvpblenve.supabase.co',key:'sb_publishable_p2W0A3R0_acZSfsz9ObkeA_S7t8nNIa'};
-const SBP={busy:false,dirty:false,t:0,last:0,err:'',pulling:false};
+const SBP={busy:false,dirty:false,t:0,last:0,err:'',pulling:false,retry:false};
 const sbKey=()=>'kx-sb-'+((typeof DIR!=='undefined'&&DIR.cur)||'u');
 const sbSess=()=>{try{return JSON.parse(localStorage.getItem(sbKey())||'null');}catch(e){return null;}};
 const sbSetSess=s=>{try{s?localStorage.setItem(sbKey(),JSON.stringify(s)):localStorage.removeItem(sbKey());}catch(e){}};
@@ -6737,12 +6735,16 @@ function sbMsg(m){
     return 'خطأ في قاعدة البيانات ('+st+(code?' '+code:'')+')';}
   if(/Invalid login credentials/i.test(m))return 'الاسم أو رقم الهاتف أو الرمز السري غير صحيح';
   if(/already registered|already been registered/i.test(m))return 'هذا الطالب مسجّل من قبل بنفس الاسم والهاتف، سجّل الدخول بدلًا من إنشاء حساب';
+  if(/signup.*disabled|signups? (?:are )?not allowed|signups? are disabled|signup_disabled|email_provider_disabled|email signups are disabled/i.test(m))return 'التسجيل بالبريد معطّل في إعدادات Supabase Authentication؛ فعّل Email signups ثم حاول مجددًا';
+  if(/database error saving new user|unexpected_failure|internal server error/i.test(m))return 'تعذّر إنشاء المستخدم في Supabase؛ راجع سجلات Authentication في لوحة Supabase';
+  if(/invalid api key|api key.*invalid/i.test(m))return 'مفتاح Supabase غير صالح؛ تحقق من عنوان المشروع والمفتاح العام في إعدادات التطبيق';
   if(/at least 6|weak/i.test(m))return 'الرمز السري قصير، استخدم 6 أحرف أو أرقام على الأقل';
   if(/valid email|invalid.*email|email.*invalid/i.test(m))return 'تحقق من رقم الهاتف والاسم';
   if(/rate limit|too many|over_email/i.test(m))return 'محاولات كثيرة، انتظر قليلًا ثم أعد المحاولة';
   if(/Email not confirmed/i.test(m))return 'يلزم إيقاف «Confirm email» في إعدادات Supabase Authentication';
   if(/Failed to fetch|NetworkError|network/i.test(m))return 'لا يوجد اتصال بالإنترنت';
-  return 'تعذّر تنفيذ الطلب، حاول مرة أخرى';
+  const detail=m.replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,'[بريد مخفي]').replace(/\+?\d[\d\s().-]{6,}\d/g,'[رقم مخفي]').replace(/[\r\n\t]+/g,' ').trim().slice(0,140);
+  return detail?'تعذّر تنفيذ الطلب: '+detail:'تعذّر تنفيذ الطلب، حاول مرة أخرى';
 }
 async function sbDbErr(r){let j={};try{j=await r.json();}catch(e){}return new Error('db:'+r.status+':'+(j.code||'')+':'+(j.message||''));}
 async function sbRaw(path,opt){
@@ -6785,7 +6787,7 @@ async function sbLogout(){
   const s=sbSess();
   if(s&&SBP.dirty){try{await sbPush();}catch(e){}}
   try{if(s)await sbRaw('/auth/v1/logout',{method:'POST',token:s.access_token});}catch(e){}
-  sbSetSess(null);SBL.list=null;SBL.at=0;SBP.dirty=false;SBP.err='';
+  sbSetSess(null);SBL.list=null;SBL.at=0;SBL.key=null;SBL.uid=null;SBL.busy=false;SBL.err=false;SBL.message='';SBL.retry=false;SBP.dirty=false;SBP.err='';
 }
 /* ---------- push / pull ---------- */
 const sbName=s=>((S.profile&&S.profile.name)||S.name||'طالب').toString().trim().slice(0,40)||'طالب';
@@ -6805,7 +6807,11 @@ async function sbPush(){
     SBP.last=Date.now();SBP.err='';SBL.at=0;
     return true;
   }catch(e){SBP.dirty=true;SBP.err=sbMsg(e.message);return false;}
-  finally{SBP.busy=false;if(typeof TAB!=='undefined'&&TAB==='me')render(true);}
+  finally{
+    SBP.busy=false;
+    if(typeof TAB!=='undefined'&&TAB==='pet'){sbRefreshBoard();render(true);}
+    else if(typeof TAB!=='undefined'&&TAB==='me')render(true);
+  }
 }
 function sbSched(){
   if(!sbSess())return;SBP.dirty=true;clearTimeout(SBP.t);SBP.t=setTimeout(()=>{if(navigator.onLine!==false)sbPush();},5000);
@@ -6822,7 +6828,8 @@ function sbApply(cs,avatar){
 }
 const sbEmpty=st=>!(st.items&&st.items.length)&&!(st.xp>0);
 async function sbPull(manual){
-  const s=sbSess();if(!s||SBP.pulling)return;
+  const s=sbSess();if(!s)return;
+  if(SBP.pulling){SBP.retry=true;return;}
   SBP.pulling=true;
   try{
     const r=await sbApi('/rest/v1/user_data?select=state,updated_at&user_id=eq.'+s.uid);
@@ -6844,43 +6851,76 @@ async function sbPull(manual){
     }else if(manual)toast('بياناتك محدّثة');
     SBP.err='';
   }catch(e){SBP.err=sbMsg(e.message);if(manual)toast(SBP.err);}
-  finally{SBP.pulling=false;if(typeof TAB!=='undefined'&&TAB==='me')render(true);}
+  finally{
+    SBP.pulling=false;
+    if(typeof TAB!=='undefined'&&TAB==='pet')sbRefreshBoard();
+    else if(typeof TAB!=='undefined'&&TAB==='me')render(true);
+    if(SBP.retry){SBP.retry=false;if(navigator.onLine!==false)setTimeout(()=>sbPull(false),0);}
+  }
 }
 /* ---------- leaderboard ---------- */
-const SBL={list:null,rank:0,me:null,at:0,busy:false,err:false};
+const sbBoardCacheKey=uid=>'kx-sb-board-'+uid;
+const SBL={list:null,rank:0,me:null,at:0,busy:false,err:false,message:'',uid:null,key:null,retry:false};
 async function sbBoardLoad(){
-  const s=sbSess();if(!s||SBL.busy||Date.now()-SBL.at<30000)return;
+  const s=sbSess();if(!s)return;
+  const key=sbBoardCacheKey(s.uid);
+  if(SBL.key!==key){
+    SBL.busy=false;SBL.uid=s.uid;SBL.key=key;SBL.list=null;SBL.rank=0;SBL.me=null;SBL.at=0;SBL.err=false;SBL.message='';
+    try{
+      const cached=JSON.parse(localStorage.getItem(key)||'null');
+      if(cached&&Array.isArray(cached.list)){SBL.list=cached.list;SBL.rank=cached.rank||0;SBL.me=cached.me||null;}
+    }catch(e){}
+  }
+  if(SBL.busy||Date.now()-SBL.at<30000)return;
   SBL.busy=true;
+  SBL.err=false;
   try{
-    const r=await sbApi('/rest/v1/profiles?select=id,name,grade,xp,avatar&order=xp.desc,name.asc&limit=5');
+    const fields='id,name,grade,xp,avatar';
+    const r=await sbApi('/rest/v1/profiles?select='+fields+'&order=xp.desc,name.asc&limit=5');
     if(!r.ok)throw await sbDbErr(r);
     const top=await r.json();
+    if(!Array.isArray(top))throw new Error('Invalid leaderboard response');
     const conv=u=>({id:u.id,p:{name:u.name,grade:(u.grade||1)-1,photo:u.avatar||''},score:u.xp||0,me:u.id===s.uid});
     const list=top.map(conv);
     let rank=list.findIndex(u=>u.me)+1,me=list.find(u=>u.me)||null;
     if(!rank){
-      const mine=await sbApi('/rest/v1/profiles?select=id,name,grade,xp,avatar&id=eq.'+s.uid);
-      const mj=mine.ok?await mine.json():[];
+      const mine=await sbApi('/rest/v1/profiles?select='+fields+'&id=eq.'+s.uid);
+      if(!mine.ok)throw await sbDbErr(mine);
+      const mj=await mine.json();
       if(mj[0]){
         me=conv(mj[0]);
         const c=await sbApi('/rest/v1/profiles?select=id&xp=gt.'+(mj[0].xp||0),{headers:{Prefer:'count=exact','Range-Unit':'items',Range:'0-0'}});
+        if(!c.ok)throw await sbDbErr(c);
         const cr=c.headers.get('content-range')||'';const tot=parseInt(cr.split('/')[1],10);
         rank=(isNaN(tot)?0:tot)+1;
       }
     }
-    SBL.list=list;SBL.me=me;SBL.rank=rank;SBL.err=false;
-  }catch(e){SBL.err=true;if(!SBL.list)SBL.list=[];}
-  SBL.at=Date.now();SBL.busy=false;
-  if(typeof TAB!=='undefined'&&TAB==='pet')render(true);
+    if(SBL.key!==key||(sbSess()||{}).uid!==s.uid)return;
+    SBL.list=list;SBL.me=me;SBL.rank=rank;SBL.err=false;SBL.message='';
+    const cachedList=list.map(u=>Object.assign({},u,{p:Object.assign({},u.p,{photo:''})}));
+    const cachedMe=me?Object.assign({},me,{p:Object.assign({},me.p,{photo:''})}):null;
+    try{localStorage.setItem(key,JSON.stringify({list:cachedList,me:cachedMe,rank}));}catch(e){}
+  }catch(e){if(SBL.key===key){SBL.err=true;SBL.message=sbMsg(e.message);}}
+  finally{
+    if(SBL.key===key){
+      SBL.at=Date.now();SBL.busy=false;
+      if(typeof TAB!=='undefined'&&TAB==='pet')render(true);
+      if(SBL.retry){SBL.retry=false;SBL.at=0;setTimeout(()=>sbBoardLoad(),0);}
+    }
+  }
 }
+function sbRefreshBoard(){SBL.at=0;if(SBL.busy)SBL.retry=true;else sbBoardLoad();}
 {const _bs=boardSec;boardSec=function(){
   const s=sbSess();
-  if(!s)return `<div class="kx-cloudbn"><span>${KI.lock}</span><div><b>هذه بيانات تجريبية</b><small>سجّل الدخول لترى المتصدرين الحقيقيين وتحفظ تقدمك على الإنترنت.</small></div><button data-act="sb_open" data-m="in">دخول</button></div>`+_bs();
+  if(!s)return _bs();
   sbBoardLoad();
-  if(!SBL.list)return `<div class="boardsec"><div class="ph"><div><h2 style="font-size:22px">المتصدرون</h2><small>جارٍ التحميل...</small></div></div><p class="help" style="text-align:center">لحظات...</p></div>`;
-  if(!SBL.list.length)return `<div class="boardsec"><div class="ph"><div><h2 style="font-size:22px">المتصدرون</h2><small>${SBL.err?'تعذّر التحميل':'لا يوجد طلاب بعد'}</small></div></div><p class="help" style="text-align:center">${SBL.err?'تحقق من اتصالك بالإنترنت.':'ستظهر هنا بعد مزامنة أول حساب.'}</p><button class="btn ghost" data-act="sb_sync">مزامنة الآن</button></div>`;
+  const note=text=>`<p class="help" style="text-align:center">${text}</p>`;
+  const localBoard=()=>_bs().replace('<small>على هذا الجهاز</small>','<small>بيانات هذا الجهاز</small>');
+  if(!SBL.list)return localBoard()+note(SBL.err?'تعذّر تحميل المتصدرين من قاعدة البيانات. يعمل التطبيق محليًا، وستُرفع تغييراتك عند عودة الاتصال. '+esc(SBL.message):'جارٍ تحميل المتصدرين من قاعدة البيانات...');
+  if(SBL.err&&!SBL.list.length)return localBoard()+note('تعذّر تحديث المتصدرين. يعرض التطبيق بيانات هذا الجهاز حتى عودة الاتصال. '+esc(SBL.message));
+  if(!SBL.list.length)return `<div class="boardsec"><div class="ph"><div><h2 style="font-size:22px">المتصدرون</h2><small>قاعدة البيانات</small></div></div><p class="help" style="text-align:center">${SBL.err?'تعذّر تحديث المتصدرين.':'لا يوجد طلاب مسجّلون بعد.'}</p><button class="btn ghost" data-act="sb_sync">مزامنة الآن</button></div>`;
   KXCL={list:SBL.list,rank:SBL.rank,meRow:SBL.me||SBL.list[0]};
-  try{return _bs();}finally{KXCL=null;}
+  try{return (SBL.err?note('تعذّر تحديث المتصدرين؛ تعرض هذه القائمة آخر بيانات محفوظة من قاعدة البيانات. '+esc(SBL.message)):'')+_bs();}finally{KXCL=null;}
 };}
 /* ---------- modal + account card ---------- */
 function kxModal(html){
@@ -6890,7 +6930,7 @@ function kxModal(html){
 }
 function kxModalClose(){document.querySelectorAll('.kx-modal').forEach(x=>x.remove());}
 function kxAuthForm(mode){
-  const up=mode==='up',p=S.profile||{};
+  const up=mode==='up',p=REG.on?REG:(S.profile||{});
   kxModal(`<button class="kx-mx" data-act="sb_close" aria-label="إغلاق">${ic('close')}</button>
    <h3>${up?'إنشاء حساب الطالب':'تسجيل الدخول'}</h3>
    <p class="help">${up?'سجّل ببيانات الطالب لتحفظ تقدمك وتنضم إلى المتصدرين، بدون بريد إلكتروني.':'اكتب بيانات الطالب كما سجّلتها أول مرة.'}</p>
@@ -6915,14 +6955,6 @@ function kxConflict(cs){
    <button class="kx-opt" data-act="sb_local"><b>بيانات هذا الجهاز</b><small>${a.vocab} كلمة · ${a.score} نقطة</small></button>`);
   window.__kxCS=cs;
 }
-function kxCloudCard(){
-  const s=sbSess();
-  if(!s)return `<div class="addcard kx-cloud"><h3>${ic('spark')} حسابي على الإنترنت</h3><p class="help">سجّل باسم الطالب ورقم الهاتف والصف، لتحفظ كلماتك وتقدمك وحيوانك على الإنترنت وتنتقل بين أجهزتك وتشارك في المتصدرين الحقيقيين.</p><div class="pair"><button class="btn" data-act="sb_open" data-m="in">تسجيل الدخول</button><button class="btn ghost" data-act="sb_open" data-m="up">إنشاء حساب</button></div></div>`;
-  const t=SBP.last?new Date(SBP.last).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}):'';
-  const st=SBP.busy||SBP.pulling?'جارٍ المزامنة...':SBP.err?SBP.err+' — ستُعاد المحاولة تلقائيًا':SBP.dirty?'بانتظار المزامنة...':t?'آخر مزامنة '+t:'متصل';
-  return `<div class="addcard kx-cloud"><h3>${ic('spark')} حسابي على الإنترنت</h3><div class="kx-who"><b>${esc((S.profile&&S.profile.name)||'الطالب')}</b><small dir="ltr" style="color:var(--muted);text-align:start">${esc((S.profile&&S.profile.phone)||'')}</small><small class="${SBP.err?'bad':'ok'}">${esc(st)}</small></div><div class="pair"><button class="btn" data-act="sb_sync" ${SBP.busy||SBP.pulling?'disabled':''}>مزامنة الآن</button><button class="btn ghost" data-act="sb_out">تسجيل الخروج</button></div></div>`;
-}
-{const _vm=vMe;vMe=function(){return _vm().replace('<div class="bgrid">',kxCloudCard()+'<div class="bgrid">');};}
 document.addEventListener('click',async e=>{
   const b=e.target.closest&&e.target.closest('[data-act^="sb_"]');if(!b)return;
   e.stopPropagation();e.preventDefault();
@@ -6935,12 +6967,21 @@ document.addEventListener('click',async e=>{
     if(!name){err.textContent='اكتب اسم الطالب';return;}
     if(up&&grade===''){err.textContent='اختر الصف الدراسي';return;}
     if(!/^\d{8,15}$/.test(phone)){err.textContent='اكتب رقم هاتف صحيحًا';return;}
+    if(up&&REG.on&&(name.length<2||!normPhone(phone))){err.textContent='تحقق من اسم الطالب ورقم هاتف ولي الأمر';return;}
     if(pw.length<6){err.textContent='الرمز السري 6 أحرف أو أرقام على الأقل';return;}
     b.disabled=true;err.textContent='';const old=b.textContent;b.textContent='لحظات...';
     try{
       const r=await sbAuth(mode,sbEmailOf(phone,name),pw);
       if(r.confirm){kxModal('<h3>تم إنشاء الحساب</h3><p class="help">Supabase تطلب تأكيد البريد، وهذا غير ممكن بدون بريد حقيقي. أوقف خيار «Confirm email» من Authentication ← Sign In / Providers ← Email ثم سجّل الدخول.</p><button class="btn" data-act="sb_open" data-m="in">تسجيل الدخول</button>');return;}
-      if(up){S.profile=Object.assign({},S.profile||{},{name:name.slice(0,30),grade:+grade,phone});S.name=S.name||name;save();}
+      if(up){
+        if(REG.on){
+          const previousKey=sbKey(),session=sbSess();
+          REG.name=name.slice(0,30);REG.grade=grade;REG.phone=normPhone(phone);
+          regSubmit();
+          if(session){sbSetSess(session);if(previousKey!==sbKey())localStorage.removeItem(previousKey);}
+        }
+        S.profile=Object.assign({},S.profile||{},{name:name.slice(0,30),grade:+grade,phone});S.name=S.name||name;save();
+      }
       kxModalClose();toast(up?'تم إنشاء الحساب':'تم تسجيل الدخول');
       await sbPull(false);render(true);
     }catch(x){err.textContent=sbMsg(x.message);b.disabled=false;b.textContent=old;}
@@ -6956,10 +6997,14 @@ document.addEventListener('visibilitychange',()=>{
   if(document.hidden){if(SBP.dirty)sbPush();}
   else if(Date.now()-SBP.last>60000)sbPull(false);
 });
-window.addEventListener('online',()=>{if(sbSess()&&SBP.dirty)sbPush();});
+window.addEventListener('online',()=>{
+  if(!sbSess())return;
+  sbRefreshBoard();
+  sbPull(false);
+});
 setTimeout(()=>{if(sbSess())sbPull(false);},1800);
 
-{const _vr=vReg;vReg=function(){return _vr().replace('<button class="tlink" data-act="adm_open">','<button class="tlink" data-act="sb_open" data-m="in">لدي حساب بالفعل، تسجيل الدخول</button><button class="tlink" data-act="adm_open">');};}
+{const _vr=vReg;vReg=function(){return _vr().replace('<button class="tlink" data-act="adm_open">','<button class="tlink" data-act="sb_open" data-m="in">لدي حساب بالفعل، تسجيل الدخول</button><button class="tlink" data-act="sb_open" data-m="up">إنشاء حساب لحفظ التقدم على الإنترنت</button><button class="tlink" data-act="adm_open">');};}
 
 </script>
 </body></html>

@@ -41,3 +41,61 @@ create policy "user_data: delete own" on public.user_data
 revoke all on public.profiles, public.user_data from anon;
 grant select, insert, update on public.profiles  to authenticated;
 grant select, insert, update, delete on public.user_data to authenticated;
+
+-- One phone-authenticated guardian can manage multiple student profiles.
+create table if not exists public.guardian_students (
+  student_id uuid primary key default gen_random_uuid(),
+  guardian_id uuid not null references auth.users(id) on delete cascade,
+  name text not null check (char_length(name) between 1 and 40),
+  grade int check (grade between 1 and 9),
+  xp int not null default 0 check (xp >= 0),
+  streak int not null default 0 check (streak >= 0),
+  avatar text check (avatar is null or char_length(avatar) < 200000),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.guardian_student_data (
+  student_id uuid primary key references public.guardian_students(student_id) on delete cascade,
+  state jsonb not null default '{}'::jsonb check (octet_length(state::text) < 3000000),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.guardian_students enable row level security;
+alter table public.guardian_student_data enable row level security;
+
+create policy "guardian_students: guardian reads own" on public.guardian_students
+  for select to authenticated using (auth.uid() = guardian_id);
+create policy "guardian_students: guardian inserts own" on public.guardian_students
+  for insert to authenticated with check (auth.uid() = guardian_id);
+create policy "guardian_students: guardian updates own" on public.guardian_students
+  for update to authenticated using (auth.uid() = guardian_id) with check (auth.uid() = guardian_id);
+create policy "guardian_students: signed-in can read leaderboard" on public.guardian_students
+  for select to authenticated using (true);
+
+create policy "guardian_student_data: guardian reads own" on public.guardian_student_data
+  for select to authenticated using (
+    exists (select 1 from public.guardian_students s
+      where s.student_id = guardian_student_data.student_id and s.guardian_id = auth.uid())
+  );
+create policy "guardian_student_data: guardian inserts own" on public.guardian_student_data
+  for insert to authenticated with check (
+    exists (select 1 from public.guardian_students s
+      where s.student_id = guardian_student_data.student_id and s.guardian_id = auth.uid())
+  );
+create policy "guardian_student_data: guardian updates own" on public.guardian_student_data
+  for update to authenticated using (
+    exists (select 1 from public.guardian_students s
+      where s.student_id = guardian_student_data.student_id and s.guardian_id = auth.uid())
+  ) with check (
+    exists (select 1 from public.guardian_students s
+      where s.student_id = guardian_student_data.student_id and s.guardian_id = auth.uid())
+  );
+grant select, insert, update on public.guardian_students to authenticated;
+grant select, insert, update, delete on public.guardian_student_data to authenticated;
+
+-- Only non-sensitive student fields are exposed to the signed-in leaderboard.
+create or replace view public.students_public
+  with (security_invoker = true) as
+  select student_id, name, grade, xp, avatar
+  from public.guardian_students;
+grant select on public.students_public to authenticated;
