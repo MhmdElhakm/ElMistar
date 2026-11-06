@@ -178,14 +178,15 @@
       right: auto;
       bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
       left: 50%;
-      z-index: 80;
+      /* Keep the picker above the Mushaf pages and allow its menu to escape
+         the floating window's bounds instead of being clipped by scrolling. */
+      z-index: 1000;
       box-sizing: border-box;
       display: block;
       width: min(420px, calc(100vw - 24px));
       max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 96px);
       padding: 34px 10px 8px;
-      overflow-x: hidden;
-      overflow-y: auto;
+      overflow: visible;
       border: 1px solid color-mix(in srgb, var(--green) 30%, var(--line));
       border-radius: 20px;
       background:
@@ -3423,7 +3424,7 @@ window.QuranWorshipData = { azkar: {
     .pro-select.open .pro-select-button::after { border-color: var(--green); transform: translateY(-20%) rotate(225deg); }
     .pro-select-menu {
       position: absolute;
-      z-index: 100;
+      z-index: 1100;
       top: calc(100% + 7px);
       right: 0;
       left: 0;
@@ -6436,6 +6437,16 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         var sSkel = spoken.replace(/ا/g, '');
         var eSkel = expected.replace(/ا/g, '');
         if (sSkel && sSkel === eSkel && spoken[0] === expected[0]) return true;
+        // Accept common pronunciation variants without allowing a skipped
+        // word to unlock the following word.
+        var soften = function (value) {
+          return value
+            .replace(/[أإآ]/g, 'ا')
+            .replace(/[ؤ]/g, 'و')
+            .replace(/[ئىي]/g, 'ي')
+            .replace(/ة/g, 'ه');
+        };
+        if (soften(spoken) === soften(expected)) return true;
         return false;
       }
 
@@ -6659,17 +6670,11 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
             }
           }
 
-          var matchedIndex = -1;
-          if (tasmeeWordMatches(token, state.words[expectedIndex])) {
-            matchedIndex = expectedIndex;
-          } else {
-            for (var c = expectedIndex + 1; c < Math.min(state.words.length, expectedIndex + 3); c++) {
-              if (tasmeeWordMatches(token, state.words[c])) {
-                matchedIndex = c;
-                break;
-              }
-            }
-          }
+          // Only the current word may unlock the next word. Do not search
+          // ahead: recognizing a later word must not hide missed words.
+          var matchedIndex = tasmeeWordMatches(token, state.words[expectedIndex])
+            ? expectedIndex
+            : -1;
 
           if (matchedIndex >= 0) {
             matchedAny = true;
