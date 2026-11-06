@@ -184,11 +184,14 @@
       grid-template-columns: max-content minmax(0, 1fr);
       align-items: center;
       width: min(980px, calc(100vw - 32px));
-      padding: 4px 8px;
-      border: 1px solid color-mix(in srgb, var(--green) 28%, var(--line));
-      border-radius: 14px;
-      background: var(--panel);
-      box-shadow: 0 12px 34px rgba(0, 0, 0, .22);
+      min-height: 58px;
+      padding: 5px 8px;
+      border: 1px solid color-mix(in srgb, var(--green) 30%, var(--line));
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--green) 7%, var(--panel)), var(--panel) 48%),
+        var(--panel);
+      box-shadow: 0 14px 34px rgba(34, 79, 51, .18), inset 0 1px 0 rgba(255, 255, 255, .62);
       cursor: grab;
       touch-action: none;
       user-select: none;
@@ -209,23 +212,28 @@
     }
     .tasmee-window-close {
       display: grid;
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       flex: none;
       margin-inline-start: auto;
       place-items: center;
       border: 1px solid var(--line);
-      border-radius: 9px;
+      border-radius: 50%;
       color: var(--muted);
       background: transparent;
       font: inherit;
-      font-size: 20px;
+      font-size: 18px;
       line-height: 1;
       cursor: pointer;
     }
+    .tasmee-window-close:hover {
+      color: var(--green);
+      border-color: color-mix(in srgb, var(--green) 35%, var(--line));
+      background: color-mix(in srgb, var(--green) 8%, var(--panel-top));
+    }
     .wp-recitation-row {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 8px;
       margin-top: 12px;
       padding-top: 10px;
@@ -1648,9 +1656,12 @@ window.QuranWorshipData = { azkar: {
 
     .w.tasmee-hidden {
       color: transparent !important;
-      -webkit-text-fill-color: transparent;
-      -webkit-text-stroke-color: transparent;
-      text-shadow: none;
+      -webkit-text-fill-color: transparent !important;
+      -webkit-text-stroke-color: transparent !important;
+      text-shadow: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      user-select: none;
     }
 
     .w.tasmee-mistake {
@@ -2267,7 +2278,7 @@ window.QuranWorshipData = { azkar: {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      column-gap: 8px;
+      column-gap: 12px;
       margin: 0;
       padding: 4px 4px 4px 8px;
       border: 0;
@@ -2278,31 +2289,50 @@ window.QuranWorshipData = { azkar: {
     .tasmee-window .tasmee-panel > .recitation-title { display: none; }
     .tasmee-window .tasmee-range {
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 5px;
+      gap: 7px;
       margin: 0;
     }
     .tasmee-window .tasmee-range label {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       min-width: 0;
+      color: var(--muted);
       font-size: 10px;
+      font-weight: 800;
       white-space: nowrap;
     }
-    .tasmee-window .tasmee-range .pro-select-button { min-height: 32px; padding-inline: 5px 18px; font-size: 11px; }
+    .tasmee-window .tasmee-range .pro-select-button {
+      min-height: 34px;
+      padding-inline: 7px 20px;
+      border-color: color-mix(in srgb, var(--green) 22%, var(--line));
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--green) 6%, var(--panel-top));
+      font-size: 11px;
+      font-weight: 800;
+    }
     .tasmee-window .tasmee-range .pro-select-button::after { left: 6px; }
     .tasmee-window .tasmee-actions {
       display: grid;
       grid-template-columns: auto auto minmax(90px, 1fr);
       align-items: center;
-      gap: 5px;
+      gap: 7px;
       padding-top: 0;
     }
     .tasmee-window .tasmee-actions .recitation-play,
     .tasmee-window .tasmee-actions .recitation-copy {
-      min-height: 34px;
-      padding-inline: 9px;
+      min-height: 35px;
+      padding-inline: 11px;
       font-size: 11px;
+    }
+    .tasmee-window .tasmee-actions .recitation-play {
+      min-width: 104px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px color-mix(in srgb, var(--green) 24%, transparent);
+    }
+    .tasmee-window .tasmee-actions .recitation-copy {
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--green) 5%, var(--panel-top));
     }
     .tasmee-window .tasmee-status {
       display: block;
@@ -2321,11 +2351,11 @@ window.QuranWorshipData = { azkar: {
         display: block;
         top: auto;
         bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
-        left: 8px;
-        right: 8px;
+        left: 0;
+        right: 0;
         transform: none;
         width: auto;
-        max-width: 460px;
+        max-width: none;
         overflow: visible;
         padding: 7px 8px 7px 34px;
       }
@@ -2344,43 +2374,43 @@ window.QuranWorshipData = { azkar: {
       .tasmee-window .tasmee-content { display: block; width: 100%; }
       .tasmee-window .tasmee-panel.settings-card {
         display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        gap: 5px;
+        grid-template-columns: minmax(0, 1.6fr) max-content max-content;
+        column-gap: 4px;
+        row-gap: 2px;
         width: 100%;
         padding: 0;
       }
       .tasmee-window .tasmee-range {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) repeat(2, minmax(72px, .75fr));
+        grid-template-columns: minmax(0, 1.7fr) repeat(2, minmax(0, .8fr));
         align-items: center;
-        gap: 4px;
+        gap: 3px;
         width: 100%;
       }
       .tasmee-window .tasmee-range label {
-        display: flex;
+        display: grid;
         align-items: center;
-        gap: 3px;
+        gap: 1px;
         min-width: 0;
-        font-size: 9px;
+        font-size: 7px;
+        text-align: center;
         white-space: nowrap;
       }
       .tasmee-window .tasmee-range label:first-child {
-        display: flex;
+        display: grid;
         min-width: 0;
         width: 100%;
         white-space: nowrap;
       }
-      .tasmee-window .tasmee-range .pro-select { flex: 1; width: auto; min-width: 0; }
-      .tasmee-window .tasmee-range .pro-select-button { min-height: 30px; padding-inline: 3px 15px; font-size: 10px; }
-      .tasmee-window .tasmee-range .pro-select-button::after { left: 5px; }
+      .tasmee-window .tasmee-range .pro-select { width: 100%; min-width: 0; }
+      .tasmee-window .tasmee-range .pro-select-button { min-height: 30px; padding-inline: 1px 12px; font-size: 9px; }
+      .tasmee-window .tasmee-range .pro-select-button::after { left: 4px; }
       .tasmee-window .tasmee-actions {
-        grid-template-columns: max-content max-content minmax(0, 1fr);
-        gap: 4px;
-        width: 100%;
+        display: contents;
       }
       .tasmee-window .tasmee-actions .recitation-play,
-      .tasmee-window .tasmee-actions .recitation-copy { min-height: 30px; padding-inline: 7px; font-size: 10px; }
-      .tasmee-window .tasmee-status { width: auto; min-width: 0; font-size: 9px; }
+      .tasmee-window .tasmee-actions .recitation-copy { min-width: 0; min-height: 30px; padding-inline: 3px; font-size: 9px; }
+      .tasmee-window .tasmee-status { grid-column: 1 / -1; width: 100%; min-width: 0; font-size: 9px; }
     }
     .tasmee-actions {
       display: grid;
@@ -2398,7 +2428,8 @@ window.QuranWorshipData = { azkar: {
       text-align: center;
     }
 
-    .reciter-picker { display: grid; gap: 7px; padding: 10px 0; }
+    .reciter-picker { display: grid; width: 100%; min-width: 0; gap: 7px; padding: 10px 0; }
+    .reciter-picker .pro-select { width: 100%; min-width: 0; }
     .reciter-picker > label,
     .reciter-picker-label { color: var(--muted); font-size: 11px; font-weight: 700; }
     .recitation-range {
@@ -4195,7 +4226,7 @@ window.QuranWorshipData = { azkar: {
       font-size: 13px;
     }
 
-    #reciterSelect { width: 154px; }
+    #reciterSelect { width: 100%; }
 
     .recitation-range {
       display: grid;
@@ -4285,15 +4316,17 @@ window.QuranWorshipData = { azkar: {
       .recitation-range { grid-template-columns: minmax(0, 1fr) 52px 52px 82px; gap: 3px; }
       .tasmee-range { grid-template-columns: minmax(0, 1fr) 62px 62px; gap: 3px; }
       .tasmee-window .tasmee-range {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: minmax(0, 1.7fr) repeat(2, minmax(36px, .8fr));
         gap: 3px;
       }
       .tasmee-window .tasmee-range label:first-child {
-        grid-column: 1 / -1;
+        display: grid;
       }
       .tasmee-window .tasmee-range label:first-child .pro-select {
         width: 100%;
       }
+      .tasmee-window .tasmee-actions .recitation-play,
+      .tasmee-window .tasmee-actions .recitation-copy { padding-inline: 1px; font-size: 8px; }
       .recitation-title label .pro-select { width: 124px; }
     }
 
@@ -6324,7 +6357,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           var hasSessionWord = verse && position >= 1 && position <= verse.words.length;
           var isMistake = !!tasmeeRetainedMistakes[tasmeeMistakeKey(verseId, position)] ||
             !!(hasSessionWord && verse.mistakes[position]);
-          var isHidden = !!(hasSessionWord && !verse.revealed[position] && !verse.mistakes[position]);
+          var isHidden = !!(hasSessionWord && !verse.revealed[position]);
           word.classList.toggle('tasmee-hidden', isHidden);
           word.classList.toggle('tasmee-mistake', isMistake);
           if (isHidden) word.setAttribute('aria-hidden', 'true');
@@ -6333,13 +6366,48 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       }
 
       function normalizeTasmeeWord(word) {
-        return String(word || '')
-          .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '')
-          .replace(/[أإآٱ]/g, 'ا')
-          .replace(/ى/g, 'ي')
-          .replace(/ؤ/g, 'و')
-          .replace(/ئ/g, 'ي')
-          .replace(/[^\u0621-\u064A]/g, '');
+        var s = String(word || '');
+        s = s.replace(/و[\u064B-\u065F]*\u0670/g, 'ا');
+        s = s.replace(/[\u06E6\u06E7]/g, 'ي');
+        s = s.replace(/[\u06E5]/g, 'و');
+        s = s.replace(/(?:ه[\u064B-\u065F]*\u0670(?=[ذؤ]))/g, 'ه');
+        s = s.replace(/(?:ذ[\u064B-\u065F]*\u0670(?=ل))/g, 'ذ');
+        s = s.replace(/(?:رَّحۡ?مَ[\u064B-\u065F]*\u0670(?=ن))/g, 'رحم');
+        s = s.replace(/(?:لَ[\u064B-\u065F]*\u0670(?=[كه]))/g, 'ل');
+        s = s.replace(/(?:أُوْلَـ[\u064B-\u065F]*\u0670)/g, 'اول');
+        s = s.replace(/\u0670/g, 'ا');
+        s = s.replace(/[\u064B-\u065F\u06D6-\u06ED\u0640]/g, '');
+        s = s.replace(/[أإآٱ]/g, 'ا');
+        s = s.replace(/ة/g, 'ه');
+        s = s.replace(/ى/g, 'ي');
+        s = s.replace(/ؤ/g, 'و');
+        s = s.replace(/ئ/g, 'ي');
+        s = s.replace(/[^\u0621-\u064A]/g, '');
+        return s;
+      }
+
+      function tasmeeWordMatches(spoken, expected) {
+        if (!spoken || !expected) return false;
+        if (spoken === expected) return true;
+        var sSkel = spoken.replace(/ا/g, '');
+        var eSkel = expected.replace(/ا/g, '');
+        if (sSkel && sSkel === eSkel && spoken[0] === expected[0]) return true;
+        return false;
+      }
+
+      function tokenizeTasmeeTranscript(transcript) {
+        var raw = String(transcript || '').trim().split(/\s+/).filter(Boolean);
+        var merged = [];
+        for (var i = 0; i < raw.length; i++) {
+          var token = raw[i];
+          if ((token === 'و' || token === 'ف') && i + 1 < raw.length) {
+            merged.push(token + raw[i + 1]);
+            i++;
+          } else {
+            merged.push(token);
+          }
+        }
+        return merged.map(normalizeTasmeeWord).filter(Boolean);
       }
 
       function createTasmeeSession() {
@@ -6356,7 +6424,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
             tasmeeStatus.textContent = 'تعذر تجهيز كلمات الآية ' + ar(ayah) + ' للتسميع.';
             return false;
           }
-          var state = { id: id, words: words, wordIndex: 0, revealed: Object.create(null), mistakes: Object.create(null) };
+          var state = { id: id, words: words, wordIndex: 0, revealed: Object.create(null), mistakes: Object.create(null), prompted: Object.create(null) };
           ayahs.push(state);
           byId[id] = state;
         }
@@ -6389,14 +6457,73 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       }
 
       function promptTasmeeWord() {
+        if (!tasmeeEnabled || !tasmeeSession || tasmeeSession.completed) return;
         var state = currentTasmeeAyah();
-        if (!tasmeeEnabled || !state || tasmeeSession.completed) return;
-        var position = state.wordIndex + 1;
-        state.revealed[position] = true;
-        state.mistakes[position] = true;
+        if (!state) return;
+
+        var targetPosition = -1;
+        for (var p = state.wordIndex + 1; p <= state.words.length; p++) {
+          if (!state.revealed[p]) {
+            targetPosition = p;
+            break;
+          }
+        }
+
+        if (targetPosition < 0) {
+          for (var a = tasmeeSession.verseIndex + 1; a < tasmeeSession.ayahs.length; a++) {
+            var nextState = tasmeeSession.ayahs[a];
+            for (var np = 1; np <= nextState.words.length; np++) {
+              if (!nextState.revealed[np]) {
+                tasmeeSession.verseIndex = a;
+                state = nextState;
+                targetPosition = np;
+                break;
+              }
+            }
+            if (targetPosition >= 1) break;
+          }
+        }
+
+        if (targetPosition < 0) {
+          var rewindState = rewindTasmeeToUnrevealedWord();
+          if (rewindState) {
+            state = rewindState;
+            for (var rp = 1; rp <= state.words.length; rp++) {
+              if (!state.revealed[rp]) {
+                targetPosition = rp;
+                break;
+              }
+            }
+          }
+        }
+
+        if (targetPosition < 0) {
+          finishTasmee();
+          return;
+        }
+
+        state.revealed[targetPosition] = true;
+        state.mistakes[targetPosition] = true;
+        state.prompted = state.prompted || Object.create(null);
+        state.prompted[targetPosition] = true;
+        state.wordIndex = targetPosition;
+
         applyTasmeeWordState(pageList);
-        var verse = pageList.querySelector('.w[data-v="' + state.id + '"][data-p="' + position + '"]');
+        navigateToVerse(state.id);
+
+        var verse = pageList.querySelector('.w[data-v="' + state.id + '"][data-p="' + targetPosition + '"]');
         if (verse) verse.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+        tasmeeStatus.textContent = 'تم تلقين الكلمة المظللة؛ يمكنك قراءتها ومتابعة التسميع.';
+
+        if (state.wordIndex >= state.words.length) {
+          tasmeeSession.verseIndex += 1;
+          if (tasmeeSession.verseIndex >= tasmeeSession.ayahs.length) {
+            if (!rewindTasmeeToUnrevealedWord()) {
+              finishTasmee();
+            }
+          }
+        }
       }
 
       function stopTasmeeRecognition() {
@@ -6417,81 +6544,126 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         if (!tasmeeSession) return;
         tasmeeSession.completed = true;
         stopTasmeeRecognition();
-        tasmeeStatus.textContent = 'أحسنت، اكتمل تسميع النطاق المحدد.';
+        var promptedCount = 0;
+        tasmeeSession.ayahs.forEach(function (state) {
+          if (state.prompted) {
+            promptedCount += Object.keys(state.prompted).length;
+          }
+        });
+        if (promptedCount > 0) {
+          tasmeeStatus.textContent = 'أحسنت! اكتمل التسميع مع تلقين ' + ar(promptedCount) + ' ' + (promptedCount === 1 ? 'كلمة مظللة.' : 'كلمات مظللة.');
+        } else {
+          tasmeeStatus.textContent = 'ممتاز! اكتمل تسميع النطاق بنجاح دون أي تلقين.';
+        }
       }
 
-      function processTasmeeTranscript(transcript) {
+      function processTasmeeTranscript(transcript, isInterim) {
         if (!tasmeeListening || !tasmeeSession || tasmeeSession.completed) return;
-        var tokens = String(transcript || '').split(/\s+/).map(normalizeTasmeeWord).filter(Boolean);
+        var tokens = tokenizeTasmeeTranscript(transcript);
         if (!tokens.length) return;
-        var hadMistake = false, changedVerse = false;
-        tokens.some(function (token) {
-          var state = currentTasmeeAyah();
-          if (!state) return true;
-          var matchedIndex = state.wordIndex;
-          if (token !== state.words[matchedIndex]) {
-            matchedIndex = -1;
-            for (var candidate = state.wordIndex + 1;
-              candidate < Math.min(state.words.length, state.wordIndex + 4); candidate++) {
-              if (token === state.words[candidate]) {
-                matchedIndex = candidate;
-                break;
-              }
+
+        var matchedAny = false;
+        var changedVerse = false;
+        var tokenIdx = 0;
+
+        var state = currentTasmeeAyah();
+        if (!state) return;
+
+        while (tokenIdx < tokens.length && state.wordIndex > 0) {
+          var matchedPrior = false;
+          for (var prior = Math.max(0, state.wordIndex - 3); prior < state.wordIndex; prior++) {
+            if (tasmeeWordMatches(tokens[tokenIdx], state.words[prior])) {
+              matchedPrior = true;
+              break;
             }
-            if (matchedIndex < 0) {
-              state.mistakes[state.wordIndex + 1] = true;
-              hadMistake = true;
-              return false;
-            }
-            for (var skipped = state.wordIndex; skipped < matchedIndex; skipped++) {
-              state.mistakes[skipped + 1] = true;
-            }
-            hadMistake = true;
           }
-          var position = matchedIndex + 1;
-          state.revealed[position] = true;
-          delete state.mistakes[position];
-          state.wordIndex = matchedIndex + 1;
-          if (state.wordIndex >= state.words.length) {
+          if (matchedPrior) tokenIdx++;
+          else break;
+        }
+
+        while (tokenIdx < tokens.length) {
+          state = currentTasmeeAyah();
+          if (!state) break;
+
+          var expectedIndex = state.wordIndex;
+
+          if (expectedIndex >= state.words.length) {
             tasmeeSession.verseIndex += 1;
             changedVerse = true;
             if (tasmeeSession.verseIndex >= tasmeeSession.ayahs.length) {
-              if (rewindTasmeeToUnrevealedWord()) changedVerse = true;
-              else {
+              if (rewindTasmeeToUnrevealedWord()) {
+                changedVerse = true;
+                state = currentTasmeeAyah();
+                expectedIndex = state ? state.wordIndex : 0;
+              } else {
                 finishTasmee();
-                return true;
+                return;
+              }
+            } else {
+              state = currentTasmeeAyah();
+              expectedIndex = state ? state.wordIndex : 0;
+            }
+            if (!state) break;
+          }
+
+          var token = tokens[tokenIdx];
+
+          if (expectedIndex > 0 && state.prompted && state.prompted[expectedIndex]) {
+            if (tasmeeWordMatches(token, state.words[expectedIndex - 1])) {
+              tokenIdx++;
+              continue;
+            }
+          }
+
+          var matchedIndex = -1;
+          if (tasmeeWordMatches(token, state.words[expectedIndex])) {
+            matchedIndex = expectedIndex;
+          } else {
+            for (var c = expectedIndex + 1; c < Math.min(state.words.length, expectedIndex + 3); c++) {
+              if (tasmeeWordMatches(token, state.words[c])) {
+                matchedIndex = c;
+                break;
               }
             }
           }
-          return false;
-        });
-        applyTasmeeWordState(pageList);
-        if (tasmeeSession && tasmeeSession.completed) return;
-        var current = currentTasmeeAyah();
-        if (changedVerse && current) navigateToVerse(current.id);
-        tasmeeStatus.textContent = hadMistake
-          ? 'لم تطابق الكلمة المنطوقة؛ أعد المحاولة للكلمة المظللة.'
-          : (hasUnrevealedTasmeeWords()
-            ? 'صحيح، بقيت كلمات مظللة تحتاج إلى إعادة.'
-            : 'صحيح، تابع القراءة.');
-      }
 
-      function markTasmeeInterimMistake(transcript) {
-        if (!tasmeeListening || !tasmeeSession || tasmeeSession.completed) return;
-        var tokens = String(transcript || '').split(/\s+/).map(normalizeTasmeeWord).filter(Boolean);
-        var state = currentTasmeeAyah();
-        if (!state || !tokens.length) return;
-        var token = tokens[0], position = state.wordIndex + 1;
-        var expected = state.words[state.wordIndex] || '';
-        if (token.length < 2 || token === expected || expected.indexOf(token) === 0 || token.indexOf(expected) === 0) return;
-        for (var candidate = state.wordIndex + 1;
-          candidate < Math.min(state.words.length, state.wordIndex + 4); candidate++) {
-          if (token === state.words[candidate]) return;
+          if (matchedIndex >= 0) {
+            matchedAny = true;
+            var position = matchedIndex + 1;
+            state.revealed[position] = true;
+            if (!state.prompted || !state.prompted[position]) {
+              delete state.mistakes[position];
+            }
+            state.wordIndex = matchedIndex + 1;
+            tokenIdx++;
+
+            if (state.wordIndex >= state.words.length) {
+              tasmeeSession.verseIndex += 1;
+              changedVerse = true;
+              if (tasmeeSession.verseIndex >= tasmeeSession.ayahs.length) {
+                if (rewindTasmeeToUnrevealedWord()) changedVerse = true;
+                else {
+                  applyTasmeeWordState(pageList);
+                  finishTasmee();
+                  return;
+                }
+              }
+            }
+          } else {
+            tokenIdx++;
+          }
         }
-        state.revealed[position] = true;
-        state.mistakes[position] = true;
-        applyTasmeeWordState(pageList);
-        tasmeeStatus.textContent = 'الكلمة المنطوقة لا تطابق؛ أُظهرت الكلمة المطلوبة وظُلّلت لإعادة قراءتها.';
+
+        if (matchedAny) {
+          applyTasmeeWordState(pageList);
+          var curAyah = currentTasmeeAyah();
+          if (changedVerse && curAyah) navigateToVerse(curAyah.id);
+          tasmeeStatus.textContent = hasUnrevealedTasmeeWords()
+            ? 'صحيح، تابع القراءة.'
+            : 'أحسنت، اكتملت قراءة النطاق المحدد.';
+        } else if (!isInterim) {
+          tasmeeStatus.textContent = 'لم يتم التعرف على الكلمة؛ أعد المحاولة أو اضغط زر التلقين للمساعدة.';
+        }
       }
 
       function startTasmeeRecognition() {
@@ -6531,39 +6703,31 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           }
           tasmeeRecognition = recognition;
           tasmeeRecognitionStarted = false;
-          var processedResults = Object.create(null);
-          var interimTimer = 0, pendingInterim = '';
           recognition.onstart = function () {
             if (!tasmeeListening || tasmeeRecognition !== recognition) {
               recognition.stop();
               return;
             }
             tasmeeRecognitionStarted = true;
-            tasmeeStatus.textContent = 'يستمع الآن. اقرأ الكلمات الظاهرة بالترتيب.';
+            tasmeeStatus.textContent = 'الميكروفون يعمل؛ ابدأ بتسميع الآيات غيبًا.';
             syncTasmeeControls();
           };
           recognition.onresult = function (event) {
             if (tasmeeRecognition !== recognition) return;
-            for (var i = 0; i < event.results.length; i++) {
+            var finalTranscript = '';
+            var interimTranscript = '';
+            for (var i = event.resultIndex; i < event.results.length; i++) {
+              var text = event.results[i][0].transcript;
               if (event.results[i].isFinal) {
-                clearTimeout(interimTimer);
-                interimTimer = 0;
-                pendingInterim = '';
-                if (processedResults[i]) continue;
-                processedResults[i] = true;
-                processTasmeeTranscript(event.results[i][0].transcript);
+                finalTranscript += ' ' + text;
               } else {
-                var transcript = event.results[i][0].transcript;
-                if (!transcript || transcript === pendingInterim) continue;
-                pendingInterim = transcript;
-                clearTimeout(interimTimer);
-                interimTimer = setTimeout(function () {
-                  interimTimer = 0;
-                  var stableInterim = pendingInterim;
-                  pendingInterim = '';
-                  if (tasmeeRecognition === recognition) markTasmeeInterimMistake(stableInterim);
-                }, 240);
+                interimTranscript += ' ' + text;
               }
+            }
+            if (finalTranscript.trim()) {
+              processTasmeeTranscript(finalTranscript, false);
+            } else if (interimTranscript.trim()) {
+              processTasmeeTranscript(interimTranscript, true);
             }
           };
           recognition.onerror = function (event) {
@@ -7657,7 +7821,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           var tf = MU && MU[s - 1] ? MU[s - 1][a - 1] : '';
           var h = '';
           var selectedWord = pos > 0 ? (verseText(s, a).split(/\s+/)[pos - 1] || glyph) : '';
-          if (pos <= 0) h += '<section class="wp-marks' + (marksPopupExpanded ? '' : ' wp-marks-compact') + '"><div class="wp-marks-head"><strong>علامات الآية</strong><button type="button" id="wpMarksEdit">' + (editing ? 'تم' : 'تحرير') + '</button></div><div class="wp-marks-list" id="wpMarksList"></div></section>';
+          if (pos <= 0 && (slots.length || marksPopupExpanded || editing)) h += '<section class="wp-marks' + (marksPopupExpanded ? '' : ' wp-marks-compact') + '"><div class="wp-marks-head"><strong>علامات الآية</strong><button type="button" id="wpMarksEdit">' + (editing ? 'تم' : 'تحرير') + '</button></div><div class="wp-marks-list" id="wpMarksList"></div></section>';
           if (pos <= 0) {
             if (!hideAyahTafsir) h += '<div class="wp-m wp-ayah-meaning"><small>معنى الآية</small>' + (tf ? esc(verseMeaningArabic(s, a, tf)) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div>';
           } else {
@@ -7698,7 +7862,9 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           }
           if (pos <= 0) {
             buildMarks();
-            wp.querySelector('#wpMarksList').appendChild(paneM);
+            var marksList = wp.querySelector('#wpMarksList');
+            if (marksList) marksList.appendChild(paneM);
+            else marksPopupHome.appendChild(paneM);
             marksPopupHome.hidden = true;
           }
           placeWp(w);
