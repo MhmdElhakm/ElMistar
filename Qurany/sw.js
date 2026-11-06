@@ -2,17 +2,9 @@ var CACHE_NAME = 'quran-pro-app-v115';
 var APP_SHELL = [
   './index.html',
   './word-data-worker.js',
-  './tajweed-font-data.js',
-  './worship-data.js',
-  './worship-ui.js',
-  './integrated-services-data.js',
-  './integrated-services.js',
-  './prayer-times.js',
   './manifest.webmanifest',
   './logo.png',
-  './note.mp3',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './note.mp3'
 ];
 
 self.addEventListener('install', function (event) {
