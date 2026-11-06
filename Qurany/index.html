@@ -3698,54 +3698,10 @@ window.QuranWorshipData = { azkar: {
       position: relative;
     }
 
-    .wp-topic-content {
-      max-height: 28svh;
-      overflow-y: auto;
-    }
-
-    .wp-topic-groups {
-      display: grid;
-      gap: 8px;
-      margin: 0;
-      padding-inline-start: 18px;
-    }
-
-    .wp-topic-group {
-      padding-inline-start: 2px;
-    }
-
-    .wp-topic-parent {
-      display: block;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 500;
-    }
-
-    .wp-topic-leaves {
-      color: var(--ink);
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .thematic-note {
-      margin: 8px 0 0;
-      color: var(--sub);
-      font-size: 11px;
-      line-height: 1.65;
-    }
-
-    .thematic-note a {
-      color: var(--green);
-    }
-
     .wp-v[open] .wp-v-content {
       display: block;
       max-height: 38svh;
       overflow-y: auto;
-    }
-
-    .wp-v[open] .wp-topic-content {
-      max-height: 28svh;
     }
 
     .wp-recitation {
@@ -4799,21 +4755,6 @@ window.QuranWorshipData = { azkar: {
             <option value="327">التبيان في تفسير غريب القرآن</option>
             <option value="1424">كلمات القرآن</option>
           </select>
-        </div>
-
-        <div class="settings-card" id="thematicDetailSettings">
-          <div class="settings-card-head">
-            <span aria-hidden="true">🧭</span>
-            <span>التفصيل الموضوعي للآية:</span>
-          </div>
-          <div class="settings-toggle-group" role="group" aria-label="التفصيل الموضوعي للآية">
-            <button type="button" class="st-btn" id="btnThematicDetailOn" aria-pressed="false">مفعّل</button>
-            <button type="button" class="st-btn" id="btnThematicDetailOff" aria-pressed="false">معطّل</button>
-          </div>
-          <p class="thematic-note">
-            يعرض الموضوعات المرتبطة بالآية في قاعدة البيانات الحالية، وهي لا تغطي جميع الآيات.
-            المصدر: <a href="https://quranpedia.net" target="_blank" rel="noopener noreferrer">الموسوعة القرآنية</a>، نسخة البيانات 2026-11-06.
-          </p>
         </div>
 
         <div class="settings-card" aria-label="التمرير التلقائي">
@@ -7204,27 +7145,6 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         save('mq.gharibBook', gharibBookId);
         if (refreshActiveWordMeaning) refreshActiveWordMeaning();
       });
-      var thematicDetailEnabled = store('mq.thematicDetail') !== '0';
-      var thematicDetailOn = $('btnThematicDetailOn'), thematicDetailOff = $('btnThematicDetailOff');
-      function syncThematicDetailSettings() {
-        thematicDetailOn.classList.toggle('active', thematicDetailEnabled);
-        thematicDetailOn.setAttribute('aria-pressed', String(thematicDetailEnabled));
-        thematicDetailOff.classList.toggle('active', !thematicDetailEnabled);
-        thematicDetailOff.setAttribute('aria-pressed', String(!thematicDetailEnabled));
-      }
-      thematicDetailOn.addEventListener('click', function () {
-        thematicDetailEnabled = true;
-        store('mq.thematicDetail', '1');
-        syncThematicDetailSettings();
-        if (refreshActiveWordMeaning) refreshActiveWordMeaning();
-      });
-      thematicDetailOff.addEventListener('click', function () {
-        thematicDetailEnabled = false;
-        store('mq.thematicDetail', '0');
-        syncThematicDetailSettings();
-        if (refreshActiveWordMeaning) refreshActiveWordMeaning();
-      });
-      syncThematicDetailSettings();
       var bScreen = $('bScreen');
       function syncScreenButton() {
         var active = !!document.fullscreenElement;
@@ -7746,106 +7666,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       var gharibMeanings = Object.create(null), gharibMeaningRequests = Object.create(null),
         gharibLoadFailed = false, refreshActiveWordMeaning = null;
       var wordDataWorker = null, wordDataRequestId = 0, wordDataRequests = Object.create(null);
-      var thematicTopicIndex = null, thematicTopicRecords = null, thematicTopicPromise = null;
       function loadMeanings() { return Promise.resolve(MU); }
-      function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-      function loadThematicTopics() {
-        if (thematicTopicIndex) return Promise.resolve(thematicTopicIndex);
-        if (thematicTopicPromise) return thematicTopicPromise;
-        function fetchTopics() {
-          return fetch('./json/topics.json').then(function (response) {
-            if (!response.ok) throw new Error('HTTP ' + response.status + ' while loading thematic topics');
-            return response;
-          });
-        }
-        var responsePromise = 'caches' in window
-          ? caches.open('quran-pro-app-v118').then(function (cache) {
-            return cache.match('./json/topics.json').then(function (cachedResponse) {
-              if (cachedResponse) return cachedResponse;
-              return fetchTopics().then(function (response) {
-                return cache.put('./json/topics.json', response.clone()).then(function () { return response; }, function (error) {
-                  console.warn('تعذر حفظ بيانات التفصيل الموضوعي دون إنترنت:', error);
-                  return response;
-                });
-              });
-            });
-          }, function (error) {
-            console.warn('تعذر فتح التخزين المحلي لبيانات التفصيل الموضوعي:', error);
-            return fetchTopics();
-          })
-          : fetchTopics();
-        thematicTopicPromise = responsePromise.then(function (response) {
-          return response.json();
-        }).then(function (payload) {
-          if (!payload || payload.schema !== '/v1/topics' || !Array.isArray(payload.data)) {
-            throw new Error('The thematic topics file has an unsupported format');
-          }
-          var records = Object.create(null), index = Object.create(null);
-          payload.data.forEach(function (topic) {
-            if (topic && Number.isInteger(topic.id) && typeof topic.name === 'string') records[topic.id] = topic;
-          });
-          payload.data.forEach(function (topic) {
-            if (!topic || typeof topic.ayahs !== 'string') return;
-            topic.ayahs.split(',').forEach(function (reference) {
-              var match = /^(\d+):(\d+)(?:-(\d+))?$/.exec(reference.trim());
-              if (!match) return;
-              var surah = +match[1], from = +match[2], to = match[3] ? +match[3] : from;
-              if (!D.surahs[surah - 1] || from < 1 || to < from || to > D.surahs[surah - 1][3]) return;
-              for (var ayah = from; ayah <= to; ayah++) {
-                var key = surah + ':' + ayah;
-                if (!index[key]) index[key] = [];
-                index[key].push(topic.id);
-              }
-            });
-          });
-          thematicTopicRecords = records;
-          thematicTopicIndex = index;
-          return index;
-        }).catch(function (error) {
-          thematicTopicPromise = null;
-          throw error;
-        });
-        return thematicTopicPromise;
-      }
-      function thematicTopicsMarkup(surah, ayah, error) {
-        var matches = thematicTopicIndex && thematicTopicIndex[surah + ':' + ayah] || [];
-        var groups = [], groupMap = Object.create(null);
-        matches.forEach(function (id) {
-          var topic = thematicTopicRecords[id];
-          if (!topic) return;
-          var path = [], current = topic, seen = Object.create(null), depth = 0;
-          while (current && depth < 8 && !seen[current.id]) {
-            seen[current.id] = true;
-            path.unshift(current.name);
-            current = current.parent_id == null ? null : thematicTopicRecords[current.parent_id];
-            depth++;
-          }
-          var parent = path.slice(0, -1).join(' ‹ ');
-          var key = parent || 'root:' + id;
-          if (!groupMap[key]) {
-            groupMap[key] = { parent: parent, names: [] };
-            groups.push(groupMap[key]);
-          }
-          if (groupMap[key].names.indexOf(path[path.length - 1]) < 0) {
-            groupMap[key].names.push(path[path.length - 1]);
-          }
-        });
-        var content;
-        if (!thematicTopicIndex && error) {
-          content = 'تعذر تحميل بيانات التفصيل الموضوعي. تحقق من الاتصال ثم أعد فتح الآية.';
-        } else if (!thematicTopicIndex) {
-          content = 'جارٍ تحميل الموضوعات…';
-        } else if (!groups.length) {
-          content = 'لا توجد موضوعات مرتبطة بهذه الآية في قاعدة البيانات الحالية.';
-        } else {
-          content = '<ul class="wp-topic-groups">' + groups.map(function (group) {
-            return '<li class="wp-topic-group">' +
-              (group.parent ? '<span class="wp-topic-parent">' + esc(group.parent) + '</span>' : '') +
-              '<span class="wp-topic-leaves">' + group.names.map(esc).join('، ') + '</span></li>';
-          }).join('') + '</ul>';
-        }
-        return '<details class="wp-v wp-topic-detail"><summary>التفصيل الموضوعي</summary><div class="wp-v-content wp-topic-content">' + content + '</div></details>';
-      }
       function requestWordData(type, data) {
         return new Promise(function (resolve, reject) {
           try {
@@ -8017,7 +7838,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         if (pageFont) glyphStyle += ';--tajweed-light-palette:--tjl' + pageFont[1] + ';--tajweed-dark-palette:--tjd' + pageFont[1];
         var glyphMarkup = '<span class="' + glyphClasses + '" style="' + glyphStyle + '">' + esc(glyph) + '</span>';
         var hideAyahTafsir = a === 15;
-        var recitationDetailsWasOpen = false, topicLoadError = null;
+        var recitationDetailsWasOpen = false;
         function draw() {
           var tf = MU && MU[s - 1] ? MU[s - 1][a - 1] : '';
           var h = '';
@@ -8039,18 +7860,6 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
                 esc(wordMeaning) + '</div>';
             }
             if (!hideAyahTafsir) h += '<details class="wp-v"><summary>التفسير المختصر للآية</summary><div class="wp-v-content">' + (tf ? esc(tf) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div></details>';
-          }
-          if (thematicDetailEnabled) {
-            h += thematicTopicsMarkup(s, a, topicLoadError);
-            if (!thematicTopicIndex && !thematicTopicPromise && !topicLoadError) {
-              loadThematicTopics().then(function () {
-                if (popWord === w) draw();
-              }).catch(function (error) {
-                console.error('تعذر تحميل بيانات التفصيل الموضوعي:', error);
-                topicLoadError = error;
-                if (popWord === w) draw();
-              });
-            }
           }
           if (pos <= 0 && !hideAyahTafsir) h += '<details class="wp-v"><summary>التفسير المختصر للآية</summary><div class="wp-v-content">' + (tf ? esc(tf) : (meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : (MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…'))) + '</div></details>';
           h += '<div class="wp-mark"><span>تظليل ' + (pos <= 0 ? 'الآية' : 'الكلمة') + '</span><div class="wp-colors" aria-label="اختيار لون التظليل">' + ANNOT_PALETTE.map(function (c) {
@@ -10240,7 +10049,6 @@ load(cur); setUI('idle'); net(); loadLocal();
         a.push('./fonts/QCF4_QBSML.woff2');
         return a;
       })();
-      var optionalUrls = ['./json/topics.json'];
       var chip = document.getElementById('dlChip'), bar = document.getElementById('dlBar'),
         pct = document.getElementById('dlPct'), lbl = document.getElementById('dlLabel');
       var done = 0, running = false, runningPromise = null, failed = [], firstError = '';
@@ -10315,16 +10123,6 @@ load(cur); setUI('idle'); net(); loadLocal();
         return Promise.all(urls.map(function (u) { return cached(cache, u); }))
           .then(function (hits) { return hits.filter(Boolean).length; });
       }
-      function downloadOptional(cache) {
-        return Promise.all(optionalUrls.map(function (url) {
-          return cached(cache, url).then(function (hit) {
-            if (hit) return;
-            return grab(cache, url).catch(function (error) {
-              console.warn('تعذر حفظ ملف إضافي للتصفح دون إنترنت:', url, error);
-            });
-          });
-        }));
-      }
       function startUI(queue) {
         done = urls.length - queue.length;
         show();
@@ -10354,12 +10152,10 @@ load(cur); setUI('idle'); net(); loadLocal();
                 var firstFailed = failed[0];
                 throw new Error('تعذر تنزيل ' + firstFailed.url + ' — ' + firstFailed.err);
               }
-              return downloadOptional(cache).then(function () {
-                return verify(cache).then(function (verified) {
+              return verify(cache).then(function (verified) {
                   if (verified !== urls.length) throw new Error('اكتمل التنزيل جزئيًا فقط (' + verified + ' من ' + urls.length + ' ملفًا)');
                   markDone();
                   finish();
-                });
               });
             });
           });

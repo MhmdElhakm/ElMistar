@@ -3,7 +3,6 @@ var APP_SHELL = [
   './index.html',
   './tasks.js',
   './word-data-worker.js',
-  './json/topics.json',
   './manifest.webmanifest',
   './logo.png',
   './note.mp3'
