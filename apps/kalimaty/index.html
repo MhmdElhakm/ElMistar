@@ -2436,7 +2436,6 @@ function vReg(){
    <div class="field"><label for="rgPhone">رقم هاتف ولي الأمر</label><input class="inp en" id="rgPhone" type="tel" inputmode="tel" dir="ltr" maxlength="16" autocomplete="off" placeholder="01012345678" value="${esc(REG.phone)}"></div>
    ${REG.err?`<div class="err" role="alert">${esc(REG.err)}</div>`:''}
    <button class="btn" data-act="rgsave">${REG.edit?'حفظ التعديلات':'ابدأ الاستخدام'} ${ic('arrow','fwd')}</button>
-   <button class="tlink" data-act="adm_open">دخول المعلم (صفحة الإدارة)</button>
    <p class="help" style="font-size:12.5px;text-align:center">تُحفظ البيانات على هذا الجهاز فقط ولا تظهر رقم الهاتف في لوحة المتصدرين.</p></div>`;
 }
 function regSubmit(){
@@ -2501,7 +2500,7 @@ function vBoard(){return '<div class="screen">'+boardSec()+'</div>';}
 function profileCards(){
   const p=S.profile||{},us=allUsers();
   const weak=S.items.filter(i=>i.m<3).sort((a,b)=>a.m-b.m).slice(0,5);
-  return `<div class="card pcard"><div style="display:flex;gap:14px;align-items:center">${av(p,66)}<div style="flex:1;min-width:0"><b style="font-size:19px">${esc(p.name||S.name)}</b><div class="help">${esc(GRADES[p.grade]||'')}</div><div class="help en" dir="ltr" style="text-align:start">${esc(p.phone||'')}</div></div></div></div>
+  return `<div class="card pcard"><div style="display:flex;gap:14px;align-items:center">${av(p,66)}<div style="flex:1;min-width:0"><b style="font-size:19px">${esc(p.name||S.name)}</b><div class="help">${esc(GRADES[p.grade]||'')}</div></div></div></div>
    <div class="card"><div class="sec-h" style="margin:0"><h3 style="font-size:18px;margin:0">المراجعة</h3><small>${S.items.filter(i=>i.m<3).length} عنصر يحتاج مراجعة</small></div>
     ${weak.length?weak.map(w=>`<div class="brow"><div class="bt"><b class="en" dir="ltr" style="text-align:start">${esc(w.en)}</b><small>${esc(w.a)}</small></div></div>`).join(''):'<p class="help">لا توجد عناصر ضعيفة الآن. أحسنت!</p>'}
     <button class="btn" style="min-height:48px;font-size:16px" data-act="game" data-k="review" ${S.items.some(i=>i.m<3)?'':'disabled'}>ابدأ المراجعة ${ic('arrow','fwd')}</button></div>
