@@ -1,7 +1,9 @@
-var CACHE_NAME = 'quran-pro-app-v115';
+var CACHE_NAME = 'quran-pro-app-v118';
 var APP_SHELL = [
   './index.html',
+  './tasks.js',
   './word-data-worker.js',
+  './json/topics.json',
   './manifest.webmanifest',
   './logo.png',
   './note.mp3'
