@@ -1,4 +1,6 @@
-var CACHE_NAME = 'quran-pro-app-v118';
+// Bump this whenever the bundled Quran assets change so stale/partial font
+// files from an older installation are discarded and downloaded again.
+var CACHE_NAME = 'quran-pro-app-v119';
 var APP_SHELL = [
   './index.html',
   './tasks.js',

@@ -5405,7 +5405,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           var chunkUrl = './fonts/tajweed/' + chunkName + '.woff2';
           function requestChunk(retry) {
             var cachedChunk = 'caches' in window
-                ? caches.open('quran-pro-app-v118').then(function (cache) { return cache.match(chunkUrl); })
+                ? caches.open('quran-pro-app-v119').then(function (cache) { return cache.match(chunkUrl); })
               : Promise.resolve(null);
             return cachedChunk.then(function (response) {
               if (response) return response.arrayBuffer();
@@ -5414,7 +5414,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
                 var copy = networkResponse.clone();
                 return networkResponse.arrayBuffer().then(function (buffer) {
                   if ('caches' in window) {
-                    return caches.open('quran-pro-app-v118').then(function (cache) {
+                    return caches.open('quran-pro-app-v119').then(function (cache) {
                       return cache.put(chunkUrl, copy).then(function () { return buffer; });
                     });
                   }
@@ -10061,7 +10061,9 @@ load(cur); setUI('idle'); net(); loadLocal();
       if (!runtime) throw new Error('Mushaf runtime is unavailable');
       var $ = runtime.$, store = runtime.store, D = runtime.data;
       var toast = runtime.toast;
-      var CACHE = 'quran-pro-app-v118', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '63';
+      // Keep this in sync with sw.js. A cache/version bump forces a clean
+      // download when an earlier attempt left incomplete Quran files behind.
+      var CACHE = 'quran-pro-app-v119', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '64';
       function ar(n) { return String(n).replace(/\d/g, function (d) { return AR[d]; }); }
       var urls = (function () {
         var a = [
