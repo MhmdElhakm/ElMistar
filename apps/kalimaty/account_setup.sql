@@ -45,3 +45,22 @@ begin
 end $$;
 revoke all on function public.delete_my_account() from public, anon;
 grant execute on function public.delete_my_account() to authenticated;
+
+-- 3) حسابات المعلمين المرتبطة برقم هاتف (دخول المعلم بالهاتف فقط)
+--    البريد الداخلي للمعلم بالشكل:  teacher-<الهاتف>-<رمز>@kalimaty.app
+create or replace function public.teacher_accounts(p text)
+returns table (id uuid, name text, class_name text, email text)
+language sql
+security definer
+stable
+set search_path = public, auth
+as $$
+  select u.id, coalesce(pr.name, ''), pr.class_name, u.email::text
+  from auth.users u
+  left join public.profiles pr on pr.id = u.id
+  where length(regexp_replace(coalesce(p, ''), '[^0-9]', '', 'g')) between 8 and 15
+    and u.email like 'teacher-' || regexp_replace(p, '[^0-9]', '', 'g') || '-%@kalimaty.app'
+  order by pr.name
+  limit 5
+$$;
+grant execute on function public.teacher_accounts(text) to anon, authenticated;
