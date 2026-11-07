@@ -709,16 +709,8 @@
       </article>` : '';
       const leaderboardTop = leaderboardEntries.slice(0, 3);
       const leaderboardRest = leaderboardEntries.slice(3);
-      const cloudUser = window.HudaCloud && window.HudaCloud.getUser ? window.HudaCloud.getUser() : null;
-      const cloudAccount = `<section class="cloud-account" aria-label="حساب المزامنة">
-        <div><strong>${cloudUser && !cloudUser.isAnonymous ? 'حساب Google متصل' : 'مزامنة بياناتك'}</strong><small>${cloudUser && !cloudUser.isAnonymous ? esc(cloudUser.email || 'يمكنك استعادة بياناتك من أي جهاز') : 'استخدم Google لاستعادة بياناتك من أي جهاز، أو تابع مجهولًا على هذا الجهاز'}</small></div>
-        <div class="cloud-account-actions">${cloudUser && !cloudUser.isAnonymous
-          ? '<button type="button" class="secondary" data-action="cloud-sign-out">تسجيل الخروج</button>'
-          : '<button type="button" class="primary" data-action="cloud-google-sign-in">الدخول بحساب Google</button><button type="button" class="secondary" data-action="cloud-anonymous">متابعة مجهولًا</button>'}</div>
-      </section>`;
       const profileView = `
         <section class="profile-page" aria-label="الملف الشخصي والنقاط">
-          ${cloudAccount}
           <div class="profile-score">
             <span class="profile-score-icon" aria-hidden="true">⭐</span>
             <div class="profile-score-copy"><strong>رصيد نقاطك</strong><small>استمر في إنجاز مهامك اليومية</small></div>
@@ -840,8 +832,6 @@
           .empty{padding:18px 8px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--line);border-radius:12px}
           .error{padding:9px;border-radius:9px;background:color-mix(in srgb,var(--red) 12%,var(--panel));color:var(--red);font-size:11px}
           .profile-page{display:grid;gap:12px;padding:2px 0 8px}
-          .cloud-account{display:grid;gap:10px;padding:12px 13px;border:1px solid color-mix(in srgb,var(--green) 22%,var(--line));border-radius:15px;background:linear-gradient(120deg,color-mix(in srgb,var(--green) 7%,var(--card)),var(--card))}
-          .cloud-account>div:first-child{display:grid;gap:3px}.cloud-account strong{font-size:12px}.cloud-account small{color:var(--muted);font-size:10px;line-height:1.5}.cloud-account-actions{display:flex;gap:7px;flex-wrap:wrap}.cloud-account-actions button{min-height:35px;padding:7px 10px;border-radius:9px;font:inherit;font-size:10px;font-weight:900}
           .profile-score,.profile-form,.leaderboard-card{border:1px solid var(--line);border-radius:17px;background:var(--card);box-shadow:0 6px 20px rgba(40,34,26,.045)}
           .profile-score{display:flex;align-items:center;gap:11px;padding:14px;background:linear-gradient(125deg,color-mix(in srgb,var(--green) 8%,var(--card)),var(--card) 72%)}
           .profile-score-icon{display:grid;place-items:center;width:40px;height:40px;flex:none;border-radius:13px;background:color-mix(in srgb,var(--sub) 14%,var(--panel));font-size:19px}
@@ -987,40 +977,6 @@
         state.profileFormOpen = true;
         storageError = '';
         render();
-      } else if (action === 'cloud-google-sign-in') {
-        if (!window.HudaCloud || !window.HudaCloud.signInGoogle) return;
-        window.HudaCloud.signInGoogle().then(function () {
-          storageError = '';
-          if (save()) render();
-        }).catch(function (error) {
-          console.error('تعذر تسجيل الدخول بحساب Google.', error);
-          const authMessages = {
-            'auth/operation-not-allowed': 'لم يتم تفعيل تسجيل الدخول بحساب Google من لوحة Firebase.',
-            'auth/unauthorized-domain': 'أضف localhost إلى النطاقات المسموح بها في Firebase Authentication.',
-            'auth/popup-blocked': 'تم حظر نافذة Google؛ اسمح بالنوافذ المنبثقة ثم أعد المحاولة.',
-            'auth/popup-closed-by-user': 'أُغلقت نافذة تسجيل الدخول قبل إكمال العملية.'
-          };
-          storageError = authMessages[error && error.code] || 'تعذر تسجيل الدخول بحساب Google. تحقق من إعدادات Firebase ثم أعد المحاولة.';
-          render();
-        });
-      } else if (action === 'cloud-anonymous') {
-        if (!window.HudaCloud || !window.HudaCloud.continueAnonymously) return;
-        window.HudaCloud.continueAnonymously().then(function () {
-          storageError = '';
-          render();
-        }).catch(function (error) {
-          console.error('تعذر إنشاء جلسة مجهولة.', error);
-          storageError = 'تعذر بدء الاستخدام المجهول. سيستمر التطبيق بالبيانات المحلية.';
-          render();
-        });
-      } else if (action === 'cloud-sign-out') {
-        if (!window.HudaCloud || !window.HudaCloud.signOut) return;
-        window.HudaCloud.signOut().then(function () {
-          storageError = '';
-          render();
-        }).catch(function (error) {
-          console.error('تعذر تسجيل الخروج.', error);
-        });
       } else if (action === 'export-app-data') {
         exportAppData();
       } else if (action === 'toggle-form') {
@@ -1106,7 +1062,6 @@
       });
     }
     window.addEventListener('quran:azkar-progress', syncAzkarTask);
-    window.addEventListener('huda-auth-changed', () => render());
     window.addEventListener('huda-leaderboard-changed', () => render());
     seedDefaultTasks();
     rollTasks();
