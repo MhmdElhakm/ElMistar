@@ -633,16 +633,6 @@ select.inp option{background:#1b1749;color:#fff}
 .kqexp.warn{border-color:var(--orange);background:var(--orange-bg)}.kqexp.bad{border-color:var(--bad);background:var(--bad-soft)}
 .kqexp small{display:block;color:var(--muted);font-weight:700;font-size:12px}.kqexp b{font-size:20px}
 .kqrules{background:var(--primary-soft);border-radius:20px;padding:12px 16px;flex:none}.kqrules ul{margin:6px 0 0;padding-inline-start:20px;line-height:1.8;font-size:14.5px;color:#ddd8ff}
-.voicebox{background:linear-gradient(145deg,#1e205c,#29256f);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px;flex:none;color:#fff}
-.voicehead{display:flex;align-items:center;gap:10px}.voicehead .vicon{width:42px;height:42px;border-radius:14px;background:#5d55e8;display:grid;place-items:center;font-size:21px}.voicehead b{display:block;font-size:16px}.voicehead small{display:block;color:#c9c6ee;font-size:12px;margin-top:2px}
-.voiceactions{display:flex;gap:8px;flex-wrap:wrap}.voicebtn{border:0;border-radius:13px;padding:9px 13px;background:#403a99;color:#fff;font:inherit;font-weight:800;cursor:pointer}.voicebtn.on{background:#36b878}.voicebtn.off{background:#633449}.voicebtn:disabled{opacity:.55;cursor:not-allowed}
-.vstudents{display:flex;flex-direction:column;gap:7px}.vstudent{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border-radius:14px;padding:7px 9px}.vstudent .vname{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vstudent .vstate{font-size:11px;color:#bcb8df}.vstudent .voicebtn{padding:6px 9px;font-size:12px}
-.voicebadge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;background:rgba(54,184,120,.18);color:#86f0b5;font-size:11px;font-weight:800}.voicebadge.off{background:rgba(255,255,255,.1);color:#bcb8df}
-.voicebox{background:linear-gradient(145deg,#1e205c,#29256f);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px;flex:none;color:#fff}
-.voicehead{display:flex;align-items:center;gap:10px}.voicehead .vicon{width:42px;height:42px;border-radius:14px;background:#5d55e8;display:grid;place-items:center;font-size:21px}.voicehead b{display:block;font-size:16px}.voicehead small{display:block;color:#c9c6ee;font-size:12px;margin-top:2px}
-.voiceactions{display:flex;gap:8px;flex-wrap:wrap}.voicebtn{border:0;border-radius:13px;padding:9px 13px;background:#403a99;color:#fff;font:inherit;font-weight:800;cursor:pointer}.voicebtn.on{background:#36b878}.voicebtn.off{background:#633449}.voicebtn:disabled{opacity:.55;cursor:not-allowed}
-.vstudents{display:flex;flex-direction:column;gap:7px}.vstudent{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border-radius:14px;padding:7px 9px}.vstudent .vname{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vstudent .vstate{font-size:11px;color:#bcb8df}.vstudent .voicebtn{padding:6px 9px;font-size:12px}
-.voicebadge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;background:rgba(54,184,120,.18);color:#86f0b5;font-size:11px;font-weight:800}.voicebadge.off{background:rgba(255,255,255,.1);color:#bcb8df}
 </style>
 <style id="kc-style">
 /* motion by mood (on .kc-in) and breathing/talking (on .kc-body) */
@@ -929,11 +919,35 @@ html[data-mode=light] .roomcard{background:linear-gradient(145deg,var(--hero2),v
 .colc{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:8px 4px;font-weight:800;font-size:13px}
 .colc.on{border-color:var(--primary);background:var(--primary-soft);color:var(--primary)}.colc svg{width:78px;height:78px}
 .brow[data-act],.pcol[data-act]{cursor:pointer}
-.bpanel{align-items:center;text-align:center}
-.bpscene{display:grid;place-items:center;background:linear-gradient(180deg,var(--sky1),var(--sky2) 70%,var(--grass1) 70%);border-radius:24px;padding:10px 0 0;overflow:hidden;width:100%}
-.bpname{display:flex;flex-direction:column}.bpname b{font-size:22px}.bpname small{color:var(--muted);font-weight:700}
-.bpmeta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-weight:700;font-size:13.5px;color:var(--muted)}.bpmeta svg{width:16px;height:16px;vertical-align:-3px;color:var(--primary)}
-.bpitems{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}.bpi{background:var(--primary-soft);color:var(--primary);font-weight:800;font-size:13px;border-radius:999px;padding:4px 12px}
+/* Professional Pet Modal */
+.bpanel{max-width:400px;margin:auto;border-radius:28px 28px 0 0;padding:16px 16px 18px;gap:12px;box-shadow:0 -10px 40px rgba(0,0,0,.5);border-top:1.5px solid rgba(255,255,255,.15);position:relative}
+@media(min-width:480px){.bpanel{border-radius:28px;margin:auto auto 24px;max-height:92vh}}
+.bp-sthead{display:flex;align-items:center;justify-content:space-between;width:100%;padding:2px 4px 8px;border-bottom:1px solid var(--line)}
+.bp-stinfo{display:flex;align-items:center;gap:10px;text-align:start}
+.bp-stinfo b{font-size:16px;display:block}
+.bp-stinfo small{color:var(--muted);font-weight:700;font-size:12.5px}
+.bpscene{position:relative;display:grid;place-items:center;border-radius:24px;padding:16px 0 10px;overflow:hidden;width:100%;min-height:280px;box-shadow:inset 0 0 40px rgba(0,0,0,.25),0 8px 24px -10px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1)}
+.bpscene svg{width:100%;max-width:310px;height:auto;filter:drop-shadow(0 12px 18px rgba(0,0,0,.35));animation:bpFloat 3.2s ease-in-out infinite}
+@keyframes bpFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.bpname{text-align:center;display:flex;flex-direction:column;gap:2px}
+.bpname b{font-size:26px;font-weight:900;letter-spacing:-.3px;color:var(--ink)}
+.bpanel .pfoot{display:flex;gap:10px;width:100%;margin-top:4px}
+.bpanel .pfoot .btn{flex:1;min-height:46px;font-size:16px}
+.av-pet-btn{cursor:pointer;position:relative;border:none;background:none;padding:0;border-radius:50%;display:inline-flex;transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease}
+.av-pet-btn:hover{transform:scale(1.06)}
+.av-pet-btn:active{transform:scale(.95)}
+.av-pet-btn::after{content:'🐾';position:absolute;bottom:-2px;inset-inline-start:-2px;font-size:11px;background:var(--card);border:1.5px solid var(--line);border-radius:50%;width:20px;height:20px;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+/* Foldable account details in auAccountCard */
+.au-card-fold{margin-top:2px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.02);overflow:hidden;transition:all .2s ease}
+.au-card-summary{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;list-style:none;font-weight:800;user-select:none}
+.au-card-summary::-webkit-details-marker{display:none}
+.au-sum-icon{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--primary-soft);color:var(--primary);flex:none}
+.au-sum-icon svg{width:18px;height:18px}
+.au-sum-title{flex:1;min-width:0;font-size:14.5px;color:var(--ink)}
+.au-sum-chev{font-size:18px;line-height:1;color:var(--primary);margin-inline-start:auto;transition:transform .2s ease}
+.au-card-fold[open] .au-sum-chev{transform:rotate(180deg)}
+.au-card-fold[open]{background:rgba(255,255,255,.04);border-color:rgba(124,107,240,.3)}
+.au-fold-content{padding:12px 14px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:12px;animation:fade .2s ease}
 .rvp svg{width:150px;height:120px;display:block}
 </style><style id="kx-css">
 /* ===== KX: unified level tab, game hub, word games, adventure challenges ===== */
@@ -1983,7 +1997,7 @@ function sRow(i){
 
 function vMe(){
   const lvl=Math.floor(S.xp/100)+1,into=S.xp%100;
-  return `<div class="screen"><div class="pagehead" style="display:flex;justify-content:space-between;align-items:center"><div><h2>حسابي</h2><small>${S.badges.length} من ${BADGES.length} شارات</small></div>${av(S.profile,54)}</div>
+  return `<div class="screen"><div class="pagehead" style="display:flex;justify-content:space-between;align-items:center"><div><h2>حسابي</h2><small>${S.badges.length} من ${BADGES.length} شارات</small></div><button type="button" class="av-pet-btn" data-act="bpet" data-id="me" aria-label="عرض الحيوان الأليف">${av(S.profile,54)}</button></div>
    ${profileCards()}
    <div class="bgrid">${BADGES.map(b=>{const on=S.badges.includes(b.id);return `<div class="bcard ${on?'':'lock'}"><span class="bi ${on?b.g:''}">${badgeIcon(b)}</span><div><b>${esc(b.n)}</b><small>${esc(b.d)}</small></div></div>`;}).join('')}</div>
    ${themeCard()}
@@ -2375,18 +2389,57 @@ function advBanner(){
 }
 /* ===== leaderboard: show a student's animal ===== */
 function bpetOpen(id){
- const u=allUsers().find(x=>x.id===id);if(!u)return;
- const pt=u.pet,lv=lvlOf(u.xp),o=document.getElementById('overlay');
- let inner;
- if(!pt||!pt.sp||!pt.born){inner=`<div class="empty"><b>${esc(u.p.name)}</b><span>لم يختر حيوانه الأليف بعد.</span></div>`;}
- else{
-  const sp=SPC(pt.sp),eq=Object.assign({},pt.eq||{}),it=(PIT(eq.bg||'bg0')||PIT('bg0')).sc,names=['hat','face','neck','body','hold','back'].map(k=>eq[k]?PIT(eq[k]):null).filter(Boolean);
-  inner=`<div class="bpscene" style="--sky1:${it.s1};--sky2:${it.s2};--grass1:${it.g1}">${petSvg({sp:pt.sp,color:pt.color,stage:stageOfXp(u.xp),exp:'happy',eq,w:240})}</div>
-   <div class="bpname"><b>${esc(pt.name||sp.n)}</b><small>${sp.n} · ${sp.v[(pt.color||0)%sp.v.length].n}</small></div>
-   <div class="bpmeta"><span>${ic('trophy')} مستوى ${lv} · ${lvTitle(lv)}</span><span>${(pt.own||[]).length} قطعة في الخزانة</span></div>
-   <div class="bpitems">${names.length?names.map(x=>`<span class="bpi">${esc(x.n)}</span>`).join(''):'<span class="help">لا يرتدي أي إكسسوارات الآن</span>'}</div>`;
+ const o=document.getElementById('overlay');if(!o)return;
+ let u=null;
+ if(!id||id==='me'||id===(typeof DIR!=='undefined'?DIR.cur:'')){
+   u={id:'me',p:S.profile||{name:S.name||'أنا'},pet:S.pet,xp:S.xp||0,me:true};
+ }else{
+   if(typeof allUsers==='function')u=allUsers().find(x=>x.id===id);
+   if(!u&&typeof SBL!=='undefined'&&SBL&&SBL.list){
+     const c=SBL.list.find(x=>x.id===id);
+     if(c)u=Object.assign({},c,{pet:c.me?S.pet:(c.pet||null),xp:c.score||0});
+   }
+   if(!u)u={id:'me',p:S.profile||{name:S.name||'أنا'},pet:S.pet,xp:S.xp||0,me:true};
  }
- o.innerHTML=`<div class="scrim"><div class="panel bpanel" role="dialog" aria-label="حيوان ${esc(u.p.name)}"><div class="phead"><h3>حيوان ${esc(u.p.name)}</h3><small>${esc(GRADES[u.p.grade]||'')}</small></div>${inner}<div class="pfoot"><button class="btn" data-act="bpet_x">إغلاق</button></div></div></div>`;
+ const isMe=!!u.me,pt=u.pet,pf=u.p||{},stg=stageOfXp(u.xp||0);
+ let body;
+ if(!pt||!pt.sp||!pt.born){
+  body=`<div class="bpscene" style="--sky1:#ffd95e;--sky2:#ffae7a;--grass1:#5cb85c;min-height:260px;padding:24px 0">
+    <div style="font-size:96px;animation:bpFloat 2.8s ease-in-out infinite">🥚</div>
+  </div>
+  <div class="bpname" style="margin:8px 0 4px">
+    <b>${isMe?'حيوانك الأليف':esc(pf.name||'')}</b>
+    <small style="color:var(--muted);font-weight:700">${isMe?'لم تختر حيوانك بعد':'لم يختر الطالب حيوانه بعد'}</small>
+  </div>
+  ${isMe?`<button class="btn" style="min-height:46px;font-size:16px;margin-top:6px" data-act="bpet_adopt">اختر حيوانك الآن ${ic('arrow','fwd')}</button>`:''}`;
+ }else{
+  const sp=SPC(pt.sp),eq=Object.assign({},pt.eq||{}),it=(PIT(eq.bg||'bg0')||PIT('bg0')).sc;
+  const petName=pt.name||sp.n;
+  body=`<div class="bpscene" style="--sky1:${it.s1};--sky2:${it.s2};--grass1:${it.g1}">
+    ${petSvg({sp:pt.sp,color:pt.color,stage:stg,exp:'happy',eq,w:310,cls:'calm'})}
+  </div>
+  <div class="bpname" style="margin:8px 0 2px">
+    <b style="font-size:26px">${esc(petName)}</b>
+  </div>`;
+ }
+ o.innerHTML=`<div class="scrim" style="z-index:99" data-act="bpet_x">
+  <div class="panel bpanel" role="dialog" aria-label="حيوان ${esc(pf.name||'')}" onclick="event.stopPropagation()">
+    <div class="bp-sthead">
+      <div class="bp-stinfo">
+        ${av(pf,40)}
+        <div>
+          <b>${esc(pf.name||S.name||'طالب')}</b>
+          <small>${esc(GRADES[pf.grade]||'')}</small>
+        </div>
+      </div>
+      <button type="button" class="kx-mx" data-act="bpet_x" aria-label="إغلاق" style="position:static;width:34px;height:34px;font-size:20px">${ic('close')}</button>
+    </div>
+    ${body}
+    <div class="pfoot" style="margin-top:4px">
+      <button class="btn" style="min-height:46px;font-size:16px" data-act="bpet_x">إغلاق</button>
+    </div>
+  </div>
+ </div>`;
 }
 
 const PRN=['عادي','نادر','أسطوري'];
@@ -2575,9 +2628,42 @@ function normPhone(v){
   if(/^\d{10,15}$/.test(t)&&!/^0?1\d{9}$/.test(t))return t;
   return '';
 }
+const AV_OFFLINE_KEY='kalimo-offline-avatars';
+function avSaveOffline(id,photo){
+  if(!id||!photo)return;
+  try{
+    const st=JSON.parse(localStorage.getItem(AV_OFFLINE_KEY)||'{}');
+    if(st[id]!==photo){st[id]=photo;localStorage.setItem(AV_OFFLINE_KEY,JSON.stringify(st));}
+  }catch(e){}
+}
+function avGetOffline(id){
+  if(!id)return '';
+  try{
+    const st=JSON.parse(localStorage.getItem(AV_OFFLINE_KEY)||'{}');
+    return st[id]||'';
+  }catch(e){return '';}
+}
+function avCacheUrl(id,url){
+  if(!id||!url||!url.startsWith('http')||avGetOffline(id))return;
+  try{
+    const img=new Image();img.crossOrigin='anonymous';
+    img.onload=()=>{
+      try{
+        const c=document.createElement('canvas');c.width=c.height=128;
+        c.getContext('2d').drawImage(img,0,0,128,128);
+        avSaveOffline(id,c.toDataURL('image/jpeg',0.82));
+      }catch(e){}
+    };
+    img.src=url;
+  }catch(e){}
+}
 function av(p,sz){
+  const id=p&&(p.id||p.pid||p.uid);
+  let photo=(p&&p.photo)||(id?avGetOffline(id):'');
+  if(!photo&&p&&p.name&&S.profile&&S.profile.name===p.name)photo=S.profile.photo||'';
+  if(id&&photo&&!avGetOffline(id))avSaveOffline(id,photo);
   const ini=((p&&p.name)||S.name||'ص').trim().charAt(0).toUpperCase();
-  return `<div class="avatar" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.44)}px">${p&&p.photo?`<img src="${p.photo}" alt="">`:esc(ini)}</div>`;
+  return `<div class="avatar" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.44)}px">${photo?`<img src="${photo}" alt="">`:esc(ini)}</div>`;
 }
 function openReg(mode){
   const p=S.profile||{};
@@ -2695,18 +2781,6 @@ async function ensurePeer(){
   return !!window.Peer;
 }
 function openBC(code,fn){try{const b=new BroadcastChannel('kalimo-room-'+code);b.onmessage=e=>fn(e.data,'bc');return b;}catch(e){return null;}}
-const ROOMVOICE={stream:null,enabled:false,teacher:false,calls:new Map(),audios:new Map()};
-function voiceStopStream(){if(ROOMVOICE.stream){ROOMVOICE.stream.getTracks().forEach(t=>t.stop());ROOMVOICE.stream=null;}}
-function voiceAudio(stream,key){let a=ROOMVOICE.audios.get(key);if(!a){a=document.createElement('audio');a.autoplay=true;a.playsInline=true;a.style.display='none';document.body.appendChild(a);ROOMVOICE.audios.set(key,a);}a.srcObject=stream;a.play().catch(()=>{});}
-function voiceDrop(key){const a=ROOMVOICE.audios.get(key);if(a){a.srcObject=null;a.remove();ROOMVOICE.audios.delete(key);}}
-async function voiceGetMic(){if(ROOMVOICE.stream)return ROOMVOICE.stream;if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw Error('unsupported');ROOMVOICE.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});return ROOMVOICE.stream;}
-function voiceCloseCalls(){ROOMVOICE.calls.forEach(c=>{try{c.close();}catch(e){}});ROOMVOICE.calls.clear();ROOMVOICE.audios.forEach((a,k)=>voiceDrop(k));}
-async function hostVoiceStart(){if(!H)return;try{await voiceGetMic();ROOMVOICE.teacher=true;H.players.forEach(p=>hostVoiceCall(p));render(true);}catch(e){toast('اسمح للمتصفح باستخدام الميكروفون لتفعيل الدردشة الصوتية');}}
-function hostVoiceStop(){ROOMVOICE.teacher=false;voiceStopStream();ROOMVOICE.calls.forEach(c=>{try{c.close();}catch(e){}});ROOMVOICE.calls.clear();render(true);}
-function hostVoiceCall(p){if(!H||!ROOMVOICE.teacher||!p.peerId||p.voice===false||!H.peer)return;try{const c=H.peer.call(p.peerId,ROOMVOICE.stream);if(c){ROOMVOICE.calls.set(p.pid,c);c.on('close',()=>ROOMVOICE.calls.delete(p.pid));c.on('error',()=>ROOMVOICE.calls.delete(p.pid));}}catch(e){}}
-function hostSetVoice(pid,on){if(!H)return;const p=H.players.get(pid);if(!p)return;p.voice=!!on;hostSend(p,{t:'voice',enabled:p.voice});if(!p.voice){const c=ROOMVOICE.calls.get(pid);if(c)try{c.close();}catch(e){}ROOMVOICE.calls.delete(pid);}else if(ROOMVOICE.teacher)hostVoiceCall(p);render(true);}
-async function studentVoiceStart(){if(!CH||!CH.peer)return;try{await voiceGetMic();ROOMVOICE.enabled=true;const c=CH.peer.call('kalimo-'+CH.code,ROOMVOICE.stream);if(c){ROOMVOICE.calls.set('teacher',c);c.on('close',()=>ROOMVOICE.calls.delete('teacher'));}render(true);}catch(e){toast('اسمح للمتصفح باستخدام الميكروفون لتفعيل صوتك');}}
-function studentVoiceStop(){ROOMVOICE.enabled=false;voiceStopStream();const c=ROOMVOICE.calls.get('teacher');if(c)try{c.close();}catch(e){}ROOMVOICE.calls.delete('teacher');render(true);}
 const rankOf=a=>a.slice().sort((x,y)=>y.score-x.score||y.correct-x.correct||x.ms-y.ms);
 function newQuiz(){return {id:newId(),title:'',grade:'',t:15,qs:[]};}
 function blankQ(){return {q:'',o:['','','',''],c:0};}
@@ -2714,7 +2788,7 @@ function blankQ(){return {q:'',o:['','','',''],c:0};}
 /* ---- host (teacher) ---- */
 async function hostOpen(quiz){
   const code=String(100000+rand(900000));
-  H={code,quiz,players:new Map(),st:'lobby',i:-1,n:0,conns:new Set(),auto:true,online:false,perr:'',ans:0,voiceOn:false};
+  H={code,quiz,players:new Map(),st:'lobby',i:-1,n:0,conns:new Set(),auto:true,online:false,perr:'',ans:0};
   H.bc=openBC(code,hostRecv);
   ADM.v='live';render();
   if(await ensurePeer()){
@@ -2722,7 +2796,6 @@ async function hostOpen(quiz){
       const peer=new Peer('kalimo-'+code,PEERCFG());H.peer=peer;
       peer.on('open',()=>{if(H&&H.peer===peer){H.online=true;render(true);}});
       peer.on('connection',c=>{H&&H.conns.add(c);c.on('data',m=>hostRecv(m,c));c.on('close',()=>{H&&H.conns.delete(c);});});
-      peer.on('call',call=>{const p=H&&[...H.players.values()].find(x=>x.peerId===call.peer);if(!p||p.voice===false){try{call.close();}catch(e){}return;}try{call.answer();call.on('stream',s=>voiceAudio(s,p.pid));call.on('close',()=>voiceDrop(p.pid));}catch(e){}});
       peer.on('error',e=>{if(H&&H.peer===peer){H.perr=e.type||'error';render(true);}});
     }catch(e){H.perr='error';}
   }else H.perr='nolib';
@@ -2737,15 +2810,13 @@ function hostRecv(m,route){
     const pid=String(m.pid||'').slice(0,40),name=String(m.name||'').slice(0,30);if(!pid||!name)return;
     const old=H.players.get(pid);
     const pl=old||{pid,name,grade:m.grade,photo:typeof m.photo==='string'&&m.photo.length<40000?m.photo:'',score:0,correct:0,ms:0,ans:{}};
-    pl.route=route==='bc'?(pl.route&&pl.route!=='bc'?pl.route:'bc'):route;pl.peerId=route&&route.peer;
-    if(pl.voice===undefined)pl.voice=true;
+    pl.route=route==='bc'?(pl.route&&pl.route!=='bc'?pl.route:'bc'):route;
     if(!old){
       if(H.st!=='lobby'){hostSend(pl,{t:'deny',reason:'بدأ التحدي بالفعل. انتظر التحدي القادم.'});return;}
       if(H.quiz.grade!==''&&String(m.grade)!==String(H.quiz.grade)){hostSend(pl,{t:'deny',reason:'هذا التحدي مخصص لطلاب '+(GRADES[H.quiz.grade]||'')+'.'});return;}
       H.players.set(pid,pl);
     }
-    hostSend(pl,{t:'welcome',title:H.quiz.title,players:plist(),st:H.st,voice:pl.voice});
-    if(ROOMVOICE.teacher)hostVoiceCall(pl);
+    hostSend(pl,{t:'welcome',title:H.quiz.title,players:plist(),st:H.st});
     if(!old){hostCast({t:'lobby',players:plist()});render(true);}
   }else if(m.t==='a'){
     const pl=H.players.get(m.pid);if(!pl||H.st!=='q'||m.i!==H.i||pl.ans[H.i])return;
@@ -2785,7 +2856,7 @@ function hostEnd(){
   render();
 }
 function hostClose(){
-  if(H){clearTimeout(H.timer);clearTimeout(H.autoT);try{hostCast({t:'close'});}catch(e){}try{H.bc&&H.bc.close();}catch(e){}try{H.peer&&H.peer.destroy();}catch(e){}voiceCloseCalls();voiceStopStream();ROOMVOICE.teacher=false;H=null;}
+  if(H){clearTimeout(H.timer);clearTimeout(H.autoT);try{hostCast({t:'close'});}catch(e){}try{H.bc&&H.bc.close();}catch(e){}try{H.peer&&H.peer.destroy();}catch(e){}H=null;}
 }
 function csvOf(rows,total){
   const e=v=>'"'+String(v).replace(/"/g,'""')+'"';
@@ -2794,7 +2865,6 @@ function csvOf(rows,total){
 function downloadCSV(rows,total,name){
   try{const b=new Blob([csvOf(rows,total)],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=(name||'نتائج')+'.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},500);}catch(e){toast('تعذّر التنزيل');}
 }
-function voiceHostPanel(){if(!H)return '';const ps=[...H.players.values()];return `<div class="voicebox"><div class="voicehead"><span class="vicon">🎙️</span><div><b>الدردشة الصوتية</b><small>تحكم في ميكروفون كل طالب داخل الغرفة</small></div><span class="voicebadge ${ROOMVOICE.teacher?'':'off'}" style="margin-inline-start:auto">${ROOMVOICE.teacher?'مفعّلة':'متوقفة'}</span></div><div class="voiceactions"><button class="voicebtn ${ROOMVOICE.teacher?'off':'on'}" data-act="adm_voice">${ROOMVOICE.teacher?'إيقاف صوت المعلم':'تشغيل صوت المعلم'}</button></div><div class="vstudents">${ps.length?ps.map(p=>`<div class="vstudent">${av(p,34)}<span class="vname">${esc(p.name)}</span><span class="vstate">${p.voice===false?'موقوف':'مسموح'}</span><button class="voicebtn ${p.voice===false?'on':'off'}" data-act="adm_vstudent" data-pid="${esc(p.pid)}">${p.voice===false?'سماح':'إيقاف'}</button></div>`).join(''):'<small style="color:#c9c6ee">سيظهر الطلاب هنا بعد انضمامهم.</small>'}</div></div>`;}
 function genFromWords(txt){
   const pairs=txt.split(/\n+/).map(l=>l.split(/\s*(?:=|-|–|—|،|,|:)\s*/)).filter(a=>a.length>=2&&a[0].trim()&&a[1].trim()).map(a=>[a[0].trim(),a.slice(1).join(' ').trim()]);
   const qs=[];
@@ -2814,7 +2884,7 @@ function optsHost(q,reveal){
 }
 function vAdmin(){
   const A=ADM,ad=adminLoad();
-  const head=(t,sub,btn)=>`<div class="ph"><div><h2>${t}</h2><small>${sub||''}</small></div>${btn||''}</div>${H?voiceHostPanel():''}`;
+  const head=(t,sub,btn)=>`<div class="ph"><div><h2>${t}</h2><small>${sub||''}</small></div>${btn||''}</div>`;
   if(A.v==='share')return vShare();
   if(A.v==='kres')return vKres();
   if(A.v==='pin'){
@@ -2882,10 +2952,9 @@ function chRecv(m,src){
   if(m.to&&m.to!==S.profile.id)return;
   if(m.n){if(m.n<=(CH.lastN||0))return;CH.lastN=m.n;}
   switch(m.t){
-   case 'welcome':if(CH.st!=='connecting'&&CH.st!=='wait')break;CH.st='wait';CH.players=m.players||[];CH.title=m.title||'';CH.voiceAllowed=m.voice!==false;clearTimeout(CH.ct);render();if(CH.voiceAllowed)studentVoiceStart();break;
+   case 'welcome':if(CH.st!=='connecting'&&CH.st!=='wait')break;CH.st='wait';CH.players=m.players||[];CH.title=m.title||'';clearTimeout(CH.ct);render();break;
    case 'lobby':CH.players=m.players||[];if(CH.st==='wait')render(true);break;
    case 'deny':chCleanup();CH.err=m.reason||'تعذّر الانضمام';CH.st='join';render();break;
-   case 'voice':CH.voiceAllowed=m.enabled!==false;if(!CH.voiceAllowed)studentVoiceStop();else studentVoiceStart();render(true);break;
    case 'q':CH.st='q';CH.q=m;CH.pick=null;CH.t0=performance.now();CH.res=null;render();break;
    case 'r':if(CH.st!=='q')break;CH.st='r';CH.rm=m;CH.res=m.res[S.profile.id]||{ok:false,pts:0,ans:false,score:0,rank:0};render();sfx(CH.res.ok?'ok':'bad');break;
    case 'end':{if(CH.st==='end')break;CH.st='end';CH.board=m.board||[];CH.total=m.total;const me=CH.board.find(x=>x.pid===S.profile.id);CH.me=me;
@@ -2901,7 +2970,7 @@ function chSend(m){
 }
 function chCleanup(){
   clearTimeout(CH.ct);try{CH.bc&&CH.bc.close();}catch(e){}try{CH.peer&&CH.peer.destroy();}catch(e){}
-  voiceCloseCalls();voiceStopStream();ROOMVOICE.enabled=false;CH.bc=null;CH.peer=null;CH.conn=null;
+  CH.bc=null;CH.peer=null;CH.conn=null;
 }
 async function chJoin(){
   const code=(CH.code||'').replace(/\D/g,'');
@@ -2915,7 +2984,6 @@ async function chJoin(){
     try{
       const peer=new Peer(undefined,PEERCFG());CH.peer=peer;
       peer.on('open',()=>{const c=peer.connect('kalimo-'+code,{reliable:true});CH.conn=c;c.on('open',()=>{c.send(Object.assign({pid:S.profile.id},join));});c.on('data',m=>chRecv(m,'peer'));});
-      peer.on('call',call=>{try{call.answer();call.on('stream',s=>voiceAudio(s,'teacher'));call.on('close',()=>voiceDrop('teacher'));}catch(e){}});
       peer.on('error',()=>{});
     }catch(e){}
   }
@@ -2984,8 +3052,6 @@ function liveAct(a,d){
    case 'adm_next':hostNext();break;
    case 'adm_auto':if(H){H.auto=!H.auto;if(!H.auto)clearTimeout(H.autoT);else if(H.st==='r')H.autoT=setTimeout(hostNext,4000);render(true);}break;
    case 'adm_close':hostClose();ADM.v='home';render();break;
-   case 'adm_voice':if(ROOMVOICE.teacher)hostVoiceStop();else hostVoiceStart();break;
-   case 'adm_vstudent':hostSetVoice(String(d.pid||''),H&&H.players.get(String(d.pid||''))?.voice===false);break;
    case 'adm_csvnow':if(H)downloadCSV(H.board.map((p,k)=>({rank:k+1,name:p.name,grade:p.grade,score:p.score,correct:p.correct})),H.quiz.qs.length,H.quiz.title);break;
    case 'adm_csv':{const h=ad.history.find(x=>x.id===d.id);if(h)downloadCSV(h.board,h.total,h.title);break;}
    case 'adm_share':{ADM.sid=d.id;ADM.link=null;ADM.msg='';ADM.dur=ADM.dur||24;ADM.base=defBase();ADM.v='share';render();break;}
@@ -5096,6 +5162,8 @@ document.addEventListener('click',e=>{
    case 'speak':e.stopPropagation();speak(d.t);break;
    case 'bpet':bpetOpen(d.id);break;
    case 'bpet_x':document.getElementById('overlay').innerHTML='';break;
+    case 'bpet_care':document.getElementById('overlay').innerHTML='';TAB='train';PV='games';render();break;
+    case 'bpet_adopt':document.getElementById('overlay').innerHTML='';TAB='train';PV='main';petAct('p_change');render();break;
    case 'wadd':startAdd();break;
    case 'photo':PHOTOMODE=d.k==='s'?'s':'w';document.getElementById(d.m==='cam'?'fCam':'fGal').click();break;
    case 'memo':{const it=S.items.find(i=>i.id===d.id);if(it){it.m=it.m>=4?0:5;save();checkBadges();render(true);}break;}
@@ -5881,7 +5949,7 @@ function vTrain(){
     ${p.sp?`<div class="kt-pay"><b>مكافأة كل إجابة صحيحة</b><span class="chip2">${ICO.apple}+1</span><span class="chip2">${ICO.coin}+${2+st}</span><span class="chip2">${ICO.bolt}+1</span><span class="chip2">+10 خبرة</span></div>`:''}`:''}
     <button class="btn" data-act="game" data-k="train" ${sel.length?'':'disabled'}>ابدأ التدريب (${sel.length} ${sel.length===1?'تمرين':'تمارين'}) ${ic('arrow','fwd')}</button>
    </div>
-   ${kxMissions()}${kxInstallBanner()}
+   ${kxInstallBanner()}
    ${p.sp?`    <button class="btn ghost" data-act="p_change">تغيير الحيوان</button>`:''}</div>`;
 }
 function tabbar(){
@@ -5979,7 +6047,7 @@ function boardSec(){
    ${list.length?`<div class="podium">${order.map(u=>{if(!u)return '<div></div>';const r=list.indexOf(u);return `<div class="pcol ${u.me?'me':''}" data-act="bpet" data-id="${u.id}" role="button" tabindex="0"><div class="pav">${av(u.p,r===0?64:52)}${r===0?'<span class="crown"><svg viewBox="0 0 32 24"><path d="M3 20L1 6l8 6 7-10 7 10 8-6-2 14z" fill="#ffd45a" stroke="#e0a21e" stroke-width="2" stroke-linejoin="round"/></svg></span>':''}</div><b>${esc(u.p.name)}</b><small class="en">${sub(u)}</small><div class="pbase" style="height:${r===0?92:r===1?68:52}px;background:${medal[r]}"><span class="en">${r+1}</span></div></div>`;}).join('')}</div>`:''}
    <div class="blist">${list.slice(3).map((u,k)=>row(u,k+3)).join('')}${meI>=5?`<p class="help" style="text-align:center;margin:4px 0">ترتيبك الحالي</p>${row(CL?CL.meRow:all[meI],meI)}`:''}</div>
    ${CL?'':'<p class="help" style="text-align:center">اضغط على أي طالب لترى حيوانه وإكسسواراته.</p>'}</div>`;
-  return CL?html.replace(/ data-act="bpet" data-id="[^"]*" role="button" tabindex="0"/g,''):html;
+  return html;
 }
 
 /* ============ training + memorize live inside the games hub ============ */
@@ -6016,7 +6084,7 @@ function vTrain(){
   return `<div class="screen">${kxLevelHero()}${kxTrainPet(true)}
    <div class="kx-tb"><div class="kx-tbh"><span class="ki">${ic('spark')}</span><div style="flex:1;min-width:0"><b>التدريب والألعاب</b><small>حفظ الكلمات · ${sel.length} تمارين · ${WGAMES.length} ألعاب · ${ACTS.length} أنشطة</small></div></div>
      <div class="kx-tbb"><button class="btn" data-act="game" data-k="train" ${sel.length?'':'disabled'}>ابدأ التدريب</button><button class="btn ghost" data-act="p_games">مركز الألعاب</button></div></div>
-   ${kxMissions()}${kxInstallBanner()}${p.sp?'<button class="btn ghost" data-act="p_change">تغيير الحيوان</button>':''}</div>`;
+   ${kxInstallBanner()}${p.sp?'<button class="btn ghost" data-act="p_change">تغيير الحيوان</button>':''}</div>`;
 }
 document.addEventListener('click',e=>{
   const b=e.target.closest&&e.target.closest('[data-act="gx_memn"],[data-act="memtab"]');if(!b)return;
@@ -7067,8 +7135,20 @@ async function sbBoardLoad(){
     }
     if(SBL.key!==key||(sbSess()||{}).uid!==s.uid)return;
     SBL.list=list;SBL.me=me;SBL.rank=rank;SBL.err=false;SBL.message='';
-    const cachedList=list.map(u=>Object.assign({},u,{p:Object.assign({},u.p,{photo:''})}));
-    const cachedMe=me?Object.assign({},me,{p:Object.assign({},me.p,{photo:''})}):null;
+    list.forEach(u=>{
+      const ph=u.p&&u.p.photo;
+      if(ph){
+        if(ph.startsWith('data:'))avSaveOffline(u.id,ph);
+        else if(ph.startsWith('http'))avCacheUrl(u.id,ph);
+      }
+    });
+    const cachedList=list.map(u=>{
+      const ph=(u.p&&u.p.photo)||avGetOffline(u.id)||'';
+      return Object.assign({},u,{p:Object.assign({},u.p,{photo:ph})});
+    });
+    const cachedMe=me?Object.assign({},me,{
+      p:Object.assign({},me.p,{photo:(me.p&&me.p.photo)||avGetOffline(me.id)||(S.profile&&S.profile.photo)||''})
+    }):null;
     try{localStorage.setItem(key,JSON.stringify({list:cachedList,me:cachedMe,rank}));}catch(e){}
   }catch(e){if(SBL.key===key){SBL.err=true;SBL.message=sbMsg(e.message);}}
   finally{
@@ -7371,17 +7451,39 @@ document.addEventListener('keydown',e=>{
 /* ---- account card in "حسابي" + prompt on the leaderboard for accounts not yet linked ---- */
 function auAccountCard(){
   const s=sbSess(),pf=S.profile||{};
-  const head=`<div class="au-prof">${av(pf,56)}<div class="au-pn"><b>${esc(pf.name||S.name)}</b><small>${esc(GRADES[pf.grade]||'')}</small></div><button type="button" class="pill au-edit" data-act="rgedit" aria-label="تعديل الملف الشخصي">${ic('pencil')} تعديل</button></div><div class="au-sep"></div>`;
-  if(s)return `<div class="card au-acc ok">${head}<div class="au-ar"><span class="au-ai">${AUI.cloud}</span><div><b>حسابك متصل</b><small>${SBP.err?esc(SBP.err):'تقدمك محفوظ ويظهر اسمك في لوحة المتصدرين'}</small></div></div>
-    ${aucRow()}
-    <div class="pair"><button class="btn ghost" style="min-height:46px;font-size:16px" data-act="sb_sync">مزامنة الآن</button><button class="btn ghost" style="min-height:46px;font-size:16px" data-act="au_out">تسجيل الخروج</button></div></div>`;
-  return `<div class="card au-acc">${head}<div class="au-ar"><span class="au-ai">${AUI.trophy}</span><div><b>انضم إلى لوحة المتصدرين</b><small>اربط الملف بحساب لتحفظ تقدمك وتظهر بين المتصدرين</small></div></div>
-    <button class="btn" style="min-height:48px;font-size:16px" data-act="sb_open" data-m="up">إنشاء حساب / ربط الحساب</button>
-    <button class="tlink" data-act="sb_open" data-m="in">لدي حساب بالفعل، تسجيل الدخول</button></div>`;
+  const head=`<div class="au-prof"><button type="button" class="av-pet-btn" data-act="bpet" data-id="me" aria-label="عرض الحيوان الأليف">${av(pf,56)}</button><div class="au-pn"><b>${esc(pf.name||S.name)}</b><small>${esc(GRADES[pf.grade]||'')}</small></div><button type="button" class="pill au-edit" data-act="rgedit" aria-label="تعديل الملف الشخصي">${ic('pencil')} تعديل</button></div>`;
+  if(s)return `<div class="card au-acc ok">${head}
+    <details class="au-card-fold">
+      <summary class="au-card-summary">
+        <span class="au-sum-icon">${AUI.cloud}</span>
+        <span class="au-sum-title">حسابك متصل والفصل الدراسي</span>
+        <span class="au-sum-chev">⌄</span>
+      </summary>
+      <div class="au-fold-content">
+        <div class="au-ar"><span class="au-ai">${AUI.cloud}</span><div><b>حسابك متصل</b><small>${SBP.err?esc(SBP.err):'تقدمك محفوظ ويظهر اسمك في لوحة المتصدرين'}</small></div></div>
+        ${aucRow()}
+        <div class="pair"><button class="btn ghost" style="min-height:46px;font-size:16px" data-act="sb_sync">مزامنة الآن</button><button class="btn ghost" style="min-height:46px;font-size:16px" data-act="au_out">تسجيل الخروج</button></div>
+      </div>
+    </details>
+  </div>`;
+  return `<div class="card au-acc">${head}
+    <details class="au-card-fold">
+      <summary class="au-card-summary">
+        <span class="au-sum-icon">${AUI.trophy}</span>
+        <span class="au-sum-title">انضم إلى لوحة المتصدرين</span>
+        <span class="au-sum-chev">⌄</span>
+      </summary>
+      <div class="au-fold-content">
+        <div class="au-ar"><span class="au-ai">${AUI.trophy}</span><div><b>انضم إلى لوحة المتصدرين</b><small>اربط الملف بحساب لتحفظ تقدمك وتظهر بين المتصدرين</small></div></div>
+        <button class="btn" style="min-height:48px;font-size:16px" data-act="sb_open" data-m="up">إنشاء حساب / ربط الحساب</button>
+        <button class="tlink" data-act="sb_open" data-m="in">لدي حساب بالفعل، تسجيل الدخول</button>
+      </div>
+    </details>
+  </div>`;
 }
-{const _vm=vMe;vMe=function(){return _vm().replace(/<button class="kx-prof"[\s\S]*?<\/button>/,'');};}
+{const _vm=vMe;vMe=function(){return _vm().replace(/<button class="kx-prof"[\s\S]*?<\/button>/,auAccountCard());};}
 {const _b3=boardSec;boardSec=function(){
-  const h=_b3();return h+auAccountCard();
+  const h=_b3();return h+sqCard()+kxMissions();
   return h+`<div class="card au-acc"><div class="au-ar"><span class="au-ai">${AUI.trophy}</span><div><b>أنت لست ضمن لوحة المتصدرين بعد</b><small>أنشئ حسابًا أو سجّل الدخول لتظهر مع كل الطلاب.</small></div></div>
    <button class="btn" style="min-height:48px;font-size:16px" data-act="sb_open" data-m="up">انضم إلى المتصدرين</button></div>`;
 };}
@@ -7462,6 +7564,12 @@ async function tLoadStudents(){
     const r=await tApi('/rest/v1/profiles?select=id,name,grade,xp,streak,avatar,updated_at&role=eq.student&class_code=eq.'+encodeURIComponent(me.class_code)+'&order=xp.desc,name.asc&limit=500');
     if(!r.ok)throw await sbDbErr(r);
     TCH.list=await r.json();
+    (TCH.list||[]).forEach(u=>{
+      if(u.avatar){
+        if(u.avatar.startsWith('data:'))avSaveOffline(u.id,u.avatar);
+        else if(u.avatar.startsWith('http'))avCacheUrl(u.id,u.avatar);
+      }
+    });
     TCH.ph={};
     const u=await tApi('/rest/v1/user_data?select=user_id,profile:state->profile&limit=500');
     if(u.ok)(await u.json()).forEach(x=>{TCH.ph[x.user_id]=(x.profile&&x.profile.phone)||'';});
@@ -8137,7 +8245,7 @@ async function sqLoad(force){
     if(m.ok)(await m.json()).forEach(x=>{SQ.res[x.quiz_id]=x;});
   }catch(e){SQ.list=SQ.list||[];}
   SQ.at=Date.now();SQ.loading=false;
-  if(typeof TAB!=='undefined'&&TAB==='train'&&!G&&!QZ.on&&!TCH.on&&!REG.on)render(true);
+  if(typeof TAB!=='undefined'&&(TAB==='train'||TAB==='pet'||TAB==='board')&&!G&&!QZ.on&&!TCH.on&&!REG.on)render(true);
 }
 function sqCard(){
   if(!sbSess())return '';
@@ -8155,7 +8263,7 @@ function sqCard(){
   };
   return `<div class="card sq-card"><div class="sec-h" style="margin:0"><h3 style="margin:0;font-size:18px">اختبارات ومسابقات فصلك</h3><small>${L.length}</small></div>${L.map(row).join('')}</div>`;
 }
-{const _vt9=vTrain;vTrain=function(){return _vt9().replace('<div class="screen">','<div class="screen">'+sqCard());};}
+// sqCard moved to boardSec
 document.addEventListener('click',async e=>{
   const b=e.target.closest&&e.target.closest('[data-act="sq_go"],[data-act="sq_rank"]');if(!b)return;
   e.stopPropagation();e.preventDefault();
