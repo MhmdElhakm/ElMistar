@@ -7033,16 +7033,105 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         startRecognitionInstance();
       }
 
-      // The active implementation uses the local ONNX engine above. The
-      // This later declaration is the only implementation invoked by the
-      // Tasmee button and uses the local ONNX engine above.
-      function startTasmeeRecognition() {
-        if (!window.QuranTasmeeEngine) {
-          tasmeeStatus.textContent = 'تعذر تحميل محرك التسميع المحلي.';
-          return;
-        }
+      function startBrowserTasmeeRecognition(Recognition) {
         if (!tasmeeSession || tasmeeSession.completed) {
           if (!createTasmeeSession()) return;
+        }
+        var firstAyah = currentTasmeeAyah();
+        if (firstAyah) {
+          closeD();
+          navigateToVerse(firstAyah.id);
+        }
+        stopRecitation('تم إيقاف الاستماع لبدء التسميع');
+        tasmeeListening = true;
+        tasmeeInterimTokens = [];
+        applyTasmeeWordState(pageList);
+        syncTasmeeControls();
+
+        var recognition;
+        try {
+          recognition = new Recognition();
+          recognition.lang = 'ar-SA';
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.maxAlternatives = 1;
+        } catch (error) {
+          tasmeeStatus.textContent = 'تعذر تهيئة التعرف الصوتي.';
+          stopTasmeeRecognition();
+          return;
+        }
+        tasmeeRecognition = recognition;
+        tasmeeRecognitionStarted = false;
+        recognition.onstart = function () {
+          tasmeeRecognitionStarted = true;
+          tasmeeStatus.textContent = 'الميكروفون يعمل؛ ابدأ بتسميع الآيات غيبًا.';
+          syncTasmeeControls();
+        };
+        recognition.onresult = function (event) {
+          if (tasmeeRecognition !== recognition) return;
+          var finalText = '', interimText = '';
+          for (var i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) finalText += ' ' + event.results[i][0].transcript;
+            else interimText += ' ' + event.results[i][0].transcript;
+          }
+          var interimTokens = tokenizeTasmeeTranscript(interimText);
+          var common = 0;
+          while (common < tasmeeInterimTokens.length && common < interimTokens.length &&
+                 tasmeeInterimTokens[common] === interimTokens[common]) common++;
+          if (interimTokens.length > common) {
+            processTasmeeTranscript(interimTokens.slice(common).join(' '), false);
+          }
+          tasmeeInterimTokens = interimTokens;
+          if (finalText.trim()) {
+            var finalTokens = tokenizeTasmeeTranscript(finalText), finalCommon = 0;
+            while (finalCommon < tasmeeInterimTokens.length && finalCommon < finalTokens.length &&
+                   tasmeeInterimTokens[finalCommon] === finalTokens[finalCommon]) finalCommon++;
+            if (finalTokens.length > finalCommon) {
+              processTasmeeTranscript(finalTokens.slice(finalCommon).join(' '), true);
+            }
+            tasmeeInterimTokens = [];
+          }
+        };
+        recognition.onerror = function (event) {
+          if (tasmeeRecognition !== recognition) return;
+          if (event.error === 'no-speech' || event.error === 'aborted') return;
+          if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+            tasmeeStatus.textContent = 'لم يُسمح بالمايك؛ فعّل إذن الميكروفون من إعدادات التطبيق ثم حاول مجددًا.';
+            stopTasmeeRecognition();
+            return;
+          }
+          tasmeeStatus.textContent = 'تعذر التعرف مؤقتًا؛ جارٍ إعادة المحاولة…';
+        };
+        recognition.onend = function () {
+          if (tasmeeRecognition !== recognition) return;
+          tasmeeRecognitionStarted = false;
+          tasmeeRecognition = null;
+          if (!tasmeeListening) return;
+          clearTimeout(tasmeeRestartTimer);
+          tasmeeRestartTimer = setTimeout(function () {
+            if (tasmeeListening) startBrowserTasmeeRecognition(Recognition);
+          }, 250);
+        };
+        try {
+          recognition.start();
+        } catch (error) {
+          tasmeeStatus.textContent = 'تعذر تشغيل الميكروفون؛ حاول مرة أخرى.';
+          stopTasmeeRecognition();
+        }
+      }
+
+      function startTasmeeRecognition() {
+        if (!tasmeeSession || tasmeeSession.completed) {
+          if (!createTasmeeSession()) return;
+        }
+        var BrowserRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (BrowserRecognition) {
+          startBrowserTasmeeRecognition(BrowserRecognition);
+          return;
+        }
+        if (!window.QuranTasmeeEngine) {
+          tasmeeStatus.textContent = 'هذا الجهاز لا يدعم التعرف الصوتي. استخدم Chrome أو حدّث Android System WebView.';
+          return;
         }
         var firstAyah = currentTasmeeAyah();
         if (firstAyah) {
