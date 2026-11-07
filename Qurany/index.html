@@ -6600,6 +6600,9 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         s = s.replace(/ؤ/g, 'و');
         s = s.replace(/ئ/g, 'ي');
         s = s.replace(/[^\u0621-\u064A]/g, '');
+        // Common external-recognizer spellings in Quranic recitation.
+        s = s.replace(/^علا$/, 'علي');
+        s = s.replace(/^اولايك$/, 'اوليك');
         return s;
       }
 
@@ -7043,6 +7046,34 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         startRecognitionInstance();
       }
 
+      function selectTasmeeSpeechAlternative(result) {
+        if (!result || !result.length) return '';
+        var state = currentTasmeeAyah();
+        var expectedIndex = state ? state.wordIndex : 0;
+        var bestText = result[0].transcript || '';
+        var bestScore = -1;
+        for (var alternativeIndex = 0; alternativeIndex < result.length; alternativeIndex++) {
+          var candidate = result[alternativeIndex].transcript || '';
+          var candidateTokens = tokenizeTasmeeTranscript(candidate);
+          var score = 0;
+          if (state) {
+            for (var tokenIndex = 0; tokenIndex < candidateTokens.length && tokenIndex < 4; tokenIndex++) {
+              var expectedWord = state.words[expectedIndex + tokenIndex];
+              if (expectedWord && tasmeeWordMatches(candidateTokens[tokenIndex], expectedWord)) score += 3;
+              else if (expectedWord) score -= 1;
+            }
+          }
+          // Prefer a fuller alternative when the matching score is equal;
+          // this helps retain quickly recited words.
+          score += Math.min(candidateTokens.length, 4) * 0.05;
+          if (score > bestScore) {
+            bestScore = score;
+            bestText = candidate;
+          }
+        }
+        return bestText;
+      }
+
       function startBrowserTasmeeRecognition(Recognition) {
         if (!tasmeeSession || tasmeeSession.completed) {
           if (!createTasmeeSession()) return;
@@ -7064,7 +7095,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           recognition.lang = 'ar-SA';
           recognition.continuous = true;
           recognition.interimResults = true;
-          recognition.maxAlternatives = 1;
+          recognition.maxAlternatives = 3;
         } catch (error) {
           tasmeeStatus.textContent = 'تعذر تهيئة التعرف الصوتي.';
           stopTasmeeRecognition();
@@ -7081,8 +7112,9 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           if (tasmeeRecognition !== recognition) return;
           var finalText = '', interimText = '';
           for (var i = event.resultIndex; i < event.results.length; i++) {
-            if (event.results[i].isFinal) finalText += ' ' + event.results[i][0].transcript;
-            else interimText += ' ' + event.results[i][0].transcript;
+            var recognizedText = selectTasmeeSpeechAlternative(event.results[i]);
+            if (event.results[i].isFinal) finalText += ' ' + recognizedText;
+            else interimText += ' ' + recognizedText;
           }
           var interimTokens = tokenizeTasmeeTranscript(interimText);
           var common = 0;
@@ -7115,12 +7147,19 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         recognition.onend = function () {
           if (tasmeeRecognition !== recognition) return;
           tasmeeRecognitionStarted = false;
-          tasmeeRecognition = null;
           if (!tasmeeListening) return;
           clearTimeout(tasmeeRestartTimer);
           tasmeeRestartTimer = setTimeout(function () {
-            if (tasmeeListening) startBrowserTasmeeRecognition(Recognition);
-          }, 250);
+            if (!tasmeeListening || tasmeeRecognition !== recognition) return;
+            try {
+              // Reuse the same recognition object. Creating a new object on
+              // every service timeout causes repeated microphone beeps.
+              recognition.start();
+            } catch (error) {
+              tasmeeRecognition = null;
+              startBrowserTasmeeRecognition(Recognition);
+            }
+          }, 700);
         };
         try {
           recognition.start();
