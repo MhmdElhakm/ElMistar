@@ -4,6 +4,7 @@
     const host = document.getElementById('tasksApp');
     if (!host) return;
     const root = host.attachShadow({ mode: 'open' });
+    const backupHost = document.getElementById('settingsBackupHost');
     const storageKey = 'quran_tasks_v1';
     const taskCompletionSound = new Audio('./note.mp3');
     taskCompletionSound.preload = 'auto';
@@ -100,6 +101,14 @@
     const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     })[ch]);
+    const whatsappNumber = value => String(value || '')
+      .replace(/[٠-٩]/g, digit => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit))
+      .replace(/[^0-9]/g, '')
+      .replace(/^00/, '');
+    const whatsappHref = value => {
+      const number = whatsappNumber(value);
+      return number.length >= 7 ? `https://wa.me/${number}?text=${encodeURIComponent('السلام عليكم، أتواصل معك من تطبيق Huda')}` : '';
+    };
     const localDate = date => {
       const d = date || new Date();
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -160,10 +169,8 @@
       profile: (function (value, tasks) {
         return {
           name: typeof (value && value.name) === 'string' ? value.name.slice(0, 80) : '',
-          age: Number.isInteger(Number(value && value.age)) && Number(value.age) >= 1 && Number(value.age) <= 120
-            ? Number(value.age)
-            : '',
           phone: typeof (value && value.phone) === 'string' ? value.phone.slice(0, 24) : '',
+          phoneVisibility: value && value.phoneVisibility === 'public' ? 'public' : 'private',
           avatar: typeof (value && value.avatar) === 'string' && value.avatar.indexOf('data:image/') === 0
             ? value.avatar
             : '',
@@ -187,6 +194,9 @@
           defaultTasksVersion: state.defaultTasksVersion,
           taskDraft: state.taskDraft, formOpen: state.formOpen
         }));
+        if (window.HudaCloud && window.HudaCloud.queueSync) {
+          window.HudaCloud.queueSync({ profile: state.profile, tasks: state.tasks });
+        }
         storageError = '';
         return true;
       } catch (error) {
@@ -196,7 +206,8 @@
         return false;
       }
     }
-    const backupFormat = 'qurany-app-backup';
+    const backupFormat = 'huda-app-backup';
+    const legacyBackupFormat = 'qurany-app-backup';
     const backupLimit = 20 * 1024 * 1024;
     function isAppStorageKey(key) {
       return key === 'quran_tasks_v1' || key === 'baytna_v2' ||
@@ -220,7 +231,7 @@
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'Qurany-backup-' + localDate() + '.json';
+        link.download = 'Huda-backup-' + localDate() + '.json';
         link.hidden = true;
         document.body.appendChild(link);
         link.click();
@@ -229,7 +240,7 @@
         storageError = '';
         render();
       } catch (error) {
-        console.error('تعذر إنشاء نسخة Qurany الاحتياطية.', error);
+        console.error('تعذر إنشاء نسخة Huda الاحتياطية.', error);
         storageError = 'تعذر إنشاء النسخة الاحتياطية. تحقق من مساحة التخزين ثم أعد المحاولة.';
         render();
       }
@@ -246,13 +257,13 @@
         backup = JSON.parse(await file.text());
       } catch (error) {
         console.error('تعذر قراءة ملف النسخة الاحتياطية.', error);
-        storageError = 'تعذر قراءة الملف. اختر نسخة Qurany الاحتياطية بصيغة JSON.';
+        storageError = 'تعذر قراءة الملف. اختر نسخة Huda الاحتياطية بصيغة JSON.';
         render();
         return;
       }
-      if (!backup || backup.format !== backupFormat || backup.version !== 1 ||
+      if (!backup || (backup.format !== backupFormat && backup.format !== legacyBackupFormat) || backup.version !== 1 ||
           !backup.data || typeof backup.data !== 'object' || Array.isArray(backup.data)) {
-        storageError = 'الملف المحدد ليس نسخة احتياطية صالحة من Qurany.';
+        storageError = 'الملف المحدد ليس نسخة احتياطية صالحة من Huda.';
         render();
         return;
       }
@@ -263,7 +274,7 @@
         render();
         return;
       }
-      if (!window.confirm('سيتم استبدال بيانات Qurany على هذا الجهاز بمحتويات النسخة الاحتياطية. هل تريد المتابعة؟')) return;
+        if (!window.confirm('سيتم استبدال بيانات Huda على هذا الجهاز بمحتويات النسخة الاحتياطية. هل تريد المتابعة؟')) return;
 
       const previous = {};
       try {
@@ -275,7 +286,7 @@
         entries.forEach(([key, value]) => localStorage.setItem(key, value));
         window.location.reload();
       } catch (error) {
-        console.error('تعذر استعادة نسخة Qurany الاحتياطية.', error);
+        console.error('تعذر استعادة نسخة Huda الاحتياطية.', error);
         try {
           for (let index = localStorage.length - 1; index >= 0; index--) {
             const key = localStorage.key(index);
@@ -577,17 +588,11 @@
     }
     async function saveProfile(form) {
       const name = form.elements.profileName.value.trim();
-      const ageValue = form.elements.profileAge.value.trim();
       const phone = form.elements.profilePhone.value.trim();
-      const age = ageValue ? Number(ageValue) : '';
+      const phoneVisibility = form.elements.profilePhoneVisibility.value === 'public' ? 'public' : 'private';
       const avatarFile = form.elements.profileAvatar.files[0];
       if (name.length > 80) {
         storageError = 'يجب ألا يتجاوز الاسم ٨٠ حرفًا.';
-        render();
-        return;
-      }
-      if (ageValue && (!Number.isInteger(age) || age < 1 || age > 120)) {
-        storageError = 'أدخل عمرًا صحيحًا بين سنة و١٢٠ سنة.';
         render();
         return;
       }
@@ -613,8 +618,8 @@
         }
       }
       state.profile.name = name;
-      state.profile.age = age;
       state.profile.phone = phone;
+      state.profile.phoneVisibility = phoneVisibility;
       state.profile.avatar = avatar;
       storageError = '';
       if (save()) {
@@ -692,12 +697,28 @@
           </section>`
         : '';
       const leaderboardEntries = defaultLeaderboard.concat(
+        window.HudaCloud && Array.isArray(window.HudaCloud.leaderboard) ? window.HudaCloud.leaderboard : [],
         state.profile.name || state.profile.totalPoints
           ? [{ name: state.profile.name || 'ملفك الشخصي', points: state.profile.totalPoints, avatar: state.profile.avatar || './logo.png', isYou: true }]
           : []
       ).sort((a, b) => b.points - a.points);
+      const leaderboardPerson = (entry, rank, className = '') => entry ? `<article class="leaderboard-person ${className}">
+        <div class="leaderboard-person-avatar-wrap"><span class="leaderboard-medal" aria-hidden="true">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}</span><img src="${entry.avatar || './logo.png'}" alt=""></div>
+        <strong>${esc(entry.name)}${entry.isYou ? ' (أنت)' : ''}</strong>
+        <b>${entry.points} <small>نقطة</small></b>
+      </article>` : '';
+      const leaderboardTop = leaderboardEntries.slice(0, 3);
+      const leaderboardRest = leaderboardEntries.slice(3);
+      const cloudUser = window.HudaCloud && window.HudaCloud.getUser ? window.HudaCloud.getUser() : null;
+      const cloudAccount = `<section class="cloud-account" aria-label="حساب المزامنة">
+        <div><strong>${cloudUser && !cloudUser.isAnonymous ? 'حساب Google متصل' : 'مزامنة بياناتك'}</strong><small>${cloudUser && !cloudUser.isAnonymous ? esc(cloudUser.email || 'يمكنك استعادة بياناتك من أي جهاز') : 'استخدم Google لاستعادة بياناتك من أي جهاز، أو تابع مجهولًا على هذا الجهاز'}</small></div>
+        <div class="cloud-account-actions">${cloudUser && !cloudUser.isAnonymous
+          ? '<button type="button" class="secondary" data-action="cloud-sign-out">تسجيل الخروج</button>'
+          : '<button type="button" class="primary" data-action="cloud-google-sign-in">الدخول بحساب Google</button><button type="button" class="secondary" data-action="cloud-anonymous">متابعة مجهولًا</button>'}</div>
+      </section>`;
       const profileView = `
         <section class="profile-page" aria-label="الملف الشخصي والنقاط">
+          ${cloudAccount}
           <div class="profile-score">
             <span class="profile-score-icon" aria-hidden="true">⭐</span>
             <div class="profile-score-copy"><strong>رصيد نقاطك</strong><small>استمر في إنجاز مهامك اليومية</small></div>
@@ -714,10 +735,13 @@
               </div>
             </div>
             <label class="profile-field">الاسم<input type="text" name="profileName" maxlength="80" autocomplete="name" value="${esc(state.profile.name)}" placeholder="الاسم الذي تفضّله"></label>
-            <div class="profile-fields-row">
-              <label class="profile-field">العمر <span class="profile-field-optional">اختياري</span><input type="number" name="profileAge" min="1" max="120" inputmode="numeric" value="${esc(state.profile.age)}" placeholder="مثال: ٢٥"></label>
-              <label class="profile-field">رقم الهاتف <span class="profile-field-optional">اختياري</span><input type="tel" name="profilePhone" maxlength="24" autocomplete="tel" value="${esc(state.profile.phone)}" placeholder="أدخل رقم هاتفك"></label>
-            </div>
+            <label class="profile-field">رقم الهاتف <span class="profile-field-optional">اختياري</span><input type="tel" name="profilePhone" maxlength="24" autocomplete="tel" value="${esc(state.profile.phone)}" placeholder="أدخل الرقم بالصيغة الدولية"></label>
+            <label class="profile-field">ظهور رقم الهاتف
+              <select name="profilePhoneVisibility">
+                <option value="private" ${state.profile.phoneVisibility !== 'public' ? 'selected' : ''}>أنا فقط</option>
+                <option value="public" ${state.profile.phoneVisibility === 'public' ? 'selected' : ''}>للعامة مع التواصل عبر واتساب</option>
+              </select>
+            </label>
             <button type="submit" class="primary profile-save"><span aria-hidden="true">✓</span> حفظ الملف على هذا الجهاز</button>
             <p class="profile-privacy"><span aria-hidden="true">🔒</span> بياناتك ونقاطك محفوظة على هذا الجهاز فقط، ولا تُرسل لأي جهة.</p>
           </form>` : `
@@ -725,8 +749,9 @@
               <img class="profile-avatar" src="${state.profile.avatar || './logo.png'}" alt="الصورة الشخصية">
               <div class="profile-summary-copy">
                 <small class="profile-summary-label">ملفك الشخصي</small>
-                <strong>${esc(state.profile.name || 'أضف اسمك إلى ملفك الشخصي')}</strong>
-                ${state.profile.age ? `<small>العمر · ${state.profile.age} سنة</small>` : '<small>أكمل بياناتك لتخصيص ملفك</small>'}
+                <strong>${esc(state.profile.name || 'أضف اسمك')}</strong>
+                ${state.profile.phone ? `<small>${state.profile.phoneVisibility === 'public' ? `رقم الهاتف: ${esc(state.profile.phone)}` : 'رقم الهاتف خاص بك فقط'}</small>` : '<small>أكمل بياناتك لتخصيص ملفك</small>'}
+                ${state.profile.phone && state.profile.phoneVisibility === 'public' && whatsappHref(state.profile.phone) ? `<a class="profile-whatsapp" href="${whatsappHref(state.profile.phone)}" target="_blank" rel="noopener">💬 التواصل عبر واتساب</a>` : ''}
               </div>
               <div class="profile-summary-actions">
                 <button type="button" class="primary" data-action="edit-profile">تعديل الملف</button>
@@ -736,12 +761,17 @@
           `}
           <section class="leaderboard-card" aria-label="لوحة المتصدرين">
             <div class="leaderboard-heading"><span aria-hidden="true">🏆</span><div><strong>لوحة المتصدرين</strong><small>نماذج افتراضية تحفيزية</small></div></div>
-            ${leaderboardEntries.map((entry, index) => `<div class="leaderboard-entry">
-              <span class="leaderboard-rank">${String(index + 1).replace(/\d/g, digit => '٠١٢٣٤٥٦٧٨٩'[digit])}</span>
+            <div class="leaderboard-podium" aria-label="المراكز الثلاثة الأولى">
+              ${leaderboardPerson(leaderboardTop[1], 2, 'is-second')}
+              ${leaderboardPerson(leaderboardTop[0], 1, 'is-first')}
+              ${leaderboardPerson(leaderboardTop[2], 3, 'is-third')}
+            </div>
+            ${leaderboardRest.length ? `<div class="leaderboard-rest" aria-label="بقية المتصدرين">${leaderboardRest.map((entry, index) => `<div class="leaderboard-entry">
+              <span class="leaderboard-rank">${String(index + 4).replace(/\d/g, digit => '٠١٢٣٤٥٦٧٨٩'[digit])}</span>
               <img src="${entry.avatar || './logo.png'}" alt="">
               <strong>${esc(entry.name)}${entry.isYou ? ' (أنت)' : ''}</strong>
               <b>${entry.points} نقطة</b>
-            </div>`).join('')}
+            </div>`).join('')}</div>` : ''}
             <p class="profile-privacy">الأسماء والنقاط الافتراضية للعرض فقط، ويُضاف رصيدك المحفوظ على هذا الجهاز إلى القائمة.</p>
           </section>
           <section class="profile-backup" aria-label="حفظ واستعادة بيانات التطبيق">
@@ -751,7 +781,7 @@
               <button type="button" class="primary" data-action="export-app-data">حفظ نسخة على الجهاز</button>
               <label class="profile-import-button">استعادة نسخة<input type="file" accept=".json,application/json" data-app-backup-file></label>
             </div>
-            <small class="profile-backup-note">سيُنزّل ملف باسم Qurany إلى مجلد التنزيلات. الاستعادة تستبدل بيانات التطبيق الحالية.</small>
+                <small class="profile-backup-note">سيُنزّل ملف باسم Huda إلى مجلد التنزيلات. الاستعادة تستبدل بيانات التطبيق الحالية.</small>
           </section>
           ${storageError ? `<div class="error" role="alert">${esc(storageError)}</div>` : ''}
         </section>`;
@@ -803,7 +833,6 @@
           .task-category,.task-points{display:inline-flex;align-items:center;gap:3px;padding:1px 5px;border-radius:6px;font-size:10px;font-weight:800;line-height:1.4;white-space:nowrap}
           .task-category{color:var(--green);background:color-mix(in srgb,var(--green) 9%,var(--panel))}
           .task-points{color:var(--sub);background:color-mix(in srgb,var(--sub) 12%,var(--panel))}
-          .prayer-schedule-note{margin:-3px 0 0;padding:8px 9px;border:1px solid color-mix(in srgb,var(--green) 18%,var(--line));border-radius:10px;background:color-mix(in srgb,var(--green) 6%,var(--panel));color:var(--muted);font-size:10px;line-height:1.55}
           .task-streak{color:var(--muted);font-size:10px}
           .is-done .item-copy strong{text-decoration:line-through}.check-button{width:23px;height:23px;flex:none;border:1.5px solid var(--green);border-radius:50%;background:transparent;color:var(--green);font-weight:900;padding:0}
           .is-done .check-button{background:var(--green);color:var(--on-green)}.delete-button{width:23px;height:23px;flex:none;border:0;border-radius:7px;background:transparent;color:var(--muted);font-size:18px}
@@ -811,6 +840,8 @@
           .empty{padding:18px 8px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--line);border-radius:12px}
           .error{padding:9px;border-radius:9px;background:color-mix(in srgb,var(--red) 12%,var(--panel));color:var(--red);font-size:11px}
           .profile-page{display:grid;gap:12px;padding:2px 0 8px}
+          .cloud-account{display:grid;gap:10px;padding:12px 13px;border:1px solid color-mix(in srgb,var(--green) 22%,var(--line));border-radius:15px;background:linear-gradient(120deg,color-mix(in srgb,var(--green) 7%,var(--card)),var(--card))}
+          .cloud-account>div:first-child{display:grid;gap:3px}.cloud-account strong{font-size:12px}.cloud-account small{color:var(--muted);font-size:10px;line-height:1.5}.cloud-account-actions{display:flex;gap:7px;flex-wrap:wrap}.cloud-account-actions button{min-height:35px;padding:7px 10px;border-radius:9px;font:inherit;font-size:10px;font-weight:900}
           .profile-score,.profile-form,.leaderboard-card{border:1px solid var(--line);border-radius:17px;background:var(--card);box-shadow:0 6px 20px rgba(40,34,26,.045)}
           .profile-score{display:flex;align-items:center;gap:11px;padding:14px;background:linear-gradient(125deg,color-mix(in srgb,var(--green) 8%,var(--card)),var(--card) 72%)}
           .profile-score-icon{display:grid;place-items:center;width:40px;height:40px;flex:none;border-radius:13px;background:color-mix(in srgb,var(--sub) 14%,var(--panel));font-size:19px}
@@ -827,6 +858,7 @@
           .profile-summary{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid color-mix(in srgb,var(--green) 19%,var(--line));border-radius:16px;background:linear-gradient(120deg,color-mix(in srgb,var(--green) 6%,var(--card)),var(--card) 68%);box-shadow:0 5px 16px rgba(40,34,26,.04)}
           .profile-summary-copy{display:grid;gap:4px;min-width:0;flex:1}.profile-summary-copy strong{overflow-wrap:anywhere;font-size:13px}
           .profile-summary-copy small{color:var(--muted);font-size:10px}.profile-summary-copy .profile-summary-label{color:var(--green);font-size:9px;font-weight:900}
+          .profile-whatsapp{display:inline-flex;align-items:center;justify-content:center;width:max-content;padding:4px 7px;border-radius:7px;background:color-mix(in srgb,var(--green) 10%,var(--panel));color:var(--green);font-size:10px;font-weight:900;text-decoration:none}
           .profile-summary-actions{display:grid;gap:6px}.profile-summary-actions button{padding:8px 10px;font:inherit;font-size:10px;font-weight:800;white-space:nowrap}
           .profile-avatar{width:70px;height:70px;flex:none;border:3px solid var(--card);border-radius:50%;object-fit:cover;background:var(--panel);box-shadow:0 0 0 2px color-mix(in srgb,var(--green) 33%,var(--line))}
           .profile-photo-button,.profile-clear-photo{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 11px;border:1px solid color-mix(in srgb,var(--green) 28%,var(--line));border-radius:9px;background:color-mix(in srgb,var(--green) 7%,var(--panel));color:var(--green);font:inherit;font-size:10px;font-weight:900;cursor:pointer}
@@ -835,16 +867,29 @@
           .profile-clear-photo{border-color:var(--line);background:var(--panel);color:var(--muted)}
           .profile-fields-row{display:grid;grid-template-columns:minmax(0,.6fr) minmax(0,1.4fr);gap:10px}
           .profile-field{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;color:var(--ink);font-size:11px;font-weight:900}
-          .profile-field input{grid-column:1/-1;min-height:43px;padding:10px 12px;border-radius:11px;background:var(--panel);font:inherit;font-size:12px;font-weight:700}
+          .profile-field input,.profile-field select{grid-column:1/-1;min-height:43px;padding:10px 12px;border-radius:11px;background:var(--panel);font:inherit;font-size:12px;font-weight:700}
           .profile-field input::placeholder{color:var(--muted);font-weight:500;opacity:.8}
           .profile-field-optional{color:var(--muted);font-size:9px;font-weight:600}
           .profile-save{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:47px;border-radius:12px;font:inherit;font-size:13px;font-weight:900;box-shadow:0 5px 13px color-mix(in srgb,var(--green) 18%,transparent);transition:filter .15s,transform .15s}
           .profile-save:hover{filter:brightness(1.05);transform:translateY(-1px)}.profile-save>span{font-size:16px}
           .profile-privacy{display:flex;align-items:flex-start;gap:6px;margin:0;color:var(--muted);font-size:10px;line-height:1.6}.profile-privacy>span{flex:none}
-          .leaderboard-card{display:grid;gap:11px;padding:14px}
+          .leaderboard-card{display:grid;gap:12px;padding:14px}
           .leaderboard-heading{display:flex;align-items:center;gap:10px}.leaderboard-heading>span{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:color-mix(in srgb,var(--sub) 12%,var(--panel));font-size:20px}
           .leaderboard-heading strong,.leaderboard-heading small{display:block}.leaderboard-heading strong{font-size:13px}.leaderboard-heading small{margin-top:2px;color:var(--muted);font-size:10px}
-          .leaderboard-entry{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid color-mix(in srgb,var(--sub) 23%,var(--line));border-radius:12px;background:linear-gradient(100deg,color-mix(in srgb,var(--sub) 7%,var(--panel)),var(--panel))}
+          .leaderboard-podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:6px;padding:10px 0 0}
+          .leaderboard-person{display:flex;min-width:0;flex-direction:column;align-items:center;gap:4px;text-align:center}
+          .leaderboard-person-avatar-wrap{position:relative;display:grid;place-items:center}
+          .leaderboard-person img{width:54px;height:54px;border:3px solid var(--card);border-radius:50%;object-fit:cover;background:var(--panel);box-shadow:0 0 0 2px color-mix(in srgb,var(--green) 35%,var(--line))}
+          .leaderboard-medal{position:absolute;z-index:1;top:-13px;font-size:20px;line-height:1}
+          .leaderboard-person strong{width:100%;min-height:30px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
+          .leaderboard-person b{display:block;width:100%;padding:7px 3px 5px;border-radius:12px 12px 0 0;color:var(--ink);font-size:11px}
+          .leaderboard-person b small{font-size:8px;font-weight:700}
+          .leaderboard-person.is-first{order:2}.leaderboard-person.is-second{order:1}.leaderboard-person.is-third{order:3}
+          .leaderboard-person.is-first b{min-height:82px;padding-top:29px;background:color-mix(in srgb,var(--green) 64%,var(--card));font-size:20px;color:var(--on-green)}
+          .leaderboard-person.is-second b{min-height:61px;padding-top:18px;background:color-mix(in srgb,var(--sub) 25%,var(--card));font-size:16px}
+          .leaderboard-person.is-third b{min-height:47px;padding-top:11px;background:color-mix(in srgb,var(--green) 24%,var(--card));font-size:14px}
+          .leaderboard-rest{display:grid;gap:7px;padding-top:3px}
+          .leaderboard-entry{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid color-mix(in srgb,var(--sub) 23%,var(--line));border-radius:12px;background:linear-gradient(100deg,color-mix(in srgb,var(--sub) 7%,var(--panel)),var(--panel))}
           .leaderboard-rank{display:grid;place-items:center;width:25px;height:25px;flex:none;border-radius:8px;background:color-mix(in srgb,var(--sub) 14%,var(--card));color:var(--sub);font-size:12px;font-weight:900}
           .leaderboard-entry img{width:36px;height:36px;border:2px solid var(--card);border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px var(--line)}
           .leaderboard-entry strong{min-width:0;flex:1;overflow-wrap:anywhere;font-size:11px}.leaderboard-entry b{color:var(--green);font-size:10px;white-space:nowrap}
@@ -868,13 +913,6 @@
           </div>
           ${state.view === 'profile' ? profileView : `
             <div class="stats"><div class="stat"><b>${pendingTasks.length}</b><span>متبقية اليوم</span></div><div class="stat"><b>${completedTasks.length}</b><span>مكتملة اليوم</span></div><div class="stat"><b>${earnedPoints} / ${availablePoints}</b><span>النقاط المحققة</span></div></div>
-          <p class="prayer-schedule-note" role="status">${prayerSchedule.fresh && activePrayer
-            ? `تُعرض الآن مهام صلاة ${esc(activePrayer)} حسب مواقيت اليوم.`
-            : prayerSchedule.error
-              ? 'تعذرت قراءة مواقيت الصلاة؛ تظهر كل المهام مجمّعة حسب الصلاة حتى تحديث الجدول.'
-              : prayerSchedule.fresh
-                ? 'لم تتوفر مواقيت صحيحة لتحديد الصلاة الحالية؛ تظهر كل المهام مجمّعة حسب الصلاة.'
-                : 'تظهر كل المهام مجمّعة حسب الصلاة حتى تحديث مواقيت اليوم من قسم الرئيسية.'}</p>
           <div class="section-head"><h4>مهام اليوم · ${scheduledTasks.length} مهمة</h4><button type="button" class="add-toggle" data-action="toggle-form">＋ مهمة جديدة</button></div>
           ${state.formOpen ? form : ''}
             ${scheduledTasks.length
@@ -885,6 +923,8 @@
           ${storageError ? `<div class="error" role="alert">${esc(storageError)}</div>` : ''}
           `}
         </main>`;
+      const backupCard = root.querySelector('.profile-backup');
+      if (backupCard && backupHost) backupHost.replaceChildren(backupCard);
     }
     function captureForm() {
       const task = root.querySelector('[data-form="task"]');
@@ -947,6 +987,40 @@
         state.profileFormOpen = true;
         storageError = '';
         render();
+      } else if (action === 'cloud-google-sign-in') {
+        if (!window.HudaCloud || !window.HudaCloud.signInGoogle) return;
+        window.HudaCloud.signInGoogle().then(function () {
+          storageError = '';
+          if (save()) render();
+        }).catch(function (error) {
+          console.error('تعذر تسجيل الدخول بحساب Google.', error);
+          const authMessages = {
+            'auth/operation-not-allowed': 'لم يتم تفعيل تسجيل الدخول بحساب Google من لوحة Firebase.',
+            'auth/unauthorized-domain': 'أضف localhost إلى النطاقات المسموح بها في Firebase Authentication.',
+            'auth/popup-blocked': 'تم حظر نافذة Google؛ اسمح بالنوافذ المنبثقة ثم أعد المحاولة.',
+            'auth/popup-closed-by-user': 'أُغلقت نافذة تسجيل الدخول قبل إكمال العملية.'
+          };
+          storageError = authMessages[error && error.code] || 'تعذر تسجيل الدخول بحساب Google. تحقق من إعدادات Firebase ثم أعد المحاولة.';
+          render();
+        });
+      } else if (action === 'cloud-anonymous') {
+        if (!window.HudaCloud || !window.HudaCloud.continueAnonymously) return;
+        window.HudaCloud.continueAnonymously().then(function () {
+          storageError = '';
+          render();
+        }).catch(function (error) {
+          console.error('تعذر إنشاء جلسة مجهولة.', error);
+          storageError = 'تعذر بدء الاستخدام المجهول. سيستمر التطبيق بالبيانات المحلية.';
+          render();
+        });
+      } else if (action === 'cloud-sign-out') {
+        if (!window.HudaCloud || !window.HudaCloud.signOut) return;
+        window.HudaCloud.signOut().then(function () {
+          storageError = '';
+          render();
+        }).catch(function (error) {
+          console.error('تعذر تسجيل الخروج.', error);
+        });
       } else if (action === 'export-app-data') {
         exportAppData();
       } else if (action === 'toggle-form') {
@@ -1009,13 +1083,31 @@
       if (backupFile) {
         const file = backupFile.files && backupFile.files[0];
         importAppData(file).catch(error => {
-          console.error('تعذر استعادة نسخة Qurany الاحتياطية.', error);
-          storageError = 'تعذر استعادة النسخة الاحتياطية. أعد المحاولة بملف Qurany صالح.';
+          console.error('تعذر استعادة نسخة Huda الاحتياطية.', error);
+          storageError = 'تعذر استعادة النسخة الاحتياطية. أعد المحاولة بملف Huda صالح.';
           render();
         }).finally(() => { backupFile.value = ''; });
       }
     });
+    if (backupHost) {
+      backupHost.addEventListener('click', event => {
+        const button = event.target.closest('button[data-action="export-app-data"]');
+        if (button) exportAppData();
+      });
+      backupHost.addEventListener('change', event => {
+        const backupFile = event.target.closest('[data-app-backup-file]');
+        if (!backupFile) return;
+        const file = backupFile.files && backupFile.files[0];
+        importAppData(file).catch(error => {
+          console.error('تعذر استعادة نسخة Huda الاحتياطية.', error);
+          storageError = 'تعذر استعادة النسخة الاحتياطية. أعد المحاولة بملف Huda صالح.';
+          render();
+        }).finally(() => { backupFile.value = ''; });
+      });
+    }
     window.addEventListener('quran:azkar-progress', syncAzkarTask);
+    window.addEventListener('huda-auth-changed', () => render());
+    window.addEventListener('huda-leaderboard-changed', () => render());
     seedDefaultTasks();
     rollTasks();
     save();

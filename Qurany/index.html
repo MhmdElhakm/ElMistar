@@ -4,8 +4,11 @@
 <head>
   <meta charset="utf-8">
   <meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Qurany</title>
+  <title>Huda هدى</title>
   <meta name="theme-color" content="#fdf8f0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="description" content="مصحف قرآن كريم مع ألوان التجويد والتلاوة">
   <link rel="icon" type="image/png" href="./logo.png">
   <link rel="apple-touch-icon" href="./logo.png">
@@ -286,6 +289,21 @@
       filter: drop-shadow(0 0 3px color-mix(in srgb, var(--green) 65%, transparent));
       animation: tasmeeMicPulse 1.2s ease-in-out infinite;
     }
+
+    .tasmee-celebration { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; background: rgba(10,34,48,.42); opacity: 0; pointer-events: none; visibility: hidden; transition: opacity .25s ease, visibility .25s ease; }
+    .tasmee-celebration.is-visible { opacity: 1; pointer-events: auto; visibility: visible; }
+    .tasmee-celebration-card { position: relative; width: min(360px,100%); overflow: hidden; padding: 30px 22px 24px; border: 1px solid rgba(255,255,255,.75); border-radius: 28px; color: #17303f; background: linear-gradient(145deg,#fff,#e9fbf1); box-shadow: 0 24px 70px rgba(7,36,49,.3); text-align: center; transform: translateY(16px) scale(.96); transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+    .tasmee-celebration.is-visible .tasmee-celebration-card { transform: none; }
+    .tasmee-celebration-mark { font-size: 54px; line-height: 1; animation: tasmeeCelebratePop .8s ease both; }
+    .tasmee-celebration h2 { margin-top: 14px; font-size: 25px; font-weight: 900; }
+    .tasmee-celebration p { margin-top: 8px; color: #53707d; font-size: 15px; line-height: 1.8; }
+    .tasmee-celebration-close { margin-top: 20px; padding: 10px 22px; border-radius: 12px; color: #fff; background: var(--green); font: inherit; font-weight: 800; }
+    .tasmee-confetti { position: absolute; inset: 0; pointer-events: none; }
+    .tasmee-confetti i { position: absolute; top: -12px; width: 8px; height: 16px; border-radius: 3px; background: var(--c); animation: tasmeeConfetti 2.2s ease-in infinite; animation-delay: var(--d); }
+    .tasmee-confetti i:nth-child(1){left:8%;--c:#1a8fd6;--d:.05s}.tasmee-confetti i:nth-child(2){left:20%;--c:#f5b82e;--d:.25s}.tasmee-confetti i:nth-child(3){left:34%;--c:#e8473a;--d:.12s}.tasmee-confetti i:nth-child(4){left:49%;--c:#7b4fe0;--d:.4s}.tasmee-confetti i:nth-child(5){left:64%;--c:#2e9e69;--d:.18s}.tasmee-confetti i:nth-child(6){left:79%;--c:#f08a24;--d:.32s}.tasmee-confetti i:nth-child(7){left:91%;--c:#1a8fd6;--d:.08s}
+    @keyframes tasmeeCelebratePop { 0% { transform: scale(.4) rotate(-12deg); opacity: 0; } 70% { transform: scale(1.12) rotate(4deg); } 100% { transform: none; opacity: 1; } }
+    @keyframes tasmeeConfetti { to { transform: translateY(390px) rotate(460deg); opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) { .tasmee-celebration-card, .tasmee-celebration-mark, .tasmee-confetti i { animation: none; transition: none; } }
 
     @keyframes tasmeeMicPulse {
       50% { opacity: .58; }
@@ -2188,6 +2206,34 @@ window.QuranWorshipData = { azkar: {
       background: var(--panel);
     }
 
+    #settingsBackupHost {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    #settingsBackupHost .profile-backup {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--card);
+    }
+    #settingsBackupHost .profile-backup-heading { display: flex; align-items: center; gap: 10px; }
+    #settingsBackupHost .profile-backup-heading > span { display: grid; place-items: center; width: 37px; height: 37px; border-radius: 12px; background: color-mix(in srgb, var(--green) 10%, var(--panel)); font-size: 19px; }
+    #settingsBackupHost .profile-backup-heading strong,
+    #settingsBackupHost .profile-backup-heading small { display: block; }
+    #settingsBackupHost .profile-backup-heading strong { font-size: 12px; }
+    #settingsBackupHost .profile-backup-heading small { margin-top: 2px; color: var(--muted); font-size: 10px; }
+    #settingsBackupHost .profile-backup > p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.65; }
+    #settingsBackupHost .profile-backup-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    #settingsBackupHost .profile-backup-actions button,
+    #settingsBackupHost .profile-import-button { display: flex; align-items: center; justify-content: center; min-height: 40px; padding: 8px; border-radius: 10px; font: inherit; font-size: 10px; font-weight: 900; cursor: pointer; }
+    #settingsBackupHost .profile-import-button { border: 1px solid color-mix(in srgb, var(--green) 28%, var(--line)); background: color-mix(in srgb, var(--green) 7%, var(--panel)); color: var(--green); }
+    #settingsBackupHost .profile-import-button input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+    #settingsBackupHost .profile-import-button:focus-within { outline: 2px solid var(--green); outline-offset: 2px; }
+    #settingsBackupHost .profile-backup-note { color: var(--muted); font-size: 9px; line-height: 1.55; }
+
     .scroll-speed-label {
       grid-column: 1 / -1;
       color: var(--muted);
@@ -2932,6 +2978,21 @@ window.QuranWorshipData = { azkar: {
     .qpt-actions { display: flex; justify-content: center; padding: 12px 0 4px; }
     .qpt-retry { border-radius: 999px; padding: 10px 20px; background: linear-gradient(135deg,var(--green),color-mix(in srgb,var(--green) 72%,var(--sub))); color: var(--on-green); font: 800 13px -apple-system, BlinkMacSystemFont, sans-serif; }
     .qpt-note { margin: 10px 4px 0; color: var(--muted); font-size: 10px; text-align: center; }
+    .qpt-preview-button { justify-self: start; border: 1px solid color-mix(in srgb, var(--green) 30%, var(--line)); border-radius: 999px; padding: 7px 12px; color: var(--green); background: var(--panel); font: 800 11px -apple-system, BlinkMacSystemFont, sans-serif; }
+    .adhan-screen { position: fixed; z-index: 10000; inset: 0; display: grid; place-items: center; overflow: hidden; padding: 24px; background: linear-gradient(145deg, color-mix(in srgb, var(--green) 88%, #102218), color-mix(in srgb, var(--panel) 94%, #08120c)); color: var(--ink); }
+    .adhan-screen[hidden] { display: none; }
+    .adhan-screen-glow { position: absolute; width: 75vmax; height: 75vmax; border: 1px solid color-mix(in srgb, var(--sub) 28%, transparent); border-radius: 50%; box-shadow: 0 0 0 24px color-mix(in srgb, var(--sub) 7%, transparent), 0 0 0 52px color-mix(in srgb, var(--sub) 5%, transparent); opacity: .9; }
+    .adhan-screen-card { position: relative; z-index: 1; display: grid; justify-items: center; width: min(100%, 430px); padding: 34px 24px 26px; border: 1px solid color-mix(in srgb, var(--sub) 30%, var(--line)); border-radius: 28px; background: color-mix(in srgb, var(--card) 94%, transparent); box-shadow: 0 22px 70px rgba(0,0,0,.28); text-align: center; }
+    .adhan-screen-icon { display: grid; place-items: center; width: 76px; height: 76px; margin-bottom: 16px; border: 1px solid color-mix(in srgb, var(--green) 30%, var(--line)); border-radius: 24px; background: color-mix(in srgb, var(--green) 12%, var(--panel)); font-size: 38px; }
+    .adhan-screen-kicker { margin: 0; color: var(--green); font-size: 14px; font-weight: 900; }
+    .adhan-screen-card h2 { margin: 8px 0 4px; color: var(--ink); font-size: clamp(28px, 8vw, 44px); font-weight: 950; }
+    .adhan-screen-time { margin: 0; color: var(--sub); font-size: 18px; font-weight: 900; }
+    .adhan-screen-message { margin: 20px 0 26px; color: var(--muted); font-size: 14px; font-weight: 800; }
+    .adhan-screen-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; width: 100%; }
+    .adhan-screen-actions button { min-height: 46px; border-radius: 13px; font: inherit; font-size: 12px; font-weight: 900; cursor: pointer; }
+    .adhan-screen-primary { border: 0; background: var(--green); color: var(--on-green); }
+    .adhan-screen-secondary { border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+    body.adhan-screen-open { overflow: hidden; }
     @media (max-width: 360px) {
       .qpt { padding-inline: 10px; }
       .qpt-city { max-width: 125px; }
@@ -4411,7 +4472,7 @@ window.QuranWorshipData = { azkar: {
 
   <div class="quran-loading" id="quranLoading" role="status" aria-live="polite" aria-label="جاري تجهيز المصحف">
     <div class="quran-loading-card">
-      <div class="quran-loading-brand"><img src="./logo.png" alt="شعار Qurany"></div>
+      <div class="quran-loading-brand"><img src="./logo.png" alt="شعار Huda هدى"></div>
       <span class="quran-loading-spinner" aria-hidden="true"></span>
       <span class="quran-loading-text" id="quranLoadingText">جاري تجهيز المصحف...</span>
     </div>
@@ -4924,6 +4985,15 @@ window.QuranWorshipData = { azkar: {
               </div>
             </section>
           </div>
+          <div class="tasmee-celebration" id="tasmeeCelebration" role="dialog" aria-modal="true" aria-labelledby="tasmeeCelebrationTitle" hidden>
+            <div class="tasmee-celebration-card">
+              <div class="tasmee-confetti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="tasmee-celebration-mark" aria-hidden="true">🎉</div>
+              <h2 id="tasmeeCelebrationTitle">أتممت الحفظ بنجاح!</h2>
+              <p id="tasmeeCelebrationMessage">ما شاء الله، ثمرة اجتهادك واضحة اليوم. واصل بهذا النور.</p>
+              <button type="button" class="tasmee-celebration-close" id="tasmeeCelebrationClose">متابعة</button>
+            </div>
+          </div>
         </section>
 
       </div>
@@ -4945,6 +5015,21 @@ window.QuranWorshipData = { azkar: {
     <div class="app-service-content" id="appServiceContent" hidden></div>
   </div>
 
+  <div class="adhan-screen" id="adhanScreen" role="dialog" aria-modal="true" aria-labelledby="adhanScreenTitle" hidden>
+    <div class="adhan-screen-glow" aria-hidden="true"></div>
+    <div class="adhan-screen-card">
+      <div class="adhan-screen-icon" aria-hidden="true">🕌</div>
+      <p class="adhan-screen-kicker">حان الآن وقت الصلاة</p>
+      <h2 id="adhanScreenTitle">حان وقت الصلاة</h2>
+      <p class="adhan-screen-time" id="adhanScreenTime"></p>
+      <p class="adhan-screen-message" id="adhanScreenMessage">حيّ على الصلاة، حيّ على الفلاح</p>
+      <div class="adhan-screen-actions">
+        <button type="button" class="adhan-screen-primary" id="adhanScreenReplay">إعادة تشغيل الأذان</button>
+        <button type="button" class="adhan-screen-secondary" id="adhanScreenClose">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status"></div>
 
   <div class="dl-chip" id="dlChip" hidden aria-live="polite">
@@ -4952,6 +5037,100 @@ window.QuranWorshipData = { azkar: {
     <div class="dl-track"><i id="dlBar"></i></div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    (function () {
+      var firebaseConfig = {
+        apiKey: 'AIzaSyCM41g90JX0Q0L9tBDrGO2VkqltRJmk9_M',
+        authDomain: 'qurany-pro.firebaseapp.com',
+        projectId: 'qurany-pro',
+        storageBucket: 'qurany-pro.firebasestorage.app',
+        messagingSenderId: '363693622415',
+        appId: '1:363693622415:web:9eb88d7cb6690a09a3dcfa',
+        measurementId: 'G-68ZJF1KWDK'
+      };
+      var cloud = { user: null, leaderboard: [], ready: Promise.resolve(null), syncTimer: 0 };
+      try {
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var auth = firebase.auth();
+        var db = firebase.firestore();
+        cloud.ready = new Promise(function (resolve) {
+          var unsubscribe = auth.onAuthStateChanged(function (user) {
+            cloud.user = user || null;
+            window.dispatchEvent(new CustomEvent('huda-auth-changed'));
+            unsubscribe();
+            resolve(user || null);
+          });
+        });
+        cloud.ready = cloud.ready.then(function (user) {
+          return user || auth.signInAnonymously().then(function (result) { return result.user; });
+        });
+        cloud.getUser = function () { return cloud.user || auth.currentUser; };
+        cloud.signInGoogle = function () {
+          var provider = new firebase.auth.GoogleAuthProvider();
+          var signIn = auth.currentUser && auth.currentUser.isAnonymous
+            ? auth.currentUser.linkWithPopup(provider)
+            : auth.signInWithPopup(provider);
+          return signIn.catch(function (error) {
+            if (['auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/cancelled-popup-request'].indexOf(error.code) === -1) throw error;
+            return auth.currentUser && auth.currentUser.isAnonymous
+              ? auth.currentUser.linkWithRedirect(provider)
+              : auth.signInWithRedirect(provider);
+          });
+        };
+        cloud.continueAnonymously = function () {
+          return auth.currentUser ? Promise.resolve(auth.currentUser) : auth.signInAnonymously();
+        };
+        cloud.signOut = function () { return auth.signOut(); };
+        cloud.startLeaderboard = function () {
+          return db.collection('leaderboard').orderBy('totalPoints', 'desc').limit(30).onSnapshot(function (snapshot) {
+            cloud.leaderboard = snapshot.docs.map(function (item) {
+              var data = item.data() || {};
+              return { id: item.id, name: data.name || 'مستخدم Huda', points: Number(data.totalPoints) || 0, avatar: data.avatar || './logo.png' };
+            });
+            window.dispatchEvent(new CustomEvent('huda-leaderboard-changed'));
+          }, function (error) { console.warn('تعذرت قراءة لوحة المتصدرين من Firestore.', error); });
+        };
+        cloud.queueSync = function (state) {
+          clearTimeout(cloud.syncTimer);
+          cloud.syncTimer = setTimeout(function () {
+            cloud.ready.then(function (user) {
+              if (!user) return;
+              var profile = state.profile || {};
+              var userRef = db.collection('users').doc(user.uid);
+              var leaderboardRef = db.collection('leaderboard').doc(user.uid);
+              var batch = db.batch();
+              batch.set(userRef, {
+                name: String(profile.name || '').slice(0, 80),
+                avatar: String(profile.avatar || '').indexOf('data:image/') === 0 ? profile.avatar : '',
+                totalPoints: Number(profile.totalPoints) || 0,
+                phone: profile.phoneVisibility === 'public' ? String(profile.phone || '').slice(0, 24) : '',
+                phoneVisibility: profile.phoneVisibility === 'public' ? 'public' : 'private',
+                publicProfile: Boolean(profile.name),
+                anonymous: user.isAnonymous === true,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+              }, { merge: true });
+              if (profile.name) batch.set(leaderboardRef, {
+                name: String(profile.name).slice(0, 80),
+                avatar: String(profile.avatar || '').indexOf('data:image/') === 0 ? profile.avatar : '',
+                totalPoints: Number(profile.totalPoints) || 0,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+              }, { merge: true });
+              else batch.delete(leaderboardRef);
+              return batch.commit();
+            }).catch(function (error) { console.warn('تعذرت مزامنة بيانات Huda مع Firestore.', error); });
+          }, 700);
+        };
+        window.HudaCloud = cloud;
+        cloud.ready.then(function () { cloud.startLeaderboard(); }).catch(function () {});
+      } catch (error) {
+        console.warn('Firebase غير متاح؛ سيعمل التطبيق بالبيانات المحلية.', error);
+        window.HudaCloud = { getUser: function () { return null; }, queueSync: function () {} };
+      }
+    })();
+  </script>
   <script src="./tasks.js"></script>
   <script>
   /* === الموديلات المدمجة: أحكام التجويد والتفسير الميسر === */
@@ -5406,7 +5585,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           var chunkUrl = './fonts/tajweed/' + chunkName + '.woff2';
           function requestChunk(retry) {
             var cachedChunk = 'caches' in window
-                ? caches.open('quran-pro-app-v119').then(function (cache) { return cache.match(chunkUrl); })
+                ? caches.open('quran-pro-app-v132').then(function (cache) { return cache.match(chunkUrl); })
               : Promise.resolve(null);
             return cachedChunk.then(function (response) {
               if (response) return response.arrayBuffer();
@@ -5415,7 +5594,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
                 var copy = networkResponse.clone();
                 return networkResponse.arrayBuffer().then(function (buffer) {
                   if ('caches' in window) {
-                    return caches.open('quran-pro-app-v119').then(function (cache) {
+                    return caches.open('quran-pro-app-v132').then(function (cache) {
                       return cache.put(chunkUrl, copy).then(function () { return buffer; });
                     });
                   }
@@ -6052,13 +6231,24 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
       var tasmeePanel = $('tasmeePanel'), tasmeeToggle = $('tasmeeToggle');
       var tasmeeClose = $('tasmeeClose'), tasmeeWindowHeader = tasmeeSection.querySelector('.tasmee-window-header');
       var tasmeePrompt = $('tasmeePrompt'), tasmeeStatus = $('tasmeeStatus');
+      var tasmeeCelebration = $('tasmeeCelebration'), tasmeeCelebrationMessage = $('tasmeeCelebrationMessage');
+      var tasmeeCelebrationClose = $('tasmeeCelebrationClose');
       var tasmeeSurah = $('tasmeeSurah'), tasmeeFrom = $('tasmeeFrom'), tasmeeTo = $('tasmeeTo');
       var tasmeeEnabled = !!load('mq.tasmeeEnabled', true);
       var tasmeeWindowOpen = false;
       var tasmeePrefs = load('mq.tasmeePrefs', {});
       var tasmeeSession = null, tasmeeRecognition = null, tasmeeListening = false, tasmeeRecognitionStarted = false;
       var tasmeeRetainedMistakes = Object.create(null);
-      var tasmeeRestartTimer = 0;
+      var tasmeeRestartTimer = 0, tasmeeInterimTokens = [];
+      var tasmeeMotivations = [
+        'ما شاء الله، ثمرة اجتهادك واضحة اليوم. واصل بهذا النور.',
+        'أحسنت! كل آية تحفظها ترفعك خطوة جديدة. استمر يا بطل.',
+        'بارك الله في وقتك وجهدك؛ أتممت المقطع بقلب حاضر وعزيمة جميلة.',
+        'إنجاز مبارك! اجعل هذا النجاح وقودًا لوردك القادم.',
+        'رائع جدًا، لقد أثمرت مداومتك. القرآن يزداد رسوخًا في صدرك.'
+      ];
+      function hideTasmeeCelebration() { tasmeeCelebration.classList.remove('is-visible'); tasmeeCelebration.hidden = true; }
+      function showTasmeeCelebration() { tasmeeCelebrationMessage.textContent = tasmeeMotivations[Math.floor(Math.random() * tasmeeMotivations.length)]; tasmeeCelebration.hidden = false; requestAnimationFrame(function () { tasmeeCelebration.classList.add('is-visible'); }); }
       var wp = $('wp');
       var recitationTrackingMode = load('mq.recitationTrackingMode', 'word');
       if (['ayah', 'word'].indexOf(recitationTrackingMode) < 0) recitationTrackingMode = 'word';
@@ -6592,6 +6782,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           if (tasmeeRecognitionStarted) recognition.stop();
         }
         tasmeeRecognitionStarted = false;
+        tasmeeInterimTokens = [];
         syncTasmeeControls();
       }
 
@@ -6610,9 +6801,10 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         } else {
           tasmeeStatus.textContent = 'ممتاز! اكتمل تسميع النطاق بنجاح دون أي تلقين.';
         }
+        showTasmeeCelebration();
       }
 
-      function processTasmeeTranscript(transcript) {
+      function processTasmeeTranscript(transcript, showFeedback) {
         if (!tasmeeListening || !tasmeeSession || tasmeeSession.completed) return;
         var tokens = tokenizeTasmeeTranscript(transcript);
         if (!tokens.length) return;
@@ -6710,7 +6902,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           tasmeeStatus.textContent = hasUnrevealedTasmeeWords()
             ? 'صحيح، تابع القراءة.'
             : 'أحسنت، اكتملت قراءة النطاق المحدد.';
-        } else {
+        } else if (showFeedback !== false) {
           tasmeeStatus.textContent = 'لم يتم التعرف على الكلمة؛ أعد المحاولة أو اضغط زر التلقين للمساعدة.';
         }
       }
@@ -6743,7 +6935,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
             recognition = new Recognition();
             recognition.lang = 'ar-SA';
             recognition.continuous = true;
-            recognition.interimResults = false;
+            recognition.interimResults = true;
           } catch (error) {
             console.error('تعذر إعداد التعرف الصوتي للتسميع:', error);
             tasmeeStatus.textContent = 'تعذر إعداد التعرف الصوتي؛ يمكنك متابعة التسميع بعد التحقق من دعم المتصفح.';
@@ -6763,11 +6955,21 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
           };
           recognition.onresult = function (event) {
             if (tasmeeRecognition !== recognition) return;
-            var finalTranscript = '';
+            var finalTranscript = '', interimTranscript = '';
             for (var i = event.resultIndex; i < event.results.length; i++) {
               if (event.results[i].isFinal) finalTranscript += ' ' + event.results[i][0].transcript;
+              else interimTranscript += ' ' + event.results[i][0].transcript;
             }
-            if (finalTranscript.trim()) processTasmeeTranscript(finalTranscript);
+            var interimTokens = tokenizeTasmeeTranscript(interimTranscript), common = 0;
+            while (common < tasmeeInterimTokens.length && common < interimTokens.length && tasmeeInterimTokens[common] === interimTokens[common]) common++;
+            if (interimTokens.length > common) processTasmeeTranscript(interimTokens.slice(common).join(' '), false);
+            tasmeeInterimTokens = interimTokens;
+            if (finalTranscript.trim()) {
+              var finalTokens = tokenizeTasmeeTranscript(finalTranscript), finalCommon = 0;
+              while (finalCommon < tasmeeInterimTokens.length && finalCommon < finalTokens.length && tasmeeInterimTokens[finalCommon] === finalTokens[finalCommon]) finalCommon++;
+              if (finalTokens.length > finalCommon) processTasmeeTranscript(finalTokens.slice(finalCommon).join(' '), true);
+              tasmeeInterimTokens = [];
+            }
           };
           recognition.onerror = function (event) {
             if (tasmeeRecognition !== recognition) return;
@@ -6789,7 +6991,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
             tasmeeRestartTimer = setTimeout(function () {
               tasmeeRestartTimer = 0;
               startRecognitionInstance();
-            }, 350);
+              }, 120);
           };
           try {
             recognition.start();
@@ -6868,6 +7070,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         startTasmeeRecognition();
       });
       tasmeePrompt.addEventListener('click', promptTasmeeWord);
+      tasmeeCelebrationClose.addEventListener('click', hideTasmeeCelebration);
       updateTasmeeBounds(false);
       tasmeeFrom.value = String(Math.max(1, Math.min(D.surahs[initialTasmeeSurah - 1][3], +tasmeePrefs.from || 1)));
       tasmeeTo.value = String(Math.max(+tasmeeFrom.value,
@@ -8832,6 +9035,7 @@ load(cur); setUI('idle'); net(); loadLocal();
   var DEFAULT_CITY = CITIES.find(function (city) { return city.id === 'aswan'; }) || CITIES[0];
   var CACHE_KEY = 'quran_prayer_cache_v1';
   var CITY_KEY = 'quran_prayer_city_v1';
+  var prayerStoragePersistenceRequested = false;
   var ALERTS_KEY = 'quran_prayer_alerts_v1';
   var ALERT_CACHE = 'quran-prayer-audio-v1';
   var AUDIO_PATH = './audio-cache/';
@@ -8840,8 +9044,8 @@ load(cur); setUI('idle'); net(); loadLocal();
   var ADHAN_VOICES = {
     'adhan-makkah': {
       label: 'أذان المسجد الحرام · مكة',
-      url: 'https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a7/Adhan%2C_Great_Mosque_of_Mecca_-_Jan_21%2C_2013.webm/Adhan%2C_Great_Mosque_of_Mecca_-_Jan_21%2C_2013.webm.360p.mpeg4.mov',
-      extension: 'mpeg4.mov',
+      url: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/Adhan%2C_Great_Mosque_of_Mecca_-_Jan_21%2C_2013.webm',
+      extension: 'webm',
       page: 'https://commons.wikimedia.org/wiki/File:Adhan,_Great_Mosque_of_Mecca_-_Jan_21,_2013.webm',
       credit: 'Seyfula Islam',
       licenseName: 'CC BY 3.0',
@@ -8860,7 +9064,14 @@ load(cur); setUI('idle'); net(); loadLocal();
   var countdownTimer = null;
   var alertTimer = null;
   var adhanAudio = new Audio();
+  var adhanScreen = document.getElementById('adhanScreen');
+  var adhanScreenTitle = document.getElementById('adhanScreenTitle');
+  var adhanScreenTime = document.getElementById('adhanScreenTime');
+  var adhanScreenClose = document.getElementById('adhanScreenClose');
+  var adhanScreenReplay = document.getElementById('adhanScreenReplay');
+  var activeAdhanPrayer = PRAYERS[0];
   var audioLoadPromises = Object.create(null);
+  var adhanObjectUrls = Object.create(null);
   var firedAlertKeys = Object.create(null);
   var requestController = null;
   var activeRequestId = 0;
@@ -8908,6 +9119,14 @@ load(cur); setUI('idle'); net(); loadLocal();
     var id = DEFAULT_CITY.id;
     try { id = localStorage.getItem(CITY_KEY) || id; } catch (error) {}
     return CITIES.find(function (city) { return city.id === id; }) || DEFAULT_CITY;
+  }
+
+  function requestPrayerStoragePersistence() {
+    if (prayerStoragePersistenceRequested || !navigator.storage) return;
+    prayerStoragePersistenceRequested = true;
+    if (typeof navigator.storage.persist === 'function') {
+      navigator.storage.persist().catch(function () {});
+    }
   }
 
   function readCache() {
@@ -9005,13 +9224,19 @@ load(cur); setUI('idle'); net(); loadLocal();
       if ('caches' in window) {
         var cache = await caches.open(ALERT_CACHE);
         var cached = await cache.match(localUrl);
-        if (cached) return localUrl;
+        if (cached) {
+          if (adhanObjectUrls[voiceId]) URL.revokeObjectURL(adhanObjectUrls[voiceId]);
+          adhanObjectUrls[voiceId] = URL.createObjectURL(await cached.blob());
+          return adhanObjectUrls[voiceId];
+        }
         var response = await fetch(voice.url, { mode: 'cors', cache: 'force-cache' });
         if (!response.ok || response.type === 'opaque') {
           throw new Error('تعذر تنزيل التسجيل المرخّص. تحقق من اتصال الإنترنت ثم أعد المحاولة.');
         }
         await cache.put(localUrl, response.clone());
-        return localUrl;
+        if (adhanObjectUrls[voiceId]) URL.revokeObjectURL(adhanObjectUrls[voiceId]);
+        adhanObjectUrls[voiceId] = URL.createObjectURL(await response.blob());
+        return adhanObjectUrls[voiceId];
       }
       return voice.url;
     })().catch(function (error) {
@@ -9035,7 +9260,25 @@ load(cur); setUI('idle'); net(); loadLocal();
     });
   }
 
-  function playSelectedAdhan() {
+  function showAdhanScreen(prayer, preview) {
+    if (!adhanScreen) return;
+    activeAdhanPrayer = prayer || PRAYERS[0];
+    adhanScreenTitle.textContent = activeAdhanPrayer.name;
+    adhanScreenTime.textContent = preview ? 'معاينة الأذان' : 'حان الآن وقت صلاة ' + activeAdhanPrayer.name;
+    adhanScreen.hidden = false;
+    document.body.classList.add('adhan-screen-open');
+  }
+
+  function hideAdhanScreen() {
+    if (!adhanScreen) return;
+    adhanScreen.hidden = true;
+    document.body.classList.remove('adhan-screen-open');
+    adhanAudio.pause();
+    adhanAudio.currentTime = 0;
+  }
+
+  function playSelectedAdhan(prayer, preview) {
+    showAdhanScreen(prayer, preview === true);
     loadAdhanVoice(ADHAN_VOICE_ID).then(function (url) {
       adhanAudio.src = url;
       adhanAudio.currentTime = 0;
@@ -9045,6 +9288,17 @@ load(cur); setUI('idle'); net(); loadLocal();
       setAlertStatus('تعذر تشغيل تسجيل الأذان تلقائيًا. افتح التطبيق وتحقق من اتصال الإنترنت.', 'warning');
     });
   }
+
+  function previewAdhan() {
+    var cache = readCache()[selectedCity().id];
+    var next = cache && cache.timings ? prayerRange(cache.timings).next : null;
+    playSelectedAdhan(next && next.prayer ? next.prayer : PRAYERS[0], true);
+  }
+
+  if (adhanScreenClose) adhanScreenClose.addEventListener('click', hideAdhanScreen);
+  if (adhanScreenReplay) adhanScreenReplay.addEventListener('click', function () {
+    playSelectedAdhan(activeAdhanPrayer, true);
+  });
 
   function sendNotification(prayer, isAdvance) {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
@@ -9106,7 +9360,8 @@ load(cur); setUI('idle'); net(); loadLocal();
           setAlertStatus('تعذر حفظ سجل التنبيه؛ سيعمل منع التكرار حتى إغلاق الصفحة فقط.', 'warning');
         }
         firedAlertKeys[key] = true;
-        if (alerts.sound) playSelectedAdhan();
+        if (!item.isAdvance) showAdhanScreen(prayer, false);
+        if (alerts.sound) playSelectedAdhan(prayer, false);
         if (alerts.notifications) sendNotification(prayer, item.isAdvance);
         if (!alerts.notifications && !alerts.sound) {
           setAlertStatus('حان وقت صلاة ' + prayer.name + '.', 'info');
@@ -9141,6 +9396,7 @@ load(cur); setUI('idle'); net(); loadLocal();
       }).join('') + '</select></label>' +
       '<label class="qpt-alert-toggle"><input type="checkbox" data-qpt-sound' +
       (alerts.sound ? ' checked' : '') + '><span>تشغيل أذان المسجد الحرام عند التنبيه</span></label>' +
+      '<button type="button" class="qpt-preview-button" data-qpt-preview>▶ معاينة الأذان</button>' +
       '<div class="qpt-notification-row"><span data-qpt-notification-label></span>' +
       '<button type="button" class="qpt-notification-button" data-qpt-notifications></button></div>' +
       '<p class="qpt-alert-status" data-qpt-alert-status role="status" aria-live="polite"></p></div>';
@@ -9156,6 +9412,7 @@ load(cur); setUI('idle'); net(); loadLocal();
       });
     });
     settings.querySelector('[data-qpt-notifications]').addEventListener('click', enableNotifications);
+    settings.querySelector('[data-qpt-preview]').addEventListener('click', previewAdhan);
   }
 
   function updateNotificationButton() {
@@ -9357,11 +9614,19 @@ load(cur); setUI('idle'); net(); loadLocal();
     var city = selectedCity();
     var cache = readCache()[city.id] || null;
     var today = todayKey();
+    var offline = navigator.onLine === false;
     if (cache && cache.timings) {
       var freshForToday = cache.day === today;
-      drawTimes(cache, !freshForToday);
-      if (freshForToday) setStatus('مواقيت اليوم محفوظة على هذا الجهاز.', 'info');
+      drawTimes(cache, !freshForToday && !offline);
+      if (offline) setStatus('المواقيت المحفوظة متاحة دون اتصال.', 'info');
+      else if (freshForToday) setStatus('مواقيت اليوم محفوظة على هذا الجهاز.', 'info');
       else setStatus('المعروض آخر مواقيت محفوظة من ' + (cache.day || 'يوم سابق') + '، وقد لا تناسب تاريخ اليوم.', 'warning');
+    }
+    if (offline) {
+      if (!cache || !cache.timings) {
+        setStatus('لا يوجد اتصال ولم تُحفظ مواقيت لهذه المدينة بعد.', 'warning');
+      }
+      return;
     }
     if (!force && cache && cache.day === today) {
       setStatus('مواقيت اليوم محفوظة؛ جارٍ التحقق من وجود تحديث.', 'info');
@@ -9450,6 +9715,7 @@ load(cur); setUI('idle'); net(); loadLocal();
     cacheReadFailed = false;
     activeContainer = container;
     activeStatus = onStatus || function () {};
+    requestPrayerStoragePersistence();
     removeUnusedAdhanCacheEntries().catch(function (error) {
       console.error('تعذر حذف تسجيلات الأذان غير المختارة من التخزين المؤقت.', error);
       setAlertStatus('تعذر حذف التسجيلات الصوتية القديمة من هذا الجهاز.', 'warning');
@@ -10068,7 +10334,7 @@ load(cur); setUI('idle'); net(); loadLocal();
       var toast = runtime.toast;
       // Keep this in sync with sw.js. A cache/version bump forces a clean
       // download when an earlier attempt left incomplete Quran files behind.
-      var CACHE = 'quran-pro-app-v119', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '64';
+      var CACHE = 'quran-pro-app-v132', DONE_KEY = 'mq.offlineReady', AR = '٠١٢٣٤٥٦٧٨٩', VER = '77';
       function ar(n) { return String(n).replace(/\d/g, function (d) { return AR[d]; }); }
       var urls = (function () {
         var a = [
@@ -10218,7 +10484,7 @@ load(cur); setUI('idle'); net(); loadLocal();
         if (isInstalledApp()) {
           installButton.disabled = true;
           installButton.textContent = 'التطبيق مثبت بالفعل';
-          installHelp.textContent = 'يمكنك فتح Qurany من شاشة التطبيقات.';
+          installHelp.textContent = 'يمكنك فتح Huda هدى من شاشة التطبيقات.';
         } else {
           installButton.disabled = false;
           installButton.textContent = installPromptEvent ? 'تثبيت التطبيق' : 'كيفية تثبيت التطبيق';
@@ -10233,7 +10499,7 @@ load(cur); setUI('idle'); net(); loadLocal();
       window.addEventListener('appinstalled', function () {
         installPromptEvent = null;
         syncInstallButton();
-        toast('تم تثبيت Qurany');
+        toast('تم تثبيت Huda هدى');
       });
       installButton.addEventListener('click', function () {
         if (isInstalledApp()) { syncInstallButton(); return; }
@@ -10242,7 +10508,7 @@ load(cur); setUI('idle'); net(); loadLocal();
           installPromptEvent = null;
           promptEvent.prompt();
           promptEvent.userChoice.then(function (choice) {
-            if (choice.outcome === 'accepted') toast('جارٍ تثبيت Qurany');
+            if (choice.outcome === 'accepted') toast('جارٍ تثبيت Huda هدى');
             else toast('يمكنك تثبيت التطبيق لاحقًا من هنا');
             syncInstallButton();
           }, function (error) {
@@ -10286,7 +10552,7 @@ load(cur); setUI('idle'); net(); loadLocal();
       });
       if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
         navigator.serviceWorker.register('./sw.js').catch(function (error) {
-          console.error('Unable to register the Qurany service worker:', error);
+          console.error('Unable to register the Huda service worker:', error);
           installHelp.textContent = 'تعذر تجهيز التثبيت في هذا المتصفح. افتح الصفحة عبر HTTPS أو localhost.';
         });
       }
