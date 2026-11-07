@@ -1750,6 +1750,15 @@ window.QuranWorshipData = { azkar: {
       box-shadow: 0 0 0 .055em color-mix(in srgb, var(--red) 42%, transparent);
     }
 
+    .w.tasmee-just-matched {
+      animation: tasmeeWordMatched .65s ease-out;
+    }
+
+    @keyframes tasmeeWordMatched {
+      0% { background: color-mix(in srgb, var(--green) 55%, transparent); box-shadow: 0 0 0 .12em color-mix(in srgb, var(--green) 42%, transparent); }
+      100% { background: transparent; box-shadow: none; }
+    }
+
     .recitation-verse-band {
       position: absolute;
       top: 7%;
@@ -6601,6 +6610,18 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         });
       }
 
+      function flashTasmeeMatches(matches) {
+        if (!matches || !matches.length) return;
+        matches.forEach(function (match) {
+          var word = pageList.querySelector('.w[data-v="' + match.verseId + '"][data-p="' + match.position + '"]');
+          if (!word) return;
+          word.classList.remove('tasmee-just-matched');
+          void word.offsetWidth;
+          word.classList.add('tasmee-just-matched');
+          setTimeout(function () { word.classList.remove('tasmee-just-matched'); }, 700);
+        });
+      }
+
       function normalizeTasmeeWord(word) {
         var s = String(word || '');
         s = s.replace(/و[\u064B-\u065F]*\u0670/g, 'ا');
@@ -6622,11 +6643,41 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         return s;
       }
 
+      function tasmeeWordDistance(a, b, limit) {
+        if (Math.abs(a.length - b.length) > limit) return limit + 1;
+        var previous = [];
+        for (var j = 0; j <= b.length; j++) previous[j] = j;
+        for (var i = 1; i <= a.length; i++) {
+          var current = [i], rowMin = i;
+          for (var k = 1; k <= b.length; k++) {
+            var cost = a[i - 1] === b[k - 1] ? 0 : 1;
+            current[k] = Math.min(
+              current[k - 1] + 1,
+              previous[k] + 1,
+              previous[k - 1] + cost
+            );
+            rowMin = Math.min(rowMin, current[k]);
+          }
+          if (rowMin > limit) return limit + 1;
+          previous = current;
+        }
+        return previous[b.length];
+      }
+
       function tasmeeWordMatches(spoken, expected) {
         if (!spoken || !expected) return false;
-        // Exact comparison after orthographic cleanup only. A homophone or a
-        // later word must never unlock the next Quran word.
-        return spoken === expected;
+        var spokenKey = normalizeTasmeeWord(spoken);
+        var expectedKey = normalizeTasmeeWord(expected);
+        if (spokenKey === expectedKey) return true;
+
+        // Whisper may add/remove one Arabic letter or repeat a letter while
+        // preserving the word. Keep the tolerance small and never search
+        // ahead to a later Quran word.
+        var compactSpoken = spokenKey.replace(/(.)\1+/g, '$1');
+        var compactExpected = expectedKey.replace(/(.)\1+/g, '$1');
+        if (compactSpoken === compactExpected) return true;
+        if (compactSpoken.length < 4 || compactExpected.length < 4) return false;
+        return tasmeeWordDistance(compactSpoken, compactExpected, 1) <= 1;
       }
 
       // These are recitation tokens, not ordinary Arabic words. Keeping them
@@ -6821,6 +6872,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         var changedVerse = false;
         var tokenIdx = 0;
         var mismatchDetected = false;
+        var matchedWords = [];
 
         var state = currentTasmeeAyah();
         if (!state) return;
@@ -6887,6 +6939,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
               delete state.mistakes[position];
             }
             state.wordIndex = matchedIndex + 1;
+            matchedWords.push({ verseId: state.id, position: position });
             tokenIdx++;
 
             if (state.wordIndex >= state.words.length) {
@@ -6912,6 +6965,7 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
 
         if (matchedAny) {
           applyTasmeeWordState(pageList);
+          flashTasmeeMatches(matchedWords);
           var curAyah = currentTasmeeAyah();
           if (changedVerse && curAyah) navigateToVerse(curAyah.id);
           tasmeeStatus.textContent = mismatchDetected
@@ -7124,15 +7178,22 @@ window.MUYASSAR_DATA=[["أبتدئ قراءة القرآن باسم الله م�
         if (!tasmeeSession || tasmeeSession.completed) {
           if (!createTasmeeSession()) return;
         }
-        var BrowserRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (BrowserRecognition) {
-          startBrowserTasmeeRecognition(BrowserRecognition);
+        // Prefer the local recorder. Browser SpeechRecognition is allowed to
+        // end its session every few seconds and restarting it causes repeated
+        // microphone disconnects and notification sounds on some devices.
+        if (window.QuranTasmeeEngine) {
+          startLocalTasmeeRecognition();
           return;
         }
-        if (!window.QuranTasmeeEngine) {
+        var BrowserRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!BrowserRecognition) {
           tasmeeStatus.textContent = 'هذا الجهاز لا يدعم التعرف الصوتي. استخدم Chrome أو حدّث Android System WebView.';
           return;
         }
+        startBrowserTasmeeRecognition(BrowserRecognition);
+      }
+
+      function startLocalTasmeeRecognition() {
         var firstAyah = currentTasmeeAyah();
         if (firstAyah) {
           closeD();
