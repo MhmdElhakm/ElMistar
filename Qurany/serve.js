@@ -9,6 +9,7 @@ const root = path.resolve(__dirname);
 const port = 8000;
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.webmanifest': 'application/manifest+json',
@@ -16,6 +17,16 @@ const mimeTypes = {
   '.mp3': 'audio/mpeg',
   '.woff2': 'font/woff2'
 };
+
+// فتح المتصفح حسب نظام التشغيل (كان يعمل على ويندوز فقط عبر cmd.exe).
+function openBrowser(url) {
+  const [command, args] =
+    process.platform === 'win32' ? ['cmd.exe', ['/c', 'start', '', url]] :
+    process.platform === 'darwin' ? ['open', [url]] : ['xdg-open', [url]];
+  execFile(command, args, { windowsHide: true }, error => {
+    if (error) console.log('Open the URL above in your browser.');
+  });
+}
 
 const server = http.createServer((request, response) => {
   let pathname;
@@ -53,10 +64,9 @@ const server = http.createServer((request, response) => {
 server.listen(port, '127.0.0.1', () => {
   const url = `http://localhost:${port}/`;
   console.log(`Qurany is available at ${url}. Press Ctrl+C to stop the server.`);
-  execFile('cmd.exe', ['/c', 'start', '', url], { windowsHide: true }, error => {
-    if (error) console.log('Open the URL above in your browser.');
-  });
+  openBrowser(url);
 });
+
 
 server.on('error', error => {
   if (error.code === 'EADDRINUSE') {
