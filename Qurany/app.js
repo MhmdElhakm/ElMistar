@@ -3965,20 +3965,40 @@
     return previous[b.length];
   }
 
+  // تقريب الحروف المتشابهة صوتيًا التي يخلط بينها المتعرّف الصوتي (ث/س، ذ/ز، ض/ظ، ط/ت، ء/ع...).
+  function tasmeePhoneticKey(key) {
+    return key
+      .replace(/[ثص]/g, 'س')
+      .replace(/[ذظ]/g, 'ز')
+      .replace(/ض/g, 'د')
+      .replace(/ط/g, 'ت')
+      .replace(/ق/g, 'ك')
+      .replace(/ح/g, 'ه')
+      .replace(/[ءع]/g, '')
+      .replace(/[اوي]/g, '')
+      .replace(/(.)\1+/g, '$1');
+  }
+
   function tasmeeWordMatches(spoken, expected) {
     if (!spoken || !expected) return false;
     var spokenKey = normalizeTasmeeWord(spoken);
     var expectedKey = normalizeTasmeeWord(expected);
     if (spokenKey === expectedKey) return true;
 
-    // Whisper may add/remove one Arabic letter or repeat a letter while
-    // preserving the word. Keep the tolerance small and never search
-    // ahead to a later Quran word.
     var compactSpoken = spokenKey.replace(/(.)\1+/g, '$1');
     var compactExpected = expectedKey.replace(/(.)\1+/g, '$1');
     if (compactSpoken === compactExpected) return true;
     if (compactSpoken.length < 4 || compactExpected.length < 4) return false;
-    return tasmeeWordDistance(compactSpoken, compactExpected, 1) <= 1;
+
+    // تسامح نسبي مع طول الكلمة: حرف واحد للكلمات القصيرة، حرفان للطويلة (٧+).
+    var limit = Math.max(compactSpoken.length, compactExpected.length) >= 7 ? 2 : 1;
+    if (tasmeeWordDistance(compactSpoken, compactExpected, limit) <= limit) return true;
+
+    // تطابق صوتي: نفس هيكل الحروف الساكنة بعد توحيد المتشابهات (الكلمة ≥ 4 حروف فقط حتى لا تُقبل كلمة خاطئة).
+    var phoneticSpoken = tasmeePhoneticKey(compactSpoken);
+    var phoneticExpected = tasmeePhoneticKey(compactExpected);
+    if (phoneticSpoken.length >= 3 && phoneticSpoken === phoneticExpected) return true;
+    return false;
   }
 
   // هل تطابق الكلمة المسموعة الكلمة رقم index في الآية: صيغة حفص أو أي صيغة للرواية المختارة.
@@ -4238,10 +4258,10 @@
     showTasmeeCelebration();
   }
 
-  function processTasmeeTranscript(transcript, showFeedback) {
-    if (!tasmeeListening || !tasmeeSession || tasmeeSession.completed) return;
+  function processTasmeeTranscript(transcript, showFeedback, interim) {
+    if (!tasmeeListening || !tasmeeSession || tasmeeSession.completed) return 0;
     var tokens = tokenizeTasmeeTranscript(transcript);
-    if (!tokens.length) return;
+    if (!tokens.length) return 0;
 
     var matchedAny = false;
     var changedVerse = false;
@@ -4249,9 +4269,11 @@
     var mismatchDetected = false;
 
     var state = currentTasmeeAyah();
-    if (!state) return;
+    if (!state) return 0;
 
-    while (tokenIdx < tokens.length && state.wordIndex > 0) {
+    // النتائج المؤقتة (interim) غير مستقرة: لا نسجّل منها أخطاءً، نكتفي بمطابقة الصحيح
+    // ونترك الباقي ليُحسم عند النتيجة النهائية.
+    while (!interim && tokenIdx < tokens.length && state.wordIndex > 0) {
       var matchedPrior = false;
       for (var prior = Math.max(0, state.wordIndex - 3); prior < state.wordIndex; prior++) {
         if (tasmeeMatchesAt(tokens[tokenIdx], state, prior)) {
@@ -4321,10 +4343,34 @@
             else {
               applyTasmeeWordState(pageList);
               finishTasmee();
-              return;
+              return tokenIdx;
             }
           }
         }
+      } else if (
+        // كلمتان مسموعتان = كلمة واحدة في المصحف (انقسام الكلمة)، أو كلمة مسموعة = كلمتان (اندماج).
+        tokenIdx + 1 < tokens.length &&
+        tasmeeMatchesAt(token + tokens[tokenIdx + 1], state, expectedIndex)
+      ) {
+        matchedAny = true;
+        state.revealed[expectedIndex + 1] = true;
+        if (!state.prompted || !state.prompted[expectedIndex + 1]) delete state.mistakes[expectedIndex + 1];
+        state.wordIndex = expectedIndex + 1;
+        tokenIdx += 2;
+      } else if (
+        expectedIndex + 1 < state.words.length &&
+        !(state.prompted && state.prompted[expectedIndex + 1]) &&
+        tasmeeWordMatches(token, state.words[expectedIndex] + state.words[expectedIndex + 1])
+      ) {
+        matchedAny = true;
+        state.revealed[expectedIndex + 1] = true;
+        state.revealed[expectedIndex + 2] = true;
+        delete state.mistakes[expectedIndex + 1];
+        delete state.mistakes[expectedIndex + 2];
+        state.wordIndex = expectedIndex + 2;
+        tokenIdx++;
+      } else if (interim) {
+        break;
       } else {
         // Mark the expected word immediately. This covers a wrong word,
         // a skipped word (the recognizer advanced), and a repeated word.
@@ -4349,6 +4395,7 @@
         : 'لم يتم التعرف على الكلمة؛ أعد المحاولة أو اضغط زر التلقين للمساعدة.';
     }
     if (mismatchDetected) applyTasmeeWordState(pageList);
+    return tokenIdx;
   }
 
   function selectTasmeeSpeechAlternative(result) {
@@ -4380,6 +4427,38 @@
     return bestText;
   }
 
+  var tasmeeFailStreak = 0;
+
+  // إعادة تشغيل المايك: سريعة (120ms) في الحالة العادية، وتصاعدية (حتى 4s) عند تكرار الفشل،
+  // مع إعادة إنشاء الكائن فقط إذا رفض start().
+  function scheduleTasmeeRestart(recognition, Recognition) {
+    clearTimeout(tasmeeRestartTimer);
+    var delay = Math.min(4000, tasmeeFailStreak ? 300 * Math.pow(2, tasmeeFailStreak - 1) : 120);
+    if (document.hidden) delay = Math.max(delay, 1000);
+    tasmeeRestartTimer = setTimeout(function () {
+      if (!tasmeeListening || tasmeeRecognition !== recognition) return;
+      if (tasmeeRecognitionStarted) return;
+      try {
+        recognition.start();
+      } catch (error) {
+        if (error && error.name === 'InvalidStateError') return; // يعمل بالفعل
+        tasmeeFailStreak++;
+        tasmeeRecognition = null;
+        startBrowserTasmeeRecognition(Recognition);
+      }
+    }, delay);
+  }
+
+  function resumeTasmeeIfStalled() {
+    if (!tasmeeListening || !tasmeeRecognition || tasmeeRecognitionStarted) return;
+    tasmeeFailStreak = 0;
+    scheduleTasmeeRestart(tasmeeRecognition, window.SpeechRecognition || window.webkitSpeechRecognition);
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) resumeTasmeeIfStalled();
+  });
+  window.addEventListener('online', resumeTasmeeIfStalled);
+
   function startBrowserTasmeeRecognition(Recognition) {
     if (!tasmeeSession || tasmeeSession.completed) {
       if (!createTasmeeSession()) return;
@@ -4391,6 +4470,7 @@
     }
     stopRecitation('تم إيقاف الاستماع لبدء التسميع');
     tasmeeListening = true;
+    tasmeeFailStreak = 0;
     tasmeeInterimTokens = [];
     applyTasmeeWordState(pageList);
     syncTasmeeControls();
@@ -4401,7 +4481,7 @@
       recognition.lang = 'ar-SA';
       recognition.continuous = true;
       recognition.interimResults = true;
-      recognition.maxAlternatives = 3;
+      recognition.maxAlternatives = 5;
     } catch (error) {
       tasmeeStatus.textContent = 'تعذر تهيئة التعرف الصوتي.';
       stopTasmeeRecognition();
@@ -4416,6 +4496,7 @@
     };
     recognition.onresult = function (event) {
       if (tasmeeRecognition !== recognition) return;
+      tasmeeFailStreak = 0;
       var finalText = '',
         interimText = '';
       for (var i = event.resultIndex; i < event.results.length; i++) {
@@ -4431,10 +4512,12 @@
         tasmeeInterimTokens[common] === interimTokens[common]
       )
         common++;
+      // المؤقت: نطابق الصحيح فقط، وما لم يُطابَق يبقى خارج "المعالَج" ليُحسم في النتيجة النهائية.
+      var consumed = 0;
       if (interimTokens.length > common) {
-        processTasmeeTranscript(interimTokens.slice(common).join(' '), false);
+        consumed = processTasmeeTranscript(interimTokens.slice(common).join(' '), false, true);
       }
-      tasmeeInterimTokens = interimTokens;
+      tasmeeInterimTokens = interimTokens.slice(0, common + consumed);
       if (finalText.trim()) {
         var finalTokens = tokenizeTasmeeTranscript(finalText),
           finalCommon = 0;
@@ -4445,7 +4528,7 @@
         )
           finalCommon++;
         if (finalTokens.length > finalCommon) {
-          processTasmeeTranscript(finalTokens.slice(finalCommon).join(' '), true);
+          processTasmeeTranscript(finalTokens.slice(finalCommon).join(' '), true, false);
         }
         tasmeeInterimTokens = [];
       }
@@ -4458,24 +4541,20 @@
         stopTasmeeRecognition();
         return;
       }
-      tasmeeStatus.textContent = 'تعذر التعرف مؤقتًا؛ جارٍ إعادة المحاولة…';
+      if (event.error === 'audio-capture') {
+        tasmeeStatus.textContent = 'لا يوجد ميكروفون متاح أو يستخدمه تطبيق آخر؛ جارٍ إعادة المحاولة…';
+      } else if (event.error === 'network') {
+        tasmeeStatus.textContent = 'التعرف الصوتي يحتاج اتصالًا بالإنترنت؛ جارٍ إعادة المحاولة…';
+      } else {
+        tasmeeStatus.textContent = 'تعذر التعرف مؤقتًا؛ جارٍ إعادة المحاولة…';
+      }
+      tasmeeFailStreak++;
     };
     recognition.onend = function () {
       if (tasmeeRecognition !== recognition) return;
       tasmeeRecognitionStarted = false;
       if (!tasmeeListening) return;
-      clearTimeout(tasmeeRestartTimer);
-      tasmeeRestartTimer = setTimeout(function () {
-        if (!tasmeeListening || tasmeeRecognition !== recognition) return;
-        try {
-          // Reuse the same recognition object. Creating a new object on
-          // every service timeout causes repeated microphone beeps.
-          recognition.start();
-        } catch (error) {
-          tasmeeRecognition = null;
-          startBrowserTasmeeRecognition(Recognition);
-        }
-      }, 700);
+      scheduleTasmeeRestart(recognition, Recognition);
     };
     try {
       recognition.start();
