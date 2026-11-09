@@ -7,7 +7,7 @@
 // في الإصدارات السابقة كانت الخطوط في نفس كاش الإصدار، وكل تحديث للـ service worker يحذفها فيحاول
 // التطبيق تنزيلها من جديد، وأي فشل في الشبكة (أو اختلاف اسم الكاش بين الصفحة والـ SW) كان يحجب المصحف.
 // عند التفعيل نُرحِّل الخطوط من الكاش القديم إلى ASSET_CACHE قبل حذفه حتى لا يخسرها من نزّلها سابقًا.
-var SHELL_CACHE = 'quran-shell-v141';
+var SHELL_CACHE = 'quran-shell-v148';
 var ASSET_CACHE = 'quran-assets-v1'; // يجب أن يطابق ASSET_CACHE في app.js
 var LEGACY_PREFIX = 'quran-pro-app-';
 var SHELL_PREFIX = 'quran-shell-';
@@ -83,7 +83,24 @@ self.addEventListener('notificationclick', function (event) {
 
 self.addEventListener('fetch', function (event) {
   var request = event.request;
-  if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
+  if (request.method !== 'GET') return;
+  var fontHost = new URL(request.url).hostname;
+  if (fontHost === 'fonts.googleapis.com' || fontHost === 'fonts.gstatic.com') {
+    // خطوط Google: تُخزَّن عند أول استخدام لتعمل دون إنترنت لاحقًا.
+    event.respondWith(
+      caches.open(ASSET_CACHE).then(function (cache) {
+        return cache.match(request).then(function (hit) {
+          var network = fetch(request).then(function (res) {
+            if (res && (res.ok || res.type === 'opaque')) cache.put(request, res.clone());
+            return res;
+          });
+          return hit || network.catch(function () { return hit; });
+        });
+      })
+    );
+    return;
+  }
+  if (new URL(request.url).origin !== self.location.origin) return;
 
   var requestUrl = new URL(request.url);
   if (requestUrl.pathname.endsWith('/note.mp3') && request.headers.has('range')) {

@@ -1504,6 +1504,7 @@ html[data-mode=light] .kx-pill.hot{background:#fff3c8;color:#8a5a00}
 .ls-gt{padding:5px 11px;border-radius:999px;background:rgba(79,220,156,.14);color:#4fdc9c;font-size:12.5px;font-weight:800}
 .ls-gt.all{background:var(--card2);color:var(--muted)}
 .acc-b .ls-types{margin:0}
+.acc[data-k="add"] .ls-blk{margin:0}
 .tc-fab .ic{width:18px;height:18px}
 .tq-card{display:flex;flex-direction:column;gap:12px}.tq-h{display:flex;align-items:center;gap:12px}.tq-h b{display:block;font-size:17px}.tq-h small{display:block;color:var(--muted);font-weight:600;font-size:12.5px;line-height:1.4}
 .tq-a{display:flex;flex-wrap:wrap;gap:6px}.tq-a .pill{min-height:38px;padding:0 13px;font-size:14px}
@@ -8458,9 +8459,7 @@ function lvStudentApply(changed){
 function lvFinish(){
   const d=LRM.st,me=lvMe(),i=d.players.findIndex(p=>p.id===me),p=d.players[i]||{};
   clearInterval(QZ.timer);LVV.permitted=false;lvvMicOff();
-  S.qh=S.qh||[];S.qh=S.qh.filter(x=>x.id!==LRM.sid);
-  S.qh.unshift({id:LRM.sid,title:d.title,kind:'contest',live:1,score:+(+p.score||0).toFixed(2),correct:+p.correct||0,total:d.total,rank:i+1,of:d.players.length,ts:Date.now()});
-  S.qh=S.qh.slice(0,50);save();
+    save();
   try{if(sbSess())sbPush().catch(()=>{});}catch(e){}
   try{sfx('ok');}catch(e){}
   sqLoad(true);render();
@@ -8510,13 +8509,13 @@ function vLvStudent(){
 {const _s=qzSubmit;qzSubmit=async function(){
   await _s.apply(this,arguments);
   try{if(QZ.sub==='saved'&&!QZ.live&&!QZ.preview){
-    const q=QZ.quiz;S.qh=(S.qh||[]).filter(x=>x.id!==q.id);
-    S.qh.unshift({id:q.id,title:q.title,kind:q.kind||'quiz',score:QZ.score,correct:QZ.correct,total:QZ.qs.length,ts:Date.now()});
-    S.qh=S.qh.slice(0,50);save();
+    const q=QZ.quiz;
+    save();
   }}catch(e){}
 };}
 /* ---------- student: history card + floating "live now" button ---------- */
 function lvHistCard(){
+  return '';
   const H=(S.qh||[]).slice(0,6);if(!H.length||!sbSess())return '';
   return `<div class="card sq-card"><div class="sec-h" style="margin:0"><h3 style="margin:0;font-size:18px">سجل اختباراتي</h3><small>${(S.qh||[]).length}</small></div>${H.map(h=>`<div class="sq-row"><span class="au-ai">${ic(h.kind==='contest'?'trophy':'pencil')}</span><div style="flex:1;min-width:0"><b>${esc(h.title)}</b><small>${h.live?`المركز ${h.rank} من ${h.of} · ${h.score} نقطة`:`${h.correct}/${h.total} صحيحة`} · ${lvDate(h.ts)}</small></div><span class="tag ok en">${Math.round((h.correct||0)/((h.total)||1)*100)}%</span></div>`).join('')}</div>`;
 }
@@ -9501,6 +9500,7 @@ function qxList(seg){
 }
 
 /* ===== lesson content: English-only input, meanings detected automatically and editable ===== */
+const lsCur=()=>{const q=typeof TQ!=='undefined'&&TQ.edit;return q&&q.settings?(q.settings.lesson||q.settings.bank||null):null;};
 const LSB=new Set();   // rows whose meaning is still being fetched
 function lsRows(g,L){
   const arr=g==='w'?L.words:L.sents;
@@ -9522,7 +9522,7 @@ function lsContent(L){
 }
 const lsEn=s=>String(s||'').trim().replace(/\s+/g,' ');
 function lsPatch(g,rows){
-  const L=TQ.edit&&TQ.edit.settings.lesson;if(!L)return;
+  const L=lsCur();if(!L)return;
   const arr=g==='w'?L.words:L.sents;
   rows.forEach(r=>{
     const i=arr.indexOf(r);if(i<0)return;
@@ -9591,11 +9591,11 @@ async function lsFill(g,rows){
   }
   rows.forEach(r=>LSB.delete(r));
   lsPatch(g,rows);
-  const L=TQ.edit&&TQ.edit.settings.lesson;if(L&&g==='w'&&rows.some(r=>r[2]))render(true);
+  const L=lsCur();if(L&&g==='w'&&rows.some(r=>r[2]))render(true);
   if(rows.some(r=>!String(r[1]).trim()))toast('لم أجد معنى بعض العناصر، اكتبه بنفسك');
 }
 function lsAdd(g){
-  const q=TQ.edit;if(!q||!q.settings.lesson)return;const L=q.settings.lesson;L.words=L.words||[];L.sents=L.sents||[];
+  const q=TQ.edit,L=lsCur();if(!q||!L)return;L.words=L.words||[];L.sents=L.sents||[];
   const inp=document.getElementById(g==='w'?'lsWIn':'lsSIn');if(!inp)return;
   const raw=inp.value;
   let items;
@@ -9616,23 +9616,111 @@ document.addEventListener('click',e=>{
   const b=e.target.closest&&e.target.closest('[data-act="lsn_wadd"],[data-act="lsn_sadd"],[data-act="lsn_rdel"],[data-act="lsn_vt"]');if(!b)return;
   e.stopPropagation();e.preventDefault();
   const a=b.dataset.act;
-  if(a==='lsn_vt'){const L=TQ.edit&&TQ.edit.settings.lesson,r=L&&L.words[+b.dataset.i];if(r){r[2]=r[2]?0:1;if(!r[2])r[5]=0;if(r[2]&&!r[3]){try{r[3]=verbPast(r[0])||'';}catch(e){}}render(true);}return;}
+  if(a==='lsn_vt'){const L=lsCur(),r=L&&L.words[+b.dataset.i];if(r){r[2]=r[2]?0:1;if(!r[2])r[5]=0;if(r[2]&&!r[3]){try{r[3]=verbPast(r[0])||'';}catch(e){}}render(true);}return;}
   if(a==='lsn_wadd')lsAdd('w');else if(a==='lsn_sadd')lsAdd('s');
-  else{const L=TQ.edit&&TQ.edit.settings.lesson;if(!L)return;const arr=b.dataset.g==='w'?L.words:L.sents,r=arr[+b.dataset.i];if(r){LSB.delete(r);arr.splice(+b.dataset.i,1);render(true);}}
+  else{const L=lsCur();if(!L)return;const arr=b.dataset.g==='w'?L.words:L.sents,r=arr[+b.dataset.i];if(r){LSB.delete(r);arr.splice(+b.dataset.i,1);render(true);}}
 },true);
 document.addEventListener('keydown',e=>{
   if(e.key!=='Enter')return;const t=e.target;
   if(t&&(t.id==='lsWIn'||t.id==='lsSIn')){e.preventDefault();lsAdd(t.id==='lsWIn'?'w':'s');}
 });
 document.addEventListener('input',e=>{
-  const t=e.target,D=t&&t.dataset;if(!D||!D.lsr||!TQ.edit||!TQ.edit.settings.lesson)return;
-  const L=TQ.edit.settings.lesson,r=(D.lsr==='w'?L.words:L.sents)[+D.i];if(r){r[1]=t.value;const el=t.closest('.ls-r');if(el)el.classList.toggle('miss',!t.value.trim());}
+  const t=e.target,D=t&&t.dataset;if(!D||!D.lsr||!lsCur())return;
+  const L=lsCur(),r=(D.lsr==='w'?L.words:L.sents)[+D.i];if(r){r[1]=t.value;const el=t.closest('.ls-r');if(el)el.classList.toggle('miss',!t.value.trim());}
 });
 {const _c=tqClean;tqClean=function(q){
   if(isLesson(q)){const L=q.settings.lesson;L.words=(L.words||[]).filter(x=>x[0]&&String(x[1]).trim());L.sents=(L.sents||[]).filter(x=>x[0]&&String(x[1]).trim());delete L.wt;delete L.st;}
   return _c.apply(this,arguments);
 };}
 /* student side: ignore entries without a meaning */
+
+/* ===== teacher quizzes/contests: same content flow as the student
+   (add words & sentences -> generate short sentences -> pick -> build questions) ===== */
+const TCA={add:1,gen:0,types:0};
+function tcBank(q){
+  const s=q.settings;
+  if(!s.bank){s.bank={words:[],sents:[],types:LS_DEF.slice()};GEN.list=[];GZ.step='t';}
+  const b=s.bank;b.words=b.words||[];b.sents=b.sents||[];if(!b.types)b.types=LS_DEF.slice();
+  return b;
+}
+function tcAcc(k,icon,color,title,sub,badge,body){
+  const o=TCA[k]?' open':'';
+  return `<section class="acc${o}" data-k="${k}" style="--ec:${color}"><button type="button" class="acc-h" data-act="tc_acc" data-k="${k}" aria-expanded="${!!TCA[k]}">
+   <span class="acc-ic">${ic(icon)}</span><span class="acc-t"><b>${title}</b><small>${sub}</small></span>${badge!==''&&badge!=null?`<span class="acc-n en">${badge}</span>`:''}<span class="acc-ch">${ic('chev')}</span></button>
+   <div class="acc-b">${body}</div></section>`;
+}
+const tcItems=b=>b.words.filter(r=>r[0]).map((r,i)=>({id:'b'+i,t:r[2]?'v':'w',en:r[0],a:r[1]||'',p:r[2]?(r[3]||(()=>{try{return verbPast(r[0])||'';}catch(e){return '';}})()):'',pa:r[2]?(r[4]||''):'',m:0}));
+function tcGenHtml(b){
+  const n=b.words.length,sv=genCount;
+  genCount=()=>n;
+  let h;try{h=genCard();}finally{genCount=sv;}
+  return h.replace(/data-act="gen"/g,'data-act="tg_gen"').replace(/data-act="genadd"/g,'data-act="tg_add"').replace(/data-act="genall"/g,'data-act="tg_all"')
+    .replace(/<button class="btn ghost gz-ai"[\s\S]*?<\/button>/,'').replace('أضف كلمات أو أفعالًا أولًا','أضف كلمات أولًا في القسم السابق');
+}
+function tcTypes(q,b){
+  const T=new Set(b.types&&b.types.length?b.types:LS_DEF),n=q.questions.length;
+  return `<div class="kx-exg">${LS_TY.map(t=>{const m=LSI[t[0]],on=T.has(t[0]);return `<button type="button" class="kx-ex ${on?'on':''}" data-act="tc_ty" data-v="${t[0]}" aria-pressed="${on}" style="--ec:${m[1]}"><span class="ei">${ic(m[0])}</span><b>${t[1].replace(/ \(.*\)/,'')}</b><small>${m[2]}</small><i class="ck">${on?ic('check'):''}</i></button>`;}).join('')}</div>
+   <div class="gz-go"><button class="btn gz-gen" data-act="tc_mk">${ic('spark')}<span>أضف الأسئلة إلى القائمة</span></button>
+   <small class="gz-hint">${n?'تُضاف الأسئلة الجديدة بعد أسئلتك الحالية':'ستظهر الأسئلة في قسم «الأسئلة» لتعدّلها'}</small></div>`;
+}
+{const _e=vTqEdit;vTqEdit=function(){
+  const q=TQ.edit,h=_e.apply(this,arguments);
+  if(!q||isLesson(q))return h;
+  const i=h.indexOf('<section class="acc'+'" data-k="gen"')>=0?h.indexOf('<section class="acc" data-k="gen"'):h.search(/<section class="acc[^"]*" data-k="gen"/);
+  if(i<0)return h;
+  const j=h.indexOf('</section>',i);if(j<0)return h;
+  const b=tcBank(q),nw=b.words.length,ns=b.sents.length;
+  const add=lsContent(b),gen=tcGenHtml(b),T=b.types&&b.types.length?b.types.length:LS_DEF.length;
+  const sec=tcAcc('add','book','#4fdc9c','إضافة الكلمات والجمل','اكتب بالإنجليزية فقط وعدّل المعاني',nw+ns||'',add)
+   +tcAcc('gen','spark','#9686ff','ولّد جمل قصيرة','من كلماتك وأفعالك بالزمن الذي تختاره',ns?ns:'',gen)
+   +tcAcc('types','list','#ffae5c','أنواع الأسئلة','اختر الأنواع ثم ولّد الأسئلة',T,tcTypes(q,b));
+  return h.slice(0,i)+sec+h.slice(j+'</section>'.length);
+};}
+function tcAddSents(b,list){
+  const have=new Set(b.sents.map(r=>r[0].toLowerCase())),rows=[];
+  list.forEach(x=>{if(have.has(x.en.toLowerCase()))return;have.add(x.en.toLowerCase());const r=[x.en,x.a||''];b.sents.push(r);if(!r[1])rows.push(r);});
+  if(rows.length)lsFill('s',rows);
+}
+document.addEventListener('click',e=>{
+  const bt=e.target.closest&&e.target.closest('[data-act^="tc_"],[data-act^="tg_"]');if(!bt||bt.disabled)return;
+  const q=TQ.edit;if(!q||isLesson(q))return;
+  e.stopPropagation();e.preventDefault();
+  const a=bt.dataset.act,b=tcBank(q);
+  if(a==='tc_acc'){
+    const k=bt.dataset.k;TCA[k]=TCA[k]?0:1;
+    const s=bt.closest('.acc');if(s){s.classList.toggle('open',!!TCA[k]);bt.setAttribute('aria-expanded',String(!!TCA[k]));}
+    return;
+  }
+  if(a==='tc_ty'){
+    const T=new Set(b.types&&b.types.length?b.types:LS_DEF);T.has(bt.dataset.v)?T.delete(bt.dataset.v):T.add(bt.dataset.v);
+    b.types=LS_TY.map(x=>x[0]).filter(x=>T.has(x));render(true);return;
+  }
+  if(a==='tc_mk'){
+    if([...b.words,...b.sents].some(r=>LSB.has(r))){tqShowMsg('انتظر لحظة حتى يكتمل تحديد المعاني.');return;}
+    const bad=[...b.words,...b.sents].filter(r=>!String(r[1]).trim());
+    if(bad.length){tqShowMsg('اكتب معنى '+bad.length+(bad.length===1?' عنصر':' عناصر')+' ناقصة (معلّمة بالأحمر) أو احذفها.');TCA.add=1;render(true);return;}
+    if(!b.words.length&&!b.sents.length){tqShowMsg('أضف كلمة أو جملة واحدة على الأقل.');TCA.add=1;render(true);return;}
+    if(!(b.types||[]).length){tqShowMsg('اختر نوعًا واحدًا من أنواع الأسئلة على الأقل.');return;}
+    const qs=lsGen(b);
+    if(!qs.length){tqShowMsg('لم تتولد أسئلة. أضف كلمتين على الأقل أو غيّر أنواع الأسئلة.');return;}
+    tqShowMsg('');q.questions=q.questions.concat(qs);QACC.qs=1;TCA.types=0;TCA.add=0;TCA.gen=0;render(true);toast('أُضيف '+qs.length+' سؤالًا، راجعها وعدّلها');
+    setTimeout(()=>{const el=document.querySelector('.acc[data-k="qs"]');if(el)el.scrollIntoView({block:'start',behavior:'smooth'});},40);
+    return;
+  }
+  if(a==='tg_gen'){
+    if(!b.words.length){toast('أضف كلمات أولًا');return;}
+    GEN.seed=(GEN.seed||Date.now())+7919;GEN.ai=false;
+    let list=[];
+    try{list=GX.gen(tcItems(b),{tense:GEN.tense,kind:GEN.kind,grp:GEN.grp,seed:GEN.seed,n:10,marks:!!GEN.marks});}catch(er){console.error(er);}
+    const have=new Set(b.sents.map(r=>r[0].toLowerCase())),wc=x=>x.en.trim().split(/\s+/).length;
+    GEN.list=list.filter(x=>!have.has(x.en.toLowerCase())).map(x=>({en:x.en,a:x.a,hl:x.hl,tn:x.tn,kind:x.kind,grp:x.grp}))
+      .map((x,i)=>[x,i]).sort((p,r)=>wc(p[0])-wc(r[0])||p[1]-r[1]).map(p=>p[0]).slice(0,8);
+    if(!GEN.list.length)toast('لا توجد جمل مناسبة، جرّب اختيارات أخرى أو أضف كلمات');
+    render(true);return;
+  }
+  if(a==='tg_add'){const x=GEN.list[+bt.dataset.k];if(!x)return;GEN.list.splice(+bt.dataset.k,1);tcAddSents(b,[x]);toast('أُضيفت الجملة إلى جمل الاختبار');render(true);return;}
+  if(a==='tg_all'){const l=GEN.list.slice();GEN.list=[];tcAddSents(b,l);toast('أُضيفت '+l.length+' جملة');render(true);return;}
+},true);
 
 
 /* ====================================================================
