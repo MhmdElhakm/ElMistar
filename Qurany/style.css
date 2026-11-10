@@ -3550,90 +3550,6 @@ body.surahs-index .d-title {
 .qpt-bell .qpt-bell-slash {
   stroke-width: 2.2;
 }
-.qpt-alerts {
-  display: block;
-  overflow: hidden;
-  margin-top: 12px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--card);
-}
-.qpt-alert-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-height: 54px;
-  padding: 10px 14px;
-  cursor: pointer;
-  list-style: none;
-}
-.qpt-alert-summary::-webkit-details-marker {
-  display: none;
-}
-.qpt-alert-summary > span {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-.qpt-alert-summary b {
-  color: var(--green);
-  font-size: 14px;
-  font-weight: 900;
-}
-.qpt-alert-summary small {
-  overflow: hidden;
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.qpt-alert-summary i {
-  width: 9px;
-  height: 9px;
-  flex: 0 0 9px;
-  border-right: 2px solid var(--muted);
-  border-bottom: 2px solid var(--muted);
-  transform: rotate(45deg) translateY(-2px);
-  transition: transform 0.18s ease;
-}
-.qpt-alerts[open] .qpt-alert-summary {
-  border-bottom: 1px solid var(--line);
-}
-.qpt-alerts[open] .qpt-alert-summary i {
-  transform: rotate(225deg) translate(-2px, -1px);
-}
-.qpt-alert-content {
-  display: grid;
-  gap: 12px;
-  padding: 14px;
-}
-.qpt-alerts input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  margin: 0;
-  accent-color: var(--green);
-}
-.qpt-alert-option,
-.qpt-alert-toggle,
-.qpt-notification-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 12px;
-  font-weight: 800;
-}
-.qpt-alert-option select {
-  max-width: 150px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 7px 9px;
-  color: var(--ink);
-  background: var(--panel);
-  font: inherit;
-}
 .qpt-audio-info {
   justify-self: end;
   color: var(--muted);
@@ -3660,47 +3576,6 @@ body.surahs-index .d-title {
   color: inherit;
   text-decoration: underline;
 }
-.qpt-alert-toggle {
-  justify-content: flex-start;
-}
-.qpt-notification-row {
-  padding-top: 10px;
-  border-top: 1px solid var(--line);
-}
-.qpt-notification-row[hidden] {
-  display: none;
-}
-.qpt-notification-button {
-  flex: 0 0 auto;
-  border: 1px solid color-mix(in srgb, var(--green) 30%, var(--line));
-  border-radius: 999px;
-  padding: 7px 11px;
-  color: var(--green);
-  background: var(--panel);
-  font:
-    800 11px -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
-}
-.qpt-notification-button[hidden] {
-  display: none;
-}
-.qpt-alert-status {
-  min-height: 0;
-  margin: 0;
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 800;
-}
-.qpt-alert-status:empty {
-  display: none;
-}
-.qpt-alert-status[data-kind="warning"] {
-  color: var(--sub);
-}
-.qpt-alert-status[data-kind="error"] {
-  color: var(--red);
-}
 .qpt-actions {
   display: flex;
   justify-content: center;
@@ -3721,18 +3596,6 @@ body.surahs-index .d-title {
   color: var(--muted);
   font-size: 10px;
   text-align: center;
-}
-.qpt-preview-button {
-  justify-self: start;
-  border: 1px solid color-mix(in srgb, var(--green) 30%, var(--line));
-  border-radius: 999px;
-  padding: 7px 12px;
-  color: var(--green);
-  background: var(--panel);
-  font:
-    800 11px -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
 }
 .adhan-screen {
   position: fixed;
@@ -6034,3 +5897,86 @@ body.titled .search {
 .ui-font-details[open] > summary {
   margin-bottom: 8px;
 }
+
+/* قسم إعدادات الأذان */
+.adhan-card > summary { cursor: pointer; list-style: none; }
+.adhan-card > summary::-webkit-details-marker { display: none; }
+.adhan-card > summary::after { content: "▾"; margin-inline-start: auto; transition: transform .2s; }
+.adhan-card[open] > summary::after { transform: rotate(180deg); }
+.adhan-set { display: grid; gap: 12px; padding-top: 8px; }
+.adhan-set-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.adhan-set-switch span { display: grid; gap: 3px; }
+.adhan-set-switch small, .adhan-set-credit { color: var(--muted, inherit); font-size: 11px; line-height: 1.6; }
+.adhan-set-switch input { width: 42px; height: 24px; flex: none; accent-color: var(--green); }
+.adhan-set-field { display: grid; gap: 6px; font-size: 13px; }
+.adhan-set-field select { width: 100%; padding: 9px 10px; border-radius: 10px; border: 1px solid rgba(128,128,128,.35); background: transparent; color: inherit; font: inherit; }
+.adhan-set-field input[type="range"] { width: 100%; accent-color: var(--green); }
+.adhan-set-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.adhan-set-file, .adhan-set-preview, .adhan-set-danger { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 14px; border-radius: 12px; font: inherit; font-size: 12.5px; font-weight: 800; cursor: pointer; border: 1px solid color-mix(in srgb, var(--green) 35%, var(--line)); background: color-mix(in srgb, var(--green) 7%, var(--card)); color: var(--green); }
+.adhan-set-file input { display: none; }
+.adhan-set-danger { border-color: color-mix(in srgb, var(--red) 40%, var(--line)); background: color-mix(in srgb, var(--red) 8%, var(--card)); color: var(--red); }
+.adhan-set-preview { background: var(--green); color: #fff; border: 0; min-height: 44px; }
+.adhan-set-prayers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.adhan-set-prayers strong { grid-column: 1 / -1; font-size: 12px; }
+.adhan-set-prayers label { display: flex; align-items: center; gap: 6px; font-size: 12.5px; }
+.adhan-set-prayers input { accent-color: var(--green); }
+.adhan-set-status { margin: 0; font-size: 11.5px; color: var(--green); }
+.adhan-set-status:empty, .adhan-set-credit:empty { display: none; }
+.adhan-set-status[data-kind="warning"] { color: #b26a00; }
+.adhan-set-status[data-kind="error"] { color: var(--red); }
+
+/* المتشابهات + لفظ الجلالة */
+.w.w-sim {
+  background: color-mix(in srgb, var(--sim-c) 20%, transparent);
+  box-shadow: inset 0 -2px 0 var(--sim-c);
+  border-radius: 4px;
+}
+.w.w-divine,
+.w.w-divine * {
+  color: #c62828 !important;
+}
+:root[data-theme="dark"] .w.w-divine,
+:root[data-theme="dark"] .w.w-divine * {
+  color: #ff6b6b !important;
+}
+/* داخل المصحف الملوّن: نستبدل لوحة الألوان بالأحمر لهذه الكلمات فقط */
+.sheet.tajweed-active .w.w-divine {
+  font-palette: var(--tajweed-divine-palette) !important;
+}
+:root[data-theme="dark"] .sheet.tajweed-active .w.w-divine {
+  font-palette: var(--tajweed-divine-dark-palette) !important;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sheet.tajweed-active .w.w-divine {
+    font-palette: var(--tajweed-divine-dark-palette) !important;
+  }
+  :root:not([data-theme="light"]) .w.w-divine,
+  :root:not([data-theme="light"]) .w.w-divine * {
+    color: #ff6b6b !important;
+  }
+}
+.wp-sim {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--green) 5%, var(--panel));
+}
+.wp-sim > small { color: var(--muted, inherit); font-weight: 800; }
+.wp-sim-note { margin: 0; font-size: 12px; }
+.wp-sim-item { display: grid; gap: 6px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.wp-sim-item:first-of-type { border-top: 0; padding-top: 0; }
+.wp-sim-go {
+  display: flex; justify-content: space-between; gap: 8px; align-items: center;
+  padding: 6px 9px; border: 0; border-radius: 9px; cursor: pointer; font: inherit;
+  background: color-mix(in srgb, var(--green) 10%, var(--card)); color: var(--green); font-size: 12px;
+}
+.wp-sim-go span { font-size: 11px; opacity: .85; }
+.wp-sim-text { margin: 0; line-height: 2; font-size: 15px; }
+.wp-sim-text mark { background: color-mix(in srgb, var(--sim-c) 28%, transparent); box-shadow: inset 0 -2px 0 var(--sim-c); color: inherit; border-radius: 4px; padding: 0 2px; }
+.wp-sim-focus { margin: 0; padding: 6px 8px; border-radius: 8px; background: color-mix(in srgb, #d97706 14%, var(--card)); font-size: 12px; font-weight: 700; }
+.wp-sim-diff { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.wp-sim-diff li { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; }
+.wp-sim-diff i { color: var(--muted, inherit); font-style: normal; }

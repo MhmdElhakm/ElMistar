@@ -1463,8 +1463,8 @@
     });
   }
   /* ===== واجهة الحساب (إنشاء / دخول برقم الهاتف / حذف) ===== */
-  const accountUi = { name: '', phone: '', loginPhone: '', results: null, busy: false, msg: '', error: false };
-  function accountSectionHtml() {
+  const accountUi = { open: false, name: '', phone: '', loginPhone: '', results: null, busy: false, msg: '', error: false };
+  function accountInnerHtml() {
     const account = cloudState().account;
     const online = navigator.onLine !== false;
     const note = accountUi.msg
@@ -1511,6 +1511,15 @@
       <p class="account-hint account-warn">⚠ الدخول يتم بالرقم فقط دون رمز تحقق؛ لا تستخدم الحساب لبيانات حساسة.</p>
       ${note}
     </section>`;
+  }
+  function accountSectionHtml() {
+    const account = cloudState().account;
+    const title = account ? `حسابك: ${esc(account.name)}` : 'الحساب السحابي';
+    const sub = account ? 'متصل — بياناتك تُحفظ تلقائيًا' : 'احفظ بياناتك وادخل من أي جهاز';
+    return `<details class="account-fold"${accountUi.open ? ' open' : ''}>
+      <summary><span class="account-fold-icon" aria-hidden="true">☁</span><span class="account-fold-copy"><strong>${title}</strong><small>${sub}</small></span><span class="account-fold-caret" aria-hidden="true">▾</span></summary>
+      ${accountInnerHtml()}
+    </details>`;
   }
   async function runAccountTask(task, successMessage) {
     accountUi.busy = true;
@@ -1780,7 +1789,7 @@
           </div>
           ${
             state.profileFormOpen
-              ? `<form class="profile-form" data-form="profile">
+              ? `<div class="profile-form"><form class="profile-form-inner" data-form="profile">
             <div class="profile-form-heading"><span aria-hidden="true">✦</span><div><strong>بياناتك الشخصية</strong><small>أضف معلوماتك لتخصيص تجربتك</small></div></div>
             <div class="profile-avatar-row">
               <img class="profile-avatar" src="${state.profile.avatar || './logo.png'}" alt="معاينة الصورة الشخصية">
@@ -1801,8 +1810,9 @@
             </label>
             <button type="submit" class="primary profile-save"><span aria-hidden="true">✓</span> حفظ الملف على هذا الجهاز</button>
             <p class="profile-privacy"><span aria-hidden="true">🔒</span> بياناتك ونقاطك محفوظة على هذا الجهاز. عند توفر الإنترنت يُرسَل اسمك ونقاطك وصورتك فقط إلى لوحة المتصدرين (دون تسجيل)، ولا يُرسَل رقم هاتفك إلا إن اخترت إظهاره. أوقف الظهور بإلغاء الخيار أعلاه.</p>
-          </form>`
+          </form>${accountSectionHtml()}</div>`
               : `
+            <div class="profile-data">
             <section class="profile-summary" aria-label="بيانات الملف المحفوظة">
               <img class="profile-avatar" src="${state.profile.avatar || './logo.png'}" alt="الصورة الشخصية">
               <div class="profile-summary-copy">
@@ -1816,9 +1826,10 @@
                 ${state.profile.avatar ? '<button type="button" class="secondary profile-clear-photo" data-action="clear-profile-avatar">إزالة الصورة</button>' : ''}
               </div>
             </section>
+            ${accountSectionHtml()}
+            </div>
           `
           }
-          ${accountSectionHtml()}
           <section class="leaderboard-card" aria-label="لوحة المتصدرين">
             <div class="leaderboard-heading"><span aria-hidden="true">🏆</span><div><strong>لوحة المتصدرين</strong><small>${boardStatus}</small></div></div>
             <div class="leaderboard-podium" aria-label="المراكز الثلاثة الأولى">
@@ -1915,6 +1926,22 @@
           .account-msg{margin:0;padding:8px;border-radius:9px;background:color-mix(in srgb,var(--green) 10%,var(--panel));font-size:11px}.account-msg.is-error{background:color-mix(in srgb,var(--red) 12%,var(--panel));color:var(--red)}
           .account-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}.account-list li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}.account-list li span{display:flex;gap:6px}
           .account-danger{color:var(--red)}
+          .profile-form-inner{display:grid;gap:13px}.profile-data{display:grid;gap:10px}
+          .account-fold{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden}
+          .account-fold>summary{display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;list-style:none}.account-fold>summary::-webkit-details-marker{display:none}
+          .account-fold-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:color-mix(in srgb,var(--green) 11%,var(--card));font-size:17px}
+          .account-fold-copy{display:grid;gap:2px;flex:1;min-width:0}.account-fold-copy strong{font-size:12.5px}.account-fold-copy small{color:var(--muted);font-size:10px}
+          .account-fold-caret{color:var(--muted);transition:transform .2s}.account-fold[open] .account-fold-caret{transform:rotate(180deg)}
+          .account-fold>.account-card{border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;background:transparent}
+          .account-head{display:none}
+          .account-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+          .account-actions button,.account-list button,.account-form button{min-height:42px;padding:0 14px;border-radius:12px;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;transition:transform .12s,background .15s}
+          .account-actions button:active,.account-list button:active,.account-form button:active{transform:scale(.97)}
+          .account-actions .primary{grid-column:1/-1;border:0;background:var(--green);color:#fff}
+          .account-actions .secondary{border:1px solid color-mix(in srgb,var(--green) 35%,var(--line));background:color-mix(in srgb,var(--green) 7%,var(--card));color:var(--green)}
+          .account-actions .account-danger,.account-list .account-danger{border:1px solid color-mix(in srgb,var(--red) 40%,var(--line));background:color-mix(in srgb,var(--red) 8%,var(--card));color:var(--red)}
+          .account-actions button:disabled,.account-list button:disabled,.account-form button:disabled{opacity:.55;cursor:default}
+          .account-list button{min-height:36px;padding:0 12px}
           .profile-score,.profile-form,.leaderboard-card{border:1px solid var(--line);border-radius:17px;background:var(--card);box-shadow:0 6px 20px rgba(40,34,26,.045)}
           .profile-score{display:flex;align-items:center;gap:11px;padding:14px;background:linear-gradient(125deg,color-mix(in srgb,var(--green) 8%,var(--card)),var(--card) 72%)}
           .profile-score-icon{display:grid;place-items:center;width:40px;height:40px;flex:none;border-radius:13px;background:color-mix(in srgb,var(--sub) 14%,var(--panel));font-size:19px}
@@ -2063,6 +2090,13 @@
     render();
   }
   let draftSaveTimer = 0;
+  root.addEventListener(
+    'toggle',
+    event => {
+      if (event.target.classList && event.target.classList.contains('account-fold')) accountUi.open = event.target.open;
+    },
+    true
+  );
   root.addEventListener('input', event => {
     const field = event.target;
     if (field && field.name === 'acctName') accountUi.name = field.value;
@@ -2763,6 +2797,206 @@
   function verseText(s, a) {
     return D.texts[s - 1][a - 1].replace(/ /g, '');
   }
+  /* ======== المتشابهات + تلوين لفظ الجلالة والرب ======== */
+  var SIMILAR = { enabled: store('mq.similar') === '1', data: null, loading: null, counts: null, cache: Object.create(null) };
+  var DIVINE = { enabled: store('mq.divine') === '1', cache: Object.create(null) };
+  var SIM_COLORS = ['#e11d48', '#2563eb', '#059669', '#d97706', '#7c3aed', '#0891b2', '#be185d', '#65a30d'];
+
+  function loadSimilar() {
+    if (SIMILAR.data) return Promise.resolve(SIMILAR.data);
+    if (!SIMILAR.loading) {
+      SIMILAR.loading = fetch('./mutashabihat.json')
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function (j) {
+          SIMILAR.data = j;
+          return j;
+        })
+        .catch(function (e) {
+          SIMILAR.loading = null;
+          throw e;
+        });
+    }
+    return SIMILAR.loading;
+  }
+  // عدد كلمات كل آية في صفحات المصحف: نلوّن فقط الآيات التي يطابق عدد كلماتها نص الآية.
+  function wordCountsMatch(v) {
+    if (!SIMILAR.counts) {
+      var cnt = Object.create(null);
+      G.forEach(function (page) {
+        page.forEach(function (l) {
+          if (l[0] !== 'w') return;
+          l[2].forEach(function (it) {
+            if (it[0] && it[2] > 0 && it[2] > (cnt[it[0]] || 0)) cnt[it[0]] = it[2];
+          });
+        });
+      });
+      SIMILAR.counts = cnt;
+    }
+    var s = Math.floor(v / 1000),
+      a = v % 1000;
+    return !!D.texts[s - 1] && SIMILAR.counts[v] === verseText(s, a).split(/\s+/).filter(Boolean).length;
+  }
+  function simWords(v) {
+    return verseText(Math.floor(v / 1000), v % 1000)
+      .split(/\s+/)
+      .filter(Boolean);
+  }
+  // مقارنة على مستوى الكلمات (LCS): تُرجع مقاطع الاختلاف بين آيتين.
+  function diffVerses(va, vb) {
+    var A = simWords(va),
+      B = simWords(vb),
+      na = A.map(normalizeTasmeeWord),
+      nb = B.map(normalizeTasmeeWord);
+    var n = na.length,
+      m = nb.length,
+      dp = [];
+    for (var i = 0; i <= n; i++) dp.push(new Array(m + 1).fill(0));
+    for (i = n - 1; i >= 0; i--)
+      for (var j = m - 1; j >= 0; j--)
+        dp[i][j] = na[i] === nb[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    var segs = [],
+      ai = 0,
+      bj = 0,
+      cur = null;
+    i = 0;
+    j = 0;
+    function flush() {
+      if (cur) segs.push(cur);
+      cur = null;
+    }
+    while (i < n || j < m) {
+      if (i < n && j < m && na[i] === nb[j]) {
+        flush();
+        i++;
+        j++;
+      } else {
+        if (!cur) cur = { a0: i, a1: i, b0: j, b1: j };
+        if (j >= m || (i < n && dp[i + 1][j] >= dp[i][j + 1])) {
+          i++;
+          cur.a1 = i;
+        } else {
+          j++;
+          cur.b1 = j;
+        }
+      }
+    }
+    flush();
+    return { A: A, B: B, segs: segs };
+  }
+  // مواضع الكلمات المختلفة في الآية v مقابل أقرب آية متشابهة (للتلوين) مع لون الزوج.
+  function verseSimilarMarks(v) {
+    if (v in SIMILAR.cache) return SIMILAR.cache[v];
+    var res = null;
+    var list = SIMILAR.data && SIMILAR.data[v];
+    if (list && list.length && wordCountsMatch(v)) {
+      var other = list[0][0];
+      var d = diffVerses(v, other);
+      var set = Object.create(null);
+      d.segs.forEach(function (sg) {
+        for (var k = sg.a0; k < sg.a1; k++) set[k + 1] = true;
+      });
+      if (Object.keys(set).length) res = { set: set, color: SIM_COLORS[Math.min(v, other) % SIM_COLORS.length] };
+    }
+    SIMILAR.cache[v] = res;
+    return res;
+  }
+  var DIVINE_RE = /^[وفبلكت]*(?:الله|لله|اللهم)$|^[وفبلك]*رب(?:ك|كم|كما|نا|ي|ه|ها|هم|هما)?$/;
+  function isDivineWord(raw) {
+    if (raw in DIVINE.cache) return DIVINE.cache[raw];
+    var ok = DIVINE_RE.test(normalizeTasmeeWord(raw));
+    DIVINE.cache[raw] = ok;
+    return ok;
+  }
+  function refreshWordMarks(root) {
+    (root || document).querySelectorAll('.w[data-v]').forEach(function (w) {
+      var pos = +w.getAttribute('data-p');
+      if (!(pos > 0)) return;
+      var v = +w.getAttribute('data-v');
+      var s = Math.floor(v / 1000),
+        a = v % 1000;
+      var marks = SIMILAR.enabled && SIMILAR.data ? verseSimilarMarks(v) : null;
+      var simOn = !!(marks && marks.set[pos]);
+      w.classList.toggle('w-sim', simOn);
+      if (simOn) w.style.setProperty('--sim-c', marks.color);
+      else if (w.style.getPropertyValue('--sim-c')) w.style.removeProperty('--sim-c');
+      var divineOn = false;
+      if (DIVINE.enabled && D.texts[s - 1] && wordCountsMatch(v)) {
+        var raw = verseText(s, a).split(/\s+/).filter(Boolean)[pos - 1];
+        divineOn = !!raw && isDivineWord(raw);
+      }
+      w.classList.toggle('w-divine', divineOn);
+    });
+  }
+  function setSimilarEnabled(on) {
+    SIMILAR.enabled = !!on;
+    store('mq.similar', on ? '1' : '0');
+    if (on) loadSimilar().then(function () { refreshWordMarks(); }, function () {});
+    else refreshWordMarks();
+  }
+  function setDivineEnabled(on) {
+    DIVINE.enabled = !!on;
+    store('mq.divine', on ? '1' : '0');
+    refreshWordMarks();
+  }
+  if (SIMILAR.enabled) loadSimilar().then(function () { refreshWordMarks(); }, function () {});
+  // الصفحات تُرسم تدريجيًا (وبعد تحميل الخطوط): نعيد وسم الكلمات عند إضافة عناصر جديدة.
+  var wordMarkTimer = 0;
+  new MutationObserver(function () {
+    if (!SIMILAR.enabled && !DIVINE.enabled) return;
+    clearTimeout(wordMarkTimer);
+    wordMarkTimer = setTimeout(function () {
+      refreshWordMarks();
+    }, 120);
+  }).observe(document.getElementById('pageList') || document.body, { childList: true, subtree: true });
+
+  function surahLabel(v) {
+    return 'سورة ' + D.surahs[Math.floor(v / 1000) - 1][1] + ' · آية ' + ar(v % 1000);
+  }
+  // قسم المتشابهات داخل نافذة الكلمة/الآية: الآيات المتشابهة مع إبراز الفروق.
+  function similarPopupHtml(v, pos) {
+    if (!SIMILAR.enabled) return '';
+    if (!SIMILAR.data) return '<div class="wp-sim"><small>المتشابهات</small><p class="wp-sim-note">جارٍ التحميل…</p></div>';
+    var list = SIMILAR.data[v];
+    if (!list || !list.length)
+      return '<div class="wp-sim"><small>المتشابهات</small><p class="wp-sim-note">لا توجد آيات متشابهة لفظًا مع هذه الآية.</p></div>';
+    var html = '<div class="wp-sim"><small>المتشابهات (' + ar(list.length) + ')</small>';
+    list.slice(0, 4).forEach(function (item) {
+      var other = item[0],
+        d = diffVerses(v, other);
+      var color = SIM_COLORS[Math.min(v, other) % SIM_COLORS.length];
+      var markB = Object.create(null),
+        focus = null;
+      d.segs.forEach(function (sg) {
+        for (var k = sg.b0; k < sg.b1; k++) markB[k] = true;
+        if (pos > 0 && pos - 1 >= sg.a0 && pos - 1 < sg.a1)
+          focus = { mine: d.A.slice(sg.a0, sg.a1).join(' '), theirs: d.B.slice(sg.b0, sg.b1).join(' ') };
+      });
+      var text = d.B.map(function (w, k) {
+        return markB[k] ? '<mark style="--sim-c:' + color + '">' + esc(w) + '</mark>' : esc(w);
+      }).join(' ');
+      var diffs = d.segs
+        .map(function (sg) {
+          var mine = d.A.slice(sg.a0, sg.a1).join(' '),
+            theirs = d.B.slice(sg.b0, sg.b1).join(' ');
+          return '<li><span>' + (mine ? esc(mine) : '—') + '</span><i aria-hidden="true">⇄</i><span>' + (theirs ? esc(theirs) : '—') + '</span></li>';
+        })
+        .join('');
+      html +=
+        '<div class="wp-sim-item"><button type="button" class="wp-sim-go" data-sim-go="' + other + '"><strong>' + surahLabel(other) +
+        '</strong><span>تشابه ' + ar(Math.round(item[1] * 100)) + '٪ ◂</span></button>' +
+        (focus
+          ? '<p class="wp-sim-focus">«' + esc(focus.mine) + '» تقابلها هناك: «' + (focus.theirs ? esc(focus.theirs) : 'لا شيء (زيادة/نقص)') + '»</p>'
+          : '') +
+        '<p class="wp-sim-text">' + text + '</p>' +
+        (diffs ? '<ul class="wp-sim-diff" aria-label="الفروق">' + diffs + '</ul>' : '') +
+        '</div>';
+    });
+    return html + '</div>';
+  }
+
   function fam(n) {
     return 'QCF4_Hafs_' + (n < 10 ? '0' : '') + n;
   }
@@ -3039,7 +3273,19 @@
           '";base-palette:1;override-colors:10 #8d7550,11 #2b251b,12 #2b251b}'
       )
     );
-    return { light: lightPalette, dark: darkPalette };
+    // لوحتان حمراوان لتلوين لفظ الجلالة داخل المصحف الملوّن (كل ألوان الخط تُستبدل بالأحمر).
+    var reds = function (hex) {
+      var list = [];
+      for (var i = 0; i < 48; i++) list.push(i + ' ' + hex);
+      return list.join(',');
+    };
+    tajweedPaletteStyle.appendChild(
+      document.createTextNode(
+        '@font-palette-values --tjr' + p + '{font-family:"' + family + '";base-palette:0;override-colors:' + reds('#c62828') + '}' +
+          '@font-palette-values --tjrd' + p + '{font-family:"' + family + '";base-palette:1;override-colors:' + reds('#ff6b6b') + '}'
+      )
+    );
+    return { light: lightPalette, dark: darkPalette, divine: '--tjr' + p, divineDark: '--tjrd' + p };
   }
 
   function loadTajweedFont(p) {
@@ -3128,6 +3374,7 @@
   }
 
   function syncPageStatus(view, p) {
+    if (SIMILAR.enabled || DIVINE.enabled || view.querySelector('.w-sim,.w-divine')) refreshWordMarks(view);
     var lines = G[p - 1],
       secs = [],
       seen = {};
@@ -3318,6 +3565,8 @@
             if (useTajweed) {
               targetSheet.style.setProperty('--tajweed-light-palette', tajweedLoaded[p].light);
               targetSheet.style.setProperty('--tajweed-dark-palette', tajweedLoaded[p].dark);
+              targetSheet.style.setProperty('--tajweed-divine-palette', tajweedLoaded[p].divine);
+              targetSheet.style.setProperty('--tajweed-divine-dark-palette', tajweedLoaded[p].divineDark);
             } else {
               targetSheet.style.removeProperty('--tajweed-light-palette');
               targetSheet.style.removeProperty('--tajweed-dark-palette');
@@ -4473,6 +4722,10 @@
       .replace(/(.)\1+/g, '$1');
   }
 
+  // مستوى الصرامة: lenient (متسامح) / balanced (متوازن، الافتراضي) / strict (صارم).
+  var tasmeeStrictness = store('mq.tasmeeStrict') || 'balanced';
+  if (['lenient', 'balanced', 'strict'].indexOf(tasmeeStrictness) === -1) tasmeeStrictness = 'balanced';
+
   function tasmeeWordMatches(spoken, expected) {
     if (!spoken || !expected) return false;
     var spokenKey = normalizeTasmeeWord(spoken);
@@ -4482,16 +4735,23 @@
     var compactSpoken = spokenKey.replace(/(.)\1+/g, '$1');
     var compactExpected = expectedKey.replace(/(.)\1+/g, '$1');
     if (compactSpoken === compactExpected) return true;
-    if (compactSpoken.length < 4 || compactExpected.length < 4) return false;
 
-    // تسامح نسبي مع طول الكلمة: حرف واحد للكلمات القصيرة، حرفان للطويلة (٧+).
-    var limit = Math.max(compactSpoken.length, compactExpected.length) >= 7 ? 2 : 1;
-    if (tasmeeWordDistance(compactSpoken, compactExpected, limit) <= limit) return true;
+    var minLength = tasmeeStrictness === 'lenient' ? 3 : tasmeeStrictness === 'strict' ? 5 : 4;
+    var shorter = Math.min(compactSpoken.length, compactExpected.length);
+    var longer = Math.max(compactSpoken.length, compactExpected.length);
+    if (shorter < minLength) return false;
 
-    // تطابق صوتي: نفس هيكل الحروف الساكنة بعد توحيد المتشابهات (الكلمة ≥ 4 حروف فقط حتى لا تُقبل كلمة خاطئة).
-    var phoneticSpoken = tasmeePhoneticKey(compactSpoken);
-    var phoneticExpected = tasmeePhoneticKey(compactExpected);
-    if (phoneticSpoken.length >= 3 && phoneticSpoken === phoneticExpected) return true;
+    // تسامح نسبي مع طول الكلمة.
+    var limit =
+      tasmeeStrictness === 'strict' ? (longer >= 8 ? 1 : 0) : longer >= 7 ? 2 : 1;
+    if (limit && tasmeeWordDistance(compactSpoken, compactExpected, limit) <= limit) return true;
+
+    // تطابق صوتي (الحروف المتشابهة): ليس في الوضع الصارم.
+    if (tasmeeStrictness !== 'strict') {
+      var phoneticSpoken = tasmeePhoneticKey(compactSpoken);
+      var phoneticExpected = tasmeePhoneticKey(compactExpected);
+      if (phoneticSpoken.length >= 3 && phoneticSpoken === phoneticExpected) return true;
+    }
     return false;
   }
 
@@ -4734,21 +4994,19 @@
     if (!tasmeeSession) return;
     tasmeeSession.completed = true;
     stopTasmeeRecognition();
-    var promptedCount = 0;
+    var promptedCount = 0,
+      totalWords = 0;
     tasmeeSession.ayahs.forEach(function (state) {
+      totalWords += state.words.length;
       if (state.prompted) {
         promptedCount += Object.keys(state.prompted).length;
       }
     });
-    if (promptedCount > 0) {
-      tasmeeStatus.textContent =
-        'أحسنت! اكتمل التسميع مع تلقين ' +
-        ar(promptedCount) +
-        ' ' +
-        (promptedCount === 1 ? 'كلمة مظللة.' : 'كلمات مظللة.');
-    } else {
-      tasmeeStatus.textContent = 'ممتاز! اكتمل تسميع النطاق بنجاح دون أي تلقين.';
-    }
+    var errors = tasmeeSession.errorCount || 0;
+    var accuracy = totalWords ? Math.max(0, Math.round(((totalWords - errors - promptedCount) / totalWords) * 100)) : 100;
+    var report = ' — الدقة ' + ar(accuracy) + '٪ (' + ar(totalWords) + ' كلمة، ' + ar(errors) + ' أخطاء، ' + ar(promptedCount) + ' تلقين).';
+    tasmeeStatus.textContent =
+      (promptedCount > 0 || errors > 0 ? 'أحسنت! اكتمل التسميع' : 'ممتاز! اكتمل تسميع النطاق دون أي خطأ أو تلقين') + report;
     showTasmeeCelebration();
   }
 
@@ -4883,11 +5141,55 @@
       } else if (interim) {
         break;
       } else {
-        // Mark the expected word immediately. This covers a wrong word,
-        // a skipped word (the recognizer advanced), and a repeated word.
-        state.mistakes[expectedIndex + 1] = true;
-        mismatchDetected = true;
-        tokenIdx++;
+        // مزامنة ذكية: إن طابقت الكلمة المسموعة كلمة قادمة (خلال ٣ كلمات) فالقارئ تجاوز كلمات
+        // أو أسقطها المتعرّف. الكلمات المتجاوزة تُوسَم أخطاءً وتبقى مخفية (يعود إليها التسميع في النهاية)،
+        // وفي الوضع المتسامح تُقبل كلمة واحدة متجاوزة دون وسم.
+        var ahead = 0;
+        var maxAhead = token.length >= 4 ? 3 : 1;
+        for (var k = 1; k <= maxAhead && expectedIndex + k < state.words.length; k++) {
+          if (state.prompted && state.prompted[expectedIndex + k + 1]) break;
+          if (tasmeeMatchesAt(token, state, expectedIndex + k)) {
+            ahead = k;
+            break;
+          }
+        }
+        if (ahead) {
+          var forgiven = tasmeeStrictness === 'lenient' && ahead === 1;
+          for (var skip = 0; skip < ahead; skip++) {
+            if (forgiven) {
+              state.revealed[expectedIndex + 1 + skip] = true;
+              delete state.mistakes[expectedIndex + 1 + skip];
+            } else {
+              state.mistakes[expectedIndex + 1 + skip] = true;
+              mismatchDetected = true;
+              tasmeeSession.errorCount = (tasmeeSession.errorCount || 0) + 1;
+            }
+          }
+          matchedAny = true;
+          state.revealed[expectedIndex + ahead + 1] = true;
+          if (!state.prompted || !state.prompted[expectedIndex + ahead + 1])
+            delete state.mistakes[expectedIndex + ahead + 1];
+          state.wordIndex = expectedIndex + ahead + 1;
+          tokenIdx++;
+          if (state.wordIndex >= state.words.length) {
+            tasmeeSession.verseIndex += 1;
+            changedVerse = true;
+            if (tasmeeSession.verseIndex >= tasmeeSession.ayahs.length) {
+              if (rewindTasmeeToUnrevealedWord()) changedVerse = true;
+              else {
+                applyTasmeeWordState(pageList);
+                finishTasmee();
+                return tokenIdx;
+              }
+            }
+          }
+        } else {
+          // كلمة خاطئة أو تكرار: نسم الكلمة المتوقعة فورًا.
+          state.mistakes[expectedIndex + 1] = true;
+          mismatchDetected = true;
+          tasmeeSession.errorCount = (tasmeeSession.errorCount || 0) + 1;
+          tokenIdx++;
+        }
       }
     }
 
@@ -4927,9 +5229,9 @@
           else if (expectedWord) score -= 1;
         }
       }
-      // Prefer a fuller alternative when the matching score is equal;
-      // this helps retain quickly recited words.
+      // نفضّل البديل الأكمل عند التساوي، ونرجّح بثقة المتعرّف.
       score += Math.min(candidateTokens.length, 4) * 0.05;
+      score += (result[alternativeIndex].confidence || 0) * 0.5;
       if (score > bestScore) {
         bestScore = score;
         bestText = candidate;
@@ -4937,6 +5239,41 @@
     }
     return bestText;
   }
+
+  // تلميحات سياقية: المتصفحات التي تدعم SpeechRecognitionPhrase تُرجّح الكلمات المتوقعة القادمة.
+  function applyTasmeePhraseHints(recognition) {
+    try {
+      if (typeof window.SpeechRecognitionPhrase !== 'function') return;
+      var state = currentTasmeeAyah();
+      if (!state) return;
+      var words = state.words.slice(state.wordIndex, state.wordIndex + 10);
+      if (!words.length) return;
+      recognition.phrases = words.map(function (word) {
+        return new window.SpeechRecognitionPhrase(word, 4);
+      });
+    } catch (error) {
+      /* غير مدعوم: يعمل التعرف بدونها */
+    }
+  }
+
+
+  // اختيار مستوى صرامة التسميع.
+  (function () {
+    var row = document.querySelector('.tasmee-riwaya-row');
+    if (!row) return;
+    var label = document.createElement('label');
+    label.setAttribute('for', 'tasmeeStrict');
+    label.innerHTML =
+      'الصرامة <select id="tasmeeStrict" aria-label="مستوى صرامة التسميع">' +
+      '<option value="lenient">متسامح</option><option value="balanced">متوازن</option><option value="strict">صارم</option></select>';
+    row.appendChild(label);
+    var select = label.querySelector('select');
+    select.value = tasmeeStrictness;
+    select.addEventListener('change', function () {
+      tasmeeStrictness = select.value;
+      store('mq.tasmeeStrict', tasmeeStrictness);
+    });
+  })();
 
   var tasmeeFailStreak = 0;
 
@@ -4949,6 +5286,7 @@
     tasmeeRestartTimer = setTimeout(function () {
       if (!tasmeeListening || tasmeeRecognition !== recognition) return;
       if (tasmeeRecognitionStarted) return;
+      applyTasmeePhraseHints(recognition);
       try {
         recognition.start();
       } catch (error) {
@@ -4993,6 +5331,7 @@
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.maxAlternatives = 5;
+      applyTasmeePhraseHints(recognition);
     } catch (error) {
       tasmeeStatus.textContent = 'تعذر تهيئة التعرف الصوتي.';
       stopTasmeeRecognition();
@@ -6363,6 +6702,33 @@
     apply();
 
   })();
+
+  // ===== بطاقتان مستقلتان: المتشابهات، وتلوين لفظ الجلالة (يعمل مع المصحف العادي والملوّن) =====
+  (function () {
+    function addCard(id, icon, title, toggleId, label, hint, enabled, onChange) {
+      var card = document.createElement('div');
+      card.className = 'settings-card';
+      card.id = id;
+      card.innerHTML =
+        '<div class="settings-card-head"><span aria-hidden="true">' + icon + '</span><span>' + title + '</span></div>' +
+        '<label class="topics-switch"><span><strong>' + label + '</strong><small>' + hint +
+        '</small></span><input type="checkbox" id="' + toggleId + '" role="switch" /></label>';
+      var font = document.getElementById('uiFontCard');
+      if (font && font.parentNode) font.parentNode.insertBefore(card, font);
+      else (document.getElementById('settingsBody') || paneTasks).appendChild(card);
+      var input = card.querySelector('input');
+      input.checked = enabled;
+      input.addEventListener('change', function () {
+        onChange(input.checked);
+      });
+    }
+    addCard('similarCard', '≈', 'المتشابهات', 'similarToggle', 'تفعيل المتشابهات',
+      'تُلوَّن الكلمات التي تختلف عن آية متشابهة بلون خاص بكل زوج، وعند الضغط المطوّل على الكلمة تظهر الآيات المتشابهة مع توضيح الفرق.',
+      SIMILAR.enabled, setSimilarEnabled);
+    addCard('divineCard', '❖', 'تلوين لفظ الجلالة', 'divineToggle', 'تلوين «الله» و«رب» بالأحمر',
+      'يعمل مستقلًا مع المصحف العادي والمصحف الملوّن (تجويد)، ويشمل: والله، بالله، ربنا، ربك…',
+      DIVINE.enabled, setDivineEnabled);
+  })();
   if (homeAutoScrollPanel) paneSettings.appendChild(homeAutoScrollPanel);
   if (homeTasmeeSection) document.body.appendChild(homeTasmeeSection);
   if (homeRecitationPanel) paneSettings.appendChild(homeRecitationPanel);
@@ -6792,6 +7158,7 @@
             esc(wordMeaning) +
             '</div>';
         }
+        h += similarPopupHtml(v, pos);
         if (!hideAyahTafsir)
           h +=
             '<details class="wp-v"><summary>التفسير المختصر للآية</summary><div class="wp-v-content">' +
@@ -6804,6 +7171,7 @@
                   : 'جارٍ تحميل التفسير المحلي…') +
             '</div></details>';
       }
+      if (pos <= 0) h += similarPopupHtml(v, pos);
       if (pos <= 0 && !hideAyahTafsir)
         h +=
           '<details class="wp-v"><summary>التفسير المختصر للآية</summary><div class="wp-v-content">' +
@@ -6891,6 +7259,13 @@
       loadMeanings().then(function () {
         if (popWord === w) draw();
       });
+    if (SIMILAR.enabled && !SIMILAR.data)
+      loadSimilar().then(
+        function () {
+          if (popWord === w) draw();
+        },
+        function () {}
+      );
   }
   function openVerseDrawer(v) {
     sel = v;
@@ -6900,6 +7275,13 @@
     openD();
   }
   wp.addEventListener('click', function (e) {
+    var simGo = e.target.closest('[data-sim-go]');
+    if (simGo) {
+      var target = +simGo.getAttribute('data-sim-go');
+      closeWp();
+      goTo(pageOfId(idOf(Math.floor(target / 1000), target % 1000)));
+      return;
+    }
     var clearTasmeeHighlight = e.target.closest('.wp-clear-tasmee-highlight');
     if (clearTasmeeHighlight && popWord) {
       clearTasmeeMistake(+popWord.getAttribute('data-v'), +popWord.getAttribute('data-p'));
@@ -7904,6 +8286,7 @@
   var AUDIO_PATH = './audio-cache/';
   var ALERT_PRAYERS = PRAYERS.slice();
   var ADHAN_VOICE_ID = 'adhan-makkah';
+  var CUSTOM_VOICES_KEY = 'quran_adhan_custom_v1';
   var ADHAN_VOICES = {
     'adhan-makkah': {
       label: 'أذان المسجد الحرام · مكة',
@@ -7915,10 +8298,51 @@
       license: 'https://creativecommons.org/licenses/by/3.0/'
     }
   };
+  // أصوات إضافية: ملف adhan-voices.json (اختياري) + أصوات يضيفها المستخدم من جهازه (تُحفظ في Cache API).
+  function readCustomVoices() {
+    try {
+      var list = JSON.parse(localStorage.getItem(CUSTOM_VOICES_KEY) || '[]');
+      return Array.isArray(list)
+        ? list.filter(function (v) {
+            return v && /^custom-[a-z0-9]+$/.test(v.id) && v.label;
+          })
+        : [];
+    } catch (error) {
+      return [];
+    }
+  }
+  function registerCustomVoices() {
+    readCustomVoices().forEach(function (v) {
+      ADHAN_VOICES[v.id] = { label: v.label, custom: true, extension: v.ext || 'mp3' };
+    });
+  }
+  registerCustomVoices();
+  function loadVoiceManifest() {
+    return fetch('./adhan-voices.json', { cache: 'no-cache' })
+      .then(function (r) {
+        return r.ok ? r.json() : { voices: [] };
+      })
+      .then(function (json) {
+        (json.voices || []).forEach(function (v) {
+          if (v && /^[a-z0-9-]+$/.test(v.id || '') && v.label && v.url) {
+            ADHAN_VOICES[v.id] = {
+              label: v.label,
+              url: v.url,
+              extension: v.extension || String(v.url).split('?')[0].split('.').pop(),
+              credit: v.credit || '',
+              licenseName: v.license || ''
+            };
+          }
+        });
+      })
+      .catch(function () {});
+  }
   var DEFAULT_ALERTS = {
     enabled: { Fajr: false, Sunrise: false, Dhuhr: false, Asr: false, Maghrib: false, Isha: false },
     sound: true,
     voice: ADHAN_VOICE_ID,
+    volume: 1,
+    fullscreen: true,
     advance: 0,
     notifications: false
   };
@@ -7933,6 +8357,7 @@
   var adhanScreenClose = document.getElementById('adhanScreenClose');
   var adhanScreenReplay = document.getElementById('adhanScreenReplay');
   var activeAdhanPrayer = PRAYERS[0];
+  var adhanWakeLock = null;
   var audioLoadPromises = Object.create(null);
   var adhanObjectUrls = Object.create(null);
   var firedAlertKeys = Object.create(null);
@@ -7977,6 +8402,8 @@
     var wrapper = document.createElement('div');
     wrapper.innerHTML = updatedButton;
     button.replaceWith(wrapper.firstChild);
+    var box = document.querySelector('[data-adhan-prayer="' + prayerId + '"]');
+    if (box) box.checked = alerts.enabled[prayerId];
     setAlertStatus(
       alerts.enabled[prayerId]
         ? 'تم تفعيل تنبيه صلاة ' + prayer.name + '.'
@@ -8072,8 +8499,10 @@
           return enabled;
         }, {}),
         sound: typeof saved.sound === 'boolean' ? saved.sound : DEFAULT_ALERTS.sound,
-        voice: ADHAN_VOICE_ID,
-        advance: [0, 5, 10, 15].indexOf(Number(saved.advance)) !== -1 ? Number(saved.advance) : 0,
+        voice: ADHAN_VOICES[saved.voice] ? saved.voice : ADHAN_VOICE_ID,
+        volume: typeof saved.volume === 'number' && saved.volume >= 0.1 && saved.volume <= 1 ? saved.volume : 1,
+        fullscreen: saved.fullscreen !== false,
+        advance: [0, 5, 10, 15, 20, 30].indexOf(Number(saved.advance)) !== -1 ? Number(saved.advance) : 0,
         notifications: saved.notifications === true
       };
     } catch (error) {
@@ -8095,12 +8524,12 @@
   }
 
   function setAlertStatus(message, kind) {
-    if (!activeContainer) return;
-    var status = activeContainer.querySelector('[data-qpt-alert-status]');
+    var status = document.getElementById('adhanSetStatus');
     if (status) {
-      status.textContent = kind === 'success' || kind === 'info' ? '' : message;
+      status.textContent = kind === 'success' || kind === 'info' ? message : message;
       status.dataset.kind = kind || 'info';
     }
+    if (activeStatus && (kind === 'warning' || kind === 'error')) activeStatus(message, kind);
   }
 
   function audioCacheUrl(voiceId) {
@@ -8125,6 +8554,7 @@
           adhanObjectUrls[voiceId] = URL.createObjectURL(await cached.blob());
           return adhanObjectUrls[voiceId];
         }
+        if (voice.custom) throw new Error('ملف هذا الصوت غير موجود على الجهاز؛ أعد إضافته.');
         var response = await fetch(voice.url, { mode: 'cors', cache: 'force-cache' });
         if (!response.ok || response.type === 'opaque') {
           throw new Error('تعذر تنزيل التسجيل المرخّص. تحقق من اتصال الإنترنت ثم أعد المحاولة.');
@@ -8145,12 +8575,12 @@
   function removeUnusedAdhanCacheEntries() {
     if (!('caches' in window)) return Promise.resolve();
     return caches.open(ALERT_CACHE).then(function (cache) {
-      var selectedUrl = audioCacheUrl(ADHAN_VOICE_ID);
+      var selectedUrl = audioCacheUrl(readAlerts().voice);
       return cache.keys().then(function (keys) {
         return Promise.all(
           keys
             .filter(function (request) {
-              return request.url !== selectedUrl;
+              return request.url !== selectedUrl && request.url.indexOf('/custom-') === -1;
             })
             .map(function (request) {
               return cache.delete(request);
@@ -8167,19 +8597,43 @@
     adhanScreenTime.textContent = preview ? 'معاينة الأذان' : 'حان الآن وقت صلاة ' + activeAdhanPrayer.name;
     adhanScreen.hidden = false;
     document.body.classList.add('adhan-screen-open');
+    // شاشة كاملة حقيقية وإبقاء الشاشة مضاءة (قد يرفضهما المتصفح دون لمسة المستخدم؛ تبقى الواجهة بملء الشاشة).
+    try {
+      if (adhanScreen.requestFullscreen && !document.fullscreenElement)
+        adhanScreen.requestFullscreen().catch(function () {});
+    } catch (error) {
+      /* غير مدعوم */
+    }
+    try {
+      if (navigator.wakeLock)
+        navigator.wakeLock.request('screen').then(function (lock) {
+          adhanWakeLock = lock;
+        }, function () {});
+    } catch (error) {
+      /* غير مدعوم */
+    }
   }
 
   function hideAdhanScreen() {
     if (!adhanScreen) return;
+    try {
+      if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+      if (adhanWakeLock) adhanWakeLock.release();
+    } catch (error) {
+      /* تجاهل */
+    }
+    adhanWakeLock = null;
     adhanScreen.hidden = true;
     document.body.classList.remove('adhan-screen-open');
     adhanAudio.pause();
     adhanAudio.currentTime = 0;
   }
 
-  function playSelectedAdhan(prayer, preview) {
-    showAdhanScreen(prayer, preview === true);
-    loadAdhanVoice(ADHAN_VOICE_ID)
+  function playSelectedAdhan(prayer, preview, skipScreen) {
+    if (!skipScreen) showAdhanScreen(prayer, preview === true);
+    var chosen = readAlerts();
+    adhanAudio.volume = chosen.volume;
+    loadAdhanVoice(chosen.voice)
       .then(function (url) {
         adhanAudio.src = url;
         adhanAudio.currentTime = 0;
@@ -8212,7 +8666,8 @@
       badge: './logo.png',
       tag: 'quran-prayer-' + prayer.id + (isAdvance ? '-reminder' : ''),
       renotify: false,
-      vibrate: [180, 90, 180],
+      requireInteraction: !isAdvance,
+      vibrate: [300, 120, 300, 120, 500],
       data: { url: './' }
     };
     var notification;
@@ -8270,8 +8725,12 @@
           setAlertStatus('تعذر حفظ سجل التنبيه؛ سيعمل منع التكرار حتى إغلاق الصفحة فقط.', 'warning');
         }
         firedAlertKeys[key] = true;
-        if (!item.isAdvance) showAdhanScreen(prayer, false);
-        if (alerts.sound) playSelectedAdhan(prayer, false);
+        if (!item.isAdvance && alerts.fullscreen) showAdhanScreen(prayer, false);
+        if (alerts.sound) {
+          if (item.isAdvance) {
+            /* التذكير المسبق إشعار فقط دون صوت الأذان */
+          } else playSelectedAdhan(prayer, false, !alerts.fullscreen);
+        }
         if (alerts.notifications) sendNotification(prayer, item.isAdvance);
         if (!alerts.notifications && !alerts.sound) {
           setAlertStatus('حان وقت صلاة ' + prayer.name + '.', 'info');
@@ -8293,113 +8752,232 @@
     alertTimer = setInterval(checkPrayerAlerts, 15000);
   }
 
-  function renderAlertSettings() {
+  /* ===== قسم إعدادات الأذان (في تبويب الإعدادات) ===== */
+  var ADVANCE_OPTIONS = [
+    [0, 'وقت الصلاة فقط'],
+    [5, 'قبلها بـ٥ دقائق'],
+    [10, 'قبلها بـ١٠ دقائق'],
+    [15, 'قبلها بـ١٥ دقيقة'],
+    [20, 'قبلها بـ٢٠ دقيقة'],
+    [30, 'قبلها بـ٣٠ دقيقة']
+  ];
+
+  function notificationState() {
+    if (!('Notification' in window)) return 'unsupported';
+    if (Notification.permission === 'denied') return 'denied';
+    return Notification.permission === 'granted' && readAlerts().notifications ? 'on' : 'off';
+  }
+
+  function voiceOptionsHtml(selected) {
+    return Object.keys(ADHAN_VOICES)
+      .map(function (id) {
+        return (
+          '<option value="' + id + '"' + (id === selected ? ' selected' : '') + '>' +
+          escapeHtml(ADHAN_VOICES[id].label) + '</option>'
+        );
+      })
+      .join('');
+  }
+
+  function renderAdhanSettings() {
+    var card = document.getElementById('adhanSettingsCard');
+    if (!card) return;
     var alerts = readAlerts();
-    var settings = activeContainer && activeContainer.querySelector('[data-qpt-alerts]');
-    if (!settings) return;
-    settings.innerHTML =
-      '<summary class="qpt-alert-summary"><span><b>إعدادات الأذان والتنبيهات</b>' +
-      '<small>' +
-      ADHAN_VOICES[ADHAN_VOICE_ID].label +
-      '</small></span><i aria-hidden="true"></i></summary>' +
-      '<div class="qpt-alert-content">' +
-      '<label class="qpt-alert-option"><span>التذكير قبل الصلاة</span><select data-qpt-advance>' +
-      [
-        [0, 'وقت الصلاة فقط'],
-        [5, 'قبلها بـ٥ دقائق'],
-        [10, 'قبلها بـ١٠ دقائق'],
-        [15, 'قبلها بـ١٥ دقيقة']
-      ]
-        .map(function (option) {
-          return (
-            '<option value="' +
-            option[0] +
-            '"' +
-            (alerts.advance === option[0] ? ' selected' : '') +
-            '>' +
-            option[1] +
-            '</option>'
-          );
-        })
-        .join('') +
-      '</select></label>' +
-      '<label class="qpt-alert-toggle"><input type="checkbox" data-qpt-sound' +
-      (alerts.sound ? ' checked' : '') +
-      '><span>تشغيل أذان المسجد الحرام عند التنبيه</span></label>' +
-      '<button type="button" class="qpt-preview-button" data-qpt-preview>▶ معاينة الأذان</button>' +
-      '<div class="qpt-notification-row"><span data-qpt-notification-label></span>' +
-      '<button type="button" class="qpt-notification-button" data-qpt-notifications></button></div>' +
-      '<p class="qpt-alert-status" data-qpt-alert-status role="status" aria-live="polite"></p></div>';
-    settings.open = false;
-    updateNotificationButton();
-    settings.querySelectorAll('[data-qpt-advance], [data-qpt-sound]').forEach(function (input) {
-      input.addEventListener('change', function () {
-        var next = readAlerts();
-        if (input.hasAttribute('data-qpt-advance')) next.advance = Number(input.value);
-        if (input.hasAttribute('data-qpt-sound')) next.sound = input.checked;
-        if (saveAlerts(next)) setAlertStatus('حُفظت إعدادات التنبيه على هذا الجهاز.', 'success');
-        startAlertScheduler();
-      });
+    var voice = ADHAN_VOICES[alerts.voice] || ADHAN_VOICES[ADHAN_VOICE_ID];
+    var note = notificationState();
+    var openNow = card.open;
+    card.innerHTML =
+      '<summary class="settings-card-head"><span aria-hidden="true">🕌</span><span>الأذان والتنبيهات</span></summary>' +
+      '<div class="adhan-set">' +
+      '<label class="adhan-set-switch"><span><strong>تشغيل صوت الأذان</strong><small>يُشغَّل عند دخول وقت الصلاة والتطبيق مفتوح</small></span><input type="checkbox" data-adhan-sound' + (alerts.sound ? ' checked' : '') + ' role="switch"></label>' +
+      '<label class="adhan-set-field">صوت الأذان<select data-adhan-voice>' + voiceOptionsHtml(alerts.voice) + '</select></label>' +
+      '<div class="adhan-set-row"><label class="adhan-set-file">＋ إضافة صوت من جهازك<input type="file" accept="audio/*" data-adhan-add></label>' +
+      (voice.custom ? '<button type="button" class="adhan-set-danger" data-adhan-remove>حذف هذا الصوت</button>' : '') + '</div>' +
+      '<label class="adhan-set-field">مستوى الصوت <output data-adhan-volume-out>' + Math.round(alerts.volume * 100) + '٪</output>' +
+      '<input type="range" min="10" max="100" step="5" value="' + Math.round(alerts.volume * 100) + '" data-adhan-volume></label>' +
+      '<label class="adhan-set-field">التذكير قبل الصلاة<select data-adhan-advance>' +
+      ADVANCE_OPTIONS.map(function (o) {
+        return '<option value="' + o[0] + '"' + (alerts.advance === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
+      }).join('') + '</select></label>' +
+      '<label class="adhan-set-switch"><span><strong>إشعار بملء الشاشة</strong><small>تظهر شاشة الأذان كاملة عند دخول الوقت (وضع ملء الشاشة وإبقاء الشاشة مضاءة)</small></span><input type="checkbox" data-adhan-fullscreen' + (alerts.fullscreen ? ' checked' : '') + ' role="switch"></label>' +
+      (note === 'unsupported'
+        ? ''
+        : '<label class="adhan-set-switch"><span><strong>إشعارات النظام</strong><small>' +
+          (note === 'denied' ? 'محظورة؛ فعّلها من إعدادات المتصفح لهذا الموقع' : 'إشعار يبقى حتى تفتحه عند دخول الوقت') +
+          '</small></span><input type="checkbox" data-adhan-notify' + (note === 'on' ? ' checked' : '') + (note === 'denied' ? ' disabled' : '') + ' role="switch"></label>') +
+      '<div class="adhan-set-prayers"><strong>الصلوات المفعّل لها التنبيه</strong>' +
+      ALERT_PRAYERS.map(function (prayer) {
+        return '<label><input type="checkbox" data-adhan-prayer="' + prayer.id + '"' + (alerts.enabled[prayer.id] ? ' checked' : '') + '><span>' + prayer.name + '</span></label>';
+      }).join('') + '</div>' +
+      '<button type="button" class="adhan-set-preview" data-adhan-preview>▶ معاينة الأذان</button>' +
+      '<p class="adhan-set-status" id="adhanSetStatus" role="status" aria-live="polite"></p>' +
+      '<p class="adhan-set-credit">' + (voice.credit ? 'التسجيل: ' + escapeHtml(voice.credit) + (voice.licenseName ? ' · ' + escapeHtml(voice.licenseName) : '') : voice.custom ? 'ملف صوتي من جهازك.' : '') + '</p>' +
+      '</div>';
+    card.open = openNow;
+  }
+
+  function refreshBells() {
+    var alerts = readAlerts();
+    ALERT_PRAYERS.forEach(function (prayer) {
+      var button = document.querySelector('[data-qpt-prayer-toggle="' + prayer.id + '"]');
+      if (!button) return;
+      var wrapper = document.createElement('div');
+      wrapper.innerHTML = prayerBellButton(prayer, alerts.enabled[prayer.id]);
+      button.replaceWith(wrapper.firstChild);
     });
-    settings.querySelector('[data-qpt-notifications]').addEventListener('click', enableNotifications);
-    settings.querySelector('[data-qpt-preview]').addEventListener('click', previewAdhan);
   }
 
-  function updateNotificationButton() {
-    if (!activeContainer) return;
-    var button = activeContainer.querySelector('[data-qpt-notifications]');
-    var label = activeContainer.querySelector('[data-qpt-notification-label]');
-    if (!button || !label) return;
-    var row = activeContainer.querySelector('.qpt-notification-row');
-    if (!('Notification' in window) || Notification.permission === 'denied') {
-      if (row) row.hidden = true;
+  function addCustomVoice(file) {
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      setAlertStatus('حجم الملف كبير؛ اختر ملفًا أقل من ٨ ميجابايت.', 'warning');
       return;
     }
-    if (row) row.hidden = false;
-    button.hidden = false;
+    var id = 'custom-' + Date.now().toString(36);
+    var ext = (file.name.split('.').pop() || 'mp3').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5) || 'mp3';
+    var label = file.name.replace(/\.[^.]+$/, '').slice(0, 40) || 'صوت مخصص';
+    caches
+      .open(ALERT_CACHE)
+      .then(function (cache) {
+        ADHAN_VOICES[id] = { label: label, custom: true, extension: ext };
+        return cache.put(
+          audioCacheUrl(id),
+          new Response(file, { headers: { 'Content-Type': file.type || 'audio/mpeg' } })
+        );
+      })
+      .then(function () {
+        var list = readCustomVoices();
+        list.push({ id: id, label: label, ext: ext });
+        localStorage.setItem(CUSTOM_VOICES_KEY, JSON.stringify(list));
+        var alerts = readAlerts();
+        alerts.voice = id;
+        saveAlerts(alerts);
+        renderAdhanSettings();
+        setAlertStatus('تمت إضافة الصوت واختياره.', 'success');
+      })
+      .catch(function (error) {
+        delete ADHAN_VOICES[id];
+        console.error('تعذرت إضافة الصوت.', error);
+        setAlertStatus('تعذرت إضافة الملف الصوتي.', 'error');
+      });
+  }
+
+  function removeCustomVoice(id) {
+    var url = audioCacheUrl(id);
+    delete ADHAN_VOICES[id];
+    delete audioLoadPromises[id];
+    try {
+      localStorage.setItem(
+        CUSTOM_VOICES_KEY,
+        JSON.stringify(
+          readCustomVoices().filter(function (v) {
+            return v.id !== id;
+          })
+        )
+      );
+    } catch (error) {
+      /* تجاهل */
+    }
     var alerts = readAlerts();
-    if (Notification.permission === 'granted' && alerts.notifications) {
-      label.textContent = 'إشعارات النظام مفعّلة';
-      button.textContent = 'إيقاف الإشعارات';
-    } else if (Notification.permission === 'granted') {
-      label.textContent = '';
-      button.textContent = 'تفعيل الإشعارات';
-    } else {
-      label.textContent = '';
-      button.textContent = 'تفعيل الإشعارات';
-    }
+    if (alerts.voice === id) alerts.voice = ADHAN_VOICE_ID;
+    saveAlerts(alerts);
+    return caches
+      .open(ALERT_CACHE)
+      .then(function (cache) {
+        return cache.delete(url);
+      })
+      .catch(function () {})
+      .then(function () {
+        renderAdhanSettings();
+        setAlertStatus('تم حذف الصوت.', 'success');
+      });
   }
 
-  function enableNotifications() {
-    if (!('Notification' in window)) {
-      setAlertStatus('المتصفح لا يدعم إشعارات النظام.', 'warning');
+  function onAdhanSettingsChange(event) {
+    var el = event.target;
+    var alerts = readAlerts();
+    if (el.hasAttribute('data-adhan-add')) {
+      addCustomVoice(el.files && el.files[0]);
       return;
     }
-    var current = readAlerts();
-    if (Notification.permission === 'granted' && current.notifications) {
-      current.notifications = false;
-      if (saveAlerts(current)) {
-        updateNotificationButton();
+    if (el.hasAttribute('data-adhan-sound')) alerts.sound = el.checked;
+    else if (el.hasAttribute('data-adhan-voice')) {
+      alerts.voice = ADHAN_VOICES[el.value] ? el.value : ADHAN_VOICE_ID;
+      if (saveAlerts(alerts)) {
+        renderAdhanSettings();
+        // تنزيل الصوت المختار مسبقًا ليعمل دون إنترنت
+        loadAdhanVoice(alerts.voice).catch(function () {
+          setAlertStatus('تعذر تنزيل هذا الصوت الآن؛ سيُحمَّل عند توفر الإنترنت.', 'warning');
+        });
       }
       return;
-    }
-    if (Notification.permission === 'denied') {
-      setAlertStatus('السماح محظور. غيّر إذن الإشعارات من إعدادات المتصفح لهذا الموقع.', 'warning');
+    } else if (el.hasAttribute('data-adhan-volume')) {
+      alerts.volume = Number(el.value) / 100;
+      var out = document.querySelector('[data-adhan-volume-out]');
+      if (out) out.textContent = Math.round(alerts.volume * 100) + '٪';
+      adhanAudio.volume = alerts.volume;
+    } else if (el.hasAttribute('data-adhan-advance')) alerts.advance = Number(el.value);
+    else if (el.hasAttribute('data-adhan-fullscreen')) alerts.fullscreen = el.checked;
+    else if (el.hasAttribute('data-adhan-prayer')) {
+      alerts.enabled[el.getAttribute('data-adhan-prayer')] = el.checked;
+      saveAlerts(alerts);
+      refreshBells();
+      startAlertScheduler();
+      return;
+    } else if (el.hasAttribute('data-adhan-notify')) {
+      toggleNotifications(el.checked);
+      return;
+    } else return;
+    if (saveAlerts(alerts)) setAlertStatus('حُفظت الإعدادات على هذا الجهاز.', 'success');
+    startAlertScheduler();
+  }
+
+  function toggleNotifications(on) {
+    if (!('Notification' in window)) return;
+    var current = readAlerts();
+    if (!on) {
+      current.notifications = false;
+      saveAlerts(current);
+      renderAdhanSettings();
       return;
     }
     (Notification.permission === 'granted' ? Promise.resolve('granted') : Notification.requestPermission())
       .then(function (permission) {
         current = readAlerts();
         current.notifications = permission === 'granted';
-        if (!saveAlerts(current)) return;
-        updateNotificationButton();
-        startAlertScheduler();
+        saveAlerts(current);
+        renderAdhanSettings();
+        if (permission !== 'granted') setAlertStatus('لم يُمنح إذن الإشعارات.', 'warning');
+        else startAlertScheduler();
       })
-      .catch(function (error) {
-        console.error('تعذر طلب إذن إشعارات الصلاة.', error);
+      .catch(function () {
         setAlertStatus('تعذر طلب إذن الإشعارات من المتصفح.', 'error');
       });
   }
+
+  function mountAdhanSettings() {
+    if (document.getElementById('adhanSettingsCard')) return;
+    var host = document.getElementById('settingsBody');
+    if (!host) return;
+    var card = document.createElement('details');
+    card.className = 'settings-card adhan-card';
+    card.id = 'adhanSettingsCard';
+    var anchor = document.getElementById('uiFontCard');
+    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(card, anchor);
+    else host.appendChild(card);
+    card.addEventListener('change', onAdhanSettingsChange);
+    card.addEventListener('input', function (event) {
+      if (event.target.hasAttribute('data-adhan-volume')) onAdhanSettingsChange(event);
+    });
+    card.addEventListener('click', function (event) {
+      if (event.target.closest('[data-adhan-preview]')) previewAdhan();
+      var rm = event.target.closest('[data-adhan-remove]');
+      if (rm) removeCustomVoice(readAlerts().voice);
+    });
+    renderAdhanSettings();
+    loadVoiceManifest().then(renderAdhanSettings);
+  }
+  mountAdhanSettings();
 
   function timeDate(value, date) {
     var match = String(value || '').match(/(\d{1,2}):(\d{2})/);
@@ -8704,7 +9282,6 @@
       '<div class="qpt-remaining">الوقت المتبقي للصلاة القادمة</div><div class="qpt-hijri" data-qpt-hijri></div></div>' +
       '<div class="qpt-status" data-qpt-status role="status" aria-live="polite"></div>' +
       '<div class="qpt-list" data-qpt-list aria-label="مواقيت الصلاة"></div>' +
-      '<details class="qpt-alerts" data-qpt-alerts aria-label="إعدادات تنبيهات الأذان"></details>' +
       '<div class="qpt-actions"><button type="button" class="qpt-retry" data-qpt-retry>تحديث المواقيت</button></div>' +
       '<p class="qpt-note">طريقة الحساب: الهيئة المصرية العامة للمساحة — قد تختلف المواقيت باختلاف الموقع المحلي.</p>' +
       '</section>';
@@ -8744,7 +9321,6 @@
       var button = event.target.closest('[data-qpt-prayer-toggle]');
       if (button) togglePrayerAlert(button);
     });
-    renderAlertSettings();
     startAlertScheduler();
     loadTimes(false);
   }
