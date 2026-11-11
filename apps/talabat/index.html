@@ -18,7 +18,120 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>window.SUPABASE_URL="https://dicnuwzxolqdtribhdnb.supabase.co";window.SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpY251d3p4b2xxZHRyaWJoZG5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1Njg2OTMsImV4cCI6MjEwNTE0NDY5M30.ye-Bm9drZt4xoq-jKKI3koVV_vTa3HRYvz6dOPvLylc";</script>
-<script src="supabase-client.js"></script>
+<script>
+/* NaqisnaSupabase — عميل المزامنة (جدول app_homes: code + data JSONB) */
+(function () {
+  var W = window, T = 'app_homes', sb = null;
+  try {
+    if (W.supabase && W.SUPABASE_URL && W.SUPABASE_ANON_KEY) {
+      sb = W.supabase.createClient(W.SUPABASE_URL, W.SUPABASE_ANON_KEY, { auth: { persistSession: false }, realtime: { params: { eventsPerSecond: 5 } } });
+    }
+  } catch (e) { console.warn('supabase init failed', e); }
+
+  var PASS = ['learnedMap', 'usageFreq', 'categoryColors', 'categoryNames', 'categoryIcons', 'productIcons', 'customCats', 'hiddenCats', 'catalogCustom'];
+
+  function isConfigured() { return !!sb; }
+  async function getRow(code) {
+    var r = await sb.from(T).select('data,updated_at').eq('code', code).maybeSingle();
+    if (r.error) throw r.error;
+    return r.data || null;
+  }
+  async function writeRow(code, data) {
+    var r = await sb.from(T).upsert({ code: code, data: data, updated_at: new Date().toISOString() }, { onConflict: 'code' });
+    if (r.error) throw r.error;
+    return true;
+  }
+  function baseData(st, ex) {
+    st = st || {}; ex = ex || {};
+    var d = Object.assign({}, ex);
+    d.name = (st.home && st.home.name) || ex.name || 'بيتنا';
+    d.orders = Array.isArray(st.orders) ? st.orders : (ex.orders || []);
+    d.orderLists = Array.isArray(st.orderLists) ? st.orderLists : (ex.orderLists || []);
+    if (st.user) d.user = { id: st.user.id, name: st.user.name, whatsapp: st.user.whatsapp };
+    var dw = st.deliveryWhatsapp || (st.home && st.home.deliveryWhatsapp), dn = st.deliveryName || (st.home && st.home.deliveryName), pw = st.partnerWhatsapp || (st.home && st.home.partnerWhatsapp);
+    if (dw) d.deliveryWhatsapp = dw; if (dn) d.deliveryName = dn; if (pw) d.partnerWhatsapp = pw;
+    PASS.forEach(function (k) { if (st[k] !== undefined && st[k] !== null) d[k] = st[k]; });
+    d.updatedAtMs = Number(st.updatedAt) || Date.now();
+    return d;
+  }
+  function kindOf(e) { return (e && e.kind) || 'expense'; }
+
+  async function fetchHomeData(code) {
+    if (!sb) return null;
+    var row = await getRow(code);
+    if (!row) return null;
+    var d = row.data || {};
+    if (!d.updatedAtMs) d.updatedAtMs = Date.parse(row.updated_at) || 0;
+    return d;
+  }
+  async function joinOrCreateHome(code, name) {
+    if (!sb) return false;
+    var row = await getRow(code);
+    if (!row) { await writeRow(code, { name: name || 'بيتنا', orders: [], expenses: [], updatedAtMs: Date.now() }); return true; }
+    var d = row.data || {};
+    var empty = !(d.orders && d.orders.length) && !(d.expenses && d.expenses.length);
+    if (empty && String(name || '').indexOf('LINK->') === 0 && d.name !== name) { d.name = name; await writeRow(code, d); }
+    return true;
+  }
+  async function pushFullState(code, st) {
+    if (!sb) return false;
+    var ex = ((await getRow(code)) || {}).data || {};
+    var d = baseData(st, ex);
+    d.expenses = Array.isArray(st.expenses) ? st.expenses : (ex.expenses || []);
+    return writeRow(code, d);
+  }
+  async function pushOrdersOnly(code, st) {
+    if (!sb) return false;
+    var ex = ((await getRow(code)) || {}).data || {};
+    var d = baseData(st, ex);
+    d.expenses = ex.expenses || [];
+    return writeRow(code, d);
+  }
+  async function pushFinPartial(code, st, m) {
+    if (!sb) return false;
+    m = m || {};
+    var ex = ((await getRow(code)) || {}).data || {};
+    var d = baseData(st, ex);
+    var keep = (ex.expenses || []).filter(function (e) { return !m[kindOf(e)]; });
+    var mine = (st.expenses || []).filter(function (e) { return e && m[kindOf(e)]; });
+    d.expenses = keep.concat(mine);
+    return writeRow(code, d);
+  }
+  async function upsertExpense(code, e) {
+    if (!sb || !e) return false;
+    var ex = ((await getRow(code)) || {}).data || {};
+    var list = (ex.expenses || []).slice();
+    var i = list.findIndex(function (x) { return x && x.id === e.id; });
+    if (i >= 0) list[i] = e; else list.push(e);
+    ex.expenses = list; ex.updatedAtMs = Date.now();
+    return writeRow(code, ex);
+  }
+  async function deleteHome(code) {
+    if (!sb) return false;
+    var r = await sb.from(T).delete().eq('code', code);
+    return !r.error;
+  }
+  function subscribeToHomeChanges(code, cb) {
+    if (!sb) return null;
+    try {
+      return sb.channel('home-' + code).on('postgres_changes', { event: '*', schema: 'public', table: T, filter: 'code=eq.' + code }, function () { try { cb(); } catch (e) {} }).subscribe();
+    } catch (e) { return null; }
+  }
+  function joinPresence(user, cb) {
+    if (!sb) return null;
+    try {
+      var key = String((user && (user.id || user.whatsapp)) || Math.random());
+      var ch = sb.channel('naqisna-online', { config: { presence: { key: key } } });
+      ch.on('presence', { event: 'sync' }, function () { try { cb(Object.keys(ch.presenceState()).length || 1); } catch (e) {} });
+      ch.subscribe(function (s) { if (s === 'SUBSCRIBED') ch.track({ t: Date.now() }); });
+      return ch;
+    } catch (e) { return null; }
+  }
+
+  W.NaqisnaSupabase = { isConfigured: isConfigured, fetchHomeData: fetchHomeData, joinOrCreateHome: joinOrCreateHome, pushFullState: pushFullState, pushOrdersOnly: pushOrdersOnly, pushFinPartial: pushFinPartial, upsertExpense: upsertExpense, deleteHome: deleteHome, subscribeToHomeChanges: subscribeToHomeChanges, joinPresence: joinPresence };
+})();
+
+</script>
 <style>
   :root {
     --bg: #F4FAFE;
@@ -565,6 +678,27 @@
   .order-card { flex-wrap: wrap; }
   .order-exp { flex-basis: 100%; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); display: flex; flex-direction: column; gap: 8px; }
   .exp-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .category-card-header.done-head { position: relative; overflow: hidden; background: linear-gradient(135deg,#ECFDF5 0%,#D1FAE5 60%,#A7F3D0 130%) !important; border-bottom: 2px solid rgba(16,185,129,.22) !important; }
+  .category-card-header.done-head::after { content: ''; position: absolute; inset-inline-start: -30px; top: -40px; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle,rgba(255,255,255,.7),transparent 70%); pointer-events: none; }
+  .done-badge { width: 46px; height: 46px; border-radius: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg,#34D399,#059669); box-shadow: 0 8px 18px rgba(16,185,129,.38), inset 0 1px 0 rgba(255,255,255,.45); }
+  .done-head .category-card-name { font-size: 16.5px; font-weight: 900; color: #064E3B; }
+  .done-sub { font-size: 12px; font-weight: 700; color: #047857; margin-top: 2px; }
+  .done-sub b { font-weight: 900; color: #065F46; }
+  .done-pill { flex-shrink: 0; padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 900; color: #047857; background: rgba(255,255,255,.85); box-shadow: inset 0 0 0 1.5px rgba(16,185,129,.4); }
+  /* بطاقات المشتريات: شكل رفيع في سطر واحد */
+  .order-card.purchased { flex-wrap: wrap !important; align-items: center !important; gap: 8px !important; padding: 5px 10px !important; border-radius: 12px !important; box-shadow: none !important; opacity: .92; }
+  .order-card.purchased > .category-card-icon { width: 28px !important; height: 28px !important; border-radius: 9px !important; font-size: 15px !important; box-shadow: none !important; }
+  .order-card.purchased > .category-card-icon svg { width: 16px !important; height: 16px !important; }
+  .order-card.purchased .order-main { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .order-card.purchased .order-name { font-size: 13.5px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+  .order-card.purchased .order-name .badge { font-size: 9.5px; padding: 1px 7px; border-width: 1px; flex-shrink: 0; }
+  .order-card.purchased .order-location, .order-card.purchased .order-meta { display: none !important; }
+  .order-card.purchased .purchase-info { order: 2; margin: 0 !important; padding: 0 !important; border: none !important; flex-shrink: 0; }
+  .order-card.purchased .purchase-info .price { font-size: 13.5px !important; white-space: nowrap; }
+  .order-card.purchased .ord-chev { width: 22px; height: 22px; font-size: 16px; }
+  .category-card-orders:has(.order-card.purchased) { gap: 6px; }
+  .exp-row:has(> .btn-sm) { flex-wrap: nowrap; }
+  .exp-row > .btn-sm { flex: 1 1 0; min-width: 0; width: auto; margin: 0; padding-inline: 6px; font-size: 12.5px; white-space: nowrap; }
   .exp-row .lbl { font-size: 12px; font-weight: 800; color: var(--text-sec); min-width: 52px; }
   .exp-row .qty-num { width: 74px; padding: 8px 10px; border-radius: 12px; border: 1.5px solid var(--border); font-size: 15px; font-weight: 800; text-align: center; background: #fff; color: var(--text); }
   .exp-row .rv-select { flex: 1; min-width: 110px; padding: 8px 10px; border-radius: 12px; border: 1.5px solid var(--border); font-size: 13px; font-weight: 700; background: #fff; color: var(--text); }
@@ -1645,7 +1779,8 @@
   #bulkCancelBuy { flex: 1; }
   .wa-row { display: flex; gap: 8px; }
   .wa-row .btn { width: auto; min-height: 44px; font-size: 12.5px; padding: 10px 6px; margin: 0; }
-  .wa-row [data-sendwaorders] { flex: 2; }
+  .wa-row [data-sendwaorders] { flex: 3; }
+  .wa-row [data-sendwabought] { flex: 3; }
   .wa-row [data-catconfirm] { flex: 1; }
   .category-card-orders { padding: 8px 12px 12px !important; display: flex; flex-direction: column; gap: 8px; }
   .order-card { background: #fff !important; border: 1.5px solid var(--border) !important; border-radius: 16px !important; padding: 13px 14px !important; margin: 0 !important; box-shadow: 0 3px 10px rgba(30,27,46,.06) !important; }
@@ -1781,6 +1916,57 @@
     .wb-blob { filter: blur(40px); opacity: .4; }
     .duo-art svg { filter: drop-shadow(0 6px 8px rgba(30,60,90,.15)); }
   }
+
+  /* ===== صفحة المصروفات: تصميم موحّد ومتناسق ===== */
+  .fin-hero { margin: 0 20px 14px !important; padding: 16px 14px 14px !important; border: 1.5px solid rgba(28,176,246,.16) !important; border-inline-start: 1.5px solid rgba(28,176,246,.16) !important; border-radius: 22px !important; background: linear-gradient(160deg,#FFFFFF 0%,#F0F9FF 100%) !important; box-shadow: 0 10px 26px rgba(28,176,246,.10) !important; }
+  .fin-hero-head { font-size: 14.5px !important; flex-wrap: nowrap !important; }
+  .fin-hero-net { flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center; gap: 4px !important; margin: 10px 0 12px !important; padding: 12px 8px; border-radius: 18px; background: #fff; border: 1.5px solid var(--border); }
+  .fin-hero-net.neg { background: linear-gradient(180deg,#FFF5F6,#fff); border-color: rgba(244,63,94,.25); }
+  .fin-hero-net.pos { background: linear-gradient(180deg,#F0FDF6,#fff); border-color: rgba(16,185,129,.28); }
+  .fin-hero-net small { font-size: 11.5px !important; }
+  .fin-hero-net b { font-size: 30px !important; white-space: nowrap; direction: ltr; unicode-bidi: plaintext; }
+  .fin-hero-cols { margin-top: 0 !important; padding-top: 0 !important; border-top: none !important; gap: 8px !important; }
+  .fin-hero-cols > div { flex-direction: column !important; text-align: center; gap: 6px !important; padding: 10px 4px !important; border-radius: 16px !important; background: #fff !important; }
+  .fin-hero-cols .fh-ico { width: 38px !important; height: 38px !important; font-size: 19px !important; border-radius: 12px !important; }
+  .fin-hero-cols .fh-tx { width: 100%; }
+  .fin-hero-cols b { font-size: 15px !important; line-height: 1.2 !important; }
+  .fin-hero-cols small { font-size: 11px !important; margin-top: 2px; }
+
+  .fin-ctl-card { padding: 12px !important; border-radius: 22px !important; box-shadow: 0 10px 26px rgba(28,176,246,.10) !important; }
+  .fin-ctl-top { margin-bottom: 10px !important; }
+  .fin-ctl-add { min-height: 56px !important; padding: 12px !important; font-size: 16px !important; border-radius: 15px !important; box-shadow: 0 8px 18px rgba(28,176,246,.32), inset 0 1px 0 rgba(255,255,255,.35) !important; }
+  .fin-ctl-add .plus { width: 24px !important; height: 24px !important; font-size: 16px !important; }
+  .fin-ctl-seg { gap: 5px !important; padding: 5px !important; border-radius: 17px !important; }
+  .fin-ctl-seg button { flex-direction: row !important; flex-wrap: nowrap !important; white-space: nowrap; gap: 4px !important; padding: 0 4px !important; min-height: 50px !important; font-size: 14px !important; border-radius: 14px !important; min-width: 0; }
+  .fin-ctl-seg button .n { font-size: 11.5px !important; padding: 2px 8px !important; min-width: 24px; text-align: center; }
+  .fin-ctl-card .rep-picker-btn { min-height: 58px !important; padding: 8px 12px !important; border-radius: 16px !important; gap: 10px !important; }
+  .fin-ctl-card .rep-picker-btn .pk-ico { width: 40px !important; height: 40px !important; font-size: 20px !important; border-radius: 13px !important; }
+  .fin-ctl-card .rep-picker-btn .pk-tx b { font-size: 15px !important; line-height: 1.3 !important; }
+  .fin-ctl-card .rep-picker-btn .pk-tx small { font-size: 11.5px !important; line-height: 1.3 !important; }
+
+  .exp-grp { margin: 0 20px 8px !important; border-radius: 18px !important; border: 1.5px solid rgba(28,176,246,.14) !important; box-shadow: 0 4px 14px rgba(28,176,246,.07) !important; }
+  .exp-grp-head { padding: 10px 12px !important; gap: 10px !important; }
+  .exp-grp-ico { width: 40px !important; height: 40px !important; border-radius: 13px !important; }
+  .exp-grp-tx b { font-size: 14.5px !important; line-height: 1.35; }
+  .exp-grp-tx small { font-size: 11px !important; margin-top: 1px; }
+  .exp-grp-total { font-size: 13.5px !important; padding: 4px 10px; border-radius: 999px; background: var(--bg); border: 1px solid var(--border); }
+  .exp-grp-chev { width: 26px !important; height: 26px !important; }
+
+  /* ===== رؤوس الأقسام: شكل رفيع ===== */
+  .category-group > .category-card > .category-card-header { padding: 7px 12px !important; gap: 9px !important; min-height: 0; }
+  .category-group > .category-card > .category-card-header > .category-card-icon { width: 34px !important; height: 34px !important; border-radius: 11px !important; font-size: 17px !important; box-shadow: none !important; }
+  .category-group > .category-card > .category-card-header > .category-card-icon svg { width: 18px !important; height: 18px !important; }
+  .category-group > .category-card > .category-card-header .category-card-info { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; min-width: 0; flex: 1; }
+  .category-group > .category-card > .category-card-header .category-card-name { font-size: 14.5px !important; line-height: 1.3; }
+  .category-group > .category-card > .category-card-header .category-card-count { font-size: 11px !important; line-height: 1.3; }
+  .category-group > .category-card > .category-card-header .cat-cnt { min-width: 26px !important; height: 26px !important; font-size: 12.5px !important; box-shadow: none !important; }
+  .category-group > .category-card > .category-card-header.done-head { padding: 7px 12px !important; }
+  .category-group .done-badge { width: 34px !important; height: 34px !important; border-radius: 11px !important; box-shadow: 0 4px 10px rgba(16,185,129,.3), inset 0 1px 0 rgba(255,255,255,.4) !important; }
+  .category-group .done-badge svg { width: 17px; height: 17px; }
+  .category-group .done-head .category-card-name { font-size: 14.5px !important; }
+  .category-group .done-sub { font-size: 11px !important; margin-top: 0 !important; }
+  .category-group .done-pill { padding: 2px 10px !important; font-size: 11px !important; }
+  .category-group .category-card-orders { padding-top: 6px !important; }
   </style>
 </head>
 <body>
@@ -2705,9 +2891,22 @@
     return { added, skipped };
   }
   /* نفس وظيفة زر «أكّد الكل» بتاع السلة — تُستخدم في السلة وفي زر القسم الشامل */
-  function handleConfirmBasket() {
+  function askConfirmBasket() {
+    const m = openModal(`<div class="modal-handle"></div>
+      <div class="task-head"><span class="task-head-ico">🧺</span><span class="task-head-tx"><b>تأكيد جميع الطلبات</b></span></div>
+      <p style="margin:8px 0 14px;">تحب نبعت رسالة واتساب بالطلبات للطرف الآخر؟</p>
+      <div class="btn-group" style="flex-direction:column;gap:8px;">
+        <button class="btn btn-success" id="bcSend">تأكيد وإرسال للطرف الآخر 💬</button>
+        <button class="btn btn-primary" id="bcNoSend">تأكيد بدون إرسال</button>
+        <button class="btn" id="bcCancel">رجوع</button>
+      </div>`);
+    m.querySelector('#bcSend').onclick = () => { closeModal(m); handleConfirmBasket(true); };
+    m.querySelector('#bcNoSend').onclick = () => { closeModal(m); handleConfirmBasket(false); };
+    m.querySelector('#bcCancel').onclick = () => closeModal(m);
+  }
+  function handleConfirmBasket(sendMsg) {
     const r = confirmBasket(); render();
-    if (r.added.length) { try { const snd = new Audio(encodeURI('audio/np money.mp3')); snd.play().catch(() => {}); } catch (e) { console.warn(e); } toast(`🧺 اتأكدت السلة: ${r.added.length} طلب ✓` + (r.skipped ? ` (عدّينا ${r.skipped} متكرر)` : ''), 'success'); try { sendPartnerWa(r.added); } catch (e) { console.warn(e); } }
+    if (r.added.length) { try { const snd = new Audio(encodeURI('audio/np money.mp3')); snd.play().catch(() => {}); } catch (e) { console.warn(e); } toast(`🧺 اتأكدت السلة: ${r.added.length} طلب ✓` + (r.skipped ? ` (عدّينا ${r.skipped} متكرر)` : ''), 'success'); if (sendMsg) { try { sendPartnerWa(r.added); } catch (e) { console.warn(e); } } }
     else toast('السلة فاضية أو كلها موجودة قبل كده', 'warning');
   }
   function toggleBasketExpand(id) {
@@ -3262,8 +3461,6 @@
     if (!state._onboardingStep) state._onboardingStep = 'welcome';
     const s = state._onboardingStep;
     if (s === 'welcome') return renderWelcome();
-    if (s === 'join') return renderJoinHome();
-    if (s === 'created-success') return renderCreatedSuccess();
     if (s === 'username') return renderUsernameScreen();
     return renderWelcome();
   }
@@ -3279,51 +3476,18 @@
       <div class="brand-title grad w-anim d1">ناقصنا ايه</div>
       <div class="brand-desc w-anim d2">مشتريات البيت بقت لعبة ممتعة — مهام ونقاط وشارات لعيلتك كلها</div>
       <div class="feat-row w-anim d3">${feats.map(f => `<div class="feat-pill"><span class="feat-ico" style="background:${f.bg};color:${f.c};">${svgIcon(f.ic, 19)}</span><span>${f.t}</span></div>`).join('')}</div>
-      <div class="w-anim d4">${assistantSay('اعمل بيتك وادعي عيلتك عشان تظبطوا المشتريات سوا', null, 'أول مهمة', 'me')}</div>
+      <div class="w-anim d4">${assistantSay('سجّل رقم هاتفك وبياناتك هتتحفظ وترجعلك من أي جهاز', null, 'أول مهمة', 'me')}</div>
       <div class="btn-group w-anim d5">
-        <button class="btn btn-primary btn-xl" id="goCreate">اعمل بيت جديد</button>
-        <button class="btn" id="goJoin">ادخل بيت موجود</button>
+        <button class="btn btn-primary btn-xl" id="goCreate">ابدأ</button>
       </div>
-      <div class="trust-row w-anim d6"><span>مزامنة سحابية</span><i></i><span>من غير تسجيل</span><i></i><span>+300 صنف جاهز</span></div>
-    </div></div>`;
-  }
-
-  function renderCreatedSuccess() {
-    const code = state._pendingCode || genHomeCode();
-    return `<div class="onboarding"><div class="form-card">
-      <div class="success-icon" style="color:#059669;">${svgIcon('check', 34)}</div>
-      <h2 class="form-title">البيت اتعمل يا حبيبي!</h2>
-      <p class="form-subtitle">ابعت الكود ده لأي حد في العيلة عشان يدخل</p>
-      <div class="home-code-box">
-        <div class="home-code-label">كود البيت</div>
-        <div class="home-code" id="codeDisplay">${code}</div>
-      </div>
-      <div class="btn-group">
-        <button class="btn" id="copyCodeBtn">نسخ الكود</button>
-        <button class="btn btn-primary" id="enterHomeBtn">ادخل البيت 🏠</button>
-      </div>
-    </div></div>`;
-  }
-
-  function renderJoinHome() {
-    return `<div class="onboarding"><div class="form-card">
-      <button class="btn-ghost" id="backWelcome2" style="margin-bottom:6px;">رجوع</button>
-      <h2 class="form-title">ادخل بيت موجود 🔗</h2>
-      <p class="form-subtitle">اكتب كود البيت اللي عندك</p>
-      <div class="field">
-        <label>كود البيت</label>
-        <input type="text" id="joinCodeInput" style="text-transform:uppercase; letter-spacing:2px;" />
-        <div class="help-text">اكتب الكود زي ما هو بالظبط</div>
-      </div>
-      <div id="joinError" class="error-text hidden">الكود غلط أو البيت مش موجود 😅</div>
-      <button class="btn btn-primary" id="submitJoin">ادخل البيت</button>
+      <div class="trust-row w-anim d6"><span>حفظ برقم الهاتف</span><i></i><span>من غير تسجيل</span><i></i><span>+300 صنف جاهز</span></div>
     </div></div>`;
   }
 
   function renderUsernameScreen() {
     return `<div class="onboarding"><div class="form-card">
       <h2 class="form-title">أهلاً بيك في بيتك 🏡</h2>
-      <p class="form-subtitle">أول مرة تدخل؟ اكتب بياناتك</p>
+      <p class="form-subtitle">اكتب بياناتك — رقمك هو مفتاح حفظ بياناتك</p>
       <div class="field">
         <label>اسمك</label>
         <input type="text" id="userNameInput" maxlength="20" value="${escapeHTML(state.user?.name || '')}" />
@@ -3334,7 +3498,7 @@
         <div class="help-text">هيوصلك عليه رسالة واتساب تلقائية أول ما تخلص كتابة الطلبات ✅</div>
         <div id="waError" class="error-text hidden">اكتب رقم واتساب مظبوط (11 رقم بيبدأ بـ 01) 📱</div>
       </div>
-      <button class="btn btn-primary" id="submitUsername">${state._pendingCloud || (state.home && state.home.code && state._pendingCode) ? 'يلا ندخل 🎉' : 'أكّد وطلّع الكود 🎉'}</button>
+      <button class="btn btn-primary" id="submitUsername">يلا ندخل 🎉</button>
     </div></div>`;
   }
   function isValidEgyptPhone(v) {
@@ -5056,7 +5220,7 @@
     for (const o of pendList) { if (!grouped[o.categoryId]) grouped[o.categoryId] = []; grouped[o.categoryId].push(o); }
     for (const k of Object.keys(grouped)) grouped[k].sort((a, b) => (((b.priority === 'high' || b.urgent) ? 1 : 0) - ((a.priority === 'high' || a.urgent) ? 1 : 0)));
     const totalPend = (pendList || []).length;
-    const allBtn = `<div class="category-group"><div class="wa-row"><button class="btn btn-primary" data-sendwaorders style="margin:0;" title="ابعت كل الطلبات المعلقة واتساب للطرف الآخر">💬 ارسال الطلبات الى الطرف الاخر</button><button class="btn btn-success" data-catconfirm="all" style="margin:0;" title="تأكيد شراء كل الطلبات المعلقة">✓ تأكيد الشراء</button></div></div>`;
+    const allBtn = `<div class="category-group"><div class="wa-row"><button class="btn btn-primary" data-sendwaorders style="margin:0;" title="ابعت كل الطلبات المعلقة واتساب للطرف الآخر">💬 إرسال الطلبات</button><button class="btn btn-primary" data-sendwabought style="margin:0;" title="ابعت المشتريات اللي اتشترت واتساب للطرف الآخر">🛒 إرسال المشتريات</button><button class="btn btn-success" data-catconfirm="all" style="margin:0;" title="تأكيد شراء كل الطلبات المعلقة">✓ شراء</button></div></div>`;
     return allBtn + [...cats, ...Object.keys(grouped).filter(id => grouped[id].length && !cats.some(c => c.id === id)).map(id => ({ id }))].map(cat => {
       const arr = grouped[cat.id] || []; if (!arr.length) return '';
       const cc = catColor(cat.id);
@@ -5070,9 +5234,10 @@
       </div></div>`;
     }).join('')
     + (doneList.length ? `<div class="category-group"><div class="category-card">
-      <div class="category-card-header" style="background:var(--success-light);">
-        <div class="category-card-icon" style="background:#fff;">✅</div>
-        <div class="category-card-info"><div class="category-card-name">اتشترى النهاردة</div><div class="category-card-count" style="color:var(--success);">${doneList.length} صنف</div></div>
+      <div class="category-card-header done-head">
+        <div class="done-badge"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <div class="category-card-info"><div class="category-card-name">اتشترى النهاردة</div><div class="done-sub">🛒 إجمالي المشتريات <b>${formatCurrency(doneList.reduce((a, o) => a + (Number(o.purchase && o.purchase.finalPrice) || 0), 0))} ج.م</b></div></div>
+        <span class="done-pill">${doneList.length} ${doneList.length === 1 ? 'صنف' : 'أصناف'}</span>
       </div>
       <div class="category-card-orders">${doneList.map(o => renderOrderCard(o)).join('')}</div>
     </div></div>` : '');
@@ -5190,9 +5355,9 @@
       <div class="section"><div class="fin-ctl-card">
         <div class="fin-ctl-top"><a href="#" id="addExpenseLink" class="fin-ctl-add"><span class="plus">+</span> ضيف حركة جديدة</a></div>
         <div class="fin-ctl-seg">
-          <button class="${fk === 'expense' ? 'active' : ''}" data-expkind="expense">💸 مصروفات <span class="n">${state.expenses.filter(e => finKindOf(e) === 'expense').length}</span></button>
-          <button class="${fk === 'income' ? 'active' : ''}" data-expkind="income">💰 دخل <span class="n">${state.expenses.filter(e => finKindOf(e) === 'income').length}</span></button>
-          <button class="${fk === 'debt' ? 'active' : ''}" data-expkind="debt">🏦 ديون <span class="n">${state.expenses.filter(e => finKindOf(e) === 'debt').length}</span></button>
+          <button class="${fk === 'expense' ? 'active' : ''}" data-expkind="expense">💸 مصروفات</button>
+          <button class="${fk === 'income' ? 'active' : ''}" data-expkind="income">💰 دخل</button>
+          <button class="${fk === 'debt' ? 'active' : ''}" data-expkind="debt">🏦 ديون</button>
         </div>
         <div style="margin-top:8px;">
           <button class="rep-picker-btn ${(state._expPickerOpen) ? 'open' : ''}" id="expMonthBtn"><span class="pk-ico">🗂️</span><span class="pk-tx"><b>${expMonthFilter === 'all' ? 'كل الشهور' : escapeHTML(fiscalLabel(expMonthFilter))}</b><small>${shown.length} حركة • دوس للفلترة بالشهر</small></span><span class="pk-chev">‹</span></button>
@@ -5240,7 +5405,7 @@
     });
     const maxExp = Math.max(1, ...cmp.map(c => c.exp));
     return `<div class="page">
-      <div class="topbar"><div class="greeting">???? ?????????</div></div>
+      <div class="topbar"><div class="greeting">نظرة على البيت 📊</div></div>
       <div class="page-title">\u0625\u062d\u0635\u0627\u0626\u064a\u0627\u062a \u0627\u0644\u0628\u064a\u062a</div>
       ${state.expenses.length === 0 ? `<div class="empty"><div class="empty-title">مفيش بيانات كفاية</div><div class="empty-desc">اشتري طلبات أو ضيف مصاريف وهتظهرلك الإحصائيات</div></div>` : `
       <div class="rep-card"><div class="rep-head"><span class="rep-ico" style="background:#E0F2FE;">📅</span><b>تقرير النهاردة</b><small>${day.count} مشتريات</small></div><div class="rep-grid">
@@ -5324,11 +5489,7 @@
         <div class="settings-item"><div class="si-icon" style="background:#E1F3FD;color:#1CB0F6;">${svgIcon('home', 18)}</div><div class="si-body"><div class="si-label">اسمك</div></div><button class="si-action" id="editUserBtn">تعديل</button></div>
         <div class="settings-item"><div class="si-icon" style="background:#DCFCE7;color:#059669;">📱</div><div class="si-body"><div class="si-label">رقم الواتساب</div></div><button class="si-action" id="editWaBtn">تعديل</button></div>
         <div class="settings-item"><div class="si-icon" style="background:#FFEED3;color:#FF9600;">👨‍👩‍👧</div><div class="si-body"><div class="si-label">رقم واتساب الطرف الآخر</div></div><button class="si-action" id="editPartnerWaBtn">تعديل</button></div>
-        ${state.home?.code ? `<div class="settings-item"><div class="si-icon" style="background:#FEF3C7;color:#D97706;">${svgIcon('check', 18)}</div><div class="si-body"><div class="si-label">كود البيت</div></div><span class="code-display inline">${escapeHTML(state.home?.code || '')}</span><button class="icon-copy-btn" id="copyHomeCode" aria-label="نسخ الكود">${svgIcon('copy', 18)}</button></div>` : ''}
-        <div style="padding:2px 16px 6px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <button class="btn btn-primary btn-sm" id="newHomeBtn" style="min-height:48px;" ${state.home?.code ? 'disabled' : ''}>🏠 بيت جديد</button>
-          <button class="btn btn-secondary btn-sm" id="joinHomeBtn" style="min-height:48px;">🔗 بيت موجود</button>
-        </div>
+        ${renderPhoneAccountHTML()}
         <div class="online-pill" id="onlinePill" style="display:none;margin:0 16px 14px;"><span class="online-dot"></span><span class="online-num" id="onlineCount">1</span><span class="online-tx">مستخدم نشط الآن<small>بيستخدموا التطبيق دلوقتي</small></span><span class="live-tag"><i></i> مباشر</span></div>
         </div>
       </div>
@@ -5375,7 +5536,7 @@
           <input type="file" id="importBackupFile" accept="application/json,.json" class="hidden" />
         </div>
         <div class="help-text" style="padding:0 16px 8px;">نسخة JSON بكل بياناتك بتتحمل على جهازك • الاستيراد يستبدل البيانات الحالية</div>
-        <div class="settings-item" id="deleteHomeBtn" style="cursor:pointer;"><div class="si-icon" style="background:var(--danger-light);color:var(--danger)">🗑️</div><div class="si-body"><div class="si-label" style="color:var(--danger)">حذف البيت نهائياً</div><div class="si-value">من جهازك ومن قاعدة البيانات — مفيش رجعة</div></div><div class="si-action" style="color:var(--danger)">→</div></div>
+        <div class="settings-item" id="deleteHomeBtn" style="cursor:pointer;"><div class="si-icon" style="background:var(--danger-light);color:var(--danger)">🗑️</div><div class="si-body"><div class="si-label" style="color:var(--danger)">${isSharedLogin() ? 'فصل الرقم عن الجهاز' : 'حذف الرقم نهائياً'}</div><div class="si-value">${isSharedLogin() ? 'بيانات الشريك هتفضل زي ما هي' : 'من جهازك ومن قاعدة البيانات — مفيش رجعة'}</div></div><div class="si-action" style="color:var(--danger)">→</div></div>
         <div style="padding:8px 16px 0;"><button class="collapsible-head sub" id="learnedHead"><span class="ch-texts"><b>الكلمات اللي اتعلمناها (${learnedEntries.length})</b><small>دوس عشان تشوف</small></span><span class="chev ${state._learnedOpen ? 'open' : ''}">‹</span></button></div>
         <div class="collapsible-body ${state._learnedOpen ? '' : 'hidden'}">
         ${!learnedEntries.length ? `<div style="padding:2px 16px 12px;color:var(--text-muted);font-size:12px;">مفيش تصنيفات مخصوصة لسه.</div>` : `<div class="learned-list">${learnedEntries.map(([term, catId]) => `<span class="learned-tag">${escapeHTML(term)} → ${getCategoryName(catId)}<button data-unlearn="${escapeHTML(term)}">✕</button></span>`).join('')}</div><div style="padding:0 16px 12px;"><button class="btn btn-sm" id="clearLearned">مسح الكل</button></div>`}
@@ -5392,61 +5553,6 @@
   function bindOnboarding() {
     const b = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
     b('goCreate', () => { state._pendingName = 'بيتنا'; state._onboardingStep = 'username'; render(); });
-    b('goJoin', () => { state._onboardingStep = 'join'; render(); });
-    b('backWelcome2', () => { state._onboardingStep = 'welcome'; render(); });
-    b('enterHomeBtn', () => { state.currentTab = 'home'; state._onboardingStep = null; persist(); render(); });
-    b('copyCodeBtn', () => { const code = document.getElementById('codeDisplay').textContent; copyToClipboard(code).then(ok => toast(ok ? 'اتنسخ ✓' : 'مقدرش أنسخ', ok ? 'success' : 'error')); });
-    b('submitJoin', async () => {
-      const inp = document.getElementById('joinCodeInput'); const err = document.getElementById('joinError');
-      const showErr = () => { err.classList.remove('hidden'); inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'), 1500); };
-      // تحويل الأرقام العربية والهندية إلى أرقام إنجليزية
-      let rawVal = inp.value.trim().replace(/[٠-٩]/g, d => d.charCodeAt(0) - 0x0660).replace(/[۰-۹]/g, d => d.charCodeAt(0) - 0x06f0);
-      let code = rawVal.toUpperCase();
-      // تنظيف الكود: إذا لم يبدأ بـ HOME- أضفها
-      if (!/^HOME-\d{4,}$/.test(code)) code = 'HOME-' + code.replace(/[^0-9]/g, '');
-      if (!code || code === 'HOME-' || !/^HOME-\d{4,}$/.test(code)) { showErr(); return; }
-      const acceptJoin = (remote) => {
-        state.home = remote.home;
-        state._pendingCode = code; state._pendingName = remote.home.name;
-        state._pendingCloud = remote;
-        state._isJoining = true;
-        state._onboardingStep = 'username'; render();
-      };
-      if (state.home && state.home.code && code === state.home.code) {
-        state._pendingCode = code; state._pendingName = state.home.name; state._isJoining = true; state._onboardingStep = 'username'; render(); return;
-      }
-      try {
-        const raw = localStorage.getItem('baytna_home_' + code);
-        if (raw) {
-          const saved = JSON.parse(raw);
-          if (saved && saved.home) { acceptJoin(saved); return; }
-        }
-      } catch {}
-      // اسحب بيانات البيت من السحابة - يقبل حتى البيت الفاضي الموجود في Supabase
-      try {
-        if (window.NaqisnaSupabase && window.NaqisnaSupabase.isConfigured()) {
-          inp.disabled = true;
-          const btnEl = document.getElementById('submitJoin'); if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'بدوّر على البيت...'; }
-          const remoteData = await window.NaqisnaSupabase.fetchHomeData(code);
-          inp.disabled = false;
-          if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'ادخل البيت'; }
-          if (remoteData !== null) {
-            // البيت موجود في Supabase (حتى لو فاضي)
-            acceptJoin({
-              home: { code, name: remoteData.name || 'بيتنا', createdAt: nowISO() },
-              orders: (remoteData.orders || []).map(normRemoteOrder).filter(Boolean),
-              expenses: (remoteData.expenses || []).map(normRemoteExpense).filter(Boolean),
-              orderLists: remoteData.orderLists || [],
-              user: remoteData.user || null,
-              updatedAt: Number(remoteData.updatedAtMs) || Date.now()
-            });
-            return;
-          }
-        }
-      } catch (e) { console.warn('Supabase join error:', e); try { inp.disabled = false; const btnEl = document.getElementById('submitJoin'); if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'ادخل البيت'; } } catch {} }
-      // الكود صحيح لكن البيت مش موجود
-      showErr();
-    });
     b('submitUsername', () => {
       const inp = document.getElementById('userNameInput'); const name = (inp.value || '').trim();
       const waInp = document.getElementById('userWaInput'); const waRaw = (waInp?.value || '').trim();
@@ -5471,13 +5577,12 @@
         state._pendingCloud = null;
       }
       state._isJoining = false;
-      if (!state.home) state.home = { code: state._pendingCode || genHomeCode(), name: 'بيتنا', createdAt: nowISO() };
+      if (!state.home || !phoneFromHomeCode(state.home.code)) state.home = { code: homeCodeFromPhone(whatsapp) || state._pendingCode || genHomeCode(), name: 'بيتنا', createdAt: nowISO() };
       state._pendingName = null;
       state.initialized = true; persist();
       try { initSupabaseSync(); } catch {}
       try { syncUserToAdminDir(); } catch {}
-      if (isJoin) { state.currentTab = 'home'; state._onboardingStep = null; persist(); toast(`أهلاً يا ${name}! 🎉`, 'success'); render(); }
-      else { state._pendingCode = state.home.code; state._onboardingStep = 'created-success'; render(); }
+      state.currentTab = 'home'; state._onboardingStep = null; persist(); toast(`أهلاً يا ${name}! 🎉`, 'success'); render();
     });
     // migration: old user without whatsapp -> force profile completion
     try {
@@ -5488,10 +5593,71 @@
   }
 
   /* إدارة البيت من الإعدادات: إنشاء بيت جديد أو الدخول لبيت موجود */
-  function normalizeHomeCode(raw) {
-    let v = String(raw || '').trim().replace(/[٠-٩]/g, d => d.charCodeAt(0) - 0x0660).replace(/[۰-۹]/g, d => d.charCodeAt(0) - 0x06f0).toUpperCase();
-    if (!/^HOME-\d{4,}$/.test(v)) v = 'HOME-' + v.replace(/[^0-9]/g, '');
-    return /^HOME-\d{4,}$/.test(v) ? v : '';
+  function arDigitsToEn(v) { return String(v || '').replace(/[٠-٩]/g, d => d.charCodeAt(0) - 0x0660).replace(/[۰-۹]/g, d => d.charCodeAt(0) - 0x06f0); }
+  /* مفتاح حفظ البيانات = رقم الهاتف (HOME-01xxxxxxxxx) */
+  function homeCodeFromPhone(raw) {
+    const v = arDigitsToEn(raw);
+    return isValidEgyptPhone(v) ? 'HOME-' + normalizeEgyptPhone(v) : '';
+  }
+  function phoneFromHomeCode(code) { const m = /^HOME-(01\d{9})$/.exec(String(code || '')); return m ? m[1] : ''; }
+  function accountPhone() { return state.home?.loginPhone || phoneFromHomeCode(state.home?.code); }
+  function isSharedLogin() { const lp = state.home?.loginPhone; return !!(lp && phoneFromHomeCode(state.home.code) !== lp); }
+  /* ربط رقم الشريك: لما الشريك يدخل برقمه تظهر له بيانات هذا الحساب */
+  async function registerPartnerLink(pnRaw) {
+    try {
+      const own = state.home?.code; const target = homeCodeFromPhone(pnRaw);
+      if (!own || !phoneFromHomeCode(own) || !target || target === own) return false;
+      const S = window.NaqisnaSupabase; if (!S || !S.isConfigured()) return false;
+      const ex = await S.fetchHomeData(target);
+      if (ex === null) { await S.joinOrCreateHome(target, 'LINK->' + own); return true; }
+      if (String(ex.name || '') === 'LINK->' + own) return true;
+      if (String(ex.name || '').startsWith('LINK->')) { await S.joinOrCreateHome(target, 'LINK->' + own); return true; }
+      toast('رقم الشريك عنده بيانات خاصة بيه — مش هنقدر نربطه تلقائي', 'warning');
+      return false;
+    } catch (e) { console.warn(e); return false; }
+  }
+  function renderPhoneAccountHTML() {
+    const code = state.home?.code || '';
+    const ph = accountPhone();
+    const statusRow = ph
+      ? `<div class="settings-item"><div class="si-icon" style="background:#DCFCE7;color:#059669;">💾</div><div class="si-body"><div class="si-label">${isSharedLogin() ? 'متزامن مع حساب الشريك — دخلت برقم' : 'بياناتك محفوظة على الرقم'}</div><div class="si-value" dir="ltr" style="text-align:right;">${escapeHTML(ph)}</div></div><button class="si-action" id="unlinkPhoneBtn">فصل</button></div>`
+      : (code ? `<div class="settings-item"><div class="si-icon" style="background:#FEF3C7;color:#D97706;">⚠️</div><div class="si-body"><div class="si-label">البيانات على كود قديم</div><div class="si-value">اربطها برقم هاتفك من تحت</div></div></div>` : '');
+    const form = ph ? '' : `<div style="padding:8px 16px 6px;">
+          <div class="field" style="margin:0 0 8px;"><label>📱 رقم الهاتف لحفظ بياناتك</label><input type="tel" id="phoneSaveInput" maxlength="15" inputmode="tel" dir="ltr" placeholder="01xxxxxxxxx" /><div class="help-text">ادخل بنفس الرقم من أي جهاز وبياناتك ترجع لك</div></div>
+          <div id="phoneSaveError" class="error-text hidden">اكتب رقم مظبوط (11 رقم بيبدأ بـ 01) 📱</div>
+          <button class="btn btn-primary btn-sm" id="phoneSaveBtn" style="min-height:48px;width:100%;">💾 احفظ بياناتي برقم الهاتف</button>
+        </div>`;
+    const syncBtn = code ? `<div style="padding:4px 16px 8px;"><button class="btn btn-secondary btn-sm" id="syncNowBtn" style="min-height:48px;width:100%;">🔄 مزامنة البيانات الآن</button></div>` : '';
+    return statusRow + syncBtn + form;
+  }
+  async function linkPhoneAccount(raw) {
+    const code = homeCodeFromPhone(raw);
+    if (!code) return { ok: false, reason: 'invalid' };
+    let remote = await findHomeByCode(code);
+    const myPhone = normalizeEgyptPhone(arDigitsToEn(raw));
+    let shared = false;
+    if (remote && remote.home && String(remote.home.name || '').startsWith('LINK->')) {
+      const target = String(remote.home.name).slice(6);
+      const tr = await findHomeByCode(target);
+      if (!tr || !tr.home) return { ok: false, reason: 'nolink' };
+      remote = tr; shared = true;
+    }
+    if (remote && remote.home) {
+      const ok = await confirmDialog({ title: shared ? 'رقمك مربوط بحساب شريكك 🤝' : 'لقينا بيانات على الرقم ده 🎉', message: shared ? 'شريكك ضاف رقمك. تحب تدخل بياناته المشتركة؟ بيانات الجهاز الحالية هتتبدل بيها.' : 'فيه بيانات محفوظة على الرقم ده. تحب نسترجعها؟ بيانات الجهاز الحالية هتتبدل بيها.', confirmText: 'أيوه، ادخل', cancelText: 'إلغاء' });
+      if (!ok) return { ok: false, reason: 'cancel' };
+      remote.home.loginPhone = myPhone;
+      applyJoinedHome(remote);
+      toast('اتسترجعت بياناتك من الرقم ✓', 'success');
+      return { ok: true, restored: true };
+    }
+    state.home = { code, name: 'بيتنا', createdAt: nowISO(), loginPhone: myPhone };
+    state._syncedOnce = false;
+    persist();
+    try { initSupabaseSync(); } catch {}
+    try { if (state.partnerWhatsapp) registerPartnerLink(state.partnerWhatsapp); } catch {}
+    render();
+    toast('اتحفظت بياناتك على الرقم ✓', 'success');
+    return { ok: true };
   }
   async function findHomeByCode(code) {
     try {
@@ -5528,33 +5694,12 @@
     try { syncUserToAdminDir(); } catch {}
     render();
   }
-  function openJoinHomeModal() {
-    const m = openModal(`<div class="modal-handle"></div><h2>ادخل بيت موجود 🔗</h2><p class="m-sub">اكتب كود البيت اللي عندك — بياناتك الحالية هتتبدل ببياناته</p>
-      <div class="field"><label>كود البيت</label><input type="text" id="joinCodeInput2" style="text-transform:uppercase; letter-spacing:2px;" /></div>
-      <div id="joinError2" class="error-text hidden">الكود غلط أو البيت مش موجود 😅</div>
-      <div class="btn-group"><button class="btn btn-primary" id="submitJoin2">ادخل البيت</button></div>`);
-    const inp = m.querySelector('#joinCodeInput2'), err = m.querySelector('#joinError2'), btn = m.querySelector('#submitJoin2');
-    const showErr = () => { err.classList.remove('hidden'); inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'), 1500); };
-    btn.onclick = async () => {
-      const code = normalizeHomeCode(inp.value);
-      if (!code) { showErr(); return; }
-      if (state.home && state.home.code && code === state.home.code) { closeModal(m); toast('انت أصلاً في البيت ده 🏠', 'info'); return; }
-      btn.disabled = true; btn.textContent = 'بدوّر على البيت...'; inp.disabled = true;
-      const remote = await findHomeByCode(code);
-      if (!remote || !remote.home) { btn.disabled = false; btn.textContent = 'ادخل البيت'; inp.disabled = false; showErr(); return; }
-      closeModal(m);
-      confirmDialog({ title: 'لقيت البيت! 🎉', message: `بيت "${remote.home.name || ''}" — تدخله؟ بياناتك الحالية هتتبدل ببياناته.`, confirmText: 'أيوه، ادخل', cancelText: 'إلغاء' }).then(ok => {
-        if (!ok) return;
-        applyJoinedHome(remote);
-        toast(`أهلاً بيك في بيتك الجديد! 🎉`, 'success');
-      });
-    };
-  }
 
   function bindMain() {
     try { syncUserToAdminDir(); } catch {}
 
-    const bc = document.getElementById('basketConfirm'); if (bc) bc.onclick = handleConfirmBasket;
+    const bc = document.getElementById('basketConfirm'); if (bc) bc.onclick = askConfirmBasket;
+    document.querySelectorAll('[data-sendwabought]').forEach(b => b.onclick = () => openSendBoughtModal());
     document.querySelectorAll('[data-sendwaorders]').forEach(b => b.onclick = () => {
       const pend = (state.orders || []).filter(o => o && o.status === 'pending');
       if (!pend.length) { toast('مفيش طلبات معلقة للواتساب ✓', 'info'); return; }
@@ -5883,20 +6028,34 @@
   function bindSettings() {
     const b = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
     b('editUserBtn', () => openEditTextModal({ title: 'تعديل اسمك', label: 'الاسم', value: state.user?.name || '', placeholder: 'اسمك', max: 20, onSave: (v) => { state.user.name = v.trim(); persist(); toast('تمام، الاسم اتغير ✓', 'success'); render(); } }));
-    b('copyHomeCode', () => { if (!state.home?.code) { toast('مفيش بيت لسه — اعمل بيت جديد الأول 🏠', 'info'); return; } copyToClipboard(state.home.code).then(ok => toast(ok ? 'الكود اتنسخ' : 'مقدرش أنسخ', ok ? 'success' : 'error')); });
-    b('newHomeBtn', () => {
-      if (state.home?.code) { toast('عندك بيت بالفعل 🏠', 'info'); return; }
-      confirmDialog({ title: 'بيت جديد؟', message: 'هنعمل بيت جديد بكود جديد، وبياناتك وقوائمك هتفضل زي ما هي.', confirmText: 'اعمل بيت جديد', cancelText: 'إلغاء' }).then(ok => {
+    b('phoneSaveBtn', async () => {
+      const inp = document.getElementById('phoneSaveInput'); const err = document.getElementById('phoneSaveError'); const btn = document.getElementById('phoneSaveBtn');
+      const raw = inp ? inp.value : '';
+      if (!homeCodeFromPhone(raw)) { if (err) err.classList.remove('hidden'); if (inp) { inp.classList.add('error'); inp.focus(); } return; }
+      if (err) err.classList.add('hidden'); if (inp) inp.classList.remove('error');
+      if (btn) { btn.disabled = true; btn.textContent = 'ثواني...'; }
+      const r = await linkPhoneAccount(raw);
+      if (!r.ok && r.reason === 'nolink') toast('مش لاقيين بيانات الشريك — اتأكد إنه ضافك', 'error');
+      if (!r.ok && btn) { btn.disabled = false; btn.textContent = '💾 احفظ بياناتي برقم الهاتف'; }
+    });
+    b('syncNowBtn', async () => {
+      const btn = document.getElementById('syncNowBtn');
+      if (!navigator.onLine) { toast('مفيش إنترنت — جرّب تاني بعد ما تتصل 📶', 'warning'); return; }
+      if (!window.NaqisnaSupabase || !window.NaqisnaSupabase.isConfigured()) { toast('المزامنة مش متاحة دلوقتي', 'error'); return; }
+      if (btn) { btn.disabled = true; btn.textContent = '🔄 بنزامن...'; }
+      let ok = false; const prevSynced = state._syncedOnce;
+      try { state._syncedOnce = false; await initSupabaseSync(); ok = !!state._syncedOnce || (!(state.orders || []).length && !(state.expenses || []).length); } catch (e) { console.warn(e); }
+      if (!ok) state._syncedOnce = prevSynced;
+      if (ok) { try { await pushFinState(); } catch {} toast('اتزامنت بياناتك ✓', 'success'); render(); }
+      else { toast('تعذرت المزامنة — اتأكد من النت وجرّب تاني', 'error'); if (btn) { btn.disabled = false; btn.textContent = '🔄 مزامنة البيانات الآن'; } }
+    });
+    b('unlinkPhoneBtn', () => {
+      confirmDialog({ title: 'فصل الرقم؟', message: 'بياناتك هتفضل على الجهاز وعلى السحابة، لكن الجهاز ده مش هيتزامن مع الرقم لحد ما تربطه تاني.', confirmText: 'افصل', cancelText: 'إلغاء', danger: true }).then(ok => {
         if (!ok) return;
-        state.home = { code: genHomeCode(), name: 'بيتنا', createdAt: nowISO() };
-        state._pendingCloud = null; state._isJoining = false; state._pendingCode = null; state._pendingName = null;
-        persist();
-        try { initSupabaseSync(); } catch {}
-        render();
-        toast('البيت الجديد اتعمل! الكود: ' + state.home.code, 'success');
+        state.home = null; state._syncedOnce = false; persist(); render();
+        toast('اتفصل الرقم', 'info');
       });
     });
-    b('joinHomeBtn', () => { openJoinHomeModal(); });
     const deliveryItem = document.getElementById('deliverySettingsItem');
     if (deliveryItem) {
       deliveryItem.style.cursor = 'pointer';
@@ -6049,19 +6208,30 @@
       Storage.clear();
       state = { initialized: false, home: null, user: null, orders: [], expenses: [], learnedMap: {}, usageFreq: {}, categoryColors: {}, categoryNames: {}, productIcons: {}, customCats: [], hiddenCats: [], photos: { me: '' }, catalogCustom: null, _shareExpenses: false, _shareFin: { expense: true, income: false, debt: true }, currentTab: 'home', orderFilter: 'all', categoryFilter: 'all', searchQuery: '', _onboardingStep: null };
       render();
-      if (cloudOk) toast('البيت اتمسح نهائياً من جهازك ومن القاعدة 🗑️', 'success');
+      if (cloudOk) toast('الرقم وبياناته اتمسحوا نهائياً من جهازك ومن القاعدة 🗑️', 'success');
       else if (cloudTried) toast('اتمسح من جهازك — وتعذر الحذف من القاعدة (تحقق من النت والصلاحيات) ⚠️', 'warning');
       else toast('اتمسح من جهازك (مفيش اتصال بالقاعدة) 🗑️', 'warning');
     }
     const delHome = document.getElementById('deleteHomeBtn');
     if (delHome) delHome.onclick = () => {
       const code = state.home?.code || '';
-      if (!code) { toast('مفيش بيت للحذف 🏠', 'info'); return; }
-      confirmDialog({ title: 'حذف البيت نهائياً؟', message: `البيت (${code}) هيتمسح من جهازك ومن قاعدة البيانات نهائياً ومفيش رجعة!`, confirmText: 'أيوه، امسح', cancelText: 'لأ، خليه', danger: true }).then(ok => {
+      if (!code) { toast('مفيش رقم محفوظ للحذف 📱', 'info'); return; }
+      if (isSharedLogin()) {
+        confirmDialog({ title: 'فصل الرقم؟', message: 'هتتفصل عن بيانات الشريك على الجهاز ده بس، وبياناته تفضل زي ما هي.', confirmText: 'أيوه، افصل', cancelText: 'لأ، خليه', danger: true }).then(async ok => {
+          if (!ok) return;
+          try { const S = window.NaqisnaSupabase; if (S && S.isConfigured() && S.deleteHome) await S.deleteHome('HOME-' + state.home.loginPhone); } catch {}
+          state.home = null; state._syncedOnce = false; persist(); render(); toast('اتفصل الرقم', 'info');
+        });
+        return;
+      }
+      const ph = accountPhone() || code;
+      confirmDialog({ title: 'حذف الرقم نهائياً؟', message: `الرقم (${ph}) وكل بياناته هيتمسحوا من جهازك ومن قاعدة البيانات نهائياً ومفيش رجعة!`, confirmText: 'أيوه، امسح', cancelText: 'لأ، خليه', danger: true }).then(ok => {
         if (!ok) return;
-        promptDialog({ title: 'تأكيد أخير', message: `اكتب كود البيت (${code}) عشان نتمم الحذف`, confirmText: 'احذف نهائياً', cancelText: 'تراجع' }).then(v => {
+        promptDialog({ title: 'تأكيد أخير', message: `اكتب الرقم (${ph}) عشان نتمم الحذف`, confirmText: 'احذف نهائياً', cancelText: 'تراجع' }).then(v => {
           if (v == null) return;
-          if (String(v).trim().toUpperCase() !== String(code).toUpperCase()) { toast('الكود مش مطابق — اتلغى الحذف', 'error'); return; }
+          const typed = normalizeEgyptPhone(arDigitsToEn(v));
+          const okMatch = phoneFromHomeCode(code) ? typed === ph : String(v).trim().toUpperCase() === String(code).toUpperCase();
+          if (!okMatch) { toast('الرقم مش مطابق — اتلغى الحذف', 'error'); return; }
           deleteHomeForever(code);
         });
       });
@@ -6661,6 +6831,7 @@
       try { if (state.home) state.home.partnerWhatsapp = pn; } catch {}
       try { localStorage.setItem('naqisna_partner_wa', pn); } catch {}
       persist(); closeModal(m); render(); toast('رقم الطرف الآخر اتحفظ ✅', 'success');
+      try { registerPartnerLink(pn).then(ok => { if (ok) toast('الشريك لما يدخل برقمه هتظهر له البيانات 🤝', 'success'); }); } catch {}
     };
   }
   const PARTNER_FUNNY = [
@@ -7434,6 +7605,20 @@
     try { window.open(`https://wa.me/${toWaIntl(p.phone)}?text=${encodeURIComponent(msg)}`, '_blank'); toast('اتفتح واتساب للطرف الآخر 💬', 'success'); } catch {}
     return true;
   }
+  function openSendBoughtModal() {
+    const today = new Date().toDateString();
+    const bought = (state.orders || []).filter(o => o && o.status === 'purchased' && o.purchase && new Date(o.purchase.purchasedAt).toDateString() === today);
+    if (!bought.length) { toast('مفيش مشتريات النهاردة نبعتها 🛒', 'info'); return; }
+    const items = bought.map(o => ({ o, v: Number(o.purchase.finalPrice) || 0 }));
+    const total = Math.round(items.reduce((a, it) => a + it.v, 0) * 100) / 100;
+    const m = openModal(`<div class="modal-handle"></div>
+      <div class="task-head"><span class="task-head-ico">🛒</span><span class="task-head-tx"><b>إرسال المشتريات للطرف الآخر</b></span><span class="task-count">${items.length} أصناف</span></div>
+      <p style="margin:8px 0;">اللي اتشترى النهاردة: ${items.length} ${items.length === 1 ? 'صنف' : 'أصناف'} • ${total} ج.م</p>
+      <label class="bulk-watoggle"><input type="checkbox" id="sbShowPrices" checked> 💰 إظهار الأسعار في الرسالة</label>
+      <div class="btn-group"><button class="btn btn-success" id="sbSend">📤 إرسال واتساب</button><button class="btn" id="sbCancel">رجوع</button></div>`);
+    m.querySelector('#sbCancel').onclick = () => closeModal(m);
+    m.querySelector('#sbSend').onclick = () => { const sp = m.querySelector('#sbShowPrices').checked; closeModal(m); try { sendBoughtWa(items, sp); } catch (e) { console.warn(e); } };
+  }
   function openBulkPurchaseModal(catId) {
     const pend = (state.orders || []).filter(o => o && o.status !== 'purchased');
     if (!pend.length) { toast('مفيش طلبات معلقة ✓', 'info'); return; }
@@ -7458,7 +7643,8 @@
       <div class="task-listbox">${rows}</div>
       <div class="bulk-foot">
         <div class="bulk-sum"><span class="t">💰 المجموع الكلي<small id="bulkCnt">0 من ${pend.length} مسعّر</small></span><b><span id="bulkTotal">0</span> <small>ج.م</small></b></div>
-        <label class="bulk-watoggle"><input type="checkbox" id="bulkShowPrices" checked> 💰 إظهار أسعار المشتريات للطرف الآخر في رسالة الواتساب</label>
+        <label class="bulk-watoggle"><input type="checkbox" id="bulkSendWa"> 📤 إرسال رسالة بالمشتريات للطرف الآخر (واتساب)</label>
+        <label class="bulk-watoggle" id="bulkShowPricesLbl" style="opacity:.5;"><input type="checkbox" id="bulkShowPrices" checked disabled> 💰 إظهار الأسعار في الرسالة</label>
         <div class="btn-group"><button class="btn btn-primary bulk-go" id="bulkConfirmBuy">✓ أكّد الكل (${pend.length})</button><button class="btn" id="bulkCancelBuy">رجوع</button></div>
       </div>`;
     const m = openModal(html);
@@ -7483,6 +7669,7 @@
     };
     m.querySelectorAll('[data-bulkprice]').forEach(inp => { inp.oninput = () => { inp.classList.remove('error'); refreshBulk(); }; });
     m.querySelector('#bulkCancelBuy').onclick = () => closeModal(m);
+    m.querySelector('#bulkSendWa').onchange = (e) => { const sp = m.querySelector('#bulkShowPrices'); sp.disabled = !e.target.checked; m.querySelector('#bulkShowPricesLbl').style.opacity = e.target.checked ? '1' : '.5'; };
     m.querySelector('#bulkConfirmBuy').onclick = () => {
       const items = [];
       for (const o of pend) {
@@ -7493,10 +7680,11 @@
       }
       if (!items.length) { toast('اكتب سعر صنف واحد على الأقل ✓', 'warning'); return; }
       items.forEach(({ o, v }) => markPurchased(o.id, { originalPrice: v, finalPrice: v }));
+      const sendWa = m.querySelector('#bulkSendWa').checked;
       const showP = m.querySelector('#bulkShowPrices') ? m.querySelector('#bulkShowPrices').checked : true;
       closeModal(m); render();
       try { const snd = new Audio(encodeURI('audio/np money.mp3')); snd.play().catch(() => {}); } catch (e) { console.warn(e); }
-      try { sendBoughtWa(items, showP); } catch (e) { console.warn(e); }
+      if (sendWa) { try { sendBoughtWa(items, showP); } catch (e) { console.warn(e); } }
       const left = (state.orders || []).filter(x => x && x.status !== 'purchased').length;
       if (!left) {
         const mm = openModal(`

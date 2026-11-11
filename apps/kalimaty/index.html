@@ -1428,6 +1428,7 @@ html[data-mode=light] .kx-pill.hot{background:#fff3c8;color:#8a5a00}
 .acc-b>.addcard,.acc-b>.kx-tex{background:none;border:0;box-shadow:none;padding:0;margin:0}
 .acc-b>.addcard>h3:first-child,.acc-b>.gencard>.kx-sh:first-child{display:none}
 .acc[data-k="list"] .m5{display:none}
+[data-act="acc_all"]{display:none!important}
 .gz{gap:10px}
 .gz-st{border:1.5px solid var(--line);border-radius:18px;background:var(--card2);overflow:hidden;transition:border-color .2s}
 .gz-st.open{border-color:var(--ec)}
@@ -1499,6 +1500,11 @@ html[data-mode=light] .kx-pill.hot{background:#fff3c8;color:#8a5a00}
 .tq-foot{display:flex!important;flex-direction:row;gap:8px;justify-content:center;align-items:center;padding:8px 0 2px}
 .tq-foot .btn{flex:1 1 0;width:auto;min-width:0;min-height:40px!important;font-size:14px!important;padding:0 12px;border-radius:999px;white-space:nowrap}
 .ls-vc{flex:none;padding:4px 12px;border-radius:999px;border:1.5px solid var(--line);background:none;color:var(--muted);font-weight:800;font-size:12.5px;min-height:30px}.ls-vc.on{border-color:#ffd45a;color:#ffd45a;background:rgba(255,212,90,.12)}
+.ls-lc{gap:8px!important;padding:12px 14px!important}
+.ls-lc .au-ai{width:38px!important;height:38px!important;border-radius:12px!important}
+.ls-lc .tq-h b{font-size:16px}.ls-lc .ls-ln{display:block;color:var(--muted);font-size:12.5px;font-weight:700;margin-top:2px}
+.ls-lc .tag{font-size:11.5px;padding:3px 9px}
+.ls-lc .tq-a{display:flex;flex-wrap:nowrap;gap:6px}.ls-lc .tq-a .pill{flex:1;min-height:34px!important;padding:0 6px!important;font-size:13px!important}
 .qx-flat{display:flex;flex-direction:column;gap:10px}
 .ls-gts{display:flex;flex-wrap:wrap;gap:6px}
 .ls-gt{padding:5px 11px;border-radius:999px;background:rgba(79,220,156,.14);color:#4fdc9c;font-size:12.5px;font-weight:800}
@@ -1513,6 +1519,12 @@ html[data-mode=light] .kx-pill.hot{background:#fff3c8;color:#8a5a00}
 .tc-tools{display:flex;gap:8px;align-items:center;margin:10px 0}.tc-tools .inp{flex:1;min-height:42px}
 .tc-tools .pill{flex:none;min-height:42px}.tc-tools .pill.bad{border-color:#ff8f8f;color:#ff8f8f}
 #tcRows{max-height:420px;overflow:auto}
+.tc-ql{display:flex;flex-direction:column;gap:8px}
+.tc-qi{display:flex;align-items:flex-start;gap:10px;background:var(--card2,rgba(255,255,255,.05));border:1px solid var(--line);border-radius:16px;padding:10px 12px}
+.tc-qn{flex:none;width:28px;height:28px;border-radius:9px;background:rgba(150,134,255,.2);display:grid;place-items:center;font-weight:800;font-size:13px}
+.tc-qb{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.tc-qb b{font-size:15px;line-height:1.5;overflow-wrap:anywhere}.tc-qb small{color:#4fdc9c;font-weight:700;font-size:13px;overflow-wrap:anywhere}
+.tc-qb .tag{font-size:11px;padding:2px 8px}
 .qd{gap:12px}
 .qd-top{display:flex;align-items:center;gap:10px}
 .qd-title{flex:1;text-align:center;font-size:17px;font-weight:800}
@@ -1532,6 +1544,9 @@ html[data-mode=light] .kx-pill.hot{background:#fff3c8;color:#8a5a00}
 .qd .qz-line{background:var(--field);min-height:84px}
 .qd .qz-fill .btn,.qd .qz-check .btn,.qd .btn{min-height:56px;font-size:18px;border-radius:18px}
 .qd .qz-w{min-height:50px;font-size:19px;border-radius:16px}
+#offChip{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:9999;max-width:calc(100vw - 24px);padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:800;pointer-events:none;box-shadow:0 8px 20px rgba(0,0,0,.4);text-align:center}
+#offChip.off{background:#3a2a3a;color:#ffb3b3;border:1px solid #6b3a4a}
+#offChip.sync{background:#1f3a35;color:#7be8c0;border:1px solid #2f6b58}
 .tc-fab .ic{width:18px;height:18px}
 .tq-card{display:flex;flex-direction:column;gap:12px}.tq-h{display:flex;align-items:center;gap:12px}.tq-h b{display:block;font-size:17px}.tq-h small{display:block;color:var(--muted);font-weight:600;font-size:12.5px;line-height:1.4}
 .tq-a{display:flex;flex-wrap:wrap;gap:6px}.tq-a .pill{min-height:38px;padding:0 13px;font-size:14px}
@@ -7998,7 +8013,7 @@ function qParseWords(txt){
 }
 /* ================= TEACHER: views ================= */
 const tcTabbar=()=>{
-  const t=[['class','user','الفصل'],['quiz','pencil','الاختبارات'],['contest','trophy','المسابقات'],['app','list','التطبيق']];
+  const t=[['class','user','الفصل'],['quiz','book','الدروس'],['contest','trophy','المسابقات'],['app','list','التطبيق']];
   return `<nav class="tabbar" style="grid-template-columns:repeat(4,minmax(0,1fr))">${t.map(([k,i,l])=>`<button class="tab ${TCH.tab===k?'on':''}" data-act="tc_tab" data-t="${k}">${ic(i)}<span>${l}</span></button>`).join('')}</nav>`;
 };
 function vTeacher(){
@@ -9099,6 +9114,17 @@ function qcReact(frac,timeout,live){
 
 /* ===== Sentences tab: collapsible professional sections (all folded by default) ===== */
 const ACC={add:0,gen:0,list:0,ex:0};
+/* one section open at a time: opening a section folds the others */
+function accOnly(sec){
+  if(!sec)return;
+  const par=sec.parentElement;if(!par)return;
+  par.querySelectorAll(':scope>.acc.open').forEach(o=>{
+    if(o===sec)return;o.classList.remove('open');
+    const h=o.querySelector('.acc-h');if(h)h.setAttribute('aria-expanded','false');
+    const k=o.dataset.k;
+    [ACC,typeof QACC!=='undefined'?QACC:null,typeof TCA!=='undefined'?TCA:null,typeof LACC!=='undefined'?LACC:null].forEach(m=>{if(m&&k in m)m[k]=0;});
+  });
+}
 function accSec(k,icon,color,title,sub,badge,body){
   const o=ACC[k]?' open':'';
   return `<section class="acc${o}" data-k="${k}" style="--ec:${color}"><button type="button" class="acc-h" data-act="acc_t" data-k="${k}" aria-expanded="${!!ACC[k]}">
@@ -9132,7 +9158,7 @@ document.addEventListener('click',e=>{
     t.textContent=all?'فتح الكل':'طيّ الكل';return;
   }
   const k=t.dataset.k;ACC[k]=ACC[k]?0:1;
-  const s=t.closest('.acc');if(s){s.classList.toggle('open',!!ACC[k]);t.setAttribute('aria-expanded',String(!!ACC[k]));}
+  const s=t.closest('.acc');if(s){s.classList.toggle('open',!!ACC[k]);t.setAttribute('aria-expanded',String(!!ACC[k]));if(ACC[k])accOnly(s);}
   const all=Object.values(ACC).every(Boolean),b=document.querySelector('.acc-all');if(b)b.textContent=all?'طيّ الكل':'فتح الكل';
   if(ACC[k]&&s)setTimeout(()=>{try{s.scrollIntoView({block:'nearest',behavior:'smooth'});}catch(x){}},60);
 },true);
@@ -9288,6 +9314,9 @@ function lsGen(L){
 /* ---------- teacher: list (quizzes | lessons) ---------- */
 {const _l=vTqList;vTqList=function(kind){
   if(kind!=='quiz')return _l(kind);
+  {const saved=TQ.list;let h;
+   try{if(saved)TQ.list=saved.filter(q=>!isLesson(q));h=_l(kind);}finally{TQ.list=saved;}
+   return h.replace('>الاختبارات<','>الدروس<').replace(/اختبارات بأنواع أسئلة متعد[^<]*/,'كلمات وجمل وأسئلة لطلاب فصلك').replace('اختبار جديد','درس جديد').replace('لا توجد اختبارات بعد','لا توجد دروس بعد').replace('أنشئ اختبارًا','أنشئ درسًا');}
   const les=true;
   const seg=`<div class="seg ls-seg" role="group" aria-label="القسم"><button class="${les?'':'on'}" data-act="lsn_sub" data-v="quiz">الاختبارات</button><button class="${les?'on':''}" data-act="lsn_sub" data-v="lesson">الدروس</button></div>`;
   if(!les)return qxList(seg);
@@ -9296,9 +9325,8 @@ function lsGen(L){
   const pub=all.filter(q=>q.status==='published').length;
   const card=q=>{
     const l=q.settings.lesson,nw=(l.words||[]).length,ns=(l.sents||[]).length,nq=(q.questions||[]).length,c=TQ.cnt[q.id]||0,tg=st[q.status]||st.draft;
-    return `<div class="card tq-card ls-lc"><div class="tq-h"><span class="au-ai">${ic('book')}</span><div style="flex:1;min-width:0"><b>${esc(q.title)}</b><small>${esc(q.description||'درس بكلمات وجمل وأسئلة متنوعة')}</small></div><span class="tag ${tg[1]}">${tg[0]}</span></div>
-     <div class="ls-chips"><span><b class="en">${nw}</b>كلمة</span><span><b class="en">${ns}</b>جملة</span><span><b class="en">${nq}</b>سؤال</span><span><b class="en">${c}</b>طالب</span></div>
-     <div class="tq-a"><button class="pill" data-act="tq_edit" data-id="${q.id}">تعديل</button><button class="pill" data-act="tq_res" data-id="${q.id}">النتائج (${c})</button>${q.status==='published'?`<button class="pill" data-act="tq_close" data-id="${q.id}">إيقاف</button>`:`<button class="pill ok" data-act="tq_pub" data-id="${q.id}">نشر</button>`}<button class="pill" data-act="tq_dup" data-id="${q.id}">نسخ</button><button class="pill bad" data-act="tq_del" data-id="${q.id}">حذف</button></div></div>`;
+    return `<div class="card tq-card ls-lc"><div class="tq-h"><span class="au-ai">${ic('book')}</span><div style="flex:1;min-width:0"><b>${esc(q.title)}</b><small class="ls-ln en-n">${nw} كلمة · ${ns} جملة · ${nq} سؤال · ${c} طالب</small></div><span class="tag ${tg[1]}">${tg[0]}</span></div>
+     <div class="tq-a"><button class="pill" data-act="tq_edit" data-id="${q.id}">تعديل</button><button class="pill" data-act="tq_res" data-id="${q.id}">النتائج</button>${q.status==='published'?`<button class="pill" data-act="tq_close" data-id="${q.id}">إيقاف</button>`:`<button class="pill ok" data-act="tq_pub" data-id="${q.id}">نشر</button>`}<button class="pill" data-act="tq_dup" data-id="${q.id}">نسخ</button><button class="pill bad" data-act="tq_del" data-id="${q.id}">حذف</button></div></div>`;
   };
   return `<div class="screen au tc"><div class="ob-top"><div><h2 style="margin:0;font-size:24px">الدروس</h2><small style="color:var(--muted);font-weight:700">كلمات حفظ وجمل مهمة، وأسئلة متنوعة تتراجع كل فترة</small></div></div>
    <div class="acc-sum ls-sum3"><div><b class="en">${all.length}</b><small>درس</small></div><div><b class="en">${pub}</b><small>منشور</small></div><div><b class="en">${all.length-pub}</b><small>مسودة</small></div></div>
@@ -9378,7 +9406,7 @@ document.addEventListener('click',e=>{
 /* ---------- student: lessons card in the training tab ---------- */
 {const _s=sqCard;sqCard=function(){
   const full=SQ.list;if(full)SQ.list=full.filter(q=>!isLesson(q));
-  try{return _s.apply(this,arguments);}finally{SQ.list=full;}
+  try{return _s.apply(this,arguments).replace('اختبارات ومسابقات فصلك','دروس ومسابقات فصلك').replace(/>اختبار</g,'>درس<');}finally{SQ.list=full;}
 };}
 const lsnDays=t=>Math.max(1,Math.ceil((t-Date.now())/864e5));
 function lsnCard(){
@@ -9398,7 +9426,6 @@ function lsnCard(){
   };
   return `<div class="card sq-card ls-card"><div class="sec-h" style="margin:0"><h3 style="margin:0;font-size:18px">دروس فصلك</h3><small>${due?due+' للمراجعة':L.length+' درس'}</small></div>${L.map(row).join('')}</div>`;
 }
-{const _t=vTrain;vTrain=function(){return _t().replace('<div class="screen">','<div class="screen">'+lsnCard());};}
 function lsnSheet(q){
   const l=q.settings.lesson,W=(l.words||[]).filter(x=>x[1]),S2=(l.sents||[]).filter(x=>x[1]);
   const row=x=>`<div class="ls-it"><button class="spk2" data-act="speak" data-t="${esc(x[0])}" aria-label="استمع">${ic('speaker')}</button><div><b class="en" dir="ltr">${esc(x[0])}</b><small>${esc(x[1])}</small></div></div>`;
@@ -9453,7 +9480,7 @@ function lsnDone(){
 };}
 
 /* ===== quizzes: grade targeting (multi-grade) + accordion editor + styled list ===== */
-const QACC={info:1,grades:0,settings:0,gen:0,qs:1};
+const QACC={info:0,grades:0,settings:0,gen:0,qs:0};
 const gShort=i=>(GRADES[i]||'').replace(/^الصف /,'');
 function gradeOk(q){
   const g=q&&q.settings&&q.settings.grades;
@@ -9503,7 +9530,7 @@ document.addEventListener('click',e=>{
   e.stopPropagation();e.preventDefault();
   if(b.dataset.act==='qx_acc'){
     const k=b.dataset.k;QACC[k]=QACC[k]?0:1;
-    const s=b.closest('.acc');if(s){s.classList.toggle('open',!!QACC[k]);b.setAttribute('aria-expanded',String(!!QACC[k]));}
+    const s=b.closest('.acc');if(s){s.classList.toggle('open',!!QACC[k]);b.setAttribute('aria-expanded',String(!!QACC[k]));if(QACC[k])accOnly(s);}
     return;
   }
   const q=TQ.edit;if(!q)return;
@@ -9571,6 +9598,8 @@ function lsPatch(g,rows){
 }
 function lsLook(raw,D){
   let w=String(raw||'').toLowerCase().trim().replace(/^to\s+/,'');if(!w)return null;
+  if(/^(am|is|are|be)$/.test(w))return {ar:'يكون',v:1,p:w==='be'?'was':w==='am'||w==='is'?'was':'were',pa:'كان',ps:0};
+  if(/^(was|were)$/.test(w))return {ar:'كان',v:1,p:w,pa:'كان',ps:1};
   const one=x=>{
     const tries=[];const add=t=>{if(t&&!tries.includes(t))tries.push(t);};
     add(x);try{add(baseOf(x,D));}catch(e){}
@@ -9618,8 +9647,16 @@ async function lsFill(g,rows){
           if(o){if(!String(r[1]).trim())r[1]=o.ar;if(r[2]==null){r[2]=o.v;r[3]=o.p;r[4]=o.pa;if(o.ps)r[5]=1;}}
           else if(r[2]==null)r[2]=0;
         }else if(!String(r[1]).trim()){
-          const ws=(r[0].toLowerCase().match(/[a-z][a-z'’-]*/g)||[]).map(x=>x.replace(/['’]s$/,'')),out=[];
-          ws.forEach(w=>{const o=lsLook(w,D),m=o?String(o.ar).split(/[،,;\/]/)[0].trim():'';if(m&&out[out.length-1]!==m)out.push(m);});
+          const q=/\?\s*$/.test(r[0]),ws=(r[0].toLowerCase().match(/[a-z][a-z'’-]*/g)||[]).map(x=>x.replace(/['’]s$/,'')),out=[];
+          const FW={i:'أنا',you:'أنت',he:'هو',she:'هي',it:'هو',we:'نحن',they:'هم',this:'هذا',that:'ذلك',these:'هؤلاء',those:'أولئك',a:'',an:'',the:'',am:'',is:'',are:'',was:'كان',were:'كانوا',do:'',does:'',did:''};
+          ws.forEach((w,k)=>{
+            let m;
+            if(k===0&&q&&/^(am|is|are|do|does|did)$/.test(w))m='هل';
+            else if(k===0&&q&&/^(was|were)$/.test(w))m='هل كان';
+            else if(Object.prototype.hasOwnProperty.call(FW,w))m=FW[w];
+            else{const o=lsLook(w,D);m=o?String(o.ar).split(/[،,;\/]/)[0].trim():'';}
+            if(m&&out[out.length-1]!==m)out.push(m);
+          });
           r[1]=out.join(' ');
         }
       });
@@ -9672,7 +9709,8 @@ document.addEventListener('input',e=>{
 
 /* ===== teacher quizzes/contests: same content flow as the student
    (add words & sentences -> generate short sentences -> pick -> build questions) ===== */
-const TCA={words:1,sents:0,list:0};
+const TCA={words:0,sents:0,list:0,qv:0};
+let TCX=null;
 const TCM={g:'w',q:'',clr:0};
 const TC_WT=['e2a','a2e','spell','match','tf','mpast'],TC_ST=['sfill','order','smean'];
 function tcBank(q){
@@ -9719,8 +9757,24 @@ function tcManager(b){
    <div class="tc-tools"><input class="inp" id="tcSrch" placeholder="ابحث بالإنجليزية أو بالعربية" autocomplete="off" value="${esc(TCM.q)}"><button type="button" class="pill ${TCM.clr?'bad':''}" data-act="tc_clr" ${arr.length?'':'disabled'}>${TCM.clr?'تأكيد حذف الكل؟':'حذف الكل'}</button></div>
    <div class="ls-rows" id="tcRows">${tcRowsHtml(b)}</div>`;
 }
+function tcQList(q){
+  const L=q.questions||[];
+  if(!L.length)return '<div class="ls-empty">لم تُضف أسئلة بعد. أضف كلمات أو جملًا ثم ولّد الأسئلة من القسمين أعلاه.</div>';
+  const ans=x=>{
+    if(x.t==='mcq')return (x.o||[])[x.c]||'';
+    if(x.t==='tf')return x.c===true||x.c==='true'?'صح':'خطأ';
+    if(x.t==='fill')return x.ans||(x.a||[])[0]||'';
+    if(x.t==='order')return x.sent||'';
+    if(x.t==='match')return (x.pairs||[]).map(p=>p[0]+' = '+p[1]).join(' ، ');
+    return '';
+  };
+  const txt=x=>x.t==='order'?(x.h||x.q||''):x.t==='match'?(x.q||'وصّل كل عنصر بما يناسبه'):(x.q||'');
+  return `<div class="tc-ql">${L.map((x,i)=>`<div class="tc-qi"><span class="tc-qn en">${i+1}</span><div class="tc-qb"><span class="tag">${esc(qTypeName(x.t))}</span><b dir="auto">${esc(txt(x))}</b><small dir="auto">${esc(ans(x))}</small></div><button type="button" class="ls-x" data-act="tc_qdel" data-i="${i}" aria-label="حذف السؤال">${ic('close')}</button></div>`).join('')}</div>`;
+}
 {const _e=vTqEdit;vTqEdit=function(){
-  const q=TQ.edit,h=_e.apply(this,arguments);
+  const q=TQ.edit;
+  if(q&&q!==TCX){TCX=q;Object.keys(QACC).forEach(k=>QACC[k]=0);Object.keys(TCA).forEach(k=>TCA[k]=0);}
+  const h=_e.apply(this,arguments);
   if(!q)return h;
   if(isLesson(q)){
     const b=tcBank(q),nw=b.words.length,ns=b.sents.length;
@@ -9739,10 +9793,10 @@ function tcManager(b){
   if(i<0)return h;
   const j=h.indexOf('</section>',i);if(j<0)return h;
   const b=tcBank(q),nw=b.words.length,ns=b.sents.length;
-  const parts=lsContent({words:[],sents:[]}).replace(/<div class="ls-empty">[^<]*<\/div>/g,'').split('<div class="ls-blk">'),wB='<div class="ls-blk">'+parts[1],sB='<div class="ls-blk">'+parts[2];
+  const parts=lsContent(b).split('<div class="ls-blk">'),wB='<div class="ls-blk">'+parts[1],sB='<div class="ls-blk">'+parts[2];
   const sec=tcAcc('words','book','#4fdc9c','الكلمات','أضف كلمات وولّد أسئلتها',nw||'',wB+tcTypes(q,b,'w'))
    +tcAcc('sents','translate','#9686ff','الجمل','أضف جملًا وولّد أسئلتها',ns||'',sB+tcTypes(q,b,'s'))
-   +tcAcc('list','list','#ffd45a','الكلمات والجمل المضافة','راجع وعدّل واحذف ما أضفته',nw+ns||'',tcManager(b));
+   +tcAcc('qv','list','#ffae5c','الأسئلة','عرض الأسئلة المضافة',q.questions.length||'',tcQList(q));
   let out=h.slice(0,i)+sec+h.slice(j+'</section>'.length);
   const grab=k=>{const a=out.search(new RegExp('<section class="acc[^"]*" data-k="'+k+'"'));if(a<0)return null;const e=out.indexOf('</section>',a)+10;const sec=out.slice(a,e);const bs=sec.indexOf('<div class="acc-b">')+19,be=sec.lastIndexOf('</div></section>');return {a,e,body:sec.slice(bs,be)};};
   {const g1=grab('info'),g2=grab('grades'),g3=grab('settings');
@@ -9763,15 +9817,16 @@ function tcAddSents(b,list){
   if(rows.length)lsFill('s',rows);
 }
 document.addEventListener('click',e=>{
-  const bt=e.target.closest&&e.target.closest('[data-act="tc_acc"],[data-act="tc_ty"],[data-act="tc_mk"],[data-act="tc_seg"],[data-act="tc_clr"],[data-act^="tg_"]');if(!bt||bt.disabled)return;
+  const bt=e.target.closest&&e.target.closest('[data-act="tc_acc"],[data-act="tc_ty"],[data-act="tc_mk"],[data-act="tc_seg"],[data-act="tc_clr"],[data-act="tc_qdel"],[data-act^="tg_"]');if(!bt||bt.disabled)return;
   const q=TQ.edit;if(!q)return;
   e.stopPropagation();e.preventDefault();
   const a=bt.dataset.act,b=tcBank(q);
   if(a==='tc_acc'){
     const k=bt.dataset.k;TCA[k]=TCA[k]?0:1;
-    const s=bt.closest('.acc');if(s){s.classList.toggle('open',!!TCA[k]);bt.setAttribute('aria-expanded',String(!!TCA[k]));}
+    const s=bt.closest('.acc');if(s){s.classList.toggle('open',!!TCA[k]);bt.setAttribute('aria-expanded',String(!!TCA[k]));if(TCA[k])accOnly(s);}
     return;
   }
+  if(a==='tc_qdel'){q.questions.splice(+bt.dataset.i,1);render(true);return;}
   if(a==='tc_seg'){TCM.g=bt.dataset.v==='s'?'s':'w';TCM.q='';TCM.clr=0;render(true);return;}
   if(a==='tc_clr'){
     if(!TCM.clr){TCM.clr=1;render(true);setTimeout(()=>{if(TCM.clr){TCM.clr=0;const el=document.querySelector('[data-act="tc_clr"]');if(el){el.classList.remove('bad');el.textContent='حذف الكل';}}},3500);return;}
@@ -9840,6 +9895,137 @@ const QD_LBL={mcq:'اختر الإجابة الصحيحة',tf:'هل العبار
   }catch(e){}
   return h;
 };}
+
+/* ====================================================================
+   OFFLINE-FIRST: account data lives on the device (student & teacher);
+   server reads are cached (leaderboards with photos & pets, classes,
+   quizzes, results); writes made offline are queued and sent
+   automatically the moment the connection returns.
+   ==================================================================== */
+const OFF={q:[],run:false,Q:'kx-outbox',IDX:'kx-rc-idx',MAXQ:400};
+const offRd=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v;}catch(e){return d;}};
+OFF.q=offRd(OFF.Q,[]);
+const offUid=t=>{try{return JSON.parse(atob(String(t).split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub||'';}catch(e){return '';}};
+const offUuid=()=>{try{return crypto.randomUUID();}catch(e){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&3|8)).toString(16);});}};
+const OFF_RPC_READ=/^\/rest\/v1\/rpc\/(my_class|check_class_code)(\?|$)/;
+const offKey=(uid,m,path,body)=>'kx-rc:'+uid+':'+m+':'+sbHash(path+(body?JSON.stringify(body):''));
+function offIdxSet(k,meta){const i=offRd(OFF.IDX,{});i[k]=meta;try{localStorage.setItem(OFF.IDX,JSON.stringify(i));}catch(e){}}
+function offEvict(n){
+  const i=offRd(OFF.IDX,{}),ks=Object.keys(i).sort((a,b)=>i[a].t-i[b].t).slice(0,n);
+  ks.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}delete i[k];});
+  try{localStorage.setItem(OFF.IDX,JSON.stringify(i));}catch(e){}
+}
+function offPut(k,rec,meta){
+  const s=JSON.stringify(rec);if(s.length>1500000)return;
+  for(let t=0;t<3;t++){
+    try{localStorage.setItem(k,s);offIdxSet(k,Object.assign({t:Date.now()},meta));return;}
+    catch(e){offEvict(6);}
+  }
+}
+function offClearUser(uid){
+  try{const i=offRd(OFF.IDX,{});Object.keys(i).forEach(k=>{if(k.indexOf('kx-rc:'+uid+':')===0){localStorage.removeItem(k);delete i[k];}});localStorage.setItem(OFF.IDX,JSON.stringify(i));}catch(e){}
+}
+function offPatchCache(m,path,body,uid){
+  try{
+    const idx=offRd(OFF.IDX,{}),id=(path.match(/id=eq\.([^&]+)/)||[])[1];
+    Object.keys(idx).forEach(k=>{
+      const mt=idx[k];if(mt.m!=='GET'||mt.uid!==uid||!/^\/rest\/v1\/quizzes\?/.test(mt.p))return;
+      const c=offRd(k,null);if(!c)return;let a;try{a=JSON.parse(c.txt);}catch(e){return;}if(!Array.isArray(a))return;
+      if(m==='POST'){if(mt.p.indexOf('teacher_id=eq.'+uid)<0)return;if(!a.some(x=>x.id===body.id))a.unshift(Object.assign({created_at:new Date().toISOString(),status:'draft'},body));}
+      else if(m==='DELETE')a=a.filter(x=>x.id!==id);
+      else a=a.map(x=>x.id===id?Object.assign({},x,body):x);
+      c.txt=JSON.stringify(a);try{localStorage.setItem(k,JSON.stringify(c));}catch(e){}
+    });
+  }catch(e){}
+}
+function offQueue(path,m,opt,uid){
+  const it={path,m,uid,body:opt.body,headers:opt.headers||{},t:Date.now()};
+  const same=OFF.q.find(x=>x.m===m&&x.path===path&&x.uid===uid&&(m==='PATCH'||/on_conflict/.test(path)));
+  if(same&&it.body&&typeof it.body==='object'&&!Array.isArray(it.body))same.body=Object.assign({},same.body,it.body);
+  else if(OFF.q.length<OFF.MAXQ)OFF.q.push(it);
+  if(/^\/rest\/v1\/quizzes/.test(path))offPatchCache(m,path,opt.body||{},uid);
+  offSaveQ();
+  return new Response(null,{status:204});
+}
+function offSaveQ(){try{localStorage.setItem(OFF.Q,JSON.stringify(OFF.q));}catch(e){}offChip();}
+{const _raw=sbRaw;sbRaw=async function(path,opt){
+  opt=opt||{};
+  if(String(path).indexOf('/rest/v1/')!==0||opt.noq)return _raw(path,opt);
+  const m=(opt.method||'GET').toUpperCase(),uid=opt.token?offUid(opt.token):'';
+  const isRead=m==='GET'||(m==='POST'&&OFF_RPC_READ.test(path));
+  if(isRead){
+    const own=/^\/rest\/v1\/user_data\?select=state/.test(path)&&uid&&path.indexOf('user_id=eq.'+uid)>=0;
+    const key=uid&&!own?offKey(uid,m,path,m==='POST'?opt.body:null):'';
+    const cached=()=>{const c=key&&offRd(key,null);return c?new Response(c.txt,{status:200,headers:{'Content-Type':'application/json','content-range':c.cr||''}}):null;};
+    if(navigator.onLine===false){const c=cached();if(c)return c;}
+    try{
+      const r=await Promise.race([_raw(path,opt),new Promise((_,rej)=>setTimeout(()=>rej(new TypeError('timeout')),20000))]);
+      if(r.ok&&key){try{const txt=await r.clone().text();offPut(key,{txt,cr:r.headers.get('content-range')||''},{m,p:path,uid});}catch(e){}}
+      return r;
+    }catch(e){const c=cached();if(c)return c;throw e;}
+  }
+  if(/^\/rest\/v1\/(quizzes|quiz_results)/.test(path)&&m!=='GET'){
+    if(m==='POST'&&/^\/rest\/v1\/quizzes(\?|$)/.test(path)&&opt.body&&!opt.body.id)opt=Object.assign({},opt,{body:Object.assign({id:offUuid()},opt.body)});
+    if(navigator.onLine===false)return offQueue(path,m,opt,uid);
+    try{return await _raw(path,opt);}catch(e){return offQueue(path,m,opt,uid);}
+  }
+  return _raw(path,opt);
+};}
+async function offFlush(){
+  if(OFF.run||!OFF.q.length||navigator.onLine===false)return;
+  OFF.run=true;let done=0;const keep=[],list=OFF.q.slice();
+  try{
+    for(let i=0;i<list.length;i++){
+      const it=list[i],ss=sbSess(),ts=tSess();
+      const api=ss&&ss.uid===it.uid?sbApi:ts&&ts.uid===it.uid?tApi:null;
+      if(!api){keep.push(it);continue;}
+      let r;
+      try{r=await api(it.path,{method:it.m,headers:it.headers,body:it.body,noq:true});}
+      catch(e){keep.push(...list.slice(i));break;}
+      if(r.ok||r.status===409)done++;
+      else if(r.status>=500||r.status===429){keep.push(...list.slice(i));break;}
+    }
+  }finally{
+    OFF.q=keep.concat(OFF.q.filter(x=>list.indexOf(x)<0));
+    OFF.run=false;
+  }
+  offSaveQ();
+  if(done){
+    toast('تمت مزامنة '+done+' تغيير مع حسابك');
+    try{if(typeof TQ!=='undefined'&&tSess()){TQ.list=null;tqLoad(true);}}catch(e){}
+    try{if(sbSess()){sbRefreshBoard();}}catch(e){}
+  }
+}
+/* status chip */
+function offChip(){
+  let c=document.getElementById('offChip');
+  const off=navigator.onLine===false,n=OFF.q.length;
+  if(!off&&!n){if(c)c.remove();return;}
+  if(!c){c=document.createElement('div');c.id='offChip';c.setAttribute('role','status');document.body.appendChild(c);}
+  c.className=off?'off':'sync';
+  c.textContent=off?'غير متصل · بياناتك محفوظة على جهازك'+(n?' · '+n+' بانتظار المزامنة':''):'جارٍ مزامنة '+n+' تغيير…';
+}
+window.addEventListener('online',()=>{offChip();setTimeout(offFlush,300);});
+window.addEventListener('offline',offChip);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)offFlush();});
+setInterval(()=>{if(OFF.q.length)offFlush();},20000);
+setTimeout(()=>{offChip();offFlush();},2500);
+/* clear cached server data of an account on sign-out */
+{const _lo=sbLogout;sbLogout=async function(){const s=sbSess();try{return await _lo.apply(this,arguments);}finally{if(s)offClearUser(s.uid);}};}
+/* leaderboard peers (names, photos, pets) persist on the device */
+(function(){
+  const K='kx-pvw';
+  try{const o=JSON.parse(localStorage.getItem(K)||'null');if(o&&typeof o==='object'&&typeof PVW!=='undefined')Object.keys(o).forEach(id=>{if(!PVW.cache[id])PVW.cache[id]=o[id];});}catch(e){}
+  let t=0;
+  const save=()=>{
+    try{
+      const ids=Object.keys(PVW.cache).sort((a,b)=>(PVW.cache[b].at||0)-(PVW.cache[a].at||0)).slice(0,150),o={};
+      ids.forEach(id=>{const v=Object.assign({},PVW.cache[id]);if(v.photo&&v.photo.length>60000)v.photo='';o[id]=v;});
+      localStorage.setItem(K,JSON.stringify(o));
+    }catch(e){}
+  };
+  const _s=pvSet;pvSet=function(id,o){_s.apply(this,arguments);clearTimeout(t);t=setTimeout(save,1500);};
+})();
 
 
 /* ====================================================================
