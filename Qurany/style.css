@@ -5925,18 +5925,7 @@ body.titled .search {
 .adhan-set-status[data-kind="warning"] { color: #b26a00; }
 .adhan-set-status[data-kind="error"] { color: var(--red); }
 
-/* المتشابهات + لفظ الجلالة */
-/* تظليل المتشابهات: شريط واحد متصل خلف الكلمات المتجاورة، بلا خط تحتها */
-.simhl {
-  position: absolute;
-  top: 10%;
-  bottom: 10%;
-  background: color-mix(in srgb, var(--sim-c, #f59e0b) 30%, transparent);
-  border-radius: 7px;
-  pointer-events: none;
-  z-index: 1;
-}
-.w.w-sim { background: none; box-shadow: none; }
+/* لفظ الجلالة */
 .w.w-divine,
 .w.w-divine * {
   color: #c62828 !important;
@@ -5961,41 +5950,6 @@ body.titled .search {
     color: #ff6b6b !important;
   }
 }
-.wp-sim {
-  display: grid;
-  gap: 8px;
-  margin: 8px 0;
-  padding: 10px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--green) 5%, var(--panel));
-}
-.wp-sim > small { color: var(--muted, inherit); font-weight: 800; }
-.wp-sim-note { margin: 0; font-size: 12px; }
-.wp-sim-item { display: grid; gap: 3px; width: 100%; padding: 8px 0 0; border: 0; border-top: 1px dashed var(--line); background: none; color: inherit; font: inherit; text-align: right; cursor: pointer; }
-.wp-sim-item:first-of-type { border-top: 0; padding-top: 0; }
-.wp-sim-item b { font-size: 12px; color: var(--green); }
-.wp-sim-item span { line-height: 2.1; font-size: 18px; font-family: "Amiri Quran", "Noto Naskh Arabic", "Amiri", serif; }
-.wp-sim-item mark, .wp-sim-more { margin-top: 6px; border: 0; background: none; color: var(--green); font: inherit; font-weight: 800; font-size: 13px; cursor: pointer; padding: 4px 0; }
-
-/* دليل المتشابهات (مصدره الكتاب) */
-.sim-guide { position: fixed; inset: 0; z-index: 9000; display: flex; flex-direction: column; background: var(--bg, var(--panel)); color: inherit; direction: rtl; }
-.sim-guide > header { display: flex; flex-direction: row-reverse; justify-content: flex-end; align-items: center; gap: 12px; padding: 12px 16px; background: var(--green); color: #fff; }
-.sim-guide > header strong { display: block; font-size: 17px; }
-.sim-guide > header small { display: block; font-size: 11px; opacity: .9; margin-top: 2px; }
-.sg-close { border: 0; background: rgba(255,255,255,.2); color: #fff; width: 36px; height: 36px; border-radius: 50%; font-size: 16px; cursor: pointer; flex: none; }
-.sg-tools { display: grid; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
-.sg-tools select, .sg-tools input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: inherit; font: inherit; }
-.sg-count { padding: 6px 16px; font-size: 12px; color: var(--muted, inherit); }
-.sg-list { flex: 1; overflow-y: auto; padding: 0 16px 24px; display: grid; gap: 12px; align-content: start; grid-auto-rows: max-content; -webkit-overflow-scrolling: touch; }
-.sg-card { border: 1px solid var(--line); border-radius: 14px; background: var(--card); overflow: hidden; }
-.sg-card h3 { margin: 0; padding: 9px 12px; font-size: 14px; background: color-mix(in srgb, var(--green) 12%, var(--card)); color: var(--green); }
-.sg-let { opacity: .8; }
-.sg-row { display: grid; gap: 4px; padding: 9px 12px; border-top: 1px dashed var(--line); }
-.sg-row p { margin: 0; line-height: 2.2; font-size: 19px; font-family: "Amiri Quran", "Noto Naskh Arabic", "Amiri", serif; }
-.sg-focus { background: color-mix(in srgb, var(--green) 8%, transparent); }
-.sg-ref { justify-self: start; border: 0; border-radius: 8px; padding: 3px 10px; background: color-mix(in srgb, var(--green) 12%, var(--card)); color: var(--green); font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
-.sg-more { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: inherit; font: inherit; font-weight: 800; cursor: pointer; }
 .topics-switch > span > strong, .topics-switch > span > small { display: block; }
 .topics-switch > span > small { margin-top: 4px; }
 
@@ -6009,7 +5963,12 @@ body.hmode #pageList .page-view:not(.active) { position: absolute; top: 0; left:
 body.hmode #pageList .page-view.active { animation: pmIn .22s ease; }
 @keyframes pmIn { from { opacity: .35; } to { opacity: 1; } }
 
-.wp-sim > summary { cursor: pointer; font-weight: 800; color: var(--muted, inherit); list-style: none; }
-.wp-sim > summary::before { content: '◂ '; }
-.wp-sim[open] > summary::before { content: '▾ '; }
-.wp-sim > summary::-webkit-details-marker { display: none; }
+/* ===== تقليب الورق: طيّ الزاوية (قص مضلّعات + SVG، بلا تحويلات ثلاثية الأبعاد) ===== */
+body.hmode #pageList { touch-action: pan-y; }
+body.flip-dragging { user-select: none; -webkit-user-select: none; }
+.flip-stage { position: absolute; top: 0; left: 0; right: 0; overflow: hidden; z-index: 6; pointer-events: none; background: var(--flip-paper, var(--bg)); }
+.flip-stage.is-fixed { position: fixed; top: 0; z-index: 5; }
+.flip-stage .page-view { position: relative !important; visibility: visible !important; animation: none !important; pointer-events: none; min-height: 0; }
+.flip-under, .flip-leaf { position: absolute; inset: 0; background: var(--flip-paper, var(--bg)); overflow: hidden; opacity: 1; }
+.flip-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.flip-flapwrap { position: absolute; inset: 0; pointer-events: none; filter: drop-shadow(-4px 3px 8px rgba(30, 18, 4, .38)); }
