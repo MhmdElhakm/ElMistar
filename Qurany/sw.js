@@ -7,7 +7,7 @@
 // في الإصدارات السابقة كانت الخطوط في نفس كاش الإصدار، وكل تحديث للـ service worker يحذفها فيحاول
 // التطبيق تنزيلها من جديد، وأي فشل في الشبكة (أو اختلاف اسم الكاش بين الصفحة والـ SW) كان يحجب المصحف.
 // عند التفعيل نُرحِّل الخطوط من الكاش القديم إلى ASSET_CACHE قبل حذفه حتى لا يخسرها من نزّلها سابقًا.
-var SHELL_CACHE = 'quran-shell-v179';
+var SHELL_CACHE = 'quran-shell-v180';
 var ASSET_CACHE = 'quran-assets-v1'; // يجب أن يطابق ASSET_CACHE في app.js
 var LEGACY_PREFIX = 'quran-pro-app-';
 var SHELL_PREFIX = 'quran-shell-';
@@ -19,6 +19,7 @@ var APP_SHELL = [
   './manifest.webmanifest',
   './logo.png',
   './note.mp3',
+  './celebrate.mp3',
   './page-flip.mp3'
 ];
 
@@ -74,6 +75,8 @@ self.addEventListener('notificationclick', function (event) {
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (windows) {
       for (var i = 0; i < windows.length; i++) {
         if (new URL(windows[i].url).origin === self.location.origin) {
+          var open = event.notification.data && event.notification.data.service;
+          if (open) windows[i].postMessage({ type: 'open-service', service: open });
           return windows[i].focus();
         }
       }
@@ -104,9 +107,10 @@ self.addEventListener('fetch', function (event) {
   if (new URL(request.url).origin !== self.location.origin) return;
 
   var requestUrl = new URL(request.url);
-  if (requestUrl.pathname.endsWith('/note.mp3') && request.headers.has('range')) {
+  var shortAudio = /\/(note|celebrate|page-flip)\.mp3$/.exec(requestUrl.pathname);
+  if (shortAudio && request.headers.has('range')) {
     event.respondWith(
-      caches.match('./note.mp3').then(function (cached) {
+      caches.match('./' + shortAudio[1] + '.mp3').then(function (cached) {
         return Promise.resolve(cached).then(function (cached) {
           if (!cached) return fetch(request);
           return cached.arrayBuffer().then(function (body) {

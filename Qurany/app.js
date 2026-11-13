@@ -1709,11 +1709,12 @@
       .map(group => {
         const groupTasks = scheduledTasks
           .filter(task => group.categories.includes(task.category))
-          .filter(task => !activePrayer || !timedAzkarKind(task))
+          .filter(task => !activePrayer || (!timedAzkarKind(task) && !task.khatmaTask))
           .concat(
             activePrayer && group.category === activePrayer
               ? scheduledTasks.filter(
-                  task => timedAzkarKind(task) && timedAzkarVisible(task, prayerSchedule)
+                  task =>
+                    task.khatmaTask || (timedAzkarKind(task) && timedAzkarVisible(task, prayerSchedule))
                 )
               : []
           );
@@ -2186,6 +2187,8 @@
         if (task.done && !task.hist) task.hist = {};
         save();
         render();
+        if (task.khatmaTask)
+          window.dispatchEvent(new CustomEvent('quran:khatma-task-toggled', { detail: { done: task.done } }));
         if (task.done) playTaskCompletionSound();
       }
     } else if (action === 'delete-task') {
@@ -2245,6 +2248,61 @@
     });
   }
   window.addEventListener('quran:azkar-progress', syncAzkarTask);
+  /* ورد الختمة: مهمة يومية تُدار من خدمة «ختمتي» وتبقى ظاهرة في وقت الصلاة الحالي */
+  function syncKhatmaTask(event) {
+    const detail = event && event.detail;
+    if (!detail) return;
+    const id = 'khatma-wird';
+    let task = state.tasks.find(item => item.id === id);
+    if (!detail.enabled) {
+      if (task) {
+        state.tasks = state.tasks.filter(item => item.id !== id);
+        if (save()) render();
+      }
+      return;
+    }
+    let changed = false;
+    const today = todayKey();
+    if (!task) {
+      task = {
+        id,
+        title: String(detail.title || 'ورد الختمة'),
+        points: Math.max(0, Number(detail.points) || 0),
+        category: 'الفجر',
+        icon: 'book',
+        khatmaTask: true,
+        daily: true,
+        done: false,
+        createdAt: new Date().toISOString(),
+        day: today,
+        days: [],
+        hist: {}
+      };
+      state.tasks.push(task);
+      changed = true;
+    }
+    if (task.day !== today) {
+      if (task.day) task.hist[task.day] = !!task.done;
+      task.done = false;
+      task.day = today;
+      changed = true;
+    }
+    const title = String(detail.title || 'ورد الختمة');
+    if (task.title !== title) {
+      task.title = title;
+      changed = true;
+    }
+    if (!!detail.done !== task.done) {
+      task.done = !!detail.done;
+      state.profile.totalPoints = Math.max(
+        0,
+        state.profile.totalPoints + (task.done ? 1 : -1) * (Number(task.points) || 0)
+      );
+      changed = true;
+    }
+    if (changed && save()) render();
+  }
+  window.addEventListener('quran:khatma-task-sync', syncKhatmaTask);
   window.addEventListener('huda-leaderboard-changed', () => render());
   window.addEventListener('online', () => render());
   window.addEventListener('offline', () => render());
@@ -4535,13 +4593,9 @@
   var tasmeeClose = $('tasmeeClose');
   var tasmeePrompt = $('tasmeePrompt'),
     tasmeeStatus = $('tasmeeStatus');
-  var tasmeeCelebration = $('tasmeeCelebration'),
-    tasmeeCelebrationMessage = $('tasmeeCelebrationMessage');
-  var tasmeeCelebrationClose = $('tasmeeCelebrationClose');
   var tasmeeSurah = $('tasmeeSurah'),
     tasmeeFrom = $('tasmeeFrom'),
-    tasmeeTo = $('tasmeeTo'),
-    tasmeeRiwaya = $('tasmeeRiwaya');
+    tasmeeTo = $('tasmeeTo');
   var tasmeeEnabled = !!load('mq.tasmeeEnabled', true);
   var tasmeeWindowOpen = false;
   var tasmeePrefs = load('mq.tasmeePrefs', {});
@@ -4559,16 +4613,10 @@
     'إنجاز مبارك! اجعل هذا النجاح وقودًا لوردك القادم.',
     'رائع جدًا، لقد أثمرت مداومتك. القرآن يزداد رسوخًا في صدرك.'
   ];
-  function hideTasmeeCelebration() {
-    tasmeeCelebration.classList.remove('is-visible');
-    tasmeeCelebration.hidden = true;
-  }
   function showTasmeeCelebration() {
-    tasmeeCelebrationMessage.textContent =
-      tasmeeMotivations[Math.floor(Math.random() * tasmeeMotivations.length)];
-    tasmeeCelebration.hidden = false;
-    requestAnimationFrame(function () {
-      tasmeeCelebration.classList.add('is-visible');
+    window.QuranCelebrate.show({
+      title: 'أتممت الحفظ بنجاح',
+      message: tasmeeMotivations[Math.floor(Math.random() * tasmeeMotivations.length)]
     });
   }
   var wp = $('wp');
@@ -4846,63 +4894,11 @@
     fillAyahSelect(tasmeeTo, count, to);
   }
 
-  /* ---- الروايات في التسميع ----
-   * المصحف المعروض بحفص، فالسور والآيات والكلمات تبقى بترقيم حفص. لكل رواية أخرى ملف
-   * riwayat/<key>.json يحوي فقط الكلمات التي تقرؤها الرواية بصورة مختلفة عن حفص:
-   *   { "سورة:آية": { "رقم الكلمة (من 1)": ["صيغة مقبولة", ...] } }
-   * وتُقبل دائمًا صيغة حفص مع صيغ الرواية (التعرف الصوتي لا يعرف الرواية فقد يكتب أيًّا منهما).
-   * الملفات مولَّدة بـ tools/build_riwayat.py من نصوص مجمع الملك فهد. */
-  var TASMEE_RIWAYAT = [
-    ['hafs', 'حفص عن عاصم'],
-    ['warsh', 'ورش عن نافع'],
-    ['qaloon', 'قالون عن نافع'],
-    ['shouba', 'شعبة عن عاصم'],
-    ['doori', 'الدوري عن أبي عمرو'],
-    ['soosi', 'السوسي عن أبي عمرو'],
-    ['bazzi', 'البزي عن ابن كثير'],
-    ['qumbul', 'قنبل عن ابن كثير']
-  ];
-  var tasmeeRiwayaData = Object.create(null);
-  function tasmeeRiwayaKey() {
-    var key = tasmeeRiwaya ? tasmeeRiwaya.value : 'hafs';
-    return TASMEE_RIWAYAT.some(function (item) {
-      return item[0] === key;
-    })
-      ? key
-      : 'hafs';
-  }
-  function loadTasmeeRiwaya(key) {
-    if (key === 'hafs') return Promise.resolve(null);
-    if (!tasmeeRiwayaData[key]) {
-      tasmeeRiwayaData[key] = fetch('./riwayat/' + key + '.json')
-        .then(function (response) {
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          return response.json();
-        })
-        .catch(function (error) {
-          delete tasmeeRiwayaData[key];
-          throw error;
-        });
-    }
-    return tasmeeRiwayaData[key];
-  }
-  function tasmeeRiwayaName(key) {
-    for (var i = 0; i < TASMEE_RIWAYAT.length; i++) if (TASMEE_RIWAYAT[i][0] === key) return TASMEE_RIWAYAT[i][1];
-    return '';
-  }
-
-  tasmeeRiwaya.innerHTML = TASMEE_RIWAYAT.map(function (item) {
-    return '<option value="' + item[0] + '">' + item[1] + '</option>';
-  }).join('');
-  tasmeeRiwaya.value = String(tasmeePrefs.riwaya || 'hafs');
-  if (!tasmeeRiwaya.value) tasmeeRiwaya.value = 'hafs';
-
   function saveTasmeePrefs() {
     save('mq.tasmeePrefs', {
       surah: +tasmeeSurah.value,
       from: +tasmeeFrom.value,
-      to: +tasmeeTo.value,
-      riwaya: tasmeeRiwayaKey()
+      to: +tasmeeTo.value
     });
   }
 
@@ -5106,9 +5102,8 @@
       .replace(/(.)\1+/g, '$1');
   }
 
-  // مستوى الصرامة: lenient (متسامح) / balanced (متوازن، الافتراضي) / strict (صارم).
-  var tasmeeStrictness = store('mq.tasmeeStrict') || 'balanced';
-  if (['lenient', 'balanced', 'strict'].indexOf(tasmeeStrictness) === -1) tasmeeStrictness = 'balanced';
+  // التسميع بمستوى متسامح ثابت (لا خيار للمستخدم).
+  var tasmeeStrictness = 'lenient';
 
   function tasmeeWordMatches(spoken, expected) {
     if (!spoken || !expected) return false;
@@ -5641,24 +5636,6 @@
   }
 
 
-  // اختيار مستوى صرامة التسميع.
-  (function () {
-    var row = document.querySelector('.tasmee-riwaya-row');
-    if (!row) return;
-    var label = document.createElement('label');
-    label.setAttribute('for', 'tasmeeStrict');
-    label.innerHTML =
-      'الصرامة <select id="tasmeeStrict" aria-label="مستوى صرامة التسميع">' +
-      '<option value="lenient">متسامح</option><option value="balanced">متوازن</option><option value="strict">صارم</option></select>';
-    row.appendChild(label);
-    var select = label.querySelector('select');
-    select.value = tasmeeStrictness;
-    select.addEventListener('change', function () {
-      tasmeeStrictness = select.value;
-      store('mq.tasmeeStrict', tasmeeStrictness);
-    });
-  })();
-
   var tasmeeFailStreak = 0;
 
   // إعادة تشغيل المايك: سريعة (120ms) في الحالة العادية، وتصاعدية (حتى 4s) عند تكرار الفشل،
@@ -5809,25 +5786,9 @@
       startBrowserTasmeeRecognition(BrowserRecognition);
       return;
     }
-    // جلسة جديدة: حمّل بيانات الرواية أولًا ثم ابدأ.
-    var key = tasmeeRiwayaKey();
-    tasmeeStatus.textContent = key === 'hafs' ? '' : 'جارٍ تجهيز رواية ' + tasmeeRiwayaName(key) + '…';
-    tasmeeToggle.disabled = true;
-    loadTasmeeRiwaya(key)
-      .then(function (variants) {
-        tasmeeRiwayaVariants = variants;
-        if (!createTasmeeSession()) return;
-        startBrowserTasmeeRecognition(BrowserRecognition);
-      })
-      .catch(function (error) {
-        console.error('تعذر تحميل بيانات الرواية:', error);
-        tasmeeStatus.textContent =
-          'تعذر تحميل بيانات رواية ' + tasmeeRiwayaName(key) + '؛ تحقق من الاتصال أو اختر حفصًا.';
-      })
-      .then(function () {
-        tasmeeToggle.disabled = false;
-        syncTasmeeControls();
-      });
+    // جلسة جديدة.
+    if (!createTasmeeSession()) return;
+    startBrowserTasmeeRecognition(BrowserRecognition);
   }
 
   $('wp').addEventListener('click', function (event) {
@@ -5896,7 +5857,6 @@
     startTasmeeRecognition();
   });
   tasmeePrompt.addEventListener('click', promptTasmeeWord);
-  tasmeeCelebrationClose.addEventListener('click', hideTasmeeCelebration);
   updateTasmeeBounds(false);
   tasmeeFrom.value = String(
     Math.max(1, Math.min(D.surahs[initialTasmeeSurah - 1][3], +tasmeePrefs.from || 1))
@@ -5918,27 +5878,6 @@
       tasmeeStatus.textContent = 'تغير نطاق التسميع؛ ابدأ جلسة جديدة.';
       syncTasmeeControls();
     }
-  });
-  tasmeeRiwaya.addEventListener('change', function () {
-    saveTasmeePrefs();
-    if (tasmeeSession) {
-      stopTasmeeRecognition();
-      tasmeeSession = null;
-      clearTasmeeMarkings();
-    }
-    var key = tasmeeRiwayaKey();
-    tasmeeStatus.textContent =
-      key === 'hafs' ? 'رواية حفص.' : 'جارٍ تجهيز رواية ' + tasmeeRiwayaName(key) + '…';
-    loadTasmeeRiwaya(key)
-      .then(function () {
-        if (tasmeeRiwayaKey() === key && key !== 'hafs')
-          tasmeeStatus.textContent = 'رواية ' + tasmeeRiwayaName(key) + ' جاهزة؛ ابدأ التسميع.';
-      })
-      .catch(function () {
-        if (tasmeeRiwayaKey() === key)
-          tasmeeStatus.textContent = 'تعذر تحميل رواية ' + tasmeeRiwayaName(key) + '؛ تحقق من الاتصال.';
-      });
-    syncTasmeeControls();
   });
   [tasmeeFrom, tasmeeTo].forEach(function (select) {
     select.addEventListener('change', function () {
@@ -6256,7 +6195,6 @@
     )
   );
   tasmeeSurah.value = String(initialTasmeeSurah);
-  professionalizeSelect(tasmeeRiwaya);
   professionalizeSelect(tasmeeSurah);
   professionalizeSelect(tasmeeFrom);
   professionalizeSelect(tasmeeTo);
@@ -7273,7 +7211,8 @@
     appServiceCleanup = null;
   var appServices = {
     prayer: { title: 'مواقيت الصلاة', status: 'طريقة الحساب: الهيئة المصرية العامة للمساحة' },
-    radio: { title: 'إذاعة القرآن الكريم', status: 'البث المباشر يحتاج إلى اتصال بالإنترنت' }
+    radio: { title: 'إذاعة القرآن الكريم', status: 'البث المباشر يحتاج إلى اتصال بالإنترنت' },
+    khatma: { title: 'ختمتي', status: 'خطّة ختمة بورد يومي وتذكير بالإشعارات' }
   };
   function closeAppService() {
     if (appServiceView.hidden) return;
@@ -7321,6 +7260,19 @@
     }
     appServicePrayer.hidden = true;
     appServiceContent.hidden = false;
+    if (key === 'khatma') {
+      if (!window.QuranKhatma) {
+        appServiceStatus.textContent = 'تعذر تحميل خدمة الختمة. أعد تحميل التطبيق.';
+        return;
+      }
+      appServiceContent.style.overflow = 'auto';
+      appServiceCleanup = window.QuranKhatma.mount(appServiceContent, function (message) {
+        appServiceStatus.textContent = message;
+      });
+      appServiceClose.focus();
+      return;
+    }
+    appServiceContent.style.overflow = '';
     if (!window.QuranIntegratedServices) {
       appServiceStatus.textContent = 'تعذر تحميل الخدمة المدمجة. أعد تحميل التطبيق.';
       return;
@@ -7340,6 +7292,23 @@
     if (trigger) openAppService(trigger.getAttribute('data-app-service'), trigger);
   });
   appServiceClose.addEventListener('click', closeAppService);
+  /* فتح صفحة من المصحف من خارج الملف (خدمة الختمة) وفتح خدمة من الإشعارات */
+  window.QuranOpenPage = function (page) {
+    if (!appServiceView.hidden) {
+      appServiceCleanup && (appServiceCleanup(), (appServiceCleanup = null));
+      appServiceContent.hidden = true;
+      appServiceView.hidden = true;
+      document.body.style.overflow = previousBodyOverflow;
+      appServiceReturnFocus = null;
+    }
+    closeD();
+    goTo(page);
+  };
+  window.QuranOpenService = function (key) {
+    if (!appServices[key]) return;
+    if (!appServiceView.hidden) closeAppService();
+    openAppService(key, null);
+  };
   appServiceView.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
       event.preventDefault();
@@ -11430,3 +11399,676 @@
   updateTajweedUI();
 })();
 
+
+
+/* ======================================================================
+ * شاشة الاحتفال المشتركة: علامة صح متحركة + قصاصات ملوّنة + صوت تشجيع (celebrate.mp3)
+ * window.QuranCelebrate.show({ title, message, stats:[[قيمة,وصف],..], button, sound })
+ * ====================================================================== */
+(function () {
+  var overlay = null,
+    raf = 0,
+    audio = null,
+    closeFn = null;
+  var COLORS = ['#0e7c3a', '#d4a72c', '#2f9e6a', '#f2d06b', '#ffffff', '#6fcf97'];
+  function esc(v) {
+    return String(v).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  function burst(canvas) {
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+    var ctx = canvas.getContext('2d'),
+      dpr = Math.min(2, window.devicePixelRatio || 1),
+      W = (canvas.width = innerWidth * dpr),
+      H = (canvas.height = innerHeight * dpr),
+      parts = [],
+      start = performance.now();
+    for (var i = 0; i < 90; i++) {
+      var ang = -Math.PI / 2 + (Math.random() - 0.5) * 1.5;
+      var sp = (6 + Math.random() * 9) * dpr;
+      parts.push({
+        x: W / 2,
+        y: H * 0.42,
+        vx: Math.cos(ang) * sp * (0.6 + Math.random()),
+        vy: Math.sin(ang) * sp,
+        w: (5 + Math.random() * 6) * dpr,
+        h: (3 + Math.random() * 4) * dpr,
+        r: Math.random() * 6,
+        vr: (Math.random() - 0.5) * 0.4,
+        c: COLORS[(Math.random() * COLORS.length) | 0]
+      });
+    }
+    function frame(now) {
+      var t = now - start;
+      ctx.clearRect(0, 0, W, H);
+      parts.forEach(function (p) {
+        p.vy += 0.28 * dpr;
+        p.vx *= 0.992;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.r += p.vr;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, 1 - t / 3200);
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.r);
+        ctx.fillStyle = p.c;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      if (t < 3200 && overlay) raf = requestAnimationFrame(frame);
+      else ctx.clearRect(0, 0, W, H);
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  function hide() {
+    if (!overlay) return;
+    cancelAnimationFrame(raf);
+    if (audio) {
+      try {
+        audio.pause();
+      } catch (e) {}
+    }
+    var el = overlay;
+    overlay = null;
+    el.classList.remove('is-in');
+    setTimeout(function () {
+      el.remove();
+    }, 260);
+    if (closeFn) {
+      var fn = closeFn;
+      closeFn = null;
+      try {
+        fn();
+      } catch (e) {}
+    }
+  }
+  function show(opts) {
+    opts = opts || {};
+    if (overlay) hide();
+    var el = document.createElement('div');
+    el.className = 'cel';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-label', opts.title || 'تهنئة');
+    var stats = (opts.stats || [])
+      .map(function (s) {
+        return '<span><b>' + esc(s[0]) + '</b>' + esc(s[1]) + '</span>';
+      })
+      .join('');
+    el.innerHTML =
+      '<canvas aria-hidden="true"></canvas><div class="cel-card">' +
+      '<svg class="cel-badge" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="40"/><path d="M26 43l11 11 21-23"/></svg>' +
+      '<h2>' + esc(opts.title || 'مبارك!') + '</h2><p>' + esc(opts.message || '') + '</p>' +
+      (stats ? '<div class="cel-stats">' + stats + '</div>' : '') +
+      '<button type="button" class="cel-btn">' + esc(opts.button || 'متابعة') + '</button></div>';
+    document.body.appendChild(el);
+    overlay = el;
+    closeFn = opts.onClose || null;
+    el.querySelector('.cel-btn').addEventListener('click', hide);
+    el.addEventListener('click', function (e) {
+      if (e.target === el) hide();
+    });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') hide();
+    });
+    requestAnimationFrame(function () {
+      el.classList.add('is-in');
+      el.querySelector('.cel-btn').focus();
+      burst(el.querySelector('canvas'));
+    });
+    if (opts.sound !== false) {
+      try {
+        audio = audio || new Audio('./celebrate.mp3');
+        audio.currentTime = 0;
+        audio.volume = 0.8;
+        var pr = audio.play();
+        if (pr && pr.catch) pr.catch(function () {});
+      } catch (e) {}
+    }
+  }
+  window.QuranCelebrate = { show: show, hide: hide };
+})();
+
+/* ======================================================================
+ * ختمتي: خطة ختمة بورد يومي + تذكير بالإشعارات + ربط بالمهام
+ * ====================================================================== */
+(function () {
+  'use strict';
+  var KEY = 'quran_khatma_v1',
+    TOTAL = 604,
+    POINTS = 3,
+    TASK_EVENT = 'quran:khatma-task-sync';
+  var PRESETS = [10, 15, 20, 30, 60];
+
+  function pad(n) {
+    return String(n).padStart(2, '0');
+  }
+  function dayKey(d) {
+    d = d || new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function parseDay(k) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k || '');
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+  }
+  function diffDays(a, b) {
+    return Math.round((parseDay(a) - parseDay(b)) / 86400000);
+  }
+  function ar(n) {
+    return String(n).replace(/\d/g, function (d) {
+      return '٠١٢٣٤٥٦٧٨٩'[d];
+    });
+  }
+  function esc(v) {
+    return String(v).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function norm(v) {
+    v = v && typeof v === 'object' ? v : {};
+    var a = v.active && typeof v.active === 'object' ? v.active : null;
+    if (a) {
+      a = {
+        name: String(a.name || 'ختمة').slice(0, 40),
+        start: parseDay(a.start) ? a.start : dayKey(),
+        days: Math.min(365, Math.max(1, parseInt(a.days, 10) || 30)),
+        read: Math.min(TOTAL, Math.max(0, parseInt(a.read, 10) || 0)),
+        doneDates: Array.isArray(a.doneDates) ? a.doneDates.slice(-400) : [],
+        added: Math.max(0, parseInt(a.added, 10) || 0),
+        addedDay: a.addedDay || ''
+      };
+    }
+    var r = v.remind && typeof v.remind === 'object' ? v.remind : {};
+    return {
+      active: a,
+      history: Array.isArray(v.history) ? v.history.slice(0, 60) : [],
+      remind: {
+        enabled: r.enabled === true,
+        time: /^\d{2}:\d{2}$/.test(r.time) ? r.time : '20:00',
+        followup: r.followup !== false
+      },
+      taskOn: v.taskOn !== false
+    };
+  }
+  var st = (function () {
+    try {
+      return norm(JSON.parse(localStorage.getItem(KEY) || 'null'));
+    } catch (e) {
+      return norm(null);
+    }
+  })();
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(st));
+    } catch (e) {}
+    if (window.HudaCloud && window.HudaCloud.queueSync) {
+      try {
+        window.HudaCloud.queueSync();
+      } catch (e) {}
+    }
+  }
+  function perDay(a) {
+    return Math.ceil(TOTAL / a.days);
+  }
+  function doneToday(a) {
+    return !!a && a.doneDates.indexOf(dayKey()) !== -1;
+  }
+  /* صفحات ورد اليوم: إن أُتمّ اليوم نعرض ما قُرئ اليوم، وإلا ما بعد آخر صفحة مقروءة */
+  function wirdRange(a) {
+    var pd = perDay(a);
+    if (doneToday(a)) {
+      var from = Math.max(1, a.read - a.added + 1);
+      return [from, Math.max(from, a.read)];
+    }
+    var f = Math.min(TOTAL, a.read + 1);
+    return [f, Math.min(TOTAL, a.read + pd)];
+  }
+  function streak(a) {
+    if (!a) return 0;
+    var d = new Date(),
+      c = 0;
+    if (a.doneDates.indexOf(dayKey(d)) === -1) d.setDate(d.getDate() - 1);
+    while (a.doneDates.indexOf(dayKey(d)) !== -1) {
+      c++;
+      d.setDate(d.getDate() - 1);
+    }
+    return c;
+  }
+  function behind(a) {
+    var elapsed = Math.max(0, diffDays(dayKey(), a.start)) + (doneToday(a) ? 1 : 0);
+    var expected = Math.min(TOTAL, perDay(a) * elapsed);
+    return Math.max(0, expected - a.read);
+  }
+  function wirdTitle() {
+    var a = st.active;
+    if (!a) return 'ورد الختمة';
+    var r = wirdRange(a);
+    return 'ورد الختمة: ص ' + ar(r[0]) + (r[1] > r[0] ? '–' + ar(r[1]) : '');
+  }
+  function syncTask() {
+    var a = st.active;
+    window.dispatchEvent(
+      new CustomEvent(TASK_EVENT, {
+        detail: {
+          enabled: !!a && st.taskOn,
+          title: wirdTitle(),
+          points: POINTS,
+          done: doneToday(a)
+        }
+      })
+    );
+  }
+
+  /* ---------- إجراءات ---------- */
+  var ui = null; // { root, say }
+  function render() {
+    if (ui) draw();
+  }
+  function start(name, days) {
+    st.active = norm({
+      active: {
+        name: name || 'ختمة رمضان',
+        start: dayKey(),
+        days: days,
+        read: 0,
+        doneDates: []
+      }
+    }).active;
+    save();
+    syncTask();
+    render();
+  }
+  function finish() {
+    var a = st.active;
+    if (!a) return;
+    var total = Math.max(1, diffDays(dayKey(), a.start) + 1);
+    st.history.unshift({ name: a.name, start: a.start, end: dayKey(), days: total, planned: a.days });
+    st.active = null;
+    save();
+    syncTask();
+    render();
+    var count = st.history.length;
+    if (window.QuranCelebrate)
+      window.QuranCelebrate.show({
+        title: 'ما شاء الله، ختمتَ القرآن!',
+        message: 'تقبّل الله منك، وجعله نورًا لك وشفيعًا يوم القيامة.',
+        stats: [
+          [ar(total), 'يومًا'],
+          [ar(count), count === 1 ? 'ختمة' : 'ختمات']
+        ],
+        button: 'آمين'
+      });
+  }
+  function markDone() {
+    var a = st.active;
+    if (!a || doneToday(a)) return;
+    var add = Math.min(perDay(a), TOTAL - a.read);
+    a.read += add;
+    a.added = add;
+    a.addedDay = dayKey();
+    a.doneDates.push(dayKey());
+    save();
+    if (a.read >= TOTAL) {
+      finish();
+      return;
+    }
+    syncTask();
+    render();
+    if (ui) ui.say('تقبّل الله ورد اليوم — بقي ' + ar(TOTAL - a.read) + ' صفحة');
+  }
+  function undoDone() {
+    var a = st.active;
+    if (!a || !doneToday(a)) return;
+    if (a.addedDay === dayKey()) a.read = Math.max(0, a.read - a.added);
+    a.doneDates = a.doneDates.filter(function (d) {
+      return d !== dayKey();
+    });
+    a.added = 0;
+    a.addedDay = '';
+    save();
+    syncTask();
+    render();
+  }
+  window.addEventListener('quran:khatma-task-toggled', function (e) {
+    if (!st.active) return;
+    if (e.detail && e.detail.done) markDone();
+    else undoDone();
+  });
+
+  /* ---------- الإشعارات ---------- */
+  function notify(title, body, tag) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    var options = {
+      body: body,
+      icon: './logo.png',
+      badge: './logo.png',
+      tag: tag,
+      renotify: true,
+      vibrate: [200, 100, 200],
+      data: { url: './', service: 'khatma' }
+    };
+    var p =
+      navigator.serviceWorker && navigator.serviceWorker.ready
+        ? navigator.serviceWorker.ready.then(function (reg) {
+            return reg.showNotification(title, options);
+          })
+        : Promise.resolve(new Notification(title, options));
+    p.catch(function (e) {
+      console.error('تعذر عرض إشعار الختمة.', e);
+    });
+  }
+  function minutesOf(t) {
+    var m = /^(\d{2}):(\d{2})$/.exec(t);
+    return m ? +m[1] * 60 + +m[2] : null;
+  }
+  function checkReminders() {
+    var a = st.active,
+      r = st.remind;
+    if (!a || !r.enabled || doneToday(a)) return;
+    var now = new Date(),
+      cur = now.getHours() * 60 + now.getMinutes(),
+      t = minutesOf(r.time);
+    if (t == null || cur < t) return;
+    var day = dayKey(),
+      k1 = 'quran_khatma_fired_' + day,
+      k2 = 'quran_khatma_follow_' + day;
+    var follow = r.followup && cur >= t + 120 && cur < 24 * 60;
+    try {
+      if (follow && !localStorage.getItem(k2)) {
+        localStorage.setItem(k2, '1');
+        localStorage.setItem(k1, '1');
+        var left = behind(a);
+        notify(
+          'لا تنسَ وردك اليوم 📖',
+          'لم تُتمّ ' + wirdTitle().replace('ورد الختمة: ', 'ورد اليوم (') + ')' + (left > perDay(a) ? ' — متأخر ' + ar(left) + ' صفحة.' : '.'),
+          'quran-khatma-follow'
+        );
+      } else if (!localStorage.getItem(k1)) {
+        localStorage.setItem(k1, '1');
+        notify('حان وقت وردك من القرآن 📖', wirdTitle().replace('ورد الختمة: ', '') + ' · ' + a.name, 'quran-khatma');
+      }
+    } catch (e) {}
+  }
+  function pruneFired() {
+    try {
+      var today = dayKey();
+      Object.keys(localStorage).forEach(function (k) {
+        var m = /^quran_khatma_(?:fired|follow)_(.+)$/.exec(k);
+        if (m && m[1] !== today) localStorage.removeItem(k);
+      });
+    } catch (e) {}
+  }
+
+  /* ---------- الواجهة ---------- */
+  function ring(pct) {
+    var c = 2 * Math.PI * 52,
+      off = c * (1 - pct / 100);
+    return (
+      '<svg class="kh-ring" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="kh-ring-bg"/>' +
+      '<circle cx="60" cy="60" r="52" class="kh-ring-fg" stroke-dasharray="' +
+      c.toFixed(1) +
+      '" stroke-dashoffset="' +
+      off.toFixed(1) +
+      '" transform="rotate(-90 60 60)"/></svg>'
+    );
+  }
+  function fmtDate(d) {
+    try {
+      return d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' });
+    } catch (e) {
+      return dayKey(d);
+    }
+  }
+  function reminderCard() {
+    var r = st.remind,
+      perm = 'Notification' in window ? Notification.permission : 'unsupported';
+    var note =
+      perm === 'unsupported'
+        ? 'متصفحك لا يدعم الإشعارات.'
+        : perm === 'denied'
+          ? 'الإشعارات محظورة من إعدادات المتصفح — فعّلها للموقع ثم أعد المحاولة.'
+          : 'تصل التذكيرات أثناء فتح التطبيق أو بقائه في الخلفية؛ قد لا تصل إن أُغلق تمامًا.';
+    return (
+      '<section class="kh-card"><h3>🔔 التذكير بالورد</h3>' +
+      '<label class="kh-row"><span>تذكير يومي بالورد</span><input type="checkbox" data-k="remind" ' +
+      (r.enabled ? 'checked' : '') +
+      '></label>' +
+      '<label class="kh-row"><span>وقت التذكير</span><input type="time" data-k="time" value="' +
+      esc(r.time) +
+      '"></label>' +
+      '<label class="kh-row"><span>تذكير ثانٍ بعد ساعتين إن لم يُنجز</span><input type="checkbox" data-k="follow" ' +
+      (r.followup ? 'checked' : '') +
+      '></label>' +
+      '<label class="kh-row"><span>إظهار الورد ضمن المهام</span><input type="checkbox" data-k="task" ' +
+      (st.taskOn ? 'checked' : '') +
+      '></label>' +
+      '<p class="kh-note" data-k="remind-note">' +
+      esc(note) +
+      '</p></section>'
+    );
+  }
+  function draw() {
+    var a = st.active,
+      h = '';
+    if (!a) {
+      h +=
+        '<section class="kh-card kh-hero"><div class="kh-hero-ico" aria-hidden="true">📖</div><h2>ابدأ ختمة جديدة</h2>' +
+        '<p>اختر المدة وسنقسّم القرآن (٦٠٤ صفحات) إلى ورد يومي ثابت، ونذكّرك به.</p>' +
+        '<label class="kh-field">اسم الختمة<input type="text" data-k="name" maxlength="40" value="ختمة جديدة"></label>' +
+        '<div class="kh-label">مدة الختمة</div><div class="kh-chips" role="group">' +
+        PRESETS.map(function (d, i) {
+          return (
+            '<button type="button" class="kh-chip' +
+            (d === 30 ? ' on' : '') +
+            '" data-days="' +
+            d +
+            '">' +
+            ar(d) +
+            ' يومًا<small>' +
+            ar(Math.ceil(TOTAL / d)) +
+            ' ص/يوم</small></button>'
+          );
+        }).join('') +
+        '</div><label class="kh-field">أو مدة مخصّصة (بالأيام)<input type="number" min="1" max="365" inputmode="numeric" data-k="custom" placeholder="مثال: 45"></label>' +
+        '<button type="button" class="kh-btn" data-act="start">ابدأ الختمة</button></section>';
+    } else {
+      var pct = Math.round((a.read / TOTAL) * 100),
+        r = wirdRange(a),
+        done = doneToday(a),
+        pd = perDay(a),
+        lag = behind(a),
+        remainDays = Math.ceil((TOTAL - a.read) / pd),
+        fin = new Date();
+      fin.setDate(fin.getDate() + remainDays - (done ? 0 : 1));
+      var dayNo = Math.min(a.days + 999, Math.max(1, diffDays(dayKey(), a.start) + 1));
+      h +=
+        '<section class="kh-card kh-progress"><div class="kh-ring-wrap">' +
+        ring(pct) +
+        '<div class="kh-ring-txt"><b>' +
+        ar(pct) +
+        '٪</b><small>' +
+        ar(a.read) +
+        ' / ' +
+        ar(TOTAL) +
+        '</small></div></div><div class="kh-prog-copy"><h2>' +
+        esc(a.name) +
+        '</h2><p>اليوم ' +
+        ar(dayNo) +
+        ' من ' +
+        ar(a.days) +
+        '</p><p>الانتهاء المتوقع: <b>' +
+        esc(fmtDate(fin)) +
+        '</b></p></div></section>' +
+        '<section class="kh-card kh-wird' +
+        (done ? ' done' : '') +
+        '"><div class="kh-label">ورد اليوم</div><div class="kh-wird-pages">' +
+        (r[1] > r[0] ? 'من صفحة ' + ar(r[0]) + ' إلى ' + ar(r[1]) : 'صفحة ' + ar(r[0])) +
+        '</div><small>' +
+        ar(r[1] - r[0] + 1) +
+        ' صفحة' +
+        (done ? ' · تم ✓' : '') +
+        '</small><div class="kh-actions"><button type="button" class="kh-btn ghost" data-act="open">افتح في المصحف</button>' +
+        (done
+          ? '<button type="button" class="kh-btn ghost" data-act="undo">تراجع</button>'
+          : '<button type="button" class="kh-btn" data-act="done">أتممت ورد اليوم ✓</button>') +
+        '</div></section>';
+      if (lag > pd && !done)
+        h += '<div class="kh-alert">⏰ أنت متأخر نحو ' + ar(lag) + ' صفحة عن الخطة — حاول زيادة وردك قليلًا لتلحق.</div>';
+      h +=
+        '<section class="kh-stats"><div><b>' +
+        ar(streak(a)) +
+        '</b><small>أيام متتالية</small></div><div><b>' +
+        ar(TOTAL - a.read) +
+        '</b><small>صفحة متبقية</small></div><div><b>' +
+        ar(pd) +
+        '</b><small>صفحات يوميًا</small></div></section>';
+    }
+    h += reminderCard();
+    if (a)
+      h +=
+        '<section class="kh-card"><h3>إدارة الختمة</h3><div class="kh-actions"><button type="button" class="kh-btn ghost" data-act="restart">إعادة من البداية</button><button type="button" class="kh-btn ghost danger" data-act="cancel">إلغاء الختمة</button></div></section>';
+    if (st.history.length)
+      h +=
+        '<section class="kh-card"><h3>🏅 ختماتي (' +
+        ar(st.history.length) +
+        ')</h3><ul class="kh-hist">' +
+        st.history
+          .slice(0, 10)
+          .map(function (x) {
+            var d = parseDay(x.end);
+            return (
+              '<li><b>' + esc(x.name) + '</b><span>' + ar(x.days) + ' يومًا · ' + esc(d ? fmtDate(d) : x.end) + '</span></li>'
+            );
+          })
+          .join('') +
+        '</ul></section>';
+    ui.root.innerHTML = '<div class="kh">' + h + '</div>';
+  }
+
+  function onClick(e) {
+    var chip = e.target.closest('[data-days]');
+    if (chip) {
+      ui.root.querySelectorAll('[data-days]').forEach(function (c) {
+        c.classList.toggle('on', c === chip);
+      });
+      var custom = ui.root.querySelector('[data-k="custom"]');
+      if (custom) custom.value = '';
+      return;
+    }
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var act = btn.getAttribute('data-act');
+    if (act === 'start') {
+      var name = (ui.root.querySelector('[data-k="name"]').value || '').trim() || 'ختمة جديدة';
+      var cv = parseInt(ui.root.querySelector('[data-k="custom"]').value, 10);
+      var on = ui.root.querySelector('[data-days].on');
+      var days = cv > 0 ? Math.min(365, cv) : on ? +on.getAttribute('data-days') : 30;
+      start(name, days);
+    } else if (act === 'done') markDone();
+    else if (act === 'undo') undoDone();
+    else if (act === 'open') {
+      var r = wirdRange(st.active);
+      if (window.QuranOpenPage) window.QuranOpenPage(r[0]);
+    } else if (act === 'restart') {
+      if (window.confirm('إعادة الختمة من الصفحة الأولى؟ سيُصفَّر التقدّم الحالي.')) start(st.active.name, st.active.days);
+    } else if (act === 'cancel') {
+      if (window.confirm('إلغاء الختمة الحالية؟ سيُحذف تقدّمها.')) {
+        st.active = null;
+        save();
+        syncTask();
+        render();
+      }
+    }
+  }
+  function onChange(e) {
+    var k = e.target.getAttribute && e.target.getAttribute('data-k');
+    if (!k) return;
+    if (k === 'remind') {
+      if (e.target.checked) {
+        if (!('Notification' in window)) {
+          e.target.checked = false;
+          return draw();
+        }
+        var go = function (perm) {
+          st.remind.enabled = perm === 'granted';
+          save();
+          draw();
+          if (st.remind.enabled) {
+            if (ui) ui.say('تم تفعيل التذكير اليومي');
+            notify('تم تفعيل تذكير الورد ✅', 'سنذكّرك يوميًا الساعة ' + ar(st.remind.time), 'quran-khatma-on');
+            checkReminders();
+          }
+        };
+        if (Notification.permission === 'granted') go('granted');
+        else if (Notification.permission === 'denied') go('denied');
+        else Notification.requestPermission().then(go, function () { go('denied'); });
+      } else {
+        st.remind.enabled = false;
+        save();
+        draw();
+      }
+    } else if (k === 'time') {
+      if (/^\d{2}:\d{2}$/.test(e.target.value)) st.remind.time = e.target.value;
+      save();
+    } else if (k === 'follow') {
+      st.remind.followup = e.target.checked;
+      save();
+    } else if (k === 'task') {
+      st.taskOn = e.target.checked;
+      save();
+      syncTask();
+    }
+  }
+  function mount(root, say) {
+    ui = { root: root, say: say || function () {} };
+    root.addEventListener('click', onClick);
+    root.addEventListener('change', onChange);
+    root.addEventListener('input', function (e) {
+      if (e.target.getAttribute && e.target.getAttribute('data-k') === 'custom' && e.target.value) {
+        root.querySelectorAll('[data-days]').forEach(function (c) {
+          c.classList.remove('on');
+        });
+      }
+    });
+    draw();
+    return function () {
+      root.removeEventListener('click', onClick);
+      root.removeEventListener('change', onChange);
+      root.replaceChildren();
+      ui = null;
+    };
+  }
+  window.QuranKhatma = { mount: mount };
+
+  /* ---------- تشغيل ---------- */
+  function tick() {
+    var before = wirdTitle();
+    syncTask();
+    checkReminders();
+    if (ui && before) render();
+  }
+  function boot() {
+    pruneFired();
+    syncTask();
+    checkReminders();
+    setInterval(function () {
+      syncTask();
+      checkReminders();
+    }, 60000);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) tick();
+    });
+    if (navigator.serviceWorker)
+      navigator.serviceWorker.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'open-service' && window.QuranOpenService) window.QuranOpenService(e.data.service);
+      });
+    if (/[?&]khatma=1/.test(location.search) && window.QuranOpenService)
+      setTimeout(function () {
+        window.QuranOpenService('khatma');
+      }, 600);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(boot, 400); });
+  else setTimeout(boot, 400);
+})();
