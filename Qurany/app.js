@@ -4050,7 +4050,7 @@
     var outOff = vert ? Math.max(0, window.scrollY - out.offsetTop) : 0;
     if (!vert) window.scrollTo(0, 0);
     var w = pageList.clientWidth,
-      h = vert ? window.innerHeight : Math.max(out.offsetHeight, inn.offsetHeight, window.innerHeight);
+      h = window.innerHeight; // الظاهر فقط: طبقات أصغر = رسم أسرع بلا اهتزاز
     var stage = flipDiv('flip-stage');
     var paper = flipPaperColor(out);
     stage.style.setProperty('--flip-paper', paper);
@@ -4064,10 +4064,10 @@
     }
     // الطبقات: الصفحة المكشوفة ← ظل الطيّ على المكشوفة ← الورقة (مقصوصة) ← ظهر الورقة المطويّة
     var under = flipDiv('flip-under', stage);
-    under.appendChild(dir === 'next' ? flipClone(inn, 0) : flipClone(out, outOff));
+    flipDiv('flip-inner', under).appendChild(dir === 'next' ? flipClone(inn, 0) : flipClone(out, outOff));
     var shadowSvg = flipSvg(w, h, stage);
     var leaf = flipDiv('flip-leaf', stage);
-    leaf.appendChild(dir === 'next' ? flipClone(out, outOff) : flipClone(inn, 0));
+    flipDiv('flip-inner', leaf).appendChild(dir === 'next' ? flipClone(out, outOff) : flipClone(inn, 0));
     var wrap = flipDiv('flip-flapwrap', stage);
     var flapSvg = flipSvg(w, h, wrap);
     var gU = flipGrad(shadowSvg, [[0, 'rgba(30,18,4,.55)'], [0.35, 'rgba(30,18,4,.22)'], [1, 'rgba(30,18,4,0)']]);
@@ -4078,7 +4078,7 @@
     pB.setAttribute('fill', paper);
     flapSvg.appendChild(pB);
     var pT = document.createElementNS(FLIP_NS, 'polygon');
-    pT.setAttribute('fill', 'rgba(140,105,50,.10)');
+    pT.setAttribute('fill', 'rgba(150,112,52,.16)');
     flapSvg.appendChild(pT);
     var gF = flipGrad(flapSvg, [
       [0, 'rgba(40,25,5,.34)'],
@@ -4090,7 +4090,7 @@
     pF.setAttribute('fill', 'url(#' + gF.id + ')');
     flapSvg.appendChild(pF);
     (vert ? document.body : pageList).appendChild(stage);
-    flip = { stage: stage, leaf: leaf, wrap: wrap, shadowSvg: shadowSvg, gU: gU, pU: pU, gF: gF, pF: pF, pB: pB, pT: pT, yb: vert ? h : Math.min(h, window.innerHeight), w: w, h: h, angle: 0, raf: 0, committing: false, dir: dir, target: p, view: inn };
+    flip = { stage: stage, leaf: leaf, wrap: wrap, shadowSvg: shadowSvg, gU: gU, pU: pU, gF: gF, pF: pF, pB: pB, pT: pT, yb: h, w: w, h: h, angle: 0, raf: 0, committing: false, dir: dir, target: p, view: inn };
     flipSetAngle(dir === 'next' ? 0 : FLIP_MAX);
     return flip;
   }
@@ -6383,8 +6383,12 @@
   var drawer = $('drawer');
   function syncPageModeButtons() {
     document.querySelectorAll('[data-page-mode]').forEach(function (button) {
-      button.setAttribute('aria-pressed', String(button.getAttribute('data-page-mode') === scrollMode));
+      var on = button.getAttribute('data-page-mode') === scrollMode;
+      button.setAttribute('aria-pressed', String(on));
+      button.classList.toggle('active', on);
     });
+    var lbl = document.getElementById('pageModeLabel');
+    if (lbl) lbl.textContent = scrollMode === 'horizontal' ? 'عرض أفقي' : 'تمرير رأسي';
   }
   /* ======== 7) أنماط الصفحة والتمرير التلقائي ======== */
   function setPageMode(mode, temp) {
@@ -7053,15 +7057,25 @@
     }
 
     var card = document.createElement('details');
-    card.className = 'settings-card ui-font-details';
+    card.className = 'qas-card ufs-card ui-font-details';
     card.id = 'uiFontCard';
+    var WEIGHTS = [['', 'الافتراضي'], ['400', 'عادي'], ['500', 'متوسط'], ['700', 'عريض'], ['800', 'عريض جدًا']];
     card.innerHTML =
-      '<summary class="settings-card-head"><span aria-hidden="true">Aa</span><span>خط القائمة الجانبية</span></summary>' +
-      '<div class="ui-font-grid">' +
-      '<label>نوع الخط<select id="uiFontFamily"></select></label>' +
-      '<label>حجم الخط <output id="uiFontSizeOut"></output><input type="range" id="uiFontSize" min="80" max="150" step="5" /></label>' +
-      '<label>سمك الخط<select id="uiFontWeight"><option value="">الافتراضي</option><option value="400">عادي</option><option value="500">متوسط</option><option value="700">عريض</option><option value="800">عريض جدًا</option></select></label>' +
-      '<button type="button" id="uiFontReset" class="ui-font-reset">استعادة الافتراضي</button>' +
+      '<summary class="qas-summary"><span class="qas-ico ufs-ico" aria-hidden="true">Aa</span>' +
+      '<span class="qas-titles"><strong>خط القائمة الجانبية</strong><small id="uiFontSummary"></small></span>' +
+      '<svg class="qas-chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>' +
+      '<div class="qas-body">' +
+      '<div class="ufs-preview" aria-hidden="true"><strong>معاينة الخط</strong><span>الحمد لله رب العالمين، حمدًا كثيرًا طيبًا مباركًا فيه</span></div>' +
+      '<div class="qas-field"><span class="qas-label">نوع الخط</span><select id="uiFontFamily" aria-label="نوع الخط"></select></div>' +
+      '<div class="qas-field"><span class="qas-label">حجم الخط <output id="uiFontSizeOut"></output></span>' +
+      '<div class="ufs-stepper"><button type="button" class="ufs-step" data-ufs-step="-5" aria-label="تصغير الخط">−</button>' +
+      '<input class="qas-range" type="range" id="uiFontSize" min="80" max="150" step="5" aria-label="حجم الخط">' +
+      '<button type="button" class="ufs-step" data-ufs-step="5" aria-label="تكبير الخط">+</button></div></div>' +
+      '<div class="qas-field"><span class="qas-label">سمك الخط</span><div class="qas-chips" id="uiFontWeight" role="group" aria-label="سمك الخط">' +
+      WEIGHTS.map(function (w) {
+        return '<button type="button" class="ufs-chip" data-ufs-weight="' + w[0] + '">' + w[1] + '</button>';
+      }).join('') + '</div></div>' +
+      '<button type="button" id="uiFontReset" class="ui-font-reset">↺ استعادة الإعدادات الافتراضية</button>' +
       '</div>';
     var host = $('settingsBody') || paneTasks;
     var trackingGroup = $('recitationTrackingGroup');
@@ -7074,7 +7088,7 @@
     var famSel = card.querySelector('#uiFontFamily'),
       sizeIn = card.querySelector('#uiFontSize'),
       sizeOut = card.querySelector('#uiFontSizeOut'),
-      weightSel = card.querySelector('#uiFontWeight');
+      summaryEl = card.querySelector('#uiFontSummary');
     famSel.innerHTML = UI_FONTS.map(function (f) {
       return '<option value="' + f[0] + '">' + f[1] + '</option>';
     }).join('');
@@ -7082,11 +7096,31 @@
       famSel.value = prefs.family;
       sizeIn.value = prefs.size;
       sizeOut.textContent = prefs.size + '%';
-      weightSel.value = prefs.weight;
+      card.querySelectorAll('[data-ufs-weight]').forEach(function (b) {
+        var on = b.getAttribute('data-ufs-weight') === String(prefs.weight || '');
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      var entry = UI_FONTS.filter(function (f) { return f[0] === prefs.family; })[0] || UI_FONTS[0];
+      var wl = WEIGHTS.filter(function (w) { return w[0] === String(prefs.weight || ''); })[0];
+      summaryEl.textContent = entry[1].replace(/\s*\(.*\)$/, '') + ' · ' + prefs.size + '٪' + (wl && wl[0] ? ' · ' + wl[1] : '');
     }
-    famSel.addEventListener('change', function () { prefs.family = famSel.value; persist(); });
-    sizeIn.addEventListener('input', function () { prefs.size = +sizeIn.value; sizeOut.textContent = prefs.size + '%'; persist(); });
-    weightSel.addEventListener('change', function () { prefs.weight = weightSel.value; persist(); });
+    famSel.addEventListener('change', function () { prefs.family = famSel.value; persist(); sync(); });
+    sizeIn.addEventListener('input', function () { prefs.size = +sizeIn.value; persist(); sync(); });
+    card.querySelectorAll('[data-ufs-step]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        prefs.size = Math.max(80, Math.min(150, (+prefs.size || 100) + Number(b.getAttribute('data-ufs-step'))));
+        persist();
+        sync();
+      });
+    });
+    card.querySelectorAll('[data-ufs-weight]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        prefs.weight = b.getAttribute('data-ufs-weight');
+        persist();
+        sync();
+      });
+    });
     card.querySelector('#uiFontReset').addEventListener('click', function () {
       prefs = { family: '', size: 100, weight: '' };
       persist();
@@ -7104,10 +7138,10 @@
     card.className = 'settings-card';
     card.id = 'pageModeCard';
     card.innerHTML =
-      '<div class="settings-card-head"><span aria-hidden="true">📖</span><span>طريقة تقليب الصفحات</span></div>' +
-      '<div class="pm-seg" role="group" aria-label="طريقة تقليب الصفحات">' +
-      '<button type="button" data-page-mode="vertical">تمرير رأسي</button>' +
-      '<button type="button" data-page-mode="horizontal">عرض أفقي</button></div>';
+      '<div class="settings-card-head"><span aria-hidden="true">📖</span><span>طريقة تقليب الصفحات:</span><span class="st-val" id="pageModeLabel"></span></div>' +
+      '<div class="settings-toggle-group" role="group" aria-label="طريقة تقليب الصفحات">' +
+      '<button type="button" class="st-btn" data-page-mode="vertical"><span class="st-dot" style="background:#27ae60"></span><span>تمرير رأسي</span></button>' +
+      '<button type="button" class="st-btn" data-page-mode="horizontal"><span class="st-dot" style="background:#2980b9"></span><span>عرض أفقي</span></button></div>';
     var font = document.getElementById('uiFontCard');
     if (font && font.parentNode) font.parentNode.insertBefore(card, font);
     else (document.getElementById('settingsBody') || paneTasks).appendChild(card);
@@ -7124,15 +7158,19 @@
     card.className = 'settings-card';
     card.id = 'flipCard';
     card.innerHTML =
-      '<div class="settings-card-head"><span aria-hidden="true">📄</span><span>تأثير تقليب الورق</span></div>' +
-      '<div class="pm-seg" role="group" aria-label="تأثير تقليب الورق">' +
-      '<button type="button" data-v="1">مفعّل</button><button type="button" data-v="0">معطّل</button></div>';
+      '<div class="settings-card-head"><span aria-hidden="true">📄</span><span>تأثير تقليب الورق:</span><span class="st-val"></span></div>' +
+      '<div class="settings-toggle-group" role="group" aria-label="تأثير تقليب الورق">' +
+      '<button type="button" class="st-btn" data-v="1"><span class="st-dot" style="background:#27ae60"></span><span>مفعّل</span></button>' +
+      '<button type="button" class="st-btn" data-v="0"><span class="st-dot" style="background:var(--muted)"></span><span>معطّل</span></button></div>';
     var anchor = document.getElementById('pageModeCard');
     if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(card, anchor.nextSibling);
     else (document.getElementById('settingsBody') || paneTasks).appendChild(card);
     function sync() {
+      card.querySelector('.st-val').textContent = flipPrefs.fx ? 'مفعّل' : 'معطّل';
       card.querySelectorAll('button').forEach(function (b) {
-        b.setAttribute('aria-pressed', String(b.getAttribute('data-v') === (flipPrefs.fx ? '1' : '0')));
+        var on = b.getAttribute('data-v') === (flipPrefs.fx ? '1' : '0');
+        b.setAttribute('aria-pressed', String(on));
+        b.classList.toggle('active', on);
       });
     }
     card.addEventListener('click', function (e) {
@@ -9198,37 +9236,68 @@
       .join('');
   }
 
+  function adhanSwitch(attr, checked, title, hint, extra) {
+    return (
+      '<label class="qas-switch"><span class="qas-sw-text"><strong>' + title + '</strong>' +
+      (hint ? '<small>' + hint + '</small>' : '') +
+      '</span><input type="checkbox" ' + attr + (checked ? ' checked' : '') + (extra || '') + ' role="switch"><i class="qas-track" aria-hidden="true"></i></label>'
+    );
+  }
+
+  function adhanSummaryText(alerts) {
+    var count = ALERT_PRAYERS.filter(function (p) {
+      return alerts.enabled[p.id];
+    }).length;
+    var adv = ADVANCE_OPTIONS.filter(function (o) {
+      return o[0] === alerts.advance;
+    })[0];
+    return (
+      (alerts.sound ? 'الصوت مفعّل' : 'الصوت متوقف') +
+      ' · ' + (count ? 'تنبيه لـ' + count + ' صلوات' : 'لا تنبيهات') +
+      (adv && adv[0] ? ' · ' + adv[1] : '')
+    );
+  }
+
   function renderAdhanSettings() {
-    var card = document.getElementById('adhanSettingsCard');
+    var card = adhanCard;
     if (!card) return;
     var alerts = readAlerts();
     var voice = ADHAN_VOICES[alerts.voice] || ADHAN_VOICES[ADHAN_VOICE_ID];
     var note = notificationState();
     var openNow = card.open;
     card.innerHTML =
-      '<summary class="settings-card-head"><span aria-hidden="true">🕌</span><span>الأذان والتنبيهات</span></summary>' +
-      '<div class="adhan-set">' +
-      '<label class="adhan-set-switch"><span><strong>تشغيل صوت الأذان</strong><small>يُشغَّل عند دخول وقت الصلاة والتطبيق مفتوح</small></span><input type="checkbox" data-adhan-sound' + (alerts.sound ? ' checked' : '') + ' role="switch"></label>' +
-      '<label class="adhan-set-field">صوت الأذان<select data-adhan-voice>' + voiceOptionsHtml(alerts.voice) + '</select></label>' +
-      '<div class="adhan-set-row"><label class="adhan-set-file">＋ إضافة صوت من جهازك<input type="file" accept="audio/*" data-adhan-add></label>' +
-      (voice.custom ? '<button type="button" class="adhan-set-danger" data-adhan-remove>حذف هذا الصوت</button>' : '') + '</div>' +
-      '<label class="adhan-set-field">مستوى الصوت <output data-adhan-volume-out>' + Math.round(alerts.volume * 100) + '٪</output>' +
-      '<input type="range" min="10" max="100" step="5" value="' + Math.round(alerts.volume * 100) + '" data-adhan-volume></label>' +
-      '<label class="adhan-set-field">التذكير قبل الصلاة<select data-adhan-advance>' +
+      '<summary class="qas-summary"><span class="qas-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span>' +
+      '<span class="qas-titles"><strong>إعدادات الأذان والتنبيهات</strong><small>' + adhanSummaryText(alerts) + '</small></span><svg class="qas-chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>' +
+      '<div class="qas-body">' +
+      // —— الصوت ——
+      '<section class="qas-group"><h4><span aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></span>صوت الأذان</h4>' +
+      adhanSwitch('data-adhan-sound', alerts.sound, 'تشغيل صوت الأذان', 'يُشغَّل عند دخول وقت الصلاة والتطبيق مفتوح') +
+      '<div class="qas-field"><span class="qas-label">الصوت المختار</span><div class="qas-inline">' +
+      '<select data-adhan-voice aria-label="صوت الأذان">' + voiceOptionsHtml(alerts.voice) + '</select>' +
+      '<button type="button" class="qas-play" data-adhan-preview aria-label="معاينة الأذان" title="معاينة الأذان">&#9654;</button></div></div>' +
+      '<div class="qas-actions"><label class="qas-file">＋ إضافة صوت من جهازك<input type="file" accept="audio/*" data-adhan-add></label>' +
+      (voice.custom ? '<button type="button" class="qas-danger" data-adhan-remove>حذف هذا الصوت</button>' : '') + '</div>' +
+      '<div class="qas-field"><span class="qas-label">مستوى الصوت <output data-adhan-volume-out>' + Math.round(alerts.volume * 100) + '٪</output></span>' +
+      '<input class="qas-range" type="range" min="10" max="100" step="5" value="' + Math.round(alerts.volume * 100) + '" data-adhan-volume aria-label="مستوى صوت الأذان"></div>' +
+      '</section>' +
+      // —— التنبيه ——
+      '<section class="qas-group"><h4><span aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span>التنبيه</h4>' +
+      '<div class="qas-field"><span class="qas-label">التذكير قبل الصلاة</span><select data-adhan-advance aria-label="التذكير قبل الصلاة">' +
       ADVANCE_OPTIONS.map(function (o) {
         return '<option value="' + o[0] + '"' + (alerts.advance === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
-      }).join('') + '</select></label>' +
-      '<label class="adhan-set-switch"><span><strong>إشعار بملء الشاشة</strong><small>تظهر شاشة الأذان كاملة عند دخول الوقت (وضع ملء الشاشة وإبقاء الشاشة مضاءة)</small></span><input type="checkbox" data-adhan-fullscreen' + (alerts.fullscreen ? ' checked' : '') + ' role="switch"></label>' +
+      }).join('') + '</select></div>' +
+      adhanSwitch('data-adhan-fullscreen', alerts.fullscreen, 'شاشة الأذان الكاملة', 'تظهر عند دخول الوقت مع إبقاء الشاشة مضاءة') +
       (note === 'unsupported'
         ? ''
-        : '<label class="adhan-set-switch"><span><strong>إشعارات النظام</strong><small>' +
-          (note === 'denied' ? 'محظورة؛ فعّلها من إعدادات المتصفح لهذا الموقع' : 'إشعار يبقى حتى تفتحه عند دخول الوقت') +
-          '</small></span><input type="checkbox" data-adhan-notify' + (note === 'on' ? ' checked' : '') + (note === 'denied' ? ' disabled' : '') + ' role="switch"></label>') +
-      '<div class="adhan-set-prayers"><strong>الصلوات المفعّل لها التنبيه</strong>' +
+        : adhanSwitch('data-adhan-notify', note === 'on', 'إشعارات النظام',
+            note === 'denied' ? 'محظورة؛ فعّلها من إعدادات المتصفح لهذا الموقع' : 'إشعار يبقى حتى تفتحه عند دخول الوقت',
+            note === 'denied' ? ' disabled' : '')) +
+      '</section>' +
+      // —— الصلوات ——
+      '<section class="qas-group"><h4><span aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>الصلوات المفعّل لها التنبيه</h4><div class="qas-chips">' +
       ALERT_PRAYERS.map(function (prayer) {
-        return '<label><input type="checkbox" data-adhan-prayer="' + prayer.id + '"' + (alerts.enabled[prayer.id] ? ' checked' : '') + '><span>' + prayer.name + '</span></label>';
-      }).join('') + '</div>' +
-      '<button type="button" class="adhan-set-preview" data-adhan-preview>▶ معاينة الأذان</button>' +
+        return '<label class="qas-chip"><input type="checkbox" data-adhan-prayer="' + prayer.id + '"' + (alerts.enabled[prayer.id] ? ' checked' : '') + '><span>' + prayer.name + '</span></label>';
+      }).join('') + '</div></section>' +
       '<p class="adhan-set-status" id="adhanSetStatus" role="status" aria-live="polite"></p>' +
       '<p class="adhan-set-credit">' + (voice.credit ? 'التسجيل: ' + escapeHtml(voice.credit) + (voice.licenseName ? ' · ' + escapeHtml(voice.licenseName) : '') : voice.custom ? 'ملف صوتي من جهازك.' : '') + '</p>' +
       '</div>';
@@ -9374,16 +9443,13 @@
       });
   }
 
+  var adhanCard = null;
   function mountAdhanSettings() {
-    if (document.getElementById('adhanSettingsCard')) return;
-    var host = document.getElementById('settingsBody');
-    if (!host) return;
+    if (adhanCard) return;
     var card = document.createElement('details');
-    card.className = 'settings-card adhan-card';
+    card.className = 'qas-card';
     card.id = 'adhanSettingsCard';
-    var anchor = document.getElementById('uiFontCard');
-    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(card, anchor);
-    else host.appendChild(card);
+    adhanCard = card;
     card.addEventListener('change', onAdhanSettingsChange);
     card.addEventListener('input', function (event) {
       if (event.target.hasAttribute('data-adhan-volume')) onAdhanSettingsChange(event);
@@ -9701,9 +9767,15 @@
       '<div class="qpt-remaining">الوقت المتبقي للصلاة القادمة</div><div class="qpt-hijri" data-qpt-hijri></div></div>' +
       '<div class="qpt-status" data-qpt-status role="status" aria-live="polite"></div>' +
       '<div class="qpt-list" data-qpt-list aria-label="مواقيت الصلاة"></div>' +
+      '<div class="qpt-adhan" data-qpt-adhan></div>' +
       '<div class="qpt-actions"><button type="button" class="qpt-retry" data-qpt-retry>تحديث المواقيت</button></div>' +
       '<p class="qpt-note">طريقة الحساب: الهيئة المصرية العامة للمساحة — قد تختلف المواقيت باختلاف الموقع المحلي.</p>' +
       '</section>';
+    var adhanHost = container.querySelector('[data-qpt-adhan]');
+    if (adhanHost && adhanCard) {
+      adhanHost.appendChild(adhanCard);
+      renderAdhanSettings();
+    }
     var select = container.querySelector('[data-qpt-city]');
     select.innerHTML = CITIES.map(function (item) {
       return (

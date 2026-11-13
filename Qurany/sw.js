@@ -7,7 +7,7 @@
 // في الإصدارات السابقة كانت الخطوط في نفس كاش الإصدار، وكل تحديث للـ service worker يحذفها فيحاول
 // التطبيق تنزيلها من جديد، وأي فشل في الشبكة (أو اختلاف اسم الكاش بين الصفحة والـ SW) كان يحجب المصحف.
 // عند التفعيل نُرحِّل الخطوط من الكاش القديم إلى ASSET_CACHE قبل حذفه حتى لا يخسرها من نزّلها سابقًا.
-var SHELL_CACHE = 'quran-shell-v174';
+var SHELL_CACHE = 'quran-shell-v179';
 var ASSET_CACHE = 'quran-assets-v1'; // يجب أن يطابق ASSET_CACHE في app.js
 var LEGACY_PREFIX = 'quran-pro-app-';
 var SHELL_PREFIX = 'quran-shell-';
