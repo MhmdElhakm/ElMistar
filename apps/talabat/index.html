@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#1CB0F6" />
 <title>ناقصنا ايه | مشتريات البيت</title>
 <link rel="icon" type="image/png" href="icon-192.png" />
@@ -10,7 +10,7 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="ناقصنا إيه" />
 <meta name="application-name" content="ناقصنا إيه" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1967,6 +1967,11 @@
   .category-group .done-sub { font-size: 11px !important; margin-top: 0 !important; }
   .category-group .done-pill { padding: 2px 10px !important; font-size: 11px !important; }
   .category-group .category-card-orders { padding-top: 6px !important; }
+
+  /* ===== ملء الشاشة + safe-area ===== */
+  html, body { min-height: 100dvh; }
+  body { padding-top: env(safe-area-inset-top); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+
   </style>
 </head>
 <body>
@@ -5490,6 +5495,7 @@
         <div class="settings-item"><div class="si-icon" style="background:#DCFCE7;color:#059669;">📱</div><div class="si-body"><div class="si-label">رقم الواتساب</div></div><button class="si-action" id="editWaBtn">تعديل</button></div>
         <div class="settings-item"><div class="si-icon" style="background:#FFEED3;color:#FF9600;">👨‍👩‍👧</div><div class="si-body"><div class="si-label">رقم واتساب الطرف الآخر</div></div><button class="si-action" id="editPartnerWaBtn">تعديل</button></div>
         ${renderPhoneAccountHTML()}
+        ${renderNotifSettingsHTML()}
         <div class="online-pill" id="onlinePill" style="display:none;margin:0 16px 14px;"><span class="online-dot"></span><span class="online-num" id="onlineCount">1</span><span class="online-tx">مستخدم نشط الآن<small>بيستخدموا التطبيق دلوقتي</small></span><span class="live-tag"><i></i> مباشر</span></div>
         </div>
       </div>
@@ -6028,6 +6034,7 @@
   function bindSettings() {
     const b = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
     b('editUserBtn', () => openEditTextModal({ title: 'تعديل اسمك', label: 'الاسم', value: state.user?.name || '', placeholder: 'اسمك', max: 20, onSave: (v) => { state.user.name = v.trim(); persist(); toast('تمام، الاسم اتغير ✓', 'success'); render(); } }));
+    bindNotifSettings();
     b('phoneSaveBtn', async () => {
       const inp = document.getElementById('phoneSaveInput'); const err = document.getElementById('phoneSaveError'); const btn = document.getElementById('phoneSaveBtn');
       const raw = inp ? inp.value : '';
@@ -8118,6 +8125,138 @@
   function syncSig() {
     try { return JSON.stringify([(state.orders || []).map(o => o.id + ':' + o.status + ':' + (o.updatedAt || '')), (state.expenses || []).map(e => e.id + ':' + e.amount + ':' + (e.updatedAt || '')), (state.orderLists || []).map(l => l.id), state.home && state.home.name, state.deliveryWhatsapp || '', state.deliveryName || '', state.partnerWhatsapp || '']); } catch { return String(Date.now()); }
   }
+  /* =====================================================
+     ملء الشاشة + الإشعارات + الملاحظات
+     ===================================================== */
+  const NOTIF_KEY = 'naqisna_notif_v1', NOTIF_FIRED_KEY = 'naqisna_notif_fired';
+  function notifPrefs() {
+    let p = {};
+    try { p = JSON.parse(localStorage.getItem(NOTIF_KEY) || '{}') || {}; } catch {}
+    return Object.assign({ on: false, appts: true, tasks: true, orders: true, taskTime: '09:00', fs: true }, p);
+  }
+  function saveNotifPrefs(p) { try { localStorage.setItem(NOTIF_KEY, JSON.stringify(p)); } catch {} }
+  function notifSupported() { return typeof Notification !== 'undefined'; }
+  function notifPerm() { return notifSupported() ? Notification.permission : 'unsupported'; }
+  async function notifyUser(title, body, opts) {
+    opts = opts || {};
+    const p = notifPrefs(); let shown = false;
+    if ((p.on || opts.force) && notifPerm() === 'granted') {
+      const o = { body: body || '', icon: 'icon-192.png', badge: 'icon-192.png', tag: opts.tag || ('n' + Date.now()), dir: 'rtl', lang: 'ar', vibrate: [150, 80, 150], renotify: true, data: opts.data || {} };
+      try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg && reg.showNotification) { await reg.showNotification(title, o); shown = true; } } catch {}
+      if (!shown) { try { const n = new Notification(title, o); n.onclick = () => { try { window.focus(); n.close(); } catch {} }; shown = true; } catch {} }
+    }
+    try { if (!document.hidden) toast(title + (body ? ' — ' + body : ''), 'info'); } catch {}
+    return shown;
+  }
+  async function enableNotifications() {
+    if (!notifSupported()) { toast('المتصفح ده مش بيدعم الإشعارات', 'error'); return false; }
+    let perm = Notification.permission;
+    if (perm === 'default') { try { perm = await Notification.requestPermission(); } catch { perm = 'denied'; } }
+    if (perm !== 'granted') { toast('الإشعارات مقفولة — فعّلها من إعدادات المتصفح للموقع ده', 'warning'); return false; }
+    const p = notifPrefs(); p.on = true; saveNotifPrefs(p);
+    notifyUser('🔔 الإشعارات اشتغلت', 'هنبلغك بالمواعيد والمهام والطلبات الجديدة', { force: true, tag: 'welcome' });
+    return true;
+  }
+  function firedGet() { try { return JSON.parse(localStorage.getItem(NOTIF_FIRED_KEY) || '{}') || {}; } catch { return {}; } }
+  function firedSave(f) {
+    const cut = Date.now() - 4 * 86400000;
+    Object.keys(f).forEach(k => { if (f[k] < cut) delete f[k]; });
+    try { localStorage.setItem(NOTIF_FIRED_KEY, JSON.stringify(f)); } catch {}
+  }
+  function arSpan(mins) {
+    if (mins < 60) return mins + ' دقيقة';
+    if (mins < 1440) { const h = Math.round(mins / 60); return h === 1 ? 'ساعة' : h === 2 ? 'ساعتين' : h + ' ساعات'; }
+    const d = Math.round(mins / 1440); return d === 1 ? 'يوم' : 'يومين';
+  }
+  function notifTick() {
+    try {
+      const p = notifPrefs(); if (!p.on || notifPerm() !== 'granted') return;
+      const now = Date.now(); const fired = firedGet(); let dirty = false;
+      if (p.appts) {
+        apptList().forEach(a => {
+          if (!a || a.done) return;
+          apptOccurrences(a, 2).forEach(dt => {
+            const rem = Number(a.remind) || 0, t = dt.getTime(), fireAt = t - rem * 60000;
+            if (now >= fireAt && now < t + 5 * 60000) {
+              const key = 'ap|' + a.id + '|' + t + '|' + rem;
+              if (fired[key]) return;
+              fired[key] = now; dirty = true;
+              const mins = Math.round((t - now) / 60000);
+              notifyUser('📅 ' + (a.title || 'موعد'), mins > 1 ? ('بعد ' + arSpan(mins)) : 'الموعد دلوقتي ⏰', { tag: key, data: { tab: 'tasks' } });
+            }
+          });
+        });
+      }
+      if (p.tasks && /^\d{2}:\d{2}$/.test(p.taskTime || '')) {
+        const d = new Date(); const hm = p.taskTime.split(':');
+        const at = new Date(d.getFullYear(), d.getMonth(), d.getDate(), +hm[0], +hm[1], 0, 0).getTime();
+        const key = 'tk|' + d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        if (now >= at && !fired[key]) {
+          fired[key] = now; dirty = true;
+          const open = taskList().filter(t => t && !t.done && taskVisibleToday(t)).length;
+          if (open > 0) notifyUser('📝 مهامك النهاردة', 'عندك ' + open + (open === 1 ? ' مهمة مستنياك' : ' مهام مستنياك') + ' 💪', { tag: key, data: { tab: 'tasks' } });
+        }
+      }
+      if (dirty) firedSave(fired);
+    } catch (e) { console.warn(e); }
+  }
+  function notifyNewOrders(list) {
+    const p = notifPrefs(); if (!p.on || !p.orders || !list.length) return;
+    const who = (function () { try { return getPartnerInfo().name || 'الطرف الآخر'; } catch { return 'الطرف الآخر'; } })();
+    const names = list.slice(0, 3).map(o => o.name).join('، ') + (list.length > 3 ? ' و' + (list.length - 3) + ' كمان' : '');
+    notifyUser('🛒 ' + (list.length === 1 ? 'طلب جديد وصل' : list.length + ' طلبات جديدة وصلت'), names + ' — من ' + who, { tag: 'orders|' + Date.now(), data: { tab: 'shop' } });
+  }
+  /* ملء الشاشة */
+  function isAppFs() { try { return matchMedia('(display-mode: fullscreen)').matches || matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch { return false; } }
+  function enterFs() {
+    try {
+      if (document.fullscreenElement || document.webkitFullscreenElement || isAppFs()) return;
+      const el = document.documentElement; const f = el.requestFullscreen || el.webkitRequestFullscreen;
+      if (f) { const r = f.call(el, { navigationUI: 'hide' }); if (r && r.catch) r.catch(() => {}); }
+    } catch {}
+  }
+  function exitFs() { try { (document.exitFullscreen || document.webkitExitFullscreen || function () {}).call(document); } catch {} }
+  function notifInit() {
+    try {
+      let tried = false;
+      const first = () => { if (tried) return; tried = true; if (notifPrefs().fs) enterFs(); };
+      document.addEventListener('click', first, { once: true, passive: true });
+      document.addEventListener('touchend', first, { once: true, passive: true });
+      setTimeout(notifTick, 3000);
+      setInterval(notifTick, 20000);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) notifTick(); });
+      if (navigator.serviceWorker) navigator.serviceWorker.addEventListener('message', ev => {
+        const d = ev.data && ev.data.type === 'NOTIF_CLICK' ? (ev.data.data || {}) : null; if (!d) return;
+        if (d.tab) { try { setTab(d.tab === 'tasks' ? 'home' : d.tab); } catch {} }
+      });
+    } catch (e) { console.warn(e); }
+  }
+  function renderNotifSettingsHTML() {
+    const p = notifPrefs(), perm = notifPerm();
+    const on = p.on && perm === 'granted';
+    const st = perm === 'unsupported' ? 'المتصفح مش بيدعم الإشعارات' : perm === 'denied' ? 'مقفولة من إعدادات المتصفح' : on ? 'شغّالة ✓' : 'مش مفعّلة';
+    const chk = (id, label, v) => `<label class="bulk-watoggle"><input type="checkbox" id="${id}" ${v ? 'checked' : ''}> ${label}</label>`;
+    return `<div class="settings-item"><div class="si-icon" style="background:#E0F2FE;color:#0284C7;">🔔</div><div class="si-body"><div class="si-label">الإشعارات</div><div class="si-value">${st}</div></div><button class="si-action" id="notifMainBtn">${on ? 'إيقاف' : 'تفعيل'}</button></div>
+      ${on ? `<div style="padding:4px 16px 8px;display:grid;gap:4px;">${chk('nfAppts', '📅 تنبيهات المواعيد', p.appts)}${chk('nfOrders', '🛒 وصول طلبات جديدة', p.orders)}${chk('nfTasks', '✅ ملخص المهام اليومي', p.tasks)}
+        <div style="display:flex;align-items:center;gap:10px;padding:4px 2px;"><span style="font-size:13px;font-weight:800;">⏰ وقت ملخص المهام</span><input type="time" id="nfTaskTime" value="${escapeHTML(p.taskTime)}" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;"></div>
+        <button class="btn btn-secondary btn-sm" id="nfTest" style="min-height:44px;">🔔 جرّب إشعار</button>
+        <div class="help-text">الإشعارات بتوصل والتطبيق مفتوح أو شغال في الخلفية.</div></div>` : ''}
+      <div class="settings-item"><div class="si-icon" style="background:#EDE9FE;color:#7C3AED;">⛶</div><div class="si-body"><div class="si-label">ملء الشاشة</div><div class="si-value">${isAppFs() ? 'التطبيق شغّال بملء الشاشة' : 'يفتح بملء الشاشة أول لمسة'}</div></div><label class="bulk-watoggle" style="margin:0;"><input type="checkbox" id="fsToggle" ${p.fs ? 'checked' : ''}></label></div>`;
+  }
+  function bindNotifSettings() {
+    const $ = id => document.getElementById(id);
+    const upd = (k, v) => { const p = notifPrefs(); p[k] = v; saveNotifPrefs(p); };
+    if ($('notifMainBtn')) $('notifMainBtn').onclick = async () => {
+      const p = notifPrefs();
+      if (p.on && notifPerm() === 'granted') { p.on = false; saveNotifPrefs(p); toast('الإشعارات اتقفلت', 'info'); render(); return; }
+      await enableNotifications(); render();
+    };
+    [['nfAppts', 'appts'], ['nfOrders', 'orders'], ['nfTasks', 'tasks']].forEach(x => { if ($(x[0])) $(x[0]).onchange = e => upd(x[1], e.target.checked); });
+    if ($('nfTaskTime')) $('nfTaskTime').onchange = e => { upd('taskTime', e.target.value || '09:00'); };
+    if ($('nfTest')) $('nfTest').onclick = () => notifyUser('🔔 إشعار تجريبي', 'الإشعارات شغّالة تمام', { force: true, tag: 'test' });
+    if ($('fsToggle')) $('fsToggle').onchange = e => { upd('fs', e.target.checked); if (e.target.checked) enterFs(); else exitFs(); };
+  }
+
   function applyRemoteData(remoteData) {
     if (!remoteData) return false;
     const rMs = Number(remoteData.updatedAtMs) || 0;
@@ -8127,6 +8266,7 @@
       const ls = JSON.stringify([(state.orders || []).map(o => (o.id || '') + ':' + (o.status || ''))]);
       if (rs === ls) return false;
     }
+    const _beforeIds = new Set((state.orders || []).map(o => String(o && o.id)));
     const before = syncSig();
     _syncLock = true;
     try {
@@ -8175,6 +8315,7 @@
           try { localStorage.setItem('naqisna_partner_wa', remoteData.partnerWhatsapp); } catch {}
         }
       } catch {}
+      try { if (_beforeIds.size && state._syncedOnce) { const nw = (state.orders || []).filter(o => o && !_beforeIds.has(String(o.id)) && o.status !== 'purchased'); if (nw.length) notifyNewOrders(nw); } } catch {}
       if (syncSig() === before) return false;
       Storage.save(state);
       try { if (state.home?.code) localStorage.setItem('baytna_home_' + state.home.code, JSON.stringify({ home: state.home, orders: state.orders, expenses: state.expenses, orderLists: state.orderLists, updatedAt: state.updatedAt })); } catch {}
@@ -8276,6 +8417,7 @@
     try { if (typeof _ensureExitGuard === 'function') _ensureExitGuard(); } catch {}
     initSupabaseSync();
     try { initPresence(); } catch {}
+    try { notifInit(); } catch {}
     try {
       if ('serviceWorker' in navigator) {
         const upd = () => { try { navigator.serviceWorker.ready.then(r => r.update().catch(() => {})).catch(() => {}); } catch {} };
