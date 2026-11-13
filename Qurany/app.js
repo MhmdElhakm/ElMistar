@@ -11665,7 +11665,53 @@
   var ui = null; // { root, say }
   function render() {
     if (ui) draw();
+    drawHome();
   }
+  /* بطاقة الصفحة الرئيسية أسفل قسم الخدمات */
+  function drawHome() {
+    var el = document.getElementById('khatmaHome');
+    if (!el) return;
+    var a = st.active,
+      h;
+    if (!a) {
+      h =
+        '<button type="button" class="kh-home kh-home-empty" data-app-service="khatma"><span class="kh-home-ico" aria-hidden="true">' + icon('book') + '</span>' +
+        '<span class="kh-home-copy"><b>ختمتي</b><small>ابدأ ختمة بورد يومي ثابت وتذكير بالإشعارات</small></span>' +
+        '<span class="kh-home-go">ابدأ ‹</span></button>';
+    } else {
+      var pct = Math.round((a.read / TOTAL) * 100),
+        r = wirdRange(a),
+        done = doneToday(a);
+      h =
+        '<div class="kh-home' +
+        (done ? ' is-done' : '') +
+        '"><button type="button" class="kh-home-main" data-app-service="khatma" aria-label="فتح ختمتي">' +
+        '<span class="kh-home-ring">' +
+        ring(pct) +
+        '<b>' +
+        ar(pct) +
+        '٪</b></span><span class="kh-home-copy"><small>ختمتي · ' +
+        esc(a.name) +
+        '</small><b>' +
+        (done ? 'أتممت ورد اليوم' : 'ورد اليوم: ص ' + ar(r[0]) + (r[1] > r[0] ? '–' + ar(r[1]) : '')) +
+        '</b><small>' + icon('flame', 'kh-inl') +
+        ar(streak(a)) +
+        ' يوم · بقي ' +
+        ar(TOTAL - a.read) +
+        ' صفحة</small></span></button>' +
+        (done
+          ? ''
+          : '<button type="button" class="kh-home-done" data-khatma-done>' + icon('check') + 'تم</button>') +
+        '</div>';
+    }
+    el.innerHTML = h;
+  }
+  document.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('[data-khatma-done]')) {
+      e.stopPropagation();
+      markDone();
+    }
+  });
   function start(name, days) {
     st.active = norm({
       active: {
@@ -11821,6 +11867,26 @@
       return dayKey(d);
     }
   }
+  var IC = {
+    book: '<path d="M4 5.500A2.500 2.500 0 0 1 6.500 3H20v15H6.500A2.500 2.500 0 0 0 4 20.500z"/><path d="M4 20.500A2.500 2.500 0 0 0 6.500 23H20v-5"/><path d="M9 8h7"/>',
+    bell: '<path d="M6 9a6 6 0 0 1 12 0c0 6 2.500 7.500 2.500 7.500h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+    gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.900 4.900 7 7M17 17l2.100 2.100M4.900 19.100 7 17M17 7l2.100-2.100"/>',
+    flame: '<path d="M12 22c4 0 7-2.800 7-6.800 0-3-1.800-5-3.400-6.700-.6 1.600-1.600 2.500-2.600 2.900.4-3.300-1-6.500-3.600-8.400.2 3.200-1.600 5-3 6.800C5.200 11.600 5 13.200 5 15.200 5 19.200 8 22 12 22z"/>',
+    pages: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
+    target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.200"/>',
+    medal: '<circle cx="12" cy="9" r="6"/><path d="M8.500 14.300 7 22l5-3 5 3-1.500-7.700"/><path d="m10 9 1.500 1.500L14.500 7.500"/>',
+    clock: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.500 1.500M5 3.500 2.500 6M19 3.500 21.500 6"/>',
+    check: '<path d="m5 12.500 4.500 4.500L19 7.500"/>'
+  };
+  function icon(name, cls) {
+    return '<svg class="kh-svg' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + IC[name] + '</svg>';
+  }
+  function juzOf(page) {
+    return Math.min(30, page <= 21 ? 1 : Math.floor((page - 2) / 20) + 1);
+  }
+  function sw(k, on) {
+    return '<span class="kh-sw"><input type="checkbox" data-k="' + k + '"' + (on ? ' checked' : '') + '><i></i></span>';
+  }
   function reminderCard() {
     var r = st.remind,
       perm = 'Notification' in window ? Notification.permission : 'unsupported';
@@ -11829,50 +11895,68 @@
         ? 'متصفحك لا يدعم الإشعارات.'
         : perm === 'denied'
           ? 'الإشعارات محظورة من إعدادات المتصفح — فعّلها للموقع ثم أعد المحاولة.'
-          : 'تصل التذكيرات أثناء فتح التطبيق أو بقائه في الخلفية؛ قد لا تصل إن أُغلق تمامًا.';
+          : 'تصل التذكيرات أثناء فتح التطبيق أو بقائه في الخلفية، وقد لا تصل إن أُغلق تمامًا.';
     return (
-      '<section class="kh-card"><h3>🔔 التذكير بالورد</h3>' +
-      '<label class="kh-row"><span>تذكير يومي بالورد</span><input type="checkbox" data-k="remind" ' +
-      (r.enabled ? 'checked' : '') +
-      '></label>' +
-      '<label class="kh-row"><span>وقت التذكير</span><input type="time" data-k="time" value="' +
+      '<details class="kh-panel kh-manage"><summary><span class="kh-ico">' + icon('bell') + '</span><b>التذكير والمهام</b><span class="kh-chev" aria-hidden="true"></span></summary>' +
+      '<label class="kh-line"><span><b>تذكير يومي بالورد</b><small>إشعار في الوقت الذي تختاره</small></span>' +
+      sw('remind', r.enabled) +
+      '</label>' +
+      '<label class="kh-line"><span><b>وقت التذكير</b><small>يتكرر كل يوم</small></span><input class="kh-time" type="time" data-k="time" value="' +
       esc(r.time) +
       '"></label>' +
-      '<label class="kh-row"><span>تذكير ثانٍ بعد ساعتين إن لم يُنجز</span><input type="checkbox" data-k="follow" ' +
-      (r.followup ? 'checked' : '') +
-      '></label>' +
-      '<label class="kh-row"><span>إظهار الورد ضمن المهام</span><input type="checkbox" data-k="task" ' +
-      (st.taskOn ? 'checked' : '') +
-      '></label>' +
-      '<p class="kh-note" data-k="remind-note">' +
+      '<label class="kh-line"><span><b>تذكير ثانٍ</b><small>بعد ساعتين إن لم يُنجز الورد</small></span>' +
+      sw('follow', r.followup) +
+      '</label>' +
+      '<label class="kh-line"><span><b>إظهار الورد في المهام</b><small>مهمة يومية بثلاث نقاط</small></span>' +
+      sw('task', st.taskOn) +
+      '</label><p class="kh-note">' +
       esc(note) +
-      '</p></section>'
+      '</p></details>'
     );
+  }
+  function week(a) {
+    var out = '';
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date();
+      d.setDate(d.getDate() - i);
+      var on = a.doneDates.indexOf(dayKey(d)) !== -1,
+        lbl = '';
+      try {
+        lbl = d.toLocaleDateString('ar-EG', { weekday: 'short' });
+      } catch (e) {}
+      out +=
+        '<span class="kh-day' + (on ? ' on' : '') + (i === 0 ? ' today' : '') + '"><i>' + (on ? icon('check') : '') + '</i><small>' + esc(lbl) + '</small></span>';
+    }
+    return out;
+  }
+  function previewText(days) {
+    var pd = Math.ceil(TOTAL / days),
+      fin = new Date();
+    fin.setDate(fin.getDate() + days - 1);
+    return '<b>' + ar(pd) + '</b> صفحة يوميًا · تنتهي في <b>' + esc(fmtDate(fin)) + '</b>';
+  }
+  function chosenDays() {
+    var cv = parseInt(ui.root.querySelector('[data-k="custom"]').value, 10);
+    var on = ui.root.querySelector('[data-days].on');
+    return cv > 0 ? Math.min(365, cv) : on ? +on.getAttribute('data-days') : 30;
   }
   function draw() {
     var a = st.active,
       h = '';
     if (!a) {
       h +=
-        '<section class="kh-card kh-hero"><div class="kh-hero-ico" aria-hidden="true">📖</div><h2>ابدأ ختمة جديدة</h2>' +
-        '<p>اختر المدة وسنقسّم القرآن (٦٠٤ صفحات) إلى ورد يومي ثابت، ونذكّرك به.</p>' +
-        '<label class="kh-field">اسم الختمة<input type="text" data-k="name" maxlength="40" value="ختمة جديدة"></label>' +
-        '<div class="kh-label">مدة الختمة</div><div class="kh-chips" role="group">' +
-        PRESETS.map(function (d, i) {
+        '<header class="kh-hero"><div class="kh-hero-glow" aria-hidden="true"></div><span class="kh-hero-ico" aria-hidden="true">' + icon('book') + '</span>' +
+        '<h2>ابدأ ختمة جديدة</h2><p>٦٠٤ صفحات تُقسَّم إلى ورد يومي ثابت، مع تذكير يرافقك حتى الختم.</p></header>' +
+        '<section class="kh-panel"><label class="kh-fld"><span>اسم الختمة</span><input type="text" data-k="name" maxlength="40" value="ختمة جديدة"></label>' +
+        '<div class="kh-sub">مدة الختمة</div><div class="kh-chips" role="group">' +
+        PRESETS.map(function (d) {
           return (
-            '<button type="button" class="kh-chip' +
-            (d === 30 ? ' on' : '') +
-            '" data-days="' +
-            d +
-            '">' +
-            ar(d) +
-            ' يومًا<small>' +
-            ar(Math.ceil(TOTAL / d)) +
-            ' ص/يوم</small></button>'
+            '<button type="button" class="kh-chip' + (d === 30 ? ' on' : '') + '" data-days="' + d + '"><b>' + ar(d) + '</b><small>يومًا</small><em>' + ar(Math.ceil(TOTAL / d)) + ' ص/يوم</em></button>'
           );
         }).join('') +
-        '</div><label class="kh-field">أو مدة مخصّصة (بالأيام)<input type="number" min="1" max="365" inputmode="numeric" data-k="custom" placeholder="مثال: 45"></label>' +
-        '<button type="button" class="kh-btn" data-act="start">ابدأ الختمة</button></section>';
+        '<label class="kh-chip kh-chip-custom"><b>مخصّص</b><input type="number" min="1" max="365" inputmode="numeric" data-k="custom" placeholder="أيام"></label></div>' +
+        '<div class="kh-preview" data-k="preview">' + previewText(30) + '</div>' +
+        '<button type="button" class="kh-cta" data-act="start">ابدأ الختمة</button></section>';
     } else {
       var pct = Math.round((a.read / TOTAL) * 100),
         r = wirdRange(a),
@@ -11882,65 +11966,39 @@
         remainDays = Math.ceil((TOTAL - a.read) / pd),
         fin = new Date();
       fin.setDate(fin.getDate() + remainDays - (done ? 0 : 1));
-      var dayNo = Math.min(a.days + 999, Math.max(1, diffDays(dayKey(), a.start) + 1));
+      var dayNo = Math.max(1, diffDays(dayKey(), a.start) + 1);
       h +=
-        '<section class="kh-card kh-progress"><div class="kh-ring-wrap">' +
-        ring(pct) +
-        '<div class="kh-ring-txt"><b>' +
-        ar(pct) +
-        '٪</b><small>' +
-        ar(a.read) +
-        ' / ' +
-        ar(TOTAL) +
-        '</small></div></div><div class="kh-prog-copy"><h2>' +
-        esc(a.name) +
-        '</h2><p>اليوم ' +
-        ar(dayNo) +
-        ' من ' +
-        ar(a.days) +
-        '</p><p>الانتهاء المتوقع: <b>' +
-        esc(fmtDate(fin)) +
-        '</b></p></div></section>' +
-        '<section class="kh-card kh-wird' +
-        (done ? ' done' : '') +
-        '"><div class="kh-label">ورد اليوم</div><div class="kh-wird-pages">' +
-        (r[1] > r[0] ? 'من صفحة ' + ar(r[0]) + ' إلى ' + ar(r[1]) : 'صفحة ' + ar(r[0])) +
-        '</div><small>' +
-        ar(r[1] - r[0] + 1) +
-        ' صفحة' +
-        (done ? ' · تم ✓' : '') +
-        '</small><div class="kh-actions"><button type="button" class="kh-btn ghost" data-act="open">افتح في المصحف</button>' +
+        '<header class="kh-hero kh-hero-act"><div class="kh-hero-glow" aria-hidden="true"></div>' +
+        '<div class="kh-hero-top"><div><small>' + esc(a.name) + '</small><h2>اليوم ' + ar(Math.min(dayNo, a.days)) + ' من ' + ar(a.days) + '</h2></div>' +
+        '<div class="kh-bigring">' + ring(pct) + '<b>' + ar(pct) + '٪</b></div></div>' +
+        '<div class="kh-bar"><i style="width:' + pct + '%"></i></div>' +
+        '<div class="kh-hero-foot"><span>قُرئ <b>' + ar(a.read) + '</b> من ' + ar(TOTAL) + '</span><span>الانتهاء <b>' + esc(fmtDate(fin)) + '</b></span></div></header>' +
+        '<section class="kh-today' + (done ? ' done' : '') + '"><div class="kh-today-h"><span>ورد اليوم</span><em>الجزء ' + ar(juzOf(r[0])) + '</em></div>' +
+        '<div class="kh-range"><div><small>من صفحة</small><b>' + ar(r[0]) + '</b></div><span aria-hidden="true">←</span><div><small>إلى صفحة</small><b>' + ar(r[1]) + '</b></div></div>' +
+        '<div class="kh-week">' + week(a) + '</div>' +
         (done
-          ? '<button type="button" class="kh-btn ghost" data-act="undo">تراجع</button>'
-          : '<button type="button" class="kh-btn" data-act="done">أتممت ورد اليوم ✓</button>') +
-        '</div></section>';
+          ? '<div class="kh-doneline">' + icon('check') + 'أتممت ورد اليوم — تقبّل الله</div><div class="kh-two"><button type="button" class="kh-sec" data-act="open">افتح في المصحف</button><button type="button" class="kh-sec" data-act="undo">تراجع</button></div>'
+          : '<button type="button" class="kh-cta" data-act="done">' + icon('check') + 'أتممت ورد اليوم</button><button type="button" class="kh-sec wide" data-act="open">' + icon('book') + 'افتح الصفحة في المصحف</button>') +
+        '</section>';
       if (lag > pd && !done)
-        h += '<div class="kh-alert">⏰ أنت متأخر نحو ' + ar(lag) + ' صفحة عن الخطة — حاول زيادة وردك قليلًا لتلحق.</div>';
+        h += '<div class="kh-alert"><span>' + icon('clock') + '</span><p>متأخر نحو <b>' + ar(lag) + '</b> صفحة عن الخطة. زد وردك قليلًا لتلحق بها.</p></div>';
       h +=
-        '<section class="kh-stats"><div><b>' +
-        ar(streak(a)) +
-        '</b><small>أيام متتالية</small></div><div><b>' +
-        ar(TOTAL - a.read) +
-        '</b><small>صفحة متبقية</small></div><div><b>' +
-        ar(pd) +
-        '</b><small>صفحات يوميًا</small></div></section>';
+        '<section class="kh-stats"><div><span>' + icon('flame') + '</span><b>' + ar(streak(a)) + '</b><small>أيام متتالية</small></div>' +
+        '<div><span>' + icon('pages') + '</span><b>' + ar(TOTAL - a.read) + '</b><small>صفحة متبقية</small></div>' +
+        '<div><span>' + icon('target') + '</span><b>' + ar(pd) + '</b><small>صفحات يوميًا</small></div></section>';
     }
     h += reminderCard();
     if (a)
       h +=
-        '<section class="kh-card"><h3>إدارة الختمة</h3><div class="kh-actions"><button type="button" class="kh-btn ghost" data-act="restart">إعادة من البداية</button><button type="button" class="kh-btn ghost danger" data-act="cancel">إلغاء الختمة</button></div></section>';
+        '<details class="kh-panel kh-manage"><summary><span class="kh-ico">' + icon('gear') + '</span><b>إدارة الختمة</b><span class="kh-chev" aria-hidden="true"></span></summary><div class="kh-two"><button type="button" class="kh-sec" data-act="restart">إعادة من البداية</button><button type="button" class="kh-sec danger" data-act="cancel">إلغاء الختمة</button></div></details>';
     if (st.history.length)
       h +=
-        '<section class="kh-card"><h3>🏅 ختماتي (' +
-        ar(st.history.length) +
-        ')</h3><ul class="kh-hist">' +
+        '<section class="kh-panel"><div class="kh-panel-h"><span class="kh-ico">' + icon('medal') + '</span><b>ختماتي</b><em>' + ar(st.history.length) + '</em></div><ul class="kh-hist">' +
         st.history
           .slice(0, 10)
           .map(function (x) {
             var d = parseDay(x.end);
-            return (
-              '<li><b>' + esc(x.name) + '</b><span>' + ar(x.days) + ' يومًا · ' + esc(d ? fmtDate(d) : x.end) + '</span></li>'
-            );
+            return '<li><span class="kh-medal">' + icon('medal') + '</span><b>' + esc(x.name) + '</b><small>' + ar(x.days) + ' يومًا · ' + esc(d ? fmtDate(d) : x.end) + '</small></li>';
           })
           .join('') +
         '</ul></section>';
@@ -11955,6 +12013,8 @@
       });
       var custom = ui.root.querySelector('[data-k="custom"]');
       if (custom) custom.value = '';
+      var pv = ui.root.querySelector('[data-k="preview"]');
+      if (pv) pv.innerHTML = previewText(chosenDays());
       return;
     }
     var btn = e.target.closest('[data-act]');
@@ -11962,10 +12022,7 @@
     var act = btn.getAttribute('data-act');
     if (act === 'start') {
       var name = (ui.root.querySelector('[data-k="name"]').value || '').trim() || 'ختمة جديدة';
-      var cv = parseInt(ui.root.querySelector('[data-k="custom"]').value, 10);
-      var on = ui.root.querySelector('[data-days].on');
-      var days = cv > 0 ? Math.min(365, cv) : on ? +on.getAttribute('data-days') : 30;
-      start(name, days);
+      start(name, chosenDays());
     } else if (act === 'done') markDone();
     else if (act === 'undo') undoDone();
     else if (act === 'open') {
@@ -12030,6 +12087,8 @@
         root.querySelectorAll('[data-days]').forEach(function (c) {
           c.classList.remove('on');
         });
+        var pv = root.querySelector('[data-k="preview"]');
+        if (pv) pv.innerHTML = previewText(chosenDays());
       }
     });
     draw();
@@ -12050,6 +12109,7 @@
     if (ui && before) render();
   }
   function boot() {
+    drawHome();
     pruneFired();
     syncTask();
     checkReminders();
