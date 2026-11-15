@@ -2052,7 +2052,6 @@
     mEl = $('measure');
   var activeView = pageList.querySelector('.page-view'),
     sheet = activeView.querySelector('.sheet');
-  var mushafScale = Math.min(130, Math.max(70, parseInt(store('mq.fontScale') || '100', 10) || 100)) / 100;
   var cur = 1,
     sel = 0,
     widths = {},
@@ -2496,8 +2495,7 @@
               if (em > M) M = em;
             });
             var fs = M ? Wc / M : W * 0.085;
-            // مقياس خط المصحف من الإعدادات: التصغير نسبة من الحجم المناسب، والتكبير محدود بعرض الصفحة.
-            fs = mushafScale <= 1 ? Math.min(fs, W * 0.085) * mushafScale : Math.min(fs, W * 0.085 * mushafScale);
+            fs = Math.min(fs, W * 0.085);
             if (p <= 2) fs *= 0.85;
             var spaced = p > 2,
               html = '';
@@ -2970,7 +2968,7 @@
   var FLIP_SPEEDS = { slow: 900, normal: 560, fast: 320 };
   var FLIP_MAX = 100; // زاوية خروج الورقة (درجات) — بعد ٩٠° تصير الورقة خارج الشاشة
   /* الصوت مفعّل دائمًا مع التأثير، والسرعة بطيئة ثابتة؛ المتاح للمستخدم تفعيل التأثير أو إلغاؤه فقط */
-  var flipPrefs = { fx: store('mq.flipFx') !== '0', snd: true, vol: 70, spd: 'slow' };
+  var flipPrefs = { fx: store('mq.flipFx') !== '0', snd: store('mq.flipSnd') !== '0', vol: 8, spd: 'slow' };
   var flipPending = 0;
   var flip = null; // حالة التقليب الجارية: { stage, leaf, shade, cast, w, angle, raf, committing, dir, target, view }
 
@@ -6201,6 +6199,41 @@
     sync();
   })();
 
+  // ===== بطاقة صوت تقليب الورق (تفعيل/إغلاق؛ الصوت منخفض جدًا دائمًا) =====
+  (function () {
+    var card = document.createElement('div');
+    card.className = 'settings-card';
+    card.id = 'flipSoundCard';
+    card.innerHTML =
+      '<div class="settings-card-head"><span aria-hidden="true">🔈</span><span>صوت تقليب الورق:</span><span class="st-val"></span></div>' +
+      '<div class="settings-toggle-group" role="group" aria-label="صوت تقليب الورق">' +
+      '<button type="button" class="st-btn" data-v="1"><span class="st-dot" style="background:#27ae60"></span><span>مفعّل</span></button>' +
+      '<button type="button" class="st-btn" data-v="0"><span class="st-dot" style="background:var(--muted)"></span><span>مغلق</span></button></div>';
+    var anchor = document.getElementById('flipCard');
+    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(card, anchor.nextSibling);
+    else (document.getElementById('settingsBody') || paneTasks).appendChild(card);
+    function sync() {
+      card.querySelector('.st-val').textContent = flipPrefs.snd ? 'مفعّل' : 'مغلق';
+      card.querySelectorAll('button').forEach(function (b) {
+        var on = b.getAttribute('data-v') === (flipPrefs.snd ? '1' : '0');
+        b.setAttribute('aria-pressed', String(on));
+        b.classList.toggle('active', on);
+      });
+    }
+    card.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      flipPrefs.snd = b.getAttribute('data-v') === '1';
+      store('mq.flipSnd', b.getAttribute('data-v'));
+      if (flipPrefs.snd) {
+        flipAudioUnlock();
+        setTimeout(flipPlay, 250);
+      }
+      sync();
+    });
+    sync();
+  })();
+
   // ===== بطاقة بسيطة (أزرار تفعيل/إيقاف): تلوين لفظ الجلالة =====
   (function () {
     function addCard(id, title, enabled, onChange, extraBtn) {
@@ -6314,6 +6347,10 @@
   function openAppService(key, trigger) {
     var service = appServices[key];
     if (!service) return;
+    if (key === 'khatma') {
+      if (window.QuranKhatma) window.QuranKhatma.reveal();
+      return;
+    }
     appServiceReturnFocus = trigger;
     appServiceTitle.textContent = service.title;
     appServiceStatus.textContent = service.status;
@@ -7543,12 +7580,6 @@
         var nearViewport = bounds.bottom >= -window.innerHeight && bounds.top <= window.innerHeight * 2;
         if (view === activeView || nearViewport) render(view, p);
       });
-    },
-    setFontScale: function (percent) {
-      mushafScale = Math.min(130, Math.max(70, Math.round(percent))) / 100;
-      store('mq.fontScale', String(Math.round(mushafScale * 100)));
-      widths = {};
-      renderInitialPage(cur);
     },
     closeDrawer: closeD,
     goTo: goTo,
@@ -10751,15 +10782,16 @@
   }
   /* بطاقة الصفحة الرئيسية أسفل قسم الخدمات */
   function drawHome() {
-    var el = document.getElementById('khatmaHome');
+    var el = document.getElementById('khatmaCard');
     if (!el) return;
+    var open = !document.getElementById('khatmaInline').hidden;
     var a = st.active,
       h;
     if (!a) {
       h =
-        '<button type="button" class="kh-home kh-home-empty" data-app-service="khatma"><span class="kh-home-ico" aria-hidden="true">' + icon('book') + '</span>' +
+        '<button type="button" class="kh-home kh-home-empty" data-khatma-toggle aria-expanded="' + open + '"><span class="kh-home-ico" aria-hidden="true">' + icon('book') + '</span>' +
         '<span class="kh-home-copy"><b>ختمتي</b><small>ابدأ ختمة بورد يومي ثابت وتذكير بالإشعارات</small></span>' +
-        '<span class="kh-home-go">ابدأ ‹</span></button>';
+        '<span class="kh-home-go">' + (open ? 'إخفاء' : 'ابدأ') + '</span></button>';
     } else {
       var pct = Math.round((a.read / TOTAL) * 100),
         r = wirdRange(a),
@@ -10767,7 +10799,7 @@
       h =
         '<div class="kh-home' +
         (done ? ' is-done' : '') +
-        '"><button type="button" class="kh-home-main" data-app-service="khatma" aria-label="فتح ختمتي">' +
+        '"><button type="button" class="kh-home-main" data-khatma-toggle aria-expanded="' + open + '" aria-label="إعدادات ختمتي">' +
         '<span class="kh-home-ring">' +
         ring(pct) +
         '<b>' +
@@ -10780,7 +10812,7 @@
         ar(streak(a)) +
         ' يوم · بقي ' +
         ar(TOTAL - a.read) +
-        ' صفحة</small></span></button>' +
+        ' صفحة</small></span><span class="kh-home-chev" aria-hidden="true"></span></button>' +
         (done
           ? ''
           : '<button type="button" class="kh-home-done" data-khatma-done>' + icon('check') + 'تم</button>') +
@@ -10788,10 +10820,22 @@
     }
     el.innerHTML = h;
   }
+  function toggleInline(force) {
+    var box = document.getElementById('khatmaInline');
+    if (!box) return;
+    var show = typeof force === 'boolean' ? force : box.hidden;
+    box.hidden = !show;
+    if (show) draw();
+    drawHome();
+    if (show) box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
   document.addEventListener('click', function (e) {
-    if (e.target.closest && e.target.closest('[data-khatma-done]')) {
+    if (!e.target.closest) return;
+    if (e.target.closest('[data-khatma-done]')) {
       e.stopPropagation();
       markDone();
+    } else if (e.target.closest('[data-khatma-toggle]')) {
+      toggleInline();
     }
   });
   function start(name, days) {
@@ -11181,7 +11225,30 @@
       ui = null;
     };
   }
-  window.QuranKhatma = { mount: mount };
+  function sayInline(message) {
+    if (!ui) return;
+    var host = ui.root.querySelector('.kh');
+    if (!host) return;
+    var note = document.createElement('div');
+    note.className = 'kh-doneline';
+    note.textContent = message;
+    host.insertBefore(note, host.firstChild);
+    setTimeout(function () {
+      note.remove();
+    }, 4000);
+  }
+  function reveal() {
+    var rt = window.MushafRuntime;
+    if (!document.body.classList.contains('open')) {
+      var menu = document.getElementById('bMenu');
+      if (menu) menu.click();
+    }
+    if (rt && rt.tabSettings) rt.tabSettings.click();
+    setTimeout(function () {
+      toggleInline(true);
+    }, 80);
+  }
+  window.QuranKhatma = { mount: mount, reveal: reveal };
 
   /* ---------- تشغيل ---------- */
   function tick() {
@@ -11191,6 +11258,8 @@
     if (ui && before) render();
   }
   function boot() {
+    var inline = document.getElementById('khatmaInline');
+    if (inline) mount(inline, sayInline);
     drawHome();
     pruneFired();
     syncTask();
@@ -11235,6 +11304,11 @@
     if (document.querySelector('.cel') && window.QuranCelebrate) {
       return function () {
         window.QuranCelebrate.hide();
+      };
+    }
+    if (window.QuranGuide && window.QuranGuide.isOpen()) {
+      return function () {
+        window.QuranGuide.close();
       };
     }
     var adhan = document.getElementById('adhanScreen');
@@ -11347,28 +11421,422 @@
     } catch (err) {}
     paintTheme(v);
   });
-  var range = document.getElementById('mushafSizeRange'),
-    label = document.getElementById('mushafSizeLabel');
-  var startScale = Math.min(130, Math.max(70, parseInt(getStore('mq.fontScale') || '100', 10) || 100));
-  range.value = String(startScale);
-  label.textContent = arD(startScale) + '٪';
-  var timer = 0;
-  function apply(v) {
-    v = Math.min(130, Math.max(70, v));
-    range.value = String(v);
-    label.textContent = arD(v) + '٪';
-    clearTimeout(timer);
-    timer = setTimeout(function () {
-      if (window.MushafRuntime && window.MushafRuntime.setFontScale) window.MushafRuntime.setFontScale(v);
-    }, 180);
+})();
+
+
+/* عند الخروج من التطبيق/إخفائه يتوقف التمرير التلقائي ويعود العرض إلى إعدادك السابق */
+(function () {
+  function stop() {
+    var t = document.getElementById('scrollToggle');
+    if (t && t.getAttribute('aria-pressed') === 'true') t.click();
   }
-  range.addEventListener('input', function () {
-    apply(+range.value);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) stop();
   });
-  document.getElementById('mushafSizeDown').addEventListener('click', function () {
-    apply(+range.value - 5);
-  });
-  document.getElementById('mushafSizeUp').addEventListener('click', function () {
-    apply(+range.value + 5);
-  });
+  window.addEventListener('pagehide', stop);
+})();
+
+
+/* ======================================================================
+ * دليل استخدام التطبيق: جولة أولى تظهر مرة واحدة + دليل كامل من الإعدادات
+ * ====================================================================== */
+(function () {
+  'use strict';
+  var KEY = 'mq.guideSeen';
+  var SECTIONS = [
+    { i: '📖', t: 'قراءة المصحف', s: 'الصفحة الرئيسية للتطبيق', p: [
+      'تُعرض صفحات المصحف بخط المصحف الشريف. انقر على الصفحة لإظهار الشريط العلوي أو إخفائه.',
+      'استخدم أزرار «السابق» و«التالي» أو اسحب الصفحة للتنقل، واكتب رقم الصفحة في الخانة الوسطى للانتقال إليها مباشرة.',
+      'اضغط على أي آية لفتح لوحتها: التفسير، العلامات، الاستماع، النسخ والمشاركة.' ] },
+    { i: '☰', t: 'قائمة الفهرس', s: 'زر القائمة في أعلى اليمين', p: [
+      'تضم أربع تبويبات: «الرئيسية» للخدمات والختمة، «السور» للفهرس والبحث، «أذكار» للمسبحة والأذكار، و«الإعدادات».',
+      'اضغط رجوع أو خارج القائمة لإغلاقها.' ] },
+    { i: '🔎', t: 'فهرس السور والبحث', s: 'تبويب «السور»', p: [
+      'اختر سورة أو جزءًا للانتقال إليه فورًا.',
+      'اكتب كلمة أو عبارة في خانة البحث لتظهر الآيات المطابقة بخط المصحف، واضغط على النتيجة للانتقال إلى مكانها.' ] },
+    { i: '🎧', t: 'الاستماع والقرّاء', s: 'لوحة الآية', p: [
+      'شغّل تلاوة الآية أو المدى المحدد، واختر القارئ من القائمة؛ ويتصدرها «المصحف المعلم» للأطفال.',
+      'يمكنك تكرار الآيات المحددة عددًا من المرات، وتفعيل «تتبّع التلاوة» ليتحرك التمييز مع الصوت.' ] },
+    { i: '🧠', t: 'التسميع والحفظ', s: 'لوحة التسميع', p: [
+      'اختر السورة ومدى الآيات ثم ابدأ التسميع، واقرأ بصوتك دون النظر؛ يتعرف التطبيق على ما تقرؤه ويبيّن الصحيح والخطأ.',
+      'يحتاج التسميع إلى إذن الميكروفون ومتصفح يدعم التعرف على الصوت.' ] },
+    { i: '🌈', t: 'ألوان التجويد', s: 'زر التجويد في الشريط العلوي', p: [
+      'يلوّن أحكام التجويد (المدود، الإخفاء، الإدغام، القلقلة…) في الصفحة.',
+      'يمكنك إظهار مفتاح الألوان أعلى رقم الصفحة، والضغط على أي لون لمعرفة الحكم. للتفاصيل: «دليل التجويد».' ] },
+    { i: '🔖', t: 'التفسير والعلامات', s: 'لوحة الآية', p: [
+      'اقرأ التفسير ومعاني الكلمات، واختر مصدر معاني الكلمات من الإعدادات.',
+      'أضف علامة على أي آية لتعود إليها لاحقًا، وتجد علاماتك مجتمعة في نافذة العلامات.' ] },
+    { i: '🕌', t: 'مواقيت الصلاة والأذان', s: 'تبويب «الرئيسية»', p: [
+      'تعرض المواقيت حسب موقعك مع العدّ التنازلي للصلاة القادمة، وتنبيه عند حلول الوقت.',
+      'اسمح بالإشعارات من متصفحك ليصلك التنبيه.' ] },
+    { i: '📻', t: 'إذاعة القرآن', s: 'تبويب «الرئيسية»', p: [
+      'استمع إلى بث الإذاعات والمحطات والتسجيلات داخل التطبيق دون مغادرته.' ] },
+    { i: '🏁', t: 'ختمتي', s: 'البطاقة الخضراء في «الرئيسية»', p: [
+      'ابدأ ختمة بتحديد المدة، فيحسب لك التطبيق ورد اليوم ويتابع تقدمك.',
+      'اضغط الزر الأخضر لفتح إعدادات الختمة (التذكير والمهام) داخل القائمة نفسها، وهي مطوية افتراضيًا.',
+      'عند إتمام الختمة تظهر شاشة تهنئة.' ] },
+    { i: '✅', t: 'المهام اليومية', s: 'تبويب «الرئيسية» ثم «الإعدادات»', p: [
+      'تظهر مهامك بحسب أوقات الصلاة. يمكنك إظهار المهمة أو إخفاءها أو تعديلها أو حذفها، وتفعيل المهام التلقائية.',
+      'تتحقق بعض المهام (كالورد وأذكار الصباح والمساء) تلقائيًا عند إنجازها.' ] },
+    { i: '📿', t: 'المسبحة والأذكار', s: 'تبويب «أذكار»', p: [
+      'مسبحة إلكترونية للعدّ، وأذكار الصباح والمساء وأذكار اليوم والليلة مصنفة بمجموعات.',
+      'يُحفظ تقدمك في الأذكار تلقائيًا.' ] },
+    { i: '↕', t: 'التمرير التلقائي', s: 'الإعدادات', p: [
+      'عند تشغيله يتحول عرض المصحف إلى الشكل الرأسي ليتحرك بسلاسة، وعند إيقافه يعود التطبيق إلى وضعه السابق.',
+      'يتوقف تلقائيًا عند مغادرة التطبيق.' ] },
+    { i: '🎨', t: 'ألوان المصحف وصوت التقليب', s: 'تبويب «الإعدادات»', p: [
+      'اختر لون خلفية المصحف وزخارفه، فيتغير معه شكل القائمة الجانبية.',
+      'يمكن تشغيل صوت تقليب الصفحات أو إيقافه من بطاقته (وهو منخفض الصوت).',
+      'الوضع الليلي من زر القمر في قائمة الإعدادات.' ] },
+    { i: '📲', t: 'التثبيت والعمل دون إنترنت', s: 'الإعدادات', p: [
+      'ثبّت التطبيق على شاشتك الرئيسية من بطاقة «تطبيق ويب» ليعمل كتطبيق مستقل.',
+      'بعد التحميل الأول تعمل أغلب الميزات دون اتصال؛ أما الصوت والإذاعة والتفسير فتحتاج إنترنت.',
+      'من «النسخ الاحتياطي» تستطيع حفظ بياناتك واستعادتها.' ] },
+    { i: '↩', t: 'زر الرجوع', s: 'في الجوال', p: [
+      'يغلق الرجوع النافذة المفتوحة أولًا، وإن لم تكن هناك نافذة فاضغطه مرتين متتاليتين للخروج.' ] }
+  ];
+  var TOUR = [0, 1, 3, 5, 8, 14];
+  var root = null, mode = 'full', step = 0, lastFocus = null;
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function seen() { try { return localStorage.getItem(KEY) === '1'; } catch (e) { return false; } }
+  function mark() { try { localStorage.setItem(KEY, '1'); } catch (e) {} }
+  function isOpen() { return !!root && !root.hidden; }
+
+  function ensure() {
+    if (root) return root;
+    root = document.createElement('div');
+    root.className = 'gd';
+    root.id = 'guideView';
+    root.hidden = true;
+    root.setAttribute('role', 'dialog');
+    root.setAttribute('aria-modal', 'true');
+    root.setAttribute('aria-labelledby', 'gdTitle');
+    document.body.appendChild(root);
+    root.addEventListener('click', onClick);
+    document.addEventListener('keydown', function (e) {
+      if (!isOpen()) return;
+      if (e.key === 'Escape') close();
+      else if (mode === 'tour' && e.key === 'ArrowLeft') go(1);
+      else if (mode === 'tour' && e.key === 'ArrowRight') go(-1);
+    });
+    return root;
+  }
+
+  function renderTour() {
+    var n = TOUR.length, sec = SECTIONS[TOUR[step]], last = step === n - 1;
+    var dots = '';
+    for (var i = 0; i < n; i++) dots += '<i' + (i === step ? ' class="on"' : '') + '></i>';
+    root.innerHTML =
+      '<div class="gd-card gd-tour">' +
+      '<button type="button" class="gd-skip" data-gd="close">تخطّي</button>' +
+      '<div class="gd-hero" aria-hidden="true">' + sec.i + '</div>' +
+      '<h2 id="gdTitle">' + esc(sec.t) + '</h2>' +
+      '<p class="gd-where">' + esc(sec.s) + '</p>' +
+      '<div class="gd-text">' + sec.p.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</div>' +
+      '<div class="gd-dots" aria-hidden="true">' + dots + '</div>' +
+      '<div class="gd-nav">' +
+      '<button type="button" class="gd-btn ghost" data-gd="prev"' + (step === 0 ? ' disabled' : '') + '>السابق</button>' +
+      '<button type="button" class="gd-btn" data-gd="' + (last ? 'done' : 'next') + '">' + (last ? 'ابدأ الاستخدام' : 'التالي') + '</button>' +
+      '</div>' +
+      '<button type="button" class="gd-link" data-gd="full">عرض الدليل الكامل</button>' +
+      '</div>';
+  }
+
+  function renderFull(openIdx) {
+    var h = '<div class="gd-card gd-full"><header class="gd-head"><div><h2 id="gdTitle">دليل استخدام التطبيق</h2>' +
+      '<small>شرح كل قسم وميزة في التطبيق</small></div>' +
+      '<button type="button" class="gd-x" data-gd="close" aria-label="إغلاق الدليل">×</button></header>' +
+      '<div class="gd-body">' +
+      '<button type="button" class="gd-tourbtn" data-gd="tour">▶ جولة سريعة (دقيقة واحدة)</button>' +
+      '<div class="gd-list">';
+    SECTIONS.forEach(function (s, i) {
+      var o = i === openIdx;
+      h += '<section class="gd-item' + (o ? ' open' : '') + '">' +
+        '<button type="button" class="gd-q" data-gd="toggle" aria-expanded="' + o + '">' +
+        '<span class="gd-ic" aria-hidden="true">' + s.i + '</span>' +
+        '<span class="gd-qt"><b>' + esc(s.t) + '</b><small>' + esc(s.s) + '</small></span>' +
+        '<span class="gd-chev" aria-hidden="true">‹</span></button>' +
+        '<div class="gd-a"' + (o ? '' : ' hidden') + '>' + s.p.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</div></section>';
+    });
+    h += '</div></div></div>';
+    root.innerHTML = h;
+  }
+
+  function open(m) {
+    if (m === 'tour') return startSpot();
+    ensure();
+    mode = m === 'card' ? 'tour' : 'full';
+    step = 0;
+    lastFocus = document.activeElement;
+    if (mode === 'tour') renderTour(); else renderFull(-1);
+    root.hidden = false;
+    requestAnimationFrame(function () { root.classList.add('is-in'); });
+    var f = root.querySelector('[data-gd="next"],[data-gd="close"]');
+    if (f) try { f.focus({ preventScroll: true }); } catch (e) {}
+  }
+  function close() {
+    if (!isOpen()) return;
+    mark();
+    root.classList.remove('is-in');
+    root.hidden = true;
+    root.innerHTML = '';
+    if (lastFocus && lastFocus.focus) try { lastFocus.focus({ preventScroll: true }); } catch (e) {}
+  }
+  function go(d) {
+    step = Math.max(0, Math.min(TOUR.length - 1, step + d));
+    renderTour();
+    var f = root.querySelector('.gd-btn:not(.ghost)');
+    if (f) try { f.focus({ preventScroll: true }); } catch (e) {}
+  }
+  function onClick(e) {
+    var b = e.target.closest ? e.target.closest('[data-gd]') : null;
+    if (!b) { if (e.target === root && mode === 'full') close(); return; }
+    var a = b.getAttribute('data-gd');
+    if (a === 'close' || a === 'done') close();
+    else if (a === 'next') go(1);
+    else if (a === 'prev') go(-1);
+    else if (a === 'tour') { close(); startSpot(); }
+    else if (a === 'full') { mode = 'full'; renderFull(-1); }
+    else if (a === 'toggle') {
+      var it = b.parentNode, o = !it.classList.contains('open');
+      it.classList.toggle('open', o);
+      b.setAttribute('aria-expanded', o);
+      it.querySelector('.gd-a').hidden = !o;
+    }
+  }
+
+
+  /* ===== جولة الإضاءة: تحديد مكان كل أيقونة فعليًا على الشاشة ===== */
+  var SPOT = [
+    { sel: ['#bMenu'], bar: 1, i: '☰', t: 'زر الفهرس', x: 'يفتح القائمة الجانبية التي تضم الخدمات والسور والأذكار والإعدادات.' },
+    { sel: ['#bTajweedToggle'], bar: 1, i: '🌈', t: 'ألوان التجويد', x: 'يلوّن أحكام التجويد في الصفحة؛ المدود والإخفاء والإدغام والقلقلة، ويمكنك إيقافه متى شئت.' },
+    { sel: ['#bPrev', '#pgIn', '#bNext'], bar: 1, i: '📖', t: 'التنقل بين الصفحات', x: 'اضغط «السابق» أو «التالي»، أو اكتب رقم الصفحة في الخانة الوسطى لتنتقل إليها مباشرة. ويمكنك أيضًا سحب الصفحة.' },
+    { sel: ['#tabSettings'], drawer: 'tabSettings', i: '🏠', t: 'تبويب الرئيسية', x: 'نقطة البداية: الخدمات والختمة والمهام اليومية، ثم إعدادات القراءة بالأسفل.' },
+    { sel: ['#integratedServices'], drawer: 'tabSettings', i: '🕌', t: 'مواقيت الصلاة وإذاعة القرآن', x: 'مواقيت الصلاة حسب موقعك مع تنبيه الأذان، وبث الإذاعات والتسجيلات داخل التطبيق.' },
+    { sel: ['#khatmaHome'], drawer: 'tabSettings', i: '🏁', t: 'ختمتي', x: 'ابدأ ختمة بمدة تحددها ليحسب لك ورد اليوم. الزر الأخضر يفتح إعداداتها (التذكير والمهام) في هذه القائمة.' },
+    { sel: ['#homeTasksSection'], drawer: 'tabSettings', i: '✅', t: 'مهامك اليومية', x: 'مهام مرتبة بحسب أوقات الصلاة، ويمكنك إظهارها أو إخفاءها أو تعديلها أو حذفها وتفعيل المهام التلقائية.' },
+    { sel: ['#tabS', '#search'], drawer: 'tabS', i: '🔎', t: 'السور والبحث', x: 'اختر سورة أو جزءًا للانتقال إليه، أو ابحث بكلمة أو عبارة فتظهر الآيات بخط المصحف.' },
+    { sel: ['#tabWorship'], drawer: 'tabWorship', i: '📿', t: 'الأذكار والمسبحة', x: 'مسبحة إلكترونية وأذكار الصباح والمساء وأذكار اليوم والليلة، ويُحفظ تقدمك تلقائيًا.' },
+    { sel: ['#tabTasks'], drawer: 'tabTasks', i: '⚙️', t: 'تبويب الإعدادات', x: 'كل ما يخص تخصيص التطبيق: المظهر والألوان والتمرير والتفسير والنسخ الاحتياطي.' },
+    { sel: ['#settingsBody .d-actions'], drawer: 'tabTasks', i: '🌙', t: 'الوضع الليلي وملء الشاشة', x: 'بدّل بين الفاتح والليلي، أو اعرض المصحف بملء الشاشة وبشكل أفقي.' },
+    { sel: ['#mushafColorCard'], drawer: 'tabTasks', i: '🎨', t: 'ألوان المصحف', x: 'اختر لون الصفحة والزخارف، ويتغير معه شكل القائمة الجانبية أيضًا.' },
+    { sel: ['#settingsBackupHost'], drawer: 'tabTasks', i: '💾', t: 'النسخ الاحتياطي', x: 'احفظ بياناتك (الختمة والمهام والعلامات) في ملف، واستعدها متى احتجت.' },
+    { sel: ['#guideCard'], drawer: 'tabTasks', i: '💡', t: 'دليل الاستخدام', x: 'يمكنك العودة إلى هذا الشرح في أي وقت من هنا، مع الدليل الكامل لكل ميزة.' },
+    { sel: [], i: '✨', t: 'أنت جاهز!', x: 'اضغط على أي آية في الصفحة لفتح التفسير والعلامات والاستماع. زر الرجوع يغلق النافذة المفتوحة، ومرتان متتاليتان للخروج.' }
+  ];
+  var startedOpen = false, barWasHidden = false, spot = null, sIdx = 0, sBusy = 0, drawerByTour = false, barByTour = false, spotTimer = 0;
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function spotOpen() { return !!spot && !spot.hidden; }
+  function ensureSpot() {
+    if (spot) return spot;
+    spot = document.createElement('div');
+    spot.className = 'gs';
+    spot.id = 'guideSpot';
+    spot.hidden = true;
+    spot.setAttribute('role', 'dialog');
+    spot.setAttribute('aria-modal', 'true');
+    spot.setAttribute('aria-labelledby', 'gsTitle');
+    spot.innerHTML =
+      '<i class="gs-p gs-t"></i><i class="gs-p gs-b"></i><i class="gs-p gs-l"></i><i class="gs-p gs-r"></i>' +
+      '<div class="gs-ring"></div><div class="gs-tip" id="gsTip"></div>';
+    document.body.appendChild(spot);
+    spot.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-gs]') : null;
+      if (!b) return;
+      var a = b.getAttribute('data-gs');
+      if (a === 'next') gsGo(1);
+      else if (a === 'prev') gsGo(-1);
+      else if (a === 'skip') endSpot();
+      else if (a === 'full') { endSpot(); open('full'); }
+    });
+    window.addEventListener('resize', function () { if (spotOpen()) { clearTimeout(spotTimer); spotTimer = setTimeout(function () { place(sIdx); }, 120); } });
+    document.addEventListener('keydown', function (e) {
+      if (!spotOpen()) return;
+      if (e.key === 'Escape') endSpot();
+      else if (e.key === 'ArrowLeft') gsGo(1);
+      else if (e.key === 'ArrowRight') gsGo(-1);
+    });
+    return spot;
+  }
+  function rectOf(sels) {
+    var u = null;
+    sels.forEach(function (q) {
+      var el = document.querySelector(q);
+      if (!el) return;
+      var r = el.getBoundingClientRect();
+      if (r.width < 2 || r.height < 2) return;
+      u = u ? { l: Math.min(u.l, r.left), t: Math.min(u.t, r.top), r: Math.max(u.r, r.right), b: Math.max(u.b, r.bottom) } : { l: r.left, t: r.top, r: r.right, b: r.bottom };
+    });
+    return u;
+  }
+  function prepare(st) {
+    var bar = document.getElementById('bar');
+    if (st.bar && bar && (bar.hidden || !bar.classList.contains('on'))) {
+      if (!barByTour) barWasHidden = bar.hidden;
+      bar.hidden = false;
+      bar.classList.add('on');
+      barByTour = true;
+    }
+    var tab = st.drawer ? document.getElementById(st.drawer) : null;
+    var need = !!st.drawer;
+    var p = Promise.resolve();
+    if (st.bar && document.body.classList.contains('open')) {
+      /* القائمة الجانبية تغطي الشريط: نغلقها ليظهر العنصر بوضوح */
+      if (window.MushafRuntime && window.MushafRuntime.closeDrawer) window.MushafRuntime.closeDrawer();
+      else document.body.classList.remove('open');
+      p = wait(480);
+    }
+    return p.then(function () {
+      if (need && !document.body.classList.contains('open')) {
+        var m = document.getElementById('bMenu');
+        if (m) { m.click(); drawerByTour = true; return wait(520); }
+      }
+    }).then(function () {
+      if (tab && tab.getAttribute('aria-selected') !== 'true') { tab.click(); return wait(220); }
+    }).then(function () {
+      if (st.sel.length) {
+        var el = document.querySelector(st.sel[st.sel.length - 1]) || document.querySelector(st.sel[0]);
+        if (el && st.drawer && el.scrollIntoView) { try { el.scrollIntoView({ block: 'nearest' }); } catch (e) {} }
+      }
+      return wait(st.drawer ? 260 : 120);
+    });
+  }
+  function place(i) {
+    var st = SPOT[i], tip = document.getElementById('gsTip');
+    var W = window.innerWidth, H = window.innerHeight, pad = 7;
+    var r = st.sel.length ? rectOf(st.sel) : null;
+    var n = SPOT.length;
+    tip.innerHTML =
+      '<div class="gs-arrow"></div>' +
+      '<div class="gs-hd"><span class="gs-ic" aria-hidden="true">' + st.i + '</span><div><h3 id="gsTitle">' + esc(st.t) + '</h3><small>' + (i + 1) + ' من ' + n + '</small></div>' +
+      '<button type="button" class="gs-skip" data-gs="skip">تخطّي</button></div>' +
+      '<p>' + esc(st.x) + '</p>' +
+      '<div class="gs-bar"><i style="width:' + Math.round(((i + 1) / n) * 100) + '%"></i></div>' +
+      '<div class="gs-nav"><button type="button" class="gs-b ghost" data-gs="prev"' + (i === 0 ? ' disabled' : '') + '>السابق</button>' +
+      '<button type="button" class="gs-b" data-gs="next">' + (i === n - 1 ? 'ابدأ الاستخدام' : 'التالي') + '</button></div>' +
+      '<button type="button" class="gs-link" data-gs="full">الدليل الكامل</button>';
+    var P = spot.children;
+    var ring = spot.querySelector('.gs-ring');
+    if (r) {
+      var L = Math.max(0, r.l - pad), T = Math.max(0, r.t - pad), R = Math.min(W, r.r + pad), B = Math.min(H, r.b + pad);
+      P[0].style.cssText = 'top:0;left:0;width:100%;height:' + T + 'px';
+      P[1].style.cssText = 'top:' + B + 'px;left:0;width:100%;height:' + (H - B) + 'px';
+      P[2].style.cssText = 'top:' + T + 'px;left:0;width:' + L + 'px;height:' + (B - T) + 'px';
+      P[3].style.cssText = 'top:' + T + 'px;left:' + R + 'px;width:' + (W - R) + 'px;height:' + (B - T) + 'px';
+      ring.style.cssText = 'opacity:1;top:' + T + 'px;left:' + L + 'px;width:' + (R - L) + 'px;height:' + (B - T) + 'px';
+    } else {
+      P[0].style.cssText = 'top:0;left:0;width:100%;height:100%';
+      P[1].style.cssText = P[2].style.cssText = P[3].style.cssText = 'top:0;left:0;width:0;height:0';
+      ring.style.cssText = 'opacity:0';
+    }
+    tip.style.width = Math.min(340, W - 24) + 'px';
+    var th = tip.offsetHeight, tw = tip.offsetWidth, top, left, arrowX = tw / 2, up = false;
+    if (!r) { top = (H - th) / 2; left = (W - tw) / 2; tip.classList.add('center'); }
+    else {
+      tip.classList.remove('center');
+      var cx = (r.l + r.r) / 2;
+      left = Math.max(12, Math.min(W - tw - 12, cx - tw / 2));
+      arrowX = Math.max(22, Math.min(tw - 22, cx - left));
+      var below = H - (r.b + pad);
+      var above = r.t - pad;
+      if (below >= th + 18 || below >= above) { top = Math.min(H - th - 12, r.b + pad + 14); }
+      else { top = Math.max(12, r.t - pad - th - 14); up = true; }
+      /* لو كان الهدف أكبر من الشاشة نضع الشرح داخل الجزء السفلي */
+      if (top < r.b + pad && top + th > r.t - pad && !up && (r.b - r.t) > H * 0.6) { top = H - th - 12; }
+    }
+    tip.style.top = Math.round(top) + 'px';
+    tip.style.left = Math.round(left) + 'px';
+    tip.classList.toggle('up', up);
+    tip.style.setProperty('--ax', Math.round(arrowX) + 'px');
+    var nb = tip.querySelector('.gs-b:not(.ghost)');
+    if (nb) try { nb.focus({ preventScroll: true }); } catch (e) {}
+  }
+  function gsGo(d) {
+    if (sBusy) return;
+    var j = sIdx + d;
+    if (j >= SPOT.length) return endSpot();
+    if (j < 0) return;
+    show(j, d);
+  }
+  function show(i, dir) {
+    sBusy = 1;
+    var st = SPOT[i];
+    prepare(st).then(function () {
+      if (!spotOpen()) return;
+      if (st.sel.length && !rectOf(st.sel)) {
+        sBusy = 0;
+        var k = i + (dir || 1);
+        if (k >= 0 && k < SPOT.length) return show(k, dir);
+        return endSpot();
+      }
+      sIdx = i;
+      place(i);
+      sBusy = 0;
+      /* إعادة قياس بعد استقرار الانتقالات لضمان دقة الإطار */
+      setTimeout(function () { if (spotOpen() && sIdx === i && !sBusy) place(i); }, 500);
+    });
+  }
+  function startSpot() {
+    if (!document.getElementById('bMenu') || !document.getElementById('bar')) return open('card');
+    ensureSpot();
+    lastFocus = document.activeElement;
+    drawerByTour = false; barByTour = false; sIdx = 0; sBusy = 0; startedOpen = document.body.classList.contains('open');
+    spot.hidden = false;
+    requestAnimationFrame(function () { spot.classList.add('is-in'); });
+    show(0, 1);
+  }
+  function endSpot() {
+    if (!spotOpen()) return;
+    mark();
+    spot.classList.remove('is-in');
+    spot.hidden = true;
+    sBusy = 0;
+    var bar = document.getElementById('bar');
+    if (!startedOpen && window.MushafRuntime && window.MushafRuntime.closeDrawer) window.MushafRuntime.closeDrawer();
+    else if (!startedOpen) document.body.classList.remove('open');
+    if (!startedOpen && drawerByTour) {
+      var t = document.getElementById('tabSettings');
+      if (t) t.click();
+    }
+    if (barByTour && bar) { bar.classList.remove('on'); bar.hidden = barWasHidden; }
+    drawerByTour = barByTour = false;
+    if (lastFocus && lastFocus.focus) try { lastFocus.focus({ preventScroll: true }); } catch (e) {}
+  }
+
+  window.QuranGuide = { open: open, close: function () { if (spotOpen()) endSpot(); else close(); }, isOpen: function () { return isOpen() || spotOpen(); } };
+
+  /* بطاقة الإعدادات */
+  function mountCard() {
+    var host = document.getElementById('settingsBody');
+    if (!host || document.getElementById('guideCard')) return;
+    var c = document.createElement('div');
+    c.className = 'settings-card guide-card';
+    c.id = 'guideCard';
+    c.innerHTML =
+      '<div class="settings-card-head"><span aria-hidden="true">💡</span><span>دليل الاستخدام</span></div>' +
+      '<p class="install-app-help">تعرّف على كل أقسام التطبيق وميزاته خطوة بخطوة.</p>' +
+      '<button type="button" class="install-app-button" id="guideOpenBtn">عرض دليل الاستخدام</button>';
+    host.insertBefore(c, host.firstChild);
+    document.getElementById('guideOpenBtn').addEventListener('click', function () { open('full'); });
+  }
+  mountCard();
+
+  /* أول فتح للتطبيق */
+  function blocked() {
+    if (document.querySelector('.cel')) return true;
+    var m = document.querySelectorAll('.app-modal');
+    for (var i = 0; i < m.length; i++) if (!m[i].hidden) return true;
+    var a = document.getElementById('adhanScreen');
+    return !!(a && !a.hidden && a.getAttribute('aria-hidden') !== 'true');
+  }
+  if (!seen()) {
+    var tries = 0;
+    var tryShow = function () {
+      if (seen() || isOpen() || spotOpen()) return;
+      if (blocked() && tries++ < 20) return void setTimeout(tryShow, 1500);
+      open('tour');
+    };
+    setTimeout(tryShow, 1800);
+  }
 })();
