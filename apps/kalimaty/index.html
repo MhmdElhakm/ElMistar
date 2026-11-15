@@ -1252,6 +1252,7 @@ html[data-mode=light] .kx-pill.hot{background:#fff3c8;color:#8a5a00}
 .kx-tk .vc button.on{background:var(--violet,#7c5cff);color:#fff;border-color:transparent}
 .kx-sp .mv{display:none!important}
 .seg[aria-label="طريقة الإضافة"]{grid-template-columns:1fr 1fr}
+.seg[aria-label="النوع"]{grid-template-columns:1fr 1fr}.seg[aria-label="النوع"] button{white-space:nowrap}
 .seg[aria-label="طريقة الإضافة"] button{white-space:nowrap;font-size:clamp(12px,3.6vw,14.5px);padding:0 6px;min-height:44px}
 .gx-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
 .gx-tags span{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:99px;background:var(--card2);color:var(--muted);border:1px solid var(--line)}
@@ -1475,6 +1476,35 @@ html[data-mode=light] .kx-pill.hot{background:#fff3c8;color:#8a5a00}
 .ls-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
 .ls-dots{display:inline-flex;gap:4px}.ls-dots i{width:9px;height:9px;border-radius:50%;background:var(--line)}.ls-dots i.on{background:#4fdc9c}
 .ls-btns{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.ls-library{flex:none;gap:14px;overflow:hidden}
+.ls-library-head{display:flex;align-items:center;gap:11px}
+.ls-library-icon{width:46px;height:46px;flex:none;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#0f9f70,#5be3ab);color:#fff;box-shadow:0 8px 18px -10px rgba(15,159,112,.8)}
+.ls-library-icon svg{width:24px;height:24px}
+.ls-library-title{flex:1;min-width:0}
+.ls-library-title h3{margin:0;font-size:19px;font-weight:800}
+.ls-library-title small{display:block;color:var(--muted);font-size:12px;font-weight:600;line-height:1.45;margin-top:2px}
+.ls-library-count{flex:none;padding:5px 10px;border-radius:999px;background:var(--primary-soft);color:var(--primary);font-size:12px;font-weight:800}
+.ls-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lsn-card{min-width:0;text-align:start}
+.lsn-card .kx-gart{height:68px}
+.lsn-card .kx-gb{flex:none;padding:9px 10px 10px;gap:5px}
+.lsn-card .kx-gb>b{font-size:15px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lsn-card .kx-gart>svg{width:88px;height:54px}
+.lsn-art-state{position:absolute;top:6px;inset-inline-end:6px;z-index:2;max-width:58%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-radius:999px;padding:2px 7px;background:rgba(10,8,40,.58);color:#fff;font-size:10px;font-weight:800;backdrop-filter:blur(4px)}
+.lsn-desc{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden;min-height:0;font-size:11.5px!important;line-height:1.4!important}
+.lsn-stats{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:4px 7px;border-radius:9px;background:var(--card2);color:var(--muted);font-size:10.5px;font-weight:800}
+.lsn-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.lsn-meta .tag{font-size:10.5px;padding:2px 7px}
+.lsn-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding-top:1px}
+.lsn-actions:not(.double) .pill{grid-column:1/-1}
+.lsn-actions .pill{width:100%;min-height:34px;padding:0 5px;font-size:11.5px;justify-content:center;white-space:nowrap}
+.ls-library-note{display:block;text-align:center;color:var(--muted);font-size:12px;font-weight:700}
+.lsn-empty{display:flex;align-items:center;gap:12px;padding:14px;border:1px dashed var(--line);border-radius:18px;background:var(--card2)}
+.lsn-empty-icon{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:14px;background:var(--primary-soft);color:var(--primary)}
+.lsn-empty-icon svg{width:21px;height:21px}
+.lsn-empty b{display:block;font-size:14px}
+.lsn-empty small{display:block;margin-top:3px;color:var(--muted);font-size:12px;line-height:1.5}
+@media(max-width:360px){.ls-grid{grid-template-columns:1fr}}
 .ls-list{display:flex;flex-direction:column;gap:6px}
 .ls-it{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:var(--card2)}
 .ls-it>div{display:flex;flex-direction:column;gap:1px;min-width:0}.ls-it small{color:var(--muted)}
@@ -1776,11 +1806,26 @@ html[data-mode=light] .trn-ring span{background:#fff}
 .ar-top{display:flex;align-items:center;gap:10px}.ar-vs{flex:1;display:flex;align-items:center;justify-content:space-between;gap:8px}.ar-me,.ar-bot{display:flex;flex-direction:column;align-items:center;font-weight:800}.ar-me span,.ar-bot span{font-size:20px;color:#ffc94d}.ar-mid{text-align:center;display:flex;flex-direction:column}.ar-mid small{opacity:.7}
 .ar-tm{position:relative;height:12px;border-radius:99px;background:rgba(255,255,255,.1);margin:12px 0}.ar-tm i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff6b81,#ffc94d);transition:width .2s linear}.ar-tm b{position:absolute;inset-inline-end:0;top:-22px;font-size:13px;opacity:.8}
 .ar-q{background:rgba(255,255,255,.06);border-radius:22px;padding:18px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}.ar-q small{opacity:.8;font-weight:700}.ar-em{font-size:72px;line-height:1}.ar-big{font-size:28px;font-weight:800;letter-spacing:1px;word-break:break-word}.ar-big.en{direction:ltr}
-.ar-os{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.ar-o{padding:16px 10px;border-radius:18px;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:inherit;font:inherit;font-weight:800;font-size:17px}.ar-o.en{direction:ltr}.ar-o.gone{visibility:hidden}.ar-o.right{background:rgba(79,220,156,.25);border-color:#4fdc9c}.ar-o.wrong{background:rgba(255,107,129,.25);border-color:#ff6b81}.ar-o.dim{opacity:.4}
+.ar-os{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.ar-os.long{grid-template-columns:1fr}.ar-o{padding:16px 10px;border-radius:18px;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:inherit;font:inherit;font-weight:800;font-size:17px}.ar-o.en{direction:ltr}.ar-o.gone{visibility:hidden}.ar-o.right{background:rgba(79,220,156,.25);border-color:#4fdc9c}.ar-o.wrong{background:rgba(255,107,129,.25);border-color:#ff6b81}.ar-o.dim{opacity:.4}
 .ar-fb{text-align:center;font-weight:800;padding:10px;border-radius:14px}.ar-fb.ok{color:#4fdc9c}.ar-fb.no{color:#ff8fa0}.ar-ll{text-align:center}
 .ar-end{text-align:center;padding:24px 8px;display:flex;flex-direction:column;gap:12px}.ar-end h2{font-size:30px}.ar-sc{display:flex;justify-content:center;gap:30px}.ar-sc div{display:flex;flex-direction:column}.ar-sc b{font-size:34px;color:#ffc94d}
 .ar-shop{display:flex;flex-direction:column;gap:10px;margin:12px 0}.ar-it{display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;background:rgba(255,255,255,.07)}.ar-it.me{outline:2px solid #ffc94d}.ar-it.w .ar-ii{color:#4fdc9c}.ar-it.l .ar-ii{color:#ff8fa0}.ar-it small{display:block;opacity:.7;font-size:12px}.ar-ii{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.1);font-weight:800}.ar-ii svg{width:22px;height:22px}
 .tiles .chal small{display:block}
+.ao-inv,.ao-u{display:flex;align-items:center;gap:12px;padding:12px;border-radius:18px;background:rgba(255,255,255,.07);margin:8px 0}.ao-inv{background:rgba(124,108,255,.22);border:1px solid rgba(124,108,255,.5)}.ao-inv small,.ao-u small{display:block;opacity:.75;font-size:12px}.ao-list{display:flex;flex-direction:column;margin:8px 0 14px}
+.ao-same{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;margin:0 0 12px;border-radius:16px;border:0;background:rgba(255,255,255,.06);color:inherit;font:inherit;font-weight:700}.ao-sw{width:38px;height:22px;border-radius:99px;background:rgba(255,255,255,.2);position:relative;flex:none}.ao-sw:after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}.ao-same.on .ao-sw{background:#4fdc9c}.ao-same.on .ao-sw:after{inset-inline-start:19px}
+.ao-vs{display:flex;align-items:center;justify-content:space-around;gap:6px;margin:22px 0}.ao-p{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;text-align:center}.ao-p .avatar{box-shadow:0 0 0 4px rgba(255,255,255,.15)}.ao-x{font-weight:900;font-size:22px;color:#ffc94d}.ao-rd{font-size:12px;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.1);opacity:.8}.ao-rd.on{background:rgba(79,220,156,.22);color:#4fdc9c;opacity:1}
+.ao-q{background:repeating-linear-gradient(45deg,rgba(255,255,255,.08),rgba(255,255,255,.08) 8px,rgba(255,255,255,.14) 8px,rgba(255,255,255,.14) 16px);animation:aop 1.2s infinite alternate}@keyframes aop{from{opacity:.5}to{opacity:1}}
+.ao-st{text-align:center;font-weight:800;padding:16px;border-radius:18px;background:rgba(255,255,255,.07);margin-bottom:12px}.ao-st.go{background:rgba(255,201,77,.15)}.ao-cd{font-size:56px;color:#ffc94d}
+.ao-sc{flex:1;display:flex;align-items:center;justify-content:space-between}.ao-me{display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:800;font-size:13px}.ao-me span{font-size:20px;color:#ffc94d}.ao-fb{text-align:center;font-weight:700;padding:10px;margin-top:8px;font-size:14px}.ao-fb.ok{color:#4fdc9c}.ao-fb.no{color:#ff8fa0}
+.kx-o.pick{outline:3px solid #7c6cff}.ao-vs.sm{margin:10px 0}
+.ar-end h2{margin-bottom:22px}.ar-end:not(.ao-end) .ar-sc{display:block}
+.ao-end{width:100%;box-sizing:border-box;flex:1;justify-content:center;align-items:stretch;padding:20px 8px}
+.ao-end h2{margin:0 0 8px;font-size:28px}
+.ao-end .ao-vs.sm{width:100%;box-sizing:border-box;margin:0;padding:16px 10px;border:1px solid rgba(255,255,255,.12);border-radius:22px;background:rgba(255,255,255,.05)}
+.ao-end .ao-p{min-width:0;gap:8px}
+.ao-end .ao-p .ar-sc{display:grid;place-items:center;min-width:58px;min-height:46px;border-radius:14px;background:rgba(255,201,77,.12)}
+.ao-end .ao-result-reward{margin:0;padding:12px;border:1px solid rgba(255,201,77,.25);border-radius:16px;background:rgba(255,201,77,.08);font-weight:800}
+.ao-end.w .ao-result-reward{color:#4fdc9c}.ao-end.l .ao-result-reward{color:#ff9daf}
 .dk-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .dk{position:relative;display:flex;flex-direction:column;align-items:center;gap:9px;padding:14px 4px 12px;border-radius:22px;border:1px solid rgba(255,255,255,.09);color:inherit;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;
  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025)),var(--card);box-shadow:0 10px 22px -14px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.08);transition:transform .15s,border-color .2s}
@@ -1870,16 +1915,147 @@ html[data-mode=light] .dk{border-color:rgba(0,0,0,.08);background:#fff}
 .qz-end{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding-top:10px}.qz-end h2{margin:6px 0 0;font-size:26px}
 .qz-ring{--p:0;width:150px;height:150px;border-radius:50%;display:grid;place-content:center;text-align:center;background:radial-gradient(closest-side,var(--bg) 78%,transparent 80%),conic-gradient(var(--primary) calc(var(--p)*1%),var(--line) 0)}
 .qz-ring b{font-size:42px;line-height:1}.qz-ring small{color:var(--muted);font-weight:700}
-.qz-rv{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}.qz-rv:first-of-type{border-top:0}.qz-rv>div{flex:1;min-width:0}.qz-rv b{display:block;font-size:15px}.qz-rv small{color:var(--muted);font-weight:600}
+.qz-rev-card{padding:0;gap:0;overflow:hidden}
+.qz-rev-head{width:100%;display:flex;align-items:center;gap:10px;padding:13px 14px;text-align:start}
+.qz-rev-icon{width:38px;height:38px;flex:none;border-radius:12px;display:grid;place-items:center;background:var(--primary-soft);color:var(--primary)}
+.qz-rev-icon svg{width:20px;height:20px}
+.qz-rev-copy{flex:1;min-width:0}.qz-rev-copy b{display:block;font-size:15px}.qz-rev-copy small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.qz-rev-count{padding:3px 9px;border-radius:999px;background:var(--card2);color:var(--muted);font-size:12px;font-weight:800}
+.qz-rev-chev{display:grid;place-items:center;color:var(--muted);transition:transform .18s}.qz-rev-chev svg{width:18px;height:18px}
+.qz-rev-head[aria-expanded=true] .qz-rev-chev{transform:rotate(180deg)}
+.qz-rv-list{padding:0 14px 8px}
+.qz-rv{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}.qz-rv>div{flex:1;min-width:0}.qz-rv b{display:block;font-size:15px}.qz-rv small{display:block;color:var(--muted);font-weight:600}
 .qz-rv>span{width:26px;height:26px;border-radius:8px;background:var(--card2);display:grid;place-items:center;font-size:13px;font-weight:800}.qz-rv>i{font-style:normal;font-weight:800}
 .qz-rv.ok>i{color:#4fdc9c}.qz-rv.bad>i{color:#ff6f88}
 .brow.me{outline:2px solid var(--primary)}
 
+.ar-home{display:flex;flex-direction:column;gap:14px}
+.ar-home-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px;border:1px solid rgba(150,134,255,.25);border-radius:22px;background:radial-gradient(circle at 100% 0,rgba(150,134,255,.22),transparent 58%),linear-gradient(145deg,var(--card),var(--card2,var(--card)));box-shadow:0 12px 28px -22px rgba(0,0,0,.7)}
+.ar-home-copy{min-width:0}.ar-kicker{display:inline-flex;align-items:center;gap:5px;color:#b9adff;font-size:11px;font-weight:800;letter-spacing:.2px}.ar-kicker svg{width:14px;height:14px}
+.ar-home-head h2{margin:2px 0 2px;font-size:24px;line-height:1.2}.ar-home-head p{margin:0;color:var(--muted);font-size:12px;font-weight:700;line-height:1.5}
+.ar-home-head .chips2{max-width:118px;justify-content:flex-end;flex-wrap:wrap;gap:5px}.ar-home-head .chip2{padding:4px 7px;font-size:11px}
+.ar-home .ar-stat{gap:8px;margin:0}.ar-home .ar-stat>div{padding:10px 4px;background:var(--card);border:1px solid var(--line);border-radius:17px;box-shadow:inset 0 1px rgba(255,255,255,.04)}
+.ar-home .ar-stat b{font-size:19px;line-height:1.2}.ar-home .ar-stat span{font-size:11px;color:var(--muted);font-weight:700}
+.ar-settings{display:flex;flex-direction:column;gap:12px;padding:14px;border:1px solid var(--line);border-radius:22px;background:var(--card)}
+.ar-setting-head,.ar-actions-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.ar-setting-head b,.ar-actions-head b{font-size:15px}.ar-setting-head small,.ar-actions-head small{color:var(--muted);font-size:11px;font-weight:700}
+.ar-config .ar-lv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0}
+.ar-config .ar-lv button{min-width:0;min-height:40px;padding:8px 4px;border:1px solid var(--line);border-radius:13px;background:var(--field,var(--card2,var(--card)));color:var(--ink);font-size:13px;transition:background .18s,border-color .18s,transform .15s}
+.ar-config .ar-lv button.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 18%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 35%,transparent);color:var(--ink)}
+.ar-config .ar-lv button:active{transform:scale(.97)}
+.ar-config .ao-same{margin:0;padding:10px 12px;border:1px solid var(--line);border-radius:15px;background:var(--card);font-size:13px}
+.ar-same-copy{display:flex;flex-direction:column;gap:1px;flex:1}.ar-same-copy b{font-size:13px}.ar-same-copy small{color:var(--muted);font-size:10.5px}
+.ar-config .ao-sw{order:2;width:36px;height:21px;background:var(--line)}.ar-config .ao-sw:after{width:15px;height:15px;background:#fff}.ar-config .ao-same.on .ao-sw:after{inset-inline-start:18px}
+.ar-actions-head{padding:0 2px;margin-top:1px}
+.ar-home .ar-grid{gap:9px}
+.ar-home .ar-b{position:relative;isolation:isolate;overflow:hidden;min-height:100px;justify-content:space-between;gap:8px;padding:13px;border:1px solid rgba(255,255,255,.14);box-shadow:0 10px 18px -14px rgba(0,0,0,.65);transition:transform .16s,filter .16s}
+.ar-home .ar-b:before{content:"";position:absolute;z-index:-1;width:90px;height:90px;border-radius:50%;inset-inline-end:-30px;top:-34px;background:rgba(255,255,255,.15)}
+.ar-home .ar-b:active{transform:scale(.97);filter:brightness(.96)}
+.ar-b-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:12px;background:rgba(255,255,255,.2)}.ar-b-icon svg{width:20px;height:20px}
+.ar-b-copy{display:flex;flex-direction:column;gap:2px}.ar-home .ar-b b{font-size:15px;line-height:1.35}.ar-home .ar-b small{font-size:10.5px;line-height:1.4}
+.ar-home .ar-b.b1{background:linear-gradient(145deg,#ff7189,#ffad61)}.ar-home .ar-b.b2{background:linear-gradient(145deg,#7868f5,#a692ff)}
+.ar-home .ar-b.b3{background:linear-gradient(145deg,#ffd56a,#ffb943)}.ar-home .ar-b.b4{background:linear-gradient(145deg,#43d69e,#24b982)}
+.ar-home .ar-daily{display:flex;align-items:center;gap:11px;margin:0;padding:12px 14px;text-align:start;border:1px solid rgba(255,201,77,.38);border-radius:17px;background:linear-gradient(120deg,rgba(255,201,77,.16),rgba(255,201,77,.06));color:var(--ink)}
+.ar-daily-icon{width:36px;height:36px;display:grid;place-items:center;flex:none;border-radius:12px;background:rgba(255,201,77,.2);color:#ffd166}.ar-daily-icon svg{width:20px;height:20px}
+.ar-daily-copy{display:flex;flex:1;flex-direction:column;gap:2px}.ar-daily-copy b{font-size:12.5px}.ar-daily-copy small{color:var(--muted);font-size:10.5px;font-weight:700}
+.ar-home .ar-daily.off{opacity:.68}
+.ar-home .ar-mic{margin:0;padding:11px 13px;border:1px solid var(--line);border-radius:16px;background:var(--card);font-size:12px;color:var(--muted)}
+.ar-mic-icon{width:32px;height:32px;display:grid;place-items:center;flex:none;border-radius:11px;background:var(--field,var(--card2,var(--card)))}.ar-mic-icon svg{width:18px;height:18px}
+.ar-home .ar-mic.on{border-color:rgba(79,220,156,.35);color:#4fdc9c}.ar-home .ar-mic.on .ar-mic-icon{background:rgba(79,220,156,.14)}
+.ar-home .ar-links{margin:0;gap:8px}.ar-home .ar-links .pill{flex:1;min-height:42px}
+.ar-home>.btn.ghost{min-height:44px}
+@media(max-width:360px){.ar-home-head{padding:13px}.ar-home-head h2{font-size:21px}.ar-home-head .chips2{max-width:96px}.ar-home .ar-stat{gap:5px}.ar-home .ar-stat span{font-size:10px}.ar-home .ar-b{min-height:94px;padding:11px}}
 .au-found{display:flex;flex-direction:column;gap:8px}.au-found>b{font-size:14px;color:var(--muted)}
 .au-acc-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:18px;background:var(--field);border:2px solid var(--line);text-align:start;transition:.15s}
 .au-acc-row:hover,.au-acc-row:focus-visible{border-color:var(--primary)}.au-acc-row>span{flex:1;min-width:0}.au-acc-row b{display:block;font-size:17px}.au-acc-row small{color:var(--muted);font-weight:700;font-size:13px}
 .au-acc-row .ic{width:20px;height:20px;color:var(--primary)}
 .au-danger{display:flex;flex-direction:column;gap:10px}.au-danger small{color:var(--muted);font-weight:600;font-size:13px;margin-top:-6px}
+
+/* دروسي الخاصة — بطاقات بعرض الشاشة */
+.ls-library{padding:16px}
+.ls-grid{grid-template-columns:1fr!important;gap:12px}
+.lsn-card{flex-direction:row!important;align-items:stretch;width:100%;min-height:148px;border-radius:22px}
+.lsn-card .kx-gart{flex:0 0 104px;height:auto!important;min-height:100%;align-content:center}
+.lsn-card .kx-gart>svg{width:76px!important;height:auto!important;margin-top:14px}
+.lsn-card .kx-badge{top:8px;inset-inline-start:8px;inset-inline-end:auto;font-size:11px;padding:3px 9px}
+.lsn-card .lsn-art-state{top:auto!important;bottom:8px;inset-inline-end:auto!important;inset-inline-start:50%;transform:translateX(50%);max-width:92%;font-size:10px}
+html[dir=rtl] .lsn-card .lsn-art-state{transform:translateX(50%)}
+.lsn-card .kx-gb{flex:1!important;min-width:0;padding:12px 14px!important;gap:6px!important;justify-content:space-between}
+.lsn-card .kx-gb>b{font-size:17px!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.lsn-card .lsn-desc{-webkit-line-clamp:2;font-size:12.5px!important}
+.lsn-stats{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:12px!important;padding:5px 9px!important}
+.lsn-meta{justify-content:space-between;gap:8px}
+.lsn-actions{display:flex!important;gap:8px}
+.lsn-actions .pill{flex:1;min-height:38px;font-size:13px;white-space:nowrap}
+.lsn-actions:not(.double) .pill{flex:1 1 100%}
+.lsn-card.due{box-shadow:0 0 0 2px rgba(255,201,77,.55),0 12px 24px -16px rgba(0,0,0,.6)}
+@media(max-width:340px){.lsn-card{flex-direction:column!important}.lsn-card .kx-gart{flex:none;height:84px!important;min-height:0}}
+
+/* حساب متصل — قسم مطوي */
+.au-fold .au-sep{margin:12px 0 4px}
+.au-tg{display:flex;align-items:center;gap:12px;width:100%;padding:10px 4px;border:0;background:none;color:inherit;font:inherit;text-align:start;cursor:pointer;border-radius:16px;-webkit-tap-highlight-color:transparent}
+.au-tg .au-ai{width:42px;height:42px;flex:none;border-radius:14px;display:grid;place-items:center;background:rgba(79,220,156,.14);color:#4fdc9c}
+.au-tg .au-ai svg{width:22px;height:22px}
+.au-tt{flex:1;min-width:0}.au-tt b{display:block;font-size:16px}.au-tt small{display:block;color:var(--muted);font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.au-chev{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.07);transition:transform .25s}
+.au-chev svg{width:18px;height:18px}
+.au-fold.open .au-chev{transform:rotate(180deg)}
+.au-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease}
+.au-fold.open .au-body{grid-template-rows:1fr}
+.au-bi{overflow:hidden;min-height:0;display:flex;flex-direction:column;gap:12px}
+.au-fold.open .au-bi{padding-top:10px;border-top:1px solid var(--line);margin-top:6px}
+.au-bi .au-ar:first-child{display:none}
+.au-bi .pair .btn{white-space:nowrap}
+
+/* غرفة المعلم المباشرة — تقسيم احترافي */
+.lv-ctl{display:flex;flex-direction:column;gap:12px;padding:12px}
+.lv-ctl-r{display:grid;grid-template-columns:1fr auto;gap:10px}
+.lv-ctl-r .btn{min-height:50px;font-size:16px;padding:0 16px;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:8px}
+.lv-ctl-r .btn svg{width:18px;height:18px}
+.lv-end{color:#ff8fa0!important}
+.lv-auto{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:16px;background:var(--card2)}
+.lv-auto b{display:block;font-size:14px}.lv-auto small{display:block;color:var(--muted);font-size:11.5px;font-weight:600;margin-top:1px}
+.lv-sec{display:flex;align-items:center;gap:10px;margin:6px 2px -2px;color:var(--muted);font-size:12.5px;font-weight:800;letter-spacing:.3px}
+.lv-sec:after{content:"";flex:1;height:1px;background:var(--line)}
+.lv-bh{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}.lv-bh h3{margin:0;font-size:17px}
+.lv-vb{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:2px 0 6px}
+.lv-vb .btn{min-height:46px;font-size:14.5px;padding:0 8px;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:6px}
+.lv-vb .btn svg{width:17px;height:17px;flex:none}
+.lv-chat.on{border-color:rgba(79,220,156,.6);color:#4fdc9c}
+.lv-chat:not(.on){color:#ff8fa0;border-color:rgba(255,143,160,.45)}
+
+/* مراجعة الأسئلة: لا تنكمش القائمة داخل شاشة النتيجة */
+.screen.qz>*{flex-shrink:0}
+.qz-rev-card{flex:none!important;height:auto!important;max-height:none!important;overflow:visible}
+.qz-rev-card .qz-rv-list{max-height:none;overflow:visible}
+.lsx-top{padding:2px 2px 10px;text-align:start}
+.lsx-top h3{margin:6px 0 2px;font-size:20px;font-weight:800;line-height:1.3}
+.lsx-top .help{margin:0 0 8px}
+.lsx-badge{display:inline-block;padding:2px 10px;border-radius:999px;background:var(--primary-soft);color:var(--primary);font-size:11px;font-weight:800}
+.lsx-sum{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.lsx-sum span{flex:1;min-width:0;text-align:center;padding:7px 6px;border-radius:12px;background:var(--card2);color:var(--muted);font-size:12px;font-weight:700}
+.lsx-sum b{display:block;font-size:17px;color:var(--text)}
+.lsx-sec{margin-top:12px}
+.lsx-h{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.lsx-h h4{margin:0;font-size:15px;font-weight:800;flex:1}
+.lsx-hi{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--primary-soft);color:var(--primary)}
+.lsx-hi svg{width:16px;height:16px}
+.lsx-h em{font-style:normal;font-size:12px;font-weight:800;color:var(--muted);background:var(--card2);padding:2px 9px;border-radius:999px}
+.lsx-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card)}
+.lsx-it{display:flex;align-items:center;gap:10px;padding:9px 11px;border-top:1px solid var(--line)}
+.lsx-it:first-child{border-top:0}
+.lsx-it .spk2{width:34px;height:34px;background:var(--primary-soft)}
+.lsx-tx{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.lsx-tx b{font-size:15px;font-weight:800;text-align:left;overflow-wrap:anywhere}
+.lsx-tx small{color:var(--muted);font-size:13.5px;line-height:1.45}
+.lsx-it.sent .lsx-tx b{font-size:14px;font-weight:700}
+.lsx-act{position:sticky;bottom:-2px;padding-top:10px;background:linear-gradient(transparent,var(--card) 28%)}
+.tcs-f{border:1px solid var(--line);border-radius:16px;background:var(--card2);overflow:hidden}
+.tcs-h{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;text-align:start;color:var(--text)}
+.tcs-h span{display:flex;flex-direction:column;gap:2px}.tcs-h b{font-size:15px;font-weight:800}.tcs-h small{color:var(--muted);font-size:12px;font-weight:700}
+.tcs-h svg{width:20px;height:20px;color:var(--muted);transition:transform .2s;flex:none}
+.tcs-f.open .tcs-h svg{transform:rotate(180deg)}
+.tcs-b{display:none;padding:4px 14px 14px;border-top:1px solid var(--line)}
+.tcs-f.open .tcs-b{display:block}
 </style></head><body>
 <div id="app">
   <div id="view"></div>
@@ -1988,7 +2164,6 @@ const EX=[
  {k:'scramble',n:'رتّب الحروف',d:'رتّب الحروف المبعثرة لتكوين الكلمة',i:'translate',c:'#6ab4ff'},
  {k:'match',n:'توصيل الكلمات بمعانيها',d:'وصّل كل كلمة بمعناها',i:'list',c:'#ff8fa8'},
  {k:'pick',n:'اختر الكلمة الصحيحة',d:'من المعنى العربي اختر الكلمة الإنجليزية',i:'check',c:'#4fdc9c'},
- {k:'listen',n:'استمع واختر',d:'اسمع الكلمة ثم اختر كتابتها الصحيحة',i:'speaker',c:'#9686ff'},
  {k:'past',n:'ماضي الفعل',d:'اختر الصيغة الصحيحة لماضي الفعل',i:'book',c:'#ffae5c'},
  {k:'matchpast',n:'توصيل المضارع بالماضي',d:'وصّل كل فعل بماضيه',i:'list',c:'#ffd45a'},
  {k:'mc',n:'معنى الكلمة',d:'اختر المعنى الصحيح من ثلاثة',i:'quiz',c:'#ff8f8f'}
@@ -3640,7 +3815,7 @@ function block(t){
 }
 function buildTest(){
   const W=words();if(W.length<3)return [];
-  const types=['mc','pick','listen','fill','scramble'];if(W.some(i=>i.t==='v'&&i.p))types.push('past');
+  const types=['mc','pick','fill','scramble'];
   const items=pick(['w','v'],10);
   return shuffle(items.map((it,k)=>{
     let t=types[k%types.length];
@@ -4030,12 +4205,57 @@ function shortChunks(rows){
   });
   return out;
 }
+/* ----- rule-based simple Arabic sentences ----- */
+const RSA_N={father:'أب',dad:'أب',mother:'أم',mom:'أم',brother:'أخ',sister:'أخت',grandfather:'جد',grandmother:'جدة',grandpa:'جد',grandma:'جدة',uncle:'عم',aunt:'عمة',son:'ابن',daughter:'ابنة',friend:'صديق',teacher:'معلم',student:'طالب',doctor:'طبيب',book:'كتاب',pen:'قلم',name:'اسم',house:'بيت',home:'بيت',school:'مدرسة',dog:'كلب',cat:'قطة',bag:'حقيبة',family:'عائلة',car:'سيارة',room:'غرفة',baby:'طفل',boy:'ولد',girl:'بنت',man:'رجل',woman:'امرأة',apple:'تفاحة',pencil:'قلم',table:'طاولة',chair:'كرسي',phone:'هاتف',hat:'قبعة',ball:'كرة',bird:'عصفور',fish:'سمكة',horse:'حصان',cow:'بقرة',sheep:'خروف'};
+const RSA_F=new Set(['sister','mother','mom','grandmother','grandma','aunt','daughter','cat','bag','family','car','room','school','girl','woman','apple','table','fish','cow']);
+const RSA_P={my:'ي',your:'ك',his:'ه',her:'ها',our:'نا',their:'هم'};
+const RSA_NPOSS={father:'أبي',dad:'أبي',mother:'أمي',mom:'أمي',brother:'أخي',sister:'أختي'};
+function rsaPoss(ar,pr,w){
+  if(pr==='my'&&RSA_NPOSS[w])return RSA_NPOSS[w];
+  const suf=RSA_P[pr];
+  if(ar.endsWith('ة'))ar=ar.slice(0,-1)+'ت';
+  const o=({father:'أب',dad:'أب',brother:'أخ'})[w];
+  if(o&&pr!=='my')return o+'و'+suf;
+  return ar+suf;
+}
+function ruleSentAr(en,lk){
+  const t=String(en||'').trim().replace(/[.!]+$/,'').replace(/’/g,"'");
+  if(!t||/\?$/.test(t))return null;
+  const low=t.toLowerCase();
+  const noun=w=>{w=w.replace(/^(a|an|the)\s+/,'').trim();if(!/^[a-z-]+$/.test(w))return null;
+    if(RSA_N[w])return {ar:RSA_N[w],f:RSA_F.has(w),w};
+    const sg=w.replace(/s$/,'');if(w.endsWith('s')&&RSA_N[sg])return null;
+    const a=lk&&lk(w);if(a)return {ar:a,f:/ة$/.test(a),w};return null;};
+  let m;
+  if(m=low.match(/^(this|that|it) is (my|your|his|her|our|their) ([a-z-]+)$/)){
+    const n=noun(m[3]);if(!n)return null;const d=m[1]==='that'?(n.f?'تلك':'ذلك'):(n.f?'هذه':'هذا');
+    return d+' '+(n.w==='name'&&m[2]==='my'?'اسمي':rsaPoss(n.ar,m[2],n.w));}
+  if(m=low.match(/^(this|that) is (a|an|the) ([a-z-]+)$/)){
+    const n=noun(m[3]);if(!n)return null;const d=m[1]==='that'?(n.f?'تلك':'ذلك'):(n.f?'هذه':'هذا');return d+' '+n.ar;}
+  if(m=low.match(/^i have (?:a |an |the )?([a-z-]+)$/)){const n=noun(m[1]);return n?'عندي '+n.ar:null;}
+  if(m=low.match(/^(you|we|they) have (?:a |an |the )?([a-z-]+)$/)){const n=noun(m[2]);return n?({you:'عندك',we:'عندنا',they:'عندهم'})[m[1]]+' '+n.ar:null;}
+  if(m=low.match(/^(he|she) has (?:a |an |the )?([a-z-]+)$/)){const n=noun(m[2]);return n?(m[1]==='he'?'عنده ':'عندها ')+n.ar:null;}
+  if(m=low.match(/^my name is (.+)$/)){return 'اسمي '+t.slice(t.length-m[1].length);}
+  if(m=low.match(/^(?:i am|i'm) (?:a |an )?([a-z-]+)$/)){const n=noun(m[1]);return n?'أنا '+n.ar:null;}
+  if(m=low.match(/^(he|she) is (?:a |an |the )?([a-z-]+)$/)){const n=noun(m[2]);return n?(m[1]==='he'?'هو ':'هي ')+n.ar:null;}
+  if(m=low.match(/^(?:i|we|they) (like|love) (?:the |a |an )?([a-z-]+)$/)){const n=noun(m[2]);return n?({i:'أحب ',we:'نحب ',they:'يحبون '})[low.split(' ')[0]]+n.ar:null;}
+  if(m=low.match(/^(my|your|his|her|our|their) ([a-z-]+) is (?:a |an |the )?([a-z-]+)$/)){
+    const n=noun(m[2]),n2=noun(m[3]);return n&&n2?rsaPoss(n.ar,m[1],n.w)+' '+n2.ar:null;}
+  return null;
+}
+function fixSentAr(en,a){
+  a=String(a||'');
+  if(!/خاص(ت|ة)?ي|خاصتك|خاصته|^أنا له|هذا خاص|هذه خاص/.test(a))return a;
+  return ruleSentAr(en)||a;
+}
 async function glossSent(rows){
   const mine=R;rows.forEach(r=>r.busy=true);redraw();
   try{
     const D=await loadDict();await loadNlp();
     rows.forEach(r=>{if(r.a.trim())return;
       const ws=(r.en.toLowerCase().match(/[a-z][a-z'’-]*/g)||[]).map(x=>x.replace(/['’]s$/,''));
+      const rs=ruleSentAr(r.en,w=>{const b=baseOf(w,D),V=D.w[b];return V?String(V).split(/[،,;\/]/)[0].trim():'';});
+      if(rs){r.a=rs;return;}
       const out=[];ws.forEach(w=>{const b=baseOf(w,D);const V=D.v[b];let m=V?V[0]:D.w[b];if(m){m=String(m).split(/[،,;\/]/)[0].trim();if(m&&out[out.length-1]!==m)out.push(m);}});
       r.a=out.join(' ');});
     if(R===mine&&!R.msg)R.msg='الترجمة تقريبية كلمة بكلمة من القاموس المدمج. صحّح المعنى قبل الإضافة.';
@@ -5062,7 +5282,6 @@ const SX=[
  ['build','رتّب الجملة','رتّب كلمات مبعثرة لتكوّن الجملة الصحيحة',1],
  ['sfill','الكلمة الناقصة','اختر الكلمة التي تكمل الجملة',1],
  ['smean','معنى الجملة','اختر المعنى الصحيح للجملة، أو الجملة الصحيحة للمعنى',3],
- ['slisten','استمع واختر','استمع للجملة ثم اختر ما سمعته',3],
  ['sall','تدريب شامل','يخلط كل أنواع تدريبات الجمل في جولة واحدة',1]
 ];
 let SXK='build';
@@ -5106,7 +5325,7 @@ function sxBlock(k,n){
   return [];
 }
 function sxBuild(){
-  if(SXK==='sall'){let q=[];['build','sfill','smean','slisten'].forEach(k=>q.push(...sxBlock(k,2)));return shuffle(q);}
+  if(SXK==='sall'){let q=[];['build','sfill','smean'].forEach(k=>q.push(...sxBlock(k,2)));return shuffle(q);}
   return sxBlock(SXK);
 }
 function sxCard(){
@@ -7613,7 +7832,7 @@ setTimeout(()=>{if(sbSess())sbPull(false);},1800);
      then pushes it so the student appears on the leaderboard
    - sign-in restores the profile, progress and photo from the cloud
    ==================================================================== */
-const AUTH={mode:'up',name:'',grade:'',phone:'',pass:'',pass2:'',code:'',found:null,busy:false,err:''};
+const AUTH={mode:'up',name:'',grade:'',phone:'',pass:'',pass2:'',found:null,busy:false,err:''};
 const AUI={
   user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
   cap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/></svg>',
@@ -7652,7 +7871,6 @@ function vAuth(){
     ${up?fld('auGrade','الصف الدراسي',AUI.cap,`<select class="inp" id="auGrade"><option value="">اختر الصف</option>${GRADES.map((g,i)=>`<option value="${i}" ${String(AUTH.grade)===String(i)?'selected':''}>${g}</option>`).join('')}</select>`):''}
     ${fld('auPhone',up?'رقم هاتف ولي الأمر':'رقم الهاتف',AUI.phone,`<input class="inp en" id="auPhone" type="tel" inputmode="tel" dir="ltr" maxlength="16" autocomplete="tel" placeholder="01012345678" value="${esc(AUTH.phone)}">`)}
     ${!up&&AUTH.found&&AUTH.found.length?auFoundList():''}
-    ${up?fld('auCode','كود المعلم (اختياري)',AUI.shield,`<input class="inp en" id="auCode" dir="ltr" maxlength="8" autocomplete="off" placeholder="مثال: K7M2QX" value="${esc(AUTH.code)}" style="text-transform:uppercase">`):''}
     <div class="au-err" id="auErr" role="alert" ${AUTH.err?'':'hidden'}>${esc(AUTH.err)}</div>
     <button type="button" class="btn au-go" id="auGo" data-act="au_go"><span class="au-bt">${up?'إنشاء الحساب والانضمام':'عرض حساباتي'}</span>${ic('arrow','fwd')}</button>
     <p class="au-note">${up?'سجّل بالاسم ورقم الهاتف فقط، بدون رمز سري.':'اكتب رقم الهاتف المسجّل لتظهر كل الحسابات المرتبطة به، ثم اختر حسابك.'}</p>
@@ -7696,8 +7914,6 @@ async function auGo(acc){
   const restoreOld=()=>{try{if(oldRaw===null)localStorage.removeItem(oldKey);else localStorage.setItem(oldKey,oldRaw);}catch(e){}};
   let created=false;
   try{
-    let cls=null;
-    if(up&&AUTH.code.trim()){cls=await checkClass(AUTH.code.trim());if(!cls)throw new Error('cls:كود المعلم غير صحيح. راجع الكود مع معلمك أو اتركه فارغًا.');}
     const email=up?sbEmailOf(ph,name):acc.email;
     let r;
     if(up)r=await sbAuth('up',email,sbAutoPw2(email));
@@ -7739,14 +7955,14 @@ async function auGo(acc){
     const nk=sbKey();
     try{localStorage.setItem(nk,JSON.stringify(Object.assign({},sess,{sm:0})));}catch(e){}
     if(nk!==oldKey)restoreOld();
-    if(up){await sbPush();if(cls){try{const jr=await sbApi('/rest/v1/rpc/join_class',{method:'POST',body:{code:AUTH.code.trim()}});if(jr.ok){AUC.info=await jr.json();toast('تم الانضمام إلى فصل '+(cls.class_name||cls.teacher));}}catch(e){}}}
+    if(up)await sbPush();
     else if(cloud.state){
       if(sbEmpty(S)){
         const cs=cloud.state;cs.profile=Object.assign({},cs.profile||{},{id:DIR.cur,name:S.profile.name,grade:S.profile.grade,phone:S.profile.phone});
         sbApply(cs,pf&&pf.avatar||null);toast('تم تحميل تقدمك من حسابك');
       }else await sbPull(false);
     }else await sbPush();
-    Object.assign(AUTH,{name:'',grade:'',phone:'',pass:'',pass2:'',code:'',err:'',found:null});
+    Object.assign(AUTH,{name:'',grade:'',phone:'',pass:'',pass2:'',err:'',found:null});
     sbRefreshBoard();render();
   }catch(x){
     if(!created)restoreOld();
@@ -7769,7 +7985,7 @@ async function auLogout(){
   S=DIR.cur?load():fresh();if(!DIR.cur)S.onboarded=true;
   G=null;TAB='train';PV='main';BOX=null;CONF=null;
   REG={on:false,add:false,edit:false,name:'',grade:'',phone:'',photo:'',err:''};
-  Object.assign(AUTH,{mode:'in',name:'',grade:'',phone:'',pass:'',pass2:'',code:'',err:''});
+  Object.assign(AUTH,{mode:'in',name:'',grade:'',phone:'',pass:'',pass2:'',err:''});
   SBL.list=null;SBL.key=null;
   render();toast('تم تسجيل الخروج');
 }
@@ -7795,24 +8011,36 @@ document.addEventListener('input',e=>{
   else if(id==='auPhone')AUTH.phone=t.value;
   else if(id==='auPass'){AUTH.pass=t.value;const m=document.getElementById('auMeter');if(m){const s=auStrength(t.value);m.dataset.s=s;m.querySelector('small').textContent=t.value?'قوة الرمز السري: '+(['','ضعيف','مقبول','جيد','قوي'][s]):'استخدم 6 أحرف أو أرقام على الأقل';}}
   else if(id==='auPass2')AUTH.pass2=t.value;
-  else if(id==='auCode')AUTH.code=t.value.toUpperCase().replace(/\s/g,'');
   if(AUTH.err)auErr('');
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&e.target&&/^au(Name|Phone|Pass|Pass2|Code)$/.test(e.target.id)){e.preventDefault();auGo();}
+  if(e.key==='Enter'&&e.target&&/^au(Name|Phone|Pass|Pass2)$/.test(e.target.id)){e.preventDefault();auGo();}
 });
 
 /* ---- account card in "حسابي" + prompt on the leaderboard for accounts not yet linked ---- */
 function auAccountCard(){
   const s=sbSess(),pf=S.profile||{};
   const head=`<div class="au-prof">${av(pf,56)}<div class="au-pn"><b>${esc(pf.name||S.name)}</b><small>${esc(GRADES[pf.grade]||'')}</small></div><button type="button" class="pill au-edit" data-act="rgedit" aria-label="تعديل الملف الشخصي">${ic('pencil')} تعديل</button></div><div class="au-sep"></div>`;
-  if(s)return `<div class="card au-acc ok">${head}<div class="au-ar"><span class="au-ai">${AUI.cloud}</span><div><b>حسابك متصل</b><small>${SBP.err?esc(SBP.err):'تقدمك محفوظ ويظهر اسمك في لوحة المتصدرين'}</small></div></div>
-    ${aucRow()}
-    <div class="pair"><button class="btn ghost" style="min-height:46px;font-size:16px" data-act="sb_sync">مزامنة الآن</button><button class="btn ghost" style="min-height:46px;font-size:16px" data-act="au_out">تسجيل الخروج</button></div></div>`;
+  if(s){
+    const row=aucRow(),cls=/هل لديك كود/.test(row)?'':((row.match(/<b>([^<]*)<\/b>/)||[])[1]||'');
+    const sum=SBP.err?esc(SBP.err):(cls?esc(cls):'تقدمك محفوظ في لوحة المتصدرين');
+    return `<div class="card au-acc ok au-fold${window.AUO?' open':''}" id="auFold">${head}
+    <button type="button" class="au-tg" data-act="au_t" aria-expanded="${window.AUO?'true':'false'}"><span class="au-ai">${AUI.cloud}</span><span class="au-tt"><b>حسابك متصل</b><small>${sum}</small></span><span class="au-chev">${ic('chev')}</span></button>
+    <div class="au-body"><div class="au-bi"><div class="au-ar"><span class="au-ai">${AUI.cloud}</span><div><b>الحفظ السحابي</b><small>${SBP.err?esc(SBP.err):'تقدمك محفوظ ويظهر اسمك في لوحة المتصدرين'}</small></div></div>
+    ${row}
+    <div class="pair"><button class="btn ghost" style="min-height:46px;font-size:16px" data-act="sb_sync">مزامنة الآن</button><button class="btn ghost" style="min-height:46px;font-size:16px" data-act="au_out">تسجيل الخروج</button></div></div></div></div>`;
+  }
   return `<div class="card au-acc">${head}<div class="au-ar"><span class="au-ai">${AUI.trophy}</span><div><b>انضم إلى لوحة المتصدرين</b><small>اربط الملف بحساب لتحفظ تقدمك وتظهر بين المتصدرين</small></div></div>
     <button class="btn" style="min-height:48px;font-size:16px" data-act="sb_open" data-m="up">إنشاء حساب / ربط الحساب</button>
     <button class="tlink" data-act="sb_open" data-m="in">لدي حساب بالفعل، تسجيل الدخول</button></div>`;
 }
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('[data-act="au_t"]');if(!b)return;
+  e.stopPropagation();e.preventDefault();
+  const c=document.getElementById('auFold');window.AUO=!window.AUO;
+  if(c){c.classList.toggle('open',window.AUO);b.setAttribute('aria-expanded',window.AUO?'true':'false');}
+},true);
 {const _vm=vMe;vMe=function(){return _vm().replace(/<button class="kx-prof"[\s\S]*?<\/button>/,'').replace('<div class="bgrid">',auAccountCard()+'<div class="bgrid">');};}
 {const _b3=boardSec;boardSec=function(){
   const h=_b3();if(sbSess())return h;
@@ -7822,27 +8050,37 @@ function auAccountCard(){
 
 
 /* ====================================================================
-   TEACHER ACCOUNT: classes by code + follow-up of the class students
-   - teacher signs up (name, phone, password) and gets a class code
+   TEACHER ACCOUNT: phone-only auth, classes by code, and student progress
+   - teacher signs up (name and phone) and gets a class code
    - students enter the code when signing up (or later from "حسابي")
    - teacher sees the class list, each student's progress, and can remove one
    (needs teacher_setup.sql in Supabase)
    ==================================================================== */
 const TS_KEY='kx-teacher-sess',TM_KEY='kx-teacher-mode';
-const TCH={on:false,mode:'in',name:'',phone:'',pass:'',pass2:'',cname:'',found:null,err:'',busy:false,me:null,list:null,ph:{},loading:false,loadErr:''};
+const TCH={on:false,mode:'in',name:'',phone:'',err:'',busy:false,me:null,list:null,ph:{},loading:false,loadErr:''};
 const tSess=()=>{try{return JSON.parse(localStorage.getItem(TS_KEY)||'null');}catch(e){return null;}};
 const tSet=s=>{try{s?localStorage.setItem(TS_KEY,JSON.stringify(s)):localStorage.removeItem(TS_KEY);}catch(e){}};
-const tEmail=(phone,name)=>'teacher-'+sbPhone(phone)+'-'+sbHash(sbNameKey(name))+'@kalimaty.app';
-const tGenCode=()=>{const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';const r=crypto.getRandomValues(new Uint8Array(6));for(let i=0;i<6;i++)c+=a[r[i]%a.length];return c;};
+const tAuthPhone=phone=>{
+  const d=sbDig(phone);
+  if(d.startsWith('0020'))return '+'+d.slice(2);
+  if(d.startsWith('20')&&d.length===12)return '+'+d;
+  if(/^01[0125]\d{8}$/.test(d))return '+20'+d.slice(1);
+  if(d.startsWith('0')&&d.length===11)return '+20'+d.slice(1);
+  return d.length>=10&&d.length<=15?'+'+d:'';
+};
+const tAuthEmail=phone=>'teacher-'+sbPhone(phone)+'@kalimaty.app';
+const tAuthPassword=email=>sbAutoPw2(email);
 function tMsg(m){
   m=String(m||'');
+  if(/email_provider_disabled|email signups?.*(disabled|not enabled)|signups?.*(disabled|not allowed)/i.test(m))return 'في Supabase: Authentication ← Sign In / Providers ← Email، فعّل Email signups وأوقف Confirm email.';
+  if(/email not confirmed|email.*confirmation|confirmation.*email/i.test(m))return 'أوقف Confirm email في إعدادات Email في Supabase Authentication.';
+  if(/invalid login credentials/i.test(m))return 'لا يوجد حساب معلم لهذا الرقم، أو تعذّر تسجيل الدخول. اختر «إنشاء حساب» إذا لم تسجّل من قبل.';
+  if(/already registered|already been registered/i.test(m))return 'هذا الرقم مسجّل بالفعل؛ اختر «تسجيل الدخول».';
   if(/^db:/.test(m)){
     const d=m.match(/^db:(\d+):([^:]*):/)||[],code=d[2]||'',st=d[1]||'';
     if(['PGRST204','PGRST202','42703','42883','PGRST205','42P01'].includes(code)||st==='404')return 'ميزة المعلمين غير مفعّلة بعد في قاعدة البيانات. شغّل ملف teacher_setup.sql في Supabase.';
     if(code==='42501'||st==='403')return 'ليست لديك صلاحية لهذه العملية. شغّل ملف teacher_setup.sql كاملًا.';
   }
-  if(/Invalid login credentials/i.test(m))return 'الاسم أو رقم الهاتف أو كلمة المرور غير صحيحة.';
-  if(/already registered|already been registered/i.test(m))return 'حساب معلم بهذا الاسم ورقم الهاتف موجود بالفعل، سجّل الدخول بدلًا من إنشاء حساب.';
   if(/^tc:/.test(m))return m.slice(3);
   return sbMsg(m);
 }
@@ -7864,24 +8102,14 @@ async function tApi(path,opt,retry){
   if(r.status===401){tSet(null);TCH.me=null;render();throw new Error('tc:انتهت الجلسة، سجّل الدخول من جديد.');}
   return r;
 }
-async function tAuth(up,email,pw){
-  const r=await sbRaw(up?'/auth/v1/signup':'/auth/v1/token?grant_type=password',{method:'POST',body:{email,password:pw}});
+async function tAuthErr(r){
   let j={};try{j=await r.json();}catch(e){}
-  if(!r.ok)throw new Error(j.msg||j.error_description||j.message||j.error||('http '+r.status));
-  if(!j.access_token)throw new Error('Email not confirmed');
-  tSet({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:Date.now()+(j.expires_in||3600)*1000,uid:j.user&&j.user.id});
+  return new Error(j.msg||j.error_description||j.message||j.error||('http '+r.status));
 }
 async function tCreateProfile(name,cname){
-  const s=tSess();
-  for(let i=0;i<6;i++){
-    const code=tGenCode();
-    const r=await tApi('/rest/v1/profiles?on_conflict=id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:{id:s.uid,name,role:'teacher',class_code:code,class_name:cname||null,grade:null,xp:0,streak:0,avatar:null,updated_at:sbIso()}});
-    if(r.ok)return {name,role:'teacher',class_code:code,class_name:cname||''};
-    let j={};try{j=await r.json();}catch(e){}
-    if(j.code==='23505')continue;
-    throw new Error('db:'+r.status+':'+(j.code||'')+':'+(j.message||''));
-  }
-  throw new Error('tc:تعذّر إنشاء كود الفصل، حاول مرة أخرى.');
+  const r=await tApi('/rest/v1/rpc/teacher_create_profile',{method:'POST',body:{p_name:name,p_class_name:cname||''}});
+  if(!r.ok)throw await sbDbErr(r);
+  return r.json();
 }
 async function tLoadMe(){
   const s=tSess();if(!s)return null;
@@ -7915,43 +8143,36 @@ function tErr(m,focus){
   if(e){e.textContent=TCH.err;e.hidden=!TCH.err;if(TCH.err){e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');}}
   if(focus){const f=document.getElementById(focus);if(f)f.focus();}
 }
-function tBusy(on){TCH.busy=on;const b=document.getElementById('tcGo');if(!b)return;b.disabled=on;b.classList.toggle('busy',on);const t=b.querySelector('.au-bt');if(t)t.textContent=on?'لحظات...':(TCH.mode==='up'?'إنشاء حساب المعلم':'عرض حسابي');}
-async function tSearch(){
-  if(TCH.busy)return;
-  const ph=normPhone(TCH.phone);
-  if(!ph)return tErr('اكتب رقم هاتف صحيحًا، مثل 01012345678.','tcPhone');
-  if(navigator.onLine===false)return tErr('لا يوجد اتصال بالإنترنت.');
-  tErr('');tBusy(true);TCH.found=null;
-  try{
-    const r=await sbRaw('/rest/v1/rpc/teacher_accounts',{method:'POST',body:{p:sbPhone(ph)}});
-    if(!r.ok)throw new Error('tc:ميزة الدخول بالهاتف غير مفعّلة بعد. شغّل ملف account_setup.sql في Supabase.');
-    TCH.found=await r.json();TCH.busy=false;render(true);
-    if(!TCH.found.length)tErr('لا يوجد حساب معلم بهذا الرقم. أنشئ حساب معلم جديدًا.');
-  }catch(x){tBusy(false);tErr(tMsg(x.message));}
-  finally{TCH.busy=false;}
-}
-async function tcGo(acc){
+function tBusy(on){TCH.busy=on;const b=document.getElementById('tcGo');if(!b)return;b.disabled=on;b.classList.toggle('busy',on);const t=b.querySelector('.au-bt');if(t)t.textContent=on?'لحظات...':(TCH.mode==='up'?'إنشاء حساب المعلم':'دخول المعلم');}
+async function tcGo(){
   if(TCH.busy)return;
   const up=TCH.mode==='up';
-  if(!up&&!(acc&&acc.email))return tSearch();
-  const name=up?TCH.name.trim().replace(/\s+/g,' '):String(acc.name||'معلم'),ph=normPhone(TCH.phone);
+  const name=TCH.name.trim().replace(/\s+/g,' '),ph=normPhone(TCH.phone),phone=tAuthPhone(ph);
   if(up&&name.length<2)return tErr('اكتب اسم المعلم (حرفان على الأقل).','tcName');
-  if(!ph)return tErr('اكتب رقم هاتف صحيحًا، مثل 01012345678.','tcPhone');
+  if(!phone)return tErr('اكتب رقم هاتف صحيحًا.','tcPhone');
   if(navigator.onLine===false)return tErr('لا يوجد اتصال بالإنترنت.');
   tErr('');tBusy(true);
   const prev=tSess();
   try{
-    const email=up?tEmail(ph,name):acc.email;
-    await tAuth(up,email,sbAutoPw2(email));
+    const email=tAuthEmail(phone),body={email,password:tAuthPassword(email)};
+    if(up)body.data={name,role:'teacher'};
+    const r=await sbRaw(up?'/auth/v1/signup':'/auth/v1/token?grant_type=password',{method:'POST',body});
+    if(!r.ok)throw await tAuthErr(r);
+    const j=await r.json();
+    if(!j.access_token)throw new Error('tc:Supabase لم يُرجع جلسة دخول. تأكد من تفعيل Email signups وإيقاف Confirm email.');
+    if(!j.user||!j.user.id)throw new Error('تعذّر إنشاء جلسة المعلم في Supabase.');
+    tSet({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:Date.now()+(j.expires_in||3600)*1000,uid:j.user&&j.user.id});
     let me=null;
-    if(up)me=await tCreateProfile(name,TCH.cname.trim().slice(0,40));
-    else{
+    if(up){
+      me=await tCreateProfile(name,'');
+    }else{
       me=await tLoadMe();
-      if(!me)me=await tCreateProfile(name,'');            /* repair: account exists but profile row is missing */
-      if(me.role!=='teacher'){tSet(null);throw new Error('tc:هذا الحساب ليس حساب معلم.');}
+      const meta=j.user.user_metadata||{};
+      if(meta.role==='teacher'&&(!me||(me.role==='student'&&!me.class_code)))me=await tCreateProfile(meta.name||'معلم','');
+      if(!me||me.role!=='teacher'){tSet(null);throw new Error('tc:هذا الرقم غير مرتبط بحساب معلم. اختر «إنشاء حساب».');}
     }
     TCH.me=me;TCH.list=null;TQ.list=null;tEnsureLocal(ph);
-    Object.assign(TCH,{pass:'',pass2:'',err:'',name:'',phone:'',cname:'',found:null});
+    Object.assign(TCH,{err:'',name:'',phone:''});
     try{localStorage.setItem(TM_KEY,'1');}catch(e){}
     TCH.busy=false;render();toast(up?'تم إنشاء حساب المعلم':'تم تسجيل الدخول');
     tLoadStudents();
@@ -7967,7 +8188,7 @@ function tOpen(){
 function tBack(){TCH.on=false;try{localStorage.setItem(TM_KEY,'0');}catch(e){}render();}
 function tOut(){
   if(!confirm('تسجيل الخروج من حساب المعلم؟'))return;
-  tSet(null);Object.assign(TCH,{on:false,mode:'in',me:null,list:null,ph:{},err:'',pass:'',pass2:'',tab:'class'});TQ.list=null;TQ.view='list';TQ.edit=null;
+  tSet(null);Object.assign(TCH,{on:false,mode:'in',name:'',phone:'',me:null,list:null,ph:{},err:'',tab:'class'});TQ.list=null;TQ.view='list';TQ.edit=null;
   try{localStorage.setItem(TM_KEY,'0');}catch(e){}
   render();toast('تم تسجيل الخروج');
 }
@@ -7977,19 +8198,16 @@ function tShareText(){return 'انضم إلى فصلي في تطبيق كلما�
 function vTeacherAuth(){
   const up=TCH.mode==='up';
   const fld=(id,label,icon,inner,extra)=>`<div class="field"><label for="${id}">${label}</label><div class="au-in">${icon}${inner}${extra||''}</div></div>`;
-  const found=!up&&TCH.found&&TCH.found.length?`<div class="au-found"><b>اختر حسابك</b>${TCH.found.map((a,i)=>`<button type="button" class="au-acc-row" data-act="tc_pick" data-i="${i}">${av({name:a.name},46)}<span><b>${esc(a.name||'معلم')}</b><small>${esc(a.class_name||'حساب معلم')}</small></span>${ic('arrow','fwd')}</button>`).join('')}</div>`:'';
   return `<div class="screen reg au">
    <div class="ob-top"><div class="logo">Kal<b>i</b>m<i>a</i>ty</div><button class="link" data-act="tc_back">رجوع</button></div>
-   <div class="au-hero"><h1>${up?'حساب المعلم':'دخول المعلم'}</h1><p>${up?'أنشئ حساب معلم لتحصل على كود فصل يضم طلابك وتتابع تقدمهم وتطلق المسابقات المباشرة.':'اكتب رقم هاتفك لتظهر حساباتك، ثم اختر حسابك.'}</p></div>
+   <div class="au-hero"><h1>${up?'حساب المعلم':'دخول المعلم'}</h1><p>${up?'أنشئ حساب المعلم باسمك ورقم هاتفك.':'أدخل رقم هاتفك للدخول إلى حساب المعلم.'}</p></div>
    <div class="au-tabs" role="tablist"><button type="button" role="tab" aria-selected="${up}" class="${up?'on':''}" data-act="tc_mode" data-m="up">إنشاء حساب</button><button type="button" role="tab" aria-selected="${!up}" class="${up?'':'on'}" data-act="tc_mode" data-m="in">تسجيل الدخول</button></div>
    <div class="au-card">
     ${up?fld('tcName','اسم المعلم',AUI.user,`<input class="inp" id="tcName" maxlength="30" autocomplete="name" placeholder="الاسم كما ترغب أن يظهر" value="${esc(TCH.name)}">`):''}
     ${fld('tcPhone','رقم الهاتف',AUI.phone,`<input class="inp en" id="tcPhone" type="tel" inputmode="tel" dir="ltr" maxlength="16" autocomplete="tel" placeholder="01012345678" value="${esc(TCH.phone)}">`)}
-    ${up?fld('tcCname','اسم الفصل (اختياري)',AUI.cap,`<input class="inp" id="tcCname" maxlength="40" autocomplete="off" placeholder="مثال: الصف الثالث - أ" value="${esc(TCH.cname)}">`):''}
-    ${found}
     <div class="au-err" id="tcErr" role="alert" ${TCH.err?'':'hidden'}>${esc(TCH.err)}</div>
-    <button type="button" class="btn au-go" id="tcGo" data-act="tc_go"><span class="au-bt">${up?'إنشاء حساب المعلم':'عرض حسابي'}</span>${ic('arrow','fwd')}</button>
-    <p class="au-note">${up?'بدون كلمة مرور: الدخول يكون برقم الهاتف فقط.':'الدخول برقم الهاتف فقط بدون كلمة مرور.'}</p></div>
+    <button type="button" class="btn au-go" id="tcGo" data-act="tc_go" ${TCH.busy?'disabled':''}><span class="au-bt">${TCH.busy?'لحظات...':up?'إنشاء حساب المعلم':'دخول المعلم'}</span>${ic('arrow','fwd')}</button>
+    <p class="au-note">استخدم رقم الهاتف فقط؛ لا تحتاج إلى بريد حقيقي أو رمز SMS.</p></div>
    <p class="au-sw"><button type="button" class="link" data-act="tc_back">أنا طالب، العودة للتطبيق</button></p></div>`;
 }
 function vTcClass(){
@@ -8037,9 +8255,8 @@ document.addEventListener('click',async e=>{
   const a=b.dataset.act;
   if(a==='tc_open'){tOpen();return;}
   if(a==='tc_back'){tBack();return;}
-  if(a==='tc_mode'){if(TCH.busy)return;TCH.mode=b.dataset.m==='up'?'up':'in';TCH.err='';TCH.found=null;render();return;}
+  if(a==='tc_mode'){if(TCH.busy)return;TCH.mode=b.dataset.m==='up'?'up':'in';TCH.err='';render();return;}
   if(a==='tc_go'){tcGo();return;}
-  if(a==='tc_pick'){const acc=(TCH.found||[])[+b.dataset.i];if(acc)tcGo(acc);return;}
   if(a==='tc_out'){tOut();return;}
   if(a==='tc_reload'){tLoadStudents();return;}
   if(a==='tc_copy'){copyText(TCH.me.class_code);toast('تم نسخ الكود');return;}
@@ -8057,12 +8274,11 @@ document.addEventListener('click',async e=>{
 },true);
 document.addEventListener('input',e=>{
   const t=e.target,id=t&&t.id;if(!id||id.slice(0,2)!=='tc')return;
-  if(id==='tcName')TCH.name=t.value;else if(id==='tcPhone')TCH.phone=t.value;else if(id==='tcCname')TCH.cname=t.value;
-  if(id==='tcPhone'&&TCH.found){TCH.found=null;const f=document.querySelector('.au-found');if(f)f.remove();}
+  if(id==='tcName')TCH.name=t.value;else if(id==='tcPhone')TCH.phone=t.value;
   if(TCH.err)tErr('');
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&e.target&&/^tc(Name|Phone|Cname)$/.test(e.target.id)){e.preventDefault();tcGo();}
+  if(e.key==='Enter'&&e.target&&/^tc(Name|Phone)$/.test(e.target.id)){e.preventDefault();tcGo();}
   if(e.key==='Enter'&&e.target&&e.target.dataset&&e.target.dataset.act==='tc_st'){e.target.click();}
 });
 
@@ -8080,11 +8296,6 @@ function aucRow(){
   if(i===undefined)return '';
   if(i&&i.teacher)return `<div class="au-sep"></div><div class="au-ar"><span class="au-ai">${AUI.cap}</span><div style="flex:1"><b>فصل ${esc(i.class_name||i.teacher)}</b><small>المعلم: ${esc(i.teacher)}</small></div><button class="pill au-edit" data-act="au_leave">مغادرة</button></div>`;
   return `<div class="au-sep"></div><div class="au-join"><b>هل لديك كود معلم؟</b><div class="au-jr"><input class="inp en" id="auJoin" dir="ltr" maxlength="8" autocomplete="off" placeholder="K7M2QX" style="text-transform:uppercase"><button class="btn" style="min-height:48px;width:auto;padding:0 20px;font-size:16px" data-act="au_join">انضم</button></div><div class="au-err" id="auJErr" hidden></div></div>`;
-}
-async function checkClass(code){
-  const r=await sbRaw('/rest/v1/rpc/check_class_code',{method:'POST',body:{code}});
-  if(!r.ok)throw new Error('cls:ميزة الفصول غير مفعّلة بعد. اترك خانة كود المعلم فارغة وسجّل الآن، وانضم لاحقًا من «حسابي».');
-  const j=await r.json();return j&&j.teacher?j:null;
 }
 document.addEventListener('click',async e=>{
   const b=e.target.closest&&e.target.closest('[data-act="au_join"],[data-act="au_leave"]');if(!b)return;
@@ -8334,7 +8545,7 @@ function vTqEdit(){
     ${isC?'':tqSw('السماح بإعادة المحاولة','تُحتسب أعلى درجة',s.retake,'retake')}</div>
    <div class="card"><div class="qe-h" style="margin:0"><b style="font-size:17px">توليد أسئلة من كلمات</b><button type="button" class="pill" data-act="tq_gen">${TQ.gen?'إخفاء':'فتح'}</button></div>
     ${TQ.gen?`<div class="hint" style="margin:6px 0">اكتب كل كلمة في سطر بالشكل: dog = كلب</div><textarea class="inp en" id="tqWords" dir="ltr" rows="5" placeholder="dog = كلب&#10;cat = قطة&#10;sun = شمس&#10;moon = قمر"></textarea>
-     <div class="qe-row" style="margin-top:8px"><div class="field" style="margin:0"><label>نوع الأسئلة</label><select class="inp" id="tqGenMode"><option value="en2ar" ${q.listen?'':'selected'}>إنجليزي ← اختر المعنى</option><option value="ar2en">عربي ← اختر الكلمة</option><option value="listen" ${q.listen?'selected':''}>استماع ← اختر المعنى</option><option value="fill">اكتب الكلمة بالإنجليزية</option></select></div><button type="button" class="btn" style="align-self:end;min-height:52px" data-act="tq_genrun">ولّد</button></div>`:''}</div>
+     <div class="qe-row" style="margin-top:8px"><div class="field" style="margin:0"><label>نوع الأسئلة</label><select class="inp" id="tqGenMode"><option value="en2ar" selected>اختر معنى الكلمة</option><option value="ar2en">اختر الكلمة الصحيحة</option></select></div><button type="button" class="btn" style="align-self:end;min-height:52px" data-act="tq_genrun">ولّد</button></div>`:''}</div>
    <div class="sec-h" style="margin:2px 0 -4px"><h3 style="margin:0;font-size:18px">الأسئلة (${n})</h3></div>
    ${n?q.questions.map((x,i)=>vQCard(x,i,n)).join(''):'<div class="empty"><b>لا توجد أسئلة بعد</b><p class="help">أضف أسئلة من الأزرار أدناه أو ولّدها من كلمات.</p></div>'}
    <div class="card"><b style="display:block;margin-bottom:8px">إضافة سؤال</b><div class="qe-add">${QTYPES.map(t=>`<button type="button" class="pill" data-act="tq_add" data-t="${t[0]}">${ic('plus')} ${t[1]}</button>`).join('')}</div></div>
@@ -8363,6 +8574,7 @@ document.addEventListener('click',async e=>{
   const a=b.dataset.act,d=b.dataset,q=TQ.edit;
   if(a==='tc_tab'){
     if(d.t==='app'){tEnsureLocal();TCH.on=false;render();return;}
+    if(d.t==='quiz')TCSEG='quiz';else if(d.t==='contest')TCSEG='contest';
     TCH.tab=d.t;TQ.view='list';TQ.edit=null;render();return;
   }
   if(a==='tq_new'){tqNewDraft(d.k,d.p);return;}
@@ -8413,7 +8625,7 @@ document.addEventListener('input',e=>{
 });
 /* ================= PLAYER (student + teacher preview) ================= */
 const QZ={on:false};
-const SQ={list:null,res:{},loading:false,at:0};
+const SQ={list:null,res:{},loading:false,at:0,err:''};
 function qzStart(quiz,preview,back){
   const st=quiz.settings||{};
   let qs=(quiz.questions||[]).map((q,i)=>Object.assign(JSON.parse(JSON.stringify(q)),{_i:i}));
@@ -8421,7 +8633,7 @@ function qzStart(quiz,preview,back){
   qs.forEach(q=>{if(q.t==='mcq'&&st.shuffleO!==false){const sh=shuffle(q.o.map((t,k)=>[t,k===q.c]));q.o=sh.map(x=>x[0]);q.c=sh.findIndex(x=>x[1]);}});
   clearInterval(QZ.timer);
   Object.keys(QZ).forEach(k=>delete QZ[k]);
-  Object.assign(QZ,{on:true,quiz,preview:!!preview,back:back||'student',qs,i:0,score:0,correct:0,max:qs.reduce((a,q)=>a+(+q.p||1),0),res:new Array((quiz.questions||[]).length).fill(0),t0:Date.now(),cur:null,done:false,sub:'',subMsg:'',rank:null,timer:null,left:0});
+  Object.assign(QZ,{on:true,quiz,preview:!!preview,back:back||'student',qs,i:0,score:0,correct:0,max:qs.reduce((a,q)=>a+(+q.p||1),0),res:new Array((quiz.questions||[]).length).fill(0),t0:Date.now(),cur:null,done:false,sub:'',subMsg:'',rank:null,timer:null,left:0,revOpen:false});
   qzShow();
 }
 function qzShow(){
@@ -8479,11 +8691,12 @@ async function qzSubmit(){
   if(QZ.on)render(true);
 }
 async function sqRanking(id){
-  const r=await sbApi('/rest/v1/quiz_results?select=student_id,student_name,score,duration_ms&quiz_id=eq.'+id+'&order=score.desc,duration_ms.asc&limit=100');
-  if(!r.ok)return null;return r.json();
+  const r=await sbApi('/rest/v1/rpc/quiz_ranking',{method:'POST',body:{p_quiz_id:id}});
+  if(!r.ok)throw await sbDbErr(r);
+  return r.json();
 }
-function qzExit(){
-  if(!QZ.done&&!QZ.preview&&!confirm('الخروج الآن؟ لن تُحفظ نتيجتك.'))return;
+function qzExit(force){
+  if(!force&&!QZ.done&&!QZ.preview&&!confirm('الخروج الآن؟ لن تُحفظ نتيجتك.'))return;
   clearInterval(QZ.timer);const back=QZ.back;QZ.on=false;
   if(back!=='teacher')sqLoad(true);
   render();
@@ -8522,15 +8735,18 @@ function vQuizEnd(reveal){
     const me=(sbSess()||{}).uid,pos=QZ.rank.findIndex(r=>r.student_id===me)+1;
     rank=`<div class="card"><h3 style="margin:0 0 6px;font-size:17px">ترتيب الفصل${pos?` · مركزك ${pos}`:''}</h3><div class="blist">${QZ.rank.slice(0,10).map((r,i)=>`<div class="brow ${r.student_id===me?'me':''}"><span class="rk en">${i+1}</span><div class="bt"><b>${esc(r.student_name)}${r.student_id===me?' (أنت)':''}</b></div><span class="bv en">${r.score}</span></div>`).join('')}</div></div>`;
   }
-  const rev=reveal?`<div class="card"><h3 style="margin:0 0 8px;font-size:17px">مراجعة الأسئلة</h3>${QZ.qs.map((q,i)=>`<div class="qz-rv ${QZ.res[q._i]?'ok':'bad'}"><span class="en">${i+1}</span><div><b>${esc(q.q)}</b><small>${q.t==='mcq'?esc(q.o[q.c]):q.t==='tf'?(q.c?'صح':'خطأ'):q.t==='fill'?esc(String(q.ans).split(',')[0]):q.t==='order'?esc(q.sent):'توصيل'}</small></div><i>${QZ.res[q._i]?'✓':'✗'}</i></div>`).join('')}</div>`:'';
-  return `<div class="screen qz"><div class="qz-end"><div class="qz-ring" style="--p:${pct}"><b class="en">${QZ.score}</b><small>نقطة</small></div><h2>${msg}</h2><p class="help">${QZ.correct} من ${N} إجابات صحيحة · ${pct}% · ${secs} ثانية</p></div>${sub}${rank}${rev}<button class="btn" data-act="qz_exit">${QZ.preview?'رجوع للمحرر':'تم'}</button></div>`;
+  const review=QZ.qs.map((q,i)=>`<div class="qz-rv ${QZ.res[q._i]?'ok':'bad'}"><span class="en">${i+1}</span><div><b>${esc(q.q)}</b><small>${q.t==='mcq'?esc(q.o[q.c]):q.t==='tf'?(q.c?'صح':'خطأ'):q.t==='fill'?esc(String(q.ans).split(',')[0]):q.t==='order'?esc(q.sent):'توصيل'}</small></div><i>${QZ.res[q._i]?'✓':'✗'}</i></div>`).join('');
+  const rev=reveal?`<section class="card qz-rev-card"><button type="button" class="qz-rev-head" data-act="qz_review" aria-expanded="${!!QZ.revOpen}" aria-controls="qzReviewList"><span class="qz-rev-icon">${ic('list')}</span><span class="qz-rev-copy"><b>مراجعة الأسئلة</b><small>${N} أسئلة · اضغط لعرض الإجابات</small></span><span class="qz-rev-count">${N}</span><span class="qz-rev-chev">${ic('chev')}</span></button>${QZ.revOpen?`<div class="qz-rv-list" id="qzReviewList">${review}</div>`:''}</section>`:'';
+  return `<div class="screen qz"><div class="qz-end"><div class="qz-ring" style="--p:${pct}"><b class="en">${QZ.score}</b><small>نقطة</small></div><h2>${msg}</h2><p class="help">${QZ.correct} من ${N} إجابات صحيحة · ${pct}% · ${secs} ثانية</p></div>${sub}${rank}${rev}<button type="button" class="btn" data-act="qz_done">${QZ.preview?'رجوع للمحرر':'تم'}</button></div>`;
 }
 document.addEventListener('click',e=>{
   const b=e.target.closest&&e.target.closest('[data-act^="qz_"]');if(!b||!QZ.on)return;
   e.stopPropagation();e.preventDefault();
   const a=b.dataset.act,d=b.dataset,q=QZ.qs&&QZ.qs[QZ.i],c=QZ.cur;
   if(a==='qz_exit'){qzExit();return;}
+  if(a==='qz_done'){qzExit(true);return;}
   if(a==='qz_retry'){qzSubmit();return;}
+  if(a==='qz_review'){QZ.revOpen=!QZ.revOpen;render(true);return;}
   if(!q||!c)return;
   if(a==='qz_next'){qzNext();return;}
   if(a==='qz_say'){speak(q.q);return;}
@@ -8563,14 +8779,14 @@ document.addEventListener('keydown',e=>{if(QZ.on&&e.key==='Enter'&&e.target.id==
 async function sqLoad(force){
   const s=sbSess();if(!s||SQ.loading)return;
   if(!force&&Date.now()-SQ.at<45000)return;
-  SQ.loading=true;
+  SQ.loading=true;SQ.err='';
   try{
     const r=await sbApi('/rest/v1/quizzes?select=id,kind,title,description,questions,settings,status,created_at&status=eq.published&order=created_at.desc&limit=50');
     if(!r.ok)throw await sbDbErr(r);
     SQ.list=await r.json();SQ.res={};
     const m=await sbApi('/rest/v1/quiz_results?select=quiz_id,score,correct,total&student_id=eq.'+s.uid);
     if(m.ok)(await m.json()).forEach(x=>{SQ.res[x.quiz_id]=x;});
-  }catch(e){SQ.list=SQ.list||[];}
+  }catch(e){SQ.list=SQ.list||[];SQ.err=sbMsg(e.message);}
   SQ.at=Date.now();SQ.loading=false;
   if(typeof TAB!=='undefined'&&(TAB==='train'||TAB==='contest')&&!G&&!QZ.on&&!TCH.on&&!REG.on)render(true);
 }
@@ -8592,8 +8808,9 @@ function sqCard(){
 }
 {const _vt9=vTrain;vTrain=function(){return _vt9().replace('<div class="screen">','<div class="screen">'+sqCard());};}
 document.addEventListener('click',async e=>{
-  const b=e.target.closest&&e.target.closest('[data-act="sq_go"],[data-act="sq_rank"]');if(!b)return;
+  const b=e.target.closest&&e.target.closest('[data-act="sq_go"],[data-act="sq_rank"],[data-act="sq_refresh"]');if(!b)return;
   e.stopPropagation();e.preventDefault();
+  if(b.dataset.act==='sq_refresh'){sqLoad(true);return;}
   const q=(SQ.list||[]).find(x=>x.id===b.dataset.id);if(!q)return;
   if(b.dataset.act==='sq_go'){
     const s=q.settings||{};if(s.deadline&&new Date(s.deadline)<Date.now()){toast('انتهى موعد هذا الاختبار');return;}
@@ -8865,11 +9082,11 @@ function vLvTeacher(){
    <div class="card lv-wait"><span class="au-ai">${ic('trophy')}</span><h2>الغرفة مفتوحة للطلاب</h2><p class="help">يدخل الطلاب من «تحدي الصف» في تطبيقهم. ابدأ عندما ينضم الجميع.</p></div>
    <div class="card"><h3 style="margin:0 0 8px;font-size:17px">المنضمون (${d.players.length})</h3><div class="lv-chips" id="lvLobby">${lvPlayersHtml()}</div></div>
    ${lvvTHtml()}
-   <button class="btn" data-act="lv_tstart">${ic('trophy')} ابدأ المسابقة (${d.total} سؤال)</button><button class="btn ghost" style="color:#ff8fa0" data-act="lv_tcancel">إلغاء الغرفة</button></div>`;
+   <button class="btn" data-act="lv_tstart">${ic('trophy')} ابدأ (${d.total} سؤال)</button><button class="btn ghost" style="color:#ff8fa0" data-act="lv_tcancel">إلغاء الغرفة</button></div>`;
   if(d.status==='finished')return `<div class="screen au tc">${back}
    <div class="card lv-wait"><span class="au-ai">${ic('medal')}</span><h2>انتهت المسابقة</h2><p class="help">حُفظت نتائج كل الطلاب في سجل اختباراتهم.</p></div>${lvPod()}
    <div class="card"><h3 style="margin:0 0 6px;font-size:17px">الترتيب النهائي</h3><div class="blist" id="lvBoard">${lvBoardHtml(0,true)}</div></div>
-   <button class="btn" data-act="lv_tres">النتائج التفصيلية</button><button class="btn ghost" data-act="lv_tclose">إغلاق</button></div>`;
+   <button class="btn" data-act="lv_tres">التفاصيل</button><button class="btn ghost" data-act="lv_tclose">إغلاق</button></div>`;
   const q=LRM.quiz&&(LRM.quiz.questions||[])[d.q],rev=d.phase==='reveal',last=d.q+1>=d.total;
   const opts=q&&q.t==='mcq'?`<div class="qz-opts">${q.o.map((o,k)=>`<div class="qz-opt ${rev?(k===q.c?'ok':'dim'):''}" style="--qc:${QMC[k%6]}"><i class="en">${'ABCDEF'[k]}</i><span>${esc(o)}</span></div>`).join('')}</div>`:'';
   return `<div class="screen au tc">${back}
@@ -8877,10 +9094,14 @@ function vLvTeacher(){
    ${rev?'':`<div class="qz-timer"><div class="qz-tb"><i id="lvTBar" style="width:100%"></i></div><span class="en" id="lvTLeft">${d.limit}</span></div>`}
    <div class="card qz-q"><div class="qz-qh"><span class="tag">${q?qTypeName(q.t):'سؤال'}</span><span class="tag">أجاب <b class="en" id="lvTCnt">${d.players.filter(p=>p.answered).length} / ${d.players.length}</b></span></div><h2 ${q&&/[A-Za-z]/.test(q.q)&&!/[؀-ۿ]/.test(q.q)?'class="en" dir="ltr"':''}>${esc(q?q.q:'السؤال '+(d.q+1))}</h2></div>
    ${opts}${rev&&q?`<div class="qz-fb ok"><b>الإجابة الصحيحة</b><p class="en" dir="auto" style="margin:4px 0 0;font-weight:800">${esc(lvAnsText(q))}</p>${q.e?`<p>${esc(q.e)}</p>`:''}</div>`:''}
-   <div class="card"><h3 style="margin:0 0 6px;font-size:17px">الترتيب المباشر</h3><div class="blist" id="lvBoard">${lvBoardHtml(10)}</div></div>
-   ${lvvTHtml()}
-   <div class="switch tq-sw"><span>تقدّم تلقائي<small>إظهار الإجابة عند انتهاء الوقت والانتقال بعد لحظات</small></span><button type="button" class="sw ${LRM.auto?'on':''}" data-act="lv_tauto" role="switch" aria-checked="${LRM.auto}"></button></div>
-   <div class="pair">${rev?`<button class="btn" data-act="lv_tnext">${last?'إنهاء وحفظ النتائج':'السؤال التالي'}</button>`:`<button class="btn" data-act="lv_treveal">إظهار الإجابة الآن</button>`}<button class="btn ghost" style="color:#ff8fa0" data-act="lv_tend">إنهاء المسابقة</button></div></div>`;
+   <div class="lv-ctl card">
+    <div class="lv-ctl-r">${rev?`<button class="btn" data-act="lv_tnext">${last?'حفظ النتائج':'التالي'} ${ic('arrow','fwd')}</button>`:`<button class="btn" data-act="lv_treveal">${ic('check')} أظهر الإجابة</button>`}<button class="btn ghost lv-end" data-act="lv_tend" aria-label="إنهاء المسابقة">${ic('close')} إنهاء</button></div>
+    <div class="lv-auto"><span><b>تقدّم تلقائي</b><small>يُظهر الإجابة وينتقل</small></span><button type="button" class="sw ${LRM.auto?'on':''}" data-act="lv_tauto" role="switch" aria-checked="${LRM.auto}"></button></div>
+   </div>
+   <div class="lv-sec"><span>المتسابقون</span></div>
+   <div class="card"><div class="lv-bh"><h3>الترتيب المباشر</h3><span class="tag">${d.players.length} طالب</span></div><div class="blist" id="lvBoard">${lvBoardHtml(10)}</div></div>
+   <div class="lv-sec"><span>الصوت</span></div>
+   ${lvvTHtml()}</div>`;
 }
 function lvTHist(rows){
   if(!rows||!rows.length)return '';
@@ -9016,11 +9237,11 @@ function lvvMuteAll(){Object.keys(LVV.conns).forEach(u=>{if(LVV.allowed[u])lvvAl
 const lvvWave='<span class="lv-wave"><i></i><i></i><i></i></span>';
 function lvvTInner(){
   const P=(LRM.st&&LRM.st.players)||[],n=P.filter(p=>LVV.conns[p.id]).length;
-  return `<div class="lv-vh"><b>${ic('mic')} الدردشة الصوتية</b><span class="tag ${n?'ok':''}">متصل ${n}/${P.length}</span></div>
+  return `<div class="lv-vh"><b>${ic('mic')} الدردشة الصوتية</b><span class="tag ${n?'ok':''}">${n}/${P.length} متصل</span></div>
    ${LVV.err?`<div class="au-err">${esc(LVV.err)}</div>`:''}
-   <button class="btn lv-talk ${LVV.talk?'on':''}" data-act="lv_vtalk">${ic('mic')} ${LVV.talk?'أنت تتحدث للصف الآن — اضغط للإيقاف':'تحدّث للصف (الطلاب يسمعونك)'}</button>
-   <button type="button" class="pill" data-act="lv_vchat" style="margin:6px 0">${ic('mic')} ${LVV.chat===false?'تشغيل دردشة الطلاب بينهم':'إيقاف دردشة الطلاب بينهم'}</button>
-   <small class="help" style="display:block;margin:6px 0">الطلاب مكتومون افتراضيًا. اضغط على الميكروفون بجانب الطالب ليتمكن من الحديث معك.</small>
+   <div class="lv-vb"><button class="btn lv-talk ${LVV.talk?'on':''}" data-act="lv_vtalk">${ic('mic')} ${LVV.talk?'إيقاف الإرسال':'تحدّث للصف'}</button>
+   <button type="button" class="btn ghost lv-chat ${LVV.chat===false?'':'on'}" data-act="lv_vchat" aria-pressed="${LVV.chat===false?'false':'true'}">${ic('user')} دردشة الطلاب: ${LVV.chat===false?'موقوفة':'تعمل'}</button></div>
+   <small class="help" style="display:block;margin:2px 0 8px">الطلاب مكتومون؛ اضغط الميكروفون بجانب الطالب ليتحدث معك.</small>
    <div class="lv-vl">${P.length?P.map(p=>{const r=LVV.conns[p.id],on=!!LVV.allowed[p.id];return `<div class="lv-vr ${r?'':'off'} ${r&&r.speaking?'sp':''}"><i class="lv-dot ${r?'ok':''}"></i><b>${esc(p.name)}</b>${r&&r.speaking?lvvWave:''}<button class="lv-mb ${on?'on':''}" data-act="lv_vallow" data-id="${esc(p.id)}" ${r?'':'disabled'} aria-label="${on?'كتم':'السماح بالكلام'}">${on?'مسموح':'مكتوم'}</button></div>`;}).join(''):'<div class="help">لا يوجد طلاب بعد.</div>'}</div>
    ${Object.keys(LVV.allowed).some(u=>LVV.allowed[u])?'<button class="pill" data-act="lv_vmuteall">كتم جميع الطلاب</button>':''}`;
 }
@@ -9509,8 +9730,8 @@ sxCard=function(){
    are studied, saved to their list and reviewed on a spaced schedule.
    A lesson is a normal quiz row with settings.lesson (no SQL change).
    ==================================================================== */
-const LS_TY=[['e2a','الكلمة ← المعنى (مع النطق)'],['a2e','المعنى ← الكلمة'],['spell','اكتب الكلمة'],['match','توصيل الكلمات'],['tf','صح أم خطأ'],['sfill','أكمل الجملة'],['order','رتّب الجملة'],['smean','معنى الجملة'],['mpast','توصيل المضارع بالماضي']];
-const LS_DEF=['e2a','a2e','spell','match','sfill','order','smean'];
+const LS_TY=[['e2a','اختر معنى الكلمة'],['a2e','اختر الكلمة الصحيحة'],['wo','ترتيب الكلمة'],['wl','أكمل الحرف الناقص'],['match','توصيل الكلمات'],['sfill','أكمل الجملة'],['order','رتّب الجملة'],['sjum','أعد ترتيب الجملة الملخبطة'],['smean','معنى الجملة'],['mpast','توصيل المضارع بالماضي']];
+const LS_DEF=['e2a','a2e','match','sfill','order','smean','wo','wl'];
 const LS_INT=[1,3,7,14,30,60];
 let TQSUB='quiz';
 const isLesson=q=>!!(q&&q.settings&&q.settings.lesson);
@@ -9537,6 +9758,17 @@ function lsGen(L){
     if(T.has('e2a')){const q=lsMc(w[0],w[1],oA,{a:true,e});if(q)out.push(q);}
     if(T.has('a2e')){const q=lsMc(w[1],w[0],oE,{e});if(q)out.push(q);}
     if(T.has('spell'))out.push(Object.assign(qNew('fill'),{q:'اكتب بالإنجليزية: '+w[1],ans:w[0],e}));
+    const lw=String(w[0]).trim();
+    if(T.has('wo')&&/^[A-Za-z]{3,12}$/.test(lw)){
+      const ch=lw.split('');let sc=ch.slice(),k=0;
+      do{sc=shuffle(ch.slice());k++;}while(sc.join('')===lw&&k<6&&new Set(ch).size>1);
+      out.push(Object.assign(qNew('order'),{q:'رتّب الحروف لتكوين الكلمة',sent:ch.join(' '),h:w[1],e}));
+    }
+    if(T.has('wl')&&/^[A-Za-z]{3,14}$/.test(lw)){
+      const n=lw.length>=7?2:1,st=1+rand(lw.length-n-(lw.length>3?0:1)>0?lw.length-n-1:1);
+      const miss=lw.substr(st,n),shown=lw.slice(0,st)+'_'.repeat(n)+lw.slice(st+n);
+      out.push(Object.assign(qNew('fill'),{q:'أكمل الحرف الناقص: '+shown+'  ('+w[1]+')',ans:miss,e}));
+    }
     if(T.has('tf')&&W.length>1){
       const ok=Math.random()<.5,shown=ok?w[1]:oA[rand(oA.length)];
       out.push(Object.assign(qNew('tf'),{q:'«'+w[0]+'» معناها «'+shown+'»',c:ok&&true,e}));
@@ -9567,6 +9799,11 @@ function lsGen(L){
       }
     }
     if(T.has('order')&&toks.length>=2)out.push(Object.assign(qNew('order'),{sent:s[0].trim().replace(/\s+/g,' '),h:s[1],e}));
+    if(T.has('sjum')&&toks.length>=3){
+      const cl=toks.map(x=>x.replace(/[.!?]+$/,'')),su=s[0].trim().replace(/\s+/g,' ');
+      let sc=cl.slice(),k=0;do{sc=shuffle(cl.slice());k++;}while(sc.join(' ')===cl.join(' ')&&k<8);
+      out.push(Object.assign(qNew('order'),{q:'أعد ترتيب الجملة الملخبطة: '+sc.join(' ، '),sent:su,h:'',e}));
+    }
     if(T.has('smean')){
       const pool=S2.filter(x=>x!==s).map(x=>x[1]).concat(ar);
       const q=lsMc(s[0],s[1],pool,{a:true,e});if(q)out.push(q);
@@ -9597,7 +9834,7 @@ function lsGen(L){
 
 /* ---------- teacher: lesson editor ---------- */
 const LACC={info:1,content:1,grades:0,types:0,qs:0};
-const LSI={mpast:['list','#ffd45a','وصّل الفعل بماضيه'],e2a:['speaker','#6ab4ff','مع النطق'],a2e:['translate','#ff8fa8','عربي ← إنجليزي'],spell:['pencil','#ffd45a','كتابة الكلمة'],match:['cards','#4fdc9c','وصّل بالمعنى'],tf:['check','#ff8f8f','عبارة وحكم'],sfill:['bulb','#ffae5c','كلمة ناقصة'],order:['blocks','#9686ff','كلمات مبعثرة'],smean:['book','#6ab4ff','مع النطق']};
+const LSI={sjum:['blocks','#ff8fa8','جملة ملخبطة'],wo:['blocks','#6ab4ff','رتّب الحروف'],wl:['pencil','#ffd45a','حرف ناقص'],mpast:['list','#ffd45a','وصّل الفعل بماضيه'],e2a:['speaker','#6ab4ff','مع النطق'],a2e:['check','#4fdc9c','اختيار من متعدد'],spell:['pencil','#ffd45a','كتابة الكلمة'],match:['cards','#4fdc9c','وصّل بالمعنى'],tf:['check','#ff8f8f','عبارة وحكم'],sfill:['bulb','#ffae5c','كلمة ناقصة'],order:['blocks','#9686ff','كلمات مبعثرة'],smean:['book','#6ab4ff','مع النطق']};
 function lsAcc(k,icon,color,title,sub,badge,body){
   const o=LACC[k]?' open':'';
   return `<section class="acc${o}" data-k="${k}" style="--ec:${color}"><button type="button" class="acc-h" data-act="lsn_acc" data-k="${k}" aria-expanded="${!!LACC[k]}">
@@ -9666,35 +9903,46 @@ document.addEventListener('click',e=>{
 /* ---------- student: lessons card in the training tab ---------- */
 {const _s=sqCard;sqCard=function(){
   const full=SQ.list;if(full)SQ.list=full.filter(q=>!isLesson(q));
-  try{return _s.apply(this,arguments).replace('اختبارات ومسابقات فصلك','دروس ومسابقات فصلك').replace(/>اختبار</g,'>درس<');}finally{SQ.list=full;}
+  try{return _s.apply(this,arguments);}finally{SQ.list=full;}
 };}
 const lsnDays=t=>Math.max(1,Math.ceil((t-Date.now())/864e5));
 function lsnCard(){
   if(!sbSess())return '';
   sqLoad();
-  const L=(SQ.list||[]).filter(isLesson).filter(gradeOk);if(!L.length)return '';
+  const L=(SQ.list||[]).filter(isLesson).filter(gradeOk),due=L.filter(q=>S.lsn&&S.lsn[q.id]&&S.lsn[q.id].due<=Date.now()).length,
+    count=L.length?L.length+' درس':SQ.list?'0 درس':'...',
+    head=`<div class="ls-library-head"><span class="ls-library-icon">${ic('book')}</span><div class="ls-library-title"><h3>دروسي الخاصة</h3><small>دروس أضافها معلمك لتتعلم وتتقدم</small></div><span class="ls-library-count">${count}</span></div>`,
+    shell=body=>`<div class="card sq-card ls-library">${head}${body}</div>`;
+  if(SQ.err&&!L.length)return shell(`<div class="lsn-empty"><span class="lsn-empty-icon">${ic('close')}</span><div><b>تعذّر تحميل الدروس</b><small>${esc(SQ.err)}</small></div></div><button class="pill" data-act="sq_refresh">إعادة المحاولة</button>`);
+  if(!SQ.list)return shell(`<div class="lsn-empty"><span class="lsn-empty-icon">${ic('book')}</span><div><b>جارٍ تحميل دروسي...</b><small>لحظات ونجهّز دروسك</small></div></div>`);
+  if(!L.length)return shell(`<div class="lsn-empty"><span class="lsn-empty-icon">${ic('book')}</span><div><b>لا توجد دروس بعد</b><small>ستظهر هنا الدروس التي ينشرها معلمك لفصلك.</small></div></div>`);
   S.lsn=S.lsn||{};
-  const now=Date.now(),due=L.filter(q=>S.lsn[q.id]&&S.lsn[q.id].due<=now).length;
-  const row=q=>{
-    const l=q.settings.lesson,st=S.lsn[q.id],isDue=st&&st.due<=now,nw=(l.words||[]).filter(x=>x[1]).length,ns=(l.sents||[]).filter(x=>x[1]).length;
+  const row=(q,i)=>{
+    const l=q.settings.lesson,st=S.lsn[q.id],isDue=st&&st.due<=Date.now(),nw=(l.words||[]).filter(x=>x[1]).length,ns=(l.sents||[]).filter(x=>x[1]).length;
     const tag=!st?'<span class="tag new">جديد</span>':isDue?'<span class="tag due">مراجعة اليوم</span>':`<span class="tag ok">المراجعة بعد ${lsnDays(st.due)} يوم</span>`;
     const dots=st?`<span class="ls-dots" aria-label="مستوى الحفظ">${LS_INT.map((_,k)=>`<i class="${k<=st.box?'on':''}"></i>`).join('')}</span>`:'';
     const btns=!st?`<button class="pill go" data-act="lsn_open" data-id="${q.id}">ابدأ الدرس</button>`
       :isDue?`<button class="pill go" data-act="lsn_rev" data-id="${q.id}">راجع الآن</button><button class="pill" data-act="lsn_open" data-id="${q.id}">الدرس</button>`
       :`<button class="pill" data-act="lsn_open" data-id="${q.id}">افتح الدرس</button><button class="pill" data-act="lsn_rev" data-id="${q.id}">راجع</button>`;
-    return `<div class="sq-row ls-row${isDue?' due':''}"><span class="au-ai">${ic('book')}</span><div style="flex:1;min-width:0"><b>${esc(q.title)}</b><small>${nw?nw+' كلمة':''}${nw&&ns?' · ':''}${ns?ns+' جملة':''} · ${(q.questions||[]).length} سؤال</small><div class="ls-meta">${tag}${dots}</div></div><div class="ls-btns">${btns}</div></div>`;
+    const palette=i%2?['#ff9a3d','#ffd166']:['#0f9f70','#5be3ab'];
+    const questions=(q.questions||[]).length,wordLabel=nw===1?'كلمة':nw===2?'كلمتان':nw<=10?'كلمات':'كلمة',
+      sentenceLabel=ns===1?'جملة':ns===2?'جملتان':ns<=10?'جمل':'جملة',
+      questionLabel=questions===1?'سؤال':questions===2?'سؤالان':questions<=10?'أسئلة':'سؤال',
+      stats=[nw&&nw+' '+wordLabel,ns&&ns+' '+sentenceLabel,questions&&questions+' '+questionLabel].filter(Boolean).join(' · ');
+    return `<article class="kx-gc lsn-card${isDue?' due':''}" style="--c1:${palette[0]};--c2:${palette[1]}"><div class="kx-gart"><span class="kx-badge">درس</span><span class="lsn-art-state">${!st?'جديد':isDue?'مراجعة اليوم':'لديك تقدم'}</span>${hubArt(i%2?'s':'w')}</div><div class="kx-gb"><b>${esc(q.title)}</b><p class="lsn-desc">${esc(q.description||'درس تفاعلي أضافه معلمك لفصلك.')}</p><div class="lsn-stats">${stats||questions+' سؤال'}</div><div class="lsn-meta">${tag}${dots}</div><div class="lsn-actions${st?' double':''}">${btns}</div></div></article>`;
   };
-  return `<div class="card sq-card ls-card"><div class="sec-h" style="margin:0"><h3 style="margin:0;font-size:18px">دروس فصلك</h3><small>${due?due+' للمراجعة':L.length+' درس'}</small></div>${L.map(row).join('')}</div>`;
+  return shell(`${SQ.err?`<div class="au-err">${esc(SQ.err)} <button class="pill" data-act="sq_refresh">إعادة المحاولة</button></div>`:''}<div class="ls-grid">${L.map(row).join('')}</div>${due?`<small class="ls-library-note">${due} درس للمراجعة اليوم</small>`:''}`);
 }
 function lsnSheet(q){
   const l=q.settings.lesson,W=(l.words||[]).filter(x=>x[1]),S2=(l.sents||[]).filter(x=>x[1]);
-  const row=x=>`<div class="ls-it"><button class="spk2" data-act="speak" data-t="${esc(x[0])}" aria-label="استمع">${ic('speaker')}</button><div><b class="en" dir="ltr">${esc(x[0])}</b><small>${esc(x[1])}</small></div></div>`;
+  const row=(x,sent)=>`<div class="lsx-it${sent?' sent':''}"><button class="spk2" data-act="speak" data-t="${esc(x[0])}" aria-label="استمع">${ic('speaker')}</button><div class="lsx-tx"><b class="en" dir="ltr">${esc(x[0])}</b><small>${esc(sent?fixSentAr(x[0],x[1]):x[1])}</small></div></div>`;
   const have=new Set(S.items.map(i=>i.en.toLowerCase())),fresh2=W.concat(S2).filter(x=>!have.has(x[0].toLowerCase())).length;
+  const sec=(ico,t,n,arr,sent)=>`<section class="lsx-sec"><div class="lsx-h"><span class="lsx-hi">${ic(ico)}</span><h4>${t}</h4><em>${n}</em></div><div class="lsx-list">${arr.map(x=>row(x,sent)).join('')}</div></section>`;
   kxModal(`<button class="kx-mx" data-act="sb_close" aria-label="إغلاق">${ic('close')}</button>
-   <h3>${esc(q.title)}</h3>${q.description?`<p class="help" style="margin:2px 0 8px">${esc(q.description)}</p>`:''}
-   ${W.length?`<div class="kx-sh" style="margin:8px 0 4px"><h3 style="font-size:16px">كلمات الحفظ</h3><small>${W.length}</small></div><div class="ls-list">${W.map(row).join('')}</div>`:''}
-   ${S2.length?`<div class="kx-sh" style="margin:10px 0 4px"><h3 style="font-size:16px">جمل الدرس</h3><small>${S2.length}</small></div><div class="ls-list">${S2.map(row).join('')}</div>`:''}
-   <div class="ls-act"><button class="btn ghost" data-act="lsn_save" data-id="${q.id}" ${fresh2?'':'disabled'}>${fresh2?`أضفها إلى قائمة حفظي (${fresh2})`:'كلها في قائمتك ✓'}</button>
+   <div class="lsx-top"><span class="lsx-badge">درس</span><h3>${esc(q.title)}</h3>${q.description?`<p class="help">${esc(q.description)}</p>`:''}<div class="lsx-sum"><span><b>${W.length}</b> كلمة</span><span><b>${S2.length}</b> جملة</span><span><b>${(q.questions||[]).length}</b> سؤال</span></div></div>
+   ${W.length?sec('book','كلمات الحفظ',W.length,W,false):''}
+   ${S2.length?sec('pencil','جمل الدرس',S2.length,S2,true):''}
+   <div class="ls-act lsx-act"><button class="btn ghost" data-act="lsn_save" data-id="${q.id}" ${fresh2?'':'disabled'}>${fresh2?`أضفها إلى قائمة حفظي (${fresh2})`:'كلها في قائمتك ✓'}</button>
    <button class="btn" data-act="lsn_quiz" data-id="${q.id}">ابدأ أسئلة الدرس ${ic('arrow','fwd')}</button></div>`);
 }
 function lsnPlay(q,review){
@@ -9717,7 +9965,7 @@ document.addEventListener('click',e=>{
   if(a==='lsn_save'){
     const l=q.settings.lesson;let n=0;
     (l.words||[]).filter(w=>w[1]).forEach(w=>{if(!S.items.some(i=>i.en.toLowerCase()===w[0].toLowerCase())){S.items.push({id:uid(),t:w[2]?'v':'w',en:w[0],a:w[1],p:w[2]?(w[3]||''):'',pa:w[2]?(w[4]||''):'',m:0,c:Date.now()+n});S.stats.added++;n++;}});
-    (l.sents||[]).filter(x=>x[1]).forEach(s=>{if(!addSentence(s[0],s[1]))n++;});
+    (l.sents||[]).filter(x=>x[1]).forEach(s=>{if(!addSentence(s[0],fixSentAr(s[0],s[1])))n++;});
     save();toast(n?'أُضيف '+n+' إلى قائمة حفظك':'كلها موجودة بالفعل');lsnSheet(q);render(true);
   }
 },true);
@@ -9915,6 +10163,7 @@ async function lsFill(g,rows){
           const o=lsLook(r[0],D);
           if(o){if(!String(r[1]).trim())r[1]=o.ar;if(r[2]==null){r[2]=o.v;r[3]=o.p;r[4]=o.pa;if(o.ps)r[5]=1;}}
           else if(r[2]==null)r[2]=0;
+        }else if(!String(r[1]).trim()&&(r[1]=ruleSentAr(r[0],w=>{const o=lsLook(w,D);return o?String(o.ar).split(/[،,;\/]/)[0].trim():'';})||'')){
         }else if(!String(r[1]).trim()){
           const q=/\?\s*$/.test(r[0]),ws=(r[0].toLowerCase().match(/[a-z][a-z'’-]*/g)||[]).map(x=>x.replace(/['’]s$/,'')),out=[];
           const FW={i:'أنا',you:'أنت',he:'هو',she:'هي',it:'هو',we:'نحن',they:'هم',this:'هذا',that:'ذلك',these:'هؤلاء',those:'أولئك',a:'',an:'',the:'',am:'',is:'',are:'',was:'كان',were:'كانوا',do:'',does:'',did:''};
@@ -9981,7 +10230,7 @@ document.addEventListener('input',e=>{
 const TCA={words:0,sents:0,list:0,qv:0};
 let TCX=null;
 const TCM={g:'w',q:'',clr:0};
-const TC_WT=['e2a','a2e','spell','match','tf','mpast'],TC_ST=['sfill','order','smean'];
+const TC_WT=['e2a','wo','wl','match','a2e','mpast'],TC_ST=['sfill','order','sjum','smean'];
 function tcBank(q){
   const s=q.settings;
   if(s.lesson){const L=s.lesson;L.words=L.words||[];L.sents=L.sents||[];if(!L.types||!L.types.length)L.types=LS_DEF.concat('mpast');return L;}
@@ -10050,12 +10299,21 @@ function tcQList(q){
     const parts=lsContent({words:[],sents:[]}).replace(/<div class="ls-empty">[^<]*<\/div>/g,'').split('<div class="ls-blk">'),wB='<div class="ls-blk">'+parts[1],sB='<div class="ls-blk">'+parts[2];
     const sec=tcAcc('words','book','#4fdc9c','الكلمات','أضف كلمات وولّد أسئلتها',nw||'',wB+tcTypes(q,b,'w'))
      +tcAcc('sents','translate','#9686ff','الجمل','أضف جملًا وولّد أسئلتها',ns||'',sB+tcTypes(q,b,'s'))
-     +tcAcc('list','list','#ffd45a','الكلمات والجمل المضافة','راجع وعدّل واحذف ما أضفته',nw+ns||'',tcManager(b));
+     +tcAcc('list','list','#ffd45a','الكلمات والجمل المضافة','راجع وعدّل واحذف ما أضفته',nw+ns||'',tcManager(b))
+     +tcAcc('qv','list','#ffae5c','الأسئلة','عرض الأسئلة المضافة',q.questions.length||'',tcQList(q));
     let out=h;
     const c=out.search(/<section class="acc[^"]*" data-k="content"/);
     if(c>=0){const e=out.indexOf('</section>',c)+10;out=out.slice(0,c)+sec+out.slice(e);}
     const t=out.search(/<section class="acc[^"]*" data-k="types"/);
     if(t>=0){const e=out.indexOf('</section>',t)+10;out=out.slice(0,t)+out.slice(e);}
+    {const q2=out.search(/<section class="acc[^"]*" data-k="qs"/);if(q2>=0){const e=out.indexOf('</section>',q2)+10;out=out.slice(0,q2)+out.slice(e);}}
+    const grab=k=>{const a=out.search(new RegExp('<section class="acc[^"]*" data-k="'+k+'"'));if(a<0)return null;const e=out.indexOf('</section>',a)+10;const sc=out.slice(a,e);const bs=sc.indexOf('<div class="acc-b">')+19,be=sc.lastIndexOf('</div></section>');return {a,e,body:sc.slice(bs,be)};};
+    {const g1=grab('info'),g2=grab('grades');
+     if(g1&&g2&&g1.a<g2.a){
+       const merged=qxAcc(QACC,'info','pencil','#6ab4ff','إعدادات الدرس','العنوان والوصف والصفوف','',g1.body+'<div class="acc-sep"></div>'+g2.body);
+       out=out.slice(0,g2.a)+out.slice(g2.e);
+       out=out.slice(0,g1.a)+merged+out.slice(g1.e-(g2.a<g1.e?0:0));
+     }}
     return out;
   }
   const i=h.indexOf('<section class="acc'+'" data-k="gen"')>=0?h.indexOf('<section class="acc" data-k="gen"'):h.search(/<section class="acc[^"]*" data-k="gen"/);
@@ -10065,12 +10323,13 @@ function tcQList(q){
   const parts=lsContent(b).split('<div class="ls-blk">'),wB='<div class="ls-blk">'+parts[1],sB='<div class="ls-blk">'+parts[2];
   const sec=tcAcc('words','book','#4fdc9c','الكلمات','أضف كلمات وولّد أسئلتها',nw||'',wB+tcTypes(q,b,'w'))
    +tcAcc('sents','translate','#9686ff','الجمل','أضف جملًا وولّد أسئلتها',ns||'',sB+tcTypes(q,b,'s'))
+   +tcAcc('list','list','#ffd45a','الكلمات والجمل المضافة','راجع وعدّل واحذف ما أضفته',nw+ns||'',tcManager(b))
    +tcAcc('qv','list','#ffae5c','الأسئلة','عرض الأسئلة المضافة',q.questions.length||'',tcQList(q));
   let out=h.slice(0,i)+sec+h.slice(j+'</section>'.length);
   const grab=k=>{const a=out.search(new RegExp('<section class="acc[^"]*" data-k="'+k+'"'));if(a<0)return null;const e=out.indexOf('</section>',a)+10;const sec=out.slice(a,e);const bs=sec.indexOf('<div class="acc-b">')+19,be=sec.lastIndexOf('</div></section>');return {a,e,body:sec.slice(bs,be)};};
   {const g1=grab('info'),g2=grab('grades'),g3=grab('settings');
    if(g1&&g2&&g3&&g1.a<g2.a&&g2.a<g3.a){
-     const body=g1.body+'<div class="acc-sep"></div>'+g2.body+'<div class="acc-sep"></div>'+g3.body;
+     const body=g1.body+'<div class="acc-sep"></div>'+g2.body+'<div class="acc-sep"></div>'+`<div class="tcs-f${TCSET?' open':''}"><button type="button" class="tcs-h" data-act="tc_set" aria-expanded="${!!TCSET}"><span><b>إعدادات الأسئلة</b><small>الزمن والدرجات والموعد والترتيب</small></span>${ic('chev')}</button><div class="tcs-b">${g3.body}</div></div>`;
      const open=QACC.info?'open':'';
      const merged=qxAcc(QACC,'info','pencil','#6ab4ff','إعدادات المسابقة','العنوان والصفوف والزمن والدرجات والموعد','',body);
      out=out.slice(0,g1.a)+merged+out.slice(g3.e);
@@ -10080,6 +10339,8 @@ function tcQList(q){
   if(k>=0){const e=out.indexOf('</section>',k);if(e>=0)out=out.slice(0,k)+out.slice(e+10);}
   return out;
 };}
+let TCSET=0;
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="tc_set"]');if(!b)return;e.stopPropagation();e.preventDefault();TCSET=TCSET?0:1;render(true);},true);
 function tcAddSents(b,list){
   const have=new Set(b.sents.map(r=>r[0].toLowerCase())),rows=[];
   list.forEach(x=>{if(have.has(x.en.toLowerCase()))return;have.add(x.en.toLowerCase());const r=[x.en,x.a||''];b.sents.push(r);if(!r[1])rows.push(r);});
@@ -10143,6 +10404,8 @@ document.addEventListener('input',e=>{
   TCM.q=t.value;const box=document.getElementById('tcRows');if(box)box.innerHTML=tcRowsHtml(tcBank(q));
 });
 
+/* approved sentence types only */
+(function(){for(let i=SX.length-1;i>=0;i--)if(!['build','sfill','smean','sall'].includes(SX[i][0]))SX.splice(i,1);if(!SX.some(x=>x[0]===SXK))SXK='build';})();
 /* ===== professional question screen (bubble + teacher + clear header) ===== */
 const QD_LBL={mcq:'اختر الإجابة الصحيحة',tf:'هل العبارة صحيحة؟',fill:'اكتب إجابتك',match:'وصّل كل عنصر بما يناسبه',order:'رتّب الكلمات لتكوّن جملة صحيحة'};
 {const _v=vQuiz;vQuiz=function(){
@@ -11023,7 +11286,7 @@ document.addEventListener('click',e=>{
 },true);
 
 /* ===== sp.js: sentence drills (fill / order / paragraph) + collapsed "جملي" list ===== */
-SX.push(['para','كوّن فقرة','أكمل فقرة مكوّنة من جمل درسك',2]);
+
 function paBlank(raw){
   const c=sxClean(raw);return c;
 }
@@ -11210,8 +11473,9 @@ document.addEventListener('click',e=>{
 let TCSEG='quiz';const TCWO={quiz:0,contest:0};
 {const _t=tcTabbar;
  tcTabbar=function(){
-  const t=[['class','user','الفصل'],['quiz','trophy','الدروس والمسابقات'],['app','list','التطبيق']];
-  return `<nav class="tabbar" style="grid-template-columns:repeat(3,minmax(0,1fr))">${t.map(([k,i,l])=>`<button class="tab ${TCH.tab===k?'on':''}" data-act="tc_tab" data-t="${k}">${ic(i)}<span>${l}</span></button>`).join('')}</nav>`;
+  const t=[['class','user','الفصل'],['quiz','book','الدروس'],['contest','trophy','المسابقات'],['app','list','التطبيق']];
+  const on=k=>k==='class'||k==='app'?TCH.tab===k:(TCH.tab==='quiz'||TCH.tab==='contest')&&TCSEG===k;
+  return `<nav class="tabbar" style="grid-template-columns:repeat(4,minmax(0,1fr))">${t.map(([k,i,l])=>`<button class="tab ${on(k)?'on':''}" data-act="tc_tab" data-t="${k}">${ic(i)}<span>${l}</span></button>`).join('')}</nav>`;
  };}
 function tcwPage(){
   const C=TCSEG==='contest',doc=new DOMParser().parseFromString('<body>'+vTqList(C?'contest':'quiz')+'</body>','text/html');
@@ -11219,13 +11483,13 @@ function tcwPage(){
   const cards=all('.tq-card').map(n=>n.outerHTML).join(''),err=q('.au-err'),empty=q('.empty'),sum=q('.acc-sum');
   const nBtn=q('.ob-top')?null:null,newBtn=q(C?'.btn[data-act="tq_new"]':'.btn[data-act="lsn_new"]'),pres=q('.tq-presets');
   const n=all('.tq-card').length,open=TCWO[TCSEG];
-  const seg=`<div class="ws-seg" role="tablist"><button class="${C?'':'on'}" data-act="tcw_seg" data-k="quiz" role="tab" aria-selected="${!C}">${ic('book')} الدروس</button><button class="${C?'on':''}" data-act="tcw_seg" data-k="contest" role="tab" aria-selected="${C}">${ic('trophy')} المسابقات</button></div>`;
+  const seg='';
   const add=`<div class="addcard"><h3>${C?'إنشاء مسابقة':'إنشاء درس'}</h3>
     <p class="help" style="margin:0 0 10px">${C?'اختر نوع المسابقة السريع أو ابدأ مسابقة فارغة، وانشرها لطلاب فصلك.':'أضف كلمات الحفظ وجمل الدرس، ويولّد التطبيق الأسئلة ثم تنشره لطلاب فصلك.'}</p>
     ${pres?pres.outerHTML:''}${newBtn?newBtn.outerHTML:''}</div>`;
   const body=`${err?err.outerHTML:''}${n?cards:(empty?empty.outerHTML:'')}`;
   const acc=`<section class="acc wl-acc tcw-acc${open?' open':''}" style="--ec:${C?'#ffae5c':'#6a58ee'}"><button type="button" class="acc-h" data-act="tcw_t" aria-expanded="${!!open}"><span class="acc-ic">${ic(C?'trophy':'book')}</span><span class="acc-t"><b>${C?'مسابقاتي':'دروسي'}</b><small>${n?(C?'اضغط لعرض مسابقاتك':'اضغط لعرض دروسك'):(C?'لا توجد مسابقات بعد':'لا توجد دروس بعد')}</small></span><span class="acc-n en">${n}</span><span class="acc-ch">${ic('chev')}</span></button><div class="acc-b">${body}</div></section>`;
-  return `<div class="screen au tc"><div class="ob-top"><div><h2 style="margin:0;font-size:24px">الدروس والمسابقات</h2><small style="color:var(--muted);font-weight:700">أنشئ دروساً ومسابقات لطلاب فصلك</small></div></div>${seg}${sum?sum.outerHTML:''}${add}${acc}</div>`;
+  return `<div class="screen au tc"><div class="ob-top"><div><h2 style="margin:0;font-size:24px">${C?'المسابقات':'الدروس'}</h2><small style="color:var(--muted);font-weight:700">${C?'أنشئ مسابقات سريعة لطلاب فصلك':'كلمات حفظ وجمل مهمة وأسئلة متنوعة لطلاب فصلك'}</small></div></div>${seg}${sum?sum.outerHTML:''}${add}${acc}</div>`;
 }
 {const _v=vTeacher;vTeacher=function(){
   if(TCH.tab==='contest'){TCH.tab='quiz';TCSEG='contest';}
@@ -11493,21 +11757,11 @@ function memImgHtml(q){
   return '';
 }
 
-/* ===== so.js: student-only app — no teacher account, teacher code, class, rooms ===== */
-try{localStorage.setItem(TM_KEY,'0');localStorage.removeItem(TS_KEY);}catch(e){}
-{const _r=render;render=function(){TCH.on=false;KQ.on=false;CH.on=false;ADM.on=false;return _r.apply(this,arguments);};}
-tFab=function(){const o=document.getElementById('tcFab');if(o)o.remove();};
+/* ===== Disable legacy rooms/arena while keeping teacher and class features enabled ===== */
+{const _r=render;render=function(){KQ.on=false;CH.on=false;ADM.on=false;return _r.apply(this,arguments);};}
 lvFab=function(){const o=document.getElementById('lvFab');if(o)o.remove();};
-aucRow=function(){return '';};
-{const _va=vAuth;vAuth=function(){
-  const d=new DOMParser().parseFromString('<div id="r">'+_va()+'</div>','text/html');
-  d.querySelectorAll('[data-act="tc_open"],[data-act="adm_open"],.au-join,.au-ar').forEach(e=>{const p=e.closest('.au-sw')||e;p.remove();});
-  const c=d.getElementById('auCode');if(c){const f=c.closest('.field');if(f)f.remove();}
-  d.querySelectorAll('.au-sep').forEach(e=>{if(!e.nextElementSibling)e.remove();});
-  return d.getElementById('r').innerHTML;
-};}
 document.addEventListener('click',e=>{
-  const b=e.target.closest&&e.target.closest('[data-act="tc_open"],[data-act="adm_open"],[data-act="ch_open"],[data-act="lv_code"],[data-act="lv_open"],[data-act="lv_join"]');
+  const b=e.target.closest&&e.target.closest('[data-act="adm_open"],[data-act="ch_open"],[data-act="lv_code"],[data-act="lv_open"],[data-act="lv_join"]');
   if(b){e.stopPropagation();e.preventDefault();}
 },true);
 
@@ -11528,9 +11782,7 @@ const arShuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Ma
 function arPool(){const m=new Map();ARV.forEach(x=>m.set(x[0],{en:x[0],ar:x[1],em:x[2]}));(S.items||[]).forEach(i=>{if(i.t!=='s'&&i.en&&i.a&&/^[a-z ]+$/i.test(i.en)){const k=i.en.toLowerCase();m.set(k,{en:k,ar:i.a,em:(m.get(k)||{}).em||(typeof kxEmoji==='function'?kxEmoji(k):'')});}});return [...m.values()];}
 function arOpts(right,all,n){const o=arShuf(all.filter(x=>x!==right)).slice(0,n-1);o.push(right);return arShuf(o);}
 function arGen(lv){
-  const P=arPool(),ty=['mcq','pic','listen','tf','scr','trE'];
-  if(lv!=='e')ty.push('fill','trA','gram','mcq');
-  if(lv==='h')ty.push('err','iq','gram','scr');
+  const P=arPool(),ty=['mcq','trE','scr','fill'];
   const a=arS();
   for(let tries=0;tries<10;tries++){
     const k=arRnd(ty);let q=null;const w=arRnd(P);
@@ -11564,7 +11816,7 @@ function arStart(mode,opp,stake){
 function arNext(){
   clearInterval(AR.tm);
   if(AR.i>=AR.N){return arEnd();}
-  const lv=arLv();AR.q=arGen(AR.k0||AR.lv);AR.fb=null;AR.left=lv.t;AR.hid=0;AR.cheat=false;AR.hide=[];
+  const lv=arLv();AR.q=AR.mode==='tour'?arGen2(AR.k0||AR.lv,AO.flt.kind):arGen(AR.k0||AR.lv);AR.fb=null;AR.left=lv.t;AR.hid=0;AR.cheat=false;AR.hide=[];
   const ok=Math.random()<AR.opp.acc,bt=lv.t*(.25+Math.random()*.6);AR.bp={ok,t:bt};
   AR.t0=Date.now();render(true);
   if(AR.q.aud)setTimeout(()=>{try{speak(AR.q.aud)}catch(e){}},300);
@@ -11620,6 +11872,13 @@ function vArenaHome(){
   <div class="ar-mic ${mic?'on':''}">${ic('mic')} ${mic?'تصريح المايك والدردشة مفعّل · '+Math.ceil((a.mic-Date.now())/60000)+' دقيقة':'اربح تحديًا لتفتح المايك والدردشة'}</div>
   <div class="ar-links"><button class="pill" data-act="ar_v" data-k="board">الترتيب</button><button class="pill" data-act="ar_v" data-k="hist">سجل المباريات</button></div>`;
 }
+function vArenaSetup(){
+  return `<div class="ph"><div><h2>إعداد البطولة</h2><small>اختر مستوى الأسئلة ونوعها قبل البدء</small></div>${chips()}</div>
+  ${aoSettings(false)}
+  <div class="note">رسوم البطولة 30 عملة افتراضية، وتبدأ بعد تأكيدك.</div>
+  <button class="btn" data-act="ar_setup_start">ابدأ البطولة · 30 عملة</button>
+  <button class="btn ghost" data-act="ar_setup_back">رجوع</button>`;
+}
 function vArenaMatch(){
   const lv=arLv(),q=AR.q,fb=AR.fb;if(!q)return '';
   const opts=q.opts.map((o,i)=>{let c='ar-o'+(q.en?' en':'');if(AR.hide&&AR.hide.includes(i))c+=' gone';if(fb){if(i===q.a)c+=' right';else if(i===fb.pick)c+=' wrong';else c+=' dim';}return `<button class="${c}" data-act="ar_a" data-i="${i}" ${fb?'disabled':''}>${esc(o)}</button>`;}).join('');
@@ -11627,7 +11886,7 @@ function vArenaMatch(){
   return `<div class="ar-top"><button class="kx-x" data-act="ar_quit" aria-label="خروج">${ic('close')}</button>${bar}</div>
   <div class="ar-tm"><i id="arT" style="width:${AR.left/lv.t*100}%"></i><b id="arTn" class="en">${Math.ceil(AR.left)}</b></div>
   <div class="ar-q"><small>${q.lab}</small>${q.em?`<div class="ar-em">${q.em}</div>`:''}${q.big?`<div class="ar-big ${q.bigAr?'':'en'}">${esc(q.big)}</div>`:''}${q.aud?`<button class="pill" data-act="speak" data-t="${esc(q.aud)}">${ic('speaker')} استمع</button>`:''}</div>
-  <div class="ar-os">${opts}</div>
+  <div class="ar-os ${q.opts.some(o=>String(o).trim().length>=24)?'long':''}">${opts}</div>
   ${fb?`<div class="ar-fb ${fb.ok?'ok':'no'}">${fb.pick===-1?'انتهى الوقت':AR.cheat?'غادرت الصفحة — محسوبة خطأ':fb.ok?'صحيح! +'+AR.last.mine:'إجابة خاطئة'} · ${esc(AR.opp.n)}: +${AR.last.bot}</div>`:`<div class="ar-ll"><button class="pill" data-act="ar_ll" ${arS().ll?'':'disabled'}>${ic('spark')} 50/50 (${arS().ll})</button></div>`}`;
 }
 function vArenaEnd(){
@@ -11656,8 +11915,22 @@ function vArenaShop(){
 }
 function vArenaBoard(){
   const a=arS(),m={};a.hist.forEach(h=>{const o=m[h.o]=m[h.o]||{w:0,l:0};if(h.r==='l')o.w++;else if(h.r==='w')o.l++;});
-  const rows=[{n:'أنت',w:a.w,l:a.l,me:1}].concat(Object.keys(m).map(n=>({n,w:m[n].w,l:m[n].l}))).sort((x,y)=>y.w-x.w);
-  return `<div class="ph"><div><h2>الترتيب</h2><small>حسب عدد الانتصارات</small></div></div><div class="ar-shop">${rows.map((r,i)=>`<div class="ar-it ${r.me?'me':''}"><span class="ar-ii en">${i+1}</span><div style="flex:1"><b>${esc(r.n)}</b></div><span class="en">${r.w} فوز · ${r.l} خسارة</span></div>`).join('')}</div><button class="btn ghost" data-act="ar_home">رجوع</button>`;
+  const rows=[{n:S.profile&&S.profile.name||'أنت',w:a.w,l:a.l,me:true}]
+    .concat(Object.keys(m).map(n=>({n,w:m[n].w,l:m[n].l})))
+    .sort((x,y)=>y.w-x.w||x.l-y.l||x.n.localeCompare(y.n,'ar'));
+  const order=[rows[1],rows[0],rows[2]],medal=['#ffd45a','#d4dcff','#ffae7a'];
+  const rate=a.hist.length?Math.round(a.w/a.hist.length*100):0;
+  const podium=order.map((r,k)=>{
+    if(!r)return '<div></div>';
+    const rank=rows.indexOf(r);
+    const profile=r.me?(S.profile||{name:r.n}):{name:r.n};
+    return `<div class="pcol ${r.me?'me':''}"><div class="pav">${av(profile,rank===0?64:52)}${rank===0?'<span class="crown"><svg viewBox="0 0 32 24"><path d="M3 20L1 6l8 6 7-10 7 10 8-6-2 14z" fill="#ffd45a" stroke="#e0a21e" stroke-width="2" stroke-linejoin="round"/></svg></span>':''}</div><b>${esc(r.n)}</b><small>${r.w} فوز · ${r.l} خسارة</small><div class="pbase" style="height:${rank===0?92:rank===1?68:52}px;background:${medal[rank]}"><span class="en">${rank+1}</span></div></div>`;
+  }).join('');
+  const rest=rows.slice(3).map((r,i)=>`<div class="brow ${r.me?'me':''}"><span class="rk en">${i+4}</span>${av(r.me?(S.profile||{name:r.n}):{name:r.n},44)}<div class="bt"><b>${esc(r.n)}${r.me?' (أنت)':''}</b><small>${r.w} فوز · ${r.l} خسارة</small></div><span class="bv en">${r.w}</span></div>`).join('');
+  return `<div class="boardsec"><div class="ph"><div><h2>الترتيب</h2><small>الفائزون حسب عدد الانتصارات</small></div></div>
+   <div class="bsum"><div><small>المباريات</small><b class="en">${a.hist.length}</b></div><div><small>انتصاراتك</small><b class="en">${a.w}</b></div><div><small>نسبة الفوز</small><b class="en">${rate}%</b></div></div>
+   ${a.hist.length?`<div class="podium">${podium}</div>${rest?`<div class="blist">${rest}</div>`:''}<p class="help" style="text-align:center">عند التعادل يتقدم من لديه خسائر أقل.</p>`:'<div class="empty"><b>لا توجد نتائج بعد</b><span>ابدأ تحديًا لتظهر أسماء الفائزين هنا.</span></div>'}
+   <button class="btn ghost" data-act="ar_home">رجوع</button></div>`;
 }
 function vArenaHist(){
   const a=arS();
@@ -11665,12 +11938,18 @@ function vArenaHist(){
 }
 function vArena(){
   let h='';
-  if(AR.v==='match')h=vArenaMatch();else if(AR.v==='end')h=vArenaEnd();else if(AR.v==='stake')h=vArenaStake();else if(AR.v==='shop')h=vArenaShop();else if(AR.v==='board')h=vArenaBoard();else if(AR.v==='hist')h=vArenaHist();
+  if(AR.v==='setup')h=vArenaSetup();else if(AR.v==='match')h=vArenaMatch();else if(AR.v==='end')h=vArenaEnd();else if(AR.v==='stake')h=vArenaStake();else if(AR.v==='shop')h=vArenaShop();else if(AR.v==='board')h=vArenaBoard();else if(AR.v==='hist')h=vArenaHist();
   else if(AR.v==='pick')h=`<div class="ph"><div><h2>اختر منافسك</h2><small>${arLv().n}</small></div></div><div class="ar-opps">${arOppsHtml()}</div><button class="btn ghost" data-act="ar_home">رجوع</button>`;
   else h=vArenaHome()+`<button class="btn ghost" data-act="ar_back">رجوع للرئيسية</button>`;
   return `<div class="screen ar">${h}</div>`;
 }
 {const _v=vTrain;vTrain=function(){if(PV==='arena')return vArena();return _v.apply(this,arguments);};}
+{const _vtStudentLessons=vTrain;vTrain=function(){
+  const h=_vtStudentLessons.apply(this,arguments);
+  if(PV!=='main'||TAB!=='train'||!sbSess())return h;
+  const end=h.lastIndexOf('</div>');
+  return end<0?h:h.slice(0,end)+lsnCard()+h.slice(end);
+};}
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&PV==='arena'&&AR.v==='match'&&!AR.fb)AR.cheat=true;});
 document.addEventListener('click',e=>{
   const t=e.target.closest&&e.target.closest('[data-act^="ar_"]');if(!t)return;
@@ -11683,8 +11962,10 @@ document.addEventListener('click',e=>{
   if(a==='ar_go'){
     if(d.k==='friend'){AR.v='pick';AR.mode='friend';render(true);}
     else if(d.k==='random'){AR.mode='random';AR.opp=arOpp();AR.stake=0;AR.v='stake';render(true);}
-    else{if(arCoins()<30){toast('رسم البطولة 30 عملة');return;}arPay(-30);save();AR.mode='tour';AR.tr=0;AR.opp=arOpp();AR.stake=0;arStart('tour',AR.opp,0);}
+    else{if(arCoins()<30){toast('رسم البطولة 30 عملة');return;}AR.mode='tour';AR.tr=0;AR.opp=arOpp();AR.stake=0;AR.v='setup';render(true);}
     return;}
+  if(a==='ar_setup_start'){if(arCoins()<30){toast('رصيدك لا يكفي لرسوم البطولة');return;}arPay(-30);save();arStart('tour',AR.opp,0);return;}
+  if(a==='ar_setup_back'){AR.v='home';render(true);return;}
   if(a==='ar_opp'){AR.opp=AR.cands[+d.i];AR.stake=0;AR.v='stake';render(true);return;}
   if(a==='ar_stake'){AR.stake=+d.v;render(true);return;}
   if(a==='ar_play'){arStart(AR.mode,AR.opp,AR.stake);return;}
@@ -11694,6 +11975,221 @@ document.addEventListener('click',e=>{
   if(a==='ar_next'){AR.opp=arOpp();AR.me=AR.bot=0;AR.stake=0;arStart('tour',AR.opp,0);AR.tr=AR.tr;return;}
   if(a==='ar_daily'){if(S0.day===arDay()){return;}S0.day=arDay();const g=25+Math.min(S0.st,7)*5;arPay(g);save();toast('+'+g+' عملة');render(true);return;}
   if(a==='ar_buy'){const x=ARSHOP.find(y=>y.id===d.id);if(!x||arCoins()<x.p)return;arPay(-x.p);if(x.id==='ll')S0.ll+=3;else if(x.id==='sh')S0.sh++;else if(x.id==='ap')S.pet.food+=3;else if(x.id==='mic')S0.mic=Math.max(S0.mic,Date.now())+30*60000;save();toast('تم الشراء');render(true);return;}
+},true);
+
+/* ===== ar2.js: ONLINE student-vs-student arena (needs arena_setup.sql) ===== */
+const ARS=[['I like apples.','أنا أحب التفاح.'],['She goes to school every day.','هي تذهب إلى المدرسة كل يوم.'],['My brother plays football.','أخي يلعب كرة القدم.'],['We live in a big house.','نحن نعيش في بيت كبير.'],['The cat is under the table.','القطة تحت الطاولة.'],['He drinks milk every morning.','هو يشرب الحليب كل صباح.'],['They are my friends.','هم أصدقائي.'],['I have a red bag.','لدي حقيبة حمراء.'],['The sun is very hot today.','الشمس حارة جدا اليوم.'],['Where is your book?','أين كتابك؟'],['My mother cooks dinner.','أمي تطبخ العشاء.'],['The bird can fly high.','الطائر يستطيع الطيران عاليا.'],['I love my school.','أحب مدرستي.'],['Ali reads a story at night.','علي يقرأ قصة في الليل.'],['The dog runs in the garden.','الكلب يجري في الحديقة.'],['We eat lunch at two.','نأكل الغداء في الثانية.']];
+function arSPool(){const m=new Map();ARS.forEach(x=>m.set(x[0],x));(S.items||[]).forEach(i=>{if(i.t==='s'&&i.en&&i.a){const n=i.en.trim().split(/\s+/).length;if(n>=3&&n<=9)m.set(i.en.trim(),[i.en.trim(),i.a]);}});return [...m.values()];}
+const arGenW=arGen;
+function arGen2(lv,kind){
+  kind=kind||'words';
+  if(kind==='words')return arGenW(lv);
+  const SP=arSPool(),a=arS();
+  const sty=['sfill','str','sord'];
+  const wty=kind==='mix'?['w','w']:[];
+  for(let tr=0;tr<10;tr++){
+    if(wty.length&&Math.random()<.4){const q=arGenW(lv);q.id=null;return q;}
+    const k=arRnd(sty),s=arRnd(SP);let q=null;
+    const allw=[...new Set(SP.flatMap(x=>x[0].replace(/[.?!,]/g,'').split(/\s+/)).filter(w=>w.length>2))];
+    if(k==='sfill'){const ws=s[0].split(/\s+/),idx=ws.map((w,i)=>[w.replace(/[.?!,]/g,''),i]).filter(x=>x[0].length>2&&x[1]>0);if(!idx.length)continue;const [w,i]=arRnd(idx);const pun=ws[i].slice(w.length);const bl=ws.slice();bl[i]='____'+pun;const o=arShuf(arShuf(allw.filter(x=>x.toLowerCase()!==w.toLowerCase())).slice(0,3).concat(w));q={lab:'أكمل الكلمة الناقصة في الجملة',big:bl.join(' '),opts:o,a:o.indexOf(w),en:1,k};q.sub=s[1];}
+    else if(k==='str'){const o=arOpts(s[1],SP.map(x=>x[1]),4);q={lab:'اختر الترجمة الصحيحة للجملة',big:s[0],opts:o,a:o.indexOf(s[1]),k,aud:s[0]};}
+    else if(k==='sord'){const ws=s[0].split(/\s+/);if(ws.length<3)continue;const vs=new Set([s[0]]);let g=0;while(vs.size<4&&g++<30){vs.add(arShuf(ws).join(' '));}if(vs.size<4)continue;const o=arShuf([...vs]);q={lab:'اختر الجملة المرتبة صحيحًا',big:s[1],bigAr:1,opts:o,a:o.indexOf(s[0]),en:1,k};}
+    else if(k==='gram'){const g=arRnd(ARG),o=arShuf(g[1].map((t,i)=>[t,i===g[2]])),ai=o.findIndex(x=>x[1]);q={lab:'اختر الإجابة الصحيحة (قواعد)',big:g[0],opts:o.map(x=>x[0]),a:ai,en:1,k};}
+    else if(k==='err'){const e=arRnd(ARE);q={lab:'اكتشف الخطأ في الجملة',big:e[0].join(' '),opts:e[0],a:e[1],en:1,k};}
+    if(!q||q.a<0)continue;q.id=k+(q.big||'');if(a.seen.includes(q.id)&&tr<9)continue;a.seen.push(q.id);if(a.seen.length>300)a.seen.shift();return q;
+  }
+  return arGenW(lv);
+}
+const arClean=q=>{const o={k:q.k,lab:q.lab,opts:q.opts,a:q.a};['big','em','aud','en','bigAr','sub'].forEach(f=>{if(q[f]!==undefined)o[f]=q[f];});return o;};
+const AO={v:'',flt:{kind:'mix',same:false},inbox:[],online:[],onlineReq:0,onlineLoading:false,M:null,mine:{},tick:0,err:'',start:0,paid:false,idx:-1,ph:'',res:null,target:null,bg:null,mt:null,busy:false};
+const arRpc=(fn,a)=>lvRpc(fn,a||{},false);
+const arErr=e=>{const m=String(e&&e.message||e);if(/404|PGRST202|does not exist|Could not find/.test(m))return 'شغّل ملف arena_setup.sql في Supabase لتفعيل التحدي الأونلاين.';if(/not_auth|no-session/.test(m))return 'سجّل الدخول أولًا.';if(/expired/.test(m))return 'انتهت صلاحية التحدي.';return 'تعذّر الاتصال، حاول مجددًا.';};
+const arGradeN=g=>(g==null||g===''||!GRADES[g])?'':String(GRADES[g]).replace('الصف ','').replace(' الابتدائي',' ابتدائي').replace(' الإعدادي',' إعدادي').replace(' الثانوي',' ثانوي');
+const arUserAv=(u,sz)=>av({name:u&&u.name,photo:u&&u.avatar},sz);
+const arKindN={words:'كلمات',sents:'جمل',mix:'كلمات وجمل'};
+function aoStop(){clearInterval(AO.bg);clearInterval(AO.mt);AO.bg=AO.mt=null;}
+function aoReset(cancel){
+  if(cancel&&AO.M&&['waiting','invited','ready'].includes(AO.M.status))arRpc('ar_cancel',{p_id:AO.M.id}).catch(()=>{});
+  aoStop();AO.M=null;AO.mine={};AO.paid=false;AO.res=null;AO.idx=-1;AO.ph='';AO.target=null;
+}
+function aoBgStart(){
+  clearInterval(AO.bg);AO.tick=0;
+  AO.bg=setInterval(async()=>{
+    if(PV!=='arena'){if(AO.M&&['waiting','invited','ready'].includes(AO.M.status))arRpc('ar_cancel',{p_id:AO.M.id}).catch(()=>{});aoStop();return;}
+    if(!sbSess())return;AO.tick++;
+    try{
+      if(['home','online','stake'].includes(AO.v)){
+        if(AO.tick%5===1)await arRpc('ar_ping');
+        const ib=await arRpc('ar_inbox');if(JSON.stringify(ib)!==JSON.stringify(AO.inbox)){AO.inbox=ib||[];if(['home','online'].includes(AO.v))render(true);}
+        if(AO.v==='online'&&AO.tick%2===0){const l=await arRpc('ar_online',{p_grade:AO.flt.same&&S.profile?+S.profile.grade:null});if(JSON.stringify(l)!==JSON.stringify(AO.online)){AO.online=l||[];if(AO.v==='online')render(true);}}
+      }else if(AO.v==='wait'||AO.v==='play'){await aoPoll();}
+    }catch(e){AO.err=arErr(e);}
+  },1000);
+}
+async function aoPoll(){
+  if(!AO.M||AO.busy)return;AO.busy=true;
+  try{
+    const m=await arRpc('ar_get',{p_id:AO.M.id}),prev=AO.M.status;AO.M=m;AO.start=Date.now()+(m.started_in||0)*1000;
+    if(m.status==='playing'&&!AO.paid){AO.paid=true;const a=arS();a.paid=a.paid||{};if(!a.paid[m.id]){a.paid[m.id]=1;arPay(-m.stake);const ks=Object.keys(a.paid);if(ks.length>30)delete a.paid[ks[0]];save();}if(AO.v==='wait'){AO.v='play';AO.idx=-1;AO.mt=setInterval(aoFrame,250);}}
+    if(m.status==='cancelled'&&AO.v==='wait'){toast('أُلغي التحدي');aoReset();AO.v='home';}
+    if(m.status==='done'&&AO.v==='play'&&AO.res===null)aoFinish();
+    else if(AO.v==='wait')render(true);
+  }catch(e){AO.err=arErr(e);if(/not_found/.test(String(e&&e.message))){aoReset();AO.v='home';render(true);}}
+  AO.busy=false;
+}
+function aoSlot(){const m=AO.M,s=m.t+3,el=(Date.now()-AO.start)/1000;if(el<0)return {i:-1,ph:'cd',left:-el};const i=Math.floor(el/s),w=el-i*s;return {i,ph:w<m.t?'q':'r',left:m.t-w,w};}
+function aoFrame(){
+  const m=AO.M;if(!m||AO.v!=='play'||PV!=='arena'){return;}
+  const sl=aoSlot();
+  if(sl.i>=m.n){if(AO.res===null&&m.status==='done')aoFinish();return;}
+  if(sl.i!==AO.idx||sl.ph!==AO.ph){
+    if(AO.ph==='q'&&AO.idx>=0&&!AO.mine[AO.idx]&&sl.ph!=='q'||(AO.idx>=0&&sl.i!==AO.idx&&!AO.mine[AO.idx]))aoSend(AO.idx,-1);
+    AO.idx=sl.i;AO.ph=sl.ph;render(true);
+    if(sl.ph==='q'&&m.qs[sl.i]&&m.qs[sl.i].aud)setTimeout(()=>{try{speak(m.qs[sl.i].aud)}catch(e){}},300);
+  }
+  const t=document.getElementById('aoT');if(t&&sl.ph==='q')t.style.width=Math.max(0,sl.left/m.t*100)+'%';
+  const n=document.getElementById('aoTn');if(n&&sl.ph==='q')n.textContent=Math.ceil(sl.left);
+}
+async function aoSend(i,pick){
+  if(AO.mine[i]&&AO.mine[i].sent)return;AO.mine[i]=Object.assign(AO.mine[i]||{},{p:pick,sent:1});
+  try{const r=await arRpc('ar_answer',{p_id:AO.M.id,p_q:i,p_pick:pick});AO.mine[i].a=r.a;AO.mine[i].ok=r.ok;AO.mine[i].s=r.score;if(AO.v==='play'&&AO.idx===i)render(true);}catch(e){}
+}
+function aoFinish(){
+  const m=AO.M,a=arS(),me=m.side==='a'?m.a_score:m.b_score,op=m.side==='a'?m.b_score:m.a_score,r=me>op?'w':me<op?'l':'d';let gain=0,note='';
+  if(r==='w'){gain=m.stake*2;a.mic=Math.max(a.mic,Date.now())+10*60000;a.w++;a.st++;a.best=Math.max(a.best,a.st);S.xp=(S.xp||0)+15+Math.round(m.stake/5);}
+  else if(r==='d'){gain=m.stake;a.d++;}
+  else{a.l++;a.st=0;if(a.sh>0&&m.stake>0){a.sh--;gain=Math.floor(m.stake/2);note='الدرع أرجع نصف الرهان';}}
+  a.pd=a.pd||{};if(!a.pd[m.id]){a.pd[m.id]=1;arPay(gain);a.hist.unshift({d:arDay(),o:(m.opp&&m.opp.name)||'?',me,bot:op,s:m.stake,r,lv:m.lv,m:'online',g:gain});if(a.hist.length>40)a.hist.pop();const ks=Object.keys(a.pd);if(ks.length>30)delete a.pd[ks[0]];}
+  save();clearInterval(AO.mt);AO.mt=null;AO.res={r,gain,note,me,op};AO.v='oend';render(true);
+}
+async function aoOpen(target){
+  if(AO.busy)return;AO.busy=true;
+  try{
+    const lv=arLv(),n=7,qs=[];for(let i=0;i<n;i++)qs.push(arClean(arGen2(AR.lv,AO.flt.kind)));
+    const m=await arRpc('ar_open',{p_kind:AO.flt.kind,p_lv:AR.lv,p_stake:AO.stake||0,p_same:!!AO.flt.same,p_target:target?target.id:null,p_qs:qs,p_n:n,p_t:lv.t});
+    AO.M=m;AO.mine={};AO.paid=false;AO.v='wait';AO.start=0;AO.busy=false;render(true);
+  }catch(e){AO.busy=false;toast(arErr(e));}
+}
+function aoInviteBox(){
+  if(!AO.inbox.length)return '';
+  return AO.inbox.map(x=>`<div class="ao-inv">${arUserAv(x.from,46)}<div style="flex:1"><b>${esc(x.from.name)}</b><small>يتحداك في ${arKindN[x.kind]||''}${x.stake?' · رهان '+x.stake+' عملة':''}</small></div><button class="pill go" data-act="ao_acc" data-id="${x.id}" data-st="${x.stake}">قبول</button></div>`).join('');
+}
+function aoSettings(withSame){
+  const f=AO.flt;
+  return `<div class="ar-settings ar-config">
+   <div class="ar-setting-head"><b>مستوى التحدي</b><small>اختر مستوى يناسبك</small></div>
+   <div class="ar-lv" role="group" aria-label="مستوى التحدي">${ARL.map(x=>`<button class="${x.k===AR.lv?'on':''}" data-act="ar_lv" data-k="${x.k}" style="--c:${x.c}" aria-pressed="${x.k===AR.lv}">${x.n}</button>`).join('')}</div>
+   <div class="ar-setting-head"><b>نوع الأسئلة</b><small>كلمات أو جمل</small></div>
+   <div class="ar-lv" role="group" aria-label="نوع الأسئلة">${[['words','كلمات'],['sents','جمل'],['mix','الاثنان']].map(x=>`<button class="${x[0]===f.kind?'on':''}" data-act="ao_f" data-k="${x[0]}" style="--c:#7c6cff" aria-pressed="${x[0]===f.kind}">${x[1]}</button>`).join('')}</div>
+   ${withSame?`<button class="ao-same ${f.same?'on':''}" data-act="ao_same" aria-pressed="${!!f.same}"><span class="ar-same-copy"><b>مع طلاب صفي فقط</b><small>طابقني مع طلاب من صفي الدراسي</small></span><span class="ao-sw"></span></button>`:''}
+  </div>`;
+}
+function aoHome(){
+  const a=arS(),can=a.day!==arDay(),mic=a.mic>Date.now();
+  return `<div class="ar-home">
+  <div class="ar-home-head"><div class="ar-home-copy"><span class="ar-kicker">${ic('spark')} تحديات مباشرة</span><h2>تحدي الصف</h2><p>نافس أصدقاءك واجمع العملات والجوائز</p></div>${chips()}</div>
+  ${aoInviteBox()}
+  <div class="ar-stat"><div><b>${a.w}</b><span>فوز</span></div><div><b>${a.l}</b><span>خسارة</span></div><div><b>${a.st}</b><span>سلسلة</span></div><div><b>${arCoins()}</b><span>عملاتك</span></div></div>
+  <div class="ar-actions-head"><b>اختر طريقة التحدي</b><small>جاهز للمنافسة؟</small></div>
+  <div class="ar-grid">
+   <button class="ar-b b1" data-act="ao_go" data-k="friend"><span class="ar-b-icon">${ic('user')}</span><span class="ar-b-copy"><b>تحدَّ صديقك</b><small>اختر من الطلاب المتصلين الآن</small></span></button>
+   <button class="ar-b b2" data-act="ao_go" data-k="random"><span class="ar-b-icon">${ic('spark')}</span><span class="ar-b-copy"><b>تحدٍّ عشوائي</b><small>نافس طالبًا حقيقيًا مباشرة</small></span></button>
+   <button class="ar-b b3" data-act="ar_go" data-k="tour"><span class="ar-b-icon">${ic('trophy')}</span><span class="ar-b-copy"><b>البطولة</b><small>تحدَّ الكمبيوتر واربح 30 عملة</small></span></button>
+   <button class="ar-b b4" data-act="ar_v" data-k="shop"><span class="ar-b-icon">${ic('gift')}</span><span class="ar-b-copy"><b>متجر الجوائز</b><small>استبدل عملاتك بمكافآت</small></span></button></div>
+  <button class="ar-daily ${can?'':'off'}" data-act="ar_daily"><span class="ar-daily-icon">${ic('gift')}</span><span class="ar-daily-copy"><b>${can?'مكافأتك اليومية جاهزة':'المكافأة اليومية'}</b><small>${can?'احصل على '+(25+Math.min(a.st,7)*5)+' عملة الآن':'عُد غدًا لمكافأة جديدة'}</small></span>${ic('arrow','fwd')}</button>
+  <div class="ar-mic ${mic?'on':''}"><span class="ar-mic-icon">${ic('mic')}</span><span>${mic?'الدردشة الصوتية مفعّلة · '+Math.ceil((a.mic-Date.now())/60000)+' دقيقة':'اربح تحديًا لفتح المايك والدردشة'}</span></div>
+  <div class="ar-links"><button class="pill" data-act="ar_v" data-k="board">الترتيب</button><button class="pill" data-act="ar_v" data-k="hist">سجل المباريات</button></div>
+  <button class="btn ghost" data-act="ar_back">رجوع للرئيسية</button>
+  </div>`;
+}
+async function aoFetchOnline(){
+  const req=AO.onlineReq=(AO.onlineReq||0)+1,grade=AO.flt.same&&S.profile?+S.profile.grade:null;
+  AO.online=[];AO.err='';AO.onlineLoading=true;render(true);
+  try{const users=await arRpc('ar_online',{p_grade:grade});if(req!==AO.onlineReq||AO.v!=='online')return;AO.online=users||[];}
+  catch(e){if(req===AO.onlineReq&&AO.v==='online')AO.err=arErr(e);}
+  finally{if(req===AO.onlineReq){AO.onlineLoading=false;if(AO.v==='online')render(true);}}
+}
+function aoOnline(){
+  const L=AO.online;
+  return `<div class="ph"><div><h2>الطلاب المتصلون</h2><small>${arKindN[AO.flt.kind]} · ${arLv().n}${AO.flt.same?' · صفي فقط':''}</small></div></div>${aoInviteBox()}${aoSettings(true)}
+  <div class="ao-list">${AO.onlineLoading?'<div class="empty"><b>جارٍ البحث عن الطلاب…</b></div>':L.length?L.map((u,i)=>`<div class="ao-u">${arUserAv(u,48)}<div style="flex:1"><b>${esc(u.name)}</b><small>${esc(arGradeN(u.grade))}${u.busy?' · في مباراة':' · متصل'}</small></div><button class="pill go" data-act="ao_ch" data-i="${i}" ${u.busy?'disabled':''}>تحدَّ</button></div>`).join(''):'<div class="empty"><b>لا يوجد طلاب في هذا الصف بعد</b><span>جرّب التحدي العشوائي، أو اطلب من أصدقائك فتح قسم تحدي الصف.</span></div>'}</div>
+  ${AO.err?`<p class="help" style="text-align:center">${esc(AO.err)}</p>`:''}
+  <button class="btn ghost" data-act="ao_home">رجوع</button>`;
+}
+function aoStake(){
+  const lv=arLv(),c=arCoins(),mx=Math.min(lv.mx,c),opts=[0,10,25,50,100,200,400].filter(v=>v<=mx);
+  if(AO.stake==null||AO.stake>mx)AO.stake=opts.includes(25)?25:opts[opts.length-1]||0;
+  const t=AO.target;
+  return `<div class="ph"><div><h2>الرهان</h2><small>${t?'ضدّ '+esc(t.name):'خصم عشوائي'} · ${arKindN[AO.flt.kind]} · ${lv.n}</small></div>${chips()}</div>
+  ${aoSettings(!t)}
+  ${t?`<div class="ar-opps one"><div class="ar-opp">${arUserAv(t,56)}<b>${esc(t.name)}</b><small>${esc(arGradeN(t.grade))}</small></div></div>`:''}
+  <div class="ar-st">${opts.map(v=>`<button class="${v===AO.stake?'on':''}" data-act="ao_stake" data-v="${v}">${v?ICO.coin+' '+v:'بدون رهان'}</button>`).join('')}</div>
+  <p class="help" style="text-align:center">${AO.stake?'تُخصم عند بدء المباراة، والفائز يأخذ '+AO.stake*2+' عملة. عملات افتراضية فقط.':'مباراة ودّية بلا عملات.'}</p>
+  <button class="btn" data-act="ao_send">${t?'أرسل التحدي':'ابحث عن خصم'}</button><button class="btn ghost" data-act="ao_home">رجوع</button>`;
+}
+function aoWait(){
+  const m=AO.M,me=S.profile||{},opp=m.opp,my=m[m.side+'_ready'],th=m[(m.side==='a'?'b':'a')+'_ready'];
+  const cd=m.status==='playing';let sl=cd&&AO.start?Math.max(0,Math.ceil((AO.start-Date.now())/1000)):0;
+  const stat=m.status==='waiting'?'جارٍ البحث عن خصم حقيقي…':m.status==='invited'?'بانتظار قبول '+esc(opp?opp.name:'الخصم')+'…':cd?'تبدأ المباراة…':'الخصم متصل — اضغط «مستعد»';
+  return `<div class="ar-wait"><div class="ph"><div><h2>غرفة الانتظار</h2><small>${arKindN[m.kind]} · ${(ARL.find(x=>x.k===m.lv)||{}).n||''}${m.stake?' · رهان '+m.stake:''}</small></div></div>
+  <div class="ao-vs"><div class="ao-p">${av({name:me.name||S.name,photo:me.photo},76)}<b>أنت</b><span class="ao-rd ${my?'on':''}">${my?'مستعد ✓':'غير مستعد'}</span></div>
+   <div class="ao-x">VS</div>
+   <div class="ao-p">${opp?arUserAv(opp,76):'<div class="avatar ao-q" style="width:76px;height:76px"></div>'}<b>${opp?esc(opp.name):'…'}</b><span class="ao-rd ${opp?(th?'on':''):''}">${opp?(th?'مستعد ✓':'لم يستعد بعد'):'غير متصل'}</span>${opp?`<small>${esc(arGradeN(opp.grade))}</small>`:''}</div></div>
+  <div class="ao-st ${cd?'go':''}">${cd&&sl>0?`<b class="ao-cd en">${sl}</b>`:esc(stat)}</div>
+  ${m.status==='ready'&&!my?`<button class="btn" data-act="ao_ready">أنا مستعد</button>`:''}
+  ${AO.err?`<p class="help" style="text-align:center">${esc(AO.err)}</p>`:''}
+  ${cd?'':'<button class="btn ghost" data-act="ao_cancel">إلغاء</button>'}</div>`;
+}
+function aoPlay(){
+  const m=AO.M,sl=aoSlot(),i=sl.i;
+  if(i<0)return aoWait();
+  const q=m.qs[i];if(!q||i>=m.n)return '<div class="empty"><b>جارٍ احتساب النتيجة…</b></div>';
+  const mine=AO.mine[i]||{},side=m.side,srv=m.ans&&m.ans[i]?m.ans[i]:{},cor=q.a!==undefined?q.a:mine.a;
+  const rev=sl.ph==='r'||mine.p!==undefined&&mine.a!==undefined;
+  const meS=side==='a'?m.a_score:m.b_score,opS=side==='a'?m.b_score:m.a_score,opp=m.opp||{};
+  const opts=q.opts.map((o,k)=>{let c='kx-o'+(q.en?' en':'');if(rev&&cor!==undefined){if(k===cor)c+=' right';else if(k===mine.p)c+=' wrong';else c+=' dim';}else if(mine.p!==undefined&&k===mine.p)c+=' pick';return `<button class="${c}" data-act="ao_a" data-i="${k}" ${mine.p!==undefined||sl.ph!=='q'?'disabled':''}>${esc(o)}</button>`;}).join('');
+  const oppA=srv.oppAnswered?(rev&&srv.opp?(srv.opp.s?'أجاب بشكل صحيح':'أجاب خطأ'):'أجاب ✓'):'يفكّر…';
+  return `<div class="ar-top"><div class="ao-sc"><div class="ao-me">${av(S.profile||{name:S.name},34)}<b>أنت</b><span class="en">${meS}</span></div><div class="ar-mid"><span class="en">${i+1}/${m.n}</span><small>${m.stake?m.stake+' عملة':'ودّية'}</small></div><div class="ao-me">${arUserAv(opp,34)}<b>${esc(opp.name||'')}</b><span class="en">${opS}</span></div></div></div>
+  <div class="ar-tm"><i id="aoT" style="width:${Math.max(0,sl.left/m.t*100)}%"></i><b id="aoTn" class="en">${Math.ceil(Math.max(0,sl.left))}</b></div>
+  <div class="kx-qc"><small>${esc(q.lab)}</small>${q.em?`<div class="ar-em">${q.em}</div>`:''}${q.big?`<div class="kx-word ${q.bigAr?'':'en'}">${esc(q.big)}</div>`:''}${q.sub?`<small>${esc(q.sub)}</small>`:''}${q.aud?`<button class="pill" data-act="speak" data-t="${esc(q.aud)}">${ic('speaker')} استمع</button>`:''}</div>
+  <div class="kx-opts">${opts}</div>
+  <div class="ao-fb ${rev?(mine.ok?'ok':'no'):''}">${rev?(mine.p===-1||mine.p===undefined?'انتهى الوقت':mine.ok?'صحيح! +'+(mine.s||0):'إجابة خاطئة'):'سرعتك تزيد نقاطك'} · ${esc(opp.name||'الخصم')}: ${oppA}</div>`;
+}
+function aoEnd(){
+  const r=AO.res,m=AO.M,opp=m.opp||{},t=r.r==='w'?'فزت! 🎉':r.r==='l'?'خسرت هذه المباراة':'تعادل';
+  return `<div class="ar-end ao-end ${r.r}"><h2>${t}</h2><div class="ao-vs sm"><div class="ao-p">${av(S.profile||{name:S.name},60)}<b>أنت</b><span class="ar-sc"><b class="en">${r.me}</b></span></div><div class="ao-x">VS</div><div class="ao-p">${arUserAv(opp,60)}<b>${esc(opp.name||'')}</b><span class="ar-sc"><b class="en">${r.op}</b></span></div></div>
+   <p class="ao-result-reward">${r.gain?'ربحت +'+r.gain+' عملة':m.stake?'خسرت '+m.stake+' عملة':'مباراة ودية'} ${r.note?'· '+r.note:''}</p>
+   ${r.r==='w'?`<div class="ar-mic on">${ic('mic')} كسبت تصريح المايك والدردشة 10 دقائق</div>`:''}
+   <button class="btn" data-act="ao_again">تحدٍّ جديد</button><button class="btn ghost" data-act="ao_home">تم</button></div>`;
+}
+{const _va=vArena;vArena=function(){
+  if(AO.v==='wait'||AO.v==='play'||AO.v==='oend'||AO.v==='online'||AO.v==='stake'){
+    const h=AO.v==='wait'?aoWait():AO.v==='play'?aoPlay():AO.v==='oend'?aoEnd():AO.v==='online'?aoOnline():aoStake();
+    return `<div class="screen ar">${h}</div>`;
+  }
+  if(AR.v==='home'&&PV==='arena')return `<div class="screen ar">${aoHome()}</div>`;
+  return _va.apply(this,arguments);
+};}
+document.addEventListener('click',e=>{
+  const t=e.target.closest&&e.target.closest('[data-act="ar_open"]');
+  if(t){AO.v='home';AO.err='';aoReset(false);aoBgStart();AO.inbox=[];}
+},true);
+document.addEventListener('click',async e=>{
+  const t=e.target.closest&&e.target.closest('[data-act^="ao_"]');if(!t)return;
+  e.stopPropagation();e.preventDefault();const a=t.dataset.act,d=t.dataset;
+  const need=()=>{if(!sbSess()){toast('سجّل الدخول (حسابي) لتلعب أونلاين');return true;}return false;};
+  if(a==='ao_f'){AO.flt.kind=d.k;render(true);return;}
+  if(a==='ao_same'){AO.flt.same=!AO.flt.same;if(AO.v==='online')await aoFetchOnline();else render(true);return;}
+  if(a==='ao_home'){aoReset(true);AO.v='home';AR.v='home';render(true);aoBgStart();return;}
+  if(a==='ao_go'){if(need())return;AO.target=null;AO.stake=null;if(d.k==='friend'){AO.v='online';await aoFetchOnline();}else{AO.v='stake';render(true);}return;}
+  if(a==='ao_ch'){AO.target=AO.online[+d.i];AO.stake=null;AO.v='stake';render(true);return;}
+  if(a==='ao_stake'){AO.stake=+d.v;render(true);return;}
+  if(a==='ao_send'){if(need())return;aoOpen(AO.target);return;}
+  if(a==='ao_acc'){if(need())return;if(arCoins()<+d.st){toast('رصيدك لا يكفي للرهان');return;}try{AO.M=await arRpc('ar_accept',{p_id:d.id});AO.mine={};AO.paid=false;AO.v='wait';AO.inbox=[];render(true);}catch(er){toast(arErr(er));}return;}
+  if(a==='ao_ready'){try{AO.M=await arRpc('ar_ready',{p_id:AO.M.id});AO.start=Date.now()+(AO.M.started_in||0)*1000;render(true);}catch(er){toast(arErr(er));}return;}
+  if(a==='ao_cancel'){aoReset(true);AO.v='home';render(true);aoBgStart();return;}
+  if(a==='ao_a'){const i=AO.idx;if(i<0||AO.mine[i])return;AO.mine[i]={p:+d.i};render(true);aoSend(i,+d.i);return;}
+  if(a==='ao_again'){aoReset(false);AO.v='stake';render(true);aoBgStart();return;}
 },true);
 
 
@@ -11731,7 +12227,7 @@ function auDropLocal(){
   S=DIR.cur?load():fresh();if(!DIR.cur)S.onboarded=true;
   G=null;TAB='train';PV='main';BOX=null;CONF=null;
   REG={on:false,add:false,edit:false,name:'',grade:'',phone:'',photo:'',err:''};
-  Object.assign(AUTH,{mode:'in',name:'',grade:'',phone:'',code:'',err:'',found:null});
+  Object.assign(AUTH,{mode:'in',name:'',grade:'',phone:'',err:'',found:null});
   SBL.list=null;SBL.key=null;AUC.info=undefined;SQ.list=null;
 }
 const AUDEL={teacher:false};
@@ -11757,7 +12253,7 @@ async function auDelRun(){
     if(AUDEL.teacher){
       const r=await tApi('/rest/v1/rpc/delete_my_account',{method:'POST',body:{}});
       if(!r.ok)throw await sbDbErr(r);
-      tSet(null);Object.assign(TCH,{on:false,mode:'in',me:null,list:null,ph:{},err:'',pass:'',pass2:'',tab:'class'});TQ.list=null;TQ.view='list';TQ.edit=null;
+      tSet(null);Object.assign(TCH,{on:false,mode:'in',name:'',phone:'',me:null,list:null,ph:{},err:'',tab:'class'});TQ.list=null;TQ.view='list';TQ.edit=null;
       try{localStorage.setItem(TM_KEY,'0');}catch(e){}
       if(S.profile&&S.profile.teacher)auDropLocal();
     }else{

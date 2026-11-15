@@ -475,7 +475,7 @@
         </section>
         <section class="khatma-home" id="khatmaHome" aria-label="ختمتي"></section>
         <section id="homeTasksSection" aria-label="المهام">
-          <div id="tasksApp" aria-label="المهام والملف الشخصي"></div>
+          <div id="tasksApp" aria-label="المهام"></div>
         </section>
         <section class="settings" aria-label="الإعدادات">
           <div class="settings-body" id="settingsBody">
@@ -539,6 +539,35 @@
                   <span>المصحف العادي</span>
                 </button>
               </div>
+            </div>
+
+            <div class="settings-card" id="mushafColorCard">
+              <div class="settings-card-head">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.8-.8 1.8-1.7 0-.5-.2-.9-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1 .8-1.7 1.8-1.7H17a4 4 0 0 0 4-4c0-4.400-4-8-9-8z"/><circle cx="7.500" cy="11" r="1"/><circle cx="10.500" cy="7" r="1"/><circle cx="15" cy="7.500" r="1"/></svg>
+                <span>ألوان المصحف:</span>
+                <span class="st-val" id="mushafColorLabel">كلاسيكي</span>
+              </div>
+              <div class="mk-swatches" id="mushafColorGroup" role="group" aria-label="ألوان المصحف">
+                <button type="button" class="mk-swatch active" data-mushaf="" aria-pressed="true"><i style="background:linear-gradient(135deg,#d9c8ac 50%,#f6eedf 50%)"></i><span>كلاسيكي</span></button>
+                <button type="button" class="mk-swatch" data-mushaf="blue" aria-pressed="false"><i style="background:linear-gradient(135deg,#2d5f9a 50%,#14305a 50%)"></i><span>أزرق</span></button>
+                <button type="button" class="mk-swatch" data-mushaf="green" aria-pressed="false"><i style="background:linear-gradient(135deg,#6a9a3c 50%,#23401a 50%)"></i><span>أخضر</span></button>
+                <button type="button" class="mk-swatch" data-mushaf="brown" aria-pressed="false"><i style="background:linear-gradient(135deg,#9a6a3a 50%,#2b1a10 50%)"></i><span>بني</span></button>
+                <button type="button" class="mk-swatch" data-mushaf="slate" aria-pressed="false"><i style="background:linear-gradient(135deg,#8a9099 50%,#1d2026 50%)"></i><span>رمادي</span></button>
+              </div>
+            </div>
+
+            <div class="settings-card" id="mushafSizeCard">
+              <div class="settings-card-head">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20 9 6l5 14M5.500 15h7M16 20l3-8 3 8M17 18h4"/></svg>
+                <span>حجم خط المصحف:</span>
+                <span class="st-val" id="mushafSizeLabel">١٠٠٪</span>
+              </div>
+              <div class="mk-size">
+                <button type="button" class="mk-size-btn" id="mushafSizeDown" aria-label="تصغير الخط">أ−</button>
+                <input type="range" id="mushafSizeRange" min="70" max="130" step="5" value="100" aria-label="حجم خط المصحف">
+                <button type="button" class="mk-size-btn" id="mushafSizeUp" aria-label="تكبير الخط">أ+</button>
+              </div>
+              <small class="mk-size-note">١٠٠٪ هو أكبر حجم يناسب عرض الشاشة الضيقة؛ التكبير فوقه يظهر على الشاشات العريضة.</small>
             </div>
 
             <div class="settings-card" id="tajweedLegendSettingsCard" hidden>
@@ -667,6 +696,8 @@
               <div class="reciter-picker">
                 <span class="reciter-picker-label">اختر القارئ</span>
                 <select id="reciterSelect" aria-label="اختر القارئ">
+                  <option value="Husary_Muallim_128kbps">المصحف المعلم للأطفال - محمود خليل الحصري</option>
+                  <option value="Minshawy_Teacher_128kbps">المصحف المعلم للأطفال - محمد صديق المنشاوي</option>
                   <option value="Alafasy_128kbps">مشاري العفاسي</option>
                   <option value="Abdurrahmaan_As-Sudais_192kbps">عبدالرحمن السديس - 192 كيلوبت</option>
                   <option value="Husary_128kbps">محمود خليل الحصري - مرتل</option>
@@ -700,7 +731,6 @@
                   <option value="Husary_64kbps">محمود خليل الحصري - 64 كيلوبت</option>
                   <option value="Husary_128kbps_Mujawwad">محمود خليل الحصري - مجود</option>
                   <option value="Husary_Mujawwad_64kbps">محمود خليل الحصري - مجود منخفض البيانات</option>
-                  <option value="Husary_Muallim_128kbps">محمود خليل الحصري - المصحف المعلم</option>
                   <option value="Ibrahim_Akhdar_64kbps">إبراهيم الأخضر - 64 كيلوبت</option>
                   <option value="Ibrahim_Akhdar_32kbps">إبراهيم الأخضر - 32 كيلوبت</option>
                   <option value="Karim_Mansoori_40kbps">كريم منصوري</option>
@@ -711,7 +741,6 @@
                   <option value="Minshawy_Murattal_128kbps">محمد صديق المنشاوي - مرتل عالي الجودة</option>
                   <option value="Minshawy_Mujawwad_192kbps">محمد صديق المنشاوي - مجود</option>
                   <option value="Minshawy_Mujawwad_64kbps">محمد صديق المنشاوي - مجود منخفض البيانات</option>
-                  <option value="Minshawy_Teacher_128kbps">محمد صديق المنشاوي - المصحف المعلم</option>
                   <option value="Mohammad_al_Tablaway_128kbps">محمد محمود الطبلاوي - 128 كيلوبت</option>
                   <option value="Mohammad_al_Tablaway_64kbps">محمد محمود الطبلاوي - 64 كيلوبت</option>
                   <option value="Muhammad_AbdulKareem_128kbps">محمد عبدالكريم</option>
@@ -858,7 +887,6 @@
     </div>
 
 
-    <!-- مكتبات Firebase تُحمَّل من app.js عند توفر الإنترنت فقط -->
     <!-- البيانات أولًا ثم المنطق -->
     <script src="./data.js"></script>
     <script src="./app.js"></script>

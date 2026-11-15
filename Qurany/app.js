@@ -1,690 +1,15 @@
 /* ======================================================================
  * Huda هدى — app.js
  * كل منطق التطبيق في ملف واحد. الأقسام بالترتيب الأصلي للتنفيذ (لا تغيّره):
- *   1) فايربيس / HudaCloud
- *   2) المهام اليومية (Tasks)
- *   3) دليل التجويد ومحلل الآيات
- *   4) المصحف الرئيسي (MushafRuntime)
- *   5) الخدمات المدمجة
- *   6) مواقيت الصلاة
- *   7) واجهة العبادة
- *   8) الأوفلاين وPWA
+ *   1) المهام اليومية (Tasks)
+ *   2) دليل التجويد ومحلل الآيات
+ *   3) المصحف الرئيسي (MushafRuntime)
+ *   4) الخدمات المدمجة
+ *   5) مواقيت الصلاة
+ *   6) واجهة العبادة
+ *   7) الأوفلاين وPWA
  * يعتمد على data.js (يُحمَّل قبله). كل قسم دالة IIFE مستقلة لا تتشارك متغيراتها.
  * ====================================================================== */
-
-/* ======================================================================
- * 1. فايربيس / HudaCloud
- * لوحة المتصدرين التلقائية: دخول مجهول دون تسجيل، ومزامنة النقاط عند توفر الإنترنت فقط.
- * ====================================================================== */
-(function () {
-  'use strict';
-
-  /* ---------------------------------------------------------------------
-   * HudaCloud: لوحة المتصدرين التلقائية.
-   *
-   * المبادئ:
-   *  1) لا تسجيل ولا كلمة مرور: يُنشأ حساب Firebase مجهول (Anonymous) تلقائيًا ويبقى على الجهاز.
-   *  2) لا شيء يُرسل ولا يُحمَّل إلا عند توفر الإنترنت. دون إنترنت يعمل التطبيق محليًا بالكامل،
-   *     وتبقى آخر نسخة من الترتيب محفوظة لتُعرض.
-   *  3) مكتبات Firebase تُحمَّل عند الحاجة فقط (وليس بوسوم <script> ثابتة) فيتعافى التطبيق وحده
-   *     إذا فُتح دون اتصال ثم عاد الإنترنت.
-   *  4) أحدث حالة فقط تُرسل (دمج الطلبات)، وعند فشل الشبكة تُعاد المحاولة بتأخير متزايد.
-   * ------------------------------------------------------------------- */
-  var SDK_VERSION = '10.12.2';
-  var SDK_URLS = ['app', 'auth', 'firestore'].map(function (name) {
-    return 'https://www.gstatic.com/firebasejs/' + SDK_VERSION + '/firebase-' + name + '-compat.js';
-  });
-  var firebaseConfig = {
-    apiKey: 'AIzaSyCM41g90JX0Q0L9tBDrGO2VkqltRJmk9_M',
-    authDomain: 'qurany-pro.firebaseapp.com',
-    projectId: 'qurany-pro',
-    storageBucket: 'qurany-pro.firebasestorage.app',
-    messagingSenderId: '363693622415',
-    appId: '1:363693622415:web:9eb88d7cb6690a09a3dcfa',
-    measurementId: 'G-68ZJF1KWDK'
-  };
-  var BOARD_CACHE_KEY = 'huda.leaderboardCache.v1';
-  var BOARD_LIMIT = 30;
-  var SYNC_DEBOUNCE_MS = 700;
-  var RETRY_DELAYS_MS = [4000, 12000, 30000, 90000, 300000];
-
-  function isOnline() {
-    return navigator.onLine !== false;
-  }
-  function toDigits(value) {
-    return String(value).replace(/\d/g, function (digit) {
-      return '٠١٢٣٤٥٦٧٨٩'[digit];
-    });
-  }
-  /* اسم تلقائي ثابت لكل جهاز مشتق من معرّف الحساب المجهول، يُستخدم حتى يختار المستخدم اسمه */
-  function autoNameFor(uid) {
-    var hash = 0;
-    for (var i = 0; i < uid.length; i++) hash = (hash * 31 + uid.charCodeAt(i)) >>> 0;
-    return 'ضيف هدى ' + toDigits((hash % 9000) + 1000);
-  }
-  function safeAvatar(value) {
-    return typeof value === 'string' && value.indexOf('data:image/') === 0 && value.length <= 150000 ? value : '';
-  }
-  function readBoardCache() {
-    try {
-      var list = JSON.parse(localStorage.getItem(BOARD_CACHE_KEY) || '[]');
-      return Array.isArray(list) ? list.slice(0, BOARD_LIMIT) : [];
-    } catch (error) {
-      return [];
-    }
-  }
-  function writeBoardCache(list) {
-    try {
-      // الصور المضمَّنة كبيرة؛ لا تُحفظ في نسخة الأوفلاين.
-      localStorage.setItem(
-        BOARD_CACHE_KEY,
-        JSON.stringify(
-          list.map(function (entry) {
-            return {
-              id: entry.id,
-              name: entry.name,
-              points: entry.points,
-              avatar: entry.avatar && entry.avatar.indexOf('data:') === 0 ? './logo.png' : entry.avatar
-            };
-          })
-        )
-      );
-    } catch (error) {
-      /* التخزين ممتلئ أو معطّل: تُهمل النسخة المحفوظة فقط */
-    }
-  }
-
-  var cloud = {
-    user: null,
-    online: isOnline(),
-    connected: false,
-    autoName: '',
-    leaderboard: readBoardCache(),
-    pending: null,
-    queueSync: queueSync
-  };
-  window.HudaCloud = cloud;
-
-  var auth = null,
-    db = null,
-    connecting = null,
-    sdkPromise = null,
-    unsubscribeBoard = null,
-    syncTimer = 0,
-    retryTimer = 0,
-    retryStep = 0,
-    syncing = false,
-    version = 0;
-
-  function notify() {
-    window.dispatchEvent(new CustomEvent('huda-leaderboard-changed'));
-  }
-
-  var loadedScripts = Object.create(null);
-  function loadScript(src) {
-    if (loadedScripts[src]) return Promise.resolve();
-    return new Promise(function (resolve, reject) {
-      var script = document.createElement('script');
-      var timer = setTimeout(function () {
-        script.remove();
-        reject(new Error('انتهت مهلة تحميل ' + src));
-      }, 20000);
-      script.src = src;
-      script.async = false;
-      script.onload = function () {
-        clearTimeout(timer);
-        loadedScripts[src] = true;
-        resolve();
-      };
-      script.onerror = function () {
-        clearTimeout(timer);
-        script.remove();
-        reject(new Error('تعذر تحميل ' + src));
-      };
-      document.head.appendChild(script);
-    });
-  }
-  function loadSdk() {
-    if (window.firebase && firebase.auth && firebase.firestore) return Promise.resolve();
-    if (!sdkPromise) {
-      sdkPromise = SDK_URLS.reduce(function (chain, url) {
-        return chain.then(function () {
-          return loadScript(url);
-        });
-      }, Promise.resolve()).catch(function (error) {
-        sdkPromise = null;
-        throw error;
-      });
-    }
-    return sdkPromise;
-  }
-
-  /* الاتصال: تحميل المكتبات ← دخول مجهول (أو استعادة الحساب المحفوظ) ← بدء متابعة الترتيب */
-  function connect() {
-    if (!isOnline()) return Promise.reject(new Error('لا يوجد اتصال بالإنترنت'));
-    if (connecting) return connecting;
-    connecting = loadSdk()
-      .then(function () {
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        auth = firebase.auth();
-        db = firebase.firestore();
-        return new Promise(function (resolve, reject) {
-          var unsubscribe = auth.onAuthStateChanged(function (user) {
-            unsubscribe();
-            resolve(user);
-          }, reject);
-        });
-      })
-      .then(function (user) {
-        return (
-          user ||
-          auth.signInAnonymously().then(function (result) {
-            return result.user;
-          })
-        );
-      })
-      .then(function (user) {
-        cloud.user = user;
-        cloud.autoName = autoNameFor(user.uid);
-        cloud.connected = true;
-        retryStep = 0;
-        startBoard();
-        notify();
-        return user;
-      })
-      .catch(function (error) {
-        connecting = null;
-        cloud.connected = false;
-        console.warn('تعذر الاتصال بلوحة المتصدرين؛ ستُعاد المحاولة تلقائيًا.', error);
-        scheduleRetry();
-        throw error;
-      });
-    return connecting;
-  }
-
-  function scheduleRetry() {
-    if (retryTimer || !isOnline()) return;
-    var delay = RETRY_DELAYS_MS[Math.min(retryStep, RETRY_DELAYS_MS.length - 1)];
-    retryStep++;
-    retryTimer = setTimeout(function () {
-      retryTimer = 0;
-      connect().then(flush, function () {});
-    }, delay);
-  }
-
-  function startBoard() {
-    if (unsubscribeBoard || !db || !isOnline()) return;
-    unsubscribeBoard = db
-      .collection('leaderboard')
-      .orderBy('totalPoints', 'desc')
-      .limit(BOARD_LIMIT)
-      .onSnapshot(
-        function (snapshot) {
-          var uid = cloud.user && cloud.user.uid;
-          cloud.leaderboard = snapshot.docs.map(function (item) {
-            var data = item.data() || {};
-            return {
-              id: item.id,
-              name: String(data.name || 'مستخدم هدى').slice(0, 80),
-              points: Number(data.totalPoints) || 0,
-              avatar: safeAvatar(data.avatar) || './logo.png',
-              isYou: item.id === uid
-            };
-          });
-          writeBoardCache(cloud.leaderboard);
-          notify();
-        },
-        function (error) {
-          console.warn('تعذرت قراءة لوحة المتصدرين من Firestore.', error);
-          stopBoard();
-        }
-      );
-  }
-  function stopBoard() {
-    if (unsubscribeBoard) {
-      unsubscribeBoard();
-      unsubscribeBoard = null;
-    }
-  }
-
-  /* استقبال أحدث حالة من واجهة المهام (يُستدعى عند كل حفظ). لا يُرسل شيء قبل توفر الإنترنت. */
-  function queueSync(state) {
-    var profile = (state && state.profile) || {};
-    cloud.pending = {
-      name: String(profile.name || '').trim().slice(0, 80),
-      avatar: safeAvatar(profile.avatar),
-      points: Math.max(0, Math.floor(Number(profile.totalPoints) || 0)),
-      phone: profile.phoneVisibility === 'public' ? String(profile.phone || '').slice(0, 24) : '',
-      phoneVisibility: profile.phoneVisibility === 'public' ? 'public' : 'private',
-      show: profile.showOnLeaderboard !== false
-    };
-    version++;
-    clearTimeout(syncTimer);
-    syncTimer = setTimeout(function () {
-      flush();
-      if (cloud.account) cloud.syncAccount();
-    }, SYNC_DEBOUNCE_MS);
-  }
-
-  function flush() {
-    if (!cloud.pending || syncing || !isOnline()) return Promise.resolve();
-    var job = cloud.pending,
-      sentVersion = version;
-    syncing = true;
-    return connect()
-      .then(function (user) {
-        var userRef = db.collection('users').doc(user.uid);
-        var boardRef = db.collection('leaderboard').doc(user.uid);
-        var stamp = firebase.firestore.FieldValue.serverTimestamp();
-        var batch = db.batch();
-        batch.set(
-          userRef,
-          {
-            name: job.name,
-            avatar: job.avatar,
-            totalPoints: job.points,
-            phone: job.phone,
-            phoneVisibility: job.phoneVisibility,
-            publicProfile: job.show,
-            anonymous: user.isAnonymous === true,
-            updatedAt: stamp
-          },
-          { merge: true }
-        );
-        if (job.show) {
-          batch.set(
-            boardRef,
-            {
-              name: job.name || autoNameFor(user.uid),
-              auto: !job.name,
-              avatar: job.avatar,
-              totalPoints: job.points,
-              updatedAt: stamp
-            },
-            { merge: true }
-          );
-        } else {
-          batch.delete(boardRef);
-        }
-        return batch.commit();
-      })
-      .then(function () {
-        if (version === sentVersion) cloud.pending = null;
-        retryStep = 0;
-      })
-      .catch(function (error) {
-        console.warn('تعذرت مزامنة بيانات هدى؛ ستُعاد المحاولة عند توفر الاتصال.', error);
-        scheduleRetry();
-      })
-      .then(function () {
-        syncing = false;
-        if (cloud.pending && version !== sentVersion) return flush();
-      });
-  }
-
-
-  /* ===================== الحساب برقم الهاتف فقط + نسخة كاملة من بيانات التقدم في Firestore =====================
-   * accounts/{phoneHash}   مستند الحساب (معرّفه بصمة الرقم SHA-256): الهاتف، وكل بيانات التقدم مضغوطة. يقرؤه صاحبه فقط.
-   * phoneIndex/{phoneHash} مؤشر وجود الحساب (دون أي بيانات) ليعرف الجهاز هل الرقم مسجَّل أم جديد.
-   * رقم واحد = حساب واحد. لا اسم ولا كلمة مرور: يُدخل المستخدم رقمه فيُنشأ الحساب أو يُفتح.
-   * تنبيه أمني: الدخول بالرقم دون رمز تحقق (OTP) — من يعرف الرقم يستطيع الدخول لحسابه.
-   * ------------------------------------------------------------------------------------------- */
-  var ACCOUNT_KEY = 'huda.account';
-  var ACCOUNT_SYNC_MS = 60000;
-  var ACCOUNT_MAX_CHARS = 800000;
-
-  function isAppDataKey(key) {
-    return (
-      key === 'quran_tasks_v1' ||
-      key === 'baytna_v2' ||
-      (key.indexOf('mq.') === 0 && key !== 'mq.offlineReady' && key !== 'mq.pagesPreparedV2') ||
-      key.indexOf('quran_') === 0 ||
-      key.indexOf('tq_') === 0
-    );
-  }
-  function readAccount() {
-    try {
-      var value = JSON.parse(localStorage.getItem(ACCOUNT_KEY) || 'null');
-      return value && value.id && value.phoneHash ? value : null;
-    } catch (error) {
-      return null;
-    }
-  }
-  function writeAccount(account) {
-    try {
-      if (account) localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
-      else localStorage.removeItem(ACCOUNT_KEY);
-    } catch (error) {
-      /* التخزين معطّل */
-    }
-    cloud.account = account;
-    notify();
-  }
-  function phoneDigits(phone) {
-    var latin = String(phone || '').replace(/[٠-٩]/g, function (d) {
-      return '٠١٢٣٤٥٦٧٨٩'.indexOf(d);
-    });
-    return latin.replace(/\D/g, '').replace(/^00/, '');
-  }
-  /* نوحّد الرقم على آخر ٩ أرقام ليتطابق 010… مع +20 10… */
-  function phoneKey(phone) {
-    var digits = phoneDigits(phone);
-    if (digits.length < 7) return '';
-    return digits.slice(-9);
-  }
-  function sha256Hex(text) {
-    var bytes = new TextEncoder().encode(text);
-    return crypto.subtle.digest('SHA-256', bytes).then(function (buffer) {
-      return Array.prototype.map
-        .call(new Uint8Array(buffer), function (b) {
-          return ('0' + b.toString(16)).slice(-2);
-        })
-        .join('');
-    });
-  }
-  function hashPhone(phone) {
-    var key = phoneKey(phone);
-    if (!key) return Promise.reject(new Error('أدخل رقم هاتف صحيحًا (٧ أرقام على الأقل).'));
-    return sha256Hex('huda-phone:' + key);
-  }
-  function collectAppData() {
-    var data = {};
-    for (var i = 0; i < localStorage.length; i++) {
-      var key = localStorage.key(i);
-      if (key && isAppDataKey(key)) data[key] = localStorage.getItem(key);
-    }
-    return JSON.stringify(data);
-  }
-  function toBase64(bytes) {
-    var binary = '';
-    for (var i = 0; i < bytes.length; i += 8192)
-      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
-    return btoa(binary);
-  }
-  function fromBase64(text) {
-    var binary = atob(text),
-      bytes = new Uint8Array(binary.length);
-    for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    return bytes;
-  }
-  function pipeThrough(bytes, stream) {
-    return new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer().then(function (b) {
-      return new Uint8Array(b);
-    });
-  }
-  function packData(json) {
-    var raw = new TextEncoder().encode(json);
-    if (typeof CompressionStream === 'undefined')
-      return Promise.resolve({ enc: 'raw', data: toBase64(raw) });
-    return pipeThrough(raw, new CompressionStream('gzip')).then(function (zipped) {
-      return { enc: 'gz', data: toBase64(zipped) };
-    });
-  }
-  function unpackData(enc, text) {
-    var bytes = fromBase64(text);
-    if (enc !== 'gz') return Promise.resolve(new TextDecoder().decode(bytes));
-    return pipeThrough(bytes, new DecompressionStream('gzip')).then(function (out) {
-      return new TextDecoder().decode(out);
-    });
-  }
-
-  cloud.account = readAccount();
-  var accountSyncing = false,
-    lastAccountPayload = '',
-    accountTimer = 0;
-
-  function needOnline() {
-    if (!isOnline()) return Promise.reject(new Error('هذه الخطوة تحتاج اتصالًا بالإنترنت.'));
-    return connect();
-  }
-  function stamp() {
-    return firebase.firestore.FieldValue.serverTimestamp();
-  }
-  function accountError(error) {
-    var code = error && error.code;
-    if (code === 'auth/admin-restricted-operation' || code === 'auth/operation-not-allowed')
-      return new Error('فعّل «Anonymous» من Firebase Console ← Authentication ← Sign-in method، ثم أعد المحاولة.');
-    if (code === 'permission-denied')
-      return new Error('رفضت قاعدة البيانات العملية؛ تأكد من نشر قواعد firestore.rules الجديدة.');
-    return error instanceof Error ? error : new Error('تعذرت العملية؛ حاول مرة أخرى.');
-  }
-
-  /* هل الرقم مسجَّل؟ (مؤشر الوجود فقط، دون قراءة بيانات الحساب) */
-  function checkPhone(phone) {
-    return hashPhone(phone)
-      .then(function (hash) {
-        return needOnline().then(function () {
-          return db.collection('phoneIndex').doc(hash).get();
-        });
-      })
-      .then(function (doc) {
-        return !!doc.exists;
-      })
-      .catch(function (error) {
-        throw accountError(error);
-      });
-  }
-
-  /* إنشاء حساب جديد بالرقم وحفظ بيانات الجهاز الحالية فيه */
-  function registerAccount(phone) {
-    var phoneHash;
-    return hashPhone(phone)
-      .then(function (hash) {
-        phoneHash = hash;
-        return needOnline();
-      })
-      .then(function (user) {
-        return packData(collectAppData()).then(function (packed) {
-          if (packed.data.length > ACCOUNT_MAX_CHARS)
-            throw new Error('حجم بياناتك كبير جدًا للحفظ السحابي؛ احذف بعض التعليقات أو العلامات.');
-          var shown = String(phone).trim().slice(0, 24);
-          var batch = db.batch();
-          batch.set(db.collection('accounts').doc(phoneHash), {
-            ownerUid: user.uid,
-            phone: shown,
-            phoneHash: phoneHash,
-            enc: packed.enc,
-            data: packed.data,
-            updatedAt: stamp()
-          });
-          batch.set(db.collection('phoneIndex').doc(phoneHash), {
-            ownerUid: user.uid,
-            updatedAt: stamp()
-          });
-          return batch.commit().then(function () {
-            lastAccountPayload = packed.data;
-            var account = { id: phoneHash, phone: shown, phoneHash: phoneHash };
-            writeAccount(account);
-            return account;
-          });
-        });
-      })
-      .catch(function (error) {
-        throw accountError(error);
-      });
-  }
-
-  /* استلام ملكية الحساب لهذا الجهاز (بعد معرفة الرقم) */
-  function claimAccount(id, phone) {
-    var phoneHash;
-    return hashPhone(phone)
-      .then(function (hash) {
-        phoneHash = hash;
-        return needOnline();
-      })
-      .then(function (user) {
-        var batch = db.batch();
-        batch.update(db.collection('accounts').doc(id), {
-          ownerUid: user.uid,
-          claimPhoneHash: phoneHash
-        });
-        if (id === phoneHash) batch.update(db.collection('phoneIndex').doc(phoneHash), { ownerUid: user.uid });
-        return batch.commit().then(function () {
-          return { user: user, phoneHash: phoneHash };
-        });
-      });
-  }
-
-  /* دخول بالرقم: يستبدل بيانات الجهاز بنسخة الحساب */
-  function loginAccount(phone) {
-    var id;
-    return hashPhone(phone)
-      .then(function (hash) {
-        id = hash;
-        return claimAccount(id, phone);
-      })
-      .then(function (claim) {
-        return db
-          .collection('accounts')
-          .doc(id)
-          .get()
-          .then(function (doc) {
-            if (!doc.exists) throw new Error('الحساب غير موجود.');
-            var info = doc.data() || {};
-            return unpackData(info.enc, info.data || '').then(function (json) {
-              var data = JSON.parse(json);
-              if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('بيانات الحساب تالفة.');
-              var keys = Object.keys(data).filter(function (k) {
-                return isAppDataKey(k) && typeof data[k] === 'string';
-              });
-              // استبدال بيانات هذا الجهاز ببيانات الحساب
-              var old = [];
-              for (var i = 0; i < localStorage.length; i++) {
-                var k = localStorage.key(i);
-                if (k && isAppDataKey(k)) old.push(k);
-              }
-              old.forEach(function (k) {
-                localStorage.removeItem(k);
-              });
-              keys.forEach(function (k) {
-                localStorage.setItem(k, data[k]);
-              });
-              writeAccount({
-                id: id,
-                phone: String(info.phone || phone).slice(0, 24),
-                phoneHash: claim.phoneHash
-              });
-              return true;
-            });
-          });
-      })
-      .catch(function (error) {
-        throw accountError(error);
-      });
-  }
-
-  function deleteAccountById(id, phone) {
-    return claimAccount(id, phone)
-      .then(function (claim) {
-        var batch = db.batch();
-        batch.delete(db.collection('accounts').doc(id));
-        if (id === claim.phoneHash) batch.delete(db.collection('phoneIndex').doc(claim.phoneHash));
-        else batch.delete(db.collection('phoneIndex').doc(claim.phoneHash).collection('accounts').doc(id));
-        return batch.commit().then(function () {
-          if (cloud.account && cloud.account.id === id) {
-            lastAccountPayload = '';
-            writeAccount(null);
-          }
-        });
-      })
-      .catch(function (error) {
-        throw accountError(error);
-      });
-  }
-
-  function logoutAccount() {
-    lastAccountPayload = '';
-    writeAccount(null);
-  }
-
-  /* رفع أحدث نسخة من بيانات الجهاز إلى الحساب (عند توفر الإنترنت وعند وجود تغيير فقط) */
-  function syncAccount(force) {
-    var account = cloud.account;
-    if (!account || accountSyncing || !isOnline()) return Promise.resolve(false);
-    var json = collectAppData();
-    accountSyncing = true;
-    return packData(json)
-      .then(function (packed) {
-        if (!force && packed.data === lastAccountPayload) return false;
-        if (packed.data.length > ACCOUNT_MAX_CHARS) {
-          console.warn('بيانات الحساب أكبر من الحد المسموح؛ لم تُرفع.');
-          return false;
-        }
-        return connect().then(function () {
-          var batch = db.batch();
-          batch.update(db.collection('accounts').doc(account.id), {
-            enc: packed.enc,
-            data: packed.data,
-            updatedAt: stamp()
-          });
-          return batch.commit().then(function () {
-            lastAccountPayload = packed.data;
-            return true;
-          });
-        });
-      })
-      .catch(function (error) {
-        console.warn('تعذرت مزامنة الحساب؛ ستُعاد المحاولة.', error);
-        return false;
-      })
-      .then(function (result) {
-        accountSyncing = false;
-        return result;
-      });
-  }
-  function startAccountSync() {
-    clearInterval(accountTimer);
-    accountTimer = setInterval(function () {
-      if (cloud.account && !document.hidden) syncAccount();
-    }, ACCOUNT_SYNC_MS);
-  }
-  startAccountSync();
-  document.addEventListener('visibilitychange', function () {
-    if (document.hidden && cloud.account) syncAccount();
-  });
-  window.addEventListener('online', function () {
-    if (cloud.account) setTimeout(syncAccount, 1500);
-  });
-
-  cloud.registerAccount = registerAccount;
-  cloud.checkPhone = checkPhone;
-  cloud.loginAccount = loginAccount;
-  cloud.deleteAccount = deleteAccountById;
-  cloud.logoutAccount = logoutAccount;
-  cloud.syncAccount = syncAccount;
-
-  window.addEventListener('online', function () {
-    cloud.online = true;
-    retryStep = 0;
-    clearTimeout(retryTimer);
-    retryTimer = 0;
-    connect().then(function () {
-      startBoard();
-      return flush();
-    }, function () {});
-    notify();
-  });
-  window.addEventListener('offline', function () {
-    cloud.online = false;
-    stopBoard();
-    notify();
-  });
-  document.addEventListener('visibilitychange', function () {
-    if (!document.hidden && cloud.pending) flush();
-  });
-
-  // بدء الاتصال بهدوء إن كان الإنترنت متاحًا؛ وإلا ننتظر حدث online.
-  if (isOnline()) {
-    var start = function () {
-      setTimeout(function () {
-        connect().then(flush, function () {});
-      }, 1500);
-    };
-    if (document.readyState === 'complete') start();
-    else window.addEventListener('load', start);
-  }
-})();
-
 
 /* ======================================================================
  * 2. المهام اليومية (Tasks)
@@ -805,22 +130,6 @@
       daily: true
     }))
   );
-  // لقطة آمنة من حالة السحابة (قد لا تكون جاهزة أو الجهاز دون إنترنت).
-  function cloudState() {
-    const cloud = window.HudaCloud || {};
-    return {
-      online: navigator.onLine !== false,
-      user: cloud.user || null,
-      autoName: cloud.autoName || '',
-      account: cloud.account || null,
-      leaderboard: Array.isArray(cloud.leaderboard) ? cloud.leaderboard : []
-    };
-  }
-  const defaultLeaderboard = [
-    { name: 'قارئ مجتهد', points: 1200 },
-    { name: 'محافظ على ورده', points: 950 },
-    { name: 'طالب علم', points: 780 }
-  ];
   const icons = [
     ['mosque', '🕌', 'صلاة'],
     ['sparkle', '📿', 'أذكار'],
@@ -895,12 +204,6 @@
       .replace(/[٠-٩]/g, digit => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit))
       .replace(/[^0-9]/g, '')
       .replace(/^00/, '');
-  const whatsappHref = value => {
-    const number = whatsappNumber(value);
-    return number.length >= 7
-      ? `https://wa.me/${number}?text=${encodeURIComponent('السلام عليكم، أتواصل معك من تطبيق Huda')}`
-      : '';
-  };
   const localDate = date => {
     const d = date || new Date();
     return (
@@ -974,25 +277,19 @@
   const state = {
     tasks: cleanTasks(data && data.tasks),
     view: 'tasks',
-    profile: (function (value, tasks) {
-      return {
-        name: typeof (value && value.name) === 'string' ? value.name.slice(0, 80) : '',
-        phone: typeof (value && value.phone) === 'string' ? value.phone.slice(0, 24) : '',
-        phoneVisibility: value && value.phoneVisibility === 'public' ? 'public' : 'private',
-        showOnLeaderboard: !(value && value.showOnLeaderboard === false),
-        avatar:
-          typeof (value && value.avatar) === 'string' && value.avatar.indexOf('data:image/') === 0
-            ? value.avatar
-            : '',
-        totalPoints:
-          value && Number.isSafeInteger(Number(value.totalPoints)) && Number(value.totalPoints) >= 0
-            ? Number(value.totalPoints)
-            : (tasks || [])
-                .filter(task => task.done)
-                .reduce((total, task) => total + (Number(task.points) || 0), 0)
-      };
-    })(data && data.profile, cleanTasks(data && data.tasks)),
-    profileFormOpen: false,
+    profile: {
+      totalPoints:
+        data && data.profile && Number.isSafeInteger(Number(data.profile.totalPoints)) && Number(data.profile.totalPoints) >= 0
+          ? Number(data.profile.totalPoints)
+          : cleanTasks(data && data.tasks)
+              .filter(task => task.done)
+              .reduce((total, task) => total + (Number(task.points) || 0), 0)
+    },
+    settings: Object.assign(
+      { byPrayer: true, autoComplete: true, timedAzkar: true, autoDefaults: true },
+      data && data.settings && typeof data.settings === 'object' ? data.settings : {}
+    ),
+    editingId: '',
     defaultTasksVersion: Number(data && data.defaultTasksVersion) || 0,
     taskDraft: Object.assign(
       { title: '', icon: 'star', points: 1, category: '', daily: false, days: [], daysOpen: false },
@@ -1007,14 +304,12 @@
         JSON.stringify({
           tasks: state.tasks,
           profile: state.profile,
+          settings: state.settings,
           defaultTasksVersion: state.defaultTasksVersion,
           taskDraft: state.taskDraft,
           formOpen: state.formOpen
         })
       );
-      if (window.HudaCloud && window.HudaCloud.queueSync) {
-        window.HudaCloud.queueSync({ profile: state.profile, tasks: state.tasks });
-      }
       storageError = '';
       return true;
     } catch (error) {
@@ -1223,7 +518,7 @@
   }
   function timedAzkarVisible(task, schedule) {
     const kind = timedAzkarKind(task);
-    if (!kind || !schedule.fresh || !schedule.timings) return true;
+    if (!kind || !state.settings.timedAzkar || !schedule.fresh || !schedule.timings) return true;
     const now = new Date(),
       current = now.getHours() * 60 + now.getMinutes();
     const fajr = timingMinutes(schedule, 'Fajr'),
@@ -1370,6 +665,8 @@
     save();
   }
   function taskVisible(task) {
+    if (task.hidden) return false;
+    if (task.defaultTask && !task.khatmaTask && state.settings.autoDefaults === false) return false;
     const scheduled = validDays(task.days);
     return !scheduled.length || scheduled.includes(new Date().getDay());
   }
@@ -1397,6 +694,7 @@
   }
   function syncAzkarTask(event) {
     const detail = event && event.detail;
+    if (!state.settings.autoComplete) return;
     if (!detail || typeof detail.categoryId !== 'string' || typeof detail.completed !== 'boolean') return;
     const source = detail.categoryId;
     const titles = {
@@ -1448,205 +746,9 @@
     }
     if (save()) render();
   }
-  function compressProfileAvatar(file) {
-    return new Promise((resolve, reject) => {
-      let objectUrl;
-      try {
-        objectUrl = URL.createObjectURL(file);
-      } catch (error) {
-        reject(error);
-        return;
-      }
-      const image = new Image();
-      const releaseUrl = () => URL.revokeObjectURL(objectUrl);
-      image.onload = () => {
-        try {
-          const scale = Math.min(1, 320 / Math.max(image.naturalWidth, image.naturalHeight));
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
-          canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
-          const context = canvas.getContext('2d');
-          if (!context) throw new Error('تعذر تجهيز الصورة في هذا المتصفح.');
-          context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          canvas.toBlob(
-            blob => {
-              releaseUrl();
-              if (!blob) {
-                reject(new Error('تعذر ضغط الصورة المختارة.'));
-                return;
-              }
-              const reader = new FileReader();
-              reader.onload = () => resolve(String(reader.result || ''));
-              reader.onerror = () => reject(reader.error || new Error('تعذر قراءة الصورة المختارة.'));
-              reader.readAsDataURL(blob);
-            },
-            'image/jpeg',
-            0.78
-          );
-        } catch (error) {
-          releaseUrl();
-          reject(error);
-        }
-      };
-      image.onerror = () => {
-        releaseUrl();
-        reject(new Error('تعذر فتح الصورة المختارة.'));
-      };
-      image.src = objectUrl;
-    });
-  }
-  /* ===== واجهة الحساب (رقم الهاتف فقط: إنشاء أو دخول) ===== */
-  const accountUi = { open: false, phone: '', busy: false, msg: '', error: false };
-  function accountInnerHtml() {
-    const account = cloudState().account;
-    const online = navigator.onLine !== false;
-    const note = accountUi.msg
-      ? `<p class="account-msg${accountUi.error ? ' is-error' : ''}" role="status">${esc(accountUi.msg)}</p>`
-      : '';
-    const busy = accountUi.busy ? ' disabled' : '';
-    if (account) {
-      return `<section class="account-card" aria-label="حسابك">
-        <div class="account-head"><span aria-hidden="true">☁</span><div><strong>حسابك</strong><small>رقم الهاتف: ${esc(account.phone || '')}</small></div></div>
-        <p class="account-hint">جميع بياناتك (المهام والنقاط والعلامات والتعليقات والإعدادات) تُحفظ على قاعدة البيانات تلقائيًا كلما توفر الإنترنت.</p>
-        <div class="account-actions">
-          <button type="button" class="primary" data-action="account-sync"${busy}>مزامنة الآن</button>
-          <button type="button" class="secondary" data-action="account-logout"${busy}>تسجيل الخروج</button>
-          <button type="button" class="secondary account-danger" data-action="account-delete-own"${busy}>حذف الحساب</button>
-        </div>
-        ${online ? '' : '<p class="account-hint">لا يوجد اتصال؛ ستُرفع التغييرات عند عودة الإنترنت.</p>'}
-        ${note}
-      </section>`;
-    }
-    return `<section class="account-card" aria-label="الحساب السحابي">
-      <div class="account-head"><span aria-hidden="true">☁</span><div><strong>الحساب السحابي</strong><small>أدخل رقم هاتفك لإنشاء حسابك أو الدخول إليه؛ يُحفظ تقدمك على Firestore</small></div></div>
-      ${online ? '' : '<p class="account-hint">الإنشاء والدخول يحتاجان اتصالًا بالإنترنت.</p>'}
-      <form class="account-form" data-form="account-phone">
-        <label class="profile-field">رقم الهاتف<input type="tel" name="acctPhone" maxlength="24" autocomplete="tel" value="${esc(accountUi.phone || state.profile.phone)}" placeholder="مثال: +201012345678"></label>
-        <button type="submit" class="primary"${busy}>متابعة</button>
-      </form>
-      <p class="account-hint account-warn">⚠ الدخول يتم بالرقم فقط دون رمز تحقق؛ لا تستخدم الحساب لبيانات حساسة.</p>
-      ${note}
-    </section>`;
-  }
-  function accountSectionHtml() {
-    const account = cloudState().account;
-    const title = account ? 'حسابك' : 'الحساب السحابي';
-    const sub = account ? 'متصل — بياناتك تُحفظ تلقائيًا' : 'احفظ بياناتك وادخل من أي جهاز';
-    return `<details class="account-fold"${accountUi.open ? ' open' : ''}>
-      <summary><span class="account-fold-icon" aria-hidden="true">☁</span><span class="account-fold-copy"><strong>${title}</strong><small>${sub}</small></span><span class="account-fold-caret" aria-hidden="true">▾</span></summary>
-      ${accountInnerHtml()}
-    </details>`;
-  }
-  async function runAccountTask(task, successMessage) {
-    accountUi.busy = true;
-    accountUi.msg = 'جارٍ التنفيذ…';
-    accountUi.error = false;
-    render();
-    try {
-      const result = await task();
-      accountUi.msg = successMessage || '';
-      accountUi.error = false;
-      return result;
-    } catch (error) {
-      accountUi.msg = (error && error.message) || 'تعذرت العملية.';
-      accountUi.error = true;
-      return undefined;
-    } finally {
-      accountUi.busy = false;
-      render();
-    }
-  }
-  const accountApi = () => window.HudaCloud || {};
-  async function handleAccountForm(form) {
-    const phone = form.elements.acctPhone.value.trim();
-    accountUi.phone = phone;
-    const api = accountApi();
-    const exists = await runAccountTask(() => api.checkPhone(phone), '');
-    if (exists === undefined) return;
-    if (exists) {
-      if (!window.confirm('يوجد حساب بهذا الرقم. سيتم استبدال بيانات هذا الجهاز ببيانات الحساب. هل تريد المتابعة؟')) {
-        accountUi.msg = '';
-        render();
-        return;
-      }
-      const ok = await runAccountTask(() => api.loginAccount(phone), 'تم تسجيل الدخول.');
-      if (ok) window.location.reload();
-    } else {
-      const done = await runAccountTask(() => api.registerAccount(phone), 'تم إنشاء الحساب وحفظ تقدمك.');
-      if (done) {
-        state.profile.phone = state.profile.phone || phone;
-        accountUi.phone = '';
-        save();
-      }
-    }
-    render();
-  }
-  async function handleAccountAction(action, id) {
-    const api = accountApi();
-    if (action === 'account-delete-own') {
-      const account = cloudState().account;
-      if (!account) return;
-      if (!window.confirm('حذف الحساب نهائي من قاعدة البيانات (تبقى بيانات هذا الجهاز). هل تريد المتابعة؟')) return;
-      await runAccountTask(() => api.deleteAccount(account.id, account.phone), 'تم حذف الحساب.');
-    } else if (action === 'account-logout') {
-      api.logoutAccount();
-      accountUi.msg = 'تم تسجيل الخروج؛ بياناتك ما زالت على هذا الجهاز.';
-      accountUi.error = false;
-      render();
-    } else if (action === 'account-sync') {
-      const ok = await runAccountTask(() => api.syncAccount(true), '');
-      accountUi.msg = ok ? 'تمت المزامنة.' : 'تعذرت المزامنة؛ تحقق من الاتصال.';
-      accountUi.error = !ok;
-      render();
-    }
-  }
-  async function saveProfile(form) {
-    const name = form.elements.profileName.value.trim();
-    const phone = form.elements.profilePhone.value.trim();
-    const phoneVisibility = form.elements.profilePhoneVisibility.value === 'public' ? 'public' : 'private';
-    const avatarFile = form.elements.profileAvatar.files[0];
-    if (name.length > 80) {
-      storageError = 'يجب ألا يتجاوز الاسم ٨٠ حرفًا.';
-      render();
-      return;
-    }
-    if (phone && !/^\+?[0-9٠-٩\s()-]{7,24}$/.test(phone)) {
-      storageError = 'تحقق من رقم الهاتف؛ اكتب ٧ أرقام على الأقل.';
-      render();
-      return;
-    }
-    let avatar = state.profile.avatar;
-    if (avatarFile) {
-      if (!avatarFile.type || avatarFile.type.indexOf('image/') !== 0 || avatarFile.size > 12 * 1024 * 1024) {
-        storageError = 'اختر صورة صالحة لا يتجاوز حجمها ١٢ ميجابايت.';
-        render();
-        return;
-      }
-      try {
-        avatar = await compressProfileAvatar(avatarFile);
-      } catch (error) {
-        console.error('تعذر تجهيز صورة الملف الشخصي.', error);
-        storageError = error && error.message ? error.message : 'تعذر تجهيز الصورة المختارة.';
-        render();
-        return;
-      }
-    }
-    state.profile.name = name;
-    state.profile.phone = phone;
-    state.profile.phoneVisibility = phoneVisibility;
-    state.profile.showOnLeaderboard = !!(
-      form.elements.profileShowOnLeaderboard && form.elements.profileShowOnLeaderboard.checked
-    );
-    state.profile.avatar = avatar;
-    storageError = '';
-    if (save()) {
-      state.profileFormOpen = false;
-      render();
-    }
-  }
   function render() {
     const prayerSchedule = readPrayerSchedule();
-    const activePrayer = currentPrayerCategory(prayerSchedule);
+    const activePrayer = state.settings.byPrayer ? currentPrayerCategory(prayerSchedule) : '';
     const scheduledTasks = state.tasks.filter(taskVisible);
     const pendingTasks = scheduledTasks.filter(task => !task.done);
     const completedTasks = scheduledTasks.filter(task => task.done);
@@ -1660,8 +762,9 @@
       : activePrayer || 'الفجر';
     const form = `
         <form class="form-card" data-form="task">
+          ${state.editingId ? '<div class="hint"><b>تعديل المهمة</b> <button type="button" class="chip" data-action="cancel-edit">إلغاء</button></div>' : ''}
           <label class="field-label" for="taskTitle">اسم المهمة</label>
-          <div class="input-row"><input id="taskTitle" name="title" maxlength="120" placeholder="مثال: مراجعة ورد القرآن" value="${esc(state.taskDraft.title)}"><button class="primary icon-only" type="submit" aria-label="إضافة المهمة">＋</button></div>
+          <div class="input-row"><input id="taskTitle" name="title" maxlength="120" placeholder="مثال: مراجعة ورد القرآن" value="${esc(state.taskDraft.title)}"><button class="primary icon-only" type="submit" aria-label="${state.editingId ? 'حفظ التعديل' : 'إضافة المهمة'}">${state.editingId ? '✓' : '＋'}</button></div>
           <label class="field-label" for="taskPrayerCategory">وقت إنجاز المهمة</label>
           <select id="taskPrayerCategory" name="category">${taskPrayerCategories.map(category => `<option value="${esc(category)}" ${taskDraftCategory === category ? 'selected' : ''}>${esc(category)}</option>`).join('')}</select>
           <label class="field-label" for="taskPoints">النقاط عند الإنجاز</label>
@@ -1755,129 +858,58 @@
             ${uncategorizedCards}
           </section>`
       : '';
-    const cloud = cloudState();
-    const showMe = state.profile.showOnLeaderboard !== false;
-    const myName = state.profile.name || cloud.autoName || 'ملفك الشخصي';
-    const me = {
-      name: myName,
-      points: state.profile.totalPoints,
-      avatar: state.profile.avatar || './logo.png',
-      isYou: true
+    const switchRow = (key, title, sub) =>
+      `<button type="button" class="setting-row" data-action="setting" data-key="${key}" role="switch" aria-checked="${state.settings[key] !== false}"><span class="setting-copy"><strong>${title}</strong><small>${sub}</small></span><span class="sw"><i></i></span></button>`;
+    const pencil =
+      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.500 6.500 4 4"/></svg>';
+    const manageRow = task => {
+      const icon = icons.find(item => item[0] === task.icon) || icons[icons.length - 1];
+      const shown = !task.hidden;
+      const sched = taskDayLabel(task);
+      return `<article class="manage-row ${shown ? '' : 'is-off'}">
+          <button type="button" class="mini-sw" data-action="toggle-hidden" data-id="${esc(task.id)}" role="switch" aria-checked="${shown}" aria-label="${shown ? 'إخفاء' : 'إظهار'} ${esc(task.title)}"><i></i></button>
+          <span class="item-icon" aria-hidden="true">${taskIconSvg(icon[0], 'task-icon-svg')}</span>
+          <div class="item-copy"><strong>${esc(task.title)}</strong><span class="item-meta">
+            ${task.defaultTask ? '<span class="task-category">تلقائية</span>' : ''}
+            ${Number(task.points) > 0 ? `<span class="task-points">${Number(task.points)} ${Number(task.points) === 1 ? 'نقطة' : 'نقاط'}</span>` : ''}
+            ${task.daily ? '<small>يومية</small>' : ''}${sched ? `<small>${esc(sched)}</small>` : ''}
+          </span></div>
+          ${task.khatmaTask ? '' : `<button class="icon-btn" type="button" data-action="edit-task" data-id="${esc(task.id)}" aria-label="تعديل ${esc(task.title)}">${pencil}</button><button class="delete-button" type="button" data-action="delete-task" data-id="${esc(task.id)}" aria-label="حذف ${esc(task.title)}">×</button>`}
+        </article>`;
     };
-    // الترتيب الحقيقي من الخادم (أو آخر نسخة محفوظة)، وإلا النماذج التحفيزية حتى يتوفر الإنترنت.
-    const hasRealBoard = cloud.leaderboard.length > 0;
-    const realEntries = cloud.leaderboard.map(entry => (entry.isYou ? Object.assign({}, entry, me) : entry));
-    const meListed = realEntries.some(entry => entry.isYou);
-    const leaderboardEntries = (
-      hasRealBoard
-        ? realEntries.concat(showMe && !meListed && (cloud.user || state.profile.totalPoints) ? [me] : [])
-        : defaultLeaderboard.concat(showMe ? [me] : [])
-    ).sort((a, b) => b.points - a.points);
-    const boardStatus = hasRealBoard
-      ? cloud.online
-        ? 'ترتيب مباشر يتحدث تلقائيًا'
-        : 'غير متصل — آخر ترتيب محفوظ'
-      : cloud.online
-        ? 'جارٍ الاتصال بلوحة المتصدرين…'
-        : 'غير متصل — نماذج تحفيزية حتى يتوفر الإنترنت';
-    const boardNote = hasRealBoard
-      ? showMe
-        ? 'تنضم تلقائيًا إلى اللوحة باسم مستعار ويُحدَّث رصيدك كلما توفر الإنترنت. يمكنك تغيير اسمك أو إيقاف الظهور من «تعديل الملف».'
-        : 'ظهورك في لوحة المتصدرين متوقف، ولا تُرسل نقاطك. فعّله من «تعديل الملف».'
-      : 'الأسماء والنقاط الحالية نماذج للعرض فقط. عند توفر الإنترنت تظهر لوحة المتصدرين الحقيقية وتنضم إليها تلقائيًا.';
-    const leaderboardPerson = (entry, rank, className = '') =>
-      entry
-        ? `<article class="leaderboard-person ${className}">
-        <div class="leaderboard-person-avatar-wrap"><span class="leaderboard-medal" aria-hidden="true">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}</span><img src="${entry.avatar || './logo.png'}" alt=""></div>
-        <strong>${esc(entry.name)}${entry.isYou ? ' (أنت)' : ''}</strong>
-        <b>${entry.points} <small>نقطة</small></b>
-      </article>`
-        : '';
-    const leaderboardTop = leaderboardEntries.slice(0, 3);
-    const leaderboardRest = leaderboardEntries.slice(3);
-    const profileView = `
-        <section class="profile-page" aria-label="الملف الشخصي والنقاط">
-          <div class="profile-score">
-            <span class="profile-score-icon" aria-hidden="true">⭐</span>
-            <div class="profile-score-copy"><strong>رصيد نقاطك</strong><small>استمر في إنجاز مهامك اليومية</small></div>
-            <div class="profile-score-total"><strong>${state.profile.totalPoints}</strong><span>نقطة</span></div>
+    const manageGroups = taskPrayerCategories
+      .map(category => ({
+        title: category === 'قيام الليل والوتر' ? category : 'صلاة ' + category,
+        items: state.tasks.filter(task => task.category === category)
+      }))
+      .concat([{ title: 'مهام أخرى', items: state.tasks.filter(task => !taskPrayerCategories.includes(task.category)) }])
+      .filter(group => group.items.length);
+    const hiddenCount = state.tasks.filter(task => task.hidden).length;
+    const manageView = `
+        <section class="manage-card" aria-label="التحكم في المهام">
+          <div class="manage-head"><strong>التحكم في العرض</strong><small>اختر كيف تظهر مهامك وتُنجَز</small></div>
+          ${switchRow('byPrayer', 'عرض المهام حسب وقت الصلاة', 'تظهر مهام الصلاة الحالية فقط؛ أوقف الخيار لعرض كل مهام اليوم')}
+          ${switchRow('timedAzkar', 'أذكار الاستيقاظ والصباح والمساء في وقتها', 'تظهر كل مجموعة في نافذتها الزمنية حسب مواقيت الصلاة')}
+          ${switchRow('autoDefaults', 'المهام التلقائية (الجاهزة)', 'مهام الصلاة والسنن والأذكار المضافة تلقائيًا')}
+          ${switchRow('autoComplete', 'إكمال المهام تلقائيًا', 'تُنجَز مهمة الأذكار تلقائيًا عند إتمام الذكر من صفحة الأذكار')}
+        </section>
+        <div class="section-head"><h4>كل المهام · ${state.tasks.length}${hiddenCount ? ' (' + hiddenCount + ' مخفية)' : ''}</h4><button type="button" class="add-toggle" data-action="toggle-form">＋ مهمة جديدة</button></div>
+        ${state.formOpen ? form : ''}
+        ${manageGroups.map(group => `<section class="prayer-task-group"><div class="prayer-task-group-head"><h4>${esc(group.title)}</h4><span>${group.items.length} مهمة</span></div>${group.items.map(manageRow).join('')}</section>`).join('') || '<div class="empty">لا توجد مهام. أضف مهمة أو استعد المهام الجاهزة.</div>'}
+        <div class="manage-actions">
+          ${hiddenCount ? '<button type="button" class="secondary" data-action="show-all">إظهار كل المهام</button>' : ''}
+          <button type="button" class="secondary" data-action="restore-defaults">استعادة المهام الجاهزة</button>
+        </div>
+        ${storageError ? `<div class="error" role="alert">${esc(storageError)}</div>` : ''}`;
+    const backupCardHtml = `
+        <section class="profile-backup" aria-label="حفظ واستعادة بيانات التطبيق">
+          <div class="profile-backup-heading"><span aria-hidden="true">📦</span><div><strong>بياناتك ونسختك الاحتياطية</strong><small>احفظ تقدمك وانقله إلى جهاز آخر</small></div></div>
+          <p>تشمل النسخة المهام والإعدادات والتقدم المحفوظ. أما ملفات الموقع فتُخزّن تلقائيًا داخل التطبيق لتعمل دون إنترنت.</p>
+          <div class="profile-backup-actions">
+            <button type="button" class="primary" data-action="export-app-data">حفظ نسخة على الجهاز</button>
+            <label class="profile-import-button">استعادة نسخة<input type="file" accept=".json,application/json" data-app-backup-file></label>
           </div>
-          ${
-            state.profileFormOpen
-              ? `<div class="profile-form"><form class="profile-form-inner" data-form="profile">
-            <div class="profile-form-heading"><span aria-hidden="true">✦</span><div><strong>بياناتك الشخصية</strong><small>أضف معلوماتك لتخصيص تجربتك</small></div></div>
-            <div class="profile-avatar-row">
-              <img class="profile-avatar" src="${state.profile.avatar || './logo.png'}" alt="معاينة الصورة الشخصية">
-              <div class="profile-avatar-content"><strong>الصورة الشخصية</strong><small>اختر صورة واضحة لملفك</small>
-                <div class="profile-avatar-actions"><label class="profile-photo-button">＋ تغيير الصورة<input type="file" name="profileAvatar" accept="image/*"></label>
-                  ${state.profile.avatar ? '<button type="button" class="secondary profile-clear-photo" data-action="clear-profile-avatar">إزالة</button>' : ''}
-                </div>
-              </div>
-            </div>
-            <label class="profile-field">الاسم<input type="text" name="profileName" maxlength="80" autocomplete="name" value="${esc(state.profile.name)}" placeholder="${esc(cloudState().autoName || 'الاسم الذي تفضّله')}"></label>
-            <label class="profile-check"><input type="checkbox" name="profileShowOnLeaderboard" ${state.profile.showOnLeaderboard !== false ? 'checked' : ''}><span>الظهور في لوحة المتصدرين <small>اتركه فارغًا ليظهر اسم تلقائي</small></span></label>
-            <label class="profile-field">رقم الهاتف <span class="profile-field-optional">اختياري</span><input type="tel" name="profilePhone" maxlength="24" autocomplete="tel" value="${esc(state.profile.phone)}" placeholder="أدخل الرقم بالصيغة الدولية"></label>
-            <label class="profile-field">ظهور رقم الهاتف
-              <select name="profilePhoneVisibility">
-                <option value="private" ${state.profile.phoneVisibility !== 'public' ? 'selected' : ''}>أنا فقط</option>
-                <option value="public" ${state.profile.phoneVisibility === 'public' ? 'selected' : ''}>للعامة مع التواصل عبر واتساب</option>
-              </select>
-            </label>
-            <button type="submit" class="primary profile-save"><span aria-hidden="true">✓</span> حفظ الملف على هذا الجهاز</button>
-            <p class="profile-privacy"><span aria-hidden="true">🔒</span> بياناتك ونقاطك محفوظة على هذا الجهاز. عند توفر الإنترنت يُرسَل اسمك ونقاطك وصورتك فقط إلى لوحة المتصدرين (دون تسجيل)، ولا يُرسَل رقم هاتفك إلا إن اخترت إظهاره. أوقف الظهور بإلغاء الخيار أعلاه.</p>
-          </form>${accountSectionHtml()}</div>`
-              : `
-            <div class="profile-data">
-            <section class="profile-summary" aria-label="بيانات الملف المحفوظة">
-              <img class="profile-avatar" src="${state.profile.avatar || './logo.png'}" alt="الصورة الشخصية">
-              <div class="profile-summary-copy">
-                <small class="profile-summary-label">ملفك الشخصي</small>
-                <strong>${esc(state.profile.name || cloudState().autoName || 'أضف اسمك')}</strong>
-                ${state.profile.phone ? `<small>${state.profile.phoneVisibility === 'public' ? `رقم الهاتف: ${esc(state.profile.phone)}` : 'رقم الهاتف خاص بك فقط'}</small>` : '<small>أكمل بياناتك لتخصيص ملفك</small>'}
-                ${state.profile.phone && state.profile.phoneVisibility === 'public' && whatsappHref(state.profile.phone) ? `<a class="profile-whatsapp" href="${whatsappHref(state.profile.phone)}" target="_blank" rel="noopener">💬 التواصل عبر واتساب</a>` : ''}
-              </div>
-              <div class="profile-summary-actions">
-                <button type="button" class="primary" data-action="edit-profile">تعديل الملف</button>
-                ${state.profile.avatar ? '<button type="button" class="secondary profile-clear-photo" data-action="clear-profile-avatar">إزالة الصورة</button>' : ''}
-              </div>
-            </section>
-            ${accountSectionHtml()}
-            </div>
-          `
-          }
-          <section class="leaderboard-card" aria-label="لوحة المتصدرين">
-            <div class="leaderboard-heading"><span aria-hidden="true">🏆</span><div><strong>لوحة المتصدرين</strong><small>${boardStatus}</small></div></div>
-            <div class="leaderboard-podium" aria-label="المراكز الثلاثة الأولى">
-              ${leaderboardPerson(leaderboardTop[1], 2, 'is-second')}
-              ${leaderboardPerson(leaderboardTop[0], 1, 'is-first')}
-              ${leaderboardPerson(leaderboardTop[2], 3, 'is-third')}
-            </div>
-            ${
-              leaderboardRest.length
-                ? `<div class="leaderboard-rest" aria-label="بقية المتصدرين">${leaderboardRest
-                    .map(
-                      (entry, index) => `<div class="leaderboard-entry">
-              <span class="leaderboard-rank">${String(index + 4).replace(/\d/g, digit => '٠١٢٣٤٥٦٧٨٩'[digit])}</span>
-              <img src="${entry.avatar || './logo.png'}" alt="">
-              <strong>${esc(entry.name)}${entry.isYou ? ' (أنت)' : ''}</strong>
-              <b>${entry.points} نقطة</b>
-            </div>`
-                    )
-                    .join('')}</div>`
-                : ''
-            }
-            <p class="profile-privacy">${boardNote}</p>
-          </section>
-          <section class="profile-backup" aria-label="حفظ واستعادة بيانات التطبيق">
-            <div class="profile-backup-heading"><span aria-hidden="true">📦</span><div><strong>بياناتك ونسختك الاحتياطية</strong><small>احفظ تقدمك وانقله إلى جهاز آخر</small></div></div>
-            <p>تشمل النسخة ملفك الشخصي والمهام والإعدادات والتقدم المحفوظ. أما ملفات الموقع فتُخزّن تلقائيًا داخل التطبيق لتعمل دون إنترنت.</p>
-            <div class="profile-backup-actions">
-              <button type="button" class="primary" data-action="export-app-data">حفظ نسخة على الجهاز</button>
-              <label class="profile-import-button">استعادة نسخة<input type="file" accept=".json,application/json" data-app-backup-file></label>
-            </div>
-                <small class="profile-backup-note">سيُنزّل ملف باسم Huda إلى مجلد التنزيلات. الاستعادة تستبدل بيانات التطبيق الحالية.</small>
-          </section>
-          ${storageError ? `<div class="error" role="alert">${esc(storageError)}</div>` : ''}
+          <small class="profile-backup-note">سيُنزّل ملف باسم Huda إلى مجلد التنزيلات. الاستعادة تستبدل بيانات التطبيق الحالية.</small>
         </section>`;
     root.innerHTML = `
         <style>
@@ -1933,103 +965,29 @@
           .delete-button:hover{background:color-mix(in srgb,var(--red) 12%,var(--panel));color:var(--red)}
           .empty{padding:18px 8px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--line);border-radius:12px}
           .error{padding:9px;border-radius:9px;background:color-mix(in srgb,var(--red) 12%,var(--panel));color:var(--red);font-size:11px}
-          .profile-page{display:grid;gap:12px;padding:2px 0 8px}
-          .account-card{display:grid;gap:10px;padding:14px;border:1px solid var(--line);border-radius:17px;background:var(--card);box-shadow:0 6px 20px rgba(40,34,26,.045)}
-          .account-head{display:flex;align-items:center;gap:10px}.account-head>span{font-size:22px}.account-head div{display:grid;gap:2px}.account-head small{color:var(--muted);font-size:10px}
-          .account-form{display:grid;gap:8px}.account-sub{font-size:12px}.account-actions{display:flex;flex-wrap:wrap;gap:8px}
-          .account-hint{margin:0;color:var(--muted);font-size:10.5px;line-height:1.7}.account-warn{color:var(--red)}
-          .account-msg{margin:0;padding:8px;border-radius:9px;background:color-mix(in srgb,var(--green) 10%,var(--panel));font-size:11px}.account-msg.is-error{background:color-mix(in srgb,var(--red) 12%,var(--panel));color:var(--red)}
-          .account-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}.account-list li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}.account-list li span{display:flex;gap:6px}
-          .account-danger{color:var(--red)}
-          .profile-form-inner{display:grid;gap:13px}.profile-data{display:grid;gap:10px}
-          .account-fold{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden}
-          .account-fold>summary{display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;list-style:none}.account-fold>summary::-webkit-details-marker{display:none}
-          .account-fold-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:color-mix(in srgb,var(--green) 11%,var(--card));font-size:17px}
-          .account-fold-copy{display:grid;gap:2px;flex:1;min-width:0}.account-fold-copy strong{font-size:12.5px}.account-fold-copy small{color:var(--muted);font-size:10px}
-          .account-fold-caret{color:var(--muted);transition:transform .2s}.account-fold[open] .account-fold-caret{transform:rotate(180deg)}
-          .account-fold>.account-card{border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;background:transparent}
-          .account-head{display:none}
-          .account-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-          .account-actions button,.account-list button,.account-form button{min-height:42px;padding:0 14px;border-radius:12px;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;transition:transform .12s,background .15s}
-          .account-actions button:active,.account-list button:active,.account-form button:active{transform:scale(.97)}
-          .account-actions .primary{grid-column:1/-1;border:0;background:var(--green);color:#fff}
-          .account-actions .secondary{border:1px solid color-mix(in srgb,var(--green) 35%,var(--line));background:color-mix(in srgb,var(--green) 7%,var(--card));color:var(--green)}
-          .account-actions .account-danger,.account-list .account-danger{border:1px solid color-mix(in srgb,var(--red) 40%,var(--line));background:color-mix(in srgb,var(--red) 8%,var(--card));color:var(--red)}
-          .account-actions button:disabled,.account-list button:disabled,.account-form button:disabled{opacity:.55;cursor:default}
-          .account-list button{min-height:36px;padding:0 12px}
-          .profile-score,.profile-form,.leaderboard-card{border:1px solid var(--line);border-radius:17px;background:var(--card);box-shadow:0 6px 20px rgba(40,34,26,.045)}
-          .profile-score{display:flex;align-items:center;gap:11px;padding:14px;background:linear-gradient(125deg,color-mix(in srgb,var(--green) 8%,var(--card)),var(--card) 72%)}
-          .profile-score-icon{display:grid;place-items:center;width:40px;height:40px;flex:none;border-radius:13px;background:color-mix(in srgb,var(--sub) 14%,var(--panel));font-size:19px}
-          .profile-score-copy{display:grid;gap:3px;min-width:0;flex:1}.profile-score-copy strong{font-size:13px}.profile-score-copy small{color:var(--muted);font-size:10px}
-          .profile-score-total{display:flex;align-items:baseline;gap:4px;padding:6px 10px;border:1px solid color-mix(in srgb,var(--green) 17%,var(--line));border-radius:11px;background:var(--panel)}
-          .profile-score-total strong{color:var(--green);font-size:21px;line-height:1}.profile-score-total span{color:var(--muted);font-size:10px;font-weight:800}
-          .profile-form{display:grid;gap:13px;padding:16px;border-color:color-mix(in srgb,var(--green) 20%,var(--line));background:linear-gradient(155deg,color-mix(in srgb,var(--green) 3%,var(--card)),var(--card) 48%)}
-          .profile-form-heading{display:flex;align-items:center;gap:9px;padding-bottom:11px;border-bottom:1px solid var(--line)}
-          .profile-form-heading>span{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:color-mix(in srgb,var(--green) 11%,var(--panel));color:var(--green);font-size:18px}
-          .profile-form-heading strong,.profile-form-heading small{display:block}.profile-form-heading strong{font-size:13px}.profile-form-heading small{margin-top:2px;color:var(--muted);font-size:10px}
-          .profile-avatar-row{display:flex;align-items:center;gap:13px;padding:11px;border:1px solid var(--line);border-radius:13px;background:color-mix(in srgb,var(--panel) 70%,var(--card))}
-          .profile-avatar-content{display:grid;gap:4px;min-width:0;flex:1}.profile-avatar-content>strong{font-size:11px}.profile-avatar-content>small{color:var(--muted);font-size:10px}
-          .profile-avatar-actions{display:flex;align-items:center;gap:7px;margin-top:3px}
-          .profile-summary{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid color-mix(in srgb,var(--green) 19%,var(--line));border-radius:16px;background:linear-gradient(120deg,color-mix(in srgb,var(--green) 6%,var(--card)),var(--card) 68%);box-shadow:0 5px 16px rgba(40,34,26,.04)}
-          .profile-summary-copy{display:grid;gap:4px;min-width:0;flex:1}.profile-summary-copy strong{overflow-wrap:anywhere;font-size:13px}
-          .profile-summary-copy small{color:var(--muted);font-size:10px}.profile-summary-copy .profile-summary-label{color:var(--green);font-size:9px;font-weight:900}
-          .profile-whatsapp{display:inline-flex;align-items:center;justify-content:center;width:max-content;padding:4px 7px;border-radius:7px;background:color-mix(in srgb,var(--green) 10%,var(--panel));color:var(--green);font-size:10px;font-weight:900;text-decoration:none}
-          .profile-summary-actions{display:grid;gap:6px}.profile-summary-actions button{padding:8px 10px;font:inherit;font-size:10px;font-weight:800;white-space:nowrap}
-          .profile-avatar{width:70px;height:70px;flex:none;border:3px solid var(--card);border-radius:50%;object-fit:cover;background:var(--panel);box-shadow:0 0 0 2px color-mix(in srgb,var(--green) 33%,var(--line))}
-          .profile-photo-button,.profile-clear-photo{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 11px;border:1px solid color-mix(in srgb,var(--green) 28%,var(--line));border-radius:9px;background:color-mix(in srgb,var(--green) 7%,var(--panel));color:var(--green);font:inherit;font-size:10px;font-weight:900;cursor:pointer}
-          .profile-photo-button input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
-          .profile-photo-button:focus-within,.profile-clear-photo:focus-visible{outline:2px solid var(--green);outline-offset:2px}
-          .profile-clear-photo{border-color:var(--line);background:var(--panel);color:var(--muted)}
-          .profile-fields-row{display:grid;grid-template-columns:minmax(0,.6fr) minmax(0,1.4fr);gap:10px}
-          .profile-field{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;color:var(--ink);font-size:11px;font-weight:900}
-          .profile-field input,.profile-field select{grid-column:1/-1;min-height:43px;padding:10px 12px;border-radius:11px;background:var(--panel);font:inherit;font-size:12px;font-weight:700}
-          .profile-field input::placeholder{color:var(--muted);font-weight:500;opacity:.8}
-          .profile-field-optional{color:var(--muted);font-size:9px;font-weight:600}
-          .profile-save{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:47px;border-radius:12px;font:inherit;font-size:13px;font-weight:900;box-shadow:0 5px 13px color-mix(in srgb,var(--green) 18%,transparent);transition:filter .15s,transform .15s}
-          .profile-save:hover{filter:brightness(1.05);transform:translateY(-1px)}.profile-save>span{font-size:16px}
-          .profile-check{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--panel) 70%,var(--card));font-size:12px;font-weight:800;cursor:pointer}.profile-check input{width:18px;height:18px;flex:none;accent-color:var(--green)}.profile-check small{display:block;margin-top:2px;color:var(--muted);font-size:10px;font-weight:600}
-          .profile-privacy{display:flex;align-items:flex-start;gap:6px;margin:0;color:var(--muted);font-size:10px;line-height:1.6}.profile-privacy>span{flex:none}
-          .leaderboard-card{display:grid;gap:12px;padding:14px}
-          .leaderboard-heading{display:flex;align-items:center;gap:10px}.leaderboard-heading>span{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:color-mix(in srgb,var(--sub) 12%,var(--panel));font-size:20px}
-          .leaderboard-heading strong,.leaderboard-heading small{display:block}.leaderboard-heading strong{font-size:13px}.leaderboard-heading small{margin-top:2px;color:var(--muted);font-size:10px}
-          .leaderboard-podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:6px;padding:10px 0 0}
-          .leaderboard-person{display:flex;min-width:0;flex-direction:column;align-items:center;gap:4px;text-align:center}
-          .leaderboard-person-avatar-wrap{position:relative;display:grid;place-items:center}
-          .leaderboard-person img{width:54px;height:54px;border:3px solid var(--card);border-radius:50%;object-fit:cover;background:var(--panel);box-shadow:0 0 0 2px color-mix(in srgb,var(--green) 35%,var(--line))}
-          .leaderboard-medal{position:absolute;z-index:1;top:-13px;font-size:20px;line-height:1}
-          .leaderboard-person strong{width:100%;min-height:30px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
-          .leaderboard-person b{display:block;width:100%;padding:7px 3px 5px;border-radius:12px 12px 0 0;color:var(--ink);font-size:11px}
-          .leaderboard-person b small{font-size:8px;font-weight:700}
-          .leaderboard-person.is-first{order:2}.leaderboard-person.is-second{order:1}.leaderboard-person.is-third{order:3}
-          .leaderboard-person.is-first b{min-height:82px;padding-top:29px;background:color-mix(in srgb,var(--green) 64%,var(--card));font-size:20px;color:var(--on-green)}
-          .leaderboard-person.is-second b{min-height:61px;padding-top:18px;background:color-mix(in srgb,var(--sub) 25%,var(--card));font-size:16px}
-          .leaderboard-person.is-third b{min-height:47px;padding-top:11px;background:color-mix(in srgb,var(--green) 24%,var(--card));font-size:14px}
-          .leaderboard-rest{display:grid;gap:7px;padding-top:3px}
-          .leaderboard-entry{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid color-mix(in srgb,var(--sub) 23%,var(--line));border-radius:12px;background:linear-gradient(100deg,color-mix(in srgb,var(--sub) 7%,var(--panel)),var(--panel))}
-          .leaderboard-rank{display:grid;place-items:center;width:25px;height:25px;flex:none;border-radius:8px;background:color-mix(in srgb,var(--sub) 14%,var(--card));color:var(--sub);font-size:12px;font-weight:900}
-          .leaderboard-entry img{width:36px;height:36px;border:2px solid var(--card);border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px var(--line)}
-          .leaderboard-entry strong{min-width:0;flex:1;overflow-wrap:anywhere;font-size:11px}.leaderboard-entry b{color:var(--green);font-size:10px;white-space:nowrap}
-          .profile-backup{display:grid;gap:10px;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
-          .profile-backup-heading{display:flex;align-items:center;gap:10px}.profile-backup-heading>span{display:grid;place-items:center;width:37px;height:37px;border-radius:12px;background:color-mix(in srgb,var(--green) 10%,var(--panel));font-size:19px}
-          .profile-backup-heading strong,.profile-backup-heading small{display:block}.profile-backup-heading strong{font-size:12px}.profile-backup-heading small{margin-top:2px;color:var(--muted);font-size:10px}
-          .profile-backup>p{margin:0;color:var(--muted);font-size:10px;line-height:1.65}
-          .profile-backup-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.profile-backup-actions button,.profile-import-button{display:flex;align-items:center;justify-content:center;min-height:40px;padding:8px;border-radius:10px;font:inherit;font-size:10px;font-weight:900;cursor:pointer}
-          .profile-import-button{border:1px solid color-mix(in srgb,var(--green) 28%,var(--line));background:color-mix(in srgb,var(--green) 7%,var(--panel));color:var(--green)}
-          .profile-import-button input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
-          .profile-import-button:focus-within{outline:2px solid var(--green);outline-offset:2px}
-          .profile-backup-note{color:var(--muted);font-size:9px;line-height:1.55}
-          @media(max-width:360px){.profile-fields-row{grid-template-columns:minmax(0,.55fr) minmax(0,1.45fr);gap:7px}.profile-form{padding:12px}.profile-avatar{width:60px;height:60px}.profile-summary{gap:9px;padding:11px}.profile-summary-actions button{padding:7px 8px}}
+          .setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:58px;padding:8px 2px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);text-align:right}
+          .setting-row:last-of-type{border-bottom:0}.setting-copy{display:grid;gap:2px;min-width:0}.setting-copy strong{font-size:12.5px}.setting-copy small{color:var(--muted);font-size:10.5px;line-height:1.5}
+          .sw,.mini-sw{position:relative;flex:none;border-radius:99px;background:var(--chip,#ddd);transition:background .2s}.sw{width:46px;height:28px}
+          .sw i,.mini-sw i{position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:transform .2s}
+          [aria-checked=true] .sw,.mini-sw[aria-checked=true]{background:var(--green)}[aria-checked=true] .sw i{transform:translateX(-18px)}
+          .mini-sw{width:38px;height:24px;border:0;padding:0}.mini-sw i{width:18px;height:18px;top:3px}.mini-sw[aria-checked=true] i{transform:translateX(-14px)}
+          .manage-card{display:grid;gap:2px;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+          .manage-head{display:grid;gap:2px;padding-bottom:6px;border-bottom:1px solid var(--line)}.manage-head strong{font-size:13px}.manage-head small{color:var(--muted);font-size:10.5px}
+          .manage-row{display:flex;align-items:center;gap:8px;min-height:54px;padding:5px 8px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+          .manage-row.is-off{opacity:.55}.manage-row .item-copy strong{font-size:12px}
+          .icon-btn{display:grid;place-items:center;width:30px;height:30px;flex:none;border:0;border-radius:9px;background:color-mix(in srgb,var(--green) 9%,var(--panel));color:var(--green);padding:0}
+          .manage-actions{display:grid;gap:8px}.secondary{min-height:42px;border:1px solid color-mix(in srgb,var(--green) 35%,var(--line));border-radius:12px;background:color-mix(in srgb,var(--green) 7%,var(--card));color:var(--green);font-weight:800}
           @media(max-width:360px){.app{padding:9px}.stats{gap:4px}.icon-grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
         </style>
         <main class="app">
           <header class="hero"><div class="hero-title"><span class="hero-icon">🌿</span><div><h3>رتّب يومك واطمئن</h3><p>خطوات صغيرة، وأوقات مباركة</p></div></div></header>
-          <div class="switch" role="tablist" aria-label="المهام والملف الشخصي">
-            <button type="button" role="tab" data-action="view" data-view="tasks" aria-pressed="${state.view === 'tasks'}"><svg class="switch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M8.5 12l2.2 2.2 4.8-4.8M8.5 17h7"/></svg><span>المهام</span></button>
-            <button type="button" role="tab" data-action="view" data-view="profile" aria-pressed="${state.view === 'profile'}"><svg class="switch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg><span>الملف الشخصي</span></button>
+          <div class="switch" role="tablist" aria-label="المهام وإدارتها">
+            <button type="button" role="tab" data-action="view" data-view="tasks" aria-pressed="${state.view === 'tasks'}"><svg class="switch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M8.5 12l2.2 2.2 4.8-4.8M8.5 17h7"/></svg><span>مهام اليوم</span></button>
+            <button type="button" role="tab" data-action="view" data-view="manage" aria-pressed="${state.view === 'manage'}"><svg class="switch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg><span>إدارة المهام</span></button>
           </div>
           ${
-            state.view === 'profile'
-              ? profileView
+            state.view === 'manage'
+              ? manageView
               : `
             <div class="stats"><div class="stat"><b>${pendingTasks.length}</b><span>متبقية اليوم</span></div><div class="stat"><b>${completedTasks.length}</b><span>مكتملة اليوم</span></div><div class="stat"><b>${earnedPoints} / ${availablePoints}</b><span>النقاط المحققة</span></div></div>
           <div class="section-head"><h4>مهام اليوم · ${scheduledTasks.length} مهمة</h4><button type="button" class="add-toggle" data-action="toggle-form">＋ مهمة جديدة</button></div>
@@ -2040,15 +998,18 @@
                 : `<div class="empty">${
                     scheduledHidden
                       ? `لا توجد مهام مجدولة لهذا اليوم. لديك ${scheduledHidden} مهام في أيام أخرى.`
-                      : 'لا توجد مهام مجدولة لليوم. أضف مهمة وحدد الصلاة المناسبة.'
+                      : 'لا توجد مهام ظاهرة لليوم. أضف مهمة أو أدر المهام من «إدارة المهام».'
                   }</div>`
             }
           ${storageError ? `<div class="error" role="alert">${esc(storageError)}</div>` : ''}
           `
           }
         </main>`;
-    const backupCard = root.querySelector('.profile-backup');
-    if (backupCard && backupHost) backupHost.replaceChildren(backupCard);
+    if (backupHost && !backupHost.firstElementChild) {
+      const holder = document.createElement('template');
+      holder.innerHTML = backupCardHtml;
+      backupHost.replaceChildren(holder.content);
+    }
   }
   function captureForm() {
     const task = root.querySelector('[data-form="task"]');
@@ -2078,6 +1039,17 @@
       return;
     }
     const scheduled = validDays(draft.days);
+    const editing = state.editingId && state.tasks.find(item => item.id === state.editingId);
+    if (editing) {
+      Object.assign(editing, {
+        title: title.slice(0, 120),
+        points: points,
+        category: draft.category,
+        icon: icons.some(icon => icon[0] === draft.icon) ? draft.icon : 'star',
+        daily: draft.daily,
+        days: scheduled
+      });
+    } else
     state.tasks.unshift({
       id: uid(),
       title: title.slice(0, 120),
@@ -2101,23 +1073,12 @@
       daysOpen: false
     };
     state.formOpen = false;
+    state.editingId = '';
     save();
     render();
   }
   let draftSaveTimer = 0;
-  root.addEventListener(
-    'toggle',
-    event => {
-      if (event.target.classList && event.target.classList.contains('account-fold')) accountUi.open = event.target.open;
-    },
-    true
-  );
   root.addEventListener('input', event => {
-    const field = event.target;
-    if (field && field.name === 'acctName') accountUi.name = field.value;
-    else if (field && field.name === 'acctPhone') accountUi.phone = field.value;
-    else if (field && field.name === 'acctLoginPhone') accountUi.loginPhone = field.value;
-    if (field && String(field.name || '').indexOf('acct') === 0) return;
     captureForm();
     window.clearTimeout(draftSaveTimer);
     draftSaveTimer = window.setTimeout(save, 400);
@@ -2132,23 +1093,81 @@
     captureForm();
     const action = button.dataset.action;
     if (action === 'view') {
-      state.view = button.dataset.view === 'profile' ? 'profile' : 'tasks';
+      state.view = button.dataset.view === 'manage' ? 'manage' : 'tasks';
       state.formOpen = false;
+      state.editingId = '';
       save();
       render();
-    } else if (action === 'clear-profile-avatar') {
-      state.profile.avatar = '';
-      if (save()) render();
-    } else if (action === 'edit-profile') {
-      state.profileFormOpen = true;
-      storageError = '';
+    } else if (action === 'setting') {
+      const key = button.dataset.key;
+      if (key in state.settings) {
+        state.settings[key] = !state.settings[key];
+        save();
+        render();
+      }
+    } else if (action === 'toggle-hidden') {
+      const task = state.tasks.find(item => item.id === button.dataset.id);
+      if (task) {
+        task.hidden = !task.hidden;
+        save();
+        render();
+      }
+    } else if (action === 'edit-task') {
+      const task = state.tasks.find(item => item.id === button.dataset.id);
+      if (task) {
+        const selected = validDays(task.days);
+        state.editingId = task.id;
+        state.taskDraft = {
+          title: task.title,
+          icon: task.icon || 'star',
+          points: Number(task.points) || 0,
+          category: taskPrayerCategories.includes(task.category) ? task.category : 'الفجر',
+          daily: !!task.daily,
+          days: selected,
+          daysOpen: selected.length > 0
+        };
+        state.formOpen = true;
+        state.view = 'manage';
+        save();
+        render();
+        const input = root.querySelector('#taskTitle');
+        if (input) input.scrollIntoView({ block: 'center' });
+      }
+    } else if (action === 'cancel-edit') {
+      state.editingId = '';
+      state.formOpen = false;
+      state.taskDraft = { title: '', icon: 'star', points: 1, category: '', daily: false, days: [], daysOpen: false };
+      save();
       render();
-    } else if (action.indexOf('account-') === 0) {
-      handleAccountAction(action, button.dataset.id);
+    } else if (action === 'show-all') {
+      state.tasks.forEach(task => {
+        delete task.hidden;
+      });
+      save();
+      render();
+    } else if (action === 'restore-defaults') {
+      if (window.confirm('إضافة المهام الجاهزة الناقصة وإظهار المهام الجاهزة المخفية؟')) {
+        const ids = new Set(state.tasks.map(task => task.id));
+        defaultTasks.forEach(task => {
+          if (ids.has(task.id)) return;
+          state.tasks.push(
+            Object.assign({}, task, { done: false, createdAt: new Date().toISOString(), day: todayKey(), days: [], hist: {} })
+          );
+        });
+        state.tasks.forEach(task => {
+          if (task.defaultTask) delete task.hidden;
+        });
+        state.settings.autoDefaults = true;
+        save();
+        render();
+      }
     } else if (action === 'export-app-data') {
       exportAppData();
     } else if (action === 'toggle-form') {
-      state.formOpen = !state.formOpen;
+      if (state.editingId) {
+        state.editingId = '';
+        state.formOpen = true;
+      } else state.formOpen = !state.formOpen;
       save();
       render();
       const input = root.querySelector('#taskTitle');
@@ -2201,14 +1220,6 @@
   });
   root.addEventListener('submit', event => {
     event.preventDefault();
-    if (event.target.dataset.form === 'profile') {
-      saveProfile(event.target);
-      return;
-    }
-    if (String(event.target.dataset.form).indexOf('account-') === 0) {
-      handleAccountForm(event.target);
-      return;
-    }
     captureForm();
     if (event.target.dataset.form === 'task') addTask();
   });
@@ -2303,7 +1314,6 @@
     if (changed && save()) render();
   }
   window.addEventListener('quran:khatma-task-sync', syncKhatmaTask);
-  window.addEventListener('huda-leaderboard-changed', () => render());
   window.addEventListener('online', () => render());
   window.addEventListener('offline', () => render());
   seedDefaultTasks();
@@ -3042,6 +2052,7 @@
     mEl = $('measure');
   var activeView = pageList.querySelector('.page-view'),
     sheet = activeView.querySelector('.sheet');
+  var mushafScale = Math.min(130, Math.max(70, parseInt(store('mq.fontScale') || '100', 10) || 100)) / 100;
   var cur = 1,
     sel = 0,
     widths = {},
@@ -3485,7 +2496,8 @@
               if (em > M) M = em;
             });
             var fs = M ? Wc / M : W * 0.085;
-            fs = Math.min(fs, W * 0.085);
+            // مقياس خط المصحف من الإعدادات: التصغير نسبة من الحجم المناسب، والتكبير محدود بعرض الصفحة.
+            fs = mushafScale <= 1 ? Math.min(fs, W * 0.085) * mushafScale : Math.min(fs, W * 0.085 * mushafScale);
             if (p <= 2) fs *= 0.85;
             var spaced = p > 2,
               html = '';
@@ -5026,9 +4038,20 @@
     });
   }
 
-  function applyTasmeeWordState(container) {
+  function applyTasmeeWordState(container, verseIds) {
     if (!container) return;
-    var words = container.querySelectorAll('.w[data-v]');
+    var words;
+    if (verseIds && verseIds.length) {
+      // تحديث الآيات المتأثرة فقط (بدل مسح كل كلمات الصفحات في كل نتيجة صوتية، وهو سبب التأخر).
+      words = [];
+      verseIds.forEach(function (id) {
+        container.querySelectorAll('.w[data-v="' + id + '"]').forEach(function (w) {
+          words.push(w);
+        });
+      });
+    } else {
+      words = container.querySelectorAll('.w[data-v]');
+    }
     words.forEach(function (word) {
       var verseId = word.getAttribute('data-v');
       var position = +word.getAttribute('data-p');
@@ -5045,7 +4068,22 @@
     });
   }
 
+  var tasmeeNormCache = Object.create(null),
+    tasmeeNormCount = 0;
   function normalizeTasmeeWord(word) {
+    var raw = String(word || '');
+    var hit = tasmeeNormCache[raw];
+    if (hit !== undefined) return hit;
+    var value = normalizeTasmeeWordUncached(raw);
+    if (tasmeeNormCount > 6000) {
+      tasmeeNormCache = Object.create(null);
+      tasmeeNormCount = 0;
+    }
+    tasmeeNormCache[raw] = value;
+    tasmeeNormCount++;
+    return value;
+  }
+  function normalizeTasmeeWordUncached(word) {
     var s = String(word || '');
     s = s.replace(/و[\u064B-\u065F]*\u0670/g, 'ا');
     s = s.replace(/[\u06E6\u06E7]/g, 'ي');
@@ -5423,6 +4461,8 @@
 
     var state = currentTasmeeAyah();
     if (!state) return 0;
+    var touched = Object.create(null);
+    touched[state.id] = true;
 
     // النتائج المؤقتة (interim) غير مستقرة: لا نسجّل منها أخطاءً، نكتفي بمطابقة الصحيح
     // ونترك الباقي ليُحسم عند النتيجة النهائية.
@@ -5444,6 +4484,7 @@
     while (tokenIdx < tokens.length) {
       state = currentTasmeeAyah();
       if (!state) break;
+      touched[state.id] = true;
 
       var expectedIndex = state.wordIndex;
 
@@ -5457,7 +4498,7 @@
             expectedIndex = state ? state.wordIndex : 0;
           } else {
             finishTasmee();
-            return;
+            return tokenIdx;
           }
         } else {
           state = currentTasmeeAyah();
@@ -5495,7 +4536,7 @@
           if (tasmeeSession.verseIndex >= tasmeeSession.ayahs.length) {
             if (rewindTasmeeToUnrevealedWord()) changedVerse = true;
             else {
-              applyTasmeeWordState(pageList);
+              applyTasmeeWordState(pageList, Object.keys(touched));
               finishTasmee();
               return tokenIdx;
             }
@@ -5556,24 +4597,32 @@
             if (tasmeeSession.verseIndex >= tasmeeSession.ayahs.length) {
               if (rewindTasmeeToUnrevealedWord()) changedVerse = true;
               else {
-                applyTasmeeWordState(pageList);
+                applyTasmeeWordState(pageList, Object.keys(touched));
                 finishTasmee();
                 return tokenIdx;
               }
             }
           }
         } else {
-          // كلمة خاطئة أو تكرار: نسم الكلمة المتوقعة فورًا.
-          state.mistakes[expectedIndex + 1] = true;
-          mismatchDetected = true;
-          tasmeeSession.errorCount = (tasmeeSession.errorCount || 0) + 1;
+          // كلمة غير مطابقة: التسامح يمنح محاولة أولى لكل كلمة (أخطاء المتعرّف الصوتي كثيرة)،
+          // فلا تُوسَم خطأً إلا عند تكرار عدم المطابقة.
+          state.fails = state.fails || Object.create(null);
+          var failKey = expectedIndex + 1;
+          state.fails[failKey] = (state.fails[failKey] || 0) + 1;
+          if (state.fails[failKey] >= 2) {
+            state.mistakes[failKey] = true;
+            mismatchDetected = true;
+            tasmeeSession.errorCount = (tasmeeSession.errorCount || 0) + 1;
+          }
           tokenIdx++;
         }
       }
     }
 
+    var cur0 = currentTasmeeAyah();
+    if (cur0) touched[cur0.id] = true;
     if (matchedAny) {
-      applyTasmeeWordState(pageList);
+      applyTasmeeWordState(pageList, Object.keys(touched));
       var curAyah = currentTasmeeAyah();
       if (changedVerse && curAyah) navigateToVerse(curAyah.id);
       tasmeeStatus.textContent = mismatchDetected
@@ -5586,12 +4635,13 @@
         ? 'رُصد خطأ أو تجاوز/تكرار في الكلمة الحالية؛ أعد قراءتها بدقة.'
         : 'لم يتم التعرف على الكلمة؛ أعد المحاولة أو اضغط زر التلقين للمساعدة.';
     }
-    if (mismatchDetected) applyTasmeeWordState(pageList);
+    if (mismatchDetected && !matchedAny) applyTasmeeWordState(pageList, Object.keys(touched));
     return tokenIdx;
   }
 
   function selectTasmeeSpeechAlternative(result) {
     if (!result || !result.length) return '';
+    if (!result.isFinal) return result[0].transcript || '';
     var state = currentTasmeeAyah();
     var expectedIndex = state ? state.wordIndex : 0;
     var bestText = result[0].transcript || '';
@@ -5654,7 +4704,7 @@
         if (error && error.name === 'InvalidStateError') return; // يعمل بالفعل
         tasmeeFailStreak++;
         tasmeeRecognition = null;
-        startBrowserTasmeeRecognition(Recognition);
+        startBrowserTasmeeRecognition(Recognition, true);
       }
     }, delay);
   }
@@ -5669,20 +4719,20 @@
   });
   window.addEventListener('online', resumeTasmeeIfStalled);
 
-  function startBrowserTasmeeRecognition(Recognition) {
+  function startBrowserTasmeeRecognition(Recognition, isRetry) {
     if (!tasmeeSession || tasmeeSession.completed) {
       if (!createTasmeeSession()) return;
     }
     var firstAyah = currentTasmeeAyah();
-    if (firstAyah) {
+    if (firstAyah && !isRetry) {
       closeD();
       navigateToVerse(firstAyah.id);
     }
-    stopRecitation('تم إيقاف الاستماع لبدء التسميع');
+    if (!isRetry) stopRecitation('تم إيقاف الاستماع لبدء التسميع');
     tasmeeListening = true;
-    tasmeeFailStreak = 0;
+    if (!isRetry) tasmeeFailStreak = 0;
     tasmeeInterimTokens = [];
-    applyTasmeeWordState(pageList);
+    if (!isRetry) applyTasmeeWordState(pageList);
     syncTasmeeControls();
 
     var recognition;
@@ -5705,6 +4755,7 @@
       tasmeeStatus.textContent = 'الميكروفون يعمل؛ ابدأ بتسميع الآيات غيبًا.';
       syncTasmeeControls();
     };
+    var processedFinals = Object.create(null);
     recognition.onresult = function (event) {
       if (tasmeeRecognition !== recognition) return;
       tasmeeFailStreak = 0;
@@ -5712,8 +4763,12 @@
         interimText = '';
       for (var i = event.resultIndex; i < event.results.length; i++) {
         var recognizedText = selectTasmeeSpeechAlternative(event.results[i]);
-        if (event.results[i].isFinal) finalText += ' ' + recognizedText;
-        else interimText += ' ' + recognizedText;
+        if (event.results[i].isFinal) {
+          // بعض متصفحات أندرويد تعيد إرسال النتيجة النهائية نفسها؛ نتجاهل المكرر.
+          if (processedFinals[i] === recognizedText) continue;
+          processedFinals[i] = recognizedText;
+          finalText += ' ' + recognizedText;
+        } else interimText += ' ' + recognizedText;
       }
       var interimTokens = tokenizeTasmeeTranscript(interimText);
       var common = 0;
@@ -6621,6 +5676,27 @@
   var verseBatchSize = 100;
   $('search').placeholder = 'ابحث عن كلمة أو عبارة في آية';
   $('search').setAttribute('aria-label', $('search').placeholder);
+  // نص الآية بخط المصحف (رموز QCF4 لكل صفحة) بدل الخط العادي؛ يرجع '' إن تعذّر فيُستعمل النص العادي.
+  var verseGlyphCache = Object.create(null);
+  function verseGlyphHtml(v) {
+    if (v in verseGlyphCache) return verseGlyphCache[v];
+    var html = '',
+      start = pageOfV(v);
+    for (var pg = start; pg <= Math.min(604, start + 1); pg++) {
+      var lines = G[pg - 1] || [],
+        found = false;
+      lines.forEach(function (l) {
+        if (l[0] !== 'w') return;
+        l[2].forEach(function (it) {
+          if (it[0] !== v) return;
+          found = true;
+          html += '<span style="font-family:' + fam(l[1]) + '">' + escapeHtml(it[1]) + '</span> ';
+        });
+      });
+      if (!found && pg > start) break;
+    }
+    return (verseGlyphCache[v] = html.trim());
+  }
   function drawVerseResults(reset) {
     if (reset) {
       renderedVerseCount = 0;
@@ -6639,7 +5715,7 @@
         '"><span class="num">' +
         ar(i + 1) +
         '</span><span><div class="sname q">' +
-        escapeHtml(verseText(result.surah, result.ayah)) +
+        (verseGlyphHtml(result.id) || escapeHtml(verseText(result.surah, result.ayah))) +
         '</div><div class="smeta">سورة ' +
         escapeHtml(surah[1]) +
         ' - الآية ' +
@@ -7509,6 +6585,9 @@
       .trim();
     return context.length > 150 ? context.slice(0, 150) + '…' : context;
   }
+  window.QuranCloseWp = function () {
+    closeWp();
+  };
   function closeWp() {
     wp.hidden = true;
     wp.classList.remove('open');
@@ -8149,6 +7228,8 @@
     syncThemeButton();
     toast(next === 'dark' ? 'تم تفعيل الوضع الليلي' : 'تم تفعيل الوضع النهاري');
   });
+  var mk = store('mq.mushafTheme');
+  if (/^(blue|green|brown|slate)$/.test(mk || '')) document.documentElement.setAttribute('data-mushaf', mk);
   var th = store('mq.theme');
   if (th === 'dark' || th === 'light') document.documentElement.setAttribute('data-theme', th);
   syncThemeButton();
@@ -8462,6 +7543,12 @@
         var nearViewport = bounds.bottom >= -window.innerHeight && bounds.top <= window.innerHeight * 2;
         if (view === activeView || nearViewport) render(view, p);
       });
+    },
+    setFontScale: function (percent) {
+      mushafScale = Math.min(130, Math.max(70, Math.round(percent))) / 100;
+      store('mq.fontScale', String(Math.round(mushafScale * 100)));
+      widths = {};
+      renderInitialPage(cur);
     },
     closeDrawer: closeD,
     goTo: goTo,
@@ -11603,11 +10690,6 @@
     try {
       localStorage.setItem(KEY, JSON.stringify(st));
     } catch (e) {}
-    if (window.HudaCloud && window.HudaCloud.queueSync) {
-      try {
-        window.HudaCloud.queueSync();
-      } catch (e) {}
-    }
   }
   function perDay(a) {
     return Math.ceil(TOTAL / a.days);
@@ -12131,4 +11213,162 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(boot, 400); });
   else setTimeout(boot, 400);
+})();
+
+
+/* ======================================================================
+ * زر الرجوع: يغلق أعلى نافذة مفتوحة بدل الخروج من التطبيق.
+ * يُبقي مدخل سجلّ «حارس» دائمًا فوق مدخل الأساس؛ كل ضغطة رجوع تُغلق طبقة،
+ * وإن لم تبقَ طبقة تُطلب ضغطة ثانية خلال ثانيتين للخروج.
+ * ====================================================================== */
+(function () {
+  'use strict';
+  if (!window.history || !history.pushState) return;
+  var lastExitTry = 0;
+  function visible(el) {
+    return !!el && !el.hidden && el.getAttribute('aria-hidden') !== 'true';
+  }
+  function click(el) {
+    if (el) el.click();
+  }
+  function topLayer() {
+    if (document.querySelector('.cel') && window.QuranCelebrate) {
+      return function () {
+        window.QuranCelebrate.hide();
+      };
+    }
+    var adhan = document.getElementById('adhanScreen');
+    if (visible(adhan))
+      return function () {
+        click(document.getElementById('adhanScreenClose'));
+      };
+    var modals = document.querySelectorAll('.app-modal');
+    for (var i = modals.length - 1; i >= 0; i--) {
+      if (!modals[i].hidden) {
+        var m = modals[i];
+        return function () {
+          click(m.querySelector('.app-modal-close'));
+          if (!m.hidden) document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+        };
+      }
+    }
+    var service = document.getElementById('appServiceView');
+    if (visible(service))
+      return function () {
+        click(document.getElementById('appServiceClose'));
+      };
+    var wp = document.getElementById('wp');
+    if (visible(wp) && window.QuranCloseWp)
+      return function () {
+        window.QuranCloseWp();
+      };
+    var marks = document.getElementById('marksPopupHome');
+    if (visible(marks))
+      return function () {
+        marks.hidden = true;
+      };
+    var cls = document.body.classList;
+    if (cls.contains('open') || cls.contains('vs'))
+      return function () {
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+      };
+    return null;
+  }
+  function guard() {
+    try {
+      history.pushState({ huda: 'guard' }, '');
+    } catch (e) {}
+  }
+  try {
+    if (!(history.state && history.state.huda)) history.replaceState({ huda: 'base' }, '');
+    guard();
+  } catch (e) {}
+  window.addEventListener('popstate', function () {
+    var close = topLayer();
+    if (close) {
+      try {
+        close();
+      } catch (e) {
+        console.error('تعذر إغلاق النافذة عند الرجوع.', e);
+      }
+      guard();
+      return;
+    }
+    var now = Date.now();
+    if (now - lastExitTry < 2200) {
+      lastExitTry = 0;
+      history.back();
+      return;
+    }
+    lastExitTry = now;
+    guard();
+    if (window.MushafRuntime && window.MushafRuntime.toast) window.MushafRuntime.toast('اضغط رجوع مرة أخرى للخروج');
+  });
+})();
+
+
+/* ألوان المصحف وحجم خطه (واجهة الإعدادات) */
+(function () {
+  'use strict';
+  var group = document.getElementById('mushafColorGroup');
+  if (!group) return;
+  var NAMES = { '': 'كلاسيكي', blue: 'أزرق', green: 'أخضر', brown: 'بني', slate: 'رمادي' };
+  function arD(n) {
+    return String(n).replace(/\d/g, function (d) {
+      return '٠١٢٣٤٥٦٧٨٩'[d];
+    });
+  }
+  function getStore(k) {
+    try {
+      return localStorage.getItem(k);
+    } catch (e) {
+      return null;
+    }
+  }
+  function paintTheme(value) {
+    group.querySelectorAll('.mk-swatch').forEach(function (b) {
+      var on = b.getAttribute('data-mushaf') === value;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+    document.getElementById('mushafColorLabel').textContent = NAMES[value] || NAMES[''];
+  }
+  var current = getStore('mq.mushafTheme') || '';
+  if (!NAMES.hasOwnProperty(current)) current = '';
+  paintTheme(current);
+  group.addEventListener('click', function (e) {
+    var b = e.target.closest('.mk-swatch');
+    if (!b) return;
+    var v = b.getAttribute('data-mushaf');
+    if (v) document.documentElement.setAttribute('data-mushaf', v);
+    else document.documentElement.removeAttribute('data-mushaf');
+    try {
+      localStorage.setItem('mq.mushafTheme', v);
+    } catch (err) {}
+    paintTheme(v);
+  });
+  var range = document.getElementById('mushafSizeRange'),
+    label = document.getElementById('mushafSizeLabel');
+  var startScale = Math.min(130, Math.max(70, parseInt(getStore('mq.fontScale') || '100', 10) || 100));
+  range.value = String(startScale);
+  label.textContent = arD(startScale) + '٪';
+  var timer = 0;
+  function apply(v) {
+    v = Math.min(130, Math.max(70, v));
+    range.value = String(v);
+    label.textContent = arD(v) + '٪';
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      if (window.MushafRuntime && window.MushafRuntime.setFontScale) window.MushafRuntime.setFontScale(v);
+    }, 180);
+  }
+  range.addEventListener('input', function () {
+    apply(+range.value);
+  });
+  document.getElementById('mushafSizeDown').addEventListener('click', function () {
+    apply(+range.value - 5);
+  });
+  document.getElementById('mushafSizeUp').addEventListener('click', function () {
+    apply(+range.value + 5);
+  });
 })();
