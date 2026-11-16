@@ -2306,6 +2306,8 @@
     var view = document.createElement('section');
     view.className = 'page-view';
     view.setAttribute('data-page', String(p));
+    /* المصحف الورقي: الصفحة الفردية على اليمين والزوجية على اليسار */
+    view.setAttribute('data-side', p % 2 ? 'right' : 'left');
     view.innerHTML =
       '<div class="run"><button type="button" class="open-juz" aria-label="فتح فهرس السور"></button>' +
       '<svg class="bm" viewBox="0 0 24 24" hidden aria-label="صفحة عليها فاصل"><path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z"/></svg>' +
@@ -2820,45 +2822,49 @@
             noteBand.style.width = (noteRight - noteLeft + 4).toFixed(1) + 'px';
           }
         }
+        /* طبقتان مستقلتان: تظليل الآية (شريط خلف النص) وتظليل الكلمة (فوقه) */
+        var verseMark = null,
+          wordMark = null;
         marks.forEach(function (m) {
-          if (String(m.v) === verse && m.p === null) mark = m;
+          if (String(m.v) !== verse) return;
+          if (m.p === null) verseMark = m;
+          else if (String(m.p) === pos) wordMark = m;
         });
-        marks.forEach(function (m) {
-          if (String(m.v) === verse && String(m.p) === pos) mark = m;
-        });
-        if (!mark || mark.t === 'erase') return;
-        var color = COL[mark.c][0];
+        if (verseMark && verseMark.t === 'highlight') {
+          var vColor = COL[verseMark.c][0];
+          var line = w.closest('.ln'),
+            lineBands = paintedVerseBands.get(line);
+          if (!lineBands) {
+            lineBands = Object.create(null);
+            paintedVerseBands.set(line, lineBands);
+          }
+          if (!lineBands[verse]) {
+            lineBands[verse] = true;
+            var verseWords = line.querySelectorAll('.w[data-v="' + verse + '"]');
+            var lineRect = line.getBoundingClientRect(),
+              left = Infinity,
+              right = -Infinity;
+            verseWords.forEach(function (verseWord) {
+              var rect = verseWord.getBoundingClientRect();
+              left = Math.min(left, rect.left);
+              right = Math.max(right, rect.right);
+            });
+            var band = document.createElement('i');
+            band.className = 'annot-verse-band';
+            band.setAttribute('data-v', verse);
+            line.insertBefore(band, line.firstChild);
+            band.style.left = (left - lineRect.left - 2).toFixed(1) + 'px';
+            band.style.width = (right - left + 4).toFixed(1) + 'px';
+            band.style.background = 'color-mix(in srgb, ' + vColor + ' 22%, transparent)';
+          }
+        }
+        if (!wordMark || wordMark.t === 'erase') return;
+        var color = COL[wordMark.c][0];
         w.style.setProperty('--annot-color', color);
-        if (mark.t === 'highlight') {
-          w.style.setProperty('--annot-bg', 'color-mix(in srgb, ' + color + ' 24%, transparent)');
-          if (mark.p === null) {
-            var line = w.closest('.ln'),
-              lineBands = paintedVerseBands.get(line);
-            if (!lineBands) {
-              lineBands = Object.create(null);
-              paintedVerseBands.set(line, lineBands);
-            }
-            if (!lineBands[verse]) {
-              lineBands[verse] = true;
-              var verseWords = line.querySelectorAll('.w[data-v="' + verse + '"]');
-              var lineRect = line.getBoundingClientRect(),
-                left = Infinity,
-                right = -Infinity;
-              verseWords.forEach(function (verseWord) {
-                var rect = verseWord.getBoundingClientRect();
-                left = Math.min(left, rect.left);
-                right = Math.max(right, rect.right);
-              });
-              var band = document.createElement('i');
-              band.className = 'annot-verse-band';
-              band.setAttribute('data-v', verse);
-              line.insertBefore(band, line.firstChild);
-              band.style.left = (left - lineRect.left - 2).toFixed(1) + 'px';
-              band.style.width = (right - left + 4).toFixed(1) + 'px';
-              band.style.background = 'color-mix(in srgb, ' + color + ' 45%, transparent)';
-            }
-          } else w.classList.add('annot-highlight');
-        } else if (mark.t === 'underline') w.classList.add('annot-underline');
+        if (wordMark.t === 'highlight') {
+          w.style.setProperty('--annot-bg', 'color-mix(in srgb, ' + color + ' 30%, transparent)');
+          w.classList.add('annot-highlight');
+        } else if (wordMark.t === 'underline') w.classList.add('annot-underline');
       });
     });
   }
@@ -2889,7 +2895,7 @@
       return true;
     }
     marks = marks.filter(function (m) {
-      return m.v !== verse;
+      return !(m.v === verse && m.p === null);
     });
     marks.push({ v: verse, p: null, c: annotPrefs.color, t: 'highlight' });
     pageAnnotations[page] = marks;
@@ -2905,13 +2911,11 @@
       found = -1;
     var position = +w.getAttribute('data-p');
     if (position > 0) {
-      var verseMark = marks.some(function (mark) {
-        return mark.v === verse && mark.p === null;
-      });
+      /* تظليل الكلمة مستقل عن تظليل الآية: لا يلغيه ولا يتأثر به */
       marks.forEach(function (mark, index) {
         if (mark.v === verse && mark.p === position && mark.t === 'highlight') found = index;
       });
-      if (found >= 0 && marks[found].c === color && !verseMark) {
+      if (found >= 0 && marks[found].c === color) {
         pageAnnotations[page] = marks.filter(function (mark) {
           return !(mark.v === verse && mark.p === position);
         });
@@ -2920,7 +2924,7 @@
         return true;
       }
       marks = marks.filter(function (mark) {
-        return !(mark.v === verse && (mark.p === null || mark.p === position));
+        return !(mark.v === verse && mark.p === position);
       });
       marks.push({ v: verse, p: position, c: color, t: 'highlight' });
       pageAnnotations[page] = marks;
@@ -2933,14 +2937,14 @@
     });
     if (found >= 0 && marks[found].c === color && marks[found].t === 'highlight') {
       pageAnnotations[page] = marks.filter(function (mark) {
-        return mark.v !== verse;
+        return !(mark.v === verse && mark.p === null);
       });
       saveAnnotations();
       repaintAnnotationPage(page);
       return true;
     }
     marks = marks.filter(function (mark) {
-      return mark.v !== verse;
+      return !(mark.v === verse && mark.p === null);
     });
     marks.push({ v: verse, p: null, c: color, t: 'highlight' });
     pageAnnotations[page] = marks;
@@ -2955,7 +2959,7 @@
     page = page || cur;
     var marks = pageAnnotations[page] || (pageAnnotations[page] = []);
     marks = marks.filter(function (m) {
-      return isVerse ? m.v !== verse : !(m.v === verse && m.p === pos);
+      return isVerse ? !(m.v === verse && m.p === null) : !(m.v === verse && m.p === pos);
     });
     marks.push({ v: verse, p: isVerse ? null : pos, c: annotPrefs.color, t: annotPrefs.type });
     pageAnnotations[page] = marks;
@@ -4138,8 +4142,19 @@
       .replace(/(.)\1+/g, '$1');
   }
 
-  // التسميع بمستوى متسامح ثابت (لا خيار للمستخدم).
-  var tasmeeStrictness = 'lenient';
+  // التسميع الصارم: لا تُقبل الكلمة إلا إذا طابقت المتوقعة فعلًا.
+  var tasmeeStrictness = 'strict';
+  // أثناء النتائج المؤقتة (غير المستقرة) وفي دمج/تقسيم الكلمات نقبل التطابق التام فقط.
+  var tasmeeExactOnly = false;
+  function tasmeeExactly(fn) {
+    var previous = tasmeeExactOnly;
+    tasmeeExactOnly = true;
+    try {
+      return fn();
+    } finally {
+      tasmeeExactOnly = previous;
+    }
+  }
 
   function tasmeeWordMatches(spoken, expected) {
     if (!spoken || !expected) return false;
@@ -4147,25 +4162,25 @@
     var expectedKey = normalizeTasmeeWord(expected);
     if (spokenKey === expectedKey) return true;
 
-    var compactSpoken = spokenKey.replace(/(.)\1+/g, '$1');
-    var compactExpected = expectedKey.replace(/(.)\1+/g, '$1');
-    if (compactSpoken === compactExpected) return true;
+    var a = spokenKey.replace(/(.)\1+/g, '$1');
+    var b = expectedKey.replace(/(.)\1+/g, '$1');
+    if (a === b) return true;
+    if (tasmeeExactOnly) return false;
 
-    var minLength = tasmeeStrictness === 'lenient' ? 3 : tasmeeStrictness === 'strict' ? 5 : 4;
-    var shorter = Math.min(compactSpoken.length, compactExpected.length);
-    var longer = Math.max(compactSpoken.length, compactExpected.length);
-    if (shorter < minLength) return false;
+    // فروق إملائية في حروف المدّ فقط (مالك/ملك): حذف حرف مدّ واحد من الأطول يطابق الأقصر.
+    if (Math.abs(a.length - b.length) === 1 && Math.min(a.length, b.length) >= 3) {
+      var lo = a.length < b.length ? a : b,
+        hi = a.length < b.length ? b : a;
+      for (var i = 0; i < hi.length; i++) {
+        if (/[اوي]/.test(hi.charAt(i)) && hi.slice(0, i) + hi.slice(i + 1) === lo) return true;
+      }
+    }
 
-    // تسامح نسبي مع طول الكلمة.
-    var limit =
-      tasmeeStrictness === 'strict' ? (longer >= 8 ? 1 : 0) : longer >= 7 ? 2 : 1;
-    if (limit && tasmeeWordDistance(compactSpoken, compactExpected, limit) <= limit) return true;
-
-    // تطابق صوتي (الحروف المتشابهة): ليس في الوضع الصارم.
-    if (tasmeeStrictness !== 'strict') {
-      var phoneticSpoken = tasmeePhoneticKey(compactSpoken);
-      var phoneticExpected = tasmeePhoneticKey(compactExpected);
-      if (phoneticSpoken.length >= 3 && phoneticSpoken === phoneticExpected) return true;
+    // الكلمات الطويلة جدًا فقط: خطأ حرف واحد في الوسط (تشويش المتعرّف الصوتي)، مع ثبات بدايتها ونهايتها.
+    if (Math.min(a.length, b.length) >= 8 && Math.abs(a.length - b.length) <= 1) {
+      if (a.slice(0, 3) === b.slice(0, 3) && a.slice(-2) === b.slice(-2)) {
+        return tasmeeWordDistance(a, b, 1) <= 1;
+      }
     }
     return false;
   }
@@ -4428,7 +4443,8 @@
   // عدة رموز مسموعة متتالية (٢–٣) تُكوّن الكلمة المتوقعة. تُرجع عدد الرموز أو 0.
   function tasmeeSplitMatch(tokens, from, state, index) {
     for (var n = 2; n <= 3 && from + n <= tokens.length; n++) {
-      if (tasmeeMatchesAt(tokens.slice(from, from + n).join(''), state, index)) return n;
+      var joinedTokens = tokens.slice(from, from + n).join('');
+      if (tasmeeExactly(function () { return tasmeeMatchesAt(joinedTokens, state, index); })) return n;
     }
     return 0;
   }
@@ -4440,12 +4456,21 @@
       joined += state.words[index + n - 1];
       var blocked = false;
       for (var k = 0; k < n; k++) if (state.prompted && state.prompted[index + 1 + k]) blocked = true;
-      if (!blocked && tasmeeWordMatches(token, joined)) return n;
+      if (!blocked && tasmeeExactly(function () { return tasmeeWordMatches(token, joined); })) return n;
     }
     return 0;
   }
 
   function processTasmeeTranscript(transcript, showFeedback, interim) {
+    var previousExact = tasmeeExactOnly;
+    tasmeeExactOnly = !!interim;
+    try {
+      return processTasmeeTranscriptCore(transcript, showFeedback, interim);
+    } finally {
+      tasmeeExactOnly = previousExact;
+    }
+  }
+  function processTasmeeTranscriptCore(transcript, showFeedback, interim) {
     if (!tasmeeListening || !tasmeeSession || tasmeeSession.completed) return 0;
     var tokens = tokenizeTasmeeTranscript(transcript);
     if (!tokens.length) return 0;
@@ -4559,61 +4584,17 @@
       } else if (interim) {
         break;
       } else {
-        // مزامنة ذكية: إن طابقت الكلمة المسموعة كلمة قادمة (خلال ٣ كلمات) فالقارئ تجاوز كلمات
-        // أو أسقطها المتعرّف. الكلمات المتجاوزة تُوسَم أخطاءً وتبقى مخفية (يعود إليها التسميع في النهاية)،
-        // وفي الوضع المتسامح تُقبل كلمة واحدة متجاوزة دون وسم.
-        var ahead = 0;
-        var maxAhead = token.length >= 4 ? 3 : 1;
-        for (var k = 1; k <= maxAhead && expectedIndex + k < state.words.length; k++) {
-          if (state.prompted && state.prompted[expectedIndex + k + 1]) break;
-          if (tasmeeMatchesAt(token, state, expectedIndex + k)) {
-            ahead = k;
-            break;
-          }
+        // لا ننتقل إلى الكلمة التالية إلا بعد قراءة الحالية قراءة صحيحة: لا بحث للأمام ولا مسامحة.
+        // الكلمة غير المطابقة تبقى مظللة، وتُوسَم خطأً عند تكرار عدم المطابقة.
+        state.fails = state.fails || Object.create(null);
+        var failKey = expectedIndex + 1;
+        state.fails[failKey] = (state.fails[failKey] || 0) + 1;
+        if (state.fails[failKey] >= 2) {
+          if (!state.mistakes[failKey]) tasmeeSession.errorCount = (tasmeeSession.errorCount || 0) + 1;
+          state.mistakes[failKey] = true;
+          mismatchDetected = true;
         }
-        if (ahead) {
-          var forgiven = tasmeeStrictness === 'lenient' && ahead === 1;
-          for (var skip = 0; skip < ahead; skip++) {
-            if (forgiven) {
-              state.revealed[expectedIndex + 1 + skip] = true;
-              delete state.mistakes[expectedIndex + 1 + skip];
-            } else {
-              state.mistakes[expectedIndex + 1 + skip] = true;
-              mismatchDetected = true;
-              tasmeeSession.errorCount = (tasmeeSession.errorCount || 0) + 1;
-            }
-          }
-          matchedAny = true;
-          state.revealed[expectedIndex + ahead + 1] = true;
-          if (!state.prompted || !state.prompted[expectedIndex + ahead + 1])
-            delete state.mistakes[expectedIndex + ahead + 1];
-          state.wordIndex = expectedIndex + ahead + 1;
-          tokenIdx++;
-          if (state.wordIndex >= state.words.length) {
-            tasmeeSession.verseIndex += 1;
-            changedVerse = true;
-            if (tasmeeSession.verseIndex >= tasmeeSession.ayahs.length) {
-              if (rewindTasmeeToUnrevealedWord()) changedVerse = true;
-              else {
-                applyTasmeeWordState(pageList, Object.keys(touched));
-                finishTasmee();
-                return tokenIdx;
-              }
-            }
-          }
-        } else {
-          // كلمة غير مطابقة: التسامح يمنح محاولة أولى لكل كلمة (أخطاء المتعرّف الصوتي كثيرة)،
-          // فلا تُوسَم خطأً إلا عند تكرار عدم المطابقة.
-          state.fails = state.fails || Object.create(null);
-          var failKey = expectedIndex + 1;
-          state.fails[failKey] = (state.fails[failKey] || 0) + 1;
-          if (state.fails[failKey] >= 2) {
-            state.mistakes[failKey] = true;
-            mismatchDetected = true;
-            tasmeeSession.errorCount = (tasmeeSession.errorCount || 0) + 1;
-          }
-          tokenIdx++;
-        }
+        tokenIdx++;
       }
     }
 
@@ -4646,6 +4627,10 @@
     var bestScore = -1;
     for (var alternativeIndex = 0; alternativeIndex < result.length; alternativeIndex++) {
       var candidate = result[alternativeIndex].transcript || '';
+      var topConfidence = result[0].confidence || 0;
+      var altConfidence = result[alternativeIndex].confidence || 0;
+      /* لا نقبل بديلًا ضعيف الثقة لمجرد أنه يطابق المتوقع */
+      if (alternativeIndex > 0 && topConfidence && altConfidence < topConfidence - 0.2) continue;
       var candidateTokens = tokenizeTasmeeTranscript(candidate);
       var score = 0;
       if (state) {
@@ -4673,10 +4658,10 @@
       if (typeof window.SpeechRecognitionPhrase !== 'function') return;
       var state = currentTasmeeAyah();
       if (!state) return;
-      var words = state.words.slice(state.wordIndex, state.wordIndex + 10);
+      var words = state.words.slice(state.wordIndex, state.wordIndex + 4);
       if (!words.length) return;
       recognition.phrases = words.map(function (word) {
-        return new window.SpeechRecognitionPhrase(word, 4);
+        return new window.SpeechRecognitionPhrase(word, 1.5);
       });
     } catch (error) {
       /* غير مدعوم: يعمل التعرف بدونها */
@@ -6987,6 +6972,11 @@
     function (event) {
       window.clearTimeout(popupDismissPointerTimer);
       popupDismissPointerTimer = 0;
+      if (event.target instanceof Element && event.target.closest('#guideSpot')) {
+        lpFired = false;
+        popupDismissPointer = null;
+        return;
+      }
       if (lpFired) {
         lpFired = false;
         popupDismissPointer = null;
@@ -11454,12 +11444,20 @@
     { i: '🔎', t: 'فهرس السور والبحث', s: 'تبويب «السور»', p: [
       'اختر سورة أو جزءًا للانتقال إليه فورًا.',
       'اكتب كلمة أو عبارة في خانة البحث لتظهر الآيات المطابقة بخط المصحف، واضغط على النتيجة للانتقال إلى مكانها.' ] },
-    { i: '🎧', t: 'الاستماع والقرّاء', s: 'لوحة الآية', p: [
-      'شغّل تلاوة الآية أو المدى المحدد، واختر القارئ من القائمة؛ ويتصدرها «المصحف المعلم» للأطفال.',
-      'يمكنك تكرار الآيات المحددة عددًا من المرات، وتفعيل «تتبّع التلاوة» ليتحرك التمييز مع الصوت.' ] },
-    { i: '🧠', t: 'التسميع والحفظ', s: 'لوحة التسميع', p: [
-      'اختر السورة ومدى الآيات ثم ابدأ التسميع، واقرأ بصوتك دون النظر؛ يتعرف التطبيق على ما تقرؤه ويبيّن الصحيح والخطأ.',
-      'يحتاج التسميع إلى إذن الميكروفون ومتصفح يدعم التعرف على الصوت.' ] },
+    { i: '👆', t: 'الضغط المطول على الكلمة', s: 'في صفحة المصحف', p: [
+      'اضغط مطولًا (نحو نصف ثانية) على أي كلمة لتفتح نافذتها: الكلمة بخط المصحف ومعناها، والتفسير، وتظليل الكلمة، والتسميع، وتشغيل الآيات.',
+      'الضغط المطول على رقم الآية يفتح نافذة الآية بعلاماتها (إضافة علامة وتحريرها).' ] },
+    { i: '📚', t: 'عرض التفسير ومعاني الكلمات', s: 'نافذة الكلمة', p: [
+      'يظهر معنى الكلمة من المصدر الذي تختاره في الإعدادات، وتحته «التفسير المختصر للآية» تضغط عليه لتفتحه.',
+      'اختر لون التظليل لتمييز الكلمة أو الآية، وأعد الضغط على اللون لإزالته.' ] },
+    { i: '🎧', t: 'تشغيل الآيات واختيار القارئ', s: 'نافذة الكلمة ← تشغيل الآيات', p: [
+      'اختر القارئ من قائمة واسعة، ويتصدرها «المصحف المعلم» للأطفال بصوتَي الحصري والمنشاوي.',
+      'حدّد السورة والآيات وعدد مرات التكرار للحفظ ثم اضغط «استماع». وخيار «تتبّع التلاوة» في الإعدادات يظلل الآية أو الكلمة الجارية.' ] },
+    { i: '🧠', t: 'التسميع', s: 'نافذة الكلمة ← زر التسميع', p: [
+      'اختر السورة ومدى الآيات ثم ابدأ، واقرأ بصوتك دون النظر؛ يتعرف التطبيق على ما تقرؤه ويظلل الخطأ بالأحمر.',
+      'يحتاج إلى إذن الميكروفون ومتصفح يدعم التعرف على الصوت، وفي النهاية يظهر تقرير بالدقة.' ] },
+    { i: '💡', t: 'التلقين', s: 'داخل نافذة التسميع', p: [
+      'إن تعثّرت فاضغط «التلقين» ليظهر لك التطبيق الكلمة التالية المظللة ويقرؤها لك، ثم تتابع القراءة. وتُحسب الكلمات الملقَّنة في تقرير الدقة.' ] },
     { i: '🌈', t: 'ألوان التجويد', s: 'زر التجويد في الشريط العلوي', p: [
       'يلوّن أحكام التجويد (المدود، الإخفاء، الإدغام، القلقلة…) في الصفحة.',
       'يمكنك إظهار مفتاح الألوان أعلى رقم الصفحة، والضغط على أي لون لمعرفة الحكم. للتفاصيل: «دليل التجويد».' ] },
@@ -11498,6 +11496,47 @@
   var TOUR = [0, 1, 3, 5, 8, 14];
   var root = null, mode = 'full', step = 0, lastFocus = null;
 
+
+  /* أيقونات SVG موحدة (خط رفيع) بدل الرموز التعبيرية */
+  var IC_P = {
+    book: '<path d="M2 5h7a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H2z"/><path d="M22 5h-7a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h8z"/>',
+    menu: '<path d="M4 6h16M4 12h16M4 18h10"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>',
+    pointer: '<path d="M9 11V5.5a1.9 1.9 0 0 1 3.8 0V11"/><path d="M12.8 10a1.9 1.9 0 0 1 3.8 0v1.2a1.9 1.9 0 0 1 3.4 1.2v3.1A6 6 0 0 1 14 22h-2.5a6 6 0 0 1-4.3-1.8L3.6 16.6a1.9 1.9 0 0 1 2.7-2.7L9 15.6"/>',
+    layers: '<path d="m12 3 9 4.5-9 4.5L3 7.5z"/><path d="m3 12 9 4.5 9-4.5"/><path d="m3 16.5 9 4.5 9-4.5"/>',
+    headphones: '<path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M3 14h3a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2z"/><path d="M21 14h-3a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h1a2 2 0 0 0 2-2z"/>',
+    mic: '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/>',
+    bulb: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+    rainbow: '<path d="M3 18a9 9 0 0 1 18 0"/><path d="M7 18a5 5 0 0 1 10 0"/><path d="M11 18a1 1 0 0 1 2 0"/>',
+    bookmark: '<path d="M6 3h12v18l-6-4-6 4z"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    radio: '<rect x="3" y="8" width="18" height="12" rx="2"/><path d="m7 8 9-5"/><circle cx="15" cy="14" r="2.6"/><path d="M6 12.5h3M6 15.5h3"/>',
+    flag: '<path d="M5 21V4"/><path d="M5 4h12l-2 4 2 4H5"/>',
+    check: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+    beads: '<circle cx="12" cy="4" r="1.8"/><circle cx="19" cy="8" r="1.8"/><circle cx="19" cy="16" r="1.8"/><circle cx="12" cy="20" r="1.8"/><circle cx="5" cy="16" r="1.8"/><circle cx="5" cy="8" r="1.8"/>',
+    updown: '<path d="M12 3v18"/><path d="m8 7 4-4 4 4"/><path d="m8 17 4 4 4-4"/>',
+    palette: '<path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.3-.5-.8-.5-1.2 0-1.1.9-2 2-2h2.3A3.7 3.7 0 0 0 21 11a9 9 0 0 0-9-8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/>',
+    phone: '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+    back: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+    home: '<path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+    gear: '<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M5 5l1.8 1.8M17.2 17.2 19 19M5 19l1.8-1.8M17.2 6.8 19 5"/>',
+    expand: '<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/>',
+    moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+    type: '<path d="M4 7V5h16v2M9 19h6M12 5v14"/>',
+    volume: '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>',
+    file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+    spark: '<path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',
+    save: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+    edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+    pen: '<path d="m9 11-6 6v3h3l6-6"/><path d="m22 6-4-4-9 9 4 4z"/>',
+    voice: '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.3 3-6 7-6s7 2.7 7 6"/><path d="M17 6a4 4 0 0 1 0 6M20 3a8 8 0 0 1 0 12"/>',
+    repeat: '<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>'
+  };
+  var IC_E = { '📖': 'book', '☰': 'menu', '🔎': 'search', '👆': 'pointer', '📚': 'layers', '🎧': 'headphones', '🧠': 'mic', '🎙️': 'mic', '💡': 'bulb', '🌈': 'rainbow', '🔖': 'bookmark', '🕌': 'clock', '📻': 'radio', '🏁': 'flag', '✅': 'check', '📿': 'beads', '↕': 'updown', '🎨': 'palette', '📲': 'phone', '↩': 'back', '🏠': 'home', '⚙️': 'gear', '⛶': 'expand', '🌙': 'moon', 'Aa': 'type', '🔈': 'volume', '📄': 'file', '✨': 'spark', '💾': 'save', '📝': 'edit', '🖍️': 'pen', '🗣️': 'voice', '🔁': 'repeat' };
+  function ic(e) {
+    var k = IC_E[e];
+    return k ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + IC_P[k] + '</svg>' : esc(e);
+  }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function seen() { try { return localStorage.getItem(KEY) === '1'; } catch (e) { return false; } }
   function mark() { try { localStorage.setItem(KEY, '1'); } catch (e) {} }
@@ -11530,7 +11569,7 @@
     root.innerHTML =
       '<div class="gd-card gd-tour">' +
       '<button type="button" class="gd-skip" data-gd="close">تخطّي</button>' +
-      '<div class="gd-hero" aria-hidden="true">' + sec.i + '</div>' +
+      '<div class="gd-hero" aria-hidden="true">' + ic(sec.i) + '</div>' +
       '<h2 id="gdTitle">' + esc(sec.t) + '</h2>' +
       '<p class="gd-where">' + esc(sec.s) + '</p>' +
       '<div class="gd-text">' + sec.p.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</div>' +
@@ -11554,7 +11593,7 @@
       var o = i === openIdx;
       h += '<section class="gd-item' + (o ? ' open' : '') + '">' +
         '<button type="button" class="gd-q" data-gd="toggle" aria-expanded="' + o + '">' +
-        '<span class="gd-ic" aria-hidden="true">' + s.i + '</span>' +
+        '<span class="gd-ic" aria-hidden="true">' + ic(s.i) + '</span>' +
         '<span class="gd-qt"><b>' + esc(s.t) + '</b><small>' + esc(s.s) + '</small></span>' +
         '<span class="gd-chev" aria-hidden="true">‹</span></button>' +
         '<div class="gd-a"' + (o ? '' : ' hidden') + '>' + s.p.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</div></section>';
@@ -11609,21 +11648,38 @@
 
   /* ===== جولة الإضاءة: تحديد مكان كل أيقونة فعليًا على الشاشة ===== */
   var SPOT = [
-    { sel: ['#bMenu'], bar: 1, i: '☰', t: 'زر الفهرس', x: 'يفتح القائمة الجانبية التي تضم الخدمات والسور والأذكار والإعدادات.' },
-    { sel: ['#bTajweedToggle'], bar: 1, i: '🌈', t: 'ألوان التجويد', x: 'يلوّن أحكام التجويد في الصفحة؛ المدود والإخفاء والإدغام والقلقلة، ويمكنك إيقافه متى شئت.' },
-    { sel: ['#bPrev', '#pgIn', '#bNext'], bar: 1, i: '📖', t: 'التنقل بين الصفحات', x: 'اضغط «السابق» أو «التالي»، أو اكتب رقم الصفحة في الخانة الوسطى لتنتقل إليها مباشرة. ويمكنك أيضًا سحب الصفحة.' },
-    { sel: ['#tabSettings'], drawer: 'tabSettings', i: '🏠', t: 'تبويب الرئيسية', x: 'نقطة البداية: الخدمات والختمة والمهام اليومية، ثم إعدادات القراءة بالأسفل.' },
+    { sel: ['#tabSettings'], drawer: 'tabSettings', i: '🏠', t: 'تبويب الرئيسية', x: 'نقطة البداية: الخدمات والختمة والمهام اليومية.' },
     { sel: ['#integratedServices'], drawer: 'tabSettings', i: '🕌', t: 'مواقيت الصلاة وإذاعة القرآن', x: 'مواقيت الصلاة حسب موقعك مع تنبيه الأذان، وبث الإذاعات والتسجيلات داخل التطبيق.' },
     { sel: ['#khatmaHome'], drawer: 'tabSettings', i: '🏁', t: 'ختمتي', x: 'ابدأ ختمة بمدة تحددها ليحسب لك ورد اليوم. الزر الأخضر يفتح إعداداتها (التذكير والمهام) في هذه القائمة.' },
-    { sel: ['#homeTasksSection'], drawer: 'tabSettings', i: '✅', t: 'مهامك اليومية', x: 'مهام مرتبة بحسب أوقات الصلاة، ويمكنك إظهارها أو إخفاءها أو تعديلها أو حذفها وتفعيل المهام التلقائية.' },
-    { sel: ['#tabS', '#search'], drawer: 'tabS', i: '🔎', t: 'السور والبحث', x: 'اختر سورة أو جزءًا للانتقال إليه، أو ابحث بكلمة أو عبارة فتظهر الآيات بخط المصحف.' },
+    { sel: ['#homeTasksSection'], drawer: 'tabSettings', i: '✅', t: 'مهامك اليومية', x: 'مهام مرتبة بحسب أوقات الصلاة؛ أظهرها أو أخفِها أو عدّلها أو احذفها، وفعّل المهام التلقائية.' },
+    { sel: ['#tabS','#search'], drawer: 'tabS', i: '🔎', t: 'السور والبحث', x: 'اختر سورة أو جزءًا للانتقال إليه، أو ابحث بكلمة أو عبارة فتظهر الآيات بخط المصحف.' },
     { sel: ['#tabWorship'], drawer: 'tabWorship', i: '📿', t: 'الأذكار والمسبحة', x: 'مسبحة إلكترونية وأذكار الصباح والمساء وأذكار اليوم والليلة، ويُحفظ تقدمك تلقائيًا.' },
-    { sel: ['#tabTasks'], drawer: 'tabTasks', i: '⚙️', t: 'تبويب الإعدادات', x: 'كل ما يخص تخصيص التطبيق: المظهر والألوان والتمرير والتفسير والنسخ الاحتياطي.' },
-    { sel: ['#settingsBody .d-actions'], drawer: 'tabTasks', i: '🌙', t: 'الوضع الليلي وملء الشاشة', x: 'بدّل بين الفاتح والليلي، أو اعرض المصحف بملء الشاشة وبشكل أفقي.' },
-    { sel: ['#mushafColorCard'], drawer: 'tabTasks', i: '🎨', t: 'ألوان المصحف', x: 'اختر لون الصفحة والزخارف، ويتغير معه شكل القائمة الجانبية أيضًا.' },
-    { sel: ['#settingsBackupHost'], drawer: 'tabTasks', i: '💾', t: 'النسخ الاحتياطي', x: 'احفظ بياناتك (الختمة والمهام والعلامات) في ملف، واستعدها متى احتجت.' },
+    { sel: ['#tabTasks'], drawer: 'tabTasks', i: '⚙️', t: 'تبويب الإعدادات', x: 'كل ما يخص تخصيص التطبيق: المظهر والألوان والتمرير والتفسير والصوت والنسخ الاحتياطي. نشرحها واحدة واحدة.' },
+    { sel: ['.install-app-card'], drawer: 'tabTasks', i: '📲', t: 'تطبيق ويب', x: 'ثبّت المصحف على شاشتك الرئيسية ليعمل كتطبيق مستقل وبسرعة أكبر، ويعمل أغلبه دون إنترنت بعد التحميل الأول.' },
+    { sel: ['#bScreen'], drawer: 'tabTasks', i: '⛶', t: 'ملء الشاشة', x: 'يعرض المصحف بملء الشاشة دون أشرطة المتصفح لقراءة أكثر تركيزًا.' },
+    { sel: ['#bTheme'], drawer: 'tabTasks', i: '🌙', t: 'الوضع الليلي', x: 'يبدّل بين المظهر الفاتح والداكن لراحة العين، خاصة في الليل.' },
+    { sel: ['^#tajweedModeLabel'], drawer: 'tabTasks', i: '🌈', t: 'ألوان التجويد', x: '«المصحف الملوّن» يلوّن أحكام التجويد (المدود والإخفاء والإدغام والقلقلة)، و«العادي» يعيد الخط الأسود.' },
+    { sel: ['#mushafColorCard'], drawer: 'tabTasks', i: '🎨', t: 'ألوان المصحف', x: 'اختر لون الصفحة والزخارف (كلاسيكي، أزرق، أخضر، بني، رمادي)، ويتغير معه شكل القائمة الجانبية أيضًا.' },
+    { sel: ['^#gharibBookSelect'], drawer: 'tabTasks', i: '📖', t: 'مصدر معاني الكلمات', x: 'اختر الكتاب الذي تُعرض منه معاني الكلمات الغريبة عند الضغط المطول على الكلمة.' },
+    { sel: ['^#scrollToggle'], drawer: 'tabTasks', i: '↕', t: 'التمرير التلقائي', x: 'يحرّك الصفحات تلقائيًا بسرعة تختارها. يتحول العرض إلى الرأسي أثناءه، ثم يعود لوضعك السابق عند الإيقاف.' },
+    { sel: ['^#recitationTrackingGroup'], drawer: 'tabTasks', i: '🔎', t: 'تتبّع التلاوة أثناء الاستماع', x: '«آية آية» تظلل الآية الجارية، و«كلمة كلمة» تظلل كل كلمة لحظة نطقها.' },
+    { sel: ['#pageModeCard'], drawer: 'tabTasks', i: '📖', t: 'طريقة تقليب الصفحات', x: '«تمرير رأسي» لصفحات متصلة، أو «عرض أفقي» لصفحة واحدة تقلّبها بالسحب كالمصحف الورقي.' },
+    { sel: ['#flipCard'], drawer: 'tabTasks', i: '📄', t: 'تأثير تقليب الورق', x: 'يفعّل حركة الورقة وهي تنقلب في العرض الأفقي، أو يعطّلها لتنتقل الصفحة مباشرة.' },
+    { sel: ['#flipSoundCard'], drawer: 'tabTasks', i: '🔈', t: 'صوت تقليب الورق', x: 'صوت خفيف جدًا عند التقليب، يمكنك إغلاقه بالكامل.' },
+    { sel: ['#divineCard'], drawer: 'tabTasks', i: '✨', t: 'تلوين لفظ الجلالة', x: 'يلوّن لفظ «الله» و«رب» بالأحمر داخل المصحف الملوّن لتمييزهما بسهولة.' },
+    { sel: ['#uiFontCard'], drawer: 'tabTasks', i: 'Aa', t: 'خط القائمة الجانبية', x: 'غيّر نوع الخط وسمكه في القائمة الجانبية لتناسب قراءتك.' },
+    { sel: ['#settingsBackupHost'], drawer: 'tabTasks', i: '💾', t: 'بياناتك ونسختك الاحتياطية', x: 'احفظ المهام والختمة والعلامات والإعدادات في ملف، واستعدها على جهاز آخر.' },
     { sel: ['#guideCard'], drawer: 'tabTasks', i: '💡', t: 'دليل الاستخدام', x: 'يمكنك العودة إلى هذا الشرح في أي وقت من هنا، مع الدليل الكامل لكل ميزة.' },
-    { sel: [], i: '✨', t: 'أنت جاهز!', x: 'اضغط على أي آية في الصفحة لفتح التفسير والعلامات والاستماع. زر الرجوع يغلق النافذة المفتوحة، ومرتان متتاليتان للخروج.' }
+    { sel: [], press: 1, wordTarget: 1, i: '👆', t: 'الضغط المطول على الكلمة', x: 'اضغط مطولًا (نحو نصف ثانية) على أي كلمة في المصحف لتفتح نافذتها. وإن ضغطت مطولًا على رقم الآية فتحت نافذة الآية بعلاماتها.' },
+    { sel: ['#wp'], popup: 1, i: '📝', t: 'نافذة الكلمة', x: 'هذه نافذة الكلمة: تعرض الكلمة بخط المصحف ومعناها من المصدر الذي اخترته، وتجمع كل أدوات الآية في مكان واحد.' },
+    { sel: ['#wp details.wp-v'], popup: 1, openTafsir: 1, i: '📚', t: 'عرض التفسير', x: 'اضغط «التفسير المختصر للآية» لتفتحه وتقرأ تفسيرًا موجزًا للآية التي فيها الكلمة، واضغط مرة أخرى لإغلاقه.' },
+    { sel: ['#wp .wp-mark'], popup: 1, i: '🖍️', t: 'تظليل الكلمة', x: 'اختر لونًا لتظليل الكلمة أو الآية وتمييزها، واضغط اللون نفسه مرة أخرى لإزالة التظليل.' },
+    { sel: ['#wp .wp-recitation-tasmee'], popup: 1, i: '🎙️', t: 'التسميع', x: 'يفتح نافذة التسميع: اختر السورة والآيات ثم ابدأ واقرأ بصوتك دون النظر؛ يتعرف التطبيق على ما تقرؤه، ويظلل الخطأ بالأحمر. يحتاج إذن الميكروفون.' },
+    { sel: [], popup: 1, demo: "talqeen", i: '💡', t: 'التلقين', x: 'إن تعثّرت أثناء التسميع فاضغط زر «التلقين» ليظهر لك التطبيق الكلمة المظللة ويقرؤها لك، ثم تتابع القراءة من حيث توقفت. وتُحسب الكلمات الملقَّنة في تقرير دقتك بنهاية التسميع.' },
+    { sel: ['#wp .wp-recitation summary'], popup: 1, i: '🎧', t: 'تشغيل الآيات', x: 'يفتح مشغّل التلاوة: استمع للآية أو لمدى من الآيات بصوت القارئ الذي تختاره.' },
+    { sel: ['#wp .reciter-picker'], popup: 1, openRecit: 1, i: '🗣️', t: 'اختيار القارئ', x: 'اختر من قائمة واسعة من القرّاء، ويتصدرها «المصحف المعلم» للأطفال بصوتَي الحصري والمنشاوي.' },
+    { sel: ['#wp .recitation-range','#wp .recitation-play'], popup: 1, openRecit: 1, i: '🔁', t: 'النطاق والتكرار والاستماع', x: 'حدّد السورة وأول آية وآخرها وعدد مرات التكرار للحفظ، ثم اضغط «استماع». ويتحرك التظليل مع التلاوة حسب خيار التتبع.' },
+    { sel: [], i: '✨', t: 'أنت جاهز!', x: 'زر الرجوع يغلق النافذة المفتوحة، ومرتان متتاليتان للخروج. بالتوفيق في ورد يومك.' }
   ];
   var startedOpen = false, barWasHidden = false, spot = null, sIdx = 0, sBusy = 0, drawerByTour = false, barByTour = false, spotTimer = 0;
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
@@ -11638,7 +11694,7 @@
     spot.setAttribute('aria-modal', 'true');
     spot.setAttribute('aria-labelledby', 'gsTitle');
     spot.innerHTML =
-      '<i class="gs-p gs-t"></i><i class="gs-p gs-b"></i><i class="gs-p gs-l"></i><i class="gs-p gs-r"></i>' +
+      '<i class="gs-p gs-pt"></i><i class="gs-p gs-pb"></i><i class="gs-p gs-pl"></i><i class="gs-p gs-pr"></i>' +
       '<div class="gs-ring"></div><div class="gs-tip" id="gsTip"></div>';
     document.body.appendChild(spot);
     spot.addEventListener('click', function (e) {
@@ -11650,7 +11706,7 @@
       else if (a === 'skip') endSpot();
       else if (a === 'full') { endSpot(); open('full'); }
     });
-    window.addEventListener('resize', function () { if (spotOpen()) { clearTimeout(spotTimer); spotTimer = setTimeout(function () { place(sIdx); }, 120); } });
+    window.addEventListener('resize', function () { if (spotOpen()) { clearTimeout(spotTimer); spotTimer = setTimeout(function () { place(sIdx, true); }, 120); } });
     document.addEventListener('keydown', function (e) {
       if (!spotOpen()) return;
       if (e.key === 'Escape') endSpot();
@@ -11662,7 +11718,8 @@
   function rectOf(sels) {
     var u = null;
     sels.forEach(function (q) {
-      var el = document.querySelector(q);
+      var el = document.querySelector(q.charAt(0) === '^' ? q.slice(1) : q);
+      if (el && q.charAt(0) === '^') el = el.closest('.settings-card') || el;
       if (!el) return;
       var r = el.getBoundingClientRect();
       if (r.width < 2 || r.height < 2) return;
@@ -11670,48 +11727,88 @@
     });
     return u;
   }
+  var DEMO_TALQEEN = '<div class="gs-demo" aria-hidden="true"><span class="gs-d-state">جاهز للتسميع</span><div class="gs-d-row"><span class="gs-d-btn gs-d-on">🎙 ابدأ التسميع</span><span class="gs-d-btn gs-d-hot">التلقين</span></div><div class="gs-d-word">ٱلْكِتَـٰبِ</div></div>';
+  function wpOpen() { var w = document.getElementById('wp'); return !!w && !w.hidden; }
+  function closeDrawerNow() {
+    if (!document.body.classList.contains('open')) return false;
+    if (window.MushafRuntime && window.MushafRuntime.closeDrawer) window.MushafRuntime.closeDrawer();
+    else document.body.classList.remove('open');
+    return true;
+  }
+  function pickWord() {
+    var H = window.innerHeight, best = null, bd = 1e9;
+    document.querySelectorAll('.w[data-v][data-p]').forEach(function (w) {
+      if (+w.getAttribute('data-p') <= 0) return;
+      var r = w.getBoundingClientRect();
+      if (r.width < 8 || r.height < 8 || r.top < 70 || r.bottom > H - 110) return;
+      var d = Math.abs((r.top + r.bottom) / 2 - H * 0.42);
+      if (d < bd) { bd = d; best = w; }
+    });
+    return best;
+  }
+  function holdWord(w) {
+    var r = w.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+    var o = { bubbles: true, cancelable: true, pointerType: 'mouse', pointerId: 77, button: 0, clientX: x, clientY: y, isPrimary: true };
+    try { w.dispatchEvent(new PointerEvent('pointerdown', o)); } catch (e) { return Promise.resolve(); }
+    return wait(560).then(function () { try { w.dispatchEvent(new PointerEvent('pointerup', o)); } catch (e) {} });
+  }
   function prepare(st) {
-    var bar = document.getElementById('bar');
-    if (st.bar && bar && (bar.hidden || !bar.classList.contains('on'))) {
-      if (!barByTour) barWasHidden = bar.hidden;
-      bar.hidden = false;
-      bar.classList.add('on');
-      barByTour = true;
-    }
-    var tab = st.drawer ? document.getElementById(st.drawer) : null;
-    var need = !!st.drawer;
     var p = Promise.resolve();
-    if (st.bar && document.body.classList.contains('open')) {
-      /* القائمة الجانبية تغطي الشريط: نغلقها ليظهر العنصر بوضوح */
-      if (window.MushafRuntime && window.MushafRuntime.closeDrawer) window.MushafRuntime.closeDrawer();
-      else document.body.classList.remove('open');
-      p = wait(480);
-    }
+    var popupStep = !!(st.popup || st.press);
+    if (popupStep && document.body.classList.contains('open')) { closeDrawerNow(); p = wait(480); }
+    if (!popupStep && st.drawer && wpOpen() && window.QuranCloseWp) { window.QuranCloseWp(); p = wait(250); }
+    if (!popupStep && !st.drawer && wpOpen() && window.QuranCloseWp) { window.QuranCloseWp(); p = wait(250); }
     return p.then(function () {
-      if (need && !document.body.classList.contains('open')) {
+      if (st.press) {
+        if (wpOpen() && window.QuranCloseWp) window.QuranCloseWp();
+        return wait(200);
+      }
+      if (st.popup && !wpOpen()) {
+        var w = pickWord();
+        if (!w) return;
+        return holdWord(w).then(function () { return wait(380); });
+      }
+    }).then(function () {
+      if (st.popup && wpOpen()) {
+        var tf = document.querySelector('#wp details.wp-v'), rc = document.querySelector('#wp details.wp-recitation');
+        if (tf && tf.open !== !!st.openTafsir) { var sm = tf.querySelector('summary'); if (sm) sm.click(); }
+        if (rc && rc.open !== !!st.openRecit) { var sr = rc.querySelector('summary'); if (sr) sr.click(); }
+        return wait(300);
+      }
+    }).then(function () {
+      if (st.drawer && !document.body.classList.contains('open')) {
         var m = document.getElementById('bMenu');
+        var bar = document.getElementById('bar');
+        if (bar && bar.hidden) { barWasHidden = true; bar.hidden = false; barByTour = true; }
         if (m) { m.click(); drawerByTour = true; return wait(520); }
       }
     }).then(function () {
+      var tab = st.drawer ? document.getElementById(st.drawer) : null;
       if (tab && tab.getAttribute('aria-selected') !== 'true') { tab.click(); return wait(220); }
     }).then(function () {
-      if (st.sel.length) {
-        var el = document.querySelector(st.sel[st.sel.length - 1]) || document.querySelector(st.sel[0]);
-        if (el && st.drawer && el.scrollIntoView) { try { el.scrollIntoView({ block: 'nearest' }); } catch (e) {} }
+      if (st.sel.length && st.drawer) {
+        var q = st.sel[st.sel.length - 1], el = document.querySelector(q.charAt(0) === '^' ? q.slice(1) : q);
+        if (el && q.charAt(0) === '^') el = el.closest('.settings-card') || el;
+        if (el && el.scrollIntoView) { try { el.scrollIntoView({ block: 'center' }); } catch (e) {} }
       }
-      return wait(st.drawer ? 260 : 120);
+      return wait(st.drawer ? 300 : 160);
     });
   }
-  function place(i) {
+  function place(i, keep) {
     var st = SPOT[i], tip = document.getElementById('gsTip');
     var W = window.innerWidth, H = window.innerHeight, pad = 7;
     var r = st.sel.length ? rectOf(st.sel) : null;
+    if (st.wordTarget) {
+      var pw = document.querySelector('.w.pop') || pickWord();
+      if (pw) { var wr = pw.getBoundingClientRect(); r = { l: wr.left, t: wr.top, r: wr.right, b: wr.bottom }; }
+    }
+    if (r && r.b - r.t > H * 0.55) r = { l: r.l, t: Math.max(r.t, 0), r: r.r, b: Math.max(r.t, 0) + H * 0.4 };
     var n = SPOT.length;
-    tip.innerHTML =
+    if (!keep) tip.innerHTML =
       '<div class="gs-arrow"></div>' +
-      '<div class="gs-hd"><span class="gs-ic" aria-hidden="true">' + st.i + '</span><div><h3 id="gsTitle">' + esc(st.t) + '</h3><small>' + (i + 1) + ' من ' + n + '</small></div>' +
+      '<div class="gs-hd"><span class="gs-ic" aria-hidden="true">' + ic(st.i) + '</span><div><h3 id="gsTitle">' + esc(st.t) + '</h3><small>' + (i + 1) + ' من ' + n + '</small></div>' +
       '<button type="button" class="gs-skip" data-gs="skip">تخطّي</button></div>' +
-      '<p>' + esc(st.x) + '</p>' +
+      '<p>' + esc(st.x) + '</p>' + (st.demo === 'talqeen' ? DEMO_TALQEEN : '') +
       '<div class="gs-bar"><i style="width:' + Math.round(((i + 1) / n) * 100) + '%"></i></div>' +
       '<div class="gs-nav"><button type="button" class="gs-b ghost" data-gs="prev"' + (i === 0 ? ' disabled' : '') + '>السابق</button>' +
       '<button type="button" class="gs-b" data-gs="next">' + (i === n - 1 ? 'ابدأ الاستخدام' : 'التالي') + '</button></div>' +
@@ -11724,6 +11821,7 @@
       P[1].style.cssText = 'top:' + B + 'px;left:0;width:100%;height:' + (H - B) + 'px';
       P[2].style.cssText = 'top:' + T + 'px;left:0;width:' + L + 'px;height:' + (B - T) + 'px';
       P[3].style.cssText = 'top:' + T + 'px;left:' + R + 'px;width:' + (W - R) + 'px;height:' + (B - T) + 'px';
+      ring.classList.toggle('press', !!st.press);
       ring.style.cssText = 'opacity:1;top:' + T + 'px;left:' + L + 'px;width:' + (R - L) + 'px;height:' + (B - T) + 'px';
     } else {
       P[0].style.cssText = 'top:0;left:0;width:100%;height:100%';
@@ -11745,11 +11843,12 @@
       /* لو كان الهدف أكبر من الشاشة نضع الشرح داخل الجزء السفلي */
       if (top < r.b + pad && top + th > r.t - pad && !up && (r.b - r.t) > H * 0.6) { top = H - th - 12; }
     }
+    if (r && top < r.b + pad && top + th > r.t - pad) { top = (r.t + r.b) / 2 > H / 2 ? 12 : H - th - 12; up = top > H / 2; }
     tip.style.top = Math.round(top) + 'px';
     tip.style.left = Math.round(left) + 'px';
     tip.classList.toggle('up', up);
     tip.style.setProperty('--ax', Math.round(arrowX) + 'px');
-    var nb = tip.querySelector('.gs-b:not(.ghost)');
+    var nb = keep ? null : tip.querySelector('.gs-b:not(.ghost)');
     if (nb) try { nb.focus({ preventScroll: true }); } catch (e) {}
   }
   function gsGo(d) {
@@ -11774,7 +11873,7 @@
       place(i);
       sBusy = 0;
       /* إعادة قياس بعد استقرار الانتقالات لضمان دقة الإطار */
-      setTimeout(function () { if (spotOpen() && sIdx === i && !sBusy) place(i); }, 500);
+      setTimeout(function () { if (spotOpen() && sIdx === i && !sBusy) place(i, true); }, 500);
     });
   }
   function startSpot() {
@@ -11792,6 +11891,7 @@
     spot.classList.remove('is-in');
     spot.hidden = true;
     sBusy = 0;
+    if (wpOpen() && window.QuranCloseWp) window.QuranCloseWp();
     var bar = document.getElementById('bar');
     if (!startedOpen && window.MushafRuntime && window.MushafRuntime.closeDrawer) window.MushafRuntime.closeDrawer();
     else if (!startedOpen) document.body.classList.remove('open');
@@ -11814,7 +11914,7 @@
     c.className = 'settings-card guide-card';
     c.id = 'guideCard';
     c.innerHTML =
-      '<div class="settings-card-head"><span aria-hidden="true">💡</span><span>دليل الاستخدام</span></div>' +
+      '<div class="settings-card-head"><span class="gd-cardic" aria-hidden="true">' + ic('💡') + '</span><span>دليل الاستخدام</span></div>' +
       '<p class="install-app-help">تعرّف على كل أقسام التطبيق وميزاته خطوة بخطوة.</p>' +
       '<button type="button" class="install-app-button" id="guideOpenBtn">عرض دليل الاستخدام</button>';
     host.insertBefore(c, host.firstChild);

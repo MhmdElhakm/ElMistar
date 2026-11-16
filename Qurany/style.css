@@ -1781,10 +1781,10 @@ textarea:focus-visible {
 
 .hl {
   position: absolute;
-  top: 7%;
-  bottom: 7%;
+  top: -0.5px;
+  bottom: -0.5px;
   background: var(--band);
-  border-radius: 8px;
+  border-radius: 3px;
   pointer-events: none;
   z-index: 0;
 }
@@ -1829,8 +1829,8 @@ body.quran-bold .sheet.tajweed-active .w {
 }
 
 .w[data-p="-1"][data-v]:not([data-v="0"]).annot-highlight {
-  background: color-mix(in srgb, var(--annot-color) 88%, var(--panel));
-  box-shadow: 0 0 0 0.035em color-mix(in srgb, var(--annot-color) 88%, var(--panel));
+  background: color-mix(in srgb, var(--annot-color) 38%, transparent);
+  box-shadow: 0 0 0 0.035em color-mix(in srgb, var(--annot-color) 38%, transparent);
 }
 
 .w.recitation-active {
@@ -1860,9 +1860,9 @@ body.quran-bold .sheet.tajweed-active .w {
 
 .recitation-verse-band {
   position: absolute;
-  top: 7%;
-  bottom: 7%;
-  border-radius: 8px;
+  top: -0.5px;
+  bottom: -0.5px;
+  border-radius: 3px;
   background: color-mix(in srgb, var(--green) 24%, transparent);
   pointer-events: none;
   z-index: 1;
@@ -1870,17 +1870,17 @@ body.quran-bold .sheet.tajweed-active .w {
 
 .annot-verse-band {
   position: absolute;
-  top: 7%;
-  bottom: 7%;
-  border-radius: 8px;
+  top: -0.5px;
+  bottom: -0.5px;
+  border-radius: 3px;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
 
 .annot-note-band {
   position: absolute;
-  top: 9%;
-  bottom: 9%;
+  top: 0;
+  bottom: 0;
   border: 1px solid color-mix(in srgb, var(--green) 46%, transparent);
   border-radius: 8px;
   background: color-mix(in srgb, var(--green) 13%, transparent);
@@ -6111,3 +6111,40 @@ html:root[data-theme="dark"][data-mushaf] {
 .gs-b:disabled { opacity: .4; cursor: default; }
 .gs-link { display: block; margin: 6px auto 2px; border: 0; background: none; color: var(--muted, #777); font: inherit; font-size: 12.5px; text-decoration: underline; cursor: pointer; padding: 4px 8px; }
 @media (prefers-reduced-motion: reduce) { .gs, .gs-p, .gs-ring, .gs-tip { transition: none; animation: none; } }
+.gs-ring.press::after { content: ''; position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: color-mix(in srgb, var(--green) 45%, transparent); border: 2px solid #fff; animation: gsTap 1.4s ease-out infinite; }
+@keyframes gsTap { 0% { transform: scale(.4); opacity: 1; } 70%, 100% { transform: scale(1.6); opacity: 0; } }
+.gs-demo { margin: 0 0 12px; padding: 12px; border-radius: 14px; background: color-mix(in srgb, var(--green) 8%, var(--card, #fff)); border: 1px dashed color-mix(in srgb, var(--green) 50%, transparent); display: grid; gap: 8px; text-align: center; }
+.gs-d-state { font-size: 12px; color: var(--muted, #777); }
+.gs-d-row { display: flex; gap: 8px; justify-content: center; }
+.gs-d-btn { padding: 8px 12px; border-radius: 11px; font-size: 13px; font-weight: 800; background: color-mix(in srgb, var(--green) 14%, transparent); color: var(--green); }
+.gs-d-btn.gs-d-on { background: var(--green); color: var(--on-green, #fff); }
+.gs-d-btn.gs-d-hot { outline: 2px solid var(--green); box-shadow: 0 0 14px color-mix(in srgb, var(--green) 60%, transparent); animation: gsPulse 1.8s ease-in-out infinite; }
+.gs-d-word { font-size: 24px; color: #c0392b; }
+
+/* موضع الصفحة في المصحف: فردية = يمين، زوجية = يسار */
+.page-view { --pg-gutter: rgba(60, 45, 20, .16); --pg-edge: rgba(60, 45, 20, .22); }
+:root[data-theme="dark"] .page-view { --pg-gutter: rgba(0, 0, 0, .55); --pg-edge: rgba(255, 255, 255, .14); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .page-view { --pg-gutter: rgba(0, 0, 0, .55); --pg-edge: rgba(255, 255, 255, .14); } }
+.page-view[data-side]::before,
+.page-view[data-side]::after { content: ''; position: absolute; top: 0; bottom: 0; pointer-events: none; z-index: 0; }
+/* ظل الكعب على الحافة الداخلية */
+.page-view[data-side="right"]::before { left: 0; width: 9cqw; background: linear-gradient(to right, var(--pg-gutter), transparent); }
+.page-view[data-side="left"]::before { right: 0; width: 9cqw; background: linear-gradient(to left, var(--pg-gutter), transparent); }
+/* سُمك الأوراق على الحافة الخارجية */
+.page-view[data-side="right"]::after { right: 0; width: 2.4cqw; background: repeating-linear-gradient(to left, var(--pg-edge) 0 1px, transparent 1px 3px); -webkit-mask-image: linear-gradient(to left, #000, transparent); mask-image: linear-gradient(to left, #000, transparent); }
+.page-view[data-side="left"]::after { left: 0; width: 2.4cqw; background: repeating-linear-gradient(to right, var(--pg-edge) 0 1px, transparent 1px 3px); -webkit-mask-image: linear-gradient(to right, #000, transparent); mask-image: linear-gradient(to right, #000, transparent); }
+.page-view > * { position: relative; z-index: 1; }
+/* رقم الصفحة عند الزاوية الخارجية */
+.page-view[data-side] .foot { direction: ltr; flex-direction: row; padding-inline: 5cqw; }
+.page-view[data-side="right"] .foot { justify-content: flex-end; }
+.page-view[data-side="left"] .foot { justify-content: flex-start; }
+.page-view[data-side] .badge { direction: rtl; }
+
+/* أيقونات الدليل (SVG) */
+.gd-ic, .gs-ic, .gd-hero { color: var(--green); background: linear-gradient(145deg, color-mix(in srgb, var(--green) 20%, var(--card, #fff)), color-mix(in srgb, var(--green) 6%, var(--card, #fff))); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--green) 28%, transparent), 0 2px 6px color-mix(in srgb, var(--green) 14%, transparent); }
+.gs-ic { border: 0; }
+.gd-hero { border: 0; font-size: 0; }
+.gd-ic svg, .gs-ic svg { width: 21px; height: 21px; }
+.gd-hero svg { width: 40px; height: 40px; }
+.gd-cardic { display: inline-grid; place-items: center; width: 22px; height: 22px; color: var(--green); }
+.gd-cardic svg { width: 19px; height: 19px; }
