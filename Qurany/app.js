@@ -10780,7 +10780,7 @@
     if (!a) {
       h =
         '<button type="button" class="kh-home kh-home-empty" data-khatma-toggle aria-expanded="' + open + '"><span class="kh-home-ico" aria-hidden="true">' + icon('book') + '</span>' +
-        '<span class="kh-home-copy"><b>ختمتي</b><small>ابدأ ختمة بورد يومي ثابت وتذكير بالإشعارات</small></span>' +
+        '<span class="kh-home-copy"><b>ختمتي</b><small>ابدأ ختمة بورد يومي</small></span>' +
         '<span class="kh-home-go">' + (open ? 'إخفاء' : 'ابدأ') + '</span></button>';
     } else {
       var pct = Math.round((a.read / TOTAL) * 100),
@@ -10794,18 +10794,14 @@
         ring(pct) +
         '<b>' +
         ar(pct) +
-        '٪</b></span><span class="kh-home-copy"><small>ختمتي · ' +
-        esc(a.name) +
-        '</small><b>' +
+        '٪</b></span><span class="kh-home-copy"><b>' +
         (done ? 'أتممت ورد اليوم' : 'ورد اليوم: ص ' + ar(r[0]) + (r[1] > r[0] ? '–' + ar(r[1]) : '')) +
-        '</b><small>' + icon('flame', 'kh-inl') +
-        ar(streak(a)) +
-        ' يوم · بقي ' +
+        '</b><small>ختمتي · بقي ' +
         ar(TOTAL - a.read) +
         ' صفحة</small></span><span class="kh-home-chev" aria-hidden="true"></span></button>' +
         (done
           ? ''
-          : '<button type="button" class="kh-home-done" data-khatma-done>' + icon('check') + 'تم</button>') +
+          : '<button type="button" class="kh-home-done" data-khatma-done aria-label="تم ورد اليوم">' + icon('check') + '<span>تم</span></button>') +
         '</div>';
     }
     el.innerHTML = h;
@@ -11938,5 +11934,77 @@
       open('tour');
     };
     setTimeout(tryShow, 1800);
+  }
+})();
+
+
+/* ======================================================================
+ * عرض بملء الشاشة: إخفاء شريط الإشعارات والشريط السفلي ولون شريط الحالة = لون الصفحة
+ * ====================================================================== */
+(function () {
+  'use strict';
+  var KEY = 'mq.autoFs';
+  var root = document.documentElement;
+  function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  /* 1) لون شريط الحالة/المتصفح يطابق خلفية الصفحة الحالية (الفاتح/الليلي/ثيم المصحف) */
+  function toHex(c) {
+    var m = /rgba?\((\d+)[ ,]+(\d+)[ ,]+(\d+)/.exec(c || '');
+    if (!m) return '';
+    return '#' + [1, 2, 3].map(function (i) { return ('0' + (+m[i]).toString(16)).slice(-2); }).join('');
+  }
+  var themeTimer = 0;
+  function syncThemeColor() {
+    clearTimeout(themeTimer);
+    themeTimer = setTimeout(function () {
+      var hex = toHex(getComputedStyle(document.body).backgroundColor);
+      if (!hex || /^#0{6}$/.test(hex) && getComputedStyle(document.body).backgroundColor.indexOf('rgba(0, 0, 0, 0)') === 0) return;
+      var metas = document.querySelectorAll('meta[name="theme-color"]');
+      if (!metas.length) {
+        var n = document.createElement('meta');
+        n.name = 'theme-color';
+        document.head.appendChild(n);
+        metas = [n];
+      }
+      for (var i = 0; i < metas.length; i++) {
+        metas[i].removeAttribute('media');
+        metas[i].setAttribute('content', hex);
+      }
+    }, 60);
+  }
+  try {
+    var mo = new MutationObserver(syncThemeColor);
+    mo.observe(root, { attributes: true, attributeFilter: ['data-theme', 'data-mushaf', 'class', 'style'] });
+    mo.observe(document.body, { attributes: true, attributeFilter: ['class', 'style'] });
+  } catch (e) {}
+  if (window.matchMedia) {
+    try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncThemeColor); } catch (e) {}
+  }
+  window.addEventListener('load', syncThemeColor);
+  syncThemeColor();
+
+  /* 2) ملء الشاشة تلقائيًا عند أول لمسة (يحتاج المتصفح لمسة من المستخدم)؛
+        إن خرج المستخدم منه يدويًا لا نعيده، ويُعاد بزر «ملء الشاشة» في الإعدادات. */
+  var alreadyFull = false;
+  try { alreadyFull = matchMedia('(display-mode: fullscreen)').matches; } catch (e) {}
+  var wasRoot = false;
+  document.addEventListener('fullscreenchange', function () {
+    var el = document.fullscreenElement;
+    if (el === root) { wasRoot = true; set(KEY, '1'); }
+    else if (el) wasRoot = false;
+    else { if (wasRoot) set(KEY, '0'); wasRoot = false; }
+  });
+  if (!alreadyFull && get(KEY) !== '0' && typeof root.requestFullscreen === 'function') {
+    var once = function (e) {
+      if (e && e.target && e.target.closest && e.target.closest('#bScreen')) return;
+      document.removeEventListener('pointerup', once, true);
+      if (document.fullscreenElement || get(KEY) === '0') return;
+      try {
+        var r = root.requestFullscreen({ navigationUI: 'hide' });
+        if (r && r.catch) r.catch(function () {});
+      } catch (err) {}
+    };
+    document.addEventListener('pointerup', once, true);
   }
 })();
