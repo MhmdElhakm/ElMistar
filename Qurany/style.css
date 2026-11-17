@@ -6125,20 +6125,20 @@ html:root[data-theme="dark"][data-mushaf] {
 .page-view { --pg-gutter: rgba(60, 45, 20, .16); --pg-edge: rgba(60, 45, 20, .22); }
 :root[data-theme="dark"] .page-view { --pg-gutter: rgba(0, 0, 0, .55); --pg-edge: rgba(255, 255, 255, .14); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .page-view { --pg-gutter: rgba(0, 0, 0, .55); --pg-edge: rgba(255, 255, 255, .14); } }
-.page-view[data-side]::before,
-.page-view[data-side]::after { content: ''; position: absolute; top: 0; bottom: 0; pointer-events: none; z-index: 0; }
+body.hmode .page-view[data-side]::before,
+body.hmode .page-view[data-side]::after { content: ''; position: absolute; top: 0; bottom: 0; pointer-events: none; z-index: 0; }
 /* ظل الكعب على الحافة الداخلية */
-.page-view[data-side="right"]::before { left: 0; width: 9cqw; background: linear-gradient(to right, var(--pg-gutter), transparent); }
-.page-view[data-side="left"]::before { right: 0; width: 9cqw; background: linear-gradient(to left, var(--pg-gutter), transparent); }
+body.hmode .page-view[data-side="right"]::before { left: 0; width: 9cqw; background: linear-gradient(to right, var(--pg-gutter), transparent); }
+body.hmode .page-view[data-side="left"]::before { right: 0; width: 9cqw; background: linear-gradient(to left, var(--pg-gutter), transparent); }
 /* سُمك الأوراق على الحافة الخارجية */
-.page-view[data-side="right"]::after { right: 0; width: 2.4cqw; background: repeating-linear-gradient(to left, var(--pg-edge) 0 1px, transparent 1px 3px); -webkit-mask-image: linear-gradient(to left, #000, transparent); mask-image: linear-gradient(to left, #000, transparent); }
-.page-view[data-side="left"]::after { left: 0; width: 2.4cqw; background: repeating-linear-gradient(to right, var(--pg-edge) 0 1px, transparent 1px 3px); -webkit-mask-image: linear-gradient(to right, #000, transparent); mask-image: linear-gradient(to right, #000, transparent); }
-.page-view > * { position: relative; z-index: 1; }
+body.hmode .page-view[data-side="right"]::after { right: 0; width: 2.4cqw; background: repeating-linear-gradient(to left, var(--pg-edge) 0 1px, transparent 1px 3px); -webkit-mask-image: linear-gradient(to left, #000, transparent); mask-image: linear-gradient(to left, #000, transparent); }
+body.hmode .page-view[data-side="left"]::after { left: 0; width: 2.4cqw; background: repeating-linear-gradient(to right, var(--pg-edge) 0 1px, transparent 1px 3px); -webkit-mask-image: linear-gradient(to right, #000, transparent); mask-image: linear-gradient(to right, #000, transparent); }
+body.hmode .page-view > * { position: relative; z-index: 1; }
 /* رقم الصفحة عند الزاوية الخارجية */
-.page-view[data-side] .foot { direction: ltr; flex-direction: row; padding-inline: 5cqw; }
-.page-view[data-side="right"] .foot { justify-content: flex-end; }
-.page-view[data-side="left"] .foot { justify-content: flex-start; }
-.page-view[data-side] .badge { direction: rtl; }
+body.hmode .page-view[data-side] .foot { direction: ltr; flex-direction: row; padding-inline: 5cqw; }
+body.hmode .page-view[data-side="right"] .foot { justify-content: flex-end; }
+body.hmode .page-view[data-side="left"] .foot { justify-content: flex-start; }
+body.hmode .page-view[data-side] .badge { direction: rtl; }
 
 /* أيقونات الدليل (SVG) */
 .gd-ic, .gs-ic, .gd-hero { color: var(--green); background: linear-gradient(145deg, color-mix(in srgb, var(--green) 20%, var(--card, #fff)), color-mix(in srgb, var(--green) 6%, var(--card, #fff))); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--green) 28%, transparent), 0 2px 6px color-mix(in srgb, var(--green) 14%, transparent); }
@@ -6169,3 +6169,48 @@ html:root[data-theme="dark"][data-mushaf] {
 .kh-home-empty .kh-home-go { padding: 6px 12px; font-size: 12px; background: var(--green); color: var(--on-green, #fff); }
 .kh-home-empty .kh-home-copy b, .kh-home-empty .kh-home-copy small { color: inherit; }
 .kh-home-empty { background: var(--card, #fff); color: var(--ink, inherit); border: 1px solid var(--line, rgba(0,0,0,.1)); }
+
+/* ختمة مصغّرة داخل القائمة الجانبية */
+.kh-inline .kh { gap: 8px; }
+.kh-inline .kh-hero { padding: 12px 14px; border-radius: 18px; }
+.kh-inline .kh-hero-top h2 { font-size: 16px; margin-top: 1px; }
+.kh-inline .kh-hero-top small { font-size: 11px; }
+.kh-inline .kh-hero-ico { width: 40px; height: 40px; margin-bottom: 6px; border-radius: 14px; font-size: 22px; }
+.kh-inline .kh-hero h2 { font-size: 16px; }
+.kh-inline .kh-hero p { font-size: 12px; margin-top: 4px; line-height: 1.6; }
+.kh-inline .kh-bigring { width: 54px; height: 54px; }
+.kh-inline .kh-bigring b { font-size: 12px; }
+.kh-inline .kh-bar { height: 5px; margin: 10px 0 6px; }
+.kh-inline .kh-hero-foot { font-size: 11px; }
+.kh-inline .kh-today { padding: 12px; border-radius: 18px; }
+.kh-inline .kh-today-h { font-size: 13px; }
+.kh-inline .kh-range { gap: 12px; margin: 10px 0; }
+.kh-inline .kh-range div { min-width: 64px; padding: 6px 10px; border-radius: 14px; }
+.kh-inline .kh-range small { font-size: 10.5px; }
+.kh-inline .kh-range b { font-size: 21px; }
+.kh-inline .kh-week { margin-bottom: 10px; padding: 6px 4px; }
+.kh-inline .kh-day i { width: 20px; height: 20px; border-width: 1.5px; }
+.kh-inline .kh-day i .kh-svg { font-size: 11px; }
+.kh-inline .kh-day small { font-size: 9.5px; }
+.kh-inline .kh-cta { min-height: 40px; border-radius: 13px; font-size: 14px; }
+.kh-inline .kh-sec { min-height: 36px; font-size: 13px; border-radius: 12px; }
+.kh-inline .kh-doneline { padding: 8px; font-size: 13px; }
+.kh-inline .kh-stats div { padding: 8px 4px; border-radius: 14px; }
+.kh-inline .kh-stats span { width: 28px; height: 28px; margin-bottom: 2px; border-radius: 9px; }
+.kh-inline .kh-stats b { font-size: 16px; }
+.kh-inline .kh-stats small { font-size: 10px; }
+.kh-inline .kh-panel { padding: 12px; border-radius: 16px; }
+.kh-inline .kh-fld input { min-height: 38px; }
+.kh-from em { font-style: normal; font-weight: 600; color: var(--muted); font-size: 11.5px; }
+.kh-setpos { display: flex; align-items: flex-end; gap: 8px; margin: 10px 0; }
+.kh-setpos label { flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; font-weight: 800; }
+.kh-setpos input { min-height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--ink); font: inherit; }
+.kh-setpos .kh-sec { min-height: 38px; }
+
+/* تحريك نافذة الكلمة/الآية */
+.wp-grip { width: 38px; height: 4px; margin: -6px auto 8px; border-radius: 99px; background: color-mix(in srgb, var(--ink, #000) 22%, transparent); cursor: grab; touch-action: none; position: relative; }
+.wp-grip::after { content: ''; position: absolute; inset: -12px -30px; }
+.wp-word-head { cursor: grab; touch-action: none; }
+.wp.dragging, .wp.dragging .wp-grip, .wp.dragging .wp-word-head { cursor: grabbing; }
+.wp.dragging { box-shadow: 0 20px 50px rgba(0, 0, 0, .38); user-select: none; -webkit-user-select: none; }
+.wp.free::before { display: none; }

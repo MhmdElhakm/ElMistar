@@ -1994,6 +1994,7 @@
   }
   function saveSlots() {
     save('mq.slots', slots);
+    try { window.dispatchEvent(new Event('quran:marks-changed')); } catch (e) {}
   }
 
   function slotById(id) {
@@ -2972,7 +2973,7 @@
   var FLIP_SPEEDS = { slow: 900, normal: 560, fast: 320 };
   var FLIP_MAX = 100; // زاوية خروج الورقة (درجات) — بعد ٩٠° تصير الورقة خارج الشاشة
   /* الصوت مفعّل دائمًا مع التأثير، والسرعة بطيئة ثابتة؛ المتاح للمستخدم تفعيل التأثير أو إلغاؤه فقط */
-  var flipPrefs = { fx: store('mq.flipFx') !== '0', snd: store('mq.flipSnd') !== '0', vol: 8, spd: 'slow' };
+  var flipPrefs = { fx: store('mq.flipFx') !== '0', snd: store('mq.flipSnd') !== '0', vol: 2, spd: 'slow' };
   var flipPending = 0;
   var flip = null; // حالة التقليب الجارية: { stage, leaf, shade, cast, w, angle, raf, committing, dir, target, view }
 
@@ -5488,10 +5489,8 @@
     }
     closeD();
     closeV();
-    if (scrollMode !== 'vertical') {
-      autoScrollRestoreMode = scrollMode;
-      setPageMode('vertical', true);
-    }
+    /* يتحول إلى العرض الرأسي ويبقى كذلك بعد الإيقاف */
+    if (scrollMode !== 'vertical') setPageMode('vertical');
     startAutoScroll();
   });
   scrollSpeedOptionsEl.addEventListener('click', function (event) {
@@ -6255,7 +6254,12 @@
     }
     addCard('divineCard', 'تلوين لفظ الجلالة (الله، رب)', DIVINE.enabled, setDivineEnabled);
   })();
-  if (homeAutoScrollPanel) paneSettings.appendChild(homeAutoScrollPanel);
+  if (homeAutoScrollPanel) {
+    /* التمرير التلقائي فوق المهام مباشرة في تبويب «الرئيسية» */
+    var homeTasksAnchor = $('homeTasksSection');
+    if (homeTasksAnchor && homeTasksAnchor.parentNode === paneSettings) paneSettings.insertBefore(homeAutoScrollPanel, homeTasksAnchor);
+    else paneSettings.appendChild(homeAutoScrollPanel);
+  }
   if (homeTasmeeSection) document.body.appendChild(homeTasmeeSection);
   if (homeRecitationPanel) paneSettings.appendChild(homeRecitationPanel);
   var panes = { settings: paneSettings, surahs: paneS, worship: paneWorship, tasks: paneTasks };
@@ -6391,6 +6395,50 @@
   });
   appServiceClose.addEventListener('click', closeAppService);
   /* فتح صفحة من المصحف من خارج الملف (خدمة الختمة) وفتح خدمة من الإشعارات */
+  /* واجهة العلامات المسمّاة (تستعملها الختمة لعلامة «الورد اليومي») */
+  window.QuranGetPage = function () {
+    return cur;
+  };
+  window.QuranMarks = {
+    setNamedPage: function (name, page, color) {
+      page = Math.min(TOTAL, Math.max(1, parseInt(page, 10) || 1));
+      var loc = locate(D.pages[page - 1]);
+      var verse = loc[0] * 1000 + loc[1];
+      var slot = null;
+      slots.forEach(function (x) {
+        if (x.auto === name) slot = x;
+      });
+      if (!slot) {
+        slot = addMarkSlot(color || 'green', name, verse);
+        slot.auto = name;
+      }
+      slot.v = verse;
+      slot.nm = name;
+      slot.ts = Date.now();
+      saveSlots();
+      try { buildMarks(); } catch (e) {}
+      try { paintSlots(); } catch (e) {}
+      try { updateBm(); } catch (e) {}
+    },
+    getPage: function (name) {
+      var page = 0;
+      slots.forEach(function (x) {
+        if (x.auto === name && x.v) page = pageOfV(x.v);
+      });
+      return page;
+    },
+    remove: function (name) {
+      var before = slots.length;
+      slots = slots.filter(function (x) {
+        return x.auto !== name;
+      });
+      if (slots.length === before) return;
+      saveSlots();
+      try { buildMarks(); } catch (e) {}
+      try { paintSlots(); } catch (e) {}
+      try { updateBm(); } catch (e) {}
+    }
+  };
   window.QuranOpenPage = function (page) {
     if (!appServiceView.hidden) {
       appServiceCleanup && (appServiceCleanup(), (appServiceCleanup = null));
@@ -6629,9 +6677,19 @@
       popWord = null;
     }
   }
+  var wpMoved = false;
   function placeWp(w) {
     var pr = pageEl.getBoundingClientRect(),
       wr = w.getBoundingClientRect();
+    if (wpMoved && !wp.hidden) {
+      /* حرّكها المستخدم يدويًا: نُبقيها مكانها مع إبقائها داخل الشاشة */
+      var box = wp.getBoundingClientRect();
+      var nl = Math.max(4, Math.min(window.innerWidth - box.width - 4, box.left));
+      var nt = Math.max(4, Math.min(window.innerHeight - Math.min(box.height, window.innerHeight - 8) - 4, box.top));
+      wp.style.left = nl - pr.left + 'px';
+      wp.style.top = nt - pr.top + 'px';
+      return;
+    }
     wp.style.visibility = 'hidden';
     wp.hidden = false;
     var h = wp.offsetHeight,
@@ -6643,7 +6701,7 @@
     wp.style.left = left + 'px';
     wp.style.top = top + 'px';
     wp.style.setProperty('--ax', Math.max(22, Math.min(wd - 22, cx - left)) + 'px');
-    wp.classList.remove('below', 'above');
+    wp.classList.remove('below', 'above', 'free');
     wp.classList.add(below ? 'below' : 'above');
     wp.style.visibility = '';
   }
@@ -6657,6 +6715,7 @@
       a = v % 1000;
     marksPopupExpanded = false;
     marksLongPressFired = false;
+    wpMoved = false;
     if (popWord) popWord.classList.remove('pop');
     wp.classList.remove('open');
     if (pos <= 0) {
@@ -6777,7 +6836,7 @@
         '"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"></path></svg><span>تسميع</span></button></div>';
       var previousRecitationDetails = wp.querySelector('.wp-recitation');
       recitationDetailsWasOpen = !!(previousRecitationDetails && previousRecitationDetails.open);
-      wp.innerHTML = h;
+      wp.innerHTML = '<div class="wp-grip" role="separator" aria-label="اسحب لتحريك النافذة" title="اسحب لتحريك النافذة"></div>' + h;
       if (recitationPanel) wp.querySelector('.wp-recitation-mount').appendChild(recitationPanel);
       var recitationDetails = wp.querySelector('.wp-recitation');
       if (recitationDetails) {
@@ -6934,6 +6993,62 @@
   pageList.addEventListener('contextmenu', function (e) {
     if (e.target.closest('.w')) e.preventDefault();
   });
+  /* تحريك نافذة الكلمة/الآية بحرية: السحب من المقبض العلوي أو من رأس الكلمة */
+  (function () {
+    var drag = null,
+      lastDragEnd = 0;
+    wp.addEventListener('pointerdown', function (e) {
+      if (e.button > 0 || !e.target.closest) return;
+      var handle = e.target.closest('.wp-grip, .wp-word-head');
+      if (!handle || e.target.closest('button, summary, input, select, textarea, a, .wp-mark')) return;
+      var box = wp.getBoundingClientRect();
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, l: box.left, t: box.top, w: box.width, h: box.height, moved: false };
+      try { wp.setPointerCapture(e.pointerId); } catch (err) {}
+      e.preventDefault();
+    });
+    wp.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dx = e.clientX - drag.x,
+        dy = e.clientY - drag.y;
+      if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 4) return;
+      drag.moved = true;
+      wpMoved = true;
+      wp.classList.add('free', 'dragging');
+      var pr = pageEl.getBoundingClientRect();
+      var nl = Math.max(4, Math.min(window.innerWidth - drag.w - 4, drag.l + dx));
+      var nt = Math.max(4, Math.min(window.innerHeight - Math.min(drag.h, window.innerHeight - 8) - 4, drag.t + dy));
+      wp.style.left = nl - pr.left + 'px';
+      wp.style.top = nt - pr.top + 'px';
+    });
+    function end(e) {
+      if (!drag || (e && e.pointerId !== drag.id)) return;
+      if (drag.moved) lastDragEnd = Date.now();
+      try { wp.releasePointerCapture(drag.id); } catch (err) {}
+      wp.classList.remove('dragging');
+      drag = null;
+    }
+    wp.addEventListener('pointerup', end);
+    wp.addEventListener('pointercancel', end);
+    /* عند فتح التفسير أو التشغيل داخل نافذة محرّكة نُبقيها كاملة داخل الشاشة */
+    wp.addEventListener(
+      'toggle',
+      function () {
+        if (wpMoved && popWord) requestAnimationFrame(function () { placeWp(popWord); });
+      },
+      true
+    );
+    /* لا يُعامل رفع الإصبع بعد السحب كنقرة (فتح القائمة/إغلاق النافذة) */
+    document.addEventListener(
+      'click',
+      function (e) {
+        if (Date.now() - lastDragEnd < 400) {
+          e.stopPropagation();
+          e.preventDefault();
+        }
+      },
+      true
+    );
+  })();
   var popupDismissPointer = null;
   var popupDismissPointerTimer = 0;
   document.addEventListener(
@@ -10683,6 +10798,7 @@
         start: parseDay(a.start) ? a.start : dayKey(),
         days: Math.min(365, Math.max(1, parseInt(a.days, 10) || 30)),
         read: Math.min(TOTAL, Math.max(0, parseInt(a.read, 10) || 0)),
+        from: Math.min(TOTAL, Math.max(1, parseInt(a.from, 10) || 1)),
         doneDates: Array.isArray(a.doneDates) ? a.doneDates.slice(-400) : [],
         added: Math.max(0, parseInt(a.added, 10) || 0),
         addedDay: a.addedDay || ''
@@ -10719,14 +10835,48 @@
     return !!a && a.doneDates.indexOf(dayKey()) !== -1;
   }
   /* صفحات ورد اليوم: إن أُتمّ اليوم نعرض ما قُرئ اليوم، وإلا ما بعد آخر صفحة مقروءة */
+  /* الصفحة الفعلية للصفحة المنطقية n في الختمة (تبدأ من صفحة البداية وتلتف بعد ٦٠٤) */
+  function actualPage(a, n) {
+    return ((a.from - 1 + n - 1) % TOTAL) + 1;
+  }
   function wirdRange(a) {
-    var pd = perDay(a);
-    if (doneToday(a)) {
-      var from = Math.max(1, a.read - a.added + 1);
-      return [from, Math.max(from, a.read)];
+    var pd = perDay(a),
+      lo,
+      hi;
+    if (doneToday(a) && a.added > 0) {
+      lo = Math.max(1, a.read - a.added + 1);
+      hi = Math.max(lo, a.read);
+    } else {
+      lo = Math.min(TOTAL, a.read + 1);
+      hi = Math.min(TOTAL, a.read + pd);
     }
-    var f = Math.min(TOTAL, a.read + 1);
-    return [f, Math.min(TOTAL, a.read + pd)];
+    return [actualPage(a, lo), actualPage(a, hi)];
+  }
+  /* مكان علامة «الورد اليومي» هو مرجع موضع القراءة: إن نقلها المستخدم تتغير صفحات الورد بحسبها */
+  var WIRD_MARK = 'الورد اليومي';
+  function syncFromMark() {
+    var a = st.active;
+    if (!a || !window.QuranMarks || !window.QuranMarks.getPage) return false;
+    var page = window.QuranMarks.getPage(WIRD_MARK);
+    if (!page || page === actualPage(a, Math.min(TOTAL, a.read + 1))) return false;
+    a.read = (page - a.from + TOTAL) % TOTAL;
+    a.added = 0;
+    a.addedDay = '';
+    save();
+    syncTask();
+    return true;
+  }
+  window.addEventListener('quran:marks-changed', function () {
+    if (syncFromMark()) {
+      render();
+    }
+  });
+  /* علامة «الورد اليومي» عند أول صفحة لم تُقرأ بعد (بداية ورد اليوم، وبعد إتمامه بداية ورد الغد) */
+  function syncWirdMark() {
+    if (!window.QuranMarks) return;
+    var a = st.active;
+    if (!a) window.QuranMarks.remove('الورد اليومي');
+    else window.QuranMarks.setNamedPage('الورد اليومي', actualPage(a, Math.min(TOTAL, a.read + 1)), 'green');
   }
   function streak(a) {
     if (!a) return 0;
@@ -10748,7 +10898,7 @@
     var a = st.active;
     if (!a) return 'ورد الختمة';
     var r = wirdRange(a);
-    return 'ورد الختمة: ص ' + ar(r[0]) + (r[1] > r[0] ? '–' + ar(r[1]) : '');
+    return 'ورد الختمة: ص ' + ar(r[0]) + (r[1] !== r[0] ? '–' + ar(r[1]) : '');
   }
   function syncTask() {
     var a = st.active;
@@ -10774,6 +10924,7 @@
   function drawHome() {
     var el = document.getElementById('khatmaCard');
     if (!el) return;
+    syncFromMark();
     var open = !document.getElementById('khatmaInline').hidden;
     var a = st.active,
       h;
@@ -10795,7 +10946,7 @@
         '<b>' +
         ar(pct) +
         '٪</b></span><span class="kh-home-copy"><b>' +
-        (done ? 'أتممت ورد اليوم' : 'ورد اليوم: ص ' + ar(r[0]) + (r[1] > r[0] ? '–' + ar(r[1]) : '')) +
+        (done ? 'أتممت ورد اليوم' : 'ورد اليوم: ص ' + ar(r[0]) + (r[1] !== r[0] ? '–' + ar(r[1]) : '')) +
         '</b><small>ختمتي · بقي ' +
         ar(TOTAL - a.read) +
         ' صفحة</small></span><span class="kh-home-chev" aria-hidden="true"></span></button>' +
@@ -10824,18 +10975,20 @@
       toggleInline();
     }
   });
-  function start(name, days) {
+  function start(name, days, from) {
     st.active = norm({
       active: {
         name: name || 'ختمة رمضان',
         start: dayKey(),
         days: days,
+        from: from || 1,
         read: 0,
         doneDates: []
       }
     }).active;
     save();
     syncTask();
+    syncWirdMark();
     render();
   }
   function finish() {
@@ -10846,6 +10999,7 @@
     st.active = null;
     save();
     syncTask();
+    syncWirdMark();
     render();
     var count = st.history.length;
     if (window.QuranCelebrate)
@@ -10873,6 +11027,7 @@
       return;
     }
     syncTask();
+    syncWirdMark();
     render();
     if (ui) ui.say('تقبّل الله ورد اليوم — بقي ' + ar(TOTAL - a.read) + ' صفحة');
   }
@@ -10887,6 +11042,7 @@
     a.addedDay = '';
     save();
     syncTask();
+    syncWirdMark();
     render();
   }
   window.addEventListener('quran:khatma-task-toggled', function (e) {
@@ -11053,6 +11209,7 @@
     return cv > 0 ? Math.min(365, cv) : on ? +on.getAttribute('data-days') : 30;
   }
   function draw() {
+    syncFromMark();
     var a = st.active,
       h = '';
     if (!a) {
@@ -11060,6 +11217,7 @@
         '<header class="kh-hero"><div class="kh-hero-glow" aria-hidden="true"></div><span class="kh-hero-ico" aria-hidden="true">' + icon('book') + '</span>' +
         '<h2>ابدأ ختمة جديدة</h2><p>٦٠٤ صفحات تُقسَّم إلى ورد يومي ثابت، مع تذكير يرافقك حتى الختم.</p></header>' +
         '<section class="kh-panel"><label class="kh-fld"><span>اسم الختمة</span><input type="text" data-k="name" maxlength="40" value="ختمة جديدة"></label>' +
+        '<label class="kh-fld kh-from"><span>ابدأ من صفحة <em>(الصفحة التي تقرأها الآن)</em></span><input type="number" min="1" max="' + TOTAL + '" inputmode="numeric" data-k="from" value="' + (Math.min(TOTAL, Math.max(1, (window.QuranGetPage && window.QuranGetPage()) || 1))) + '"></label>' +
         '<div class="kh-sub">مدة الختمة</div><div class="kh-chips" role="group">' +
         PRESETS.map(function (d) {
           return (
@@ -11102,7 +11260,7 @@
     h += reminderCard();
     if (a)
       h +=
-        '<details class="kh-panel kh-manage"><summary><span class="kh-ico">' + icon('gear') + '</span><b>إدارة الختمة</b><span class="kh-chev" aria-hidden="true"></span></summary><div class="kh-two"><button type="button" class="kh-sec" data-act="restart">إعادة من البداية</button><button type="button" class="kh-sec danger" data-act="cancel">إلغاء الختمة</button></div></details>';
+        '<details class="kh-panel kh-manage"><summary><span class="kh-ico">' + icon('gear') + '</span><b>إدارة الختمة</b><span class="kh-chev" aria-hidden="true"></span></summary><div class="kh-setpos"><label><span>أنا الآن عند صفحة</span><input type="number" min="1" max="' + TOTAL + '" inputmode="numeric" data-k="pos" value="' + ((window.QuranGetPage && window.QuranGetPage()) || wirdRange(a)[0]) + '"></label><button type="button" class="kh-sec" data-act="setpos">ضبط</button></div><div class="kh-two"><button type="button" class="kh-sec" data-act="restart">إعادة من البداية</button><button type="button" class="kh-sec danger" data-act="cancel">إلغاء الختمة</button></div></details>';
     if (st.history.length)
       h +=
         '<section class="kh-panel"><div class="kh-panel-h"><span class="kh-ico">' + icon('medal') + '</span><b>ختماتي</b><em>' + ar(st.history.length) + '</em></div><ul class="kh-hist">' +
@@ -11134,19 +11292,36 @@
     var act = btn.getAttribute('data-act');
     if (act === 'start') {
       var name = (ui.root.querySelector('[data-k="name"]').value || '').trim() || 'ختمة جديدة';
-      start(name, chosenDays());
+      var fromEl = ui.root.querySelector('[data-k="from"]');
+      start(name, chosenDays(), parseInt(fromEl && fromEl.value, 10) || 1);
     } else if (act === 'done') markDone();
     else if (act === 'undo') undoDone();
-    else if (act === 'open') {
-      var r = wirdRange(st.active);
-      if (window.QuranOpenPage) window.QuranOpenPage(r[0]);
+    else if (act === 'setpos') {
+      var posEl = ui.root.querySelector('[data-k="pos"]'),
+        n = parseInt(posEl && posEl.value, 10),
+        ac = st.active;
+      if (!ac || !(n >= 1 && n <= TOTAL)) return;
+      ac.read = (n - ac.from + TOTAL) % TOTAL;
+      ac.added = 0;
+      ac.addedDay = '';
+      save();
+      syncTask();
+      syncWirdMark();
+      render();
+      if (ui) ui.say('تم ضبط موضع القراءة عند صفحة ' + ar(n));
+    } else if (act === 'open') {
+      syncFromMark();
+      var r = wirdRange(st.active),
+        markPage = window.QuranMarks && window.QuranMarks.getPage ? window.QuranMarks.getPage(WIRD_MARK) : 0;
+      if (window.QuranOpenPage) window.QuranOpenPage(markPage || r[0]);
     } else if (act === 'restart') {
-      if (window.confirm('إعادة الختمة من الصفحة الأولى؟ سيُصفَّر التقدّم الحالي.')) start(st.active.name, st.active.days);
+      if (window.confirm('إعادة الختمة من صفحة البداية؟ سيُصفَّر التقدّم الحالي.')) start(st.active.name, st.active.days, st.active.from);
     } else if (act === 'cancel') {
       if (window.confirm('إلغاء الختمة الحالية؟ سيُحذف تقدّمها.')) {
         st.active = null;
         save();
         syncTask();
+        syncWirdMark();
         render();
       }
     }
@@ -11234,6 +11409,7 @@
       toggleInline(true);
     }, 80);
   }
+  setTimeout(syncWirdMark, 1200);
   window.QuranKhatma = { mount: mount, reveal: reveal };
 
   /* ---------- تشغيل ---------- */
@@ -11657,15 +11833,15 @@
     { sel: ['^#tajweedModeLabel'], drawer: 'tabTasks', i: '🌈', t: 'ألوان التجويد', x: '«المصحف الملوّن» يلوّن أحكام التجويد (المدود والإخفاء والإدغام والقلقلة)، و«العادي» يعيد الخط الأسود.' },
     { sel: ['#mushafColorCard'], drawer: 'tabTasks', i: '🎨', t: 'ألوان المصحف', x: 'اختر لون الصفحة والزخارف (كلاسيكي، أزرق، أخضر، بني، رمادي)، ويتغير معه شكل القائمة الجانبية أيضًا.' },
     { sel: ['^#gharibBookSelect'], drawer: 'tabTasks', i: '📖', t: 'مصدر معاني الكلمات', x: 'اختر الكتاب الذي تُعرض منه معاني الكلمات الغريبة عند الضغط المطول على الكلمة.' },
-    { sel: ['^#scrollToggle'], drawer: 'tabTasks', i: '↕', t: 'التمرير التلقائي', x: 'يحرّك الصفحات تلقائيًا بسرعة تختارها. يتحول العرض إلى الرأسي أثناءه، ثم يعود لوضعك السابق عند الإيقاف.' },
+    { sel: ['^#scrollToggle'], drawer: 'tabSettings', i: '↕', t: 'التمرير التلقائي', x: 'يحرّك الصفحات تلقائيًا بسرعة تختارها. يتحول العرض إلى الرأسي أثناءه، ثم يعود لوضعك السابق عند الإيقاف.' },
     { sel: ['^#recitationTrackingGroup'], drawer: 'tabTasks', i: '🔎', t: 'تتبّع التلاوة أثناء الاستماع', x: '«آية آية» تظلل الآية الجارية، و«كلمة كلمة» تظلل كل كلمة لحظة نطقها.' },
     { sel: ['#pageModeCard'], drawer: 'tabTasks', i: '📖', t: 'طريقة تقليب الصفحات', x: '«تمرير رأسي» لصفحات متصلة، أو «عرض أفقي» لصفحة واحدة تقلّبها بالسحب كالمصحف الورقي.' },
     { sel: ['#flipCard'], drawer: 'tabTasks', i: '📄', t: 'تأثير تقليب الورق', x: 'يفعّل حركة الورقة وهي تنقلب في العرض الأفقي، أو يعطّلها لتنتقل الصفحة مباشرة.' },
     { sel: ['#flipSoundCard'], drawer: 'tabTasks', i: '🔈', t: 'صوت تقليب الورق', x: 'صوت خفيف جدًا عند التقليب، يمكنك إغلاقه بالكامل.' },
     { sel: ['#divineCard'], drawer: 'tabTasks', i: '✨', t: 'تلوين لفظ الجلالة', x: 'يلوّن لفظ «الله» و«رب» بالأحمر داخل المصحف الملوّن لتمييزهما بسهولة.' },
     { sel: ['#uiFontCard'], drawer: 'tabTasks', i: 'Aa', t: 'خط القائمة الجانبية', x: 'غيّر نوع الخط وسمكه في القائمة الجانبية لتناسب قراءتك.' },
-    { sel: ['#settingsBackupHost'], drawer: 'tabTasks', i: '💾', t: 'بياناتك ونسختك الاحتياطية', x: 'احفظ المهام والختمة والعلامات والإعدادات في ملف، واستعدها على جهاز آخر.' },
     { sel: ['#guideCard'], drawer: 'tabTasks', i: '💡', t: 'دليل الاستخدام', x: 'يمكنك العودة إلى هذا الشرح في أي وقت من هنا، مع الدليل الكامل لكل ميزة.' },
+    { sel: ['#settingsBackupHost'], drawer: 'tabTasks', i: '💾', t: 'بياناتك ونسختك الاحتياطية', x: 'احفظ المهام والختمة والعلامات والإعدادات في ملف، واستعدها على جهاز آخر.' },
     { sel: [], press: 1, wordTarget: 1, i: '👆', t: 'الضغط المطول على الكلمة', x: 'اضغط مطولًا (نحو نصف ثانية) على أي كلمة في المصحف لتفتح نافذتها. وإن ضغطت مطولًا على رقم الآية فتحت نافذة الآية بعلاماتها.' },
     { sel: ['#wp'], popup: 1, i: '📝', t: 'نافذة الكلمة', x: 'هذه نافذة الكلمة: تعرض الكلمة بخط المصحف ومعناها من المصدر الذي اخترته، وتجمع كل أدوات الآية في مكان واحد.' },
     { sel: ['#wp details.wp-v'], popup: 1, openTafsir: 1, i: '📚', t: 'عرض التفسير', x: 'اضغط «التفسير المختصر للآية» لتفتحه وتقرأ تفسيرًا موجزًا للآية التي فيها الكلمة، واضغط مرة أخرى لإغلاقه.' },
@@ -11910,11 +12086,18 @@
     c.className = 'settings-card guide-card';
     c.id = 'guideCard';
     c.innerHTML =
-      '<div class="settings-card-head"><span class="gd-cardic" aria-hidden="true">' + ic('💡') + '</span><span>دليل الاستخدام</span></div>' +
-      '<p class="install-app-help">تعرّف على كل أقسام التطبيق وميزاته خطوة بخطوة.</p>' +
-      '<button type="button" class="install-app-button" id="guideOpenBtn">عرض دليل الاستخدام</button>';
-    host.insertBefore(c, host.firstChild);
+      '<div class="settings-card-head"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + IC_P.bulb + '</svg>' +
+      '<span>دليل الاستخدام:</span><span class="st-val">شرح كل الأقسام</span></div>' +
+      '<div class="settings-toggle-group">' +
+      '<button type="button" class="st-btn" id="guideTourBtn"><span class="st-dot" style="background: #27ae60"></span><span>جولة سريعة</span></button>' +
+      '<button type="button" class="st-btn" id="guideOpenBtn"><span class="st-dot" style="background: var(--muted)"></span><span>الدليل الكامل</span></button>' +
+      '</div>';
+    host.appendChild(c);
     document.getElementById('guideOpenBtn').addEventListener('click', function () { open('full'); });
+    document.getElementById('guideTourBtn').addEventListener('click', function () {
+      if (window.MushafRuntime && window.MushafRuntime.closeDrawer) window.MushafRuntime.closeDrawer();
+      setTimeout(function () { open('tour'); }, 350);
+    });
   }
   mountCard();
 
