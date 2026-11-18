@@ -2295,6 +2295,9 @@ html[dir=rtl] .lsn-card .lsn-art-state{transform:translateX(50%)}
 @keyframes crRing{from{transform:scale(.5);opacity:1}to{transform:scale(1.4);opacity:0}}@keyframes crIn{from{opacity:0}}
 .cr-pill{position:absolute;top:10px;inset-inline:12px;z-index:70;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:99px;background:linear-gradient(90deg,#e0314b,#ff6a3d);color:#fff;font-weight:900;font-size:14px;box-shadow:0 12px 26px -10px rgba(255,80,70,.9);animation:crGlow 1.8s ease-in-out infinite}
 .cr-pill em{display:inline-block}
+.cr-home{flex:none!important;min-height:78px;height:auto!important}.cr-home.t{margin:4px 0 6px}
+.cr-r b small{display:block;font-size:11px;font-weight:600;opacity:.7}.cr-dot.lb{background:#ffb84a;box-shadow:0 0 8px #ffb84a}.cr-inv{padding:6px 14px;border-radius:99px;background:linear-gradient(180deg,#8f7dff,#6a56f0);color:#fff;font-weight:900;font-size:12px}.cr-inv.sent{background:rgba(63,215,138,.2);color:#3fd78a}.cr-all{min-height:44px!important;font-size:14px!important;margin-bottom:8px}.cr-r.lob{background:rgba(255,184,74,.08)}
+.cr-ctl.c3{grid-template-columns:repeat(auto-fit,minmax(0,1fr))}.cr-ctl.c3 .cr-cb{flex-direction:column;gap:4px;font-size:12.5px;padding:10px 4px}
 </style></head><body>
 <div id="app">
   <div id="view"></div>
@@ -12854,8 +12857,8 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 const CR={role:'',on:false,code:'',rid:'',teacher:'',title:'غرفة الشرح',peer:null,sp:null,live:null,seen:'',tconn:null,stu:{},roster:[],err:'',
  ac:null,dest:null,out:null,screen:null,mic:null,micOn:false,sharing:false,tsp:false,
  cfg:{kind:'mix',n:8,t:15},qs:[],qi:-1,qph:'idle',qt0:0,qr0:0,qT:15,cq:null,board:[],allowed:false,hand:false,smic:null,scall:null,tmic:false,tshare:false,
- pbusy:0,sig:'',bcT:0,tm:null,rt:null,guest:'',jn:false,paint:0,ended:null};
-const crTid=c=>'kxr-'+String(c).replace(/[^A-Za-z0-9]/g,'');
+ pbusy:0,pend:{},slot:0,vk:'',face:'environment',lob:{},lc:null,sig:'',bcT:0,tm:null,rt:null,guest:'',jn:false,paint:0,ended:null};
+const crTid=(c,sl)=>'kxr-'+String(c).replace(/[^A-Za-z0-9]/g,'')+(sl?'-'+sl:'');
 const crUid=()=>{const s=sbSess();return (s&&s.uid)||CR.guest||(CR.guest='g'+Math.random().toString(36).slice(2,9));};
 const crMyName=()=>((S.profile&&S.profile.name)||S.name||'طالب');
 const crFirst=n=>String(n||'').trim().split(/\s+/)[0]||'طالب';
@@ -12874,7 +12877,7 @@ function crReset(){
   try{CR.tconn&&CR.tconn.close();}catch(e){}
   if(CR.role==='t'){try{CR.peer&&CR.peer.destroy();}catch(e){}try{CR.ac&&CR.ac.close();}catch(e){}}
   document.querySelectorAll('[id^="lvva-cr"]').forEach(a=>a.remove());
-  Object.assign(CR,{role:'',on:false,peer:null,stu:{},roster:[],err:'',ac:null,dest:null,out:null,screen:null,mic:null,micOn:false,sharing:false,tsp:false,qs:[],qi:-1,qph:'idle',cq:null,board:[],allowed:false,hand:false,smic:null,scall:null,tmic:false,tshare:false,tconn:null,tm:null,rt:null,jn:false,sig:'',ended:null,mst:null,open:false,needTap:false,qEnd:false,gain:0});
+  Object.assign(CR,{role:'',on:false,peer:null,stu:{},roster:[],err:'',ac:null,dest:null,out:null,screen:null,mic:null,micOn:false,sharing:false,tsp:false,qs:[],qi:-1,qph:'idle',cq:null,board:[],allowed:false,hand:false,smic:null,scall:null,tmic:false,tshare:false,tconn:null,tm:null,rt:null,jn:false,sig:'',ended:null,mst:null,open:false,needTap:false,qEnd:false,gain:0,lob:{}});
 }
 function crShell(){
   let o=document.getElementById('crOv');if(o)o.remove();
@@ -12905,24 +12908,37 @@ async function crTStart(){
   if(CR.on&&CR.role==='t'){if(!document.getElementById('crOv')){crShell();}crPaint(true);return;}
   if(!await ensurePeer()){toast('تعذر تحميل مكتبة الاتصال. تحقق من الإنترنت.');return;}
   crReset();CR.role='t';CR.code=code;CR.rid=Date.now().toString(36);CR.teacher=TCH.me.name||'المعلم';CR.on=true;
-  let peer;try{peer=new (lvvCtor())(crTid(code),{debug:0});}catch(e){CR.on=false;toast('تعذر فتح الغرفة');return;}
-  CR.peer=peer;
-  peer.on('open',()=>{CR.open=true;crPaint(true);});
-  peer.on('error',e=>{const t=e&&e.type;if(t==='unavailable-id')CR.err='الغرفة مفتوحة بالفعل على جهاز آخر. أغلقها منه أولًا ثم أعد المحاولة.';else if(t!=='peer-unavailable')CR.err='تعذر الاتصال بخادم الغرفة. تحقق من الإنترنت.';crPaint(true);});
-  peer.on('connection',crTConn);peer.on('call',crTCall);
+  crOpenPeer(0);
   crMixInit();crShell();crPaint(true);
   CR.tm=setInterval(crTick,500);CR.rt=setInterval(()=>crBc(true),3000);
   try{SND.q(0,0);}catch(e){}
 }
+function crOpenPeer(slot){
+  let peer;try{peer=new (lvvCtor())(crTid(CR.code,slot),{debug:0});}catch(e){CR.on=false;toast('تعذر فتح الغرفة');return;}
+  CR.peer=peer;CR.slot=slot;
+  peer.on('open',()=>{CR.open=true;CR.err='';crPaint(true);});
+  peer.on('error',e=>{
+    const t=e&&e.type;
+    if(t==='unavailable-id'){try{peer.destroy();}catch(x){}if(CR.peer!==peer)return;if(slot<3){crOpenPeer(slot+1);return;}CR.err='تعذر فتح الغرفة: يوجد عدة غرف قديمة مفتوحة بنفس الكود. أغلق التبويبات الأخرى وانتظر دقيقة ثم أعد المحاولة.';}
+    else if(t!=='peer-unavailable')CR.err='تعذر الاتصال بخادم الغرفة. تحقق من الإنترنت.';
+    crPaint(true);
+  });
+  peer.on('connection',crTConn);peer.on('call',crTCall);
+}
 function crTConn(conn){
   conn.on('data',m=>{
     if(!m)return;
-    if(m.t==='probe'){crSend(conn,{t:'live',rid:CR.rid,teacher:CR.teacher,title:CR.title,n:Object.values(CR.stu).filter(r=>r.on).length});return;}
+    if(m.t==='probe'){crSend(conn,{t:'live',slot:CR.slot||0,rid:CR.rid,teacher:CR.teacher,title:CR.title,n:Object.values(CR.stu).filter(r=>r.on).length});return;}
+    if(m.t==='lobby'){
+      const u=String(m.u||'').slice(0,40);if(!u)return;
+      const o=CR.lob[u];if(o&&o.conn!==conn){try{o.conn.close();}catch(e){}}
+      CR.lob[u]={u,n:String(m.n||'طالب').slice(0,30),p:String(m.p||'').slice(0,90),conn,inv:o?o.inv:0};conn.__lob=u;crPaint();return;
+    }
     if(m.t==='hello'){
       const u=String(m.u||'').slice(0,40);if(!u)return;
       const old=CR.stu[u];if(old&&old.conn&&old.conn!==conn){try{old.conn.close();}catch(e){}}
       const r=CR.stu[u]={u,n:String(m.n||'طالب').slice(0,30),p:String(m.p||'').slice(0,90),conn,on:true,score:old?old.score:0,correct:old?old.correct:0,hand:false,allowed:!!(old&&old.allowed),ans:old?old.ans:{},speak:false,call:null,hear:null,lastE:0};
-      conn.__u=u;
+      conn.__u=u;delete CR.lob[u];
       crSend(conn,{t:'welcome',rid:CR.rid,teacher:CR.teacher,title:CR.title});
       if(r.allowed)crSend(conn,{t:'allow',v:true});
       if(CR.qph==='q'&&CR.qs[CR.qi])crSend(conn,crQMsg(Math.max(1,CR.qT-(Date.now()-CR.qt0)/1000)));
@@ -12943,7 +12959,7 @@ function crTConn(conn){
       crPaintQ();
     }
   });
-  conn.on('close',()=>{const u=conn.__u,r=u&&CR.stu[u];if(r&&r.conn===conn){r.on=false;r.speak=false;r.hand=false;try{r.call&&r.call.close();}catch(e){}crBc(true);crPaint();}});
+  conn.on('close',()=>{if(conn.__lob&&CR.lob[conn.__lob]&&CR.lob[conn.__lob].conn===conn){delete CR.lob[conn.__lob];crPaint();}const u=conn.__u,r=u&&CR.stu[u];if(r&&r.conn===conn){r.on=false;r.speak=false;r.hand=false;try{r.call&&r.call.close();}catch(e){}crBc(true);crPaint();}});
 }
 function crTCall(call){
   const u=(call.metadata||{}).u,r=CR.stu[u];
@@ -12975,22 +12991,30 @@ async function crTMic(){
   }else{const t=CR.mic.getAudioTracks()[0];t.enabled=!t.enabled;CR.micOn=t.enabled;if(!CR.micOn)CR.tsp=false;}
   crBc(true);crPaint();
 }
-async function crTShare(){
-  if(CR.sharing){crStopShare();return;}
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia){toast('مشاركة الشاشة غير مدعومة على هذا الجهاز. افتح الغرفة من حاسوب (متصفح Chrome أو Edge).');return;}
-  let st;try{st=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:15},audio:true});}catch(e){return;}
+async function crTShare(kind){
+  if(CR.sharing&&(!kind||kind===CR.vk)){crStopShare();return;}
+  if(CR.sharing)crStopShare();
+  const md=navigator.mediaDevices,canScr=!!(md&&md.getDisplayMedia);
+  if(!md){toast('هذا المتصفح لا يدعم البث. افتح التطبيق من Chrome (رابط https).');return;}
+  kind=kind||(canScr?'screen':'cam');
+  let st;
+  try{
+    if(kind==='screen'){if(!canScr){toast('مشاركة الشاشة غير متاحة على الموبايل. استخدم زر «الكاميرا» لتصوير السبورة أو الكتاب.');return;}st=await md.getDisplayMedia({video:{frameRate:15},audio:true});}
+    else st=await md.getUserMedia({video:{facingMode:CR.face,width:{ideal:1280},height:{ideal:720}},audio:false});
+  }catch(e){toast(kind==='cam'?'تعذر تشغيل الكاميرا. اسمح للمتصفح باستخدامها.':'تم إلغاء مشاركة الشاشة');return;}
   const v=st.getVideoTracks()[0];if(!v)return;
-  CR.screen=st;v.onended=()=>crStopShare();
+  CR.screen=st;CR.vk=kind;v.onended=()=>crStopShare();
   try{CR.ac.resume();const a=st.getAudioTracks();if(a.length){CR.ssrc=CR.ac.createMediaStreamSource(new MediaStream(a));CR.ssrc.connect(CR.dest);}}catch(e){}
   CR.out=new MediaStream(CR.dest.stream.getAudioTracks().concat([v]));CR.sharing=true;
   const lv=document.getElementById('crVid');if(lv){lv.srcObject=new MediaStream([v]);lv.muted=true;lv.play().catch(()=>{});}
   Object.keys(CR.stu).forEach(crCallStu);crBc(true);crPaint();
 }
+function crFlip(){CR.face=CR.face==='user'?'environment':'user';crTShare('cam');}
 function crStopShare(){
   if(!CR.sharing)return;
   try{CR.screen&&CR.screen.getTracks().forEach(t=>t.stop());}catch(e){}
   try{CR.ssrc&&CR.ssrc.disconnect();}catch(e){}
-  CR.screen=null;CR.sharing=false;CR.out=new MediaStream(CR.dest.stream.getAudioTracks());
+  CR.screen=null;CR.sharing=false;CR.vk='';CR.out=new MediaStream(CR.dest.stream.getAudioTracks());
   const lv=document.getElementById('crVid');if(lv)lv.srcObject=null;
   Object.keys(CR.stu).forEach(crCallStu);crBc(true);crPaint();
 }
@@ -12999,6 +13023,15 @@ function crTAllow(u,v){
   crSend(r.conn,{t:'allow',v:!!v});
   if(!v){try{r.hear&&r.hear.close();}catch(e){}r.hear=null;r.speak=false;try{r.src&&r.src.disconnect();}catch(e){}}
   crBc(true);crPaint();
+}
+function crInvite(u){
+  const o=CR.lob[u];if(!o||!o.conn||!o.conn.open)return;
+  crSend(o.conn,{t:'invite',teacher:CR.teacher,title:CR.title});o.inv=Date.now();toast('تم إرسال الدعوة إلى '+crFirst(o.n));crPaint();
+  setTimeout(crPaint,20500);
+}
+function crInviteAll(){
+  let n=0;Object.values(CR.lob).forEach(o=>{if(o.conn&&o.conn.open){crSend(o.conn,{t:'invite',teacher:CR.teacher,title:CR.title});o.inv=Date.now();n++;}});
+  toast(n?'تم إرسال الدعوة إلى '+n+' طالب':'لا يوجد طلاب متصلون خارج الغرفة');crPaint();setTimeout(crPaint,20500);
 }
 function crMuteAll(){Object.keys(CR.stu).forEach(u=>{if(CR.stu[u].allowed)crTAllow(u,false);});}
 function crTEnd(){
@@ -13067,8 +13100,9 @@ async function crSJoin(){
   if(!await ensurePeer()){toast('تعذر تحميل مكتبة الاتصال. تحقق من الإنترنت.');return;}
   crSpeer();
   const live=CR.live;crReset();
-  CR.role='s';CR.on=true;CR.code=code;CR.teacher=(live&&live.teacher)||'المعلم';CR.title=(live&&live.title)||'غرفة الشرح';
+  CR.role='s';CR.on=true;CR.code=code;CR.teacher=(live&&live.teacher)||'المعلم';CR.title=(live&&live.title)||'غرفة الشرح';CR.slot=(live&&live.slot)||0;
   try{CR.ac=null;}catch(e){}
+  try{CR.lc&&CR.lc.close();}catch(e){}CR.lc=null;
   crNtClose();crShell();crPaint(true);crSConnect();
   CR.rt=setInterval(()=>{if(CR.role==='s'&&(!CR.tconn||!CR.tconn.open)){CR.jn=false;crSConnect();crPaint();}},4000);
   CR.tm=setInterval(crSTick,500);
@@ -13077,13 +13111,13 @@ function crSpeer(){
   if(CR.sp&&!CR.sp.destroyed)return;
   const sp=new (lvvCtor())(undefined,{debug:0});CR.sp=sp;
   sp.on('call',crSCall);
-  sp.on('error',e=>{if(e&&e.type==='peer-unavailable'){CR.pbusy=0;if(!CR.on)crSetLive(null);}});
+  sp.on('error',e=>{if(e&&e.type==='peer-unavailable'){const m=/peer\s+(\S+)/.exec(e.message||''),f=m&&CR.pend[m[1]];if(f)f(null);}});
   sp.on('disconnected',()=>{try{sp.reconnect();}catch(e){}});
 }
 function crSConnect(){
   if(!CR.sp||CR.sp.destroyed||!CR.sp.open){setTimeout(()=>{if(CR.role==='s')crSConnect();},800);return;}
   try{CR.tconn&&CR.tconn.close();}catch(e){}
-  const c=CR.sp.connect(crTid(CR.code),{reliable:true});CR.tconn=c;
+  const c=CR.sp.connect(crTid(CR.code,CR.slot||0),{reliable:true});CR.tconn=c;
   c.on('open',()=>{crSend(c,{t:'hello',u:crUid(),n:crMyName(),p:aoPetCode()});});
   c.on('data',crSData);
   c.on('close',()=>{CR.jn=false;crPaint();});
@@ -13135,7 +13169,7 @@ async function crSAllow(v){
   if(v){
     if(!CR.smic){
       try{CR.smic=await lvvMedia();}catch(e){toast('اسمح للمتصفح باستخدام الميكروفون ثم اطلب الإذن من جديد');CR.allowed=false;crPaint();return;}
-      try{CR.scall=CR.sp.call(crTid(CR.code),CR.smic,{metadata:{u:crUid()}});}catch(e){}
+      try{CR.scall=CR.sp.call(crTid(CR.code,CR.slot||0),CR.smic,{metadata:{u:crUid()}});}catch(e){}
     }else{CR.smic.getAudioTracks().forEach(t=>t.enabled=true);}
     toast('المعلم سمح لك بالكلام 🎤');
   }else{
@@ -13173,19 +13207,34 @@ function crSetLive(m){
   crLivePill();
   if((was||'')!==((m&&m.rid)||'')&&typeof PV!=='undefined'&&PV==='arena'&&AO.v==='home'&&!CR.on){try{render(true);}catch(e){}}
 }
+function crProbeOne(code,sl){
+  return new Promise(res=>{
+    const id=crTid(code,sl);let done=false,c;
+    const fin=v=>{if(done)return;done=true;clearTimeout(to);delete CR.pend[id];if(!v){try{c&&c.close();}catch(e){}}res(v);};
+    const to=setTimeout(()=>fin(null),3500);CR.pend[id]=fin;
+    try{c=CR.sp.connect(id,{reliable:true});}catch(e){fin(null);return;}
+    c.on('open',()=>crSend(c,{t:'probe'}));
+    c.on('data',m=>{if(m&&m.t==='live')fin({c,m});});
+    c.on('error',()=>fin(null));
+  });
+}
 async function crProbeLoop(){
   try{
     if(document.hidden||CR.on||TCH.on||!sbSess())return;
     aucLoad();const code=AUC.info&&AUC.info.code;if(!code)return;
-    if(Date.now()-CR.pbusy<6000)return;CR.pbusy=Date.now();
+    if(Date.now()-CR.pbusy<6000||CR.pl)return;CR.pbusy=Date.now();CR.pl=1;
     if(!await ensurePeer())return;
     crSpeer();
     if(!CR.sp.open){await new Promise(r=>{try{CR.sp.once('open',r);}catch(e){}setTimeout(r,3500);});if(!CR.sp||!CR.sp.open)return;}
-    const c=CR.sp.connect(crTid(code),{reliable:true});let done=false;
-    const to=setTimeout(()=>{if(!done){done=true;try{c.close();}catch(e){}crSetLive(null);}},5000);
-    c.on('open',()=>crSend(c,{t:'probe'}));
-    c.on('data',m=>{if(m&&m.t==='live'&&!done){done=true;clearTimeout(to);crSetLive(m);try{c.close();}catch(e){}}});
-  }catch(e){}
+    if(CR.lc&&CR.lc.open)return;
+    let hit=null;
+    for(let sl=0;sl<4&&!hit&&!CR.on;sl++)hit=await crProbeOne(code,sl);
+    if(!hit){crSetLive(null);return;}
+    const c=hit.c;CR.lc=c;
+    c.on('data',m=>{if(m&&m.t==='invite'&&!CR.on){crSetLive(Object.assign({},CR.live||{},m,{rid:(CR.live&&CR.live.rid)||'inv'}));crNotify(CR.live);}});
+    c.on('close',()=>{if(CR.lc===c){CR.lc=null;if(!CR.on){CR.pbusy=0;setTimeout(crProbeLoop,1200);}}});
+    crSetLive(hit.m);crSend(c,{t:'lobby',u:crUid(),n:crMyName(),p:aoPetCode()});
+  }catch(e){}finally{CR.pl=0;}
 }
 setInterval(crProbeLoop,8000);setTimeout(crProbeLoop,3500);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){CR.pbusy=0;setTimeout(crProbeLoop,400);}});
@@ -13220,16 +13269,30 @@ function crPaintStage(){
   const fs=document.querySelector('.cr-fs');if(fs)fs.style.display=has?'':'none';
   if(has){p.innerHTML=CR.needTap&&CR.role==='s'?`<button class="btn" data-act="cr_play">اضغط لتشغيل الصوت</button>`:'';p.style.display=CR.needTap&&CR.role==='s'?'grid':'none';return;}
   p.style.display='grid';
-  p.innerHTML=CR.role==='t'?`<div>${ic('blocks')}<b>لم تبدأ مشاركة الشاشة</b><small>اضغط «شارك الشاشة» لتشرح الدرس للطلاب</small></div>`:`<div>${ic('mic')}<b>${CR.jn?'بانتظار شرح المعلم…':'جارٍ الاتصال بالغرفة…'}</b><small>${CR.tmic?'المعلم يتحدث الآن':'ستظهر شاشة المعلم هنا عند المشاركة'}</small></div>`;
+  p.innerHTML=CR.role==='t'?`<div>${ic('blocks')}<b>لم يبدأ البث</b><small>شارك الشاشة أو الكاميرا ليرى الطلاب الشرح</small></div>`:`<div>${ic('mic')}<b>${CR.jn?'بانتظار شرح المعلم…':'جارٍ الاتصال بالغرفة…'}</b><small>${CR.tmic?'المعلم يتحدث الآن':'ستظهر شاشة المعلم هنا عند المشاركة'}</small></div>`;
 }
 function crRosterHtml(){
-  const isT=CR.role==='t';
-  const R=isT?Object.values(CR.stu).map(r=>({u:r.u,n:r.n,p:r.p,on:r.on?1:0,s:r.score,h:r.hand?1:0,m:r.allowed?1:0,k:r.speak?1:0})):CR.roster.slice();
-  R.sort((a,b)=>b.on-a.on||b.s-a.s||String(a.n).localeCompare(String(b.n),'ar'));
-  const on=R.filter(r=>r.on).length,me=crUid();
-  return `<div class="cr-card"><div class="cr-h"><b>الطلاب</b><span class="tag ${on?'ok':''}">${on} متصل</span></div>
-   ${R.length?`<div class="cr-ros">${R.map((r,i)=>`<div class="cr-r ${r.on?'':'off'} ${r.k?'sp':''} ${r.u===me?'me':''}"><i class="cr-dot ${r.on?'on':''}"></i>${crAv(r.n,r.p,34)}<b>${esc(r.n)}${r.u===me?' (أنت)':''}</b>${r.h?'<span class="cr-hand">✋</span>':''}${r.k?'<span class="lv-wave"><i></i><i></i><i></i></span>':''}${r.s?`<span class="cr-sc en">${r.s}</span>`:''}${isT&&r.on?`<button class="cr-mb ${r.m?'on':''}" data-act="cr_allow" data-u="${esc(r.u)}">${r.m?'يتحدث':'السماح'}</button>`:''}</div>`).join('')}</div>`:'<div class="help" style="text-align:center;padding:10px">بانتظار انضمام الطلاب…</div>'}
-   ${isT&&R.some(r=>r.m)?'<button class="pill" data-act="cr_muteall" style="margin-top:8px">كتم جميع الطلاب</button>':''}</div>`;
+  const isT=CR.role==='t',me=crUid();
+  if(!isT){
+    const R=CR.roster.slice().sort((a,b)=>b.on-a.on||b.s-a.s),on=R.filter(r=>r.on).length;
+    return `<div class="cr-card"><div class="cr-h"><b>الطلاب</b><span class="tag ${on?'ok':''}">${on} متصل</span></div>
+     ${R.length?`<div class="cr-ros">${R.map(r=>`<div class="cr-r ${r.on?'':'off'} ${r.k?'sp':''} ${r.u===me?'me':''}"><i class="cr-dot ${r.on?'on':''}"></i>${crAv(r.n,r.p,34)}<b>${esc(r.n)}${r.u===me?' (أنت)':''}</b>${r.h?'<span class="cr-hand">✋</span>':''}${r.k?'<span class="lv-wave"><i></i><i></i><i></i></span>':''}${r.s?`<span class="cr-sc en">${r.s}</span>`:''}</div>`).join('')}</div>`:'<div class="help" style="text-align:center;padding:10px">بانتظار انضمام الطلاب…</div>'}</div>`;
+  }
+  const inRoom=Object.values(CR.stu).filter(r=>r.on),seen=new Set(Object.keys(CR.stu));
+  const lob=Object.values(CR.lob).filter(o=>!(CR.stu[o.u]&&CR.stu[o.u].on));
+  lob.forEach(o=>seen.add(o.u));
+  const off=(TCH.list||[]).filter(u=>!seen.has(u.id)).map(u=>({u:u.id,n:u.name||'طالب'}));
+  const leftRoom=Object.values(CR.stu).filter(r=>!r.on);
+  const row=(r,k)=>{
+    if(k==='room')return `<div class="cr-r ${r.speak?'sp':''}"><i class="cr-dot on"></i>${crAv(r.n,r.p,34)}<b>${esc(r.n)}</b>${r.hand?'<span class="cr-hand">✋</span>':''}${r.speak?'<span class="lv-wave"><i></i><i></i><i></i></span>':''}${r.score?`<span class="cr-sc en">${r.score}</span>`:''}<button class="cr-mb ${r.allowed?'on':''}" data-act="cr_allow" data-u="${esc(r.u)}">${r.allowed?'يتحدث':'السماح'}</button></div>`;
+    if(k==='lob'){const inv=Date.now()-r.inv<20000;return `<div class="cr-r lob"><i class="cr-dot lb"></i>${crAv(r.n,r.p,34)}<b>${esc(r.n)}<small>متصل · خارج الغرفة</small></b><button class="cr-inv ${inv?'sent':''}" data-act="cr_inv" data-u="${esc(r.u)}" ${inv?'disabled':''}>${inv?'تمت الدعوة ✓':'دعوة'}</button></div>`;}
+    return `<div class="cr-r off"><i class="cr-dot"></i>${crAv(r.n,'',34)}<b>${esc(r.n)}<small>غير متصل</small></b></div>`;
+  };
+  return `<div class="cr-card"><div class="cr-h"><b>الطلاب</b><span class="tag ${inRoom.length?'ok':''}">${inRoom.length} في الغرفة · ${lob.length} متصل</span></div>
+   ${lob.length?`<button class="btn cr-all" data-act="cr_invall">${ic('mic')} دعوة جميع المتصلين (${lob.length})</button>`:''}
+   <div class="cr-ros">${inRoom.map(r=>row(r,'room')).join('')}${lob.map(o=>row(o,'lob')).join('')}${leftRoom.map(r=>row({n:r.n},'off')).join('')}${off.map(r=>row(r,'off')).join('')}</div>
+   ${!inRoom.length&&!lob.length&&!off.length?'<div class="help" style="text-align:center;padding:10px">بانتظار انضمام الطلاب…</div>':''}
+   ${inRoom.some(r=>r.allowed)?'<button class="pill" data-act="cr_muteall" style="margin-top:8px">كتم جميع الطلاب</button>':''}</div>`;
 }
 function crBoardHtml(list,title){
   if(!list||!list.length)return '';const me=crUid();
@@ -13237,7 +13300,8 @@ function crBoardHtml(list,title){
 }
 function crTBody(){
   const err=CR.err?`<div class="au-err">${esc(CR.err)}</div>`:'';
-  const ctl=`<div class="cr-ctl"><button class="cr-cb ${CR.sharing?'on':''}" data-act="cr_share">${ic('blocks')}<span>${CR.sharing?'إيقاف مشاركة الشاشة':'شارك الشاشة'}</span></button><button class="cr-cb ${CR.micOn?'on':''}" data-act="cr_tmic">${ic('mic')}<span>${CR.mic?(CR.micOn?'كتم المايك':'تشغيل المايك'):'تشغيل المايك'}</span></button></div>`;
+  const canScr=!!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia);
+  const ctl=`<div class="cr-ctl c3">${canScr?`<button class="cr-cb ${CR.sharing&&CR.vk==='screen'?'on':''}" data-act="cr_share">${ic('blocks')}<span>${CR.sharing&&CR.vk==='screen'?'إيقاف الشاشة':'الشاشة'}</span></button>`:''}<button class="cr-cb ${CR.sharing&&CR.vk==='cam'?'on':''}" data-act="cr_cam"><span class="cr-ic">📷</span><span>${CR.sharing&&CR.vk==='cam'?'إيقاف الكاميرا':'الكاميرا'}</span></button><button class="cr-cb ${CR.micOn?'on':''}" data-act="cr_tmic">${ic('mic')}<span>${CR.mic?(CR.micOn?'كتم المايك':'تشغيل المايك'):'المايك'}</span></button></div>${CR.sharing&&CR.vk==='cam'?'<button class="pill" data-act="cr_flip" style="align-self:center">🔄 قلب الكاميرا</button>':''}${canScr?'':'<div class="help" style="text-align:center">مشاركة الشاشة غير متاحة على الموبايل — استخدم الكاميرا لتصوير السبورة أو الكتاب، أو افتح الغرفة من حاسوب لمشاركة الشاشة.</div>'}`;
   const kinds=[['mix','مختلط'],['words','كلمات'],['sents','جمل']];
   let qp;
   if(CR.qph==='idle')qp=`<div class="cr-card"><div class="cr-h"><b>${ic('trophy')} مسابقة من كلماتك</b></div><small class="help">تُبنى الأسئلة تلقائيًا من الكلمات والجمل التي أضفتها.</small>
@@ -13310,10 +13374,14 @@ document.addEventListener('click',e=>{
   else if(a==='cr_later'){crNtClose();crLivePill();}
   else if(a==='cr_end'){if(b.dataset.c==='1'){crTEnd();}else{b.dataset.c='1';b.textContent='اضغط للتأكيد';setTimeout(()=>{if(b.isConnected){b.dataset.c='';b.textContent='إنهاء';}},3000);}}
   else if(a==='cr_leave')crSLeave();
-  else if(a==='cr_share')crTShare();
+  else if(a==='cr_share')crTShare('screen');
+  else if(a==='cr_cam')crTShare('cam');
+  else if(a==='cr_flip')crFlip();
   else if(a==='cr_tmic')crTMic();
   else if(a==='cr_allow'){const r=CR.stu[b.dataset.u];if(r)crTAllow(r.u,!r.allowed);}
   else if(a==='cr_muteall')crMuteAll();
+  else if(a==='cr_inv')crInvite(b.dataset.u);
+  else if(a==='cr_invall')crInviteAll();
   else if(a==='cr_cfg'){CR.cfg[b.dataset.f]=b.dataset.f==='kind'?b.dataset.v:+b.dataset.v;crPaint(true);}
   else if(a==='cr_qstart')crQStart();
   else if(a==='cr_qstop')crQStop();

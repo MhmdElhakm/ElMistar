@@ -3870,6 +3870,101 @@
     });
   }
   addReciterOptions(EXTRA_RECITERS);
+
+  /* ===== فحص القرّاء: إخفاء أي قارئ لا يعمل ملفه الصوتي (يُفحص في الخلفية ويُخزَّن النتيجة) ===== */
+  var reciterHealth = (function () {
+    var BAD_KEY = 'mq.reciterBad',
+      OK_KEY = 'mq.reciterOk',
+      BAD_TTL = 3 * 86400000,
+      OK_TTL = 7 * 86400000,
+      CONTROL = 'Alafasy_128kbps';
+    var bad = load(BAD_KEY, {}),
+      okMap = load(OK_KEY, {});
+    if (!bad || typeof bad !== 'object') bad = {};
+    if (!okMap || typeof okMap !== 'object') okMap = {};
+    var running = false;
+
+    function removeReciter(id) {
+      var picked = reciterSelect.value === id;
+      Array.prototype.slice.call(reciterSelect.options).forEach(function (o) {
+        if (o.value === id) o.remove();
+      });
+      if (picked && reciterSelect.options.length) {
+        reciterSelect.selectedIndex = 0;
+        try { saveRecitationPrefs(); } catch (e) {}
+      }
+      if (reciterSelect._refreshProfessionalSelect) reciterSelect._refreshProfessionalSelect();
+    }
+    function probe(id, ms) {
+      return new Promise(function (resolve) {
+        var a = new Audio(),
+          done = false,
+          timer = 0;
+        function fin(v) {
+          if (done) return;
+          done = true;
+          clearTimeout(timer);
+          a.onloadedmetadata = a.onerror = null;
+          try { a.removeAttribute('src'); a.load(); } catch (e) {}
+          resolve(v);
+        }
+        a.preload = 'metadata';
+        a.onloadedmetadata = function () { fin('ok'); };
+        a.onerror = function () { fin('bad'); };
+        timer = setTimeout(function () { fin('unknown'); }, ms || 12000);
+        a.src = recitationUrl(1, 1, id);
+      });
+    }
+    function markBad(id) {
+      bad[id] = Date.now();
+      save(BAD_KEY, bad);
+      delete okMap[id];
+      save(OK_KEY, okMap);
+      removeReciter(id);
+    }
+    /* القرّاء الذين ثبت عطلهم حديثًا يُخفون فورًا */
+    Object.keys(bad).forEach(function (id) {
+      if (Date.now() - bad[id] < BAD_TTL) removeReciter(id);
+      else delete bad[id];
+    });
+    function run() {
+      if (running || navigator.onLine === false) return;
+      if (navigator.connection && navigator.connection.saveData) return;
+      running = true;
+      probe(CONTROL).then(function (control) {
+        if (control !== 'ok') { running = false; return; } /* لا إنترنت/الخادم غير متاح: لا نحكم على أحد */
+        var ids = Array.prototype.map.call(reciterSelect.options, function (o) { return o.value; }).filter(function (id) {
+          return id !== CONTROL && !(okMap[id] && Date.now() - okMap[id] < OK_TTL);
+        });
+        var next = 0;
+        function worker() {
+          if (next >= ids.length) return Promise.resolve();
+          var id = ids[next++];
+          return probe(id).then(function (r) {
+            if (r === 'bad') markBad(id);
+            else if (r === 'ok') { okMap[id] = Date.now(); }
+          }).then(worker);
+        }
+        return Promise.all([worker(), worker(), worker()]).then(function () {
+          save(OK_KEY, okMap);
+          running = false;
+        });
+      }).catch(function () { running = false; });
+    }
+    /* عند فشل تشغيل القارئ الحالي نتحقق منه فورًا ونخفيه إن كان معطّلًا */
+    function checkCurrent() {
+      var id = reciterSelect.value;
+      if (!id || navigator.onLine === false) return;
+      Promise.all([probe(CONTROL), probe(id)]).then(function (r) {
+        if (r[0] === 'ok' && r[1] === 'bad') {
+          markBad(id);
+          try { toast('تم إخفاء قارئ لا يعمل ملفه الصوتي، اختر قارئًا آخر'); } catch (e) {}
+        }
+      });
+    }
+    setTimeout(run, 9000);
+    return { run: run, checkCurrent: checkCurrent };
+  })();
   var reciterIds = Array.prototype.map.call(reciterSelect.options, function (option) {
     return option.value;
   });
@@ -5159,6 +5254,7 @@
     if (!recitationRange) return;
     stopRecitation('تعذّر تحميل التلاوة؛ تحقق من الاتصال أو اختر قارئًا آخر');
     toast('تعذّر تحميل الآية');
+    reciterHealth.checkCurrent();
   });
 
   recitationSurah.addEventListener('change', function () {
@@ -6734,6 +6830,32 @@
         ';--tajweed-light-palette:--tjl' + pageFont[1] + ';--tajweed-dark-palette:--tjd' + pageFont[1];
     var glyphMarkup =
       '<span class="' + glyphClasses + '" style="' + glyphStyle + '">' + esc(glyph) + '</span>';
+    function briefTafsir(t) {
+      /* مختصر الآية: أول عبارة من نص الميسر (نحو 100 حرف) تنتهي عند فاصلة أو نقطة، دون قطع داخل ﴿ ﴾ */
+      var depth = 0;
+      for (var i = 0; i < t.length; i++) {
+        var ch = t.charAt(i);
+        if (ch === '﴿') depth++;
+        else if (ch === '﴾') depth = Math.max(0, depth - 1);
+        else if (depth === 0 && i >= 95 && (ch === '،' || ch === '.' || ch === '؛')) {
+          if (t.length - i < 45) return t;
+          var cut = t.slice(0, i).replace(/[\s،؛.]+$/, '');
+          return cut + (ch === '.' ? '.' : '…');
+        }
+      }
+      return t;
+    }
+    function tafsirBlocks(tf) {
+      var msg = meaningLoadFailed ? 'تعذر تحميل التفسير المحلي.' : MU ? 'لا يتوفر تفسير لهذه الآية.' : 'جارٍ تحميل التفسير المحلي…';
+      return (
+        '<details class="wp-v"><summary>التفسير المختصر للآية</summary><div class="wp-v-content">' +
+        (tf ? esc(briefTafsir(tf)) : msg) +
+        '</div></details>' +
+        '<details class="wp-v"><summary>التفسير الميسر</summary><div class="wp-v-content">' +
+        (tf ? esc(tf) : msg) +
+        '</div></details>'
+      );
+    }
     var hideAyahTafsir = a === 15;
     var recitationDetailsWasOpen = false;
     function draw() {
@@ -6781,29 +6903,9 @@
             esc(wordMeaning) +
             '</div>';
         }
-        if (!hideAyahTafsir)
-          h +=
-            '<details class="wp-v"><summary>التفسير المختصر للآية</summary><div class="wp-v-content">' +
-            (tf
-              ? esc(tf)
-              : meaningLoadFailed
-                ? 'تعذر تحميل التفسير المحلي.'
-                : MU
-                  ? 'لا يتوفر تفسير لهذه الآية.'
-                  : 'جارٍ تحميل التفسير المحلي…') +
-            '</div></details>';
+        if (!hideAyahTafsir) h += tafsirBlocks(tf);
       }
-      if (pos <= 0 && !hideAyahTafsir)
-        h +=
-          '<details class="wp-v"><summary>التفسير المختصر للآية</summary><div class="wp-v-content">' +
-          (tf
-            ? esc(tf)
-            : meaningLoadFailed
-              ? 'تعذر تحميل التفسير المحلي.'
-              : MU
-                ? 'لا يتوفر تفسير لهذه الآية.'
-                : 'جارٍ تحميل التفسير المحلي…') +
-          '</div></details>';
+      if (pos <= 0 && !hideAyahTafsir) h += tafsirBlocks(tf);
       h +=
         '<div class="wp-mark"><span>تظليل ' +
         (pos <= 0 ? 'الآية' : 'الكلمة') +
@@ -11620,10 +11722,10 @@
       'اضغط مطولًا (نحو نصف ثانية) على أي كلمة لتفتح نافذتها: الكلمة بخط المصحف ومعناها، والتفسير، وتظليل الكلمة، والتسميع، وتشغيل الآيات.',
       'الضغط المطول على رقم الآية يفتح نافذة الآية بعلاماتها (إضافة علامة وتحريرها).' ] },
     { i: '📚', t: 'عرض التفسير ومعاني الكلمات', s: 'نافذة الكلمة', p: [
-      'يظهر معنى الكلمة من المصدر الذي تختاره في الإعدادات، وتحته «التفسير المختصر للآية» تضغط عليه لتفتحه.',
+      'يظهر معنى الكلمة من المصدر الذي تختاره في الإعدادات، وتحته «التفسير المختصر للآية» ثم «التفسير الميسر» تضغط على أيٍّ منهما لتفتحه.',
       'اختر لون التظليل لتمييز الكلمة أو الآية، وأعد الضغط على اللون لإزالته.' ] },
     { i: '🎧', t: 'تشغيل الآيات واختيار القارئ', s: 'نافذة الكلمة ← تشغيل الآيات', p: [
-      'اختر القارئ من قائمة واسعة، ويتصدرها «المصحف المعلم» للأطفال بصوتَي الحصري والمنشاوي.',
+      'اختر القارئ من قائمة واسعة، ويُخفى منها تلقائيًا أي قارئ لا يعمل ملفه الصوتي.',
       'حدّد السورة والآيات وعدد مرات التكرار للحفظ ثم اضغط «استماع». وخيار «تتبّع التلاوة» في الإعدادات يظلل الآية أو الكلمة الجارية.' ] },
     { i: '🧠', t: 'التسميع', s: 'نافذة الكلمة ← زر التسميع', p: [
       'اختر السورة ومدى الآيات ثم ابدأ، واقرأ بصوتك دون النظر؛ يتعرف التطبيق على ما تقرؤه ويظلل الخطأ بالأحمر.',
@@ -11849,7 +11951,7 @@
     { sel: ['#wp .wp-recitation-tasmee'], popup: 1, i: '🎙️', t: 'التسميع', x: 'يفتح نافذة التسميع: اختر السورة والآيات ثم ابدأ واقرأ بصوتك دون النظر؛ يتعرف التطبيق على ما تقرؤه، ويظلل الخطأ بالأحمر. يحتاج إذن الميكروفون.' },
     { sel: [], popup: 1, demo: "talqeen", i: '💡', t: 'التلقين', x: 'إن تعثّرت أثناء التسميع فاضغط زر «التلقين» ليظهر لك التطبيق الكلمة المظللة ويقرؤها لك، ثم تتابع القراءة من حيث توقفت. وتُحسب الكلمات الملقَّنة في تقرير دقتك بنهاية التسميع.' },
     { sel: ['#wp .wp-recitation summary'], popup: 1, i: '🎧', t: 'تشغيل الآيات', x: 'يفتح مشغّل التلاوة: استمع للآية أو لمدى من الآيات بصوت القارئ الذي تختاره.' },
-    { sel: ['#wp .reciter-picker'], popup: 1, openRecit: 1, i: '🗣️', t: 'اختيار القارئ', x: 'اختر من قائمة واسعة من القرّاء، ويتصدرها «المصحف المعلم» للأطفال بصوتَي الحصري والمنشاوي.' },
+    { sel: ['#wp .reciter-picker'], popup: 1, openRecit: 1, i: '🗣️', t: 'اختيار القارئ', x: 'اختر من قائمة واسعة من القرّاء، ويُخفى منها تلقائيًا أي قارئ لا يعمل ملفه الصوتي.' },
     { sel: ['#wp .recitation-range','#wp .recitation-play'], popup: 1, openRecit: 1, i: '🔁', t: 'النطاق والتكرار والاستماع', x: 'حدّد السورة وأول آية وآخرها وعدد مرات التكرار للحفظ، ثم اضغط «استماع». ويتحرك التظليل مع التلاوة حسب خيار التتبع.' },
     { sel: [], i: '✨', t: 'أنت جاهز!', x: 'زر الرجوع يغلق النافذة المفتوحة، ومرتان متتاليتان للخروج. بالتوفيق في ورد يومك.' }
   ];
@@ -12190,4 +12292,47 @@
     };
     document.addEventListener('pointerup', once, true);
   }
+})();
+
+/* ===== شكل أيقونة التطبيق (أخضر / أسود) ===== */
+(function () {
+  var KEY = 'mq.iconStyle';
+  function get() { try { return localStorage.getItem(KEY) === 'black' ? 'black' : 'green'; } catch (e) { return 'green'; } }
+  var blobUrl = '';
+  function apply(style) {
+    var abs = function (f) { return new URL('./' + f, location.href).href; };
+    var f192 = 'icon-' + style + '-192.png', f512 = 'icon-' + style + '-512.png', fm = 'icon-' + style + '-maskable.png';
+    document.querySelectorAll('link[rel="icon"],link[rel="apple-touch-icon"]').forEach(function (l) { l.href = abs(f512); });
+    var img = document.querySelector('.quran-loading-brand img');
+    if (img) img.src = abs(f512);
+    var link = document.querySelector('link[rel="manifest"]');
+    if (link) {
+      fetch('./manifest.webmanifest', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (m) {
+        m.start_url = new URL(m.start_url || './', location.href).href;
+        m.scope = new URL(m.scope || './', location.href).href;
+        if (m.id) m.id = new URL(m.id, location.href).href;
+        m.icons = [
+          { src: abs(f192), sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: abs(f512), sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: abs(fm), sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+        ];
+        var u = URL.createObjectURL(new Blob([JSON.stringify(m)], { type: 'application/manifest+json' }));
+        link.href = u;
+        if (blobUrl) URL.revokeObjectURL(blobUrl);
+        blobUrl = u;
+      }).catch(function () {});
+    }
+    document.querySelectorAll('.icon-style-opt').forEach(function (b) {
+      b.setAttribute('aria-checked', b.getAttribute('data-icon-style') === style ? 'true' : 'false');
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.icon-style-opt');
+    if (!b) return;
+    var s = b.getAttribute('data-icon-style');
+    try { localStorage.setItem(KEY, s); } catch (x) {}
+    apply(s);
+    try { var tm = s === 'black' ? 'تم اختيار الأيقونة السوداء' : 'تم اختيار الأيقونة الخضراء'; (window.MushafRuntime && window.MushafRuntime.toast) ? window.MushafRuntime.toast(tm) : toast(tm); } catch (x) {}
+  });
+  if (get() === 'black') apply('black'); else apply('green');
 })();
