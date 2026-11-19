@@ -12063,6 +12063,7 @@
       if (st.sel.length && st.drawer) {
         var q = st.sel[st.sel.length - 1], el = document.querySelector(q.charAt(0) === '^' ? q.slice(1) : q);
         if (el && q.charAt(0) === '^') el = el.closest('.settings-card') || el;
+        var dt = el && el.closest && el.closest('details'); if (dt && !dt.open) dt.open = true;
         if (el && el.scrollIntoView) { try { el.scrollIntoView({ block: 'center' }); } catch (e) {} }
       }
       return wait(st.drawer ? 300 : 160);
@@ -12195,6 +12196,19 @@
       '<button type="button" class="st-btn" id="guideOpenBtn"><span class="st-dot" style="background: var(--muted)"></span><span>الدليل الكامل</span></button>' +
       '</div>';
     host.appendChild(c);
+    /* تخصيص المصحف: قسم مطوي يضم ألوان المصحف وشكل الأيقونة، أسفل دليل الاستخدام */
+    if (!document.getElementById('customizeCard')) {
+      var cz = document.createElement('details');
+      cz.className = 'settings-card customize-card';
+      cz.id = 'customizeCard';
+      cz.innerHTML = '<summary class="settings-card-head"><span aria-hidden="true">🎨</span><span>تخصيص المصحف</span><span class="cz-chev" aria-hidden="true">‹</span></summary><div class="cz-body"></div>';
+      var czBody = cz.querySelector('.cz-body');
+      ['mushafColorCard', 'iconStyleCard'].forEach(function (id) {
+        var n = document.getElementById(id);
+        if (n) czBody.appendChild(n);
+      });
+      c.after(cz);
+    }
     document.getElementById('guideOpenBtn').addEventListener('click', function () { open('full'); });
     document.getElementById('guideTourBtn').addEventListener('click', function () {
       if (window.MushafRuntime && window.MushafRuntime.closeDrawer) window.MushafRuntime.closeDrawer();
