@@ -48,7 +48,7 @@ begin
     select jsonb_build_object('id',pr.id,'name',pr.name,'grade',pr.grade,
       'avatar',case when length(coalesce(pr.avatar,''))<30000 then pr.avatar end,
       'ago',extract(epoch from now()-p.seen)::int,
-      'busy',exists(select 1 from arena_matches m where m.status in ('ready','playing') and (m.a=pr.id or m.b=pr.id))) x
+      'busy',(p.seen>now()-interval '90 seconds' and exists(select 1 from arena_matches m where m.status in ('ready','playing') and m.created_at>now()-interval '15 minutes' and (m.a=pr.id or m.b=pr.id)))) x
     from arena_presence p join profiles pr on pr.id=p.uid
     where p.seen>now()-interval '7 days' and p.uid<>me
       and (p_grade is null or pr.grade=p_grade)
@@ -230,3 +230,7 @@ begin
   update arena_matches set qs=nq where id=p_id;
 end $$;
 grant execute on function public.ar_mix(uuid,jsonb) to authenticated;
+
+
+-- تنظيف المباريات العالقة (لم تنتهِ ولم تُلغَ) حتى لا يظهر الطلاب «في مباراة» بالخطأ
+update public.arena_matches set status='cancelled' where status in ('waiting','invited','ready','playing') and created_at<now()-interval '30 minutes';

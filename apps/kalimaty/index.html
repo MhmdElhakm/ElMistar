@@ -2298,6 +2298,28 @@ html[dir=rtl] .lsn-card .lsn-art-state{transform:translateX(50%)}
 .cr-home{flex:none!important;min-height:78px;height:auto!important}.cr-home.t{margin:4px 0 6px}
 .cr-r b small{display:block;font-size:11px;font-weight:600;opacity:.7}.cr-dot.lb{background:#ffb84a;box-shadow:0 0 8px #ffb84a}.cr-inv{padding:6px 14px;border-radius:99px;background:linear-gradient(180deg,#8f7dff,#6a56f0);color:#fff;font-weight:900;font-size:12px}.cr-inv.sent{background:rgba(63,215,138,.2);color:#3fd78a}.cr-all{min-height:44px!important;font-size:14px!important;margin-bottom:8px}.cr-r.lob{background:rgba(255,184,74,.08)}
 .cr-ctl.c3{grid-template-columns:repeat(auto-fit,minmax(0,1fr))}.cr-ctl.c3 .cr-cb{flex-direction:column;gap:4px;font-size:12.5px;padding:10px 4px}
+.ao-fold{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin:10px 0;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(155,123,255,.3);color:inherit;text-align:start}.ao-fold span{display:flex;flex-direction:column;gap:2px}.ao-fold small{opacity:.75;font-size:12.5px}.ao-fold svg{width:20px;height:20px;transition:transform .2s}.ao-fold.open svg{transform:rotate(180deg)}.ao-list[hidden]{display:none}
+.cr-mg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.cr-mc{min-height:66px;border-radius:14px;border:2px solid var(--line);background:rgba(255,255,255,.08);color:var(--ink);font-size:17px;font-weight:800;padding:6px;line-height:1.2;word-break:break-word}
+.cr-mc.up{background:var(--primary);color:var(--on-primary);border-color:transparent}
+.cr-mc.ok{background:rgba(79,220,156,.25);color:var(--ink);border-color:#4fdc9c}
+.cr-mc:disabled{opacity:1}
+.cr-ans.one{grid-template-columns:1fr}
+.cr-card .slots,.cr-card .answer{margin:6px 0}
+.cr-fold{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;border-radius:20px;background:linear-gradient(135deg,rgba(127,108,245,.28),rgba(255,255,255,.05));border:1px solid rgba(155,123,255,.4);color:inherit;text-align:start}
+.cr-fi{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#7f6cf5,#b8a2ff);display:grid;place-items:center;flex:none}.cr-fi svg{width:22px;height:22px;color:#fff}
+.cr-ft{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}.cr-ft b{font-size:16px}.cr-ft small{opacity:.75;font-size:12.5px}
+.cr-fold>svg{width:20px;height:20px;flex:none;transition:transform .2s}.cr-fold.open>svg{transform:rotate(180deg)}
+.cr-gh{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.cr-gc{display:flex;flex-direction:column;padding:0;border-radius:20px;overflow:hidden;background:var(--card2,rgba(255,255,255,.06));border:2px solid var(--line);color:inherit;text-align:start}
+.cr-gc.on{border-color:#a78bfa;box-shadow:0 0 0 3px rgba(167,139,250,.3)}
+.cr-gc:last-child:nth-child(odd){grid-column:1/-1}
+.cr-gt{position:relative;height:86px;display:grid;place-items:center;overflow:hidden}
+.cr-gem{font-size:44px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.25));position:relative;z-index:1}
+.cr-gt u{position:absolute;border-radius:50%;background:rgba(255,255,255,.2)}.cr-gt u:nth-of-type(1){width:90px;height:90px;top:-30px;inset-inline-start:-20px}.cr-gt u:nth-of-type(2){width:60px;height:60px;bottom:-24px;inset-inline-end:-10px}
+.cr-gtag{position:absolute;top:8px;inset-inline-end:8px;z-index:2;font-style:normal;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;background:rgba(0,0,0,.35);color:#fff}
+.cr-gb{display:flex;flex-direction:column;gap:3px;padding:10px 12px 12px}.cr-gb b{font-size:15px}.cr-gb small{opacity:.75;font-size:12px;line-height:1.4}
+.cr-set{margin-top:0}
 </style></head><body>
 <div id="app">
   <div id="view"></div>
@@ -12492,7 +12514,7 @@ const AO={v:'',flt:{kind:'mix',same:false},inbox:[],online:[],onlineReq:0,online
 const arRpc=(fn,a)=>lvRpc(fn,a||{},false);
 setInterval(()=>{try{if(document.visibilityState==='visible'&&sbSess())arRpc('ar_ping').catch(()=>{});}catch(e){}},60000);setTimeout(()=>{try{if(sbSess())arRpc('ar_ping').catch(()=>{});}catch(e){}},4000);
 const arErr=e=>{const m=String(e&&e.message||e);if(/404|PGRST202|does not exist|Could not find/.test(m))return 'شغّل ملف arena_setup.sql في Supabase لتفعيل التحدي الأونلاين.';if(/not_auth|no-session/.test(m))return 'سجّل الدخول أولًا.';if(/expired/.test(m))return 'انتهت صلاحية التحدي.';return 'تعذّر الاتصال، حاول مجددًا.';};
-const arGradeN=g=>(g==null||g===''||!GRADES[g])?'':String(GRADES[g]).replace('الصف ','').replace(' الابتدائي',' ابتدائي').replace(' الإعدادي',' إعدادي').replace(' الثانوي',' ثانوي');
+const arGradeN=g=>(g==null||g===''||!GRADES[g-1])?'':String(GRADES[g-1]).replace('الصف ','').replace(' الابتدائي',' ابتدائي').replace(' الإعدادي',' إعدادي').replace(' الثانوي',' ثانوي');
 const arUserAv=(u,sz)=>av({name:u&&u.name,photo:u&&u.avatar},sz);
 const arKindN={words:'تدريب الكلمات',sents:'تدريبات الجمل',mix:'سباق المعاني'};
 function aoStop(){clearInterval(AO.bg);clearInterval(AO.mt);AO.bg=AO.mt=null;}
@@ -12509,7 +12531,7 @@ function aoBgStart(){
       if(['home','online','stake'].includes(AO.v)){
         if(AO.tick%5===1)await arRpc('ar_ping');
         const ib=await arRpc('ar_inbox');if(JSON.stringify(ib)!==JSON.stringify(AO.inbox)){AO.inbox=ib||[];if(['home','online'].includes(AO.v))render(true);}
-        if(AO.v==='online'&&AO.tick%2===0){const l=await arRpc('ar_online',{p_grade:AO.flt.same&&S.profile?+S.profile.grade:null});if(JSON.stringify(l)!==JSON.stringify(AO.online)){AO.online=l||[];if(AO.v==='online')render(true);}}
+        if(AO.v==='online'&&AO.tick%2===0){const l=await arRpc('ar_online',{p_grade:AO.flt.same&&S.profile&&S.profile.grade!==''&&S.profile.grade!=null?+S.profile.grade+1:null});if(JSON.stringify(l)!==JSON.stringify(AO.online)){AO.online=l||[];if(AO.v==='online')render(true);}}
       }else if(AO.v==='wait'||AO.v==='play'){await aoPoll();}
     }catch(e){AO.err=arErr(e);}
   },1000);
@@ -12603,18 +12625,19 @@ function aoHome(){
 }
 function arAgo(sec){sec=+sec;if(!(sec>=0))return '';if(sec<45)return 'متصل الآن';const m=Math.floor(sec/60);if(m<1)return 'منذ لحظات';if(m<60)return 'منذ '+(m===1?'دقيقة':m===2?'دقيقتين':m+(m<11?' دقائق':' دقيقة'));const h=Math.floor(m/60);if(h<24)return 'منذ '+(h===1?'ساعة':h===2?'ساعتين':h+(h<11?' ساعات':' ساعة'));const d=Math.floor(h/24);return 'منذ '+(d===1?'يوم':d===2?'يومين':d+(d<11?' أيام':' يومًا'));}
 const arAct=u=>u&&+u.ago<45;
-function aoWho(u){return `<span class="ao-dot ${arAct(u)?'on':''}"></span>${esc(arGradeN(u.grade))}${u.busy?' · في مباراة':' · '+(u.ago!=null?arAgo(u.ago):'متصل')}`;}
+const arBusy=u=>!!(u&&u.busy&&u.ago!=null&&+u.ago<90);
+function aoWho(u){return `<span class="ao-dot ${arAct(u)?'on':''}"></span>${esc(arGradeN(u.grade))}${arBusy(u)?' · في مباراة':' · '+(u.ago!=null?arAgo(u.ago):'متصل')}`;}
 async function aoFetchStrip(){
   if(!sbSess())return;const req=AO.stripReq=(AO.stripReq||0)+1;
-  try{const l=await arRpc('ar_online',{p_grade:AO.flt.same&&S.profile?+S.profile.grade:null});if(req!==AO.stripReq)return;AO.strip=l||[];if(AO.v==='stake')render(true);}catch(e){}
+  try{const l=await arRpc('ar_online',{p_grade:AO.flt.same&&S.profile&&S.profile.grade!==''&&S.profile.grade!=null?+S.profile.grade+1:null});if(req!==AO.stripReq)return;AO.strip=l||[];if(AO.v==='stake')render(true);}catch(e){}
 }
 function aoStrip(){
   const L=AO.strip||[];if(!L.length)return '';const act=L.filter(arAct).length;
   return `<div class="ao-strip"><div class="ao-sh"><b>الطلاب</b><small>${act?act+' نشط الآن':'لا أحد نشط الآن'}</small></div><div class="ao-sr">${L.slice(0,10).map(u=>`<div class="ao-sc ${arAct(u)?'on':''}"><span class="ao-av">${arUserAv(u,44)}<i class="ao-dot ${arAct(u)?'on':''}"></i></span><b>${esc((u.name||'').split(' ')[0])}</b><small>${arAgo(u.ago)}</small></div>`).join('')}</div></div>`;
 }
 async function aoFetchOnline(){
-  const req=AO.onlineReq=(AO.onlineReq||0)+1,grade=AO.flt.same&&S.profile?+S.profile.grade:null;
-  AO.online=[];AO.err='';AO.onlineLoading=true;render(true);
+  const req=AO.onlineReq=(AO.onlineReq||0)+1,grade=AO.flt.same&&S.profile&&S.profile.grade!==''&&S.profile.grade!=null?+S.profile.grade+1:null;
+  AO.online=[];AO.err='';AO.listOpen=false;AO.onlineLoading=true;render(true);
   try{const users=await arRpc('ar_online',{p_grade:grade});if(req!==AO.onlineReq||AO.v!=='online')return;AO.online=users||[];}
   catch(e){if(req===AO.onlineReq&&AO.v==='online')AO.err=arErr(e);}
   finally{if(req===AO.onlineReq){AO.onlineLoading=false;if(AO.v==='online')render(true);}}
@@ -12622,7 +12645,8 @@ async function aoFetchOnline(){
 function aoOnline(){
   const L=AO.online;
   return `<div class="ph"><div><h2>الطلاب المتصلون</h2><small>${arKindN[AO.flt.kind]} · ${arLv().n}${AO.flt.same?' · صفي فقط':''}</small></div></div>${aoInviteBox()}${aoSettings(true)}
-  <div class="ao-list">${AO.onlineLoading?'<div class="empty"><b>جارٍ البحث عن الطلاب…</b></div>':L.length?L.map((u,i)=>`<div class="ao-u">${arUserAv(u,48)}<div style="flex:1"><b>${esc(u.name)}</b><small>${aoWho(u)}</small></div><button class="pill go" data-act="ao_ch" data-i="${i}" ${u.busy?'disabled':''}>تحدَّ</button></div>`).join(''):'<div class="empty"><b>لا يوجد طلاب في هذا الصف بعد</b><span>جرّب التحدي العشوائي، أو اطلب من أصدقائك فتح قسم تحدي الصف.</span></div>'}</div>
+  <button class="ao-fold ${AO.listOpen?'open':''}" data-act="ao_lt" aria-expanded="${AO.listOpen?'true':'false'}"><span><b>قائمة الطلاب</b><small>${AO.onlineLoading?'جارٍ البحث…':L.length+' طالب'+(L.filter(arAct).length?' · '+L.filter(arAct).length+' نشط الآن':'')}</small></span>${ic('chev')}</button>
+  <div class="ao-list" ${AO.listOpen?'':'hidden'}>${AO.onlineLoading?'<div class="empty"><b>جارٍ البحث عن الطلاب…</b></div>':L.length?L.map((u,i)=>`<div class="ao-u">${arUserAv(u,48)}<div style="flex:1"><b>${esc(u.name)}</b><small>${aoWho(u)}</small></div><button class="pill go" data-act="ao_ch" data-i="${i}" ${arBusy(u)?'disabled':''}>تحدَّ</button></div>`).join(''):'<div class="empty"><b>لا يوجد طلاب في هذا الصف بعد</b><span>جرّب التحدي العشوائي، أو اطلب من أصدقائك فتح قسم تحدي الصف.</span></div>'}</div>
   ${AO.err?`<p class="help" style="text-align:center">${esc(AO.err)}</p>`:''}
   <button class="btn ghost" data-act="ao_home">رجوع</button>`;
 }
@@ -12856,7 +12880,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 /* ===== غرفة الشرح المباشرة: المعلم يشارك الشاشة والمايك، الطلاب يتفاعلون ويجاوبون ===== */
 const CR={role:'',on:false,code:'',rid:'',teacher:'',title:'غرفة الشرح',peer:null,sp:null,live:null,seen:'',tconn:null,stu:{},roster:[],err:'',
  ac:null,dest:null,out:null,screen:null,mic:null,micOn:false,sharing:false,tsp:false,
- cfg:{kind:'mix',n:8,t:15},qs:[],qi:-1,qph:'idle',qt0:0,qr0:0,qT:15,cq:null,board:[],allowed:false,hand:false,smic:null,scall:null,tmic:false,tshare:false,
+ cfg:{kind:'mix',n:8,t:15,g:'quiz'},game:'quiz',gOpen:false,mem:null,mg:null,lf:[],lw:null,le:0,qs:[],qi:-1,qph:'idle',qt0:0,qr0:0,qT:15,cq:null,board:[],allowed:false,hand:false,smic:null,scall:null,tmic:false,tshare:false,
  pbusy:0,pend:{},slot:0,vk:'',face:'environment',lob:{},lc:null,sig:'',bcT:0,tm:null,rt:null,guest:'',jn:false,paint:0,ended:null};
 const crTid=(c,sl)=>'kxr-'+String(c).replace(/[^A-Za-z0-9]/g,'')+(sl?'-'+sl:'');
 const crUid=()=>{const s=sbSess();return (s&&s.uid)||CR.guest||(CR.guest='g'+Math.random().toString(36).slice(2,9));};
@@ -12942,6 +12966,7 @@ function crTConn(conn){
       crSend(conn,{t:'welcome',rid:CR.rid,teacher:CR.teacher,title:CR.title});
       if(r.allowed)crSend(conn,{t:'allow',v:true});
       if(CR.qph==='q'&&CR.qs[CR.qi])crSend(conn,crQMsg(Math.max(1,CR.qT-(Date.now()-CR.qt0)/1000)));
+      if(CR.qph==='mem'&&CR.mem)crSend(conn,{t:'mem',pairs:CR.mem.pairs,T:CR.mem.T,left:Math.max(8,CR.mem.T-(Date.now()-CR.mem.t0)/1000)});
       crCallStu(u);crBc(true);crPaint();
       try{SND.pick();}catch(e){}
       return;
@@ -12957,6 +12982,12 @@ function crTConn(conn){
       const on=Object.values(CR.stu).filter(x=>x.on);
       if(on.length&&on.every(x=>x.ans[CR.qi]))setTimeout(crReveal,500);
       crPaintQ();
+    }else if(m.t==='memres'&&CR.qph==='mem'&&CR.mem&&!r.mem){
+      const np=CR.mem.pairs.length,n=Math.max(0,Math.min(np,+m.n||0)),ms=Math.max(0,+m.ms||0),mv=Math.max(0,+m.mv||0),dn=m.done?1:0;
+      r.mem={n,ms,mv,dn};r.correct=n;r.score=n*100+(dn?Math.max(0,300-Math.round(ms/1000)*3-mv*3):0);
+      const on=Object.values(CR.stu).filter(x=>x.on);
+      if(on.length&&on.every(x=>x.mem))setTimeout(crMemEnd,900);
+      crBc(true);crPaint();
     }
   });
   conn.on('close',()=>{if(conn.__lob&&CR.lob[conn.__lob]&&CR.lob[conn.__lob].conn===conn){delete CR.lob[conn.__lob];crPaint();}const u=conn.__u,r=u&&CR.stu[u];if(r&&r.conn===conn){r.on=false;r.speak=false;r.hand=false;try{r.call&&r.call.close();}catch(e){}crBc(true);crPaint();}});
@@ -13042,21 +13073,30 @@ function crTEnd(){
 /* ----- questions / games ----- */
 function crQMsg(left){
   const q=CR.qs[CR.qi];
-  return {t:'q',i:CR.qi,n:CR.qs.length,T:CR.qT,left,q:{lab:q.lab,big:q.big,em:q.em,aud:q.aud,opts:q.opts,en:q.en,bigAr:q.bigAr,sub:q.sub}};
+  return {t:'q',i:CR.qi,n:CR.qs.length,T:CR.qT,left,q:{lab:q.lab,big:q.big,em:q.em,aud:q.aud,opts:q.opts,en:q.en,bigAr:q.bigAr,sub:q.sub,lt:q.lt,tk:q.tk}};
 }
-function crQStart(){
-  const k=CR.cfg.kind;
-  if(!arCanPlay(k)){toast('أضف كلمات وجمل في قسم «الكلمات والجمل» أولًا لتُبنى الأسئلة منها');return;}
+const CRG={quiz:'مسابقة من كلماتك',race:'سباق المعاني',trw:'تدريب الكلمات',trs:'تدريب الجمل',mem:'ذاكرة الكلمات'};
+function crGenQs(g,n){
+  const kind=g==='trs'?'sents':(g==='trw'||g==='race')?'words':CR.cfg.kind,allowT=(g==='trw'||g==='trs');
   const qs=[],seen=new Set();let tries=0;
-  while(qs.length<CR.cfg.n&&tries<CR.cfg.n*15){
+  while(qs.length<n&&tries<n*20){
     tries++;try{arS().seen=[];}catch(e){}
-    let q;try{q=arClean(arGen2(AR.lv||'e',k));}catch(e){continue;}
-    if(!q||q.lt||q.tk||!q.opts||q.opts.length<2)continue;
+    let q;try{q=arClean(arGen2(AR.lv||'e',kind));}catch(e){continue;}
+    if(!q||!q.opts||q.opts.length<2)continue;
+    if(!allowT&&(q.lt||q.tk))continue;
     const key=(q.big||'')+'|'+q.lab+'|'+q.opts.join('/');if(seen.has(key))continue;seen.add(key);qs.push(q);
   }
-  if(qs.length<2){toast('لا توجد كلمات كافية لبناء أسئلة. أضف المزيد.');return;}
-  CR.qs=qs;CR.qi=-1;CR.qT=CR.cfg.t;
-  Object.values(CR.stu).forEach(r=>{r.score=0;r.correct=0;r.ans={};});
+  return qs;
+}
+function crGo(){return CR.cfg.g==='mem'?crMemStart():crQStart();}
+function crQStart(){
+  const g=CR.cfg.g||'quiz',k=g==='trs'?'sents':(g==='trw'||g==='race')?'words':CR.cfg.kind;
+  if(!arCanPlay(k))return;
+  if(g==='race'&&arPool().length<4){toast('سباق المعاني يحتاج 4 كلمات على الأقل في قسم الكلمات');return;}
+  const qs=crGenQs(g,CR.cfg.n);
+  if(qs.length<2){toast('لا توجد كلمات أو جمل كافية لبناء أسئلة. أضف المزيد.');return;}
+  CR.game=g;CR.mem=null;CR.qs=qs;CR.qi=-1;CR.qT=CR.cfg.t;
+  Object.values(CR.stu).forEach(r=>{r.score=0;r.correct=0;r.ans={};r.mem=null;});
   crSendAll({t:'qstart',n:qs.length});crQNext();
 }
 function crQNext(){
@@ -13069,13 +13109,14 @@ function crQNext(){
 }
 function crReveal(){
   if(CR.qph!=='q')return;CR.qph='r';CR.qr0=Date.now();
-  const q=CR.qs[CR.qi],res={};
+  const q=CR.qs[CR.qi],res={},mul=CR.game==='race'?10:5;
   Object.values(CR.stu).forEach(r=>{
     const a=r.ans[CR.qi],ok=!!a&&a.k===q.a;let sc=0;
-    if(ok){sc=100+Math.ceil(Math.max(0,CR.qT-a.ms/1000)*5);r.score+=sc;r.correct++;}
+    if(ok){sc=100+Math.ceil(Math.max(0,CR.qT-a.ms/1000)*mul);r.score+=sc;r.correct++;}
     res[r.u]={ok:ok?1:0,s:sc,k:a?a.k:-1};
   });
-  crSendAll({t:'rev',i:CR.qi,a:q.a,res,b:crBoard(5)});
+  const at=q.lt?q.lt.L.join('').toLowerCase():q.tk?q.tk.full:'';
+  crSendAll({t:'rev',i:CR.qi,a:q.a,at,res,b:crBoard(5)});
   try{SND.ok();}catch(e){}crPaint();
 }
 function crQEnd(){
@@ -13083,7 +13124,20 @@ function crQEnd(){
   crSendAll({t:'end',b:CR.board});
   try{sfx('win');confetti();}catch(e){}crPaint();
 }
-function crQStop(){CR.qph='idle';CR.qi=-1;crSendAll({t:'qstop'});crPaint();}
+function crQStop(){CR.qph='idle';CR.qi=-1;CR.mem=null;crSendAll({t:'qstop'});crPaint();}
+function crMemStart(){
+  const P=arPool();if(P.length<3){toast('أضف 3 كلمات على الأقل في قسم الكلمات لتبدأ لعبة الذاكرة');return;}
+  const pairs=arShuf(P).slice(0,6).map(x=>[x.en,x.ar]);
+  CR.game='mem';CR.mem={pairs,T:CR.cfg.t,t0:Date.now()};CR.qph='mem';CR.qi=-1;CR.board=[];
+  Object.values(CR.stu).forEach(r=>{r.score=0;r.correct=0;r.ans={};r.mem=null;});
+  crSendAll({t:'qstart',n:0});crSendAll({t:'mem',pairs,T:CR.mem.T,left:CR.mem.T});
+  try{SND.q(0,1);}catch(e){}crPaint();
+}
+function crMemEnd(){
+  if(CR.qph!=='mem')return;CR.qph='end';CR.board=crBoard(50);
+  crSendAll({t:'end',b:CR.board});
+  try{sfx('win');confetti();}catch(e){}crPaint();
+}
 function crTick(){
   if(CR.role!=='t')return;
   if(CR.qph==='q'){
@@ -13091,6 +13145,68 @@ function crTick(){
     const b=document.getElementById('crTb');if(b)b.style.width=Math.max(0,left/CR.qT*100)+'%';
     if(left<=0)crReveal();
   }else if(CR.qph==='r'&&Date.now()-CR.qr0>=3800)crQNext();
+  else if(CR.qph==='mem'&&CR.mem){
+    const left=CR.mem.T-(Date.now()-CR.mem.t0)/1000,el=document.getElementById('crTm');if(el)el.textContent=Math.max(0,Math.ceil(left));
+    const b=document.getElementById('crTb');if(b)b.style.width=Math.max(0,left/CR.mem.T*100)+'%';
+    if(left<=-4)crMemEnd();
+  }
+}
+/* student-side memory game + tile questions */
+function crMemInit(m){
+  const cards=[];(m.pairs||[]).forEach((p,k)=>{cards.push({k,s:'en',t:String(p[0])});cards.push({k,s:'ar',t:String(p[1])});});
+  CR.mg={T:m.T,t0:Date.now()-(m.T-(m.left||m.T))*1000,cards:arShuf(cards),open:[],done:{},mv:0,fin:false,lock:false,n:(m.pairs||[]).length,res:null};
+}
+function crMemTap(i){
+  const g=CR.mg;if(!g||g.fin||g.lock)return;const c=g.cards[i];if(!c||g.done[i]||g.open.includes(i))return;
+  g.open.push(i);try{SND.pick();if(c.s==='en')speak(c.t);}catch(e){}
+  if(g.open.length===2){
+    g.mv++;const a=g.cards[g.open[0]],b=g.cards[g.open[1]];
+    if(a.k===b.k){g.done[g.open[0]]=g.done[g.open[1]]=1;g.open=[];try{SND.ok();}catch(e){}if(Object.keys(g.done).length===g.cards.length){crMemFin(true);return;}}
+    else{g.lock=true;try{SND.un();}catch(e){}setTimeout(()=>{g.open=[];g.lock=false;crPaint();},800);}
+  }
+  crPaint();
+}
+function crMemFin(done){
+  const g=CR.mg;if(!g||g.fin)return;g.fin=true;
+  const n=Object.keys(g.done).length/2,ms=Date.now()-g.t0;g.res={n,ms,mv:g.mv,done:!!done};
+  crSend(CR.tconn,{t:'memres',n,ms,mv:g.mv,done:done?1:0});
+  if(done){try{sfx('win');}catch(e){}}crPaint();
+}
+function crMemHtml(){
+  const g=CR.mg;
+  const grid=g.cards.map((c,i)=>{const up=g.done[i]||g.open.includes(i);return `<button class="cr-mc ${up?'up':''} ${g.done[i]?'ok':''} ${c.s==='en'?'en':''}" data-act="cr_mc" data-i="${i}" ${up||g.fin?'disabled':''}>${up?esc(c.t):'?'}</button>`;}).join('');
+  return `<div class="cr-card"><div class="cr-h"><b>🧠 ذاكرة الكلمات</b>${g.fin?'':`<span class="cr-tmr"><b id="crTm" class="en">${g.T}</b></span>`}</div>${g.fin?'':'<div class="cr-bar"><i id="crTb"></i></div>'}
+   <small class="help">اقلب بطاقتين: كلمة ومعناها. الأسرع والأقل حركات يحصل على نقاط أكثر.</small>
+   <div class="cr-mg">${grid}</div>
+   <div class="cr-prog">الحركات <b class="en">${g.mv}</b> · المطابق <b class="en">${Object.keys(g.done).length/2}/${g.n}</b></div>
+   ${g.fin?`<div class="cr-wait">${g.res.done?'أحسنت! أنهيت اللعبة ✓':'انتهى الوقت'} — بانتظار بقية الطلاب…</div>`:''}</div>`;
+}
+function crLtHtml(c,rev){
+  const q=c.q,locked=c.k>=0||!!rev,f=CR.lf||[];
+  if(q.lt){
+    const cs=(ch,p)=>p===0?ch.toUpperCase():ch.toLowerCase(),L=q.lt.L,bl=q.lt.b,T=q.lt.t;
+    const arr=L.map((ch,p)=>{const j=bl.indexOf(p);return j<0?{fx:1,c:cs(ch,p)}:{fx:0,c:rev?cs(ch,p):(f[j]!=null?cs(T[f[j]],p):'')};});
+    const nx=locked?-1:arr.findIndex(x=>!x.fx&&!x.c);
+    const cls=rev?(rev.ok?'good':'bad'):(CR.lw!=null?'warn':'');
+    return `<div class="slots ${cls}" style="--n:${L.length}">${arr.map((x,ix)=>`<span class="slot ${x.fx?'fx':x.c?'fill':ix===nx?'next':''}">${esc(x.c)}</span>`).join('')}</div>
+     <div class="tiles2">${T.map((t,k)=>`<button class="lt ${CR.lw===k?'wrong':''}" data-act="cr_lt" data-i="${k}" ${f.includes(k)||locked?'disabled':''}>${esc(t.toLowerCase())}</button>`).join('')}</div>
+     ${CR.lw!=null&&!locked?`<div class="fb warn" role="alert">⚠ حرف خاطئ! جرّب حرفًا آخر (${CR.le}/3)</div>`:''}`;
+  }
+  const tk=q.tk;
+  return `<div class="answer ${rev?(rev.ok?'good':'bad'):''}">${f.map(i=>`<button class="chip" data-act="cr_lu" data-i="${i}" ${locked?'disabled':''}>${esc(tk.t[i])}</button>`).join('')}</div>
+   <div class="bank">${tk.o.map(i=>`<button class="chip ${f.includes(i)?'used':''}" data-act="cr_lc" data-i="${i}" ${locked?'disabled':''}>${esc(tk.t[i])}</button>`).join('')}</div>
+   ${locked?'':`<button class="btn" data-act="cr_lok" ${f.length===tk.t.length?'':'disabled'}>${ic('check')} تأكيد الإجابة</button>`}`;
+}
+function crLtAct(a,k){
+  const c=CR.cq;if(!c||c.k>=0||c.rev)return;const q=c.q,f=CR.lf=CR.lf||[];
+  if(a==='cr_lt'&&q.lt){
+    if(f.includes(k)||f.length>=q.lt.b.length)return;
+    if(q.lt.t[k]===q.lt.L[q.lt.b[f.length]]){f.push(k);CR.lw=null;try{SND.pick();}catch(e){}if(f.length===q.lt.b.length){crSAnswer(0);return;}}
+    else{try{SND.err();}catch(e){}CR.le++;CR.lw=k;if(CR.le>=3){crSAnswer(1);return;}setTimeout(()=>{if(CR.lw===k){CR.lw=null;crPaint();}},700);}
+  }else if(a==='cr_lc'&&q.tk){if(!f.includes(k)){f.push(k);try{SND.pick();}catch(e){}}}
+  else if(a==='cr_lu'&&q.tk){CR.lf=f.filter(x=>x!==k);try{SND.un();}catch(e){}}
+  else if(a==='cr_lok'&&q.tk){if(f.length===q.tk.t.length)crSAnswer(f.map(i=>q.tk.t[i]).join(' ')===q.tk.full?0:1);return;}
+  crPaint();
 }
 /* ---------- student ---------- */
 async function crSJoin(){
@@ -13143,25 +13259,26 @@ function crSData(m){
   }
   else if(m.t==='emo'){crFloat(m.n,m.e,m.p);}
   else if(m.t==='allow'){crSAllow(!!m.v);}
-  else if(m.t==='qstart'){CR.cq=null;CR.board=[];CR.qEnd=false;crPaint();}
+  else if(m.t==='qstart'){CR.cq=null;CR.mg=null;CR.board=[];CR.qEnd=false;crPaint();}
+  else if(m.t==='mem'){CR.cq=null;CR.qEnd=false;CR.board=[];crMemInit(m);crPaint();try{SND.q(0,1);}catch(e){}}
   else if(m.t==='q'){
-    CR.cq={i:m.i,n:m.n,T:m.T,t0:Date.now()-(m.T-(m.left||m.T))*1000,q:m.q,k:-1,rev:null};CR.qEnd=false;
+    CR.cq={i:m.i,n:m.n,T:m.T,t0:Date.now()-(m.T-(m.left||m.T))*1000,q:m.q,k:-1,rev:null};CR.qEnd=false;CR.mg=null;CR.lf=[];CR.lw=null;CR.le=0;
     crPaint();try{SND.q(m.i,m.n);}catch(e){}
     if(m.q.aud)setTimeout(()=>{try{speak(m.q.aud);}catch(e){}},400);
   }
   else if(m.t==='ack'){}
   else if(m.t==='rev'&&CR.cq&&CR.cq.i===m.i){
     const mine=(m.res||{})[crUid()]||{ok:0,s:0,k:-1};
-    CR.cq.rev={a:m.a,ok:!!mine.ok,s:mine.s,k:mine.k};CR.board=m.b||[];
+    CR.cq.rev={a:m.a,at:m.at||'',ok:!!mine.ok,s:mine.s,k:mine.k};CR.board=m.b||[];
     try{arFx(!!mine.ok);}catch(e){}crPaint();
   }
   else if(m.t==='end'){
-    CR.board=m.b||[];CR.qEnd=true;CR.cq=null;
+    CR.board=m.b||[];CR.qEnd=true;CR.cq=null;CR.mg=null;
     const me=CR.board.findIndex(x=>x.u===crUid());
     try{if(me>=0){const sc=CR.board[me].s,g=Math.min(30,Math.round(sc/40));if(g>0){arPay(g);CR.gain=g;}S.xp=(S.xp||0)+Math.min(20,Math.round(sc/60));save();sfx(me===0?'win':'ok');if(me===0)confetti();}}catch(e){}
     crPaint();
   }
-  else if(m.t==='qstop'){CR.cq=null;CR.qEnd=false;CR.board=[];crPaint();}
+  else if(m.t==='qstop'){CR.cq=null;CR.mg=null;CR.qEnd=false;CR.board=[];crPaint();}
   else if(m.t==='bye'){toast('أنهى المعلم غرفة الشرح');crSLeave(true);}
 }
 async function crSAllow(v){
@@ -13188,7 +13305,10 @@ function crSLeave(silent){
   crLivePill();
 }
 function crSTick(){
-  const c=CR.cq;if(CR.role!=='s'||!c||c.rev)return;
+  if(CR.role!=='s')return;
+  const g=CR.mg;
+  if(g&&!g.fin){const lf=g.T-(Date.now()-g.t0)/1000,e1=document.getElementById('crTm');if(e1)e1.textContent=Math.max(0,Math.ceil(lf));const b1=document.getElementById('crTb');if(b1)b1.style.width=Math.max(0,lf/g.T*100)+'%';if(lf<=0)crMemFin(false);return;}
+  const c=CR.cq;if(!c||c.rev)return;
   const left=c.T-(Date.now()-c.t0)/1000,el=document.getElementById('crTm');if(el)el.textContent=Math.max(0,Math.ceil(left));
   const b=document.getElementById('crTb');if(b)b.style.width=Math.max(0,left/c.T*100)+'%';
   if(c.k<0&&left>0&&left<=5){const s=Math.ceil(left);if(CR.lt!==s){CR.lt=s;try{s<=3?SND.warn(s):SND.tick();}catch(e){}}}
@@ -13303,32 +13423,48 @@ function crTBody(){
   const canScr=!!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia);
   const ctl=`<div class="cr-ctl c3">${canScr?`<button class="cr-cb ${CR.sharing&&CR.vk==='screen'?'on':''}" data-act="cr_share">${ic('blocks')}<span>${CR.sharing&&CR.vk==='screen'?'إيقاف الشاشة':'الشاشة'}</span></button>`:''}<button class="cr-cb ${CR.sharing&&CR.vk==='cam'?'on':''}" data-act="cr_cam"><span class="cr-ic">📷</span><span>${CR.sharing&&CR.vk==='cam'?'إيقاف الكاميرا':'الكاميرا'}</span></button><button class="cr-cb ${CR.micOn?'on':''}" data-act="cr_tmic">${ic('mic')}<span>${CR.mic?(CR.micOn?'كتم المايك':'تشغيل المايك'):'المايك'}</span></button></div>${CR.sharing&&CR.vk==='cam'?'<button class="pill" data-act="cr_flip" style="align-self:center">🔄 قلب الكاميرا</button>':''}${canScr?'':'<div class="help" style="text-align:center">مشاركة الشاشة غير متاحة على الموبايل — استخدم الكاميرا لتصوير السبورة أو الكتاب، أو افتح الغرفة من حاسوب لمشاركة الشاشة.</div>'}`;
   const kinds=[['mix','مختلط'],['words','كلمات'],['sents','جمل']];
+  const GM=[['quiz','🏆','مسابقة','أسئلة اختيار من متعدد من كلماتك وجملك','مسابقة','linear-gradient(135deg,#5b7cff,#a06bff)'],
+   ['race','⚡','سباق المعاني','أجب بسرعة، نقاط السرعة ×2','سرعة','linear-gradient(135deg,#ff7a6b,#ffb14d)'],
+   ['trw','✏️','تدريب الكلمات','ترتيب الحروف وإكمال الكلمة والمعنى','تمارين','linear-gradient(135deg,#27b384,#5fe3a8)'],
+   ['trs','🧩','تدريب الجمل','أكمل الجملة ورتّب كلماتها','جمل','linear-gradient(135deg,#ff9f45,#ffd166)'],
+   ['mem','🧠','ذاكرة الكلمات','طابق كل كلمة بمعناها بأقل حركات','ذاكرة','linear-gradient(135deg,#7f6cf5,#b8a2ff)']];
+  const G=CR.cfg.g||'quiz',ts={quiz:[10,15,20,30],race:[6,8,10,15],trw:[20,30,45,60],trs:[30,45,60,90],mem:[60,90,120,180]}[G],ns=G==='race'?[8,10,15,20]:[5,8,10,15];
   let qp;
-  if(CR.qph==='idle')qp=`<div class="cr-card"><div class="cr-h"><b>${ic('trophy')} مسابقة من كلماتك</b></div><small class="help">تُبنى الأسئلة تلقائيًا من الكلمات والجمل التي أضفتها.</small>
-    <div class="cr-cf"><span>النوع</span>${kinds.map(([k,t])=>`<button class="${CR.cfg.kind===k?'on':''}" data-act="cr_cfg" data-f="kind" data-v="${k}">${t}</button>`).join('')}</div>
-    <div class="cr-cf"><span>الأسئلة</span>${[5,8,10,15].map(n=>`<button class="${CR.cfg.n===n?'on':''}" data-act="cr_cfg" data-f="n" data-v="${n}">${n}</button>`).join('')}</div>
-    <div class="cr-cf"><span>الوقت</span>${[10,15,20,30].map(n=>`<button class="${CR.cfg.t===n?'on':''}" data-act="cr_cfg" data-f="t" data-v="${n}">${n} ث</button>`).join('')}</div>
-    <button class="btn" data-act="cr_qstart">${ic('trophy')} ابدأ المسابقة</button></div>`;
+  if(CR.qph==='idle')qp=`<button class="cr-fold ${CR.gOpen?'open':''}" data-act="cr_gfold" aria-expanded="${CR.gOpen?'true':'false'}"><span class="cr-fi">${ic('trophy')}</span><span class="cr-ft"><b>ألعاب وتدريبات للطلاب</b><small>٥ ألعاب جاهزة من كلماتك وجملك</small></span>${ic('chev')}</button>
+    ${CR.gOpen?`<div class="cr-gh">${GM.map(([k,em,t,d,tg,bg])=>`<button class="cr-gc ${G===k?'on':''}" data-act="cr_cfg" data-f="g" data-v="${k}" aria-pressed="${G===k}"><span class="cr-gt" style="background:${bg}"><i class="cr-gtag">${tg}</i><span class="cr-gem">${em}</span><u></u><u></u></span><span class="cr-gb"><b>${t}</b><small>${d}</small></span></button>`).join('')}</div>
+    <div class="cr-card cr-set"><div class="cr-h"><b>${GM.find(x=>x[0]===G)[1]} ${CRG[G]}</b></div>
+    ${G==='quiz'?`<div class="cr-cf"><span>النوع</span>${kinds.map(([k,t])=>`<button class="${CR.cfg.kind===k?'on':''}" data-act="cr_cfg" data-f="kind" data-v="${k}">${t}</button>`).join('')}</div>`:''}
+    ${G==='mem'?'':`<div class="cr-cf"><span>الأسئلة</span>${ns.map(n=>`<button class="${CR.cfg.n===n?'on':''}" data-act="cr_cfg" data-f="n" data-v="${n}">${n}</button>`).join('')}</div>`}
+    <div class="cr-cf"><span>الوقت</span>${ts.map(n=>`<button class="${CR.cfg.t===n?'on':''}" data-act="cr_cfg" data-f="t" data-v="${n}">${n} ث</button>`).join('')}</div>
+    <button class="btn" data-act="cr_qstart">${ic('trophy')} ابدأ ${CRG[G]}</button></div>`:''}`;
   else if(CR.qph==='end')qp=`<div class="cr-card"><div class="cr-h"><b>${ic('medal')} انتهت المسابقة</b></div>${crBoardHtml(CR.board,'الترتيب النهائي').replace('<div class="cr-card">','<div>').replace(/<\/div>$/,'')}<div class="pair"><button class="btn" data-act="cr_qstart">مسابقة جديدة</button><button class="btn ghost" data-act="cr_qstop">إغلاق</button></div></div>`;
-  else{
+  else if(CR.qph==='mem'&&CR.mem){
+    const on=Object.values(CR.stu).filter(r=>r.on),fin=on.filter(r=>r.mem).length;
+    qp=`<div class="cr-card"><div class="cr-h"><b>🧠 ذاكرة الكلمات</b><span class="cr-tmr"><b id="crTm" class="en">${CR.mem.T}</b></span></div><div class="cr-bar"><i id="crTb"></i></div>
+     <div class="cr-ans">${CR.mem.pairs.map(p=>`<span><b class="en">${esc(p[0])}</b> = ${esc(p[1])}</span>`).join('')}</div>
+     <div class="cr-prog">أنهى <b class="en">${fin}/${on.length}</b></div>
+     <div class="pair"><button class="btn" data-act="cr_memend">إنهاء وعرض الترتيب</button><button class="btn ghost" data-act="cr_qstop">إيقاف</button></div></div>`;
+  }else{
     const q=CR.qs[CR.qi]||{},on=Object.values(CR.stu).filter(r=>r.on),ans=on.filter(r=>r.ans[CR.qi]).length;
     qp=`<div class="cr-card"><div class="cr-h"><b>السؤال ${CR.qi+1}/${CR.qs.length}</b><span class="cr-tmr"><b id="crTm" class="en">${CR.qT}</b></span></div><div class="cr-bar"><i id="crTb"></i></div>
      <div class="cr-q"><small>${esc(q.lab||'')}</small>${q.em?`<div class="ar-em">${q.em}</div>`:''}<div class="cr-qb ${q.bigAr?'':'en'}">${esc(q.big||'')}</div>${q.sub?`<small>${esc(q.sub)}</small>`:''}</div>
-     <div class="cr-ans">${(q.opts||[]).map((o,k)=>`<span class="${CR.qph==='r'&&k===q.a?'ok':''}">${esc(o)}</span>`).join('')}</div>
+     <div class="cr-ans ${(q.lt||q.tk)?'one':''}">${(q.lt||q.tk)?(CR.qph==='r'?`<span class="ok en">${esc(q.lt?q.lt.L.join('').toLowerCase():q.tk.full)}</span>`:'<span>الطلاب يكوّنون الإجابة بأنفسهم…</span>'):(q.opts||[]).map((o,k)=>`<span class="${CR.qph==='r'&&k===q.a?'ok':''}">${esc(o)}</span>`).join('')}</div>
      <div class="cr-prog">أجاب <b class="en">${ans}/${on.length}</b>${CR.qph==='r'?' · عرض الإجابة':''}</div>
      <div class="pair">${CR.qph==='q'?'<button class="btn" data-act="cr_reveal">أظهر الإجابة</button>':'<button class="btn" data-act="cr_next">السؤال التالي</button>'}<button class="btn ghost" data-act="cr_qstop">إيقاف</button></div></div>`;
   }
-  return err+(CR.open?'':'<div class="busybox"><span class="spin"></span> جارٍ فتح الغرفة…</div>')+ctl+qp+(CR.qph==='q'||CR.qph==='r'?crBoardHtml(crBoard(5),'المتصدرون'):'')+crRosterHtml();
+  return err+(CR.open?'':'<div class="busybox"><span class="spin"></span> جارٍ فتح الغرفة…</div>')+ctl+qp+(CR.qph==='q'||CR.qph==='r'||CR.qph==='mem'?crBoardHtml(crBoard(8),'المتصدرون'):'')+crRosterHtml();
 }
 function crSBody(){
   const emo=`<div class="cr-emo">${CR_EMO.map(e=>`<button data-act="cr_emo" data-e="${e}" aria-label="${e}">${e}</button>`).join('')}</div>`;
   const ctl=`<div class="cr-ctl"><button class="cr-cb ${CR.hand?'on':''}" data-act="cr_hand" ${CR.allowed?'disabled':''}><span class="cr-ic">✋</span><span>${CR.hand?'تم رفع يدك':'ارفع يدك لتتحدث'}</span></button><button class="cr-cb ${CR.allowed?'on live':''}" ${CR.allowed?'':'disabled'} data-act="cr_smic">${ic('mic')}<span>${CR.allowed?'مايكك يعمل — تحدّث':'المايك مغلق'}</span></button></div>`;
   let qp='';const c=CR.cq;
-  if(c){
+  if(CR.mg)qp=crMemHtml();
+  else if(c){
     const q=c.q,sent=aoIsSent(q),rev=c.rev;
     qp=`<div class="cr-card"><div class="cr-h"><b>السؤال ${c.i+1}/${c.n}</b>${rev?`<span class="tag ${rev.ok?'ok':'bad'}">${rev.ok?'صحيح +'+rev.s:'خطأ'}</span>`:`<span class="cr-tmr"><b id="crTm" class="en">${c.T}</b></span>`}</div>${rev?'':'<div class="cr-bar"><i id="crTb"></i></div>'}
      <div class="cr-q"><small>${esc(q.lab||'')}</small>${q.em?`<div class="ar-em">${q.em}</div>`:''}${q.big?`<div class="cr-qb ${q.bigAr?'':'en'}">${esc(q.big)}</div>`:''}${q.sub?`<small>${esc(q.sub)}</small>`:''}${q.aud?`<button class="pill" data-act="speak" data-t="${esc(q.aud)}">${ic('speaker')} استمع</button>`:''}</div>
-     <div class="ap-opts ${sent?'list':'grid'}">${q.opts.map((o,k)=>{let cl='kx-o ap-o'+(q.en?' en':'');if(rev){if(k===rev.a)cl+=' right';else if(k===c.k)cl+=' wrong';else cl+=' dim';}else if(k===c.k)cl+=' pick';return `<button class="${cl}" data-act="cr_ans" data-k="${k}" ${c.k>=0||rev?'disabled':''}><span class="ap-ot">${esc(o)}</span></button>`;}).join('')}</div>
+     ${(q.lt||q.tk)?crLtHtml(c,rev):''}<div class="ap-opts ${sent?'list':'grid'}" style="${(q.lt||q.tk)?'display:none':''}">${q.opts.map((o,k)=>{let cl='kx-o ap-o'+(q.en?' en':'');if(rev){if(k===rev.a)cl+=' right';else if(k===c.k)cl+=' wrong';else cl+=' dim';}else if(k===c.k)cl+=' pick';return `<button class="${cl}" data-act="cr_ans" data-k="${k}" ${c.k>=0||rev?'disabled':''}><span class="ap-ot">${esc(o)}</span></button>`;}).join('')}</div>
+     ${rev&&rev.at?'<div class="cr-wait">الإجابة: <b class="en">'+esc(rev.at)+'</b></div>':''}
      ${!rev&&c.k>=0?'<div class="cr-wait">تم إرسال إجابتك ✓ بانتظار الباقين…</div>':''}</div>`;
   }else if(CR.qEnd){
     const i=CR.board.findIndex(x=>x.u===crUid());
@@ -13382,8 +13518,12 @@ document.addEventListener('click',e=>{
   else if(a==='cr_muteall')crMuteAll();
   else if(a==='cr_inv')crInvite(b.dataset.u);
   else if(a==='cr_invall')crInviteAll();
-  else if(a==='cr_cfg'){CR.cfg[b.dataset.f]=b.dataset.f==='kind'?b.dataset.v:+b.dataset.v;crPaint(true);}
-  else if(a==='cr_qstart')crQStart();
+  else if(a==='cr_cfg'){const f=b.dataset.f;if(f==='g'){CR.cfg.g=b.dataset.v;const d={quiz:[8,15],race:[10,8],trw:[8,30],trs:[6,45],mem:[0,90]}[b.dataset.v];CR.cfg.n=d[0]||CR.cfg.n;CR.cfg.t=d[1];}else CR.cfg[f]=f==='kind'?b.dataset.v:+b.dataset.v;crPaint(true);}
+  else if(a==='cr_lt'||a==='cr_lc'||a==='cr_lu'||a==='cr_lok')crLtAct(a,+b.dataset.i);
+  else if(a==='cr_mc')crMemTap(+b.dataset.i);
+  else if(a==='cr_memend')crMemEnd();
+  else if(a==='cr_qstart')crGo();
+  else if(a==='cr_gfold'){CR.gOpen=!CR.gOpen;crPaint(true);}
   else if(a==='cr_qstop')crQStop();
   else if(a==='cr_reveal')crReveal();
   else if(a==='cr_next'){if(CR.qph==='r')crQNext();}
@@ -13485,7 +13625,8 @@ document.addEventListener('click',async e=>{
   if(a==='ao_same'){AO.flt.same=!AO.flt.same;if(AO.v==='online')await aoFetchOnline();else render(true);return;}
   if(a==='ao_home'){aoReset(true);AO.v='home';AR.v='home';render(true);aoBgStart();return;}
   if(a==='ao_go'){if(need())return;AO.target=null;AO.stake=null;if(d.k==='friend'){AO.v='online';await aoFetchOnline();}else{AO.v='stake';AO.strip=[];render(true);aoFetchStrip();}return;}
-  if(a==='ao_ch'){AO.target=AO.online[+d.i];AO.stake=null;AO.v='stake';render(true);return;}
+  if(a==='ao_lt'){AO.listOpen=!AO.listOpen;render(true);return;}
+  if(a==='ao_ch'){AO.target=AO.online[+d.i];AO.listOpen=false;AO.stake=null;AO.v='stake';render(true);return;}
   if(a==='ao_stake'){AO.stake=+d.v;render(true);return;}
   if(a==='ao_send'){if(need())return;aoOpen(AO.target);return;}
   if(a==='ao_acc'){if(need())return;if(arCoins()<+d.st){toast('رصيدك لا يكفي للرهان');return;}try{AO.M=await arRpc('ar_accept',{p_id:d.id});AO.mine={};AO.paid=false;AO.v='wait';AO.inbox=[];render(true);}catch(er){toast(arErr(er));}return;}
