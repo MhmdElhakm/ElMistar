@@ -4923,31 +4923,38 @@
     quranAsrPromise = null,
     quranRun = 0,
     quranSession = null;
-  var tasmeeEngine = load('mq.tasmeeEngine', 'quran');
-  if (tasmeeEngine !== 'browser') tasmeeEngine = 'quran';
+  var tasmeeEngine = load('mq.tasmeeEngine', 'browser');
+  if (tasmeeEngine !== 'quran' && tasmeeEngine !== 'auto') tasmeeEngine = 'browser';
   var quranSupported = !!(window.WebAssembly && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 
   function loadQuranModel(onProgress) {
     if (window.QuranTasmeeTranscriber) return Promise.resolve(window.QuranTasmeeTranscriber);
     if (quranAsr) return Promise.resolve(quranAsr);
     if (quranAsrPromise) return quranAsrPromise;
-    var files = {};
-    quranAsrPromise = import(QURAN_LIB)
+    var files = {}, lastTick = Date.now(), idle = 0;
+    var watchdog = new Promise(function (_, no) {
+      idle = setInterval(function () {
+        if (Date.now() - lastTick > 45000) no(new Error('انتهت مهلة التحميل: تحقق من الإنترنت'));
+      }, 5000);
+    });
+    quranAsrPromise = Promise.race([watchdog, import(QURAN_LIB)])
       .then(function (lib) {
         try {
           lib.env.allowLocalModels = false;
         } catch (e) {}
-        return lib.pipeline('automatic-speech-recognition', QURAN_MODEL, {
+        lastTick = Date.now();
+        return Promise.race([watchdog, lib.pipeline('automatic-speech-recognition', QURAN_MODEL, {
           dtype: 'q8',
           device: 'wasm',
           progress_callback: function (p) {
+            lastTick = Date.now();
             if (!p || p.status !== 'progress' || !p.total) return;
             files[p.file] = { l: p.loaded, t: p.total };
             var l = 0, t = 0;
             Object.keys(files).forEach(function (k) { l += files[k].l; t += files[k].t; });
             if (onProgress && t) onProgress(Math.min(99, Math.round((l / t) * 100)));
           }
-        });
+        })]);
       })
       .then(function (pipe) {
         quranAsr = function (audio) {
@@ -4956,9 +4963,11 @@
           });
         };
         save('mq.quranModelReady', 1);
+        clearInterval(idle);
         return quranAsr;
       })
       .catch(function (e) {
+        clearInterval(idle);
         quranAsrPromise = null;
         throw e;
       });
@@ -5153,7 +5162,7 @@
         var Browser = window.SpeechRecognition || window.webkitSpeechRecognition;
         tasmeeRecognition = null;
         if (Browser) {
-          tasmeeStatus.textContent = 'تعذر تشغيل النموذج القرآني؛ استخدمنا تعرّف المتصفح بدلًا منه.';
+          tasmeeStatus.textContent = 'تعذر تشغيل النموذج القرآني (' + String((error && (error.message || error.name)) || 'خطأ').slice(0, 80) + ')؛ استخدمنا تعرّف المتصفح.';
           startBrowserTasmeeRecognition(Browser, true);
         } else {
           tasmeeStatus.textContent = 'تعذر تشغيل النموذج القرآني (يحتاج إنترنت في أول مرة).';
@@ -5162,23 +5171,51 @@
       });
   }
 
-  var tasmeeEngineSelect = $('tasmeeEngine');
-  if (tasmeeEngineSelect) {
-    if (!quranSupported) {
-      tasmeeEngine = 'browser';
-      tasmeeEngineSelect.value = 'browser';
-      var qo = tasmeeEngineSelect.querySelector('option[value="quran"]');
-      if (qo) qo.disabled = true;
-    } else tasmeeEngineSelect.value = tasmeeEngine;
-    tasmeeEngineSelect.addEventListener('change', function () {
-      tasmeeEngine = tasmeeEngineSelect.value === 'browser' ? 'browser' : 'quran';
-      save('mq.tasmeeEngine', tasmeeEngine);
-      if (tasmeeListening) stopTasmeeRecognition();
+  function syncEngineUi() {
+    document.querySelectorAll('.eng-opt').forEach(function (b) {
+      var on = b.getAttribute('data-eng') === tasmeeEngine;
+      b.setAttribute('aria-checked', String(on));
+      if (!quranSupported && b.getAttribute('data-eng') !== 'browser') b.disabled = true;
     });
+    var st = $('quranModelStatus');
+    if (st && !st.getAttribute('data-busy'))
+      st.textContent = !quranSupported ? 'النموذج القرآني غير مدعوم في هذا المتصفح' : load('mq.quranModelReady', 0) ? 'النموذج القرآني: منزَّل وجاهز ✓' : 'النموذج القرآني: غير منزَّل';
   }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.eng-opt');
+    if (!b || b.disabled) return;
+    tasmeeEngine = b.getAttribute('data-eng');
+    save('mq.tasmeeEngine', tasmeeEngine);
+    if (tasmeeListening) stopTasmeeRecognition();
+    syncEngineUi();
+    if (tasmeeEngine === 'quran' && !load('mq.quranModelReady', 0)) toast('نزّل النموذج من الزر أدناه قبل استخدامه');
+  });
+  var modelTest = $('quranModelTest'), modelDel = $('quranModelDel');
+  if (modelTest)
+    modelTest.addEventListener('click', function () {
+      var st = $('quranModelStatus');
+      st.setAttribute('data-busy', '1');
+      modelTest.disabled = true;
+      st.textContent = 'جارٍ تنزيل النموذج…';
+      loadQuranModel(function (pct) { st.textContent = 'تنزيل النموذج ' + pct + '%'; })
+        .then(function (fn) { return fn(new Float32Array(16000)).then(function () { st.removeAttribute('data-busy'); syncEngineUi(); toast('النموذج القرآني جاهز'); }); })
+        .catch(function (err) {
+          st.textContent = 'فشل: ' + String((err && (err.message || err.name)) || err).slice(0, 140);
+        })
+        .then(function () { modelTest.disabled = false; st.removeAttribute('data-busy'); });
+    });
+  if (modelDel)
+    modelDel.addEventListener('click', function () {
+      quranAsr = null; quranAsrPromise = null;
+      try { save('mq.quranModelReady', 0); } catch (e) {}
+      (window.caches ? caches.keys() : Promise.resolve([])).then(function (ks) {
+        return Promise.all(ks.filter(function (k) { return /transformers/i.test(k); }).map(function (k) { return caches.delete(k); }));
+      }).then(function () { syncEngineUi(); toast('حُذف النموذج المنزَّل'); });
+    });
+  syncEngineUi();
 
   function startTasmeeRecognition() {
-    if (tasmeeEngine === 'quran' && quranSupported) {
+    if (quranSupported && (tasmeeEngine === 'quran' || (tasmeeEngine === 'auto' && load('mq.quranModelReady', 0)))) {
       startQuranTasmee();
       return;
     }
@@ -5605,7 +5642,6 @@
   professionalizeSelect(tasmeeSurah);
   professionalizeSelect(tasmeeFrom);
   professionalizeSelect(tasmeeTo);
-  professionalizeSelect($('tasmeeEngine'));
   professionalizeSelect(reciterSelect);
   professionalizeSelect(recitationSurah);
   professionalizeSelect(recitationRepeat);
@@ -12511,6 +12547,15 @@
         if (n) fzBody.appendChild(n);
       });
       cz.after(fz);
+      var tsc = document.getElementById('tasmeeSettingsCard');
+      if (tsc) {
+        var tz = document.createElement('details');
+        tz.className = 'settings-card customize-card';
+        tz.id = 'tasmeeSettingsGroup';
+        tz.innerHTML = '<summary class="settings-card-head"><span aria-hidden="true">🎙️</span><span>إعدادات التسميع</span><span class="cz-chev" aria-hidden="true">‹</span></summary><div class="cz-body"></div>';
+        tz.querySelector('.cz-body').appendChild(tsc);
+        fz.after(tz);
+      }
     }
     document.getElementById('guideOpenBtn').addEventListener('click', function () { open('full'); });
     document.getElementById('guideTourBtn').addEventListener('click', function () {

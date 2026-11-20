@@ -575,6 +575,19 @@
               <p class="install-app-help icon-style-note">لتحديث أيقونة الشاشة الرئيسية بعد التغيير: احذف التطبيق المثبّت وثبّته من جديد.</p>
             </div>
 
+            <div class="settings-card" id="tasmeeSettingsCard">
+              <div class="settings-card-head"><span aria-hidden="true">🎙️</span><span>طريقة التعرّف في التسميع</span></div>
+              <div class="eng-opts" role="radiogroup" aria-label="طريقة التعرّف">
+                <button type="button" class="eng-opt" role="radio" data-eng="browser" aria-checked="true"><b>تعرّف المتصفح</b><small>سريع، يحتاج إنترنت، دقته أقل</small></button>
+                <button type="button" class="eng-opt" role="radio" data-eng="quran" aria-checked="false"><b>النموذج القرآني</b><small>أدق، يعمل داخل الجهاز بعد تنزيله (~120MB)</small></button>
+                <button type="button" class="eng-opt" role="radio" data-eng="auto" aria-checked="false"><b>تلقائي</b><small>القرآني إن كان منزَّلًا، وإلا المتصفح</small></button>
+              </div>
+              <div class="eng-model">
+                <span id="quranModelStatus" role="status">النموذج القرآني: غير منزَّل</span>
+                <div class="eng-btns"><button type="button" class="acct-btn" id="quranModelTest">تنزيل واختبار النموذج</button><button type="button" class="acct-btn out" id="quranModelDel">حذف</button></div>
+              </div>
+            </div>
+
             <div class="settings-card" id="tajweedLegendSettingsCard" hidden>
               <div class="settings-card-head">
                 <span aria-hidden="true">🎨</span>
@@ -826,15 +839,6 @@
                     <label for="tasmeeTo"
                       >إلى آية
                       <select id="tasmeeTo" aria-label="آخر آية للتسميع"></select>
-                    </label>
-                  </div>
-                  <div class="recitation-range tasmee-engine-row">
-                    <label for="tasmeeEngine"
-                      >طريقة التعرّف
-                      <select id="tasmeeEngine" aria-label="طريقة التعرّف الصوتي">
-                        <option value="quran">نموذج قرآني (أدق، يعمل داخل الجهاز)</option>
-                        <option value="browser">تعرّف المتصفح (أسرع، يحتاج إنترنت)</option>
-                      </select>
                     </label>
                   </div>
                   <div class="tasmee-actions">
