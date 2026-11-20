@@ -277,6 +277,7 @@
   const state = {
     tasks: cleanTasks(data && data.tasks),
     view: 'tasks',
+    collapsed: true,
     profile: {
       totalPoints:
         data && data.profile && Number.isSafeInteger(Number(data.profile.totalPoints)) && Number(data.profile.totalPoints) >= 0
@@ -918,6 +919,7 @@
           .app{padding:12px;display:grid;gap:12px}
           .hero{position:relative;overflow:hidden;padding:15px;border:1px solid color-mix(in srgb,var(--green) 25%,var(--line));border-radius:16px;background:linear-gradient(145deg,color-mix(in srgb,var(--green) 12%,var(--panel)),var(--card));}
           .hero:after{content:"";position:absolute;inset:auto -25px -48px auto;width:110px;height:110px;border:1px solid color-mix(in srgb,var(--green) 22%,transparent);border-radius:50%;box-shadow:0 0 0 14px color-mix(in srgb,var(--green) 5%,transparent),0 0 0 29px color-mix(in srgb,var(--green) 4%,transparent)}
+          .hero-toggle{cursor:pointer;-webkit-tap-highlight-color:transparent}.hero-toggle .hero-title{position:relative;z-index:1}.hero-chev{margin-inline-start:auto;font-size:26px;line-height:1;color:var(--green);transition:transform .2s}.app:not(.is-collapsed) .hero-chev{transform:rotate(-90deg)}.app.is-collapsed>:not(.hero){display:none!important}
           .hero-title{display:flex;align-items:center;gap:10px}.hero-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:color-mix(in srgb,var(--green) 13%,var(--panel));font-size:22px}
           h3,h4,p{margin:0}.hero h3{font-size:16px}.hero p{margin-top:3px;color:var(--muted);font-size:12px}
           .switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:4px;gap:4px;border:1px solid var(--line);border-radius:12px;background:var(--panel-top)}
@@ -979,8 +981,8 @@
           .manage-actions{display:grid;gap:8px}.secondary{min-height:42px;border:1px solid color-mix(in srgb,var(--green) 35%,var(--line));border-radius:12px;background:color-mix(in srgb,var(--green) 7%,var(--card));color:var(--green);font-weight:800}
           @media(max-width:360px){.app{padding:9px}.stats{gap:4px}.icon-grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
         </style>
-        <main class="app">
-          <header class="hero"><div class="hero-title"><span class="hero-icon">🌿</span><div><h3>رتّب يومك واطمئن</h3><p>خطوات صغيرة، وأوقات مباركة</p></div></div></header>
+        <main class="app${state.collapsed ? ' is-collapsed' : ''}">
+          <header class="hero hero-toggle" data-action="toggle-tasks" role="button" tabindex="0" aria-expanded="${state.collapsed ? 'false' : 'true'}"><div class="hero-title"><span class="hero-icon">🌿</span><div><h3>رتّب يومك واطمئن</h3><p>خطوات صغيرة، وأوقات مباركة</p></div><span class="hero-chev" aria-hidden="true">‹</span></div></header>
           <div class="switch" role="tablist" aria-label="المهام وإدارتها">
             <button type="button" role="tab" data-action="view" data-view="tasks" aria-pressed="${state.view === 'tasks'}"><svg class="switch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M8.5 12l2.2 2.2 4.8-4.8M8.5 17h7"/></svg><span>مهام اليوم</span></button>
             <button type="button" role="tab" data-action="view" data-view="manage" aria-pressed="${state.view === 'manage'}"><svg class="switch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg><span>إدارة المهام</span></button>
@@ -1088,7 +1090,7 @@
     save();
   });
   root.addEventListener('click', event => {
-    const button = event.target.closest('button[data-action]');
+    const button = event.target.closest('button[data-action],.hero-toggle');
     if (!button) return;
     captureForm();
     const action = button.dataset.action;
@@ -1163,6 +1165,9 @@
       }
     } else if (action === 'export-app-data') {
       exportAppData();
+    } else if (action === 'toggle-tasks') {
+      state.collapsed = !state.collapsed;
+      render();
     } else if (action === 'toggle-form') {
       if (state.editingId) {
         state.editingId = '';
@@ -6395,11 +6400,13 @@
   });
 
   var appServiceView = $('appServiceView'),
-    appServiceContent = $('appServiceContent'),
-    appServiceTitle = $('appServiceTitle'),
-    appServiceStatus = $('appServiceStatus'),
-    appServicePrayer = $('appServicePrayer'),
-    appServiceClose = $('appServiceClose'),
+    appServiceContent = $('svcContent'),
+    appServiceTitle = $('svcTitle'),
+    appServiceStatus = $('svcStatus'),
+    appServicePrayer = $('svcPrayer'),
+    appServiceClose = $('svcClose'),
+    svcPanel = $('svcPanel'),
+    activeSvc = '',
     appServiceReturnFocus = null,
     previousBodyOverflow = '',
     appServiceCleanup = null;
@@ -6408,26 +6415,29 @@
     radio: { title: 'إذاعة القرآن الكريم', status: 'البث المباشر يحتاج إلى اتصال بالإنترنت' },
     khatma: { title: 'ختمتي', status: 'خطّة ختمة بورد يومي وتذكير بالإشعارات' }
   };
+  function syncSvcCards() {
+    document.querySelectorAll('[data-app-service]').forEach(function (b) {
+      var on = b.getAttribute('data-app-service') === activeSvc;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-expanded', String(on));
+    });
+  }
+  /* الخدمات تُعرض الآن داخل نفس القسم كقائمة مطوية أسفل البطاقتين، وفتح الأخرى يطوي الأولى */
   function closeAppService() {
-    if (appServiceView.hidden) return;
-    if (window.QuranPrayerTimes) window.QuranPrayerTimes.close();
+    if (!activeSvc) return;
+    if (window.QuranPrayerTimes) {
+      try { window.QuranPrayerTimes.close(); } catch (e) {}
+    }
     if (appServiceCleanup) {
-      appServiceCleanup();
+      try { appServiceCleanup(); } catch (e) {}
       appServiceCleanup = null;
     }
+    appServiceContent.textContent = '';
     appServiceContent.hidden = true;
     appServicePrayer.hidden = true;
-    appServiceView.hidden = true;
-    document.body.style.overflow = previousBodyOverflow;
-    var returnFocus = appServiceReturnFocus;
-    openD();
-    show('settings');
-    if (returnFocus && returnFocus.isConnected) {
-      requestAnimationFrame(function () {
-        returnFocus.focus();
-      });
-    }
-    appServiceReturnFocus = null;
+    svcPanel.hidden = true;
+    activeSvc = '';
+    syncSvcCards();
   }
   function openAppService(key, trigger) {
     var service = appServices[key];
@@ -6436,13 +6446,19 @@
       if (window.QuranKhatma) window.QuranKhatma.reveal();
       return;
     }
-    appServiceReturnFocus = trigger;
+    if (activeSvc === key) {
+      closeAppService();
+      return;
+    }
+    closeAppService();
+    activeSvc = key;
     appServiceTitle.textContent = service.title;
     appServiceStatus.textContent = service.status;
-    appServiceView.hidden = false;
-    previousBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    closeD();
+    svcPanel.hidden = false;
+    syncSvcCards();
+    function reveal() {
+      try { svcPanel.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+    }
     if (key === 'prayer') {
       appServiceContent.hidden = true;
       appServicePrayer.hidden = false;
@@ -6453,24 +6469,11 @@
       window.QuranPrayerTimes.open(appServicePrayer, function (message) {
         appServiceStatus.textContent = message;
       });
-      appServiceClose.focus();
+      reveal();
       return;
     }
     appServicePrayer.hidden = true;
     appServiceContent.hidden = false;
-    if (key === 'khatma') {
-      if (!window.QuranKhatma) {
-        appServiceStatus.textContent = 'تعذر تحميل خدمة الختمة. أعد تحميل التطبيق.';
-        return;
-      }
-      appServiceContent.style.overflow = 'auto';
-      appServiceCleanup = window.QuranKhatma.mount(appServiceContent, function (message) {
-        appServiceStatus.textContent = message;
-      });
-      appServiceClose.focus();
-      return;
-    }
-    appServiceContent.style.overflow = '';
     if (!window.QuranIntegratedServices) {
       appServiceStatus.textContent = 'تعذر تحميل الخدمة المدمجة. أعد تحميل التطبيق.';
       return;
@@ -6483,7 +6486,7 @@
         'تعذر فتح الخدمة: ' + (error && error.message ? error.message : 'خطأ غير معروف');
       throw error;
     }
-    appServiceClose.focus();
+    reveal();
   }
   paneSettings.addEventListener('click', function (event) {
     var trigger = event.target.closest('[data-app-service]');
@@ -6548,7 +6551,9 @@
   };
   window.QuranOpenService = function (key) {
     if (!appServices[key]) return;
-    if (!appServiceView.hidden) closeAppService();
+    openD();
+    show('settings');
+    if (activeSvc === key) return;
     openAppService(key, null);
   };
   appServiceView.addEventListener('keydown', function (event) {
@@ -7859,7 +7864,26 @@
       (key === 'radio'
         ? ':host{display:flex;justify-content:center;align-items:center;width:100%;max-width:100%;min-width:0}' +
           ':host .integrated-service-root{display:grid;place-items:center;width:100%;min-width:0}' +
-          ':host .integrated-service-root>.app{width:min(100%,430px);margin:0 auto}'
+          ':host .integrated-service-root>.app{width:100%!important;max-width:100%!important;height:min(76vh,600px)!important;min-height:420px;max-height:none!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;background:transparent!important}' +
+          ':host .integrated-service-root>.app>.home{position:absolute!important;inset:0!important;padding:10px 10px 72px!important;overflow-y:auto!important;scrollbar-width:none;-ms-overflow-style:none}' +
+          ':host .home::-webkit-scrollbar,:host .sheet-body::-webkit-scrollbar{display:none;width:0;height:0}:host .sheet-body{scrollbar-width:none;padding:2px 10px 84px}' +
+          ':host .hero{padding:12px 12px 12px;border-radius:16px}:host .livepill{font-size:10.5px;top:10px;left:12px}' +
+          ':host .hero-row{gap:10px;margin-top:8px}:host .logo{width:56px;height:56px}' +
+          ':host .now small{font-size:10.5px}:host .now h2{font-size:16px;line-height:1.4}:host .now p{font-size:11.5px}' +
+          ':host .eq{margin-top:4px;height:16px}' +
+          ':host .bigplay{height:42px;margin-top:12px;font-size:14px;border-radius:12px;gap:8px}:host .bigplay svg{width:18px;height:18px}' +
+          ':host .grid{gap:8px;margin-top:8px}' +
+          ':host .tile{padding:9px 11px;border-radius:14px;column-gap:10px}:host .tile .ico{width:38px;height:38px;border-radius:11px}:host .tile .ico svg{width:20px;height:20px}' +
+          ':host .tile h3{font-size:13.5px;line-height:1.35}:host .tile .sub{font-size:11px;line-height:1.35}' +
+          ':host .recrow,:host .chips{margin-top:9px}:host .recbtn{height:38px;font-size:13px;border-radius:11px}:host .roundbtn{width:38px;height:38px;border-radius:11px}:host .roundbtn svg{width:18px;height:18px}' +
+          ':host .chips{gap:6px}:host .chip{height:34px;font-size:12px;border-radius:10px}' +
+          ':host .sheet-h{padding:12px 12px 8px;gap:10px}:host .sheet-h h2{font-size:16px}:host .back{width:34px;height:34px;border-radius:11px}:host .back svg{width:18px;height:18px}' +
+          ':host .list{gap:8px}:host .st{padding:9px 10px;gap:10px;border-radius:14px}:host .st .ic{width:36px;height:36px;border-radius:11px}:host .st .ic svg{width:20px;height:20px}' +
+          ':host .st b{font-size:13px}:host .st span{font-size:11px}:host .st .go{width:28px;height:28px}:host .fav{width:32px;height:32px}:host .fav svg{width:19px;height:19px}' +
+          ':host .lib{padding:12px;border-radius:16px}:host .lib-top h3{font-size:14px}:host .addbtn{padding:6px 11px;font-size:12px;border-radius:10px}:host .hint2{font-size:11px}' +
+          ':host .lt .nm{font-size:12.5px}:host .lt .pb,:host .lt .rm,:host .lt .dl{width:30px;height:30px}:host .empty{font-size:12px}' +
+          ':host .mini{inset-inline:10px;bottom:10px;padding:8px 10px;border-radius:14px;gap:10px}:host .mini .mi{width:34px;height:34px}:host .mini .mt small{font-size:10px}:host .mini .mt b{font-size:12.5px}:host .mini .mp{width:36px;height:36px}' +
+          ':host .offbar{font-size:11.5px;padding:8px 10px}:host .toast{font-size:12px;padding:9px 12px}'
         : '') +
       (key === 'radio'
         ? ':host{--bg:var(--panel,#f5f8fb);--ink:inherit;--muted:inherit;--line:inherit;--blue:var(--green,#14634a);--blue2:color-mix(in srgb,var(--green,#14634a) 78%,#123);--blue-soft:color-mix(in srgb,var(--green,#14634a) 12%,var(--panel,#fff));}' +
@@ -12208,6 +12232,17 @@
         if (n) czBody.appendChild(n);
       });
       c.after(cz);
+      /* إعدادات تقليب الصفحات: قسم مطوي أسفل «تخصيص المصحف» */
+      var fz = document.createElement('details');
+      fz.className = 'settings-card customize-card';
+      fz.id = 'flipSettingsCard';
+      fz.innerHTML = '<summary class="settings-card-head"><span aria-hidden="true">📖</span><span>إعدادات تقليب الصفحات</span><span class="cz-chev" aria-hidden="true">‹</span></summary><div class="cz-body"></div>';
+      var fzBody = fz.querySelector('.cz-body');
+      ['pageModeCard', 'flipCard', 'flipSoundCard'].forEach(function (id) {
+        var n = document.getElementById(id);
+        if (n) fzBody.appendChild(n);
+      });
+      cz.after(fz);
     }
     document.getElementById('guideOpenBtn').addEventListener('click', function () { open('full'); });
     document.getElementById('guideTourBtn').addEventListener('click', function () {
@@ -12349,4 +12384,179 @@
     try { var tm = s === 'black' ? 'تم اختيار الأيقونة السوداء' : 'تم اختيار الأيقونة الخضراء'; (window.MushafRuntime && window.MushafRuntime.toast) ? window.MushafRuntime.toast(tm) : toast(tm); } catch (x) {}
   });
   if (get() === 'black') apply('black'); else apply('green');
+})();
+
+/* ===== تسجيل الدخول بالاسم ورقم الهاتف (بدون تحقق) + حفظ التقدم في Firestore ===== */
+(function () {
+  var KEY = 'mq.account';
+  var SDK = '10.12.2';
+  var CFG = {
+    apiKey: 'AIzaSyCM41g90JX0Q0L9tBDrGO2VkqltRJmk9_M',
+    authDomain: 'qurany-pro.firebaseapp.com',
+    projectId: 'qurany-pro',
+    storageBucket: 'qurany-pro.firebasestorage.app',
+    messagingSenderId: '363693622415',
+    appId: '1:363693622415:web:9eb88d7cb6690a09a3dcfa'
+  };
+  var MAX_BYTES = 900000;
+  function load() { try { var v = JSON.parse(localStorage.getItem(KEY) || 'null'); return v && v.name && v.phone ? v : null; } catch (e) { return null; } }
+  function save(v) { try { if (v) localStorage.setItem(KEY, JSON.stringify(v)); else localStorage.removeItem(KEY); } catch (e) {} }
+  function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function digits(t) {
+    return String(t).replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 1632; }).replace(/[۰-۹]/g, function (d) { return d.charCodeAt(0) - 1776; });
+  }
+  function notify(m) {
+    try { if (window.MushafRuntime && window.MushafRuntime.toast) window.MushafRuntime.toast(m); } catch (e) {}
+  }
+  var host = document.getElementById('settingsBody');
+  if (!host || document.getElementById('accountCard')) return;
+
+  /* ---------- السحابة ---------- */
+  var scripts = {}, fb = null, sdkP = null;
+  function loadScript(src) {
+    if (scripts[src]) return Promise.resolve();
+    return new Promise(function (ok, no) {
+      var el = document.createElement('script'), t = setTimeout(function () { el.remove(); no(new Error('timeout')); }, 20000);
+      el.src = src; el.async = false;
+      el.onload = function () { clearTimeout(t); scripts[src] = 1; ok(); };
+      el.onerror = function () { clearTimeout(t); el.remove(); no(new Error('load')); };
+      document.head.appendChild(el);
+    });
+  }
+  function connect() {
+    if (navigator.onLine === false) return Promise.reject(new Error('offline'));
+    if (fb) return Promise.resolve(fb);
+    if (!sdkP) {
+      sdkP = ['app', 'auth', 'firestore'].reduce(function (p, n) {
+        return p.then(function () { return window.firebase && firebase[n] && n !== 'app' ? 0 : loadScript('https://www.gstatic.com/firebasejs/' + SDK + '/firebase-' + n + '-compat.js'); });
+      }, Promise.resolve()).then(function () {
+        if (!firebase.apps.length) firebase.initializeApp(CFG);
+        var auth = firebase.auth();
+        return new Promise(function (ok, no) {
+          var un = auth.onAuthStateChanged(function (u) { un(); ok(u); }, no);
+        }).then(function (u) { return u || auth.signInAnonymously().then(function (r) { return r.user; }); })
+          .then(function () { fb = firebase.firestore(); return fb; });
+      }).catch(function (e) { sdkP = null; throw e; });
+    }
+    return sdkP;
+  }
+  function docId(phone) {
+    var norm = phone.replace(/\D/g, '');
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode('huda|' + norm)).then(function (b) {
+      return 'p_' + Array.prototype.map.call(new Uint8Array(b), function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
+    });
+  }
+  function appKey(k) {
+    return k === 'quran_tasks_v1' || k === 'baytna_v2' || k.indexOf('quran_') === 0 || k.indexOf('tq_') === 0 ||
+      (k.indexOf('mq.') === 0 && k !== 'mq.offlineReady' && k !== 'mq.pagesPreparedV2' && k !== KEY && k !== 'mq.cloudLast');
+  }
+  function snapshot() {
+    var d = {};
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && appKey(k)) d[k] = localStorage.getItem(k);
+    }
+    return JSON.stringify(d);
+  }
+  var lastSent = '', busy = false;
+  function errText(e) {
+    var c = e && e.code;
+    if (c === 'permission-denied') return 'صلاحيات Firestore لا تسمح بالحفظ (راجع القواعد في README).';
+    if (e && e.message === 'offline') return 'لا يوجد اتصال بالإنترنت.';
+    return 'تعذر الاتصال بالسحابة، ستُعاد المحاولة لاحقًا.';
+  }
+  function setStatus(t, bad) {
+    var el = document.getElementById('acctSync');
+    if (el) { el.textContent = t; el.style.color = bad ? '#c0392b' : ''; }
+  }
+  function push(force) {
+    var a = load();
+    if (!a || busy) return Promise.resolve();
+    var snap = snapshot();
+    if (!force && snap === lastSent) return Promise.resolve();
+    if (snap.length > MAX_BYTES) { setStatus('حجم البيانات كبير على الحفظ السحابي.', true); return Promise.resolve(); }
+    busy = true;
+    return Promise.all([connect(), docId(a.phone)]).then(function (r) {
+      return r[0].collection('accounts').doc(r[1]).set({ name: a.name, data: snap, updatedAt: Date.now() }, { merge: true });
+    }).then(function () {
+      lastSent = snap;
+      var t = Date.now();
+      try { localStorage.setItem('mq.cloudLast', String(t)); } catch (e) {}
+      setStatus('☁ تم الحفظ السحابي ' + new Date(t).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }));
+    }).catch(function (e) { setStatus(errText(e), true); }).then(function () { busy = false; });
+  }
+  function fetchRemote(a) {
+    return Promise.all([connect(), docId(a.phone)]).then(function (r) {
+      return r[0].collection('accounts').doc(r[1]).get();
+    });
+  }
+  function restore(data) {
+    try {
+      var obj = JSON.parse(data);
+      Object.keys(obj).forEach(function (k) { if (appKey(k) && typeof obj[k] === 'string') localStorage.setItem(k, obj[k]); });
+      return true;
+    } catch (e) { return false; }
+  }
+
+  /* ---------- الواجهة ---------- */
+  var card = document.createElement('div');
+  card.className = 'settings-card account-card';
+  card.id = 'accountCard';
+  host.insertBefore(card, host.firstChild);
+  function draw(err, n0, p0) {
+    var a = load();
+    if (a) {
+      var last = 0; try { last = +localStorage.getItem('mq.cloudLast') || 0; } catch (e) {}
+      card.innerHTML =
+        '<div class="settings-card-head"><span aria-hidden="true">👤</span><span>حسابي</span><span class="st-val">مسجَّل</span></div>' +
+        '<p class="acct-hello">مرحبًا ' + esc(a.name) + '</p>' +
+        '<p class="acct-note" dir="ltr" style="text-align:right">' + esc(a.phone) + '</p>' +
+        '<p class="acct-note" id="acctSync">' + (last ? '☁ آخر حفظ سحابي ' + new Date(last).toLocaleString('ar-EG') : '☁ لم يُحفظ بعد') + '</p>' +
+        '<div class="acct-row"><button type="button" class="acct-btn" id="acctPush">حفظ التقدم الآن</button><button type="button" class="acct-btn out" id="acctPull">استعادة من السحابة</button></div>' +
+        '<p class="acct-note">يُحفظ تقدمك (الختمة والعلامات والمهام والإعدادات) تلقائيًا في السحابة برقم هاتفك، وتستعيده على أي جهاز بتسجيل الدخول بنفس الرقم. لا يوجد تحقق من الهاتف.</p>' +
+        '<button type="button" class="acct-btn out" id="acctOut">تسجيل الخروج</button>';
+      card.querySelector('#acctOut').addEventListener('click', function () { push(true).then(function () { save(null); draw(); }); });
+      card.querySelector('#acctPush').addEventListener('click', function () { setStatus('جارٍ الحفظ…'); push(true); });
+      card.querySelector('#acctPull').addEventListener('click', function () {
+        setStatus('جارٍ الاستعادة…');
+        fetchRemote(a).then(function (s) {
+          if (!s.exists || !s.data().data) return setStatus('لا يوجد تقدم محفوظ لهذا الرقم.');
+          if (!confirm('سيُستبدل تقدمك على هذا الجهاز بالنسخة السحابية. متابعة؟')) return setStatus('أُلغيت الاستعادة.');
+          if (restore(s.data().data)) location.reload(); else setStatus('بيانات السحابة غير صالحة.', true);
+        }).catch(function (e) { setStatus(errText(e), true); });
+      });
+    } else {
+      card.innerHTML =
+        '<div class="settings-card-head"><span aria-hidden="true">👤</span><span>تسجيل الدخول</span><span class="st-val">لحفظ التقدم</span></div>' +
+        '<label class="acct-field">الاسم<input id="acctName" type="text" autocomplete="name" maxlength="40" value="' + esc(n0 || '') + '" /></label>' +
+        '<label class="acct-field">رقم الهاتف<input id="acctPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" dir="ltr" value="' + esc(p0 || '') + '" /></label>' +
+        (err ? '<div class="acct-err" role="alert">' + esc(err) + '</div>' : '') +
+        '<button type="button" class="acct-btn" id="acctIn">تسجيل الدخول</button>' +
+        '<p class="acct-note" id="acctSync">بدون كلمة مرور ولا رمز تحقق؛ يُحفظ تقدمك في السحابة برقم هاتفك لتستعيده على أي جهاز.</p>';
+      card.querySelector('#acctIn').addEventListener('click', function () {
+        var name = card.querySelector('#acctName').value.trim().replace(/\s+/g, ' ');
+        var phone = digits(card.querySelector('#acctPhone').value).replace(/[\s\-()]/g, '');
+        if (name.length < 2) return draw('اكتب اسمك (حرفان على الأقل).', name, phone);
+        if (!/^\+?\d{8,15}$/.test(phone)) return draw('اكتب رقم هاتف صحيحًا (8 إلى 15 رقمًا).', name, phone);
+        var a = { name: name, phone: phone, at: Date.now() };
+        setStatus('جارٍ تسجيل الدخول…');
+        card.querySelector('#acctIn').disabled = true;
+        fetchRemote(a).then(function (s) {
+          save(a);
+          if (s.exists && s.data().data && confirm('وُجد تقدم محفوظ لهذا الرقم. هل تريد استعادته على هذا الجهاز؟\n(موافق = استعادة، إلغاء = الاحتفاظ ببيانات هذا الجهاز ورفعها)')) {
+            if (restore(s.data().data)) { location.reload(); return; }
+          }
+          draw();
+          return push(true);
+        }).catch(function (e) {
+          save(a); /* الدخول يعمل حتى دون سحابة؛ يُحفظ التقدم محليًا ويُرفع لاحقًا */
+          draw();
+          setStatus(errText(e), true);
+        });
+      });
+    }
+  }
+  draw();
+  setInterval(function () { push(false); }, 45000);
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') push(false); });
 })();

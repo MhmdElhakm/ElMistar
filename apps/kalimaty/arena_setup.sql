@@ -234,3 +234,63 @@ grant execute on function public.ar_mix(uuid,jsonb) to authenticated;
 
 -- تنظيف المباريات العالقة (لم تنتهِ ولم تُلغَ) حتى لا يظهر الطلاب «في مباراة» بالخطأ
 update public.arena_matches set status='cancelled' where status in ('waiting','invited','ready','playing') and created_at<now()-interval '30 minutes';
+
+-- ===== غرفة الشرح: إشعار البث والحضور عبر قاعدة البيانات (لا يعتمد على الاتصال المباشر بين الأجهزة) =====
+create table if not exists public.class_rooms(
+  code text primary key, teacher uuid, rid text, title text, slot int default 0, seen timestamptz default now());
+alter table public.class_rooms enable row level security;
+
+create or replace function public.cr_live_set(p_code text, p_rid text, p_title text, p_slot int, p_on boolean)
+returns void language plpgsql security definer set search_path=public as $$
+declare me uuid := auth.uid();
+begin
+  if me is null then raise exception 'not_auth'; end if;
+  if not exists(select 1 from profiles where id=me and role='teacher' and class_code=p_code) then raise exception 'forbidden'; end if;
+  if p_on then
+    insert into class_rooms(code,teacher,rid,title,slot,seen) values(p_code,me,p_rid,left(coalesce(p_title,''),60),coalesce(p_slot,0),now())
+      on conflict(code) do update set teacher=me,rid=p_rid,title=left(coalesce(p_title,''),60),slot=coalesce(p_slot,0),seen=now();
+  else
+    delete from class_rooms where code=p_code and teacher=me;
+  end if;
+end $$;
+
+create or replace function public.cr_live_get() returns jsonb
+language sql security definer stable set search_path=public as $$
+  select jsonb_build_object('code',r.code,'rid',r.rid,'title',r.title,'slot',r.slot,
+           'teacher',(select name from profiles where id=r.teacher))
+  from profiles s join class_rooms r on r.code=s.class_code
+  where s.id=auth.uid() and r.seen>now()-interval '40 seconds'
+  limit 1
+$$;
+
+create or replace function public.cr_class_presence() returns jsonb
+language sql security definer stable set search_path=public as $$
+  select coalesce(jsonb_agg(jsonb_build_object('id',pr.id,'ago',extract(epoch from now()-p.seen)::int)),'[]'::jsonb)
+  from profiles pr join arena_presence p on p.uid=pr.id
+  where pr.class_code=(select class_code from profiles where id=auth.uid() and role='teacher')
+    and pr.id<>auth.uid()
+$$;
+grant execute on function public.cr_live_set(text,text,text,int,boolean), public.cr_live_get(), public.cr_class_presence() to authenticated;
+
+-- ===== صورة المعلم تظهر للطلاب =====
+drop function if exists public.my_class();
+create function public.my_class()
+returns json language sql security definer stable set search_path = public as $$
+  select json_build_object('code', s.class_code, 'class_name', t.class_name, 'teacher', t.name,
+           'photo', case when length(coalesce(t.avatar,''))<60000 then t.avatar end)
+  from public.profiles s
+  join public.profiles t on t.role = 'teacher' and t.class_code = s.class_code
+  where s.id = auth.uid() and s.role = 'student'
+$$;
+grant execute on function public.my_class() to authenticated;
+
+create or replace function public.cr_live_get() returns jsonb
+language sql security definer stable set search_path=public as $$
+  select jsonb_build_object('code',r.code,'rid',r.rid,'title',r.title,'slot',r.slot,
+           'teacher',(select name from profiles where id=r.teacher),
+           'photo',(select case when length(coalesce(avatar,''))<60000 then avatar end from profiles where id=r.teacher))
+  from profiles s join class_rooms r on r.code=s.class_code
+  where s.id=auth.uid() and r.seen>now()-interval '40 seconds'
+  limit 1
+$$;
+grant execute on function public.cr_live_get() to authenticated;
