@@ -4512,7 +4512,8 @@
     var recognition = tasmeeRecognition;
     tasmeeListening = false;
     tasmeeRecognition = null;
-    if (recognition) {
+    stopQuranTasmee();
+    if (recognition && !recognition.quran) {
       recognition.onend = null;
       if (tasmeeRecognitionStarted) recognition.stop();
     }
@@ -4914,7 +4915,273 @@
     }
   }
 
+
+  /* ===== محرّك التسميع القرآني: نموذج Whisper قرآني صغير يعمل داخل الجهاز (يُحمَّل مرة واحدة ثم يعمل دون إنترنت) ===== */
+  var QURAN_MODEL = 'omartariq612/whisper-tiny-ar-quran-onnx';
+  var QURAN_LIB = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1';
+  var quranAsr = null,
+    quranAsrPromise = null,
+    quranRun = 0,
+    quranSession = null;
+  var tasmeeEngine = load('mq.tasmeeEngine', 'quran');
+  if (tasmeeEngine !== 'browser') tasmeeEngine = 'quran';
+  var quranSupported = !!(window.WebAssembly && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+
+  function loadQuranModel(onProgress) {
+    if (window.QuranTasmeeTranscriber) return Promise.resolve(window.QuranTasmeeTranscriber);
+    if (quranAsr) return Promise.resolve(quranAsr);
+    if (quranAsrPromise) return quranAsrPromise;
+    var files = {};
+    quranAsrPromise = import(QURAN_LIB)
+      .then(function (lib) {
+        try {
+          lib.env.allowLocalModels = false;
+        } catch (e) {}
+        return lib.pipeline('automatic-speech-recognition', QURAN_MODEL, {
+          dtype: 'q8',
+          device: 'wasm',
+          progress_callback: function (p) {
+            if (!p || p.status !== 'progress' || !p.total) return;
+            files[p.file] = { l: p.loaded, t: p.total };
+            var l = 0, t = 0;
+            Object.keys(files).forEach(function (k) { l += files[k].l; t += files[k].t; });
+            if (onProgress && t) onProgress(Math.min(99, Math.round((l / t) * 100)));
+          }
+        });
+      })
+      .then(function (pipe) {
+        quranAsr = function (audio) {
+          return pipe(audio, { language: 'arabic', task: 'transcribe', max_new_tokens: 160 }).then(function (r) {
+            return (r && r.text) || '';
+          });
+        };
+        save('mq.quranModelReady', 1);
+        return quranAsr;
+      })
+      .catch(function (e) {
+        quranAsrPromise = null;
+        throw e;
+      });
+    return quranAsrPromise;
+  }
+
+  /* مطابقة النص (مؤقتًا أو نهائيًا) بنفس منطق التعرّف القديم */
+  function feedTasmeeText(text, isFinal) {
+    var tokens = tokenizeTasmeeTranscript(text);
+    if (!tokens.length) return;
+    if (!isFinal) {
+      var common = 0;
+      while (common < tasmeeInterimTokens.length && common < tokens.length && tasmeeInterimTokens[common] === tokens[common]) common++;
+      var consumed = 0;
+      if (tokens.length > common) consumed = processTasmeeTranscript(tokens.slice(common).join(' '), false, true);
+      tasmeeInterimTokens = tokens.slice(0, common + consumed);
+      return;
+    }
+    var fc = 0;
+    while (fc < tasmeeInterimTokens.length && fc < tokens.length && tasmeeInterimTokens[fc] === tokens[fc]) fc++;
+    if (tokens.length > fc) processTasmeeTranscript(tokens.slice(fc).join(' '), true, false);
+    tasmeeInterimTokens = [];
+  }
+
+  function stopQuranTasmee() {
+    quranRun++;
+    var q = quranSession;
+    quranSession = null;
+    if (!q) return;
+    try { q.node.disconnect(); q.src.disconnect(); } catch (e) {}
+    try { q.node.onaudioprocess = null; } catch (e) {}
+    try { q.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
+    try { q.ctx.close(); } catch (e) {}
+  }
+
+  function startQuranCapture(run, transcribe) {
+    return navigator.mediaDevices
+      .getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
+      .then(function (stream) {
+        if (run !== quranRun || !tasmeeListening) {
+          stream.getTracks().forEach(function (t) { t.stop(); });
+          return;
+        }
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        var ctx = new Ctx();
+        var rate = ctx.sampleRate,
+          step = rate / 16000;
+        var src = ctx.createMediaStreamSource(stream);
+        var node = ctx.createScriptProcessor(4096, 1, 1);
+        var mute = ctx.createGain();
+        mute.gain.value = 0;
+        src.connect(node);
+        node.connect(mute);
+        mute.connect(ctx.destination);
+        var q = (quranSession = { stream: stream, ctx: ctx, node: node, src: src });
+        var cur = [], pre = [], speaking = false, lastVoice = 0, lastDecode = 0, utter = 0, voiced = 0;
+        var floor = 0.004, jobs = [], working = false;
+
+        function samples(frame) {
+          var out = new Float32Array(Math.floor(frame.length / step));
+          for (var i = 0; i < out.length; i++) out[i] = frame[Math.floor(i * step)];
+          return out;
+        }
+        function concat(list) {
+          var n = 0;
+          list.forEach(function (a) { n += a.length; });
+          var o = new Float32Array(n), p = 0;
+          list.forEach(function (a) { o.set(a, p); p += a.length; });
+          return o;
+        }
+        function pump() {
+          if (working || !jobs.length || run !== quranRun) return;
+          var job = jobs.shift();
+          working = true;
+          Promise.resolve(transcribe(job.audio))
+            .then(function (text) {
+              if (run !== quranRun || !tasmeeListening) return;
+              if (!job.final && job.utter !== utter) return; /* نتيجة مؤقتة قديمة */
+              feedTasmeeText(text || '', job.final);
+            })
+            .catch(function () {
+              if (run === quranRun) tasmeeStatus.textContent = 'تعذر تحليل المقطع الصوتي؛ تابع القراءة.';
+            })
+            .then(function () {
+              working = false;
+              pump();
+            });
+        }
+        function enqueue(final) {
+          if (!cur.length) return;
+          var audio = concat(cur);
+          if (audio.length < 16000 * 0.45) return;
+          if (!final) {
+            if (working || jobs.length) return; /* لا نكدّس المؤقت */
+          }
+          if (audio.length > 16000 * 25) audio = audio.subarray(audio.length - 16000 * 25);
+          jobs.push({ audio: audio, final: final, utter: utter });
+          pump();
+        }
+        node.onaudioprocess = function (e) {
+          if (run !== quranRun) return;
+          var frame = samples(e.inputBuffer.getChannelData(0));
+          var sum = 0;
+          for (var i = 0; i < frame.length; i++) sum += frame[i] * frame[i];
+          var rms = Math.sqrt(sum / (frame.length || 1));
+          var now = Date.now();
+          var voice = rms > Math.max(0.012, floor * 3);
+          if (!voice) floor = floor * 0.95 + rms * 0.05;
+          if (voice) {
+            if (!speaking) {
+              speaking = true;
+              cur = pre.slice();
+              voiced = 0;
+              lastDecode = now;
+            }
+            lastVoice = now;
+            voiced += frame.length;
+            cur.push(frame);
+            if (now - lastDecode > 1800) {
+              lastDecode = now;
+              enqueue(false);
+            }
+          } else if (speaking) {
+            cur.push(frame);
+            if (now - lastVoice > 700) {
+              speaking = false;
+              if (voiced > 16000 * 0.3) enqueue(true);
+              utter++;
+              cur = [];
+              pre = [];
+            }
+          } else {
+            pre.push(frame);
+            if (pre.length > 2) pre.shift();
+          }
+          if (speaking && cur.length * frame.length > 16000 * 20) {
+            speaking = false;
+            enqueue(true);
+            utter++;
+            cur = [];
+          }
+        };
+        tasmeeRecognitionStarted = true;
+        tasmeeStatus.textContent = 'الميكروفون يعمل؛ ابدأ بتسميع الآيات غيبًا.';
+        syncTasmeeControls();
+        return q;
+      });
+  }
+
+  function startQuranTasmee() {
+    if (!tasmeeSession || tasmeeSession.completed) {
+      if (!createTasmeeSession()) return;
+    }
+    var firstAyah = currentTasmeeAyah();
+    if (firstAyah) {
+      closeD();
+      navigateToVerse(firstAyah.id);
+    }
+    stopRecitation('تم إيقاف الاستماع لبدء التسميع');
+    stopQuranTasmee();
+    var run = ++quranRun;
+    tasmeeListening = true;
+    tasmeeFailStreak = 0;
+    tasmeeInterimTokens = [];
+    tasmeeRecognitionStarted = false;
+    tasmeeRecognition = { quran: true, onend: null, stop: stopQuranTasmee };
+    applyTasmeeWordState(pageList);
+    syncTasmeeControls();
+    var ready = !!quranAsr || !!window.QuranTasmeeTranscriber;
+    tasmeeStatus.textContent = ready
+      ? 'جارٍ تشغيل الميكروفون…'
+      : load('mq.quranModelReady', 0)
+        ? 'جارٍ تجهيز النموذج القرآني…'
+        : 'جارٍ تحميل النموذج القرآني (مرة واحدة فقط، نحو 120MB)…';
+    loadQuranModel(function (pct) {
+      if (run === quranRun) tasmeeStatus.textContent = 'تحميل النموذج القرآني ' + pct + '% (مرة واحدة فقط)';
+    })
+      .then(function (transcribe) {
+        if (run !== quranRun || !tasmeeListening) return;
+        tasmeeStatus.textContent = 'جارٍ تشغيل الميكروفون…';
+        return startQuranCapture(run, transcribe);
+      })
+      .catch(function (error) {
+        if (run !== quranRun) return;
+        var denied = error && (error.name === 'NotAllowedError' || error.name === 'SecurityError');
+        if (denied) {
+          tasmeeStatus.textContent = 'لم يُسمح بالمايك؛ فعّل إذن الميكروفون ثم حاول مجددًا.';
+          stopTasmeeRecognition();
+          return;
+        }
+        /* تعذر تحميل/تشغيل النموذج: نعود للتعرّف المدمج في المتصفح */
+        var Browser = window.SpeechRecognition || window.webkitSpeechRecognition;
+        tasmeeRecognition = null;
+        if (Browser) {
+          tasmeeStatus.textContent = 'تعذر تشغيل النموذج القرآني؛ استخدمنا تعرّف المتصفح بدلًا منه.';
+          startBrowserTasmeeRecognition(Browser, true);
+        } else {
+          tasmeeStatus.textContent = 'تعذر تشغيل النموذج القرآني (يحتاج إنترنت في أول مرة).';
+          stopTasmeeRecognition();
+        }
+      });
+  }
+
+  var tasmeeEngineSelect = $('tasmeeEngine');
+  if (tasmeeEngineSelect) {
+    if (!quranSupported) {
+      tasmeeEngine = 'browser';
+      tasmeeEngineSelect.value = 'browser';
+      var qo = tasmeeEngineSelect.querySelector('option[value="quran"]');
+      if (qo) qo.disabled = true;
+    } else tasmeeEngineSelect.value = tasmeeEngine;
+    tasmeeEngineSelect.addEventListener('change', function () {
+      tasmeeEngine = tasmeeEngineSelect.value === 'browser' ? 'browser' : 'quran';
+      save('mq.tasmeeEngine', tasmeeEngine);
+      if (tasmeeListening) stopTasmeeRecognition();
+    });
+  }
+
   function startTasmeeRecognition() {
+    if (tasmeeEngine === 'quran' && quranSupported) {
+      startQuranTasmee();
+      return;
+    }
     var BrowserRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!BrowserRecognition) {
       tasmeeStatus.textContent =
@@ -5338,6 +5605,7 @@
   professionalizeSelect(tasmeeSurah);
   professionalizeSelect(tasmeeFrom);
   professionalizeSelect(tasmeeTo);
+  professionalizeSelect($('tasmeeEngine'));
   professionalizeSelect(reciterSelect);
   professionalizeSelect(recitationSurah);
   professionalizeSelect(recitationRepeat);
@@ -12499,25 +12767,33 @@
   }
 
   /* ---------- الواجهة ---------- */
-  var card = document.createElement('div');
+  var card = document.createElement('details');
   card.className = 'settings-card account-card';
   card.id = 'accountCard';
-  host.insertBefore(card, host.firstChild);
+  card.innerHTML = '<summary class="acct-sum"><span class="acct-av" id="acctAv" aria-hidden="true">👤</span><span class="acct-sumtxt"><b id="acctTitle">تسجيل الدخول</b><small id="acctSub">احفظ تقدمك في السحابة</small></span><span class="acct-dot" id="acctDot" aria-hidden="true"></span><span class="cz-chev" aria-hidden="true">‹</span></summary><div class="acct-body"></div>';
+  var body = card.querySelector('.acct-body');
+  host.appendChild(card);
+  function head(a) {
+    card.querySelector('#acctTitle').textContent = a ? a.name : 'تسجيل الدخول';
+    card.querySelector('#acctSub').textContent = a ? 'مسجَّل · التقدم يُحفظ تلقائيًا' : 'احفظ تقدمك في السحابة';
+    card.querySelector('#acctAv').textContent = a ? a.name.trim().charAt(0) : '👤';
+    card.classList.toggle('is-in', !!a);
+  }
   function draw(err, n0, p0) {
     var a = load();
+    head(a);
     if (a) {
       var last = 0; try { last = +localStorage.getItem('mq.cloudLast') || 0; } catch (e) {}
-      card.innerHTML =
-        '<div class="settings-card-head"><span aria-hidden="true">👤</span><span>حسابي</span><span class="st-val">مسجَّل</span></div>' +
+      body.innerHTML =
         '<p class="acct-hello">مرحبًا ' + esc(a.name) + '</p>' +
         '<p class="acct-note" dir="ltr" style="text-align:right">' + esc(a.phone) + '</p>' +
         '<p class="acct-note" id="acctSync">' + (last ? '☁ آخر حفظ سحابي ' + new Date(last).toLocaleString('ar-EG') : '☁ لم يُحفظ بعد') + '</p>' +
         '<div class="acct-row"><button type="button" class="acct-btn" id="acctPush">حفظ التقدم الآن</button><button type="button" class="acct-btn out" id="acctPull">استعادة من السحابة</button></div>' +
         '<p class="acct-note">يُحفظ تقدمك (الختمة والعلامات والمهام والإعدادات) تلقائيًا في السحابة برقم هاتفك، وتستعيده على أي جهاز بتسجيل الدخول بنفس الرقم. لا يوجد تحقق من الهاتف.</p>' +
         '<button type="button" class="acct-btn out" id="acctOut">تسجيل الخروج</button>';
-      card.querySelector('#acctOut').addEventListener('click', function () { push(true).then(function () { save(null); draw(); }); });
-      card.querySelector('#acctPush').addEventListener('click', function () { setStatus('جارٍ الحفظ…'); push(true); });
-      card.querySelector('#acctPull').addEventListener('click', function () {
+      body.querySelector('#acctOut').addEventListener('click', function () { push(true).then(function () { save(null); draw(); }); });
+      body.querySelector('#acctPush').addEventListener('click', function () { setStatus('جارٍ الحفظ…'); push(true); });
+      body.querySelector('#acctPull').addEventListener('click', function () {
         setStatus('جارٍ الاستعادة…');
         fetchRemote(a).then(function (s) {
           if (!s.exists || !s.data().data) return setStatus('لا يوجد تقدم محفوظ لهذا الرقم.');
@@ -12526,21 +12802,20 @@
         }).catch(function (e) { setStatus(errText(e), true); });
       });
     } else {
-      card.innerHTML =
-        '<div class="settings-card-head"><span aria-hidden="true">👤</span><span>تسجيل الدخول</span><span class="st-val">لحفظ التقدم</span></div>' +
+      body.innerHTML =
         '<label class="acct-field">الاسم<input id="acctName" type="text" autocomplete="name" maxlength="40" value="' + esc(n0 || '') + '" /></label>' +
         '<label class="acct-field">رقم الهاتف<input id="acctPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" dir="ltr" value="' + esc(p0 || '') + '" /></label>' +
         (err ? '<div class="acct-err" role="alert">' + esc(err) + '</div>' : '') +
         '<button type="button" class="acct-btn" id="acctIn">تسجيل الدخول</button>' +
         '<p class="acct-note" id="acctSync">بدون كلمة مرور ولا رمز تحقق؛ يُحفظ تقدمك في السحابة برقم هاتفك لتستعيده على أي جهاز.</p>';
-      card.querySelector('#acctIn').addEventListener('click', function () {
-        var name = card.querySelector('#acctName').value.trim().replace(/\s+/g, ' ');
-        var phone = digits(card.querySelector('#acctPhone').value).replace(/[\s\-()]/g, '');
+      body.querySelector('#acctIn').addEventListener('click', function () {
+        var name = body.querySelector('#acctName').value.trim().replace(/\s+/g, ' ');
+        var phone = digits(body.querySelector('#acctPhone').value).replace(/[\s\-()]/g, '');
         if (name.length < 2) return draw('اكتب اسمك (حرفان على الأقل).', name, phone);
         if (!/^\+?\d{8,15}$/.test(phone)) return draw('اكتب رقم هاتف صحيحًا (8 إلى 15 رقمًا).', name, phone);
         var a = { name: name, phone: phone, at: Date.now() };
         setStatus('جارٍ تسجيل الدخول…');
-        card.querySelector('#acctIn').disabled = true;
+        body.querySelector('#acctIn').disabled = true;
         fetchRemote(a).then(function (s) {
           save(a);
           if (s.exists && s.data().data && confirm('وُجد تقدم محفوظ لهذا الرقم. هل تريد استعادته على هذا الجهاز؟\n(موافق = استعادة، إلغاء = الاحتفاظ ببيانات هذا الجهاز ورفعها)')) {
