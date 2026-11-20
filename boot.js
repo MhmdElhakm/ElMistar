@@ -1,9 +1,6 @@
 (function () {
     'use strict';
 
-    var BOOT_TIMEOUT_MS = 25000;
-    var DB_WAIT_MS = 12000;
-    var POLL_MS = 100;
     var READ_TIMEOUT_MS = 12000;
     var RESUME_AFTER_MS = 5 * 60 * 1000;
 
@@ -30,15 +27,7 @@
     }
 
     function waitForDb() {
-        return new Promise(function (resolve, reject) {
-            if (window.db) { resolve(window.db); return; }
-            var waited = 0;
-            var iv = setInterval(function () {
-                if (window.db) { clearInterval(iv); resolve(window.db); return; }
-                waited += POLL_MS;
-                if (waited >= DB_WAIT_MS) { clearInterval(iv); reject(new Error('no-db')); }
-            }, POLL_MS);
-        });
+        return window.db ? Promise.resolve(window.db) : Promise.reject(new Error('no-db'));
     }
 
     function fetchDocServer(db, id) {
@@ -81,10 +70,7 @@
         if (running) return readyPromise;
         running = true;
         setStatus('pending');
-        withTimeout(
-            waitForDb().then(fetchAllFromServer),
-            BOOT_TIMEOUT_MS
-        ).then(function () {
+        waitForDb().then(function () {
             running = false;
             setStatus('ready');
             try { window.__ELMISTAR_LAST_SYNC = Date.now(); } catch (e) {}
@@ -156,24 +142,7 @@
     });
 
     window.addEventListener('pageshow', function (e) {
-        if (e && e.persisted) {
-            var html = document.documentElement;
-            var pre = document.getElementById('preloader');
-            if (html) html.classList.add('loading');
-            if (html) html.classList.remove('loaded');
-            if (pre) {
-                pre.style.display = 'flex';
-                pre.classList.remove('fade-out');
-                delete pre.dataset.revealed;
-            }
-            retry().then(function (ok) {
-                if (ok) {
-                    try { document.dispatchEvent(new Event('elmistar:boot-ready')); } catch (e2) {}
-                }
-            });
-        } else {
-            refreshInBackground();
-        }
+        if (e && e.persisted && status !== 'ready') retry();
     });
 
     window.ElmistarBoot = {

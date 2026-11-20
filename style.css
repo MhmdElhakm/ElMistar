@@ -21,6 +21,7 @@ html.loading body {
 }
 
 html:not(.loading) #preloader {
+    display: none;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -280,6 +281,40 @@ html:not(.loading) #preloader {
 .pl-retry-btn:hover { transform: scale(1.04); }
 #preloader.boot-error .pl-loader-group,
 #preloader.boot-error .pl-label { display: none; }
+
+.boot-error-toast {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    z-index: 1000000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: none;
+    margin: 0;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+}
+
+.boot-error-toast .pl-error-msg {
+    margin-bottom: 0;
+}
+
+@media (max-width: 520px) {
+    .boot-error-toast {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .boot-error-toast .pl-retry-btn {
+        align-self: flex-end;
+    }
+}
 
 /* ============================================
    DOODLE STYLE - ElMistar Kids Edition
@@ -542,6 +577,7 @@ body::before {
 }
 
 .nav-btn-link {
+    display: inline-block;
     background: none;
     border: 2.5px solid transparent;
     border-radius: 50px;
@@ -554,6 +590,7 @@ body::before {
     transition: var(--transition);
     position: relative;
     white-space: nowrap;
+    text-decoration: none;
 }
 
 .nav-btn-link:hover {
@@ -876,7 +913,6 @@ section {
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-    will-change: transform, opacity;
 }
 
 .reveal.visible {
@@ -9798,6 +9834,12 @@ body {
 /* ---------- Hero section ---------- */
 .hero-content { animation: slideSide .7s cubic-bezier(.22,.61,.36,1) .2s backwards; }
 .hero-visual  { animation: cardUp .7s cubic-bezier(.22,.61,.36,1) .4s backwards; }
+
+html.loaded .hero-merged .reveal {
+    opacity: 1;
+    transform: none;
+    animation: none;
+}
 
 .hero-image-wrapper { animation: floatSoft 6s ease-in-out infinite; }
 .hero-glow-circle { animation: pulseGlow 3s ease-in-out infinite; }
