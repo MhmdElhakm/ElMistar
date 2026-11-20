@@ -2360,6 +2360,36 @@ html[dir=rtl] .lsn-card .lsn-art-state{transform:translateX(50%)}
 .tc-ls{display:flex;align-items:center;gap:6px;font-size:12px!important;margin-top:2px}.tc-ls i{width:7px;height:7px;border-radius:50%;background:#6b6a86;flex:none}.tc-ls.on{color:#4fdc9c!important}.tc-ls.on i{background:#4fdc9c;box-shadow:0 0 0 3px rgba(79,220,156,.22)}
 .au-ai.ph,.cr-hi.ph,.cr-nt-i.ph{background:none!important;padding:0;overflow:hidden}.au-ai.ph .avatar,.cr-hi.ph .avatar,.cr-nt-i.ph .avatar{width:100%!important;height:100%!important;font-size:16px!important}
 .cr-hi.ph{border-radius:50%}
+
+.tcs{display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:center}
+.tcs-hd{display:flex;align-items:center;gap:12px;padding-inline-start:44px;text-align:start}.tcs-hd .au-pn b{font-size:18px}.tcs-hd .au-pn small{display:block}
+.tcs-sec{display:flex;align-items:center;gap:10px;margin-top:6px;font-size:14px}.tcs-sec b{white-space:nowrap}.tcs-sec::after{content:"";flex:1;height:1.5px;background:var(--line)}
+.tcs-ct{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tcs-ct .btn{min-height:44px;font-size:14px;white-space:nowrap;padding:0 8px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px}.tcs-ct svg{width:16px;height:16px}
+.tcs-rm{color:#ff8fa0!important;border-color:rgba(255,143,160,.4)!important;min-height:44px}
+.pv-none2{display:flex;align-items:center;gap:10px;justify-content:center;padding:12px;border-radius:16px;background:var(--card2,rgba(255,255,255,.05));color:var(--muted);font-weight:700;font-size:13.5px}
+.tcs .bpscene{border-radius:20px}
+
+.cr-src{border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.05);padding:12px;margin:10px 0;display:flex;flex-direction:column;gap:10px}
+.cr-srch{display:flex;align-items:center;gap:10px}.cr-srci{width:38px;height:38px;border-radius:12px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;flex:none}.cr-srci svg{width:20px;height:20px}
+.cr-srct{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}.cr-srct b{font-size:15px}.cr-srct small{color:var(--muted);font-size:12px;font-weight:700}
+.cr-addb{display:flex;flex-direction:column;gap:8px}.cr-addb textarea{min-height:110px;resize:vertical;font-size:15px}
+
+.cr-rows{display:flex;flex-direction:column;gap:6px}
+.cr-ar{display:grid;grid-template-columns:minmax(70px,.9fr) 1.3fr auto auto;gap:6px;align-items:center;padding:6px 8px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.cr-ar b{font-size:14px;overflow-wrap:anywhere}.cr-ari{min-height:38px!important;padding:0 10px!important;font-size:14.5px!important}
+.cr-ar.miss{border-color:#ffb14d}.cr-ar.busy{opacity:.7}.cr-ar .tag{font-size:11px}
+.cr-ard{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center;color:var(--muted)}.cr-ard svg{width:14px;height:14px}
+
+.cr-lsb{min-height:44px;font-size:14.5px;display:flex;align-items:center;justify-content:center;gap:8px}.cr-lsb svg{width:18px;height:18px}
+.cr-lsl{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow:auto}
+.cr-lsi{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:inherit;text-align:start}
+.cr-lsx{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}.cr-lsx b{font-size:14.5px}.cr-lsx small{color:var(--muted);font-size:12px;font-weight:700}.cr-lsi svg{width:20px;height:20px;color:var(--primary)}
+
+.cr-srcb{display:flex;flex-direction:column;gap:6px;flex:none}.cr-srcb .pill{min-height:32px;padding:0 14px;font-size:13px}
+.cr-itl{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto;padding:2px}
+.cr-ith{font-weight:800;font-size:13px;color:var(--muted);margin-top:4px;display:flex;gap:6px;align-items:center}
+.cr-it{display:grid;grid-template-columns:minmax(70px,.9fr) 1.3fr auto;gap:6px;align-items:center;padding:6px 8px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.cr-it b{font-size:14px;overflow-wrap:anywhere}
 </style></head><body>
 <div id="app">
   <div id="view"></div>
@@ -8686,18 +8716,37 @@ function vTcClass(){
   document.getElementById('app').classList.remove('wide');
   const s=view.querySelector('.screen');if(s&&top)s.scrollTop=top;
 };}
+function pvBodyHtml(info,w){
+  const pt=info.pet;
+  if(!pt||!pt.sp||!pt.born)return `<div class="pv-none2"><span class="au-ai">${ic('paw')}</span><span>لم يختر حيوانه الأليف بعد</span></div>`;
+  const sp=SPC(pt.sp),col=sp.v[(pt.color||0)%sp.v.length],eq=Object.assign({},pt.eq||{}),it=(PIT(eq.bg||'bg0')||PIT('bg0')).sc;
+  const x=pt.x!=null?+pt.x:+info.xp||0,lv=lvlOf(x),st=stageOfXp(x),names=['hat','face','neck','body','hold','back'].map(k=>eq[k]?PIT(eq[k]):null).filter(Boolean);
+  const nxt=STAGE_LV[st+1],stg=PSTAGE.map((s,i)=>`<span class="${i<=st?'on':''}"><i></i>${s[0]}</span>`).join('');
+  return `<div class="bpscene pv-scene" style="--sky1:${it.s1};--sky2:${it.s2};--grass1:${it.g1}"><span class="pv-stage">${PSTAGE[st][0]}</span>${petSvg({sp:pt.sp,color:pt.color,stage:st,exp:'happy',eq,w:w||200})}</div>
+   <div class="bpname"><b>${esc(pt.name||sp.n)}</b><small>${esc(sp.n)} · ${esc(col.n)}</small></div>
+   <div class="pv-prog" aria-label="مراحل النمو">${stg}</div>
+   <div class="pv-stats"><div><b class="en">${lv}</b><small>المستوى</small></div><div><b>${esc(lvTitle(lv))}</b><small>اللقب</small></div><div><b class="en">${(pt.own||[]).length}</b><small>قطعة بالخزانة</small></div></div>
+   <small class="help">${nxt?`يتطور في المستوى ${nxt}`:'وصل لأعلى مرحلة نمو'}</small>
+   <div class="bpitems">${names.length?names.map(q=>`<span class="bpi">${esc(q.n)}</span>`).join(''):'<span class="help">لا يرتدي أي إكسسوارات الآن</span>'}</div>`;
+}
 async function tcStudent(id){
   const u=(TCH.list||[]).find(x=>x.id===id);if(!u)return;
-  const ph=TCH.ph[id]||'';
-  const frame=(inner)=>kxModal(`<button class="kx-mx" data-act="sb_close" aria-label="إغلاق">${ic('close')}</button>
-   <div class="au-prof">${av({name:u.name,photo:u.avatar||''},64)}<div class="au-pn"><b>${esc(u.name)}</b><small>${esc(GRADES[(u.grade||1)-1]||'')}</small></div></div>${inner}`);
-  frame('<div class="empty"><b>جارٍ التحميل...</b></div>');
+  const ph=TCH.ph[id]||'',sn=tcSeen(u);
+  const head=(pet)=>`<button class="kx-mx" data-act="sb_close" aria-label="إغلاق">${ic('close')}</button>
+   <div class="tcs-hd">${av({name:u.name,photo:u.avatar||''},60)}<div class="au-pn"><b>${esc(u.name)}</b><small>${esc(GRADES[(u.grade||1)-1]||'')}</small>${tcLs(u)}</div></div>`;
+  kxModal(head()+'<div class="empty"><b>جارٍ التحميل...</b></div>');
+  try{await pvLoad([id],true);}catch(e){}
   let st=null;
   try{const r=await tApi('/rest/v1/user_data?select=state&user_id=eq.'+id);if(r.ok){const j=await r.json();st=j[0]&&j[0].state||null;}}catch(e){}
   const s=st?userStats(st):null;let qr=[];try{const rr=await tApi('/rest/v1/quiz_results?select=quiz_id,score,max_score,correct,total,created_at&student_id=eq.'+id+'&order=created_at.desc&limit=10');if(rr.ok)qr=await rr.json();}catch(e){}
-  frame(`${ph?`<div class="pair"><a class="btn ghost" style="min-height:44px;font-size:15px;text-decoration:none" href="tel:${esc(ph)}">اتصال بولي الأمر</a><a class="btn ghost" style="min-height:44px;font-size:15px;text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/${esc(tWaNum(ph))}">واتساب</a></div><small class="help en" dir="ltr" style="text-align:center">${esc(ph)}</small>`:''}
+  const c=PVW.cache[id]||{},info={id,name:u.name,grade:(u.grade||1)-1,photo:u.avatar||c.photo||'',xp:u.xp||0,pet:c.pet};
+  kxModal(head()+`<div class="tcs">
+   ${pvBodyHtml(info,190)}
+   <div class="tcs-sec"><b>تقرير الطالب</b></div>
    ${s?`<div class="tc-det"><div><small>كلمات</small><b class="en">${s.vocab}</b></div><div><small>محفوظة</small><b class="en">${s.mem}</b></div><div><small>جمل متقنة</small><b class="en">${s.sm}</b></div><div><small>دروس</small><b class="en">${s.lessons}</b></div><div><small>أيام النشاط</small><b class="en">${s.days}</b></div><div><small>النقاط</small><b class="en">${u.xp||s.score}</b></div></div>`:'<p class="help">لا توجد بيانات تقدم مرفوعة لهذا الطالب بعد.</p>'}
-   ${lvTHist(qr)}<button class="btn ghost" style="color:#ff8fa0" data-act="tc_rm" data-id="${esc(id)}">إزالة من الفصل</button>`);
+   ${ph?`<div class="tcs-ct"><a class="btn ghost" href="tel:${esc(ph)}">اتصال بولي الأمر</a><a class="btn ghost" target="_blank" rel="noopener" href="https://wa.me/${esc(tWaNum(ph))}">واتساب</a></div><small class="help en" dir="ltr" style="text-align:center">${esc(ph)}</small>`:''}
+   ${lvTHist(qr)}
+   <button class="btn ghost tcs-rm" data-act="tc_rm" data-id="${esc(id)}">إزالة من الفصل</button></div>`);
 }
 document.addEventListener('click',async e=>{
   const b=e.target.closest&&e.target.closest('[data-act^="tc_"]');if(!b)return;
@@ -9830,7 +9879,9 @@ bpetOpen=function(id){
 document.addEventListener('click',e=>{
   const b=e.target.closest&&e.target.closest('[data-act="pv_open"]');if(!b)return;
   e.stopPropagation();e.preventDefault();
-  const id=b.dataset.id,show=()=>{const c=PVW.cache[id];if(c&&c.name)pvOpen({id,name:c.name,grade:c.grade,photo:c.photo,xp:c.xp,pet:c.pet});else toast('تعذر تحميل بيانات الطالب');};
+  const id=b.dataset.id;
+  if(TCH.on&&TCH.me&&(TCH.list||[]).some(x=>x.id===id)){tcStudent(id);return;}
+  const show=()=>{const c=PVW.cache[id];if(c&&c.name)pvOpen({id,name:c.name,grade:c.grade,photo:c.photo,xp:c.xp,pet:c.pet});else toast('تعذر تحميل بيانات الطالب');};
   const c=PVW.cache[id];
   if(c&&c.name)show();else pvLoad([id],LRM.role==='t'||!!TCH.on).then(show);
 },true);
@@ -13151,6 +13202,101 @@ function crGenQs(g,n){
   }
   return qs;
 }
+const CRAR={t:0,seq:0};
+function crItemsHtml(){
+  const L=(S.items||[]).filter(i=>i&&i.en&&i.a),W=L.filter(i=>i.t!=='s'),Sn=L.filter(i=>i.t==='s');
+  const row=i=>`<div class="cr-it"><b class="en" dir="ltr">${esc(i.en)}</b><input class="inp cr-iti" data-id="${esc(i.id)}" value="${esc(i.a)}" aria-label="ترجمة ${esc(i.en)}"><button type="button" class="cr-ard" data-act="cr_itd" data-id="${esc(i.id)}" aria-label="حذف">${ic('close')}</button></div>`;
+  const sec=(t,A)=>A.length?`<div class="cr-ith">${t} <em class="en">${A.length}</em></div>${A.map(row).join('')}`:'';
+  return `<div class="cr-itl">${L.length?sec('الكلمات',W)+sec('الجمل',Sn):'<div class="help" style="text-align:center;padding:8px">لا توجد كلمات أو جمل مضافة بعد.</div>'}</div>`;
+}
+function crLsnHtml(){
+  const L=(TQ.list||[]).filter(q=>q.kind==='quiz'&&q.settings&&q.settings.lesson);
+  const list=CR.lsnOpen?(TQ.loading&&!TQ.list?'<div class="help" style="text-align:center">جارٍ تحميل الدروس…</div>':L.length?`<div class="cr-lsl">${L.map(q=>{const l=q.settings.lesson,nw=(l.words||[]).filter(x=>x[1]).length,ns=(l.sents||[]).filter(x=>x[1]).length;return `<button type="button" class="cr-lsi" data-act="cr_lsn" data-id="${esc(q.id)}"><span class="cr-lsx"><b>${esc(q.title)}</b><small>${nw} كلمة · ${ns} جملة</small></span>${ic('plus')}</button>`;}).join('')}</div>`:'<div class="help" style="text-align:center">لا توجد دروس بعد. أنشئ درسًا من تبويب «الدروس».</div>'):'';
+  return `<button type="button" class="btn ghost cr-lsb" data-act="cr_lsnt">${ic('book')} ${CR.lsnOpen?'إخفاء الدروس':'سحب كلمات وجمل من الدروس'}</button>${list}`;
+}
+function crLsnPull(id){
+  const q=(TQ.list||[]).find(x=>x.id===id);if(!q||!q.settings||!q.settings.lesson)return;
+  const L=q.settings.lesson,have=new Set((S.items||[]).map(i=>String(i.en||'').trim().toLowerCase()));
+  CR.addRows=CR.addRows||[];const cur=new Set(CR.addRows.map(r=>r.en.toLowerCase()));let n=0,sk=0;
+  const add=(a,sent)=>{const en=String(a[0]||'').replace(/\s+/g,' ').trim(),ar=String(a[1]||'').trim();if(!en||!ar)return;const k=en.toLowerCase();if(have.has(k)||cur.has(k)){sk++;return;}cur.add(k);CR.addRows.push({en,a:ar,edited:1,sent,busy:0,src:q.title,v:!sent&&a[2]?1:0,p:!sent&&a[2]?(a[3]||''):'',pa:!sent&&a[2]?(a[4]||''):''});n++;};
+  (L.words||[]).forEach(w=>add(w,false));(L.sents||[]).forEach(x=>add(x,true));
+  CR.lsnOpen=false;
+  toast(n?`تم سحب ${n} من «${q.title}»${sk?` · ${sk} موجودة مسبقًا`:''}`:'كل كلمات وجمل هذا الدرس مضافة من قبل');
+  crPaint(true);
+}
+function crAddBtnTxt(){const n=(CR.addRows||[]).filter(r=>String(r.a||'').trim()).length;return n?`حفظ وإضافة (${n})`:'حفظ وإضافة';}
+function crAddRowsHtml(){
+  const R=CR.addRows||[];if(!R.length)return '';
+  return R.map((r,i)=>`<div class="cr-ar ${r.busy?'busy':''} ${!r.busy&&!String(r.a||'').trim()?'miss':''}"><b class="en" dir="ltr">${esc(r.en)}</b><input class="inp cr-ari" data-i="${i}" value="${esc(r.a||'')}" placeholder="${r.busy?'جارٍ الترجمة…':'اكتب المعنى بالعربية'}" ${r.busy?'disabled':''}><span class="tag">${r.sent?'جملة':'كلمة'}${r.src?' · درس':''}</span><button type="button" class="cr-ard" data-act="cr_ard" data-i="${i}" aria-label="حذف">${ic('close')}</button></div>`).join('');
+}
+function crAddRepaint(){
+  const h=document.getElementById('crAddRows');if(h){
+    const act=document.activeElement,keep=act&&act.classList&&act.classList.contains('cr-ari')?[+act.dataset.i,act.selectionStart]:null;
+    h.innerHTML=crAddRowsHtml();
+    if(keep){const e=h.querySelector('.cr-ari[data-i="'+keep[0]+'"]');if(e){e.focus();try{e.setSelectionRange(keep[1],keep[1]);}catch(x){}}}
+  }
+  const b=document.getElementById('crAddBtn');if(b)b.innerHTML=ic('check')+' '+crAddBtnTxt();
+}
+async function crAddGloss(en,D){
+  const ws=(en.toLowerCase().match(/[a-z][a-z'’-]*/g)||[]).map(x=>x.replace(/['’]s$/,''));
+  try{const rs=ruleSentAr(en,w=>{const b=baseOf(w,D),V=D.w[b];return V?String(V).split(/[،,;\/]/)[0].trim():'';});if(rs)return rs;}catch(e){}
+  const out=[];ws.forEach(w=>{const b=baseOf(w,D),V=D.v[b];let m=V?V[0]:D.w[b];if(m){m=String(m).split(/[،,;\/]/)[0].trim();if(m&&out[out.length-1]!==m)out.push(m);}});
+  return out.join(' ');
+}
+async function crAddSync(){
+  const tx=document.getElementById('crAddTx');if(!tx)return;
+  const my=++CRAR.seq,old=new Map((CR.addRows||[]).map(r=>[r.en.toLowerCase(),r]));
+  const rows=[];const seen=new Set();
+  String(tx.value||'').split(/\r?\n/).forEach(l=>{
+    l=l.trim();if(!l)return;
+    const m=l.match(/^(.+?)\s*[=:\t]\s*(.+)$/);
+    const en=(m?m[1]:l).replace(/\s+/g,' ').trim(),ar=m?m[2].trim():'';
+    if(!/[a-z]/i.test(en))return;const k=en.toLowerCase();if(seen.has(k))return;seen.add(k);
+    const o=old.get(k);
+    rows.push(o?(ar&&!o.edited?Object.assign(o,{a:ar,edited:1}):o):{en,a:ar,edited:ar?1:0,sent:en.split(' ').length>=3||/[.!?]$/.test(en),busy:0});
+  });
+  const keep=(CR.addRows||[]).filter(r=>r.src&&!seen.has(r.en.toLowerCase()));
+  CR.addRows=keep.concat(rows);
+  const need=rows.filter(r=>!String(r.a||'').trim()&&!r.edited&&!r.tried);
+  need.forEach(r=>{r.busy=1;r.tried=1;});crAddRepaint();
+  if(!need.length)return;
+  try{
+    const D=await loadDict();try{await loadNlp();}catch(e){}
+    for(const r of need){
+      let v='';
+      if(r.sent)v=await crAddGloss(r.en,D);
+      else{const x=lsLook(r.en,D);v=x&&x.ar?String(x.ar).split(/[،,;\/]/)[0].trim():'';}
+      r.dict=v;if(v)r.a=v;
+    }
+    const miss=need.filter(r=>!r.a);
+    if(miss.length&&typeof SAMPLE!=='undefined'&&SAMPLE){
+      try{const res=await SAMPLE.json('Translate each English word or sentence into simple, natural Arabic (for a single word give its most common meaning, 1-3 Arabic words). Reply with a JSON array of strings in the same order, nothing else.\nITEMS_JSON: '+JSON.stringify(miss.map(r=>r.en)),{modelTier:'quick'});
+        if(Array.isArray(res))miss.forEach((r,i)=>{if(typeof res[i]==='string'&&!r.edited)r.a=res[i].trim();});}catch(e){}
+    }
+  }catch(e){}
+  need.forEach(r=>{r.busy=0;});
+  if(my===CRAR.seq||true)crAddRepaint();
+}
+function crAddSave(){
+  const R=(CR.addRows||[]);if(!R.length){toast('اكتب كلمة أو جملة بالإنجليزي أولًا');return;}
+  const have=new Set((S.items||[]).map(i=>String(i.en||'').trim().toLowerCase()));let n=0,bad=0,dup=0,nt=0;
+  R.forEach((r,k)=>{
+    const en=r.en,ar=String(r.a||'').trim(),key=en.toLowerCase();
+    if(!ar){nt++;return;}
+    if(have.has(key)){dup++;return;}
+    if(!r.sent&&!/^[a-z ]+$/i.test(en)){bad++;return;}
+    S.items.push({id:uid(),t:r.sent?'s':(r.v?'v':'w'),en,a:ar,p:r.v?r.p:'',pa:r.v?r.pa:'',m:0,c:Date.now()+k});have.add(key);n++;
+  });
+  if(n){S.stats.added=(S.stats.added||0)+n;try{save();}catch(e){}CR.addTx='';CR.addRows=[];}
+  toast(n?`تمت إضافة ${n}${dup?` · ${dup} مكررة`:''}${nt?` · ${nt} بلا ترجمة`:''}${bad?` · ${bad} غير صالحة`:''}`:(nt?'اكتب المعنى للعناصر الفارغة أولًا':(dup?'كلها مضافة من قبل':'لم تُضف أي عناصر')));
+  crPaint(true);
+}
+document.addEventListener('change',e=>{const t=e.target;if(t&&t.classList&&t.classList.contains('cr-iti')){const it=(S.items||[]).find(i=>i.id===t.dataset.id);if(it&&t.value.trim()){it.a=t.value.trim();try{save();}catch(x){}toast('تم تعديل الترجمة');}else if(it)t.value=it.a;}});
+document.addEventListener('input',e=>{
+  const t=e.target;if(!t)return;
+  if(t.id==='crAddTx'){CR.addTx=t.value;clearTimeout(CRAR.t);CRAR.t=setTimeout(crAddSync,450);}
+  else if(t.classList&&t.classList.contains('cr-ari')){const r=(CR.addRows||[])[+t.dataset.i];if(r){r.a=t.value;r.edited=1;const b=document.getElementById('crAddBtn');if(b)b.innerHTML=ic('check')+' '+crAddBtnTxt();t.closest('.cr-ar').classList.toggle('miss',!t.value.trim());}}
+});
 function crGo(){return CR.cfg.g==='mem'?crMemStart():crQStart();}
 function crQStart(){
   const g=CR.cfg.g||'quiz',k=g==='trs'?'sents':(g==='trw'||g==='race')?'words':CR.cfg.kind;
@@ -13523,7 +13669,10 @@ function crTBody(){
   const G=CR.cfg.g||'quiz',ts={quiz:[10,15,20,30],race:[6,8,10,15],trw:[20,30,45,60],trs:[30,45,60,90],mem:[60,90,120,180]}[G],ns=G==='race'?[8,10,15,20]:[5,8,10,15];
   let qp;
   if(CR.qph==='idle')qp=`<button class="cr-fold ${CR.gOpen?'open':''}" data-act="cr_gfold" aria-expanded="${CR.gOpen?'true':'false'}"><span class="cr-fi">${ic('trophy')}</span><span class="cr-ft"><b>ألعاب وتدريبات للطلاب</b><small>٥ ألعاب جاهزة من كلماتك وجملك</small></span>${ic('chev')}</button>
-    ${CR.gOpen?`<div class="cr-gh">${GM.map(([k,em,t,d,tg,bg])=>`<button class="cr-gc ${G===k?'on':''}" data-act="cr_cfg" data-f="g" data-v="${k}" aria-pressed="${G===k}"><span class="cr-gt" style="background:${bg}"><i class="cr-gtag">${tg}</i><span class="cr-gem">${em}</span><u></u><u></u></span><span class="cr-gb"><b>${t}</b><small>${d}</small></span></button>`).join('')}</div>
+    ${CR.gOpen?`<div class="cr-src"><div class="cr-srch"><span class="cr-srci">${ic('book')}</span><span class="cr-srct"><b>مصدر الأسئلة</b><small>${arPool().length} كلمة · ${arSPool().length} جملة — تُبنى منها الأسئلة تلقائيًا</small></span><span class="cr-srcb"><button type="button" class="pill" data-act="cr_addt">${CR.addOpen?'إغلاق':'+ إضافة'}</button><button type="button" class="pill plain" data-act="cr_vwt" aria-expanded="${!!CR.vwOpen}">${CR.vwOpen?'إخفاء':'عرض'}</button></span></div>
+    ${CR.vwOpen?crItemsHtml():''}
+    ${CR.addOpen?`<div class="cr-addb">${crLsnHtml()}<textarea id="crAddTx" class="inp en" dir="ltr" rows="4" placeholder="banana&#10;car&#10;he plays football">${esc(CR.addTx||'')}</textarea><small class="help">اكتب الكلمات أو الجمل بالإنجليزي، سطر لكل واحدة. تُترجم تلقائيًا ويمكنك تعديل الترجمة قبل الحفظ.</small><div id="crAddRows" class="cr-rows">${crAddRowsHtml()}</div><button class="btn" id="crAddBtn" data-act="cr_addsv">${ic('check')} ${crAddBtnTxt()}</button></div>`:''}</div>
+    <div class="cr-gh">${GM.map(([k,em,t,d,tg,bg])=>`<button class="cr-gc ${G===k?'on':''}" data-act="cr_cfg" data-f="g" data-v="${k}" aria-pressed="${G===k}"><span class="cr-gt" style="background:${bg}"><i class="cr-gtag">${tg}</i><span class="cr-gem">${em}</span><u></u><u></u></span><span class="cr-gb"><b>${t}</b><small>${d}</small></span></button>`).join('')}</div>
     <div class="cr-card cr-set"><div class="cr-h"><b>${GM.find(x=>x[0]===G)[1]} ${CRG[G]}</b></div>
     ${G==='quiz'?`<div class="cr-cf"><span>النوع</span>${kinds.map(([k,t])=>`<button class="${CR.cfg.kind===k?'on':''}" data-act="cr_cfg" data-f="kind" data-v="${k}">${t}</button>`).join('')}</div>`:''}
     ${G==='mem'?'':`<div class="cr-cf"><span>الأسئلة</span>${ns.map(n=>`<button class="${CR.cfg.n===n?'on':''}" data-act="cr_cfg" data-f="n" data-v="${n}">${n}</button>`).join('')}</div>`}
@@ -13616,6 +13765,13 @@ document.addEventListener('click',e=>{
   else if(a==='cr_memend')crMemEnd();
   else if(a==='cr_qstart')crGo();
   else if(a==='cr_gfold'){CR.gOpen=!CR.gOpen;crPaint(true);}
+  else if(a==='cr_addt'){CR.addOpen=!CR.addOpen;crPaint(true);}
+  else if(a==='cr_addsv')crAddSave();
+  else if(a==='cr_vwt'){CR.vwOpen=!CR.vwOpen;crPaint(true);}
+  else if(a==='cr_itd'){S.items=(S.items||[]).filter(i=>i.id!==b.dataset.id);try{save();}catch(e){}crPaint(true);}
+  else if(a==='cr_lsnt'){CR.lsnOpen=!CR.lsnOpen;if(CR.lsnOpen&&!TQ.list)tqLoad().then(()=>crPaint(true));crPaint(true);}
+  else if(a==='cr_lsn')crLsnPull(b.dataset.id);
+  else if(a==='cr_ard'){const i=+b.dataset.i,r=(CR.addRows||[])[i];if(r){CR.addRows.splice(i,1);const tx=document.getElementById('crAddTx');if(tx){tx.value=tx.value.split(/\r?\n/).filter(l=>{const m=l.trim().match(/^(.+?)\s*[=:\t]\s*(.+)$/);return ((m?m[1]:l).replace(/\s+/g,' ').trim().toLowerCase())!==r.en.toLowerCase();}).join('\n');CR.addTx=tx.value;}crAddRepaint();}}
   else if(a==='cr_qstop')crQStop();
   else if(a==='cr_reveal')crReveal();
   else if(a==='cr_next'){if(CR.qph==='r')crQNext();}
