@@ -2253,6 +2253,10 @@ html[dir=rtl] .lsn-card .lsn-art-state{transform:translateX(50%)}
 .cr-ov{position:absolute;inset:0;z-index:90;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
 .cr-top{display:flex;align-items:center;gap:10px;padding:10px 12px;background:linear-gradient(180deg,rgba(124,108,255,.28),rgba(124,108,255,.1));border-bottom:1px solid rgba(155,123,255,.3);flex:none}
 .cr-live{display:inline-flex;align-items:center;gap:6px;background:#e0314b;color:#fff;font-weight:900;font-size:12px;padding:5px 10px;border-radius:99px}.cr-live em,.cr-pill em,.cr-nt-k em{width:8px;height:8px;border-radius:50%;background:#fff;animation:crBlink 1s infinite;display:inline-block}
+.cr-rec{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:7px 12px;border-radius:99px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.1);color:#fff;font:800 12.5px inherit;white-space:nowrap}
+.cr-rec i{width:9px;height:9px;border-radius:50%;background:#a7a4b8;display:inline-block;flex:none}
+.cr-rec.on{background:rgba(224,49,75,.18)!important;border-color:rgba(255,82,82,.72)!important;color:#fff}
+.cr-rec.on i{background:#ff5252;box-shadow:0 0 0 4px rgba(255,82,82,.14);animation:crBlink 1s infinite}
 .cr-tt{flex:1;min-width:0;display:flex;flex-direction:column}.cr-tt b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cr-tt small{font-size:12px;opacity:.8}.cr-tk{color:#3fd78a;font-style:normal;font-weight:900}
 .cr-cnt{display:inline-flex;align-items:center;gap:4px;font-weight:900;font-size:14px}.cr-cnt svg{width:16px;height:16px}
 .cr-x{padding:7px 14px;border-radius:99px;background:rgba(255,255,255,.1);color:#fff;font-weight:800;font-size:13px;border:1px solid rgba(255,255,255,.18)}.cr-x.end{background:#e0314b;border-color:transparent}
@@ -13103,7 +13107,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 const CR={role:'',on:false,code:'',rid:'',teacher:'',title:'غرفة الشرح',peer:null,sp:null,live:null,seen:'',tconn:null,stu:{},roster:[],err:'',
  ac:null,dest:null,out:null,screen:null,mic:null,micOn:false,sharing:false,tsp:false,
  cfg:{kind:'mix',n:8,t:15,g:'quiz'},game:'quiz',gOpen:false,mem:null,mg:null,lf:[],lw:null,le:0,qs:[],qi:-1,qph:'idle',qt0:0,qr0:0,qT:15,cq:null,board:[],allowed:false,hand:false,smic:null,scall:null,tmic:false,tshare:false,
- pbusy:0,pend:{},slot:0,vk:'',face:'environment',lob:{},lc:null,scam:null,scamCall:null,shareCall:null,srt:null,sig:'',bcT:0,tm:null,rt:null,guest:'',jn:false,paint:0,ended:null};
+ pbusy:0,pend:{},slot:0,vk:'',face:'environment',lob:{},lc:null,scam:null,scamCall:null,shareCall:null,srt:null,rec:null,recChunks:[],sig:'',bcT:0,tm:null,rt:null,guest:'',jn:false,paint:0,ended:null};
 const crTid=(c,sl)=>'kxr-'+String(c).replace(/[^A-Za-z0-9]/g,'')+(sl?'-'+sl:'');
 const crUid=()=>{const s=sbSess();return (s&&s.uid)||CR.guest||(CR.guest='g'+Math.random().toString(36).slice(2,9));};
 const crMyName=()=>((S.profile&&S.profile.name)||S.name||'طالب');
@@ -13118,6 +13122,7 @@ function crReset(){
   try{fishClose(true);}catch(e){}
   clearInterval(CR.tm);clearInterval(CR.rt);
   clearInterval(CR.srt);CR.srt=null;
+  if(CR.rec)crRecStop(true);
   try{CR.mst&&CR.mst();}catch(e){}
   [CR.mic,CR.screen,CR.smic,CR.scam].forEach(s=>{if(s)s.getTracks().forEach(t=>t.stop());});
   try{CR.scamCall&&CR.scamCall.close();}catch(e){}
@@ -13127,7 +13132,7 @@ function crReset(){
   try{CR.shareCall&&CR.shareCall.close();}catch(e){}
   if(CR.role==='t'){try{CR.peer&&CR.peer.destroy();}catch(e){}try{CR.ac&&CR.ac.close();}catch(e){}}
   document.querySelectorAll('[id^="lvva-cr"]').forEach(a=>a.remove());
-  Object.assign(CR,{fish:null,fg:null,go:false,goBusy:0,role:'',on:false,peer:null,stu:{},roster:[],err:'',ac:null,dest:null,out:null,screen:null,mic:null,scam:null,scamCall:null,micOn:false,sharing:false,tsp:false,qs:[],qi:-1,qph:'idle',cq:null,board:[],allowed:false,hand:false,smic:null,scall:null,shareCall:null,srt:null,tmic:false,tshare:false,tconn:null,tm:null,rt:null,jn:false,sig:'',ended:null,mst:null,open:false,needTap:false,qEnd:false,gain:0,lob:{}});
+  Object.assign(CR,{fish:null,fg:null,go:false,goBusy:0,role:'',on:false,peer:null,stu:{},roster:[],err:'',ac:null,dest:null,out:null,screen:null,mic:null,scam:null,scamCall:null,micOn:false,sharing:false,tsp:false,qs:[],qi:-1,qph:'idle',cq:null,board:[],allowed:false,hand:false,smic:null,scall:null,shareCall:null,srt:null,rec:null,tmic:false,tshare:false,tconn:null,tm:null,rt:null,jn:false,sig:'',ended:null,mst:null,open:false,needTap:false,qEnd:false,gain:0,lob:{}});
 }
 function crShell(){
   let o=document.getElementById('crOv');if(o)o.remove();
@@ -13305,6 +13310,44 @@ function crShareStart(st,kind){
       if(r&&r.on&&(!r.call||!r.call.open))crCallStu(u);
     });
   },1200);
+}
+function crRecSupported(){
+  return !!(window.MediaRecorder&&CR.out&&CR.out.getTracks().length);
+}
+function crRecStart(){
+  if(!CR.sharing||CR.rec)return false;
+  if(!crRecSupported()){toast('تسجيل الفيديو غير مدعوم في هذا المتصفح');return false;}
+  CR.recChunks=[];
+  let mime='',types=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4'];
+  for(const type of types){if(MediaRecorder.isTypeSupported(type)){mime=type;break;}}
+  try{
+    CR.rec=new MediaRecorder(CR.out,mime?{mimeType:mime,videoBitsPerSecond:2500000}:undefined);
+  }catch(e){toast('تعذر بدء تسجيل البث');return false;}
+  const recorder=CR.rec;
+  recorder.ondataavailable=e=>{if(e.data&&e.data.size)CR.recChunks.push(e.data);};
+  recorder.onstop=()=>{
+    const chunks=CR.recChunks||[],mimeType=recorder.mimeType||mime||'video/webm';
+    CR.rec=null;CR.recChunks=[];
+    if(!chunks.length){toast('لم يتم تسجيل بيانات فيديو');crPaintTop();return;}
+    const blob=new Blob(chunks,{type:mimeType}),ext=mimeType.includes('mp4')?'mp4':'webm';
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    const stamp=new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+    a.href=url;a.download=`شرح-البث-${stamp}.${ext}`;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    toast('تم حفظ تسجيل شرح البث');
+    crPaintTop();
+  };
+  CR.rec.start(1000);toast('بدأ تسجيل شرح البث');
+  crPaintTop();return true;
+}
+function crRecStop(download=true){
+  if(!CR.rec)return;
+  if(CR.rec.state==='recording'||CR.rec.state==='paused')CR.rec.stop();
+  if(!download)CR.recChunks=[];
+  crPaintTop();
+}
+function crRecToggle(){
+  if(CR.rec)crRecStop(true);else crRecStart();
 }
 const CRB_COL=['#ff3b30','#1a73e8','#16a34a','#f59e0b','#111111','#ffffff'],CRB_HL=['#ffea00','#ffb000','#ff6b81','#39d98a','#80c7ff','#d8b4fe'],CRB_SEL=['#6d5cf0','#2563eb','#ec4899','#14b8a6','#111111','#ffffff'],CRB_LAS=['#ff2d55','#ff1744','#ffcc00','#22d3ee','#a855f7','#ffffff'],CRB_W=[5,9,16],CRB_H=[28,42,62],CRB_T=[44,64,92];
 function crRender(x,W,H,s,cur,live){
@@ -13595,6 +13638,7 @@ function crDeleteSlide(){
 function crFlip(){CR.face=CR.face==='user'?'environment':'user';crTShare('cam');}
 function crStopShare(){
   if(!CR.sharing)return;
+  if(CR.rec)crRecStop(true);
   clearInterval(CR.srt);CR.srt=null;
   try{CR.screen&&CR.screen.getTracks().forEach(t=>t.stop());}catch(e){}
   try{CR.ssrc&&CR.ssrc.disconnect();}catch(e){}
@@ -14173,7 +14217,8 @@ function crPaintTop(){
   const t=document.getElementById('crTop');if(!t)return;
   const isT=CR.role==='t',n=isT?Object.values(CR.stu).filter(r=>r.on).length:CR.roster.filter(r=>r.on).length;
   const talking=isT?CR.tsp:CR.ttalk;
-  t.innerHTML=`${isT&&!CR.go?`<button class="cr-live off" data-act="cr_go" ${CR.goBusy?'disabled':''}><em></em> ${CR.goBusy?'جارٍ البدء…':'مباشر'}</button>`:'<span class="cr-live"><em></em> مباشر</span>'}<div class="cr-tt"><b>${esc(CR.title)}</b><small>${isT?(CR.go?'أنت المعلم':'وضع التحضير · اضغط «مباشر» لبدء الحصة'):esc(CR.teacher)}${talking?' · <i class="cr-tk">يتحدث الآن</i>':''}</small></div><span class="cr-cnt">${ic('user')} ${n}</span>${isT?`<button class="cr-x end" data-act="cr_end">إنهاء</button>`:`<button class="cr-x" data-act="cr_leave">مغادرة</button>`}`;
+  const rec=isT&&CR.sharing?`<button class="cr-rec ${CR.rec?'on':''}" data-act="cr_rec" aria-pressed="${!!CR.rec}"><i></i>${CR.rec?'إيقاف الحفظ':'تسجيل الفيديو'}</button>`:'';
+  t.innerHTML=`${isT&&!CR.go?`<button class="cr-live off" data-act="cr_go" ${CR.goBusy?'disabled':''}><em></em> ${CR.goBusy?'جارٍ البدء…':'مباشر'}</button>`:'<span class="cr-live"><em></em> مباشر</span>'}<div class="cr-tt"><b>${esc(CR.title)}</b><small>${isT?(CR.go?'أنت المعلم':'وضع التحضير · اضغط «مباشر» لبدء الحصة'):esc(CR.teacher)}${talking?' · <i class="cr-tk">يتحدث الآن</i>':''}</small></div>${rec}<span class="cr-cnt">${ic('user')} ${n}</span>${isT?`<button class="cr-x end" data-act="cr_end">إنهاء</button>`:`<button class="cr-x" data-act="cr_leave">مغادرة</button>`}`;
 }
 function crPaintStage(){
   const p=document.getElementById('crPh'),v=document.getElementById('crVid');if(!p||!v)return;
@@ -14377,6 +14422,7 @@ document.addEventListener('click',e=>{
   else if(a==='cr_leave')crSLeave();
   else if(a==='cr_share')crTShare('screen');
   else if(a==='cr_cam')crTShare('cam');
+  else if(a==='cr_rec')crRecToggle();
   else if(a==='cr_img'){if(CR.sharing&&CR.vk==='img')crStopShare();else crPickSlides(false);}
   else if(a==='cr_imga')crPickSlides(true);
   else if(a==='cr_wb'||a==='cr_wbn')crWb();
