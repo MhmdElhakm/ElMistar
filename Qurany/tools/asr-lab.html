@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>مختبر قياس التسميع</title>
+<style>
+  :root{--bg:#f6f4ee;--card:#fff;--ink:#1d2a24;--mut:#5b6b63;--ln:#d8d4c6;--ac:#1f7a4d;--bad:#b3261e;--warn:#9a6700}
+  @media (prefers-color-scheme:dark){:root{--bg:#121816;--card:#1a221f;--ink:#e8efe9;--mut:#9fb0a6;--ln:#2e3b36;--ac:#4cc38a;--bad:#ff8a80;--warn:#e3b341}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 system-ui,"Segoe UI",Tahoma,sans-serif;padding:14px 16px 60px;max-width:860px;margin-inline:auto}
+  h1{font-size:20px;margin:6px 0}
+  h2{font-size:16px;margin:0 0 8px}
+  section{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:12px 14px;margin:12px 0}
+  .note{color:var(--mut);font-size:13px}
+  .warn{color:var(--warn)} .bad{color:var(--bad)} .ok{color:var(--ac)}
+  button{font:inherit;padding:9px 14px;border-radius:10px;border:1px solid var(--ln);background:var(--card);color:var(--ink);cursor:pointer;min-height:44px}
+  button.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+  pre{margin:8px 0 0;padding:8px;border-radius:8px;background:rgba(128,128,128,.12);font:12px/1.7 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;display:block;overflow-x:auto}
+  th,td{border-bottom:1px solid var(--ln);padding:4px 6px;text-align:start;white-space:nowrap}
+  td.txt{white-space:normal;min-width:160px;font-size:14px}
+  input[type=text],textarea{width:100%;font:inherit;padding:8px;border-radius:8px;border:1px solid var(--ln);background:var(--bg);color:var(--ink)}
+  label{display:inline-flex;gap:6px;align-items:center}
+  #stubBadge{display:none;background:var(--warn);color:#000;padding:2px 8px;border-radius:8px;font-size:12px}
+</style>
+</head>
+<body>
+<h1>مختبر قياس التسميع <span id="stubBadge">وضع المحاكاة: ليست قياسات حقيقية</span></h1>
+<p class="note">صفحة اختبار معزولة عن التطبيق. الصوت يُعالَج داخل المتصفح فقط ولا يُرسل ولا يُحفظ. الاتصال الوحيد هو تنزيل المكتبة والنموذج (jsDelivr وHugging Face) كما يفعل التطبيق. النتائج تبقى في الذاكرة حتى تصدّرها. الأرقام هنا تخص هذا الجهاز وهذا المتصفح وحدهما.</p>
+
+<section>
+  <h2>0) بيئة الجهاز</h2>
+  <pre id="env">…</pre>
+</section>
+
+<section>
+  <h2>1) تحميل النموذج وقياسه</h2>
+  <p class="note">النموذج والمكتبة نفس ما يستخدمه التطبيق (انظر <code>QURAN_MODEL</code> في app.js). حجم التنزيل يُقاس أثناء التنزيل ويظهر بعده؛ ابدأ على شبكة مناسبة. إن كان النموذج مخزّنًا من قبل فسيُقرأ من الكاش ولن يُحتسب تنزيلًا.</p>
+  <div class="row"><button class="pri" id="btnLoad">تنزيل وتحميل النموذج</button><span id="loadState" role="status">لم يُحمَّل</span></div>
+  <pre id="loadInfo" hidden></pre>
+</section>
+
+<section>
+  <h2>2) مصدر الصوت</h2>
+  <div class="row">
+    <label>ملفات مرجعية: <input type="file" id="files" accept="audio/*" multiple></label>
+  </div>
+  <div class="row">
+    <label>مدة التسجيل: <select id="recSec"><option>5</option><option selected>10</option><option>20</option><option>30</option></select> ثانية</label>
+    <label><input type="checkbox" id="cEcho" checked> echoCancellation</label>
+    <label><input type="checkbox" id="cNoise" checked> noiseSuppression</label>
+    <label><input type="checkbox" id="cAgc" checked> autoGainControl</label>
+  </div>
+  <div class="row"><button id="btnRec">تسجيل من الميكروفون</button><span id="recState" role="status"></span></div>
+  <p class="note">الإعدادات الثلاثة مفعّلة افتراضيًا كما في التطبيق. جرّب إيقافها ومقارنة النتيجة بنفس القراءة، ولا تستنتج أثرها قبل القياس. بعد كل تسجيل يظهر مشغّل لتسمع ما التُقط.</p>
+  <div id="clips"></div>
+</section>
+
+<section>
+  <h2>3) تشغيل الاستدلال على المقاطع</h2>
+  <div class="row">
+    <label>عدد التكرارات لكل مقطع: <input type="text" id="reps" value="3" size="2" inputmode="numeric"></label>
+    <button class="pri" id="btnRun" disabled>تشغيل على كل المقاطع</button>
+  </div>
+  <p class="note">التكرار الأول للمقطع الأول بعد التحميل يُعد «بارد»، والباقي «مستقر». أدخل النص المرجعي الصحيح لكل مقطع (من المصحف) لحساب نسبة خطأ الكلمات التقريبية؛ المقارنة هنا بعد حذف التشكيل فقط ولا تطابق قواعد مطابقة التطبيق.</p>
+</section>
+
+<section>
+  <h2>4) اختبار التراكم (قراءة مستمرة)</h2>
+  <p class="note">يحاكي ما يفعله التطبيق الآن: كل 1.2 ثانية يُعاد تفريغ المقطع كاملًا من أوله حتى 20 ثانية. إن تجاوز زمن الاستدلال 1200ms فالتفريغ لا يلحق بالصوت. هذا القياس لا يتضمن ضغط الالتقاط والواجهة على الخيط الرئيسي، لذلك استخدم أيضًا لوحة التشخيص داخل التطبيق أثناء قراءة حقيقية.</p>
+  <div class="row"><select id="accClip"></select><button id="btnAcc" disabled>تشغيل اختبار التراكم</button></div>
+</section>
+
+<section>
+  <h2>5) اختبار الصمت والضوضاء</h2>
+  <p class="note">ينتج 5 ثوانٍ من صمت رقمي وضوضاء بمستويات مختلفة ويعرض ما يخرجه النموذج. أي نص غير فارغ يُعد احتمال هلوسة (يُذكر إن كان مرشّح التطبيق سيرفضه).</p>
+  <div class="row"><button id="btnSil" disabled>تشغيل</button></div>
+</section>
+
+<section>
+  <h2>النتائج</h2>
+  <div class="row"><button id="btnJson" disabled>تصدير JSON</button><button id="btnCsv" disabled>تصدير CSV</button><button id="btnClear">مسح النتائج</button></div>
+  <p class="note" id="sumLine"></p>
+  <table id="tbl"><thead><tr><th>#</th><th>نوع</th><th>مقطع</th><th>مدة الصوت</th><th>بارد؟</th><th>استدلال ms</th><th>RTF</th><th>WER</th><th>النص</th></tr></thead><tbody></tbody></table>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  /* مرآة لثوابت التطبيق (app.js): عدّلها هناك أولًا إن تغيّرت */
+  var QURAN_MODEL = 'omartariq612/whisper-tiny-ar-quran-onnx';
+  var QURAN_LIB = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1';
+  var STUB = /[?&]stub=1/.test(location.search);
+  var $ = function (id) { return document.getElementById(id); };
+  var pipe = null, libEnv = null, loadMeta = null, inferCount = 0, clips = [], rows = [], busy = false;
+  if (STUB) $('stubBadge').style.display = 'inline-block';
+
+  function now() { return performance.now(); }
+  function med(a) { if (!a.length) return null; var s = a.slice().sort(function (x, y) { return x - y; }); return s[Math.floor((s.length - 1) / 2)]; }
+  function p95(a) { if (!a.length) return null; var s = a.slice().sort(function (x, y) { return x - y; }); return s[Math.min(s.length - 1, Math.ceil(0.95 * s.length) - 1)]; }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  /* ---------- بيئة ---------- */
+  (function () {
+    var n = navigator, e = {
+      userAgent: n.userAgent, hardwareConcurrency: n.hardwareConcurrency || 'غير معروف', deviceMemoryGB: n.deviceMemory || 'غير معروف',
+      crossOriginIsolated: !!window.crossOriginIsolated, SharedArrayBuffer: typeof SharedArrayBuffer !== 'undefined',
+      webgpuApi: !!n.gpu, secureContext: window.isSecureContext, online: n.onLine,
+      note: 'ظهور واجهة WebGPU لا يعني أن النموذج يعمل عليها. هذا المختبر يختبر WASM فقط كما في التطبيق.'
+    };
+    $('env').textContent = JSON.stringify(e, null, 1);
+    window.__env = e;
+  })();
+
+  /* ---------- النموذج ---------- */
+  function filterHallu(text, sec) { /* نفس مرشّح التطبيق: يُعيد true إن كان سيرفض النص */
+    var toks = text.split(/\s+/).filter(Boolean);
+    if (toks.length > sec * 5 + 4) return true;
+    var run = 1;
+    for (var i = 1; i < toks.length; i++) { run = toks[i] === toks[i - 1] ? run + 1 : 1; if (run > 4) return true; }
+    return false;
+  }
+  async function infer(audio) {
+    var sec = audio.length / 16000, t0 = now(), text;
+    if (STUB) {
+      await new Promise(function (r) { setTimeout(r, 120 + sec * 30); });
+      text = 'نص محاكاة';
+    } else {
+      var r = await pipe(audio, { language: 'arabic', task: 'transcribe', max_new_tokens: Math.min(160, Math.round(sec * 7) + 12), num_beams: 1, do_sample: false });
+      text = ((r && r.text) || '').trim();
+    }
+    var ms = now() - t0, cold = inferCount === 0;
+    inferCount++;
+    return { text: text, ms: ms, cold: cold, sec: sec, rejected: filterHallu(text, sec) };
+  }
+  $('btnLoad').onclick = async function () {
+    if (!STUB && !confirm('سيُنزَّل النموذج والمكتبة من الإنترنت (الحجم الفعلي يظهر بعد التنزيل). المتابعة؟')) return;
+    this.disabled = true;
+    var st = $('loadState'), files = {}, t0 = now(), tLib, meta = { stub: STUB };
+    try {
+      if (STUB) {
+        await new Promise(function (r) { setTimeout(r, 300); });
+        meta.libMs = 150; meta.pipelineMs = 150; meta.bytes = 0;
+      } else {
+        st.textContent = 'تحميل المكتبة…';
+        var lib = await import(QURAN_LIB);
+        lib.env.allowLocalModels = false;
+        tLib = now(); meta.libMs = tLib - t0;
+        try { var w = lib.env.backends.onnx.wasm; meta.wasmThreads = w.numThreads; meta.wasmProxy = !!w.proxy; } catch (e) {}
+        pipe = await lib.pipeline('automatic-speech-recognition', QURAN_MODEL, {
+          dtype: 'q8', device: 'wasm',
+          progress_callback: function (p) {
+            if (p && p.status === 'progress' && p.total) {
+              files[p.file] = { l: p.loaded, t: p.total };
+              var l = 0, t = 0; Object.keys(files).forEach(function (k) { l += files[k].l; t += files[k].t; });
+              st.textContent = 'تنزيل النموذج ' + Math.round(l / t * 100) + '% (' + (l / 1048576).toFixed(1) + ' / ' + (t / 1048576).toFixed(1) + ' MB)';
+            }
+          }
+        });
+        meta.pipelineMs = now() - tLib;
+        var bytes = 0; Object.keys(files).forEach(function (k) { bytes += files[k].t; });
+        meta.bytes = bytes; meta.files = Object.keys(files);
+      }
+      /* تسخين: استدلال على ثانية صمت يُسجَّل كأول استدلال (بارد) */
+      inferCount = 0;
+      var w1 = await infer(new Float32Array(16000));
+      meta.firstInferMs = w1.ms;
+      loadMeta = meta;
+      st.textContent = 'جاهز';
+      st.className = 'ok';
+      $('loadInfo').hidden = false;
+      $('loadInfo').textContent =
+        'المكتبة: ' + Math.round(meta.libMs) + 'ms\nالنموذج (تنزيل + تجميع، غير قابلين للفصل هنا): ' + Math.round(meta.pipelineMs) + 'ms\n' +
+        'المنزَّل المقاس: ' + (meta.bytes ? (meta.bytes / 1048576).toFixed(1) + ' MB' : 'غير مقاس (قد يكون من الكاش)') + '\n' +
+        'أول استدلال (ثانية صمت): ' + Math.round(meta.firstInferMs) + 'ms\nخيوط wasm المقروءة: ' + (meta.wasmThreads == null ? 'غير معروف' : meta.wasmThreads) +
+        '\nالمحرك: wasm (مطلوب). التحقق الفعلي من المحرك غير متاح من واجهة المكتبة سوى عدد الخيوط.';
+      rows.push({ kind: 'load', clip: '-', sec: 0, cold: true, ms: meta.firstInferMs, text: '(ثانية صمت للتسخين)', meta: meta });
+      enable(); render();
+    } catch (e) {
+      st.textContent = 'فشل: ' + String(e && (e.message || e.name) || e).slice(0, 160);
+      st.className = 'bad';
+      this.disabled = false;
+    }
+  };
+
+  function enable() {
+    var ok = !!(pipe || STUB) && !!loadMeta;
+    $('btnRun').disabled = !ok || !clips.length;
+    $('btnAcc').disabled = !ok || !clips.length;
+    $('btnSil').disabled = !ok;
+  }
+
+  /* ---------- مقاطع الصوت ---------- */
+  async function decodeToMono16k(buf) {
+    var Ctx = window.AudioContext || window.webkitAudioContext, ctx = new Ctx();
+    var ab = await ctx.decodeAudioData(buf.slice(0));
+    try { ctx.close(); } catch (e) {}
+    var len = ab.length, ch = ab.numberOfChannels, mono = new Float32Array(len);
+    for (var c = 0; c < ch; c++) { var d = ab.getChannelData(c); for (var i = 0; i < len; i++) mono[i] += d[i] / ch; }
+    if (ab.sampleRate === 16000) return mono;
+    var off = new OfflineAudioContext(1, Math.ceil(len * 16000 / ab.sampleRate), 16000);
+    var b = off.createBuffer(1, len, ab.sampleRate); b.getChannelData(0).set(mono);
+    var src = off.createBufferSource(); src.buffer = b; src.connect(off.destination); src.start();
+    var out = await off.startRendering();
+    return out.getChannelData(0).slice();
+  }
+  function stats(a) { var pk = 0, s = 0; for (var i = 0; i < a.length; i++) { var v = Math.abs(a[i]); if (v > pk) pk = v; s += a[i] * a[i]; } return { peak: pk, rms: Math.sqrt(s / (a.length || 1)) }; }
+  function addClip(name, audio, blob) {
+    var id = clips.length, s = stats(audio);
+    clips.push({ name: name, audio: audio, ref: '' });
+    var d = document.createElement('div');
+    d.style.cssText = 'border-top:1px solid var(--ln);padding:8px 0';
+    d.innerHTML = '<b>' + esc(name) + '</b> <span class="note">' + (audio.length / 16000).toFixed(1) + 's، ذروة ' + s.peak.toFixed(3) + '، RMS ' + s.rms.toFixed(4) + (s.peak < 0.01 ? ' <span class="warn">(صوت خافت جدًا)</span>' : '') + '</span>' +
+      (blob ? '<br><audio controls src="' + URL.createObjectURL(blob) + '" style="width:100%"></audio>' : '') +
+      '<br><input type="text" placeholder="النص المرجعي الصحيح لهذا المقطع (اختياري، لحساب WER)" data-ref="' + id + '">';
+    $('clips').appendChild(d);
+    d.querySelector('input').oninput = function () { clips[id].ref = this.value; };
+    var o = document.createElement('option'); o.value = id; o.textContent = name; $('accClip').appendChild(o);
+    enable();
+  }
+  $('files').onchange = async function () {
+    for (var f of this.files) {
+      try { addClip(f.name, await decodeToMono16k(await f.arrayBuffer()), f); }
+      catch (e) { alert('تعذر فك ترميز ' + f.name); }
+    }
+  };
+  $('btnRec').onclick = async function () {
+    var sec = +$('recSec').value, st = $('recState'), self = this;
+    self.disabled = true;
+    var stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: $('cEcho').checked, noiseSuppression: $('cNoise').checked, autoGainControl: $('cAgc').checked } });
+    } catch (e) {
+      st.textContent = e && e.name === 'NotAllowedError' ? 'لم يُسمح بالميكروفون' : 'تعذر فتح الميكروفون: ' + (e && e.name);
+      self.disabled = false; return;
+    }
+    var Ctx = window.AudioContext || window.webkitAudioContext, ctx;
+    try { ctx = new Ctx({ sampleRate: 16000 }); } catch (e) { ctx = new Ctx(); }
+    var rate = ctx.sampleRate, settings = stream.getAudioTracks()[0].getSettings ? stream.getAudioTracks()[0].getSettings() : {};
+    var src = ctx.createMediaStreamSource(stream), node = ctx.createScriptProcessor(4096, 1, 1), mute = ctx.createGain(), parts = [], n = 0;
+    mute.gain.value = 0; src.connect(node); node.connect(mute); mute.connect(ctx.destination);
+    node.onaudioprocess = function (e) { var f = new Float32Array(e.inputBuffer.getChannelData(0)); parts.push(f); n += f.length; };
+    var left = sec;
+    st.textContent = 'يسجّل… ' + left + 's';
+    var iv = setInterval(function () { left--; st.textContent = 'يسجّل… ' + left + 's'; }, 1000);
+    await new Promise(function (r) { setTimeout(r, sec * 1000); });
+    clearInterval(iv);
+    try { node.disconnect(); src.disconnect(); stream.getTracks().forEach(function (t) { t.stop(); }); ctx.close(); } catch (e) {}
+    var all = new Float32Array(n), p = 0; parts.forEach(function (a) { all.set(a, p); p += a.length; });
+    var audio = all;
+    if (rate !== 16000) { /* إعادة أخذ عينات حقيقية عبر OfflineAudioContext */
+      var off = new OfflineAudioContext(1, Math.ceil(all.length * 16000 / rate), 16000), b = off.createBuffer(1, all.length, rate);
+      b.getChannelData(0).set(all); var bs = off.createBufferSource(); bs.buffer = b; bs.connect(off.destination); bs.start();
+      audio = (await off.startRendering()).getChannelData(0).slice();
+    }
+    /* WAV للمعاينة المحلية فقط (لا يُحفظ ولا يُرسل) */
+    var wav = new ArrayBuffer(44 + audio.length * 2), dv = new DataView(wav);
+    function ws(o, s) { for (var i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); }
+    ws(0, 'RIFF'); dv.setUint32(4, 36 + audio.length * 2, true); ws(8, 'WAVEfmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+    dv.setUint32(24, 16000, true); dv.setUint32(28, 32000, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); ws(36, 'data'); dv.setUint32(40, audio.length * 2, true);
+    for (var i = 0; i < audio.length; i++) dv.setInt16(44 + i * 2, Math.max(-1, Math.min(1, audio[i])) * 32767, true);
+    var tag = 'تسجيل ' + (clips.length + 1) + ' [' + (+$('cEcho').checked) + (+$('cNoise').checked) + (+$('cAgc').checked) + ']';
+    addClip(tag, audio, new Blob([wav], { type: 'audio/wav' }));
+    clips[clips.length - 1].settings = settings;
+    st.textContent = 'تم. معدل الالتقاط الفعلي ' + rate + 'Hz. الرمز [صدى/ضوضاء/AGC] في الاسم يبيّن الإعدادات.';
+    self.disabled = false;
+  };
+
+  /* ---------- WER تقريبي ---------- */
+  function wnorm(t) { return String(t).replace(/[ً-ٰٟۖ-ۭـ]/g, '').replace(/[^ء-ي\s]/g, ' ').split(/\s+/).filter(Boolean); }
+  function wer(ref, hyp) {
+    var a = wnorm(ref), b = wnorm(hyp);
+    if (!a.length) return null;
+    var d = []; for (var j = 0; j <= b.length; j++) d[j] = j;
+    for (var i = 1; i <= a.length; i++) { var prev = d[0]; d[0] = i; for (var k = 1; k <= b.length; k++) { var tmp = d[k]; d[k] = Math.min(d[k] + 1, d[k - 1] + 1, prev + (a[i - 1] === b[k - 1] ? 0 : 1)); prev = tmp; } }
+    return d[b.length] / a.length;
+  }
+
+  /* ---------- التشغيل ---------- */
+  function lock(v) { busy = v; ['btnRun', 'btnAcc', 'btnSil', 'btnLoad'].forEach(function (i) { if (i !== 'btnLoad') $(i).disabled = v || !(pipe || STUB); }); if (!v) enable(); }
+  $('btnRun').onclick = async function () {
+    if (busy) return; lock(true);
+    var reps = Math.max(1, Math.min(10, parseInt($('reps').value, 10) || 3));
+    for (var c = 0; c < clips.length; c++) {
+      for (var r = 0; r < reps; r++) {
+        var o = await infer(clips[c].audio);
+        rows.push({ kind: 'clip', clip: clips[c].name, sec: o.sec, cold: o.cold, ms: o.ms, rtf: o.ms / 1000 / o.sec, wer: clips[c].ref ? wer(clips[c].ref, o.text) : null, text: o.text, rejectedByAppFilter: o.rejected, settings: clips[c].settings || null });
+        render(); await new Promise(function (r2) { setTimeout(r2, 0); });
+      }
+    }
+    lock(false);
+  };
+  $('btnAcc').onclick = async function () {
+    if (busy) return; lock(true);
+    var clip = clips[+$('accClip').value], A = clip.audio, step = 1.2, maxS = Math.min(20, A.length / 16000);
+    if (maxS < 6) alert('المقطع أقصر من 6 ثوانٍ؛ سجّل أو اختر مقطعًا أطول (يفضّل 20 ثانية قراءة متصلة) لنتيجة ذات معنى.');
+    for (var t = step; t <= maxS + 1e-6; t += step) {
+      var o = await infer(A.subarray(0, Math.floor(t * 16000)));
+      rows.push({ kind: 'accum', clip: clip.name, sec: t, cold: o.cold, ms: o.ms, rtf: o.ms / 1000 / t, lagVsStep: o.ms > step * 1000 ? 'لا يلحق' : 'يلحق', text: o.text });
+      render(); await new Promise(function (r2) { setTimeout(r2, 0); });
+    }
+    lock(false);
+  };
+  $('btnSil').onclick = async function () {
+    if (busy) return; lock(true);
+    var cases = [['صمت رقمي', 0], ['ضوضاء خافتة', 0.003], ['ضوضاء متوسطة', 0.02]];
+    for (var i = 0; i < cases.length; i++) {
+      var a = new Float32Array(80000);
+      for (var j = 0; j < a.length; j++) a[j] = (Math.random() * 2 - 1) * cases[i][1];
+      var o = await infer(a);
+      rows.push({ kind: 'silence', clip: cases[i][0], sec: 5, cold: o.cold, ms: o.ms, rtf: o.ms / 5000, text: o.text || '(فارغ)', hallucination: !!o.text, rejectedByAppFilter: o.rejected });
+      render();
+    }
+    lock(false);
+  };
+
+  /* ---------- عرض وتصدير ---------- */
+  var KIND = { load: 'تحميل', clip: 'مقطع', accum: 'تراكم', silence: 'صمت' };
+  function render() {
+    var tb = $('tbl').tBodies[0]; tb.innerHTML = '';
+    rows.forEach(function (r, i) {
+      var tr = document.createElement('tr');
+      var flag = r.hallucination ? ' <span class="bad">⚠ هلوسة محتملة' + (r.rejectedByAppFilter ? ' (يرفضها مرشّح التطبيق)' : ' (لا يرفضها المرشّح)') + '</span>' : r.lagVsStep === 'لا يلحق' ? ' <span class="bad">⚠ لا يلحق</span>' : '';
+      tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + KIND[r.kind] + '</td><td>' + esc(r.clip) + '</td><td>' + (r.sec ? r.sec.toFixed(1) + 's' : '') + '</td><td>' + (r.cold ? 'بارد' : 'مستقر') + '</td><td>' + Math.round(r.ms) + '</td><td>' + (r.rtf != null ? r.rtf.toFixed(2) : '') + '</td><td>' + (r.wer != null ? Math.round(r.wer * 100) + '%' : '') + '</td><td class="txt">' + esc(r.text) + flag + '</td>';
+      tb.appendChild(tr);
+    });
+    var st = rows.filter(function (r) { return r.kind === 'clip' && !r.cold; }).map(function (r) { return r.ms; }), cd = rows.filter(function (r) { return r.kind === 'clip' && r.cold; }).map(function (r) { return r.ms; });
+    $('sumLine').textContent = 'مقاطع (استدلال): بارد ' + (cd.length ? Math.round(med(cd)) + 'ms' : 'غير مقاس') + ' | مستقر وسيط ' + (st.length ? Math.round(med(st)) + 'ms، p95 ' + Math.round(p95(st)) + 'ms (n=' + st.length + (st.length < 20 ? '، عينة صغيرة' : '') + ')' : 'غير مقاس') + (STUB ? ' | محاكاة' : '');
+    $('btnJson').disabled = $('btnCsv').disabled = !rows.length;
+  }
+  function dl(name, mime, text) { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: mime })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800); }
+  $('btnJson').onclick = function () { dl('asr-lab-' + Date.now() + '.json', 'application/json', JSON.stringify({ exportedAt: new Date().toISOString(), stub: STUB, env: window.__env, model: QURAN_MODEL, lib: QURAN_LIB, load: loadMeta, rows: rows }, null, 1)); };
+  $('btnCsv').onclick = function () {
+    var cols = ['kind', 'clip', 'sec', 'cold', 'ms', 'rtf', 'wer', 'hallucination', 'rejectedByAppFilter', 'lagVsStep', 'text'];
+    var lines = [cols.join(',')];
+    rows.forEach(function (r) { lines.push(cols.map(function (c) { var v = r[c]; if (v == null) return ''; if (typeof v === 'number') v = Math.round(v * 1000) / 1000; return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',')); });
+    dl('asr-lab-' + Date.now() + '.csv', 'text/csv', '﻿' + lines.join('\n'));
+  };
+  $('btnClear').onclick = function () { rows = []; render(); };
+  render();
+})();
+</script>
+</body>
+</html>

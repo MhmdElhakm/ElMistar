@@ -63,7 +63,7 @@ const server = http.createServer((request, response) => {
 
 server.listen(port, '127.0.0.1', () => {
   const url = `http://localhost:${port}/`;
-  console.log(`Qurany is available at ${url}. Press Ctrl+C to stop the server.`);
+  console.log(`El Huda is available at ${url}. Press Ctrl+C to stop the server.`);
   openBrowser(url);
 });
 

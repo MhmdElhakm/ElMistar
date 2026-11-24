@@ -1,5 +1,5 @@
 /* ======================================================================
- * Huda هدى — app.js
+ * El Huda — app.js
  * كل منطق التطبيق في ملف واحد. الأقسام بالترتيب الأصلي للتنفيذ (لا تغيّره):
  *   1) المهام اليومية (Tasks)
  *   2) دليل التجويد ومحلل الآيات
@@ -349,7 +349,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'Huda-backup-' + localDate() + '.json';
+      link.download = 'El-El Huda-backup-' + localDate() + '.json';
       link.hidden = true;
       document.body.appendChild(link);
       link.click();
@@ -358,7 +358,7 @@
       storageError = '';
       render();
     } catch (error) {
-      console.error('تعذر إنشاء نسخة Huda الاحتياطية.', error);
+      console.error('تعذر إنشاء نسخة El Huda الاحتياطية.', error);
       storageError = 'تعذر إنشاء النسخة الاحتياطية. تحقق من مساحة التخزين ثم أعد المحاولة.';
       render();
     }
@@ -375,7 +375,7 @@
       backup = JSON.parse(await file.text());
     } catch (error) {
       console.error('تعذر قراءة ملف النسخة الاحتياطية.', error);
-      storageError = 'تعذر قراءة الملف. اختر نسخة Huda الاحتياطية بصيغة JSON.';
+      storageError = 'تعذر قراءة الملف. اختر نسخة El Huda الاحتياطية بصيغة JSON.';
       render();
       return;
     }
@@ -387,7 +387,7 @@
       typeof backup.data !== 'object' ||
       Array.isArray(backup.data)
     ) {
-      storageError = 'الملف المحدد ليس نسخة احتياطية صالحة من Huda.';
+      storageError = 'الملف المحدد ليس نسخة احتياطية صالحة من El Huda.';
       render();
       return;
     }
@@ -401,7 +401,7 @@
       return;
     }
     if (
-      !window.confirm('سيتم استبدال بيانات Huda على هذا الجهاز بمحتويات النسخة الاحتياطية. هل تريد المتابعة؟')
+      !window.confirm('سيتم استبدال بيانات El Huda على هذا الجهاز بمحتويات النسخة الاحتياطية. هل تريد المتابعة؟')
     )
       return;
 
@@ -415,7 +415,7 @@
       entries.forEach(([key, value]) => localStorage.setItem(key, value));
       window.location.reload();
     } catch (error) {
-      console.error('تعذر استعادة نسخة Huda الاحتياطية.', error);
+      console.error('تعذر استعادة نسخة El Huda الاحتياطية.', error);
       try {
         for (let index = localStorage.length - 1; index >= 0; index--) {
           const key = localStorage.key(index);
@@ -444,7 +444,65 @@
     'قيام الليل والوتر': 'بعد العشاء'
   };
   const taskPrayerCategories = ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء', 'قيام الليل والوتر'];
+  /* حساب تقريبي لمواقيت الصلاة دون إنترنت (الهيئة المصرية: فجر 19.5° وعشاء 17.5°) يُستخدم إن لم تتوفر مواقيت اليوم المحفوظة */
+  function approxTimings(date) {
+    var rad = Math.PI / 180, lat = 24.0889, lng = 32.8998;
+    try {
+      var cityId = localStorage.getItem('quran_prayer_city_v1') || 'aswan';
+      var list = window.QuranPrayerCities || [];
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].id === cityId && typeof list[i].lat === 'number') { lat = list[i].lat; lng = list[i].lng; }
+      }
+    } catch (e) {}
+    var y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate();
+    var a = Math.floor((14 - m) / 12), yy = y + 4800 - a, mm = m + 12 * a - 3;
+    var jdn = d + Math.floor((153 * mm + 2) / 5) + 365 * yy + Math.floor(yy / 4) - Math.floor(yy / 100) + Math.floor(yy / 400) - 32045;
+    var D = jdn - 2451545.0;
+    var g = (357.529 + 0.98560028 * D) % 360, q = (280.459 + 0.98564736 * D) % 360;
+    var L = (q + 1.915 * Math.sin(g * rad) + 0.02 * Math.sin(2 * g * rad)) % 360;
+    var e = 23.439 - 0.00000036 * D;
+    var RA = (Math.atan2(Math.cos(e * rad) * Math.sin(L * rad), Math.cos(L * rad)) / rad) / 15;
+    RA = ((RA % 24) + 24) % 24;
+    var decl = Math.asin(Math.sin(e * rad) * Math.sin(L * rad));
+    var eqt = q / 15 - RA;
+    while (eqt > 12) eqt -= 24;
+    while (eqt < -12) eqt += 24;
+    var tz = -date.getTimezoneOffset() / 60;
+    var noon = 12 + tz - lng / 15 - eqt;
+    function H(alt) {
+      var c = (Math.sin(alt * rad) - Math.sin(lat * rad) * Math.sin(decl)) / (Math.cos(lat * rad) * Math.cos(decl));
+      return c < -1 || c > 1 ? NaN : Math.acos(c) / rad / 15;
+    }
+    var asrAlt = Math.atan(1 / (1 + Math.tan(Math.abs(lat * rad - decl)))) / rad;
+    function fmt(h) {
+      if (!isFinite(h)) return '';
+      h = ((h % 24) + 24) % 24;
+      var mins = Math.round(h * 60);
+      return ('0' + (Math.floor(mins / 60) % 24)).slice(-2) + ':' + ('0' + (mins % 60)).slice(-2);
+    }
+    return {
+      Fajr: fmt(noon - H(-19.5)),
+      Sunrise: fmt(noon - H(-0.833)),
+      Dhuhr: fmt(noon + 1 / 60),
+      Asr: fmt(noon + H(asrAlt)),
+      Maghrib: fmt(noon + H(-0.833)),
+      Isha: fmt(noon + H(-17.5))
+    };
+  }
   function readPrayerSchedule() {
+    var real = readPrayerScheduleSaved();
+    if (real.fresh && real.timings) return real;
+    return { timings: approxTimings(new Date()), fresh: true, error: false, approximate: true };
+  }
+  window.QuranPrayerMinutes = function () {
+    var sc = readPrayerSchedule(), out = {};
+    ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].forEach(function (k) {
+      var mt = String((sc.timings && sc.timings[k]) || '').match(/(\d{1,2}):(\d{2})/);
+      if (mt) out[k] = Number(mt[1]) * 60 + Number(mt[2]);
+    });
+    return out;
+  };
+  function readPrayerScheduleSaved() {
     try {
       const raw = localStorage.getItem('quran_prayer_cache_v1');
       if (!raw) return { timings: null, fresh: false, error: false };
@@ -910,7 +968,7 @@
             <button type="button" class="primary" data-action="export-app-data">حفظ نسخة على الجهاز</button>
             <label class="profile-import-button">استعادة نسخة<input type="file" accept=".json,application/json" data-app-backup-file></label>
           </div>
-          <small class="profile-backup-note">سيُنزّل ملف باسم Huda إلى مجلد التنزيلات. الاستعادة تستبدل بيانات التطبيق الحالية.</small>
+          <small class="profile-backup-note">سيُنزّل ملف باسم El Huda إلى مجلد التنزيلات. الاستعادة تستبدل بيانات التطبيق الحالية.</small>
         </section>`;
     root.innerHTML = `
         <style>
@@ -1234,8 +1292,8 @@
       const file = backupFile.files && backupFile.files[0];
       importAppData(file)
         .catch(error => {
-          console.error('تعذر استعادة نسخة Huda الاحتياطية.', error);
-          storageError = 'تعذر استعادة النسخة الاحتياطية. أعد المحاولة بملف Huda صالح.';
+          console.error('تعذر استعادة نسخة El Huda الاحتياطية.', error);
+          storageError = 'تعذر استعادة النسخة الاحتياطية. أعد المحاولة بملف El Huda صالح.';
           render();
         })
         .finally(() => {
@@ -1254,8 +1312,8 @@
       const file = backupFile.files && backupFile.files[0];
       importAppData(file)
         .catch(error => {
-          console.error('تعذر استعادة نسخة Huda الاحتياطية.', error);
-          storageError = 'تعذر استعادة النسخة الاحتياطية. أعد المحاولة بملف Huda صالح.';
+          console.error('تعذر استعادة نسخة El Huda الاحتياطية.', error);
+          storageError = 'تعذر استعادة النسخة الاحتياطية. أعد المحاولة بملف El Huda صالح.';
           render();
         })
         .finally(() => {
@@ -4916,6 +4974,142 @@
   }
 
 
+  /* ===== أدوات قياس التسميع (ASRDIAG): معطّلة افتراضيًا، محلية بالكامل، لا تُغيّر سلوك التسميع =====
+     التفعيل: من «إعدادات التسميع ← تشخيص الأداء» أو بإضافة ?asrdiag=1 للرابط. لا يُسجَّل صوت ولا نص تلاوة؛
+     تُحفظ أزمنة وعدّادات فقط في localStorage (mq.asrDiagLog) ويُصدَّر يدويًا. لا أي إرسال لأي خادم. */
+  var ASRDIAG = (function () {
+    var KEY = 'mq.asrDiagLog', MAX_ROWS = 400;
+    var on = false;
+    try { on = load('mq.asrDiag', false) === true || /[?&]asrdiag=1/.test(location.search); } catch (e) {}
+    var st = { env: null, model: null, sessions: [], rows: [] };
+    var seq = 0, inferN = 0, saveT = 0, rawText = '';
+    try {
+      var old = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (old && old.rows) st = old;
+    } catch (e) {}
+    function now() { return performance.now(); }
+    function env() {
+      var n = navigator, c = null;
+      try { c = n.connection ? n.connection.effectiveType : null; } catch (e) {}
+      return {
+        ua: n.userAgent, cores: n.hardwareConcurrency || null, memGB: n.deviceMemory || null,
+        crossOriginIsolated: !!window.crossOriginIsolated, sharedArrayBuffer: typeof SharedArrayBuffer !== 'undefined',
+        webgpuApi: !!n.gpu, net: c, model: QURAN_MODEL, lib: QURAN_LIB,
+        requestedDevice: 'wasm', requestedDtype: 'q8'
+      };
+    }
+    function heap() { try { return performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null; } catch (e) { return null; } }
+    function persist() {
+      clearTimeout(saveT);
+      saveT = setTimeout(function () {
+        try {
+          if (st.rows.length > MAX_ROWS) st.rows = st.rows.slice(-MAX_ROWS);
+          localStorage.setItem(KEY, JSON.stringify(st));
+        } catch (e) {}
+        render();
+      }, 400);
+    }
+    function pct(a, p) {
+      if (!a.length) return null;
+      var s = a.slice().sort(function (x, y) { return x - y; });
+      return s[Math.min(s.length - 1, Math.max(0, Math.ceil(p * s.length) - 1))];
+    }
+    function stat(rows, k) {
+      var v = rows.map(function (r) { return r[k]; }).filter(function (x) { return typeof x === 'number'; });
+      return v.length ? { n: v.length, med: Math.round(pct(v, 0.5)), p95: Math.round(pct(v, 0.95)) } : null;
+    }
+    function summary() {
+      var done = st.rows.filter(function (r) { return !r.stale && typeof r.inferMs === 'number'; });
+      var cold = done.filter(function (r) { return r.cold; }), steady = done.filter(function (r) { return !r.cold; });
+      var out = { env: st.env, model: st.model, jobs: st.rows.length, stale: st.rows.filter(function (r) { return r.stale; }).length,
+        lastSession: st.sessions[st.sessions.length - 1] || null, cold: {}, steady: {}, unmeasured: ['لحظة النطق الفعلية', 'زمن الميكروفون ومخرج الصوت', 'حرارة الجهاز والبطارية'] };
+      ['inferMs', 'queueWaitMs', 'matchMs', 'paintMs', 'e2eMs', 'e2eVoiceMs'].forEach(function (k) {
+        out.cold[k] = stat(cold, k); out.steady[k] = stat(steady, k);
+      });
+      var fin = steady.filter(function (r) { return r.final; }), itm = steady.filter(function (r) { return !r.final; });
+      out.steadyFinalE2E = stat(fin, 'e2eMs'); out.steadyInterimE2E = stat(itm, 'e2eMs');
+      var xs = done.map(function (r) { return r.queueWaitMs; }).filter(function (x) { return typeof x === 'number'; });
+      out.queueGrowth = xs.length >= 6 ? { firstThirdMedianMs: Math.round(pct(xs.slice(0, Math.floor(xs.length / 3)), 0.5)), lastThirdMedianMs: Math.round(pct(xs.slice(-Math.floor(xs.length / 3)), 0.5)) } : null;
+      return out;
+    }
+    function fmt(s) { return s ? s.med + ' / ' + s.p95 + 'ms (n=' + s.n + ')' : 'غير مقاس'; }
+    function render() {
+      var panel = document.getElementById('asrDiagPanel'), box = document.getElementById('asrDiagSummary'), tg = document.getElementById('asrDiagToggle');
+      if (tg) tg.checked = on;
+      if (panel) panel.hidden = !on;
+      if (!on || !box) return;
+      var s = summary(), m = st.model || {}, L = [];
+      L.push('تحميل النموذج: ' + (m.stubbed ? 'مفرّغ بديل (اختبار)' : m.pipelineMs != null ? 'المكتبة ' + Math.round(m.libMs) + 'ms، النموذج ' + Math.round(m.pipelineMs) + 'ms، المنزَّل ' + (m.bytes ? (m.bytes / 1048576).toFixed(1) + 'MB' : 'غير مقاس') : 'لم يُحمَّل بعد'));
+      L.push('المحرك: مطلوب wasm، خيوط=' + (m.threads == null ? 'غير معروف' : m.threads) + '، isolated=' + (st.env && st.env.crossOriginIsolated));
+      L.push('بارد  (وسيط/p95): استدلال ' + fmt(s.cold.inferMs) + ' | كامل ' + fmt(s.cold.e2eMs));
+      L.push('مستقر (وسيط/p95): استدلال ' + fmt(s.steady.inferMs) + ' | انتظار ' + fmt(s.steady.queueWaitMs));
+      L.push('                  مطابقة ' + fmt(s.steady.matchMs) + ' | رسم ' + fmt(s.steady.paintMs));
+      L.push('من آخر إطار صوتي للشاشة ' + fmt(s.steady.e2eMs) + ' | من آخر صوت منطوق ' + fmt(s.steady.e2eVoiceMs));
+      if (s.queueGrowth) L.push('انتظار الطابور: أول ثلث ' + s.queueGrowth.firstThirdMedianMs + 'ms ← آخر ثلث ' + s.queueGrowth.lastThirdMedianMs + 'ms');
+      var ls = s.lastSession;
+      if (ls && ls.live) L.push('آخر جلسة: إطارات ' + ls.live.frames + '، توقفات الالتقاط ' + ls.live.stalls + '، أطول فجوة ' + Math.round(ls.live.maxGapMs) + 'ms، مؤقتة مُسقَطة ' + ls.live.droppedInterim + '، متأخرة مُهملة ' + ls.live.stale);
+      L.push('المقاطع: ' + s.jobs + ' (مُهملة ' + s.stale + ')');
+      L.push('غير مقاس: ' + s.unmeasured.join('، '));
+      box.textContent = L.join('\n');
+    }
+    function dl(name, mime, text) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([text], { type: mime }));
+      a.download = name;
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+    }
+    var COLS = ['id', 'session', 'final', 'cold', 'audioSec', 'queueLenAtEnq', 'busyAtEnq', 'peak', 'gain', 'toEnqMs', 'queueWaitMs', 'inferMs', 'matchMs', 'paintMs', 'e2eMs', 'e2eVoiceMs', 'rawChars', 'textChars', 'rejectedHallu', 'advanced', 'stale', 'heapMB'];
+    var api = {
+      get on() { return on; },
+      setEnabled: function (v) {
+        on = !!v;
+        try { localStorage.setItem('mq.asrDiag', JSON.stringify(on)); } catch (e) {}
+        if (on) st.env = env();
+        render();
+      },
+      now: now, heap: heap,
+      noteRaw: function (t) { rawText = t || ''; },
+      takeRaw: function () { var t = rawText; rawText = ''; return t; },
+      modelLoaded: function (d) { st.env = env(); st.model = d; inferN = 0; persist(); },
+      sessionStart: function (info) {
+        st.env = env();
+        var s = { id: st.sessions.length + 1, at: new Date().toISOString(), ctxRate: info.rate, resampleStep: info.step, constraints: info.settings, firstFrameMs: null, live: null };
+        st.sessions.push(s);
+        if (st.sessions.length > 30) st.sessions = st.sessions.slice(-30);
+        persist();
+        return s;
+      },
+      nextJobId: function () { return ++seq; },
+      isCold: function () { return inferN === 0; },
+      countInfer: function () { inferN++; },
+      row: function (r) { st.rows.push(r); persist(); },
+      touchSession: function (s, live) { s.live = live; },
+      summary: summary,
+      exportJSON: function () { dl('asr-diag-' + Date.now() + '.json', 'application/json', JSON.stringify({ exportedAt: new Date().toISOString(), summary: summary(), data: st }, null, 1)); },
+      exportCSV: function () {
+        var lines = [COLS.join(',')];
+        st.rows.forEach(function (r) { lines.push(COLS.map(function (c) { var v = r[c]; return v == null ? '' : typeof v === 'number' ? Math.round(v * 100) / 100 : v; }).join(',')); });
+        dl('asr-diag-' + Date.now() + '.csv', 'text/csv', lines.join('\n'));
+      },
+      clear: function () { st.rows = []; st.sessions = []; st.model = null; inferN = 0; try { localStorage.removeItem(KEY); } catch (e) {} render(); },
+      render: render
+    };
+    document.addEventListener('click', function (e) {
+      var t = e.target.closest && e.target.closest('#asrDiagJson,#asrDiagCsv,#asrDiagClear');
+      if (!t) return;
+      if (t.id === 'asrDiagJson') api.exportJSON();
+      else if (t.id === 'asrDiagCsv') api.exportCSV();
+      else if (confirm('حذف سجل التشخيص المحفوظ على هذا الجهاز؟')) api.clear();
+    });
+    document.addEventListener('change', function (e) {
+      if (e.target && e.target.id === 'asrDiagToggle') api.setEnabled(e.target.checked);
+    });
+    window.QuranAsrDiag = api;
+    setTimeout(render, 0);
+    return api;
+  })();
+
   /* ===== محرّك التسميع القرآني: نموذج Whisper قرآني صغير يعمل داخل الجهاز (يُحمَّل مرة واحدة ثم يعمل دون إنترنت) ===== */
   var QURAN_MODEL = 'omartariq612/whisper-tiny-ar-quran-onnx';
   var QURAN_LIB = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1';
@@ -4932,6 +5126,7 @@
     if (quranAsr) return Promise.resolve(quranAsr);
     if (quranAsrPromise) return quranAsrPromise;
     var files = {}, lastTick = Date.now(), idle = 0;
+    var dg = ASRDIAG.on ? { t0: ASRDIAG.now() } : null;
     var watchdog = new Promise(function (_, no) {
       idle = setInterval(function () {
         if (Date.now() - lastTick > 45000) no(new Error('انتهت مهلة التحميل: تحقق من الإنترنت'));
@@ -4943,6 +5138,10 @@
           lib.env.allowLocalModels = false;
         } catch (e) {}
         lastTick = Date.now();
+        if (dg) {
+          dg.tLib = ASRDIAG.now();
+          try { var ow = lib.env.backends.onnx.wasm; dg.threads = ow.numThreads; dg.proxy = !!ow.proxy; } catch (e) {}
+        }
         return Promise.race([watchdog, lib.pipeline('automatic-speech-recognition', QURAN_MODEL, {
           dtype: 'q8',
           device: 'wasm',
@@ -4957,9 +5156,24 @@
         })]);
       })
       .then(function (pipe) {
+        if (dg) {
+          var dgBytes = 0;
+          Object.keys(files).forEach(function (k) { dgBytes += files[k].t; });
+          ASRDIAG.modelLoaded({ libMs: dg.tLib - dg.t0, pipelineMs: ASRDIAG.now() - dg.tLib, bytes: dgBytes, threads: dg.threads, proxy: dg.proxy, filesCount: Object.keys(files).length });
+        }
         quranAsr = function (audio) {
-          return pipe(audio, { language: 'arabic', task: 'transcribe', max_new_tokens: 160 }).then(function (r) {
-            return (r && r.text) || '';
+          var sec = audio.length / 16000;
+          return pipe(audio, { language: 'arabic', task: 'transcribe', max_new_tokens: Math.min(160, Math.round(sec * 7) + 12), num_beams: 1, do_sample: false }).then(function (r) {
+            var text = ((r && r.text) || '').trim();
+            if (ASRDIAG.on) ASRDIAG.noteRaw(text);
+            var toks = text.split(/\s+/).filter(Boolean);
+            if (toks.length > sec * 5 + 4) return ''; /* هلوسة: كلمات أكثر مما يمكن نطقه */
+            var run = 1;
+            for (var i = 1; i < toks.length; i++) {
+              run = toks[i] === toks[i - 1] ? run + 1 : 1;
+              if (run > 4) return '';
+            }
+            return text;
           });
         };
         save('mq.quranModelReady', 1);
@@ -5012,7 +5226,9 @@
           return;
         }
         var Ctx = window.AudioContext || window.webkitAudioContext;
-        var ctx = new Ctx();
+        var ctx;
+        try { ctx = new Ctx({ sampleRate: 16000 }); } catch (e) { ctx = new Ctx(); } /* 16kHz مباشرة: تحويل نظيف بلا تشويه */
+        try { if (ctx.state === 'suspended') ctx.resume(); } catch (e) {}
         var rate = ctx.sampleRate,
           step = rate / 16000;
         var src = ctx.createMediaStreamSource(stream);
@@ -5025,10 +5241,51 @@
         var q = (quranSession = { stream: stream, ctx: ctx, node: node, src: src });
         var cur = [], pre = [], speaking = false, lastVoice = 0, lastDecode = 0, utter = 0, voiced = 0;
         var floor = 0.004, jobs = [], working = false;
+        var dgOn = ASRDIAG.on, frameN = 0, prevFrameAt = 0, lastFrameAt = 0, lastVoiceAt = 0, stalls = 0, maxGap = 0, droppedInterim = 0, staleDropped = 0;
+        var frameMs = (4096 / rate) * 1000, tCap0 = dgOn ? ASRDIAG.now() : 0, sess = null, sessId = 0;
+        if (dgOn) {
+          sess = ASRDIAG.sessionStart({ rate: rate, step: step, settings: (function () { try { return stream.getAudioTracks()[0].getSettings(); } catch (e) { return null; } })() });
+          sessId = sess.id;
+        }
+        function dgLive() {
+          if (sess) ASRDIAG.touchSession(sess, { frames: frameN, stalls: stalls, maxGapMs: maxGap, droppedInterim: droppedInterim, stale: staleDropped, queue: jobs.length });
+        }
+        function dgPos() {
+          var n = 0;
+          if (tasmeeSession) tasmeeSession.ayahs.forEach(function (a) {
+            var rv = a.revealed;
+            if (rv) Object.keys(rv).forEach(function (k) { if (rv[k]) n++; });
+          });
+          return n;
+        }
+        function dgFinish(job, tStart, tInfer, tMatch, text, before, stale) {
+          var raw = ASRDIAG.takeRaw();
+          var rec = { id: job.id, session: sessId, final: job.final, cold: job.cold, audioSec: Math.round((job.audio.length / 16000) * 100) / 100, queueLenAtEnq: job.qLen, busyAtEnq: job.busy, peak: Math.round(job.peak * 1000) / 1000, gain: Math.round(job.gain * 100) / 100, toEnqMs: job.tEnq - job.tFrame, queueWaitMs: tStart - job.tEnq, inferMs: tInfer - tStart, rawChars: raw.length, textChars: (text || '').length, rejectedHallu: !!raw && !text, heapMB: ASRDIAG.heap(), stale: !!stale };
+          dgLive();
+          if (stale) { ASRDIAG.row(rec); return; }
+          rec.matchMs = tMatch - tInfer;
+          rec.advanced = dgPos() > before;
+          /* رسم: إطاران متتاليان بعد المطابقة؛ تقريب لأقرب عرض فعلي وليس لحظة وصول الضوء للعين */
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              var tp = ASRDIAG.now();
+              rec.paintMs = tp - tMatch;
+              rec.e2eMs = tp - job.tFrame;
+              rec.e2eVoiceMs = tp - job.tVoice;
+              ASRDIAG.row(rec);
+            });
+          });
+        }
 
         function samples(frame) {
-          var out = new Float32Array(Math.floor(frame.length / step));
-          for (var i = 0; i < out.length; i++) out[i] = frame[Math.floor(i * step)];
+          var n = Math.floor(frame.length / step);
+          var out = new Float32Array(n);
+          if (step === 1) { out.set(frame.subarray(0, n)); return out; }
+          for (var i = 0; i < n; i++) { /* متوسط مجموعة عينات بدل الاقتطاع (يقلّل التشويه) */
+            var a0 = Math.floor(i * step), a1 = Math.min(frame.length, Math.floor((i + 1) * step)), acc = 0;
+            for (var j = a0; j < a1; j++) acc += frame[j];
+            out[i] = acc / Math.max(1, a1 - a0);
+          }
           return out;
         }
         function concat(list) {
@@ -5042,13 +5299,26 @@
           if (working || !jobs.length || run !== quranRun) return;
           var job = jobs.shift();
           working = true;
+          var tStart = dgOn ? ASRDIAG.now() : 0, tInfer = 0;
+          if (dgOn) job.cold = ASRDIAG.isCold();
           Promise.resolve(transcribe(job.audio))
             .then(function (text) {
-              if (run !== quranRun || !tasmeeListening) return;
-              if (!job.final && job.utter !== utter) return; /* نتيجة مؤقتة قديمة */
+              if (dgOn) { tInfer = ASRDIAG.now(); ASRDIAG.countInfer(); }
+              if (run !== quranRun || !tasmeeListening) {
+                if (dgOn) dgFinish(job, tStart, tInfer, 0, '', 0, true);
+                return;
+              }
+              if (!job.final && job.utter !== utter) { /* نتيجة مؤقتة قديمة */
+                staleDropped++;
+                if (dgOn) dgFinish(job, tStart, tInfer, 0, '', 0, true);
+                return;
+              }
+              var before = dgOn ? dgPos() : 0;
               feedTasmeeText(text || '', job.final);
+              if (dgOn) dgFinish(job, tStart, tInfer, ASRDIAG.now(), text, before, false);
             })
-            .catch(function () {
+            .catch(function (err) {
+              if (dgOn) ASRDIAG.row({ id: job.id, session: sessId, final: job.final, error: String((err && (err.message || err.name)) || err).slice(0, 120) });
               if (run === quranRun) tasmeeStatus.textContent = 'تعذر تحليل المقطع الصوتي؛ تابع القراءة.';
             })
             .then(function () {
@@ -5061,14 +5331,30 @@
           var audio = concat(cur);
           if (audio.length < 16000 * 0.45) return;
           if (!final) {
-            if (working || jobs.length) return; /* لا نكدّس المؤقت */
+            if (working || jobs.length) { droppedInterim++; return; } /* لا نكدّس المؤقت */
           }
           if (audio.length > 16000 * 25) audio = audio.subarray(audio.length - 16000 * 25);
-          jobs.push({ audio: audio, final: final, utter: utter });
+          var peak = 0;
+          for (var pi = 0; pi < audio.length; pi++) { var av = Math.abs(audio[pi]); if (av > peak) peak = av; }
+          if (peak > 0.002 && peak < 0.6) { /* رفع مستوى الصوت الخافت */
+            var gain = Math.min(8, 0.9 / peak);
+            audio = audio.map(function (x) { return x * gain; });
+          }
+          jobs.push({ audio: audio, final: final, utter: utter, id: dgOn ? ASRDIAG.nextJobId() : 0, tFrame: lastFrameAt, tVoice: lastVoiceAt, tEnq: dgOn ? ASRDIAG.now() : 0, qLen: jobs.length, busy: working, peak: peak, gain: typeof gain === 'number' ? gain : 1 });
           pump();
         }
         node.onaudioprocess = function (e) {
           if (run !== quranRun) return;
+          if (dgOn) {
+            var tn = ASRDIAG.now();
+            frameN++;
+            if (prevFrameAt) {
+              var gp = tn - prevFrameAt;
+              if (gp > maxGap) maxGap = gp;
+              if (gp > frameMs * 3) stalls++;
+            } else if (sess) sess.firstFrameMs = tn - tCap0;
+            prevFrameAt = lastFrameAt = tn;
+          }
           var frame = samples(e.inputBuffer.getChannelData(0));
           var sum = 0;
           for (var i = 0; i < frame.length; i++) sum += frame[i] * frame[i];
@@ -5084,9 +5370,10 @@
               lastDecode = now;
             }
             lastVoice = now;
+            if (dgOn) lastVoiceAt = lastFrameAt;
             voiced += frame.length;
             cur.push(frame);
-            if (now - lastDecode > 1800) {
+            if (now - lastDecode > 1200) {
               lastDecode = now;
               enqueue(false);
             }
@@ -5101,7 +5388,9 @@
             }
           } else {
             pre.push(frame);
-            if (pre.length > 2) pre.shift();
+            var preLen = 0;
+            pre.forEach(function (f) { preLen += f.length; });
+            while (pre.length > 1 && preLen - pre[0].length >= 16000 * 0.5) { preLen -= pre[0].length; pre.shift(); }
           }
           if (speaking && cur.length * frame.length > 16000 * 20) {
             speaking = false;
@@ -6060,7 +6349,7 @@
   paneS.insertBefore(verseSearchResults, sectionsContent);
   var matchingVerses = [],
     renderedVerseCount = 0;
-  var verseBatchSize = 100;
+  var verseBatchSize = 40;
   $('search').placeholder = 'ابحث عن كلمة أو عبارة في آية';
   $('search').setAttribute('aria-label', $('search').placeholder);
   // نص الآية بخط المصحف (رموز QCF4 لكل صفحة) بدل الخط العادي؛ يرجع '' إن تعذّر فيُستعمل النص العادي.
@@ -6114,6 +6403,18 @@
     var more = verseSearchResults.querySelector('.search-more');
     if (more) more.remove();
     verseSearchResults.insertAdjacentHTML('beforeend', html);
+    /* خط المصحف لكل صفحة تظهر فيها نتيجة يُحمَّل صراحةً (وإلا تظهر المربعات الفارغة) */
+    var fontPages = [], seenPg = {};
+    for (var fi = renderedVerseCount; fi < end; fi++) {
+      var fp = pageOfV(matchingVerses[fi].id);
+      for (var fq = fp; fq <= Math.min(604, fp + 1); fq++) if (!seenPg[fq]) { seenPg[fq] = 1; fontPages.push(fq); }
+    }
+    (function loadNext(k) {
+      if (k >= fontPages.length) return;
+      var pgn = fontPages[k];
+      var run = G[pgn - 1] ? ensureFonts(G[pgn - 1], 0) : Promise.resolve();
+      run.catch(function () {}).then(function () { loadNext(k + 1); });
+    })(0);
     renderedVerseCount = end;
     if (renderedVerseCount < matchingVerses.length) {
       var button = document.createElement('button');
@@ -6714,6 +7015,14 @@
     appServiceReturnFocus = null,
     previousBodyOverflow = '',
     appServiceCleanup = null;
+  appServiceContent.addEventListener('click', function () {
+    setTimeout(function () {
+      var sr = appServiceContent.shadowRoot;
+      if (sr && sr.querySelector('.sheet.on')) {
+        try { svcPanel.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {}
+      }
+    }, 120);
+  });
   var appServices = {
     prayer: { title: 'مواقيت الصلاة', status: 'طريقة الحساب: الهيئة المصرية العامة للمساحة' },
     radio: { title: 'إذاعة القرآن الكريم', status: 'البث المباشر يحتاج إلى اتصال بالإنترنت' },
@@ -6784,6 +7093,7 @@
     }
     try {
       appServiceCleanup = window.QuranIntegratedServices.mount(key, appServiceContent);
+      appServiceContent.style.setProperty('overflow', 'visible', 'important');
       appServiceStatus.textContent = service.status;
     } catch (error) {
       appServiceStatus.textContent =
@@ -8168,8 +8478,8 @@
       (key === 'radio'
         ? ':host{display:flex;justify-content:center;align-items:center;width:100%;max-width:100%;min-width:0}' +
           ':host .integrated-service-root{display:grid;place-items:center;width:100%;min-width:0}' +
-          ':host .integrated-service-root>.app{width:100%!important;max-width:100%!important;height:min(76vh,600px)!important;min-height:420px;max-height:none!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;background:transparent!important}' +
-          ':host .integrated-service-root>.app>.home{position:absolute!important;inset:0!important;padding:10px 10px 72px!important;overflow-y:auto!important;scrollbar-width:none;-ms-overflow-style:none}' +
+          ':host .integrated-service-root>.app{width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important;background:transparent!important}' +
+          ':host .integrated-service-root>.app>.home{position:relative!important;inset:auto!important;padding:10px 10px 72px!important;overflow:visible!important;min-height:420px}' +
           ':host .home::-webkit-scrollbar,:host .sheet-body::-webkit-scrollbar{display:none;width:0;height:0}:host .sheet-body{scrollbar-width:none;padding:2px 10px 84px}' +
           ':host .hero{padding:12px 12px 12px;border-radius:16px}:host .livepill{font-size:10.5px;top:10px;left:12px}' +
           ':host .hero-row{gap:10px;margin-top:8px}:host .logo{width:56px;height:56px}' +
@@ -8353,6 +8663,7 @@
     { id: 'qena', name: 'قنا', lat: 26.1642, lng: 32.7267 },
     { id: 'gps', name: 'موقعي الحالي (GPS)', lat: null, lng: null }
   ];
+  window.QuranPrayerCities = CITIES;
   var DEFAULT_CITY =
     CITIES.find(function (city) {
       return city.id === 'aswan';
@@ -9707,15 +10018,36 @@
       })
     );
   }
+  /* فترة اليوم الحالية بحسب المواقيت: am (الفجر←الظهر) noon (الظهر←العصر) pm (العصر←العشاء+ساعة) night */
+  function azkarPeriod() {
+    var t = window.QuranPrayerMinutes ? window.QuranPrayerMinutes() : {};
+    var now = new Date(),
+      cur = now.getHours() * 60 + now.getMinutes();
+    var fajr = t.Fajr != null ? t.Fajr : 270,
+      dhuhr = t.Dhuhr != null ? t.Dhuhr : 720,
+      asr = t.Asr != null ? t.Asr : 900,
+      isha = (t.Isha != null ? t.Isha : 1110) + 60;
+    if (cur >= fajr && cur < dhuhr) return 'am';
+    if (cur >= dhuhr && cur < asr) return 'noon';
+    if (cur >= asr && cur < isha) return 'pm';
+    return 'night';
+  }
+  function preferredCategory() {
+    var p = azkarPeriod();
+    return p === 'am' ? 'morning' : p === 'noon' ? 'daily' : p === 'pm' ? 'evening' : 'sleep';
+  }
   function selectedCategoryId() {
     var saved = readStoredText('mq.worshipAzkarCategory');
+    var savedPeriod = readStoredText('mq.worshipAzkarPeriod');
+    /* اختيارك اليدوي يبقى طوال الفترة نفسها فقط، ثم يعود الاختيار التلقائي بحسب الوقت */
     if (
+      savedPeriod === azkarPeriod() &&
       data.categories.some(function (category) {
         return category.id === saved;
       })
     )
       return saved;
-    var preferred = new Date().getHours() < 12 ? 'morning' : 'evening';
+    var preferred = preferredCategory();
     return data.categories.some(function (category) {
       return category.id === preferred;
     })
@@ -9723,6 +10055,14 @@
       : data.categories[0].id;
   }
   var categoryId = selectedCategoryId();
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState !== 'visible') return;
+    var next = selectedCategoryId();
+    if (next !== categoryId) {
+      categoryId = next;
+      try { paintAzkar(); } catch (e) {}
+    }
+  });
   var categoryTrigger = $('worshipAzkarCategoryTrigger');
   var categoryWrap = $('worshipAzkarCategories');
   var categoryList = $('worshipAzkarCategoryList');
@@ -9851,6 +10191,7 @@
       return;
     categoryId = nextCategory;
     writeStoredText('mq.worshipAzkarCategory', categoryId);
+    writeStoredText('mq.worshipAzkarPeriod', azkarPeriod());
     if (categoryCloseTimer) window.clearTimeout(categoryCloseTimer);
     categoryTrigger.setAttribute('aria-expanded', 'false');
     categoryWrap.classList.remove('open');
@@ -10375,7 +10716,7 @@
     if (isInstalledApp()) {
       installButton.disabled = true;
       installButton.textContent = 'التطبيق مثبت بالفعل';
-      installHelp.textContent = 'يمكنك فتح Huda هدى من شاشة التطبيقات.';
+      installHelp.textContent = 'يمكنك فتح El Huda من شاشة التطبيقات.';
     } else {
       installButton.disabled = false;
       installButton.textContent = installPromptEvent ? 'تثبيت التطبيق' : 'كيفية تثبيت التطبيق';
@@ -10390,7 +10731,7 @@
   window.addEventListener('appinstalled', function () {
     installPromptEvent = null;
     syncInstallButton();
-    toast('تم تثبيت Huda هدى');
+    toast('تم تثبيت El Huda');
   });
   installButton.addEventListener('click', function () {
     if (isInstalledApp()) {
@@ -10403,7 +10744,7 @@
       promptEvent.prompt();
       promptEvent.userChoice.then(
         function (choice) {
-          if (choice.outcome === 'accepted') toast('جارٍ تثبيت Huda هدى');
+          if (choice.outcome === 'accepted') toast('جارٍ تثبيت El Huda');
           else toast('يمكنك تثبيت التطبيق لاحقًا من هنا');
           syncInstallButton();
         },
@@ -10526,7 +10867,7 @@
 
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
     navigator.serviceWorker.register('./sw.js').catch(function (error) {
-      console.error('Unable to register the Huda service worker:', error);
+      console.error('Unable to register the El Huda service worker:', error);
       installHelp.textContent = 'تعذر تجهيز التثبيت في هذا المتصفح. افتح الصفحة عبر HTTPS أو localhost.';
     });
   }
@@ -11282,19 +11623,10 @@
     }
     return [actualPage(a, lo), actualPage(a, hi)];
   }
-  /* مكان علامة «الورد اليومي» هو مرجع موضع القراءة: إن نقلها المستخدم تتغير صفحات الورد بحسبها */
   var WIRD_MARK = 'الورد اليومي';
+  /* العلامة للتنبيه فقط ولا تتحكم في ورد اليوم؛ موضع القراءة يُضبط من لوحة الختمة (زر «ضبط») أو بإتمام الورد */
   function syncFromMark() {
-    var a = st.active;
-    if (!a || !window.QuranMarks || !window.QuranMarks.getPage) return false;
-    var page = window.QuranMarks.getPage(WIRD_MARK);
-    if (!page || page === actualPage(a, Math.min(TOTAL, a.read + 1))) return false;
-    a.read = (page - a.from + TOTAL) % TOTAL;
-    a.added = 0;
-    a.addedDay = '';
-    save();
-    syncTask();
-    return true;
+    return false;
   }
   window.addEventListener('quran:marks-changed', function () {
     if (syncFromMark()) {
@@ -11741,9 +12073,8 @@
       if (ui) ui.say('تم ضبط موضع القراءة عند صفحة ' + ar(n));
     } else if (act === 'open') {
       syncFromMark();
-      var r = wirdRange(st.active),
-        markPage = window.QuranMarks && window.QuranMarks.getPage ? window.QuranMarks.getPage(WIRD_MARK) : 0;
-      if (window.QuranOpenPage) window.QuranOpenPage(markPage || r[0]);
+      var r = wirdRange(st.active);
+      if (window.QuranOpenPage) window.QuranOpenPage(r[0]);
     } else if (act === 'restart') {
       if (window.confirm('إعادة الختمة من صفحة البداية؟ سيُصفَّر التقدّم الحالي.')) start(st.active.name, st.active.days, st.active.from);
     } else if (act === 'cancel') {
