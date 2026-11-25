@@ -874,3 +874,34 @@ returns json language sql security definer stable set search_path = public as $$
      and s.status <> 'finished'
      and s.created_at > now() - interval '8 hours'
 $$;
+
+-- ===== مزامنة لوحة تحكم غرفة الشرح بين أجهزة المعلم =====
+create table if not exists public.class_rooms(
+  code text primary key, teacher uuid, rid text, title text, slot int default 0, seen timestamptz default now());
+alter table public.class_rooms enable row level security;
+create table if not exists public.class_room_controls(
+  code text primary key references public.class_rooms(code) on delete cascade,
+  teacher uuid not null references auth.users(id) on delete cascade,
+  version bigint not null default 0,
+  state jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now());
+alter table public.class_room_controls enable row level security;
+create or replace function public.cr_live_control_set(p_code text, p_state jsonb)
+returns jsonb language plpgsql security definer set search_path=public,auth as $$
+declare me uuid := auth.uid(); v jsonb; n bigint;
+begin
+  if me is null then raise exception 'not_auth'; end if;
+  if not exists(select 1 from profiles where id=me and role='teacher' and class_code=p_code) then raise exception 'forbidden'; end if;
+  insert into class_room_controls(code,teacher,version,state,updated_at)
+    values(p_code,me,1,coalesce(p_state,'{}'::jsonb),now())
+    on conflict(code) do update set teacher=me,version=class_room_controls.version+1,state=coalesce(p_state,'{}'::jsonb),updated_at=now()
+    returning version,state into n,v;
+  return jsonb_build_object('code',p_code,'version',n,'state',v,'updated_at',now());
+end $$;
+create or replace function public.cr_live_control_get(p_code text)
+returns jsonb language sql security definer stable set search_path=public,auth as $$
+  select jsonb_build_object('code',c.code,'version',c.version,'state',c.state,'updated_at',c.updated_at)
+  from class_room_controls c join profiles p on p.class_code=c.code
+  where c.code=p_code and p.id=auth.uid() and p.role='teacher'
+$$;
+grant execute on function public.cr_live_control_set(text,jsonb), public.cr_live_control_get(text) to authenticated;

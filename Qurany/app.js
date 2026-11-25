@@ -6251,6 +6251,8 @@
   /* ======== 8) القائمة الجانبية: الفهرس والبحث في الآيات والعلامات ======== */
   function openD() {
     if (body.classList.contains('open')) return;
+    /* فتح القائمة الجانبية من أي زر يخفي شريط الإشعارات وأزرار النظام (يلزم لمسة المستخدم، وإلا يتجاهله المتصفح) */
+    if (window.QuranSystemBars) window.QuranSystemBars.hide();
     stopAutoScroll();
     closeV();
     body.classList.add('open');
@@ -7912,6 +7914,8 @@
   });
   pageEl.addEventListener('click', function (e) {
     if (e.target.closest('.w, .wp, .run, .hdr, .bis, .foot, button, input, label')) return;
+    /* على الجوال: الضغط على الصفحة يُظهر/يُخفي شريط الإشعارات وأزرار النظام بدل فتح القائمة الجانبية */
+    if (!document.body.classList.contains('open') && window.QuranSystemBars && window.QuranSystemBars.toggle()) return;
     openD();
   });
   var bMenu = $('bMenu'),
@@ -7919,6 +7923,7 @@
   bMenu.addEventListener('pointerup', function (event) {
     if (event.pointerType !== 'touch') return;
     menuPointerHandled = true;
+    if (window.QuranSystemBars) window.QuranSystemBars.hide();
     openD();
     setTimeout(function () {
       menuPointerHandled = false;
@@ -7930,6 +7935,7 @@
       event.preventDefault();
       return;
     }
+    if (window.QuranSystemBars) window.QuranSystemBars.hide();
     openD();
   });
   $('scrim').addEventListener('click', function () {
@@ -12966,17 +12972,18 @@
         إن خرج المستخدم منه يدويًا لا نعيده، ويُعاد بزر «ملء الشاشة» في الإعدادات. */
   var alreadyFull = false;
   try { alreadyFull = matchMedia('(display-mode: fullscreen)').matches; } catch (e) {}
-  var wasRoot = false;
+  var wasRoot = false, viaToggle = false, pending = 0;
   document.addEventListener('fullscreenchange', function () {
     var el = document.fullscreenElement;
     if (el === root) { wasRoot = true; set(KEY, '1'); }
     else if (el) wasRoot = false;
-    else { if (wasRoot) set(KEY, '0'); wasRoot = false; }
+    else { if (wasRoot && !viaToggle) set(KEY, '0'); wasRoot = false; viaToggle = false; }
   });
   if (!alreadyFull && get(KEY) !== '0' && typeof root.requestFullscreen === 'function') {
     var once = function (e) {
-      if (e && e.target && e.target.closest && e.target.closest('#bScreen')) return;
+      if (e && e.target && e.target.closest && e.target.closest('#bScreen,#bMenu')) return;
       document.removeEventListener('pointerup', once, true);
+      pending = Date.now();
       if (document.fullscreenElement || get(KEY) === '0') return;
       try {
         var r = root.requestFullscreen({ navigationUI: 'hide' });
@@ -12985,6 +12992,37 @@
     };
     document.addEventListener('pointerup', once, true);
   }
+
+  /* 3) إظهار/إخفاء شريط الإشعارات وأزرار النظام بلمسة على الصفحة؛ زر الفهرس يعيد الإخفاء ويفتح القائمة الجانبية.
+        يعمل على أجهزة اللمس فقط، ولا يخرج من ملء الشاشة إن كان فرضه manifest قديم (يحتاج إعادة تثبيت). */
+  function fsActive() { return !!document.fullscreenElement; }
+  function canToggle() {
+    if (typeof root.requestFullscreen !== 'function' || typeof document.exitFullscreen !== 'function') return false;
+    try { if (!matchMedia('(pointer: coarse)').matches) return false; } catch (e) { return false; }
+    var dm = false;
+    try { dm = matchMedia('(display-mode: fullscreen)').matches; } catch (e) {}
+    return !(dm && !fsActive());
+  }
+  window.QuranSystemBars = {
+    can: canToggle,
+    visible: function () { return !fsActive(); },
+    hide: function () {
+      if (!canToggle() || fsActive()) return;
+      pending = Date.now();
+      try { var r = root.requestFullscreen({ navigationUI: 'hide' }); if (r && r.catch) r.catch(function () {}); } catch (e) {}
+    },
+    show: function () {
+      if (!fsActive()) return;
+      viaToggle = true;
+      try { var r = document.exitFullscreen(); if (r && r.catch) r.catch(function () { viaToggle = false; }); } catch (e) { viaToggle = false; }
+    },
+    toggle: function () {
+      if (Date.now() - pending < 900) return true; /* اللمسة الأولى دخلت ملء الشاشة للتو */
+      if (!canToggle()) return false;
+      if (fsActive()) this.show(); else this.hide();
+      return true;
+    }
+  };
 })();
 
 /* ===== شكل أيقونة التطبيق (أخضر / أسود) ===== */
