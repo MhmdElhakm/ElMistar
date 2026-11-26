@@ -3673,7 +3673,8 @@
     tasmeeStatus = $('tasmeeStatus');
   var tasmeeSurah = $('tasmeeSurah'),
     tasmeeFrom = $('tasmeeFrom'),
-    tasmeeTo = $('tasmeeTo');
+    tasmeeTo = $('tasmeeTo'),
+    tasmeeRiwaya = $('tasmeeRiwaya');
   var tasmeeEnabled = !!load('mq.tasmeeEnabled', true);
   var tasmeeWindowOpen = false;
   var tasmeePrefs = load('mq.tasmeePrefs', {});
@@ -4067,11 +4068,94 @@
     fillAyahSelect(tasmeeTo, count, to);
   }
 
+
+  /* ---- الروايات في التسميع ----
+   * المصحف المعروض بحفص، فالسور والآيات والكلمات تبقى بترقيم حفص. لكل رواية أخرى ملف
+   * riwayat/<key>.json يحوي فقط الكلمات التي تقرؤها الرواية بصورة مختلفة عن حفص:
+   *   { "سورة:آية": { "رقم الكلمة (من 1)": ["صيغة مقبولة", ...] } }
+   * وتُقبل دائمًا صيغة حفص مع صيغ الرواية (التعرف الصوتي لا يعرف الرواية فقد يكتب أيًّا منهما).
+   * الملفات مولَّدة بـ tools/build_riwayat.py من نصوص مجمع الملك فهد، وصيغها مطابقة لـ normalizeTasmeeWord.
+   * ملاحظة: نموذج التعرف نفسه مدرَّب على حفص غالبًا؛ لذلك قد يكتب المسموع بصيغة حفص حتى لو قُرئ بغيرها. */
+  var TASMEE_RIWAYAT = [
+    ['hafs', 'حفص عن عاصم'],
+    ['warsh', 'ورش عن نافع'],
+    ['qaloon', 'قالون عن نافع'],
+    ['shouba', 'شعبة عن عاصم'],
+    ['doori', 'الدوري عن أبي عمرو'],
+    ['soosi', 'السوسي عن أبي عمرو'],
+    ['bazzi', 'البزي عن ابن كثير'],
+    ['qumbul', 'قنبل عن ابن كثير']
+  ];
+  var tasmeeRiwayaData = Object.create(null),
+    tasmeeRiwayaReady = 'hafs';
+  function tasmeeRiwayaKey() {
+    var key = tasmeeRiwaya ? tasmeeRiwaya.value : 'hafs';
+    return TASMEE_RIWAYAT.some(function (item) {
+      return item[0] === key;
+    })
+      ? key
+      : 'hafs';
+  }
+  function loadTasmeeRiwaya(key) {
+    if (key === 'hafs') return Promise.resolve(null);
+    if (!tasmeeRiwayaData[key]) {
+      tasmeeRiwayaData[key] = fetch('./riwayat/' + key + '.json')
+        .then(function (response) {
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          return response.json();
+        })
+        .catch(function (error) {
+          delete tasmeeRiwayaData[key];
+          throw error;
+        });
+    }
+    return tasmeeRiwayaData[key];
+  }
+  function tasmeeRiwayaName(key) {
+    for (var i = 0; i < TASMEE_RIWAYAT.length; i++) if (TASMEE_RIWAYAT[i][0] === key) return TASMEE_RIWAYAT[i][1];
+    return '';
+  }
+  if (tasmeeRiwaya) {
+    tasmeeRiwaya.innerHTML = TASMEE_RIWAYAT.map(function (item) {
+      return '<option value="' + item[0] + '">' + item[1] + '</option>';
+    }).join('');
+    tasmeeRiwaya.value = String(tasmeePrefs.riwaya || 'hafs');
+    if (!tasmeeRiwaya.value) tasmeeRiwaya.value = 'hafs';
+  }
+
+  /* سطر «سمعتُ» لعرض ما وصل من محرك التعرف (للعرض فقط، لا يُحفظ) + تنبيه إن لم يصل أي صوت */
+  var tasmeeHeard = document.createElement('div');
+  tasmeeHeard.id = 'tasmeeHeard';
+  tasmeeHeard.setAttribute('dir', 'rtl');
+  tasmeeHeard.hidden = true;
+  if (tasmeeStatus && tasmeeStatus.parentNode) tasmeeStatus.parentNode.insertBefore(tasmeeHeard, tasmeeStatus.nextSibling);
+  var heardAny = false;
+  function showTasmeeHeard(text) {
+    text = String(text || '').trim();
+    if (!text) return;
+    heardAny = true;
+    tasmeeHeard.hidden = false;
+    tasmeeHeard.textContent = 'سمعتُ: ' + (text.length > 70 ? '…' + text.slice(-70) : text);
+  }
+  (function () {
+    var prev = false, since = 0, hinted = false;
+    setInterval(function () {
+      if (tasmeeListening && !prev) { since = Date.now(); heardAny = false; hinted = false; tasmeeHeard.hidden = true; tasmeeHeard.textContent = ''; }
+      if (!tasmeeListening && prev) tasmeeHeard.hidden = true;
+      prev = tasmeeListening;
+      if (tasmeeListening && !heardAny && !hinted && Date.now() - since > 12000) {
+        hinted = true;
+        tasmeeStatus.textContent = 'لم يصل صوت للتعرّف بعد؛ قرّب الميكروفون وتأكد أنه غير مكتوم، أو غيّر طريقة التعرّف من «إعدادات التسميع».';
+      }
+    }, 1500);
+  })();
+
   function saveTasmeePrefs() {
     save('mq.tasmeePrefs', {
       surah: +tasmeeSurah.value,
       from: +tasmeeFrom.value,
-      to: +tasmeeTo.value
+      to: +tasmeeTo.value,
+      riwaya: tasmeeRiwayaKey()
     });
   }
 
@@ -4913,6 +4997,7 @@
           finalText += ' ' + recognizedText;
         } else interimText += ' ' + recognizedText;
       }
+      showTasmeeHeard(finalText || interimText);
       var interimTokens = tokenizeTasmeeTranscript(interimText);
       var common = 0;
       while (
@@ -5190,6 +5275,7 @@
 
   /* مطابقة النص (مؤقتًا أو نهائيًا) بنفس منطق التعرّف القديم */
   function feedTasmeeText(text, isFinal) {
+    showTasmeeHeard(text);
     var tokens = tokenizeTasmeeTranscript(text);
     if (!tokens.length) return;
     if (!isFinal) {
@@ -5504,6 +5590,31 @@
   syncEngineUi();
 
   function startTasmeeRecognition() {
+    var rk = tasmeeRiwayaKey();
+    if (!(tasmeeSession && !tasmeeSession.completed)) {
+      if (rk === 'hafs') {
+        tasmeeRiwayaVariants = null;
+        tasmeeRiwayaReady = 'hafs';
+      } else if (tasmeeRiwayaReady !== rk) {
+        /* جلسة جديدة برواية غير حفص: حمّل بياناتها أولًا ثم ابدأ */
+        tasmeeStatus.textContent = 'جارٍ تجهيز رواية ' + tasmeeRiwayaName(rk) + '…';
+        tasmeeToggle.disabled = true;
+        loadTasmeeRiwaya(rk)
+          .then(function (variants) {
+            tasmeeRiwayaVariants = variants;
+            tasmeeRiwayaReady = rk;
+          })
+          .catch(function () {
+            tasmeeStatus.textContent = 'تعذر تحميل بيانات رواية ' + tasmeeRiwayaName(rk) + '؛ تحقق من الاتصال أو اختر حفصًا.';
+          })
+          .then(function () {
+            tasmeeToggle.disabled = false;
+            syncTasmeeControls();
+            if (tasmeeRiwayaReady === rk && tasmeeRiwayaKey() === rk) startTasmeeRecognition();
+          });
+        return;
+      }
+    }
     if (quranSupported && (tasmeeEngine === 'quran' || (tasmeeEngine === 'auto' && load('mq.quranModelReady', 0)))) {
       startQuranTasmee();
       return;
@@ -5610,6 +5721,29 @@
       tasmeeStatus.textContent = 'تغير نطاق التسميع؛ ابدأ جلسة جديدة.';
       syncTasmeeControls();
     }
+  });
+  if (tasmeeRiwaya) tasmeeRiwaya.addEventListener('change', function () {
+    saveTasmeePrefs();
+    if (tasmeeSession) {
+      stopTasmeeRecognition();
+      tasmeeSession = null;
+      applyTasmeeWordState(pageList);
+    }
+    var key = tasmeeRiwayaKey();
+    tasmeeRiwayaVariants = null;
+    tasmeeRiwayaReady = 'hafs';
+    tasmeeStatus.textContent = key === 'hafs' ? 'رواية حفص.' : 'جارٍ تجهيز رواية ' + tasmeeRiwayaName(key) + '…';
+    loadTasmeeRiwaya(key)
+      .then(function (variants) {
+        if (tasmeeRiwayaKey() !== key) return;
+        tasmeeRiwayaVariants = variants;
+        tasmeeRiwayaReady = key;
+        if (key !== 'hafs') tasmeeStatus.textContent = 'رواية ' + tasmeeRiwayaName(key) + ' جاهزة؛ ابدأ التسميع.';
+      })
+      .catch(function () {
+        if (tasmeeRiwayaKey() === key) tasmeeStatus.textContent = 'تعذر تحميل رواية ' + tasmeeRiwayaName(key) + '؛ تحقق من الاتصال.';
+      });
+    syncTasmeeControls();
   });
   [tasmeeFrom, tasmeeTo].forEach(function (select) {
     select.addEventListener('change', function () {
@@ -5928,6 +6062,7 @@
     )
   );
   tasmeeSurah.value = String(initialTasmeeSurah);
+  if (tasmeeRiwaya) professionalizeSelect(tasmeeRiwaya);
   professionalizeSelect(tasmeeSurah);
   professionalizeSelect(tasmeeFrom);
   professionalizeSelect(tasmeeTo);
@@ -6352,6 +6487,7 @@
   var matchingVerses = [],
     renderedVerseCount = 0;
   var verseBatchSize = 40;
+  var verseDrawPageOk = null;
   $('search').placeholder = 'ابحث عن كلمة أو عبارة في آية';
   $('search').setAttribute('aria-label', $('search').placeholder);
   // نص الآية بخط المصحف (رموز QCF4 لكل صفحة) بدل الخط العادي؛ يرجع '' إن تعذّر فيُستعمل النص العادي.
@@ -6379,7 +6515,7 @@
     if (reset) {
       renderedVerseCount = 0;
       verseSearchResults.innerHTML =
-        '<div class="search-results-info">عدد الآيات المطابقة: ' + ar(matchingVerses.length) + '</div>';
+        '<div class="search-results-info">الآيات (' + ar(matchingVerses.length) + ')</div>';
     }
     var end = Math.min(matchingVerses.length, renderedVerseCount + verseBatchSize),
       html = '';
@@ -6388,35 +6524,55 @@
         surah = D.surahs[result.surah - 1],
         page = pageOfV(result.id);
       html +=
-        '<button type="button" class="srow" data-verse="' +
+        '<button type="button" class="srow vrow" data-verse="' +
         result.id +
-        '"><span class="num">' +
-        ar(i + 1) +
-        '</span><span><div class="sname q">' +
-        (verseGlyphHtml(result.id) || escapeHtml(verseText(result.surah, result.ayah))) +
-        '</div><div class="smeta">سورة ' +
+        '"><span class="vhead"><b class="vname">' +
         escapeHtml(surah[1]) +
-        ' - الآية ' +
+        ': ' +
         ar(result.ayah) +
-        ' - الصفحة ' +
+        '</b><span class="vpage">' +
         ar(page) +
-        '</div></span></button>';
+        '</span></span><span class="sname q q-plain" data-gv="' +
+        result.id +
+        '">' +
+        escapeHtml(verseText(result.surah, result.ayah)) +
+        '</span></button>';
     }
     var more = verseSearchResults.querySelector('.search-more');
     if (more) more.remove();
     verseSearchResults.insertAdjacentHTML('beforeend', html);
-    /* خط المصحف لكل صفحة تظهر فيها نتيجة يُحمَّل صراحةً (وإلا تظهر المربعات الفارغة) */
-    var fontPages = [], seenPg = {};
-    for (var fi = renderedVerseCount; fi < end; fi++) {
-      var fp = pageOfV(matchingVerses[fi].id);
-      for (var fq = fp; fq <= Math.min(604, fp + 1); fq++) if (!seenPg[fq]) { seenPg[fq] = 1; fontPages.push(fq); }
+    /* تظهر الآية أولًا بنص عادي مقروء، ثم تُستبدل بخط المصحف (رموز QCF4) فور تحميل خط كل صفحاتها
+       بنجاح؛ فإن تعذّر تحميل الخط تبقى بالنص العادي ولا تظهر مربعات فارغة. */
+    var batchFrom = renderedVerseCount, batchTo = end, token = verseSearchResults.__tok = (verseSearchResults.__tok || 0) + (reset ? 1 : 0);
+    var pageOk = verseDrawPageOk || (verseDrawPageOk = Object.create(null));
+    function pageFont(pg) {
+      if (!G[pg - 1]) return Promise.resolve(false);
+      if (!pageOk[pg]) {
+        pageOk[pg] = ensureFonts(G[pg - 1], 0).then(
+          function () { return true; },
+          function () { delete pageOk[pg]; return false; }
+        );
+      }
+      return pageOk[pg];
     }
-    (function loadNext(k) {
-      if (k >= fontPages.length) return;
-      var pgn = fontPages[k];
-      var run = G[pgn - 1] ? ensureFonts(G[pgn - 1], 0) : Promise.resolve();
-      run.catch(function () {}).then(function () { loadNext(k + 1); });
-    })(0);
+    var chain = Promise.resolve();
+    for (var vi = batchFrom; vi < batchTo; vi++) {
+      (function (vid) {
+        var start = pageOfV(vid), pgs = [start];
+        if (start < 604) pgs.push(start + 1);
+        chain = chain.then(function () {
+          return Promise.all(pgs.map(pageFont)).then(function (oks) {
+            if (!oks[0]) return;
+            var el = verseSearchResults.querySelector('.sname[data-gv="' + vid + '"]');
+            var glyph = verseGlyphHtml(vid);
+            if (el && glyph && verseSearchResults.__tok === token) {
+              el.innerHTML = glyph;
+              el.classList.remove('q-plain');
+            }
+          });
+        }).catch(function () {});
+      })(matchingVerses[vi].id);
+    }
     renderedVerseCount = end;
     if (renderedVerseCount < matchingVerses.length) {
       var button = document.createElement('button');
@@ -12979,7 +13135,8 @@
     else if (el) wasRoot = false;
     else { if (wasRoot && !viaToggle) set(KEY, '0'); wasRoot = false; viaToggle = false; }
   });
-  if (!alreadyFull && get(KEY) !== '0' && typeof root.requestFullscreen === 'function') {
+  /* v225: لا دخول تلقائي لملء الشاشة؛ يُفعَّل يدويًا فقط من زر «ملء الشاشة» في الإعدادات */
+  if (false && !alreadyFull && get(KEY) !== '0' && typeof root.requestFullscreen === 'function') {
     var once = function (e) {
       if (e && e.target && e.target.closest && e.target.closest('#bScreen,#bMenu')) return;
       document.removeEventListener('pointerup', once, true);
@@ -13006,22 +13163,10 @@
   window.QuranSystemBars = {
     can: canToggle,
     visible: function () { return !fsActive(); },
-    hide: function () {
-      if (!canToggle() || fsActive()) return;
-      pending = Date.now();
-      try { var r = root.requestFullscreen({ navigationUI: 'hide' }); if (r && r.catch) r.catch(function () {}); } catch (e) {}
-    },
-    show: function () {
-      if (!fsActive()) return;
-      viaToggle = true;
-      try { var r = document.exitFullscreen(); if (r && r.catch) r.catch(function () { viaToggle = false; }); } catch (e) { viaToggle = false; }
-    },
-    toggle: function () {
-      if (Date.now() - pending < 900) return true; /* اللمسة الأولى دخلت ملء الشاشة للتو */
-      if (!canToggle()) return false;
-      if (fsActive()) this.show(); else this.hide();
-      return true;
-    }
+    /* v225: معطّلة عمدًا (لا تبديل تلقائي)؛ ملء الشاشة يدوي فقط */
+    hide: function () {},
+    show: function () {},
+    toggle: function () { return false; }
   };
 })();
 
