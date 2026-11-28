@@ -5,12 +5,18 @@ const path = require('path');
 const PORT = 4000;
 
 const mimeTypes = {
-  '.html': 'text/html',
+  '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
-  '.css': 'text/css',
-  '.json': 'application/json',
+  '.css': 'text/css; charset=utf-8',
+  '.webp': 'image/webp',
+  '.woff2': 'font/woff2',
+  '.ico': 'image/x-icon',
+  '.xml': 'application/xml',
+  '.txt': 'text/plain; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
   '.png': 'image/png',
-  '.jpg': 'image/jpg',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
   '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
   '.wav': 'audio/wav',
@@ -24,12 +30,11 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
-  console.log(`${req.method} ${req.url}`);
 
   // ─── ربط قاعدة البيانات من لوحة التحكم: حفظ إعدادات Firebase ───
   if (req.method === 'POST' && req.url.split('?')[0] === '/save-config') {
     let body = '';
-    req.on('data', (chunk) => { body += chunk; });
+    req.on('data', (chunk) => { body += chunk; if (body.length > 20000) req.destroy(); });
     req.on('end', () => {
       try {
         const payload = JSON.parse(body || '{}');
@@ -57,10 +62,13 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  let filePath = '.' + req.url.split('?')[0];
-  if (filePath === './') {
-    filePath = './index.html';
-  }
+  // حماية من path traversal: لا نخدم إلا ملفات داخل مجلد الموقع
+  let reqPath;
+  try { reqPath = decodeURIComponent(req.url.split('?')[0]); } catch (e) { res.writeHead(400); return res.end('Bad request'); }
+  if (reqPath === '/') reqPath = '/index.html';
+  const root = path.resolve(__dirname);
+  const filePath = path.resolve(root, '.' + reqPath);
+  if (filePath !== root && !filePath.startsWith(root + path.sep)) { res.writeHead(403); return res.end('Forbidden'); }
 
   const extname = String(path.extname(filePath)).toLowerCase();
   const contentType = mimeTypes[extname] || 'application/octet-stream';
@@ -77,8 +85,8 @@ const server = http.createServer((req, res) => {
       }
     }
     else {
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content, 'utf-8');
+      res.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': 'no-cache' });
+      res.end(content);
     }
   });
 
@@ -96,6 +104,6 @@ function sanitizeConfig(cfg) {
   return out;
 }
 
-server.listen(PORT, () => {
+server.listen(PORT, '127.0.0.1', () => {
   console.log(`Server running at http://localhost:${PORT}/`);
 });
